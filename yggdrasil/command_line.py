@@ -118,16 +118,20 @@ class SubCommand(metaclass=SubCommandMeta):
     allow_unknown = False
 
     @classmethod
-    def parse_args(cls, parser, args=None, allow_unknown=False):
+    def parse_args(cls, parser, args=None, allow_unknown=False,
+                   namespace=None):
         # TODO: Check choices for positional arguments that can
         # have more than one element
         if isinstance(args, argparse.Namespace):
             return args
+        kws = dict(args=args)
+        if namespace is not None:
+            kws['namespace'] = namespace
         if cls.allow_unknown or allow_unknown:
-            args, extra = parser.parse_known_args(args=args)
+            args, extra = parser.parse_known_args(**kws)
             args._extra_commands = extra
         else:
-            args = parser.parse_args(args=args)
+            args = parser.parse_args(**kws)
         for k in ['language', 'languages']:
             v = getattr(args, k, None)
             if isinstance(v, list):
@@ -144,9 +148,9 @@ class SubCommand(metaclass=SubCommandMeta):
         raise NotImplementedError
 
     @classmethod
-    def call(cls, args=None, **kwargs):
+    def call(cls, args=None, namespace=None, **kwargs):
         parser = cls.get_parser(args=args)
-        args = cls.parse_args(parser, args=args)
+        args = cls.parse_args(parser, args=args, namespace=namespace)
         return cls.func(args, **kwargs)
 
     @classmethod
@@ -259,7 +263,13 @@ class yggrun(SubCommand):
     arguments = [
         (('yamlfile', ),
          {'nargs': '+',
-          'help': "One or more yaml specification files."})]
+          'help': "One or more yaml specification files."}),
+        (('--with-mpi', '--mpi-nproc'),
+         {'type': int, 'default': 1,
+          'help': 'Number of MPI processes to run on.'}),
+        (('--mpi-tag-start', ),
+         {'type': int, 'default': 0,
+          'help': 'Tag that MPI communications should start at.'})]
 
     @classmethod
     def add_arguments(cls, parser, **kwargs):
@@ -269,11 +279,24 @@ class yggrun(SubCommand):
 
     @classmethod
     def func(cls, args):
+        if args.with_mpi > 1:
+            new_args = ['mpiexec', '-n', str(args.with_mpi)]
+            i = 0
+            while i < len(sys.argv):
+                x = sys.argv[i]
+                if x.startswith(('--with-mpi', '--mpi-nproc')):
+                    if '=' not in x:
+                        i += 1
+                else:
+                    new_args.append(x)
+                i += 1
+            return subprocess.check_call(new_args)
         from yggdrasil import runner, config
         prog = sys.argv[0].split(os.path.sep)[-1]
         with config.parser_config(args):
             runner.run(args.yamlfile, ygg_debug_prefix=prog,
-                       production_run=args.production_run)
+                       production_run=args.production_run,
+                       mpi_tag_start=args.mpi_tag_start)
 
 
 class ygginfo(SubCommand):
@@ -1182,7 +1205,7 @@ class run_tsts(SubCommand):
          {'nargs': '+', 'action': 'extend', 'type': str,
           'choices': ['all', 'top', 'examples', 'examples_part1',
                       'examples_part2', 'demos', 'types', 'timing',
-                      'connections', 'models'],
+                      'connections', 'models', 'mpi'],
           'help': 'Test suite(s) that should be run.',
           'dest': 'test_suites'}),
         (('--pytest-config', '-c'),
@@ -1200,7 +1223,17 @@ class run_tsts(SubCommand):
           'help': 'Number of times to repeat a test.'}),
         (('--additional-info', '-r'),
          {'type': str, 'default': '',
-          'help': 'Display additional info for test results.'})]
+          'help': 'Display additional info for test results.'}),
+        (('--with-mpi', '--mpi-nproc'),
+         {'type': int, 'default': 1,
+          'help': 'Number of MPI processes to run tests on.'}),
+        (('--write-script', ),
+         {'type': str,
+          'help': 'Name of script that should be created to run tests.'}),
+        (('--separate-test', '--separate-tests'),
+         {'nargs': '+', 'action': 'extend', 'type': str,
+          'help': 'Flags defining tests that should be run separately.',
+          'dest': 'separate_tests'})]
     allow_unknown = True
 
     @classmethod
@@ -1215,6 +1248,9 @@ class run_tsts(SubCommand):
         args = super(run_tsts, cls).parse_args(*args, **kwargs)
         extra = args._extra_commands
         if args.ci:
+            requires_mpi = (
+                (args.test_suites and ('mpi' in args.test_suites))
+                or (args.with_mpi > 1))
             args.verbose = True
             args.withcoverage = True
             args.setup_cfg = 'setup.cfg'
@@ -1224,14 +1260,18 @@ class run_tsts(SubCommand):
                 args.ignore = []
             args.ignore.append('yggdrasil/rapidjson/')
             args.rootdir = package_dir
-            extra += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
+            if not requires_mpi:
+                extra += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
+        if args.write_script:
+            if not os.path.isabs(args.write_script):
+                args.write_script = os.path.abspath(args.write_script)
         # Separate out paths from options
         test_paths = []
         if args.test_suites:
             if 'all' in args.test_suites:
                 args.test_suites.remove('all')
                 for x in ['top', 'examples', 'demos', 'types', 'timing',
-                          'connections', 'models']:
+                          'connections', 'models', 'mpi']:
                     if x not in args.test_suites:
                         args.test_suites.append(x)
             for x in args.test_suites:
@@ -1276,6 +1316,22 @@ class run_tsts(SubCommand):
                     test_paths.append(
                         os.path.join('drivers', 'tests',
                                      'test_*ModelDriver.py'))
+                elif x == 'mpi':
+                    args.enable_examples = True
+                    if args.with_mpi == 1:
+                        args.with_mpi = 2
+                    test_paths += [
+                        os.path.join('communication', 'tests',
+                                     'test_MPIComm.py'),
+                        os.path.join('examples', 'tests',
+                                     'test_gs_lesson4.py'),
+                        os.path.join('examples', 'tests',
+                                     'test_rpc_lesson3b.py')]
+                    if not platform._is_win:
+                        test_paths += [
+                            os.path.join('examples', 'tests',
+                                         'test_model_error_with_io.py')]
+                    extra += ['-p', 'no:flaky']
         if (not test_paths) and all(x.startswith('-') for x in extra):
             test_paths.append(package_dir)
         # Get expanded tests to allow for paths that are relative to
@@ -1283,6 +1339,7 @@ class run_tsts(SubCommand):
         # directory
         args = config.resolve_config_parser(args)
         args.extra = []
+        args.added_paths = test_paths
         cls.expand_and_add(extra + test_paths, args.extra,
                            [package_dir, os.getcwd()],
                            add_on_nomatch=True)
@@ -1351,10 +1408,42 @@ class run_tsts(SubCommand):
         return 0
 
     @classmethod
+    def write_script(cls, args, argv, cfg_env):
+        r"""Write a script to run the pytest command.
+
+        """
+        import stat
+        from yggdrasil import platform
+        assert(not platform._is_win)
+        lines = ['#!/bin/bash']
+        for k, v in cfg_env.new_env.items():
+            if '"' in v:
+                lines.append('export %s=\'%s\'' % (k, v))
+            else:
+                lines.append('export %s=%s' % (k, v))
+        lines.append(' '.join(argv))
+        for k, v in cfg_env.old_env.items():
+            if v is None:
+                lines.append('unset %s' % k)
+            elif '"' in v:
+                lines.append('export %s=\'%s\'' % (k, v))
+            else:
+                lines.append('export %s=%s' % (k, v))
+        with open(args.write_script, 'w') as fd:
+            fd.write('\n'.join(lines))
+        os.chmod(args.write_script, (stat.S_IRWXU
+                                     | stat.S_IRGRP | stat.S_IXGRP
+                                     | stat.S_IROTH | stat.S_IXOTH))
+        print("Wrote test script to '%s':\n\t%s"
+              % (args.write_script, '\n\t'.join(lines)))
+                                     
+    @classmethod
     def func(cls, args):
-        from yggdrasil import config
+        from yggdrasil import config, platform
         argv = [sys.executable, '-m', 'pytest']
         # test_paths = args.test_paths
+        if args.with_mpi > 1:
+            argv = ['mpiexec', '-n', str(args.with_mpi)] + argv + ['--with-mpi']
         if args.verbose:
             argv.append('-v')
         if args.nocapture:
@@ -1383,7 +1472,7 @@ class run_tsts(SubCommand):
             argv += ['-r', args.additional_info]
         argv += args.extra
         # Run test command and perform cleanup before logging any errors
-        logger.info("Running %s from %s", argv, os.getcwd())
+        logger.info("Running \'%s\' from %s", ' '.join(argv), os.getcwd())
         new_config = {}
         # pth_file = 'ygg_coverage.pth'
         # assert(not os.path.isfile(pth_file))
@@ -1394,7 +1483,7 @@ class run_tsts(SubCommand):
         #         fd.write("import coverage; coverage.process_startup()")
         initial_dir = os.getcwd()
         error_code = 0
-        with config.parser_config(args, **new_config):
+        with config.parser_config(args, **new_config) as cfg_env:
             try:
                 # Perform CI specific pretest operations
                 if args.ci:
@@ -1432,12 +1521,15 @@ class run_tsts(SubCommand):
                     subprocess.check_call(["yggdrasil", "info",
                                            "--verbose"])
                 error_code = 0
-                for x in range(args.count):
-                    x_error_code = subprocess.call(argv)
-                    if x_error_code != 0:
-                        error_code = x_error_code
-                        if args.stop:
-                            break
+                if args.write_script and (not platform._is_win):
+                    cls.write_script(args, argv, cfg_env)
+                else:
+                    for x in range(args.count):
+                        x_error_code = subprocess.call(argv)
+                        if x_error_code != 0:
+                            error_code = x_error_code
+                            if args.stop:
+                                break
             # except BaseException:
             #     logger.exception('Error in running test.')
             #     error_code = -1
@@ -1445,6 +1537,23 @@ class run_tsts(SubCommand):
                 os.chdir(initial_dir)
                 # if os.path.isfile(pth_file):
                 #     os.remove(pth_file)
+        if args.separate_tests and (error_code == 0):
+            import re
+            assert(not args.write_script)
+            new_args = args.separate_tests
+            args.test_suites = []
+            args.separate_tests = []
+            paths = []
+            cls.expand_and_add(args.added_paths, paths,
+                               [package_dir, os.getcwd()])
+            args.extra = [x for x in args.extra if
+                          ((x not in paths)
+                           and (not re.match(r".*test\_.*\.py.*", x)))]
+            for iargs in new_args:
+                if error_code:
+                    break
+                error_code = cls.call(args=(iargs.split() + args.extra),
+                                      namespace=copy.copy(args))
         return error_code
 
 
@@ -1532,7 +1641,7 @@ class generate_gha_workflow(SubCommand):
         class NoAliasDumper(yaml.SafeDumper):
             def ignore_aliases(self, data):
                 return True
-        if gitdir is None:
+        if (args.base is None or args.dest is None) and (gitdir is None):
             try:
                 gitdir = subprocess.check_output(
                     ["git", "rev-parse", "--git-dir"],

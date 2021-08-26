@@ -645,34 +645,38 @@ def remove_path(fpath, timer_class=None, timeout=None):
         RuntimeError: If the product cannot be removed.
 
     """
-    if timer_class is None:
-        timer_class = YggClass()
+    from yggdrasil import multitasking
+    if timeout is None:
+        if timer_class is None:
+            timer_class = YggClass()
+        timeout = timer_class.timeout
     if os.path.isdir(fpath):
-        T = timer_class.start_timeout(t=timeout)
-        while ((not T.is_out) and os.path.isdir(fpath)):
-            try:
-                shutil.rmtree(fpath)
-            except BaseException:  # pragma: debug
-                if os.path.isdir(fpath):
-                    timer_class.sleep()
-                if T.is_out:
-                    raise
-        timer_class.stop_timeout()
-        if os.path.isdir(fpath):  # pragma: debug
-            raise RuntimeError("Failed to remove directory: %s" % fpath)
+        ftype = 'directory'
+        fcheck = os.path.isdir
+        fremove = shutil.rmtree
     elif os.path.isfile(fpath):
-        T = timer_class.start_timeout(t=timeout)
-        while ((not T.is_out) and os.path.isfile(fpath)):
+        ftype = 'file'
+        fcheck = os.path.isfile
+        fremove = os.remove
+    else:
+        return
+    errors = []
+    
+    def is_removed():
+        if fcheck(fpath):
             try:
-                os.remove(fpath)
-            except BaseException:  # pragma: debug
-                if os.path.isfile(fpath):
-                    timer_class.sleep()
-                if T.is_out:
-                    raise
-        timer_class.stop_timeout()
-        if os.path.isfile(fpath):  # pragma: debug
-            raise RuntimeError("Failed to remove file: %s" % fpath)
+                fremove(fpath)
+            except BaseException as e:  # pragma: debug
+                errors.append(e)
+        return (not fcheck(fpath))
+    try:
+        multitasking.wait_on_function(is_removed, timeout=timeout)
+    except multitasking.TimeoutError as e:  # pragma: debug
+        if errors:
+            raise errors[-1]
+        if not e.function_value:
+            raise multitasking.TimeoutError(
+                "Failed to remove %s: %s" % (ftype, fpath))
 
 
 def get_supported_platforms():
@@ -1571,7 +1575,8 @@ class YggClass(ComponentBase):
 
     def printStatus(self, level='info'):
         r"""Print the class status."""
-        getattr(self.logger, level)('%s(%s): ', self.__module__, self.print_name)
+        getattr(self.logger, level)('%s(%s): ', self.__module__,
+                                    self.print_name)
 
     def _task_with_output(self, func, *args, **kwargs):
         self.sched_out = func(*args, **kwargs)
@@ -1658,6 +1663,52 @@ class YggClass(ComponentBase):
         if key_suffix is not None:
             key += key_suffix
         return key
+
+    def wait_on_function(self, function, timeout=None, polling_interval=None,
+                         key=None, key_level=0, key_suffix=None, quiet=False):
+        r"""Wait util a function returns True or a time limit is reached.
+
+        Args:
+            t (float, optional): Maximum time that the calling function should
+                wait before timeing out. If not provided, the attribute
+                'timeout' is used.
+            key (str, optional): Key that should be associated with the timeout
+                that is created. Defaults to None and is set by the calling
+                class and function/method (See `get_timeout_key`).
+            key_level (int, optional): Positive integer indicating the level of
+                the calling class and function/method that should be used to
+                key the timeout. 0 is the class and function/method that called
+                start_timeout. Higher values use classes and function/methods
+                further up in the stack. Defaults to 0.
+            key_suffix (str, optional): String that should be appended to the
+                end of the generated key. Defaults to None and is ignored.
+            quiet (bool, optional): If True, error message on timeout exceeded
+                will be debug log. Defaults to False.
+
+        Raises:
+            KeyError: If the key already exists.
+
+        """
+        from yggdrasil import multitasking
+        if timeout is None:
+            timeout = self.timeout
+        elif timeout is False:
+            timeout = None
+        if polling_interval is None:
+            polling_interval = self.sleeptime
+        if key is None:
+            key = self.get_timeout_key(key_level=key_level, key_suffix=key_suffix)
+        try:
+            out = multitasking.wait_on_function(
+                function, timeout=timeout, polling_interval=polling_interval)
+        except multitasking.TimeoutError as e:
+            out = e.function_value
+            msg = "Timeout for %s at %5.2f s" % (key, timeout)
+            if quiet:
+                self.debug(msg)
+            else:
+                self.info(msg)
+        return out
 
     def start_timeout(self, t=None, key=None, key_level=0, key_suffix=None):
         r"""Start a timeout for the calling function/method.

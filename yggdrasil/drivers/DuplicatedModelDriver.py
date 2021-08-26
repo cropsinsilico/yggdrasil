@@ -22,14 +22,38 @@ class DuplicatedModelDriver(Driver):
 
     name_format = "%s_copy%d"
 
-    def __init__(self, yml, **kwargs):
+    def __init__(self, yml, duplicates=None, **kwargs):
         kwargs.update(yml)
         self.copies = []
-        for iyml in self.get_yaml_copies(yml):
-            ikws = copy.deepcopy(kwargs)
-            ikws.update(iyml)
-            self.copies.append(create_driver(yml=iyml, **ikws))
+        if duplicates is not None:
+            for x in duplicates:
+                ienv = copy.deepcopy(yml.get('env', {}))
+                ienv.update(yml.pop('env_%s' % x['name'], {}))
+                ienv.update(x.pop('env', {}))
+                x['env'] = ienv
+                ikws = copy.deepcopy(kwargs)
+                ikws.update(x)
+                self.copies.append(create_driver(yml=x, **ikws))
+        else:
+            for iyml in self.get_yaml_copies(yml):
+                ikws = copy.deepcopy(kwargs)
+                ikws.update(iyml)
+                self.copies.append(create_driver(yml=iyml, **ikws))
         super(DuplicatedModelDriver, self).__init__(**kwargs)
+
+    @classmethod
+    def get_base_name(cls, name):
+        r"""Get the name of the base model.
+
+        Args:
+            name (str): Model name.
+
+        Returns:
+            str: Base model name.
+
+        """
+        assert('_copy' in name)
+        return name.split('_copy')[0]
 
     @classmethod
     def get_yaml_copies(cls, yml):

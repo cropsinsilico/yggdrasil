@@ -662,6 +662,11 @@ comm_head_t comm_send_multipart_header(const comm_t *x, const char * data,
   if (model_name != NULL) {
     strcpy(head.model, model_name);
   }
+  char *model_copy = getenv("YGG_MODEL_COPY");
+  if (model_copy != NULL) {
+    strcat(head.model, "_copy");
+    strcat(head.model, model_copy);
+  }
   head.flags = head.flags | HEAD_FLAG_VALID | HEAD_FLAG_MULTIPART;
   // Add datatype information to header
   if (!(x->flags & COMM_FLAG_FILE)) {

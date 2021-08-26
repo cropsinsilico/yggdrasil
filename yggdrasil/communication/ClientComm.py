@@ -48,17 +48,20 @@ class ClientComm(CommBase.CommBase):
         self.icomm = None
         self.request_order = []
         self.responses = OrderedDict()
+        for k, v in self.ocomm.get_response_comm_kwargs.items():
+            self.response_kwargs.setdefault(k, v)
         self.response_kwargs.setdefault('is_interface', self.ocomm.is_interface)
-        self.response_kwargs.setdefault('commtype', self.ocomm._commtype)
         self.response_kwargs.setdefault('recv_timeout', self.ocomm.recv_timeout)
         self.response_kwargs.setdefault('language', self.ocomm.language)
         self.response_kwargs.setdefault('use_async', self.ocomm.is_async)
+        self.response_kwargs.setdefault('env', self.ocomm.env)
         super(ClientComm, self).__init__(self.ocomm.name, dont_open=dont_open,
                                          recv_timeout=self.ocomm.recv_timeout,
                                          is_interface=self.ocomm.is_interface,
                                          direction='send', no_suffix=True,
                                          address=self.ocomm.address,
-                                         is_async=self.ocomm.is_async)
+                                         is_async=self.ocomm.is_async,
+                                         env=self.ocomm.env)
 
     def get_status_message(self, nindent=0, **kwargs):
         r"""Return lines composing a status message.
@@ -207,7 +210,7 @@ class ClientComm(CommBase.CommBase):
             if comm_kwargs.get('use_async', False):
                 comm_kwargs['async_recv_method'] = 'recv_message'
             self.icomm = new_comm(self.name + '.client_response_comm', **comm_kwargs)
-        header['response_address'] = self.icomm.address
+        header['response_address'] = self.icomm.opp_address
         self.request_order.append(header['request_id'])
         return header
 

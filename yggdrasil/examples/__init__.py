@@ -8,7 +8,7 @@ from yggdrasil import tools, languages, serialize, constants
 # TODO: This can be generated from the drivers
 ext_map = dict(constants.LANG2EXT, executable='',
                make='.cpp', cmake='.cpp', function='',
-               osr='.xml', sbml='.xml')
+               osr='.xml', sbml='.xml', mpi='')
 for lang in tools.get_supported_lang():
     if lang.lower() not in ext_map:
         ext_map[lang.lower()] = languages.get_language_ext(lang)
@@ -58,7 +58,7 @@ def register_example(example_dir):
         lang_avail += ['all', 'all_nomatlab', 'c', 'cpp', 'matlab', 'python']
     elif example_base in ['types', 'transforms']:
         lang_avail += tools.get_supported_lang()
-        for k in ['cmake', 'make', 'lpy', 'executable']:
+        for k in ['cmake', 'make', 'lpy', 'executable', 'mpi']:
             lang_avail.remove(k)
     elif example_base.startswith('sbml'):
         lang_avail = ['sbml']
@@ -107,10 +107,10 @@ def register_example(example_dir):
             src_names = ['%sCli%s' % (example_base, ext_map[lang_set[0]]),
                          '%sSrv%s' % (example_base, ext_map[lang_set[1]])]
         elif example_base.startswith('rpc_'):
-            # TODO: Create server examples in other languages
-            yml_names = ['server_python.yml',
+            yml_names = ['server_%s.yml' % lang,
                          'client_%s.yml' % lang]
-            src_names = ['server.py', 'client%s' % ext_map[lang]]
+            src_names = ['server%s' % ext_map[lang],
+                         'client%s' % ext_map[lang]]
         elif example_base == 'root_to_shoot':
             if lang.startswith('all'):
                 yml_names = ['root.yml', 'shoot.yml', 'root_to_shoot.yml']

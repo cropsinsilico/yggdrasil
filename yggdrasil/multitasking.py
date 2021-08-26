@@ -7,7 +7,22 @@ import logging
 import threading
 import queue
 import multiprocessing
+import asyncio
 from yggdrasil.tools import YggClass
+MPI = None
+_on_mpi = False
+_mpi_rank = -1
+if os.environ.get('YGG_SUBPROCESS', False):
+    if 'YGG_MPI_RANK' in os.environ:
+        _on_mpi = True
+        _mpi_rank = int(os.environ['YGG_MPI_RANK'])
+else:
+    try:
+        from mpi4py import MPI
+        _on_mpi = (MPI.COMM_WORLD.Get_size() > 1)
+        _mpi_rank = MPI.COMM_WORLD.Get_rank()
+    except ImportError:
+        pass
 
 
 mp_ctx = multiprocessing.get_context()
@@ -451,6 +466,35 @@ class DummyEvent(DummyContextObject):  # pragma: no cover
         raise AliasDisconnectError("DummyEvent will never change to True.")
 
 
+class ProcessEvent(object):
+    r"""Multiprocessing/threading event associated with a process that has
+    a discreet start and end."""
+
+    def __init__(self, *args, **kwargs):
+        self.started = Event(*args, **kwargs)
+        self.stopped = Event(task_context=self.started.context)
+
+    def start(self):
+        r"""Set the started event."""
+        self.started.set()
+
+    def stop(self):
+        r"""Set the stopped event."""
+        self.stopped.set()
+
+    def has_started(self):
+        r"""bool: True if the process has started."""
+        return self.started.is_set()
+
+    def has_stopped(self):
+        r"""bool: True if the process has stopped."""
+        return self.stopped.is_set()
+
+    def is_running(self):
+        r"""bool: True if the processes has started, but hasn't stopped."""
+        return (self.has_started() and (not self.has_stopped()))
+
+
 class Event(ContextObject):
     r"""Multiprocessing/threading event."""
 
@@ -475,6 +519,57 @@ class Event(ContextObject):
             if val:
                 state['_base'].set()
         super(Event, self).__setstate__(state)
+
+    # @classmethod
+    # def from_event_set(cls, *events):
+    #     r"""Create an event that is triggered when any one of the provided
+    #     events is set.
+
+    #     Args:
+    #         *events: One or more events that will trigger this event.
+
+    #     """
+    #     # Modified version of https://stackoverflow.com/questions/12317940/
+    #     # python-threading-can-i-sleep-on-two-threading-events-simultaneously/
+    #     # 36661113
+    #     or_event = cls()
+
+    #     def changed():
+    #         bools = [e.is_set() for e in events]
+    #         if any(bools):
+    #             or_event.set()
+    #         else:
+    #             or_event.clear()
+    #     for e in events:
+    #         e.add_callback(changed, trigger='set')
+    #         e.add_callback(changed, trigger='clear')
+    #     return or_event
+
+    def add_callback(self, callback, args=(), kwargs={}, trigger='set'):
+        r"""Add a callback that will be called when set or clear is invoked.
+
+        Args:
+            callback (callable): Callable executed when set is called.
+            args (tuple, optional): Arguments to pass to the callback.
+            kwargs (dict, optional): Keyword arguments to pass to the
+                callback.
+            trigger (str, optional): Action triggering the set call.
+                Options are 'set' or 'clear'. Defaults to 'set'.
+
+        """
+        if not hasattr(self, f'_{trigger}_callbacks'):
+            assert(trigger in ['set', 'clear'])
+            setattr(self, f'_{trigger}_callbacks', [])
+            setattr(self, f'_{trigger}', getattr(self._base, trigger))
+            
+            def callback_method(self):
+                getattr(self, f'_{trigger}')()
+                for (x, a, k) in getattr(self, f'_{trigger}_callbacks'):
+                    x(*a, **k)
+
+            setattr(self._base, trigger, lambda: callback_method(self))
+        getattr(self, f'_{trigger}_callbacks').append(
+            (callback, args, kwargs))
 
 
 class DummyTask(DummyContextObject):  # pragma: no cover
@@ -768,6 +863,310 @@ class LockedDict(LockedObject):
         return out
 
 
+class TimeoutError(asyncio.TimeoutError):
+    r"""Error to raise when a wait times out."""
+
+    def __init__(self, msg, function_value):
+        self.function_value = function_value
+        super(TimeoutError, self).__init__(msg)
+    
+
+class WaitableFunction(object):
+    r"""Create an object that can be waited on until a function returns True.
+
+    Args:
+        function (callable): Callable function that takes no arguments and
+            returns a boolean.
+        polling_interval (float, optional): Time (in seconds) that should be
+            waited in between function calls. Defaults to 0.1 seconds.
+
+    """
+
+    __slots__ = ["function", "polling_interval"]
+
+    def __init__(self, function, polling_interval=0.1):
+        self.function = function
+        self.polling_interval = polling_interval
+
+    async def await_function(self):
+        r"""Coroutine to wait for the function to return True."""
+        while not self.function():
+            await asyncio.sleep(self.polling_interval)
+        return self.function()
+
+    def wait(self, timeout=None, on_timeout=False):
+        r"""Wait for the function to return True.
+
+        Args:
+            timeout (float, optional): Time (in seconds) that should be
+                waited for the process to finish. A value of None will wait
+                indefinitely. Defaults to None.
+            on_timeout (callable, bool, str, optional): Object indicating
+                what action should be taken in the event that the timeout is
+                reached. If a callable is provided, it will be called. A
+                value of False will cause a TimeoutError to be raised. A
+                value of True will cause the function value to be returned.
+                A string will be used as the error message for a raised
+                timeout error. Defaults to False.
+
+        Returns:
+            object: The result of the function call.
+
+        """
+        loop = asyncio.new_event_loop()
+        try:
+            return loop.run_until_complete(
+                asyncio.wait_for(self.await_function(), timeout))
+        except asyncio.TimeoutError as e:
+            if on_timeout is False:
+                raise TimeoutError(e, self.function())
+            elif on_timeout is True:
+                return self.function()
+            elif isinstance(on_timeout, str):
+                raise TimeoutError(on_timeout, self.function())
+            else:
+                return on_timeout()
+        finally:
+            try:
+                loop.run_until_complete(loop.shutdown_asyncgens())
+            finally:
+                loop.close()
+
+
+def wait_on_function(function, timeout=None, on_timeout=False,
+                     polling_interval=0.1):
+    r"""Wait for the function to return True.
+
+    Args:
+        function (callable): Callable function that takes no arguments and
+            returns a boolean.
+        timeout (float, optional): Time (in seconds) that should be
+            waited for the process to finish. A value of None will wait
+            indefinitely. Defaults to None.
+        on_timeout (callable, bool, str, optional): Object indicating
+            what action should be taken in the event that the timeout is
+            reached. If a callable is provided, it will be called. A
+            value of False will cause a TimeoutError to be raised. A
+            value of True will cause the function value to be returned.
+            A string will be used as the error message for a raised
+            timeout error. Defaults to False.
+        polling_interval (float, optional): Time (in seconds) that should be
+            waited in between function calls. Defaults to 0.1 seconds.
+
+    Returns:
+        object: The result of the function call.
+
+    """
+    x = WaitableFunction(function, polling_interval=polling_interval)
+    return x.wait(timeout=timeout, on_timeout=on_timeout)
+
+
+class MPIRequestWrapper(WaitableFunction):
+    r"""Wrapper for an MPI request."""
+
+    __slots__ = ["request", "completed", "canceled", "_result"]
+
+    def __init__(self, request, completed=False, **kwargs):
+        self.request = request
+        self.completed = completed
+        self.canceled = False
+        self._result = None
+        super(MPIRequestWrapper, self).__init__(
+            lambda: self.test()[0] or self.canceled, **kwargs)
+
+    def cancel(self):
+        r"""Cancel the request."""
+        if not self.test()[0]:
+            self.canceled = True
+            return self.request.Cancel()
+
+    @property
+    def result(self):
+        r"""object: The result of the MPI request."""
+        if not self.completed:  # pragma: intermittent
+            self.test()
+        return self._result
+
+    def test(self):
+        r"""Test to see if the request has completed."""
+        if not self.completed:
+            self.completed, self._result = self.request.test()
+        return (self.completed, self._result)
+
+    def wait(self, timeout=None, on_timeout=False):
+        r"""Wait for the request to be completed.
+
+        Args:
+            timeout (float, optional): Time (in seconds) that should be
+                waited for the process to finish. A value of None will wait
+                indefinitely. Defaults to None.
+            on_timeout (callable, bool, str, optional): Object indicating
+                what action should be taken in the event that the timeout is
+                reached. If a callable is provided, it will be called. A
+                value of False will cause a TimeoutError to be raised. A
+                value of True will cause the function value to be returned.
+                A string will be used as the error message for a raised
+                timeout error. Defaults to False.
+
+        Returns:
+            object: The result of the request.
+
+        """
+        if not self.test()[0]:
+            super(MPIRequestWrapper, self).wait(timeout=timeout,
+                                                on_timeout=on_timeout)
+        return self._result
+
+
+class MPIPartnerError(Exception):
+    r"""Error raised when there is an error on another process."""
+    pass
+
+
+class MPIErrorExchange(object):
+    r"""Set of MPI messages to check for errors."""
+
+    tags = {'ERROR_ON_RANK0': 1,
+            'ERROR_ON_RANKX': 2}
+    closing_messages = ['ERROR', 'COMPLETE']
+
+    def __init__(self, global_tag=0):
+        self.comm = MPI.COMM_WORLD
+        self.rank = self.comm.Get_rank()
+        self.size = self.comm.Get_size()
+        if self.rank == 0:
+            self.partner_ranks = list(range(1, self.size))
+        else:
+            self.partner_ranks = [0]
+        self.reset(global_tag=global_tag)
+        self._first_use = True
+
+    def reset(self, global_tag=0):
+        r"""Rest comms for the next test."""
+        global_tag = max(self.comm.alltoall([global_tag] * self.size))
+        self.global_tag = global_tag + max(self.tags.values()) + 1
+        if self.rank == 0:
+            self.incoming_tag = self.tags['ERROR_ON_RANKX'] + global_tag
+            self.outgoing_tag = self.tags['ERROR_ON_RANK0'] + global_tag
+        else:
+            self.incoming_tag = self.tags['ERROR_ON_RANK0'] + global_tag
+            self.outgoing_tag = self.tags['ERROR_ON_RANKX'] + global_tag
+        self.outgoing = None
+        self.incoming = [
+            MPIRequestWrapper(
+                self.comm.irecv(source=i, tag=self.incoming_tag),
+                polling_interval=0)
+            for i in self.partner_ranks]
+        self._first_use = False
+        
+    def recv(self, wait=False):
+        r"""Check for response to receive request."""
+        results = []
+        for i, x in enumerate(self.incoming):
+            if wait:
+                x.wait()
+            completed, result = x.test()
+            
+            if ((completed
+                 and ((self.rank != 0)
+                      or (result[1] not in self.closing_messages)))):
+                self.incoming[i] = MPIRequestWrapper(
+                    self.comm.irecv(
+                        source=self.partner_ranks[i],
+                        tag=self.incoming_tag),
+                    polling_interval=0)
+            results.append((completed, result))
+        return results
+
+    def send(self, msg):
+        r"""Send a message."""
+        if (self.rank == 0) or (self.outgoing is None):
+            for i in self.partner_ranks:
+                self.comm.send(msg, dest=i, tag=self.outgoing_tag)
+            if (self.rank != 0) and (msg[1] in self.closing_messages):
+                self.outgoing = msg
+
+    def finalize(self, failure):
+        r"""Finalize an instance by waiting for completions.
+
+        Args:
+            failure (bool): True if there was an error.
+
+        """
+        complete = True
+        try:
+            complete = self.sync(msg='COMPLETE',
+                                 local_error=failure,
+                                 check_complete=True,
+                                 sync_tag=True)
+        finally:
+            while not complete:  # pragma: debug
+                complete = self.sync(msg='COMPLETE',
+                                     local_error=failure,
+                                     check_complete=True,
+                                     dont_raise=True,
+                                     sync_tag=True)
+
+    def sync(self, local_tag=None, msg=None, get_tags=False,
+             check_equal=False,
+             dont_raise=False, local_error=False, sync_tag=False,
+             check_complete=False):
+        r"""Synchronize processes.
+
+        Args:
+            local_tag (int): Next tag that will be used by the local MPI comm.
+            get_tags (bool, optional): If True, tags will be exchanged between
+                all processes. Defaults to False.
+            check_equal (bool, optional): If True, tags will be checked to be
+                equal. Defaults to False.
+            dont_raise (bool, optional): If True and a MPIPartnerError were
+                to be raised, the sync will abort. Defaults to False.
+
+        Raises:
+            MPIPartnerError: If there was an error on one of the other MPI
+                processes.
+            AssertionError: If check_equal is True and the tags are not
+                equivalent.
+
+        """
+        if local_tag is None:
+            local_tag = self.global_tag
+        remote_error = False
+        if msg is None:
+            msg = 'TAG'
+        if local_error:  # pragma: debug
+            msg = 'ERROR'
+        if self.outgoing is not None:  # pragma: debug
+            msg = self.outgoing
+        if self.rank != 0:
+            self.send((local_tag, msg))
+            out = self.recv(wait=True)
+            complete, results = out[0]  # self.recv(wait=True)[0]
+            assert(complete)
+        else:
+            if (self.outgoing is None) and (msg in self.closing_messages):
+                self.outgoing = msg
+            results = [(True, (local_tag, msg))] + self.recv(wait=True)
+            # TODO: Check for completion (instead of error)
+            self.send(results)
+        remote_error = any((x[0] and (x[1][1] == 'ERROR'))
+                           for x in results)
+        all_tag = [x[1][0] for x in results]
+        if sync_tag:
+            self.global_tag = max(all_tag)
+        else:
+            self.global_tag = local_tag
+        if remote_error and (not local_error) and (not dont_raise):  # pragma: debug
+            raise MPIPartnerError("Error on another process.")
+        if check_equal and not (remote_error or local_error):
+            assert(all((x == local_tag) for x in all_tag))
+        if check_complete:
+            return all(x[1][1] in self.closing_messages
+                       for x in results)
+        if get_tags:
+            return all_tag
+            
+
 # class LockedWeakValueDict(LockedDict):
 #     r"""Dictionary of weakrefs that can be shared between threads."""
 
@@ -1059,12 +1458,8 @@ class YggTask(YggClass):
                 Defaults to None and is set based on the stack trace.
 
         """
-        T = self.start_timeout(timeout, key_level=1, key=key)
-        while self.is_alive() and not T.is_out:
-            self.verbose_debug('Waiting for %s to finish...',
-                               self.context.task_method)
-            self.sleep()
-        self.stop_timeout(key_level=1, key=key)
+        self.wait_on_function(lambda: not self.is_alive(),
+                              timeout=timeout, key_level=1, key=key)
 
 
 class BreakLoopException(BaseException):
@@ -1163,12 +1558,10 @@ class YggTaskLoop(YggTask):
                 before breaking. Defaults to 0.
 
         """
-        T = self.start_timeout(timeout, key_level=1, key=key)
-        while (((not self.was_loop) or (self.loop_count < nloop))
-               and self.is_alive() and (not T.is_out)):  # pragma: debug
-            self.verbose_debug('Waiting for thread/process to enter loop...')
-            self.sleep()
-        self.stop_timeout(key_level=1, key=key)
+        self.wait_on_function(
+            lambda: (self.was_loop and (self.loop_count >= nloop)
+                     or (not self.is_alive())),
+            timeout=timeout, key=key, key_level=1)
 
     def before_loop(self):
         r"""Actions performed before the loop."""

@@ -39,6 +39,7 @@ prof
 
 # Coverage
 .coveragerc
+.coveragerc_parallel
 .coverage
 htmlcov
 .coverage.*

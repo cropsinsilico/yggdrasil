@@ -609,7 +609,8 @@ class ZMQComm(CommBase.CommBase):
         return self.address_param['port']
 
     @classmethod
-    def new_comm_kwargs(cls, name, protocol=None, host=None, port=None, **kwargs):
+    def new_comm_kwargs(cls, name, protocol=None, host=None, port=None,
+                        **kwargs):
         r"""Initialize communication with new queue.
 
         Args:
@@ -741,7 +742,7 @@ class ZMQComm(CommBase.CommBase):
         if not hasattr(self, 'socket_lock'):
             return
         with self.socket_lock:
-            if self._connected:
+            if getattr(self, '_connected', False):
                 self.debug('Disconnecting from %s' % self.address)
                 try:
                     self.socket.disconnect(self.address)
@@ -967,7 +968,8 @@ class ZMQComm(CommBase.CommBase):
             if back_messages:  # pragma: debug
                 # for x in back_messages:
                 #     self._send_client_msg(x)
-                raise RuntimeError("backlogged messages not supported.")
+                raise RuntimeError("backlogged messages not supported: %s"
+                                   % back_messages)
         super(ZMQComm, self)._close(linger=linger)
         if self.cli_socket is not None:
             self.cli_socket.disconnect(self.cli_address)

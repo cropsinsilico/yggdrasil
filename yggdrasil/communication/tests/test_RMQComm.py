@@ -13,7 +13,7 @@ _rmq_installed = RMQComm.is_installed(language='python')
 
 @unittest.skipIf(not _rmq_installed, "RMQ Server not running")
 @flaky.flaky
-@timeout(timeout=600)
+@timeout(timeout=60)
 class TestRMQComm(test_CommBase.TestCommBase):
     r"""Test for RMQComm communication class."""
 

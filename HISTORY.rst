@@ -2,6 +2,21 @@
 History
 =======
 
+1.7.0 (2021-08-26) Support for MPI communicators, MPI execution, and pika >= 1.0.0
+------------------
+
+* Allow models to be run on distributed processes via MPI
+* Added support for MPI based comms
+* Update the required version of pika to be >=1.0.0 and update the RMQComm/RMQAsyncComm code to use the updated API
+* Added C, C++, Fortran, Matlab, R versions of server in rpc_lesson1 example
+* Added C, C++, Fortran, Matlab, R versions of server in rpc_lesson2 example
+* Added C, C++, Fortran, Matlab, R versions of server in rpc_lesson2b example
+* Added C, C++, Fortran, Matlab, R versions of server in rpc_lesson3 example
+* Added C, C++, Fortran, Matlab, R versions of server in rpc_lesson3b example
+* Added C++, Fortran, and Python versions of client in rpc_lesson3b example (still need to thread the Python version and add R & Matlab versions)
+* Fixed bug in yggdevup CLI for missing language directories
+* Enhance debug information w/ task status
+
 1.6.4 (2021-08-10) More minor bug fixes & Automated iteration
 ------------------
 

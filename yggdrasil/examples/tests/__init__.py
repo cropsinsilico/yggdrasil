@@ -1,13 +1,16 @@
 import os
 import six
+import sys
 import uuid
 import unittest
 import tempfile
 import shutil
 import itertools
 import flaky
+import subprocess
 from yggdrasil.components import ComponentMeta, import_component
 from yggdrasil import runner, tools, platform
+from yggdrasil.multitasking import _on_mpi
 from yggdrasil.examples import (
     get_example_yaml, get_example_source, get_example_languages,
     ext_map, display_example)
@@ -296,12 +299,19 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
             out.append(self.read_file(fname))
         return out
 
+    @property
+    def mpi_rank(self):
+        r"""int: MPI process rank."""
+        if self.runner.mpi_comm:
+            return self.runner.rank
+        return 0
+
     def check_results(self):
         r"""This should be overridden with checks for the result."""
-        if self.output_files is None:
-            return
         res_list = self.results
         out_list = self.output_files
+        if (out_list is None) or (res_list is None):
+            return
         assert(res_list is not None)
         assert(out_list is not None)
         self.assert_equal(len(res_list), len(out_list))
@@ -331,7 +341,8 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                 make_ext = '_windows'
             else:
                 make_ext = '_linux'
-            shutil.copy(makefile + make_ext, makefile)
+            if not os.path.isfile(makefile):
+                shutil.copy(makefile + make_ext, makefile)
         # Check that comm is installed
         if self.comm in ['ipc', 'IPCComm']:
             from yggdrasil.communication.IPCComm import (
@@ -342,25 +353,54 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                 ipcrm_queues()
         # Run
         os.environ.update(self.env)
-        self.runner = runner.get_runner(self.yaml, namespace=self.namespace,
-                                        production_run=True)
-        self.runner.run()
-        self.runner.printStatus()
-        if self.expects_error:
-            assert(self.runner.error_flag)
+        mpi_tag_start = None
+        if ((self.iter_param.get('mpi', False) and (not _on_mpi)) or _on_mpi):
+            from yggdrasil.communication.tests.conftest import adv_global_mpi_tag
+            mpi_tag_start = adv_global_mpi_tag(1000)
+        if self.iter_param.get('mpi', False) and (not _on_mpi):  # pragma: testing
+            # This method for running tests will not be run unless MPI is
+            # enabled for all tests and mpi is added as an iteration parameter
+            try:
+                nproc = 2
+                args = ['mpiexec', '-n', str(nproc), sys.executable,
+                        '-m', 'yggdrasil', 'run']
+                if isinstance(self.yaml, str):
+                    args.append(self.yaml)
+                else:
+                    args += self.yaml
+                args += ['--namespace=%s' % self.namespace,
+                         '--production-run',
+                         '--mpi-tag-start=%s' % mpi_tag_start]
+                subprocess.check_call(args)
+                assert(not self.expects_error)
+            except subprocess.CalledProcessError:
+                if not self.expects_error:
+                    raise
         else:
-            assert(not self.runner.error_flag)
+            self.runner = runner.get_runner(self.yaml, namespace=self.namespace,
+                                            production_run=True,
+                                            mpi_tag_start=mpi_tag_start)
+            self.runner.run()
+            self.runner.printStatus()
+            if self.mpi_rank != 0:
+                return
+            if self.expects_error:
+                assert(self.runner.error_flag)
+            else:
+                assert(not self.runner.error_flag)
         try:
             self.check_results()
         except BaseException:  # pragma: debug
-            self.runner.printStatus()
+            if self.runner is not None:
+                self.runner.printStatus()
             raise
         finally:
             self.example_cleanup()
             # Remove copied makefile
-            if self.language == 'make':
+            if (self.language == 'make') and (self.mpi_rank == 0):
                 makefile = os.path.join(self.yamldir, 'src', 'Makefile')
                 if os.path.isfile(makefile):
+                    self.runner.info("Removing makefile")
                     os.remove(makefile)
             self.runner = None
 
@@ -389,6 +429,17 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
             del self.iter_param[k]
         assert(not self.iter_param)
         self.iter_param = {}
+
+    # This method can be used if mpi is toggled via an iteration variable,
+    # but the current test setup runs the mpi enabled versions separately
+    def setup_iteration_mpi(self, mpi=None):  # pragma: testing
+        r"""Perform setup associated with an MPI iteration."""
+        if mpi:
+            try:
+                import mpi4py  # noqa: F401
+            except ImportError:
+                raise unittest.SkipTest("mpi4py not installed")
+        return mpi
 
     def setup_iteration_language(self, language=None):
         r"""Perform setup associated with a language iteration."""

@@ -8,6 +8,7 @@ import subprocess
 import shutil
 import uuid
 import tempfile
+import asyncio
 from collections import OrderedDict
 from pprint import pformat
 from yggdrasil import platform, tools, languages, multitasking
@@ -425,9 +426,18 @@ class ModelDriver(Driver):
                         + ['queue', 'queue_thread',
                            'event_process_kill_called',
                            'event_process_kill_complete'])
+    _mpi_tags = {'ENV': 1,
+                 'START': 2,
+                 'STOP_RANK0': 3,  # Stopped by partner
+                 'STOP_RANKX': 4,  # Stopped by root
+                 'BUILDFILE': 5,
+                 'LOCK_BUILDFILE': 6,
+                 'UNLOCK_BUILDFILE': 7}
 
     def __init__(self, name, args, model_index=0, copy_index=-1, clients=[],
-                 preparsed_function=None, outputs_in_inputs=None, **kwargs):
+                 preparsed_function=None, outputs_in_inputs=None,
+                 mpi_rank=0, mpi_tag_start=None, **kwargs):
+        self._inv_mpi_tags = {v: k for k, v in self._mpi_tags.items()}
         self.model_outputs_in_inputs = outputs_in_inputs
         self.preparsed_function = preparsed_function
         super(ModelDriver, self).__init__(name, **kwargs)
@@ -467,6 +477,18 @@ class ModelDriver(Driver):
         self.args = args
         self.modified_files = []
         self.wrapper_products = []
+        self._mpi_comm = False
+        self._mpi_rank = 0
+        self._mpi_size = 1
+        self._mpi_requests = {}
+        self._mpi_tag = (len(self._mpi_tags) * self.model_index)
+        if mpi_tag_start is not None:
+            self._mpi_tag += mpi_tag_start
+        if multitasking._on_mpi:
+            self._mpi_comm = multitasking.MPI.COMM_WORLD
+            self._mpi_rank = self._mpi_comm.Get_rank()
+            self._mpi_size = self._mpi_comm.Get_size()
+            self._mpi_partner_rank = mpi_rank
         # Update for function
         if self.function:
             args = [self.init_from_function(args)]
@@ -533,6 +555,16 @@ class ModelDriver(Driver):
             if x not in _map_language_ext:
                 _map_language_ext[x] = []
             _map_language_ext[x].append(cls.language)
+
+    @classmethod
+    def mpi_partner_init(cls, self):
+        r"""Actions initializing an MPIPartnerModel."""
+        pass
+
+    @classmethod
+    def mpi_partner_cleanup(cls, self):
+        r"""Actions cleaning up an MPIPartnerModel."""
+        pass
 
     @classmethod
     def get_inverse_type_map(cls):
@@ -665,9 +697,11 @@ class ModelDriver(Driver):
         self.model_outputs_in_inputs = self.preparsed_function['outputs_in_inputs']
         model_dir, model_base = os.path.split(self.model_function_file)
         model_base = os.path.splitext(model_base)[0]
-        wrapper_fname = os.path.join(model_dir, 'ygg_' + model_base
-                                     + self.language_ext[0])
-        lines = self.write_model_wrapper(**self.preparsed_function)
+        wrapper_fname = os.path.join(model_dir,
+                                     'ygg_%s_%s%s' % (model_base, self.name,
+                                                      self.language_ext[0]))
+        lines = self.write_model_wrapper(model_name=self.name,
+                                         **self.preparsed_function)
         # Write file
         if (not os.path.isfile(wrapper_fname)) or self.overwrite:
             with open(wrapper_fname, 'w') as fd:
@@ -685,6 +719,9 @@ class ModelDriver(Driver):
     @property
     def n_sent_messages(self):
         r"""dict: Number of messages sent by the model via each connection."""
+        if (self._mpi_rank > 0) and self.check_mpi_request('stopped'):
+            out = self._mpi_requests['stopped'].result
+            return out
         out = {}
         for x in self.yml.get('output_drivers', []):
             x_inst = x.get('instance', None)
@@ -1237,7 +1274,9 @@ class ModelDriver(Driver):
             output_drivers = self.yml.get('output_drivers', [])
         out = {}
         if self.copies > 1:
-            base_name = self.name.split('_copy')[0]
+            from yggdrasil.drivers.DuplicatedModelDriver import (
+                DuplicatedModelDriver)
+            base_name = DuplicatedModelDriver.get_base_name(self.name)
         else:
             base_name = self.name
         for x in input_drivers + output_drivers:
@@ -1294,9 +1333,14 @@ class ModelDriver(Driver):
                    # YGG_PYTHON_EXEC=sys.executable,
                    YGG_DEFAULT_COMM=tools.get_default_comm(),
                    YGG_NCLIENTS=str(len(self.clients)))
+        if multitasking._on_mpi:
+            env['YGG_MPI_RANK'] = str(multitasking._mpi_rank)
         if self.copies > 1:
+            from yggdrasil.drivers.DuplicatedModelDriver import (
+                DuplicatedModelDriver)
             env['YGG_MODEL_COPY'] = str(self.copy_index)
-            env['YGG_MODEL_NAME'] = self.name.split('_copy')[0]
+            env['YGG_MODEL_NAME'] = DuplicatedModelDriver.get_base_name(
+                self.name)
         else:
             env['YGG_MODEL_NAME'] = self.name
         if self.allow_threading or (self.copies > 1):
@@ -1322,6 +1366,8 @@ class ModelDriver(Driver):
             **kwargs: Keyword arguments are pased to run_model.
 
         """
+        # if multitasking._on_mpi:
+        #     self.init_mpi_env()
         self.model_process = self.run_model(**kwargs)
         # Start thread to queue output
         if not no_queue_thread:
@@ -1329,6 +1375,8 @@ class ModelDriver(Driver):
                 target=self.enqueue_output_loop,
                 name=self.name + '.EnqueueLoop')
             self.queue_thread.start()
+        if multitasking._on_mpi:
+            self.init_mpi()
 
     def queue_close(self):
         r"""Close the queue for messages from the model process."""
@@ -1368,9 +1416,109 @@ class ModelDriver(Driver):
                    self.model_command(), os.getcwd(), self.working_dir,
                    pformat(self.env))
 
+    # def init_mpi_env(self):
+    #     r"""Receive env information to the partner model."""
+    #     self.env = self.recv_mpi(tag=self._mpi_tags['ENV'])
+        
+    def init_mpi(self):
+        r"""Initialize MPI communicator."""
+        if self._mpi_rank == 0:
+            self._mpi_comm = None
+        else:
+            self.recv_mpi(tag=self._mpi_tags['START'])
+            self._mpi_requests['stopped'] = multitasking.MPIRequestWrapper(
+                self.recv_mpi(tag=self._mpi_tags['STOP_RANKX'],
+                              dont_block=True))
+
+    def send_mpi(self, msg, tag=0, dont_block=False):
+        r"""Send an MPI message."""
+        self.debug("send %d (%d) [%s]: %s (blocking=%s)", tag,
+                   self._mpi_tag + tag, self._inv_mpi_tags[tag],
+                   msg, not dont_block)
+        kws = {'dest': self._mpi_partner_rank, 'tag': (self._mpi_tag + tag)}
+        if dont_block:  # pragma: debug
+            # return self._mpi_comm.isend(msg, **kws)
+            raise NotImplementedError("Non-blocking MPI send not tested.")
+        else:
+            return self._mpi_comm.send(msg, **kws)
+
+    def recv_mpi(self, tag=0, dont_block=False):
+        r"""Receive an MPI message."""
+        self.debug('recv %d (%d) [%s] (blocking=%s)', tag,
+                   self._mpi_tag + tag, self._inv_mpi_tags[tag],
+                   not dont_block)
+        kws = {'source': self._mpi_partner_rank, 'tag': (self._mpi_tag + tag)}
+        if dont_block:
+            return self._mpi_comm.irecv(**kws)
+        else:
+            return self._mpi_comm.recv(**kws)
+
+    def stop_mpi_partner(self, msg=None, dest=0, tag=None):
+        r"""Send a message to stop the MPI partner model on the main process."""
+        if self._mpi_comm and (not self.check_mpi_request('stopping')):
+            if tag is None:
+                tag = self._mpi_tags['STOP_RANK0']
+            if msg is None:
+                if self.errors or self.model_process_returncode:
+                    msg = 'ERROR'
+                else:
+                    msg = 'STOPPING'
+            self.debug("stop_mpi_partner: %d, %s", tag, msg)
+            # Don't call test()
+            self._mpi_requests['stopping'] = multitasking.MPIRequestWrapper(
+                self.send_mpi(msg, tag=tag), completed=True)
+
+    def wait_on_mpi_request(self, name, timeout=False):
+        r"""Wait for a request to be completed.
+
+        Args:
+            name (str): Name that request was registered under.
+
+        Returns:
+            bool, str: Received message or False if the request does not
+                exist or is not complete.
+
+        """
+        self.debug("Waiting on '%s' (timeout=%s)", name, timeout)
+        try:
+            out = self._mpi_requests[name].wait(timeout=timeout)
+            if out == 'ERROR':  # pragma: debug
+                self.errors.append(out)
+            return out
+        except asyncio.TimeoutError:  # pragma: debug
+            self.info("Timeout for MPI '%s' request", name)
+
+    def check_mpi_request(self, name):
+        r"""Check if a request has been completed.
+
+        Args:
+            name (str): Name that request was registered under.
+
+        Returns:
+            bool, str: Received message or False if the request does not
+                exist or is not complete.
+
+        """
+        if self._mpi_comm and (name in self._mpi_requests):
+            out, msg = self._mpi_requests[name].test()
+            if out and (msg == 'ERROR'):  # pragma: debug
+                self.errors.append(msg)
+            return out
+        return False
+
+    def set_break_flag(self, *args, **kwargs):
+        r"""Stop the model loop."""
+        self.stop_mpi_partner()
+        super(ModelDriver, self).set_break_flag(*args, **kwargs)
+
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""
         # Continue reading until there is not any output
+        if self.model_process_returncode:
+            self.errors.append(self.model_process_returncode)
+        if self.check_mpi_request('stopped'):
+            self.debug("Stop requested by MPI partner.")
+            self.set_break_flag()
         try:
             line = self.queue.get_nowait()
         except Empty:
@@ -1381,12 +1529,19 @@ class ModelDriver(Driver):
             self.error("Queue disconnected")
             self.set_break_flag()
         else:
-            if (line == self._exit_line):
+            if (line == self._exit_line) or self.check_mpi_request('stopped'):
                 self.debug("No more output")
                 self.set_break_flag()
             else:
                 self.print_encoded(line, end="")
                 sys.stdout.flush()
+
+    def run_finally(self):
+        r"""Actions to perform in finally clause of try/except wrapping
+        run."""
+        # Ensure the MPI partner gets cleaned up following an error
+        self.stop_mpi_partner()
+        super(ModelDriver, self).run_finally()
 
     def after_loop(self):
         r"""Actions to perform after run_loop has finished. Mainly checking
@@ -1409,10 +1564,14 @@ class ModelDriver(Driver):
                        self.yml.get('output_drivers', [])]))
         for drv in self.yml.get('input_drivers', []):
             if 'instance' in drv:
+                if self.language == 'mpi':
+                    drv['instance'].wait(self.timeout)
                 drv['instance'].on_model_exit('output', self.name,
                                               errors=self.errors)
         for drv in self.yml.get('output_drivers', []):
             if 'instance' in drv:
+                if self.language == 'mpi':
+                    drv['instance'].wait(self.timeout)
                 drv['instance'].on_model_exit('input', self.name,
                                               errors=self.errors)
 
@@ -1436,6 +1595,14 @@ class ModelDriver(Driver):
             return True
         return (self.model_process.poll() is not None)
 
+    @property
+    def model_process_returncode(self):
+        r"""int: Return code for the model process where non-zero values
+        indicate that there was an error."""
+        if self.model_process_complete and (self.model_process is not None):
+            return self.model_process.returncode
+        return 0
+
     def wait_process(self, timeout=None, key=None, key_suffix=None):
         r"""Wait for some amount of time for the process to finish.
 
@@ -1451,11 +1618,9 @@ class ModelDriver(Driver):
         """
         if not self.was_started:  # pragma: debug
             return True
-        T = self.start_timeout(timeout, key_level=1, key=key, key_suffix=key_suffix)
-        while ((not T.is_out) and (not self.model_process_complete)):  # pragma: debug
-            self.sleep()
-        self.stop_timeout(key_level=1, key=key, key_suffix=key_suffix)
-        return self.model_process_complete
+        return self.wait_on_function(lambda: self.model_process_complete,
+                                     timeout=timeout, key_level=1, key=key,
+                                     key_suffix=key_suffix)
 
     def kill_process(self):
         r"""Kill the process running the model, checking return code."""
@@ -1483,12 +1648,11 @@ class ModelDriver(Driver):
                 if not self.has_sent_messages:
                     ignore_error_code = True
             assert(self.model_process_complete)
-            if (((self.model_process is not None)
-                 and (self.model_process.returncode != 0)
+            if (((self.model_process_returncode != 0)
                  and (not ignore_error_code))):
                 self.error(("return code of %s indicates model error. "
                             "(sent messages: %s)"),
-                           str(self.model_process.returncode),
+                           str(self.model_process_returncode),
                            self.n_sent_messages)
             self.event_process_kill_complete.set()
             if self.queue_thread is not None:
@@ -2106,7 +2270,7 @@ class ModelDriver(Driver):
                             inputs=[], outputs=[], model_flag=None,
                             outputs_in_inputs=None, verbose=False, copies=1,
                             iter_function_over=[], verbose_model=False,
-                            skip_update_io=False):
+                            skip_update_io=False, model_name=None):
         r"""Return the lines required to wrap a model function as an integrated
         model.
 
@@ -2138,6 +2302,8 @@ class ModelDriver(Driver):
                 will not be called. Defaults to False.
             verbose_model (bool, optional): If True, print statements will
                 be added after every line in the model. Defaults to False.
+            model_name (str, optional): Name given to the model. Defaults to
+                None.
 
         Returns:
             list: Lines of code wrapping the provided model with the necessary
@@ -2329,6 +2495,7 @@ class ModelDriver(Driver):
                 prefix = [cls.format_function_param(
                     'interface', interface_library=ygglib)]
         out = cls.write_executable(lines, prefix=prefix,
+                                   model_name=model_name,
                                    imports={'filename': model_file,
                                             'function': model_function})
         if verbose:  # pragma: debug
@@ -3195,7 +3362,7 @@ class ModelDriver(Driver):
         return out
         
     @classmethod
-    def write_executable_import(cls, **kwargs):
+    def write_executable_import(cls, model_name=None, **kwargs):
         r"""Add import statements to executable lines.
        
         Args:
@@ -3219,7 +3386,8 @@ class ModelDriver(Driver):
 
     @classmethod
     def write_executable(cls, lines, prefix=None, suffix=None,
-                         function_definitions=None, imports=None):
+                         function_definitions=None, imports=None,
+                         model_name=None):
         r"""Return the lines required to complete a program that will run
         the provided lines.
 
@@ -3236,6 +3404,8 @@ class ModelDriver(Driver):
             imports (list, optional): Kwargs for packages that should
                 be imported for use by the executable. Defaults to
                 None and is ignored.
+            model_name (str, optional): Name given to the model. Defaults to
+                None.
 
         Returns:
             lines: Lines of code wrapping the provided lines with the

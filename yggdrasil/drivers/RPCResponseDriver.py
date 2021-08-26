@@ -41,7 +41,7 @@ class RPCResponseDriver(ConnectionDriver):
     @property
     def response_address(self):
         r"""str: Address of response comm."""
-        return self.icomm.address
+        return self.icomm.opp_address
 
     def send_eof(self):
         r"""Send EOF message.

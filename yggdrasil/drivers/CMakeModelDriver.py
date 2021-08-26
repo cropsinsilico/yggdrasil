@@ -750,6 +750,12 @@ class CMakeModelDriver(BuildModelDriver):
     use_env_vars = False
     buildfile_base = 'CMakeLists.txt'
 
+    @classmethod
+    def mpi_partner_init(cls, self):
+        r"""Actions initializing an MPIPartnerModel."""
+        super(CMakeModelDriver, cls).mpi_partner_init(self)
+        cls.partner_buildfile_lock(self)
+        
     def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an argument
         is a source file, compilation flag, or runtime option/flag that should
@@ -777,7 +783,7 @@ class CMakeModelDriver(BuildModelDriver):
     def buildfile_ygg(self):
         r"""str: Full path to the verison of the CMakeLists.txt that has been
         updated w/ yggdrasil compilation flags."""
-        return '_ygg'.join(os.path.splitext(self.buildfile))
+        return ('_ygg_%s' % self.name).join(os.path.splitext(self.buildfile))
     
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
@@ -1029,7 +1035,8 @@ class CMakeModelDriver(BuildModelDriver):
             return self.call_linker(self.builddir, target=target, out=target,
                                     overwrite=True, working_dir=self.working_dir,
                                     allow_error=True, **kwargs)
-        else:
+        out = None
+        with self.buildfile_locked(kwargs.get('dry_run', False)):
             default_kwargs = dict(target=target,
                                   sourcedir=self.sourcedir,
                                   builddir=self.builddir,
@@ -1038,10 +1045,13 @@ class CMakeModelDriver(BuildModelDriver):
             for k, v in default_kwargs.items():
                 kwargs.setdefault(k, v)
             if (not kwargs.get('dry_run', False)) and os.path.isfile(self.buildfile):
-                shutil.copy2(self.buildfile, self.buildfile_orig)
+                if not os.path.isfile(self.buildfile_orig):
+                    shutil.copy2(self.buildfile, self.buildfile_orig)
+                    self.modified_files.append((self.buildfile_orig,
+                                                self.buildfile))
                 shutil.copy2(self.buildfile_ygg, self.buildfile)
-                self.modified_files.append((self.buildfile_orig, self.buildfile))
-            return super(CMakeModelDriver, self).compile_model(**kwargs)
+            out = super(CMakeModelDriver, self).compile_model(**kwargs)
+        return out
 
     @classmethod
     def prune_sh_gcc(cls, path, gcc):  # pragma: appveyor

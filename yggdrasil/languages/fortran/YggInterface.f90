@@ -1314,6 +1314,17 @@ contains
   ! YggInterface
 
   ! Utilities
+  function ygg_init() result(out)
+    implicit none
+    logical :: out
+    integer(kind=c_int) :: c_out
+    c_out = ygg_init_c()
+    if (c_out.eq.0) then
+       out = .true.
+    else
+       out = .false.
+    end if
+  end function ygg_init
   !> @brief Write a log message at the INFO level.
   !> @param[in] fmt Log message.
   subroutine ygglog_info(fmt)

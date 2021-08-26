@@ -580,6 +580,18 @@ def resolve_config_parser(args):
     return args
 
 
+class ConfigEnv(object):
+    r"""Container for environment variable modification."""
+
+    def __init__(self, old_env, new_env):
+        self.old_env = old_env
+        self.new_env = new_env
+
+    def restore(self):
+        r"""Restore the old environment variables."""
+        restore_env(self.old_env)
+
+
 def acquire_env(new_env):
     r"""Get the existing environment variable values and set the environment
     based on the provided dictionary.
@@ -611,6 +623,7 @@ def acquire_env(new_env):
     if new_env.get('validate_messages', '') in ['True', 'False']:
         new_env['validate_messages'] = (new_env['validate_messages'] == 'True')
     # old_env = {k: os.environ.get(k, None) for k in _key2env.values()}
+    set_env = {}
     for k, v in new_env.items():
         k_env = _key2env.get(k, k)
         old_env.setdefault(k_env, os.environ.get(k_env, None))
@@ -622,10 +635,11 @@ def acquire_env(new_env):
             v = [import_component('model', x).language for x in v]
         if not isinstance(v, str):
             v = json.dumps(v)
+        set_env[k_env] = v
         os.environ[k_env] = v
     if new_env.get('loglevel', False):
         set_ygg_loglevel(new_env['loglevel'])
-    return old_env
+    return ConfigEnv(old_env, set_env)
 
 
 def restore_env(old_env):
@@ -660,11 +674,11 @@ def parser_config(args, **kwargs):
         k = k0.replace('-', '_')
         if getattr(args, k, None) is not None:
             kwargs[k0] = getattr(args, k)
-    old_env = acquire_env(kwargs)
+    cfg_env = acquire_env(kwargs)
     try:
-        yield
+        yield cfg_env
     finally:
-        restore_env(old_env)
+        cfg_env.restore()
 
 
 @contextmanager
@@ -677,8 +691,8 @@ def temp_config(**kwargs):
             key/value pairs that should be added to the environment.
 
     """
-    old_env = acquire_env(kwargs)
+    cfg_env = acquire_env(kwargs)
     try:
-        yield
+        yield cfg_env
     finally:
-        restore_env(old_env)
+        cfg_env.restore()

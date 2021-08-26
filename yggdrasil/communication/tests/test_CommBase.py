@@ -571,7 +571,6 @@ class TestCommBase(YggTestClassInfo):
 
         def fcond(x):
             try:
-                self.send_instance.info("%s vs. %s", x, msg)
                 self.assert_equal(x, msg)
                 return False
             except AssertionError:
@@ -663,7 +662,8 @@ class TestCommBase(YggTestClassInfo):
                           msg_send=msg,
                           send_kwargs=dict(header_kwargs=dict(x=msg)),
                           print_status=True)
-        self.send_instance.linger()
+        if self.send_instance is not None:
+            self.send_instance.linger()
 
     def test_send_recv_array(self):
         r"""Test send/recv of a array message."""

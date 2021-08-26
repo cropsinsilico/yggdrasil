@@ -24,6 +24,7 @@ definitions:
           - buffer
           - default
           - ipc
+          - mpi
           - rmq
           - rmq_async
           - value
@@ -140,6 +141,17 @@ definitions:
       title: comm_base
       type: object
     - anyOf:
+      - additionalProperties: true
+        description: Schema for comm component ['mpi'] subtype.
+        properties:
+          commtype:
+            default: default
+            description: MPI communicator.
+            enum:
+            - mpi
+            type: string
+        title: MPIComm
+        type: object
       - additionalProperties: true
         description: Schema for comm component ['rmq'] subtype.
         properties:
@@ -1374,6 +1386,7 @@ definitions:
           - lpy
           - make
           - matlab
+          - mpi
           - osr
           - python
           - r
@@ -1692,8 +1705,8 @@ definitions:
             is used.
           type: string
       required:
-      - name
       - language
+      - name
       - args
       - working_dir
       title: model_base
@@ -1843,6 +1856,18 @@ definitions:
               type: string
             type: array
         title: MakeModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['mpi'] subtype.
+        properties:
+          language:
+            default: executable
+            description: Model is being run on another MPI process and this driver
+              is used as as stand-in to monitor it on the root process.
+            enum:
+            - mpi
+            type: string
+        title: MPIPartnerModel
         type: object
       - additionalProperties: true
         description: Schema for model component ['python'] subtype.

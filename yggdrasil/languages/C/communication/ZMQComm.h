@@ -786,7 +786,8 @@ int free_zmq_comm(comm_t *x) {
   if (x == NULL)
     return ret;
   // Drain input
-  if ((is_recv(x->direction)) && (x->flags & COMM_FLAG_VALID)) {
+  if ((is_recv(x->direction)) && (x->flags & COMM_FLAG_VALID)
+      && (!(x->const_flags[0] & COMM_EOF_RECV))) {
     if (_ygg_error_flag == 0) {
       size_t data_len = 100;
       char *data = (char*)malloc(data_len);

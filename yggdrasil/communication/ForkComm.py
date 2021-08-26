@@ -87,7 +87,8 @@ class ForkComm(CommBase.CommBase):
     _commtype = 'fork'
     _dont_register = True
     child_keys = ['serializer_class', 'serializer_kwargs',
-                  'format_str', 'field_names', 'field_units', 'as_array']
+                  'format_str', 'field_names', 'field_units', 'as_array',
+                  'partner_copies']
     noprop_keys = ['send_converter', 'recv_converter', 'filter', 'transform']
     
     def __init__(self, name, comm_list=None, is_async=False,
@@ -148,7 +149,7 @@ class ForkComm(CommBase.CommBase):
         super(ForkComm, self).__init__(name, is_async=is_async, **kwargs)
         assert(not self.single_use)
         assert(not self.is_server)
-        assert(not self.is_client)
+        assert(not (self.is_client and (self.pattern != 'cycle')))
 
     def disconnect(self):
         r"""Disconnect attributes that are aliases."""
@@ -227,6 +228,19 @@ class ForkComm(CommBase.CommBase):
                 out[k].update(v)
         return out
 
+    # @property
+    # def mpi_model_kws(self):
+    #     r"""dict: Mapping between model name and opposite comm keyword
+    #     arguments that need to be provided to the model for the MPI
+    #     connection."""
+    #     out = {}
+    #     for x in self.comm_list:
+    #         iout = x.mpi_model_kws
+    #         for k, v in iout.items():
+    #             out.setdefault(k, [])
+    #             out[k] += v
+    #     return out
+
     @property
     def opp_comms(self):
         r"""dict: Name/address pairs for opposite comms."""
@@ -251,6 +265,12 @@ class ForkComm(CommBase.CommBase):
                 kwargs['pattern'] = pair[(pair.index(self.pattern) + 1) % 2]
         return kwargs
 
+    @property
+    def get_response_comm_kwargs(self):
+        r"""dict: Keyword arguments to use for a response comm."""
+        assert(self.pattern == 'cycle')
+        return self.curr_comm.get_response_comm_kwargs
+        
     def bind(self):
         r"""Bind in place of open."""
         for x in self.comm_list:

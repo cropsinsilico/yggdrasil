@@ -1,0 +1,27 @@
+IDIR = .
+# CC ?= cl.exe
+# LINK ?= link.exe
+CFLAGS = $(CFLAGS) /I$(IDIR)
+
+SDIR = .
+ODIR = .
+
+LIBS = $(LDFLAGS)
+
+.PHONY: all
+all: model_error_with_io_modelA model_error_with_io_modelB
+
+model_error_with_io_modelA: $(ODIR)\model_error_with_io_modelA.o
+	$(CC) /OUT:$@.exe $** /link $(LIBS)
+
+model_error_with_io_modelB: $(ODIR)\model_error_with_io_modelB.o
+	$(CC) /OUT:$@.exe $** /link $(LIBS)
+
+{$(SDIR)}.c{$(ODIR)}.o:
+	$(CC) /c $< -Fo$@ $(CFLAGS)
+
+{$(SDIR)}.cpp{$(ODIR)}.o:
+	$(CC) /c $< -Fo$@ $(CFLAGS)
+
+clean:
+	del $(ODIR)\*.o *~ model_error_with_io_modelA.exe model_error_with_io_modelB.exe $(IDIR)\*~ 

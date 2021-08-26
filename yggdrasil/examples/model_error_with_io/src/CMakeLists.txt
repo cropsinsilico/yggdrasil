@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.6)
+project(model_error_with_io)
+
+ADD_EXECUTABLE(model_error_with_io_modelA model_error_with_io_modelA.cpp)
+ADD_EXECUTABLE(model_error_with_io_modelB model_error_with_io_modelB.cpp)

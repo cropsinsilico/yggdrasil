@@ -24,6 +24,7 @@ env:
   INSTALLTRIMESH: 1
   INSTALLPYGMENTS: 1
   INSTALLOMP: 1
+  INSTALLMPI: 1
   USEVIRTUALENV: 0
   BUILDDOCS: 0
   YGG_GHA_JOB_ID_SUFFIX:
@@ -39,9 +40,10 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
         install-method: [pip]
-        test-flags1: [--long-running --test-suite=timing --test-suite=demos --test-suite=top, --test-suite=examples, --test-suite=types --skip-languages c c++, --test-suite=types --languages c cpp]
+        test-flags1: [--long-running --test-suite=timing --test-suite=demos --test-suite=top, --test-suite=examples --separate-test='--test-suite=mpi --write-script=run_mpi.sh --with-mpi=3', --test-suite=types --skip-languages c c++, --test-suite=types --languages c cpp]
         test-flags2: [""]
         install-c: [true]
+        install-mpi: [true]
         include:
           - os: windows-latest
             python-version: 3.6
@@ -49,6 +51,7 @@ jobs:
             test-flags1: --long-running --languages cpp
             test-flags2: --long-running --skip-languages c++
             install-c: false
+            install-mpi: false
       fail-fast: false
 
     steps: &steps
@@ -58,6 +61,10 @@ jobs:
     - name: Set C installation based on matrix value
       if: matrix.install-c != true && matrix.install-method != 'conda'
       run: echo "INSTALLC=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Set MPI installation based on matrix value
+      if: matrix.install-mpi != true
+      run: echo "INSTALLMPI=0" >> $GITHUB_ENV
       shell: bash -l {0}
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ matrix.os }}-${{ matrix.install-method }}-py${{ matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{ env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
@@ -77,6 +84,9 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC == 1
       with:
         toolset: 14.0
+    - name: (WINDOWS,PIP) Set up MSMPI
+      uses: mpi4py/setup-mpi@v1
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLMPI == 1
     - name: Install R
       uses: r-lib/actions/setup-r@v1
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR == 1
@@ -225,30 +235,74 @@ jobs:
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
+    # - name: Run MPI tests (macos)
+    #   if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
+    #   id: mpi_macos
+    #   run: |
+    #     yggtest --ci --test-suite=mpi --write-script=run_mpi.sh
+    #     ./run_mpi.sh
+    # - name: Run MPI tests (ubuntu)
+    #   if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
+    #   id: mpi_ubuntu
+    #   run: |
+    #     yggtest --ci --with-mpi=3 --test-suite=mpi --write-script=run_mpi.sh
+    #     # yggtest --ci --with-mpi=3 yggdrasil/communication/tests/test_MPIComm.py --write-script=run_mpi.sh --nocapture --debug
+    #     ./run_mpi.sh
+    # - name: Run MPI tests (windows)
+    #   if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
+    #   id: mpi_windows
+    #   run: yggtest --ci --test-suite=mpi
+    #   continue-on-error: true
+    # - name: Re-run MPI test failures (windows)
+    #   if: ${{ steps.mpi_windows.outcome == 'failure' }}
+    #   run: yggtest --ci --test-suite=mpi --debug --nocapture
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
       shell: cmd /C CALL {0}
       run: |
         cmake -h
-        yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
+        yggtest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
+      if: ${{ matrix.os == 'windows-latest' || !contains(matrix.test-flags1, '--write-script') }}
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none --debug
+    - name: Run generated test script (1st)
+      if: ${{ matrix.os != 'windows-latest' && contains(matrix.test-flags1, '--write-script') }}
+      id: test1_script
+      run: |
+        yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+        ./run_mpi.sh
+    - name: Re-run test script failures (1st)
+      if: ${{ steps.test1_script.outcome == 'failure' }}
+      run: |
+        yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none --debug
+        ./run_mpi.sh
     - name: Run tests (2nd)
-      if: matrix.test-flags2 != ''
+      if: ${{ matrix.test-flags2 != '' && (matrix.os == 'windows-latest' || !contains(matrix.test-flags2, '--write-script')) }}
       id: test2
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
       continue-on-error: true
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none --debug
+    - name: Run generated test script (2nd)
+      if: ${{ matrix.test-flags2 != '' && (matrix.os != 'windows-latest' && contains(matrix.test-flags2, '--write-script')) }}
+      id: test2_script
+      run: |
+        yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+        ./run_mpi.sh
+    - name: Re-run test script failures (2nd)
+      if: ${{ steps.test2_script.outcome == 'failure' }}
+      run: |
+        yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none --debug
+        ./run_mpi.sh
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
-    #   if: ${{ failure() }}  # && env.USEVIRTUALENV == 1 }}
+    #   if: ${{ failure() && matrix.os == 'ubuntu-latest' }}
     #   with:
     #     NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
     #     SSH_PASS: ${{ secrets.SSH_PASS }}
@@ -294,9 +348,10 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
         install-method: [conda]
-        test-flags1: [--long-running]
+        test-flags1: [--long-running --separate-test='--test-suite=mpi --write-script=run_mpi.sh']
         test-flags2: [--with-examples examples/tests/test_backwards.py]
         install-c: [true]
+        install-mpi: [true]
         include:
           - os: ubuntu-latest
             python-version: 3.7
@@ -304,24 +359,28 @@ jobs:
             test-flags1: --long-running
             test-flags2: ""
             install-c: true
+            install-mpi: false
           - os: ubuntu-latest
             python-version: 3.8
             install-method: conda
             test-flags1: --long-running
             test-flags2: ""
             install-c: true
+            install-mpi: false
           - os: ubuntu-latest
             python-version: 3.9
             install-method: conda
             test-flags1: --long-running
             test-flags2: ""
             install-c: true
+            install-mpi: false
           - os: macos-latest
             python-version: 3.8
             install-method: conda
             test-flags1: tests/test_tools.py --with-examples examples/tests/test_rpc_lesson3.py
             test-flags2: ""
             install-c: true
+            install-mpi: false
       fail-fast: false
     defaults:
       run:
@@ -344,6 +403,7 @@ jobs:
         test-flags1: [--long-running --languages python R matlab]
         test-flags2: [""]
         install-c: [true]
+        install-mpi: [false]
       fail-fast: false
     services: &rmq_services
       rabbitmq:
@@ -368,6 +428,7 @@ jobs:
         test-flags1: [--long-running --languages python R matlab]
         test-flags2: [""]
         install-c: [true]
+        install-mpi: [false]
       fail-fast: false
     services: *rmq_services
     defaults:
@@ -387,6 +448,7 @@ jobs:
       INSTALLRMQ: 0
       INSTALLTRIMESH: 0
       INSTALLPYGMENTS: 0
+      INSTALLMPI: 0
       YGG_GHA_JOB_ID_SUFFIX: -stripped
     strategy:
       matrix:
@@ -396,6 +458,7 @@ jobs:
         test-flags1: [--long-running]
         test-flags2: [""]
         install-c: [false]
+        install-mpi: [false]
       fail-fast: false
     steps: *steps
 

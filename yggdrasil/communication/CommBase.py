@@ -11,7 +11,7 @@ from yggdrasil import tools, multitasking
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import (
     new_comm, get_comm, determine_suffix, TemporaryCommunicationError,
-    import_comm)
+    import_comm, check_env_for_address)
 from yggdrasil.components import import_component, create_component
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError, type2numpy
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
@@ -363,11 +363,15 @@ class CommBase(tools.YggClass):
             interface binding. Defaults to False.
         language (str, optional): Programming language of the calling model.
             Defaults to 'python'.
+        env (dict, optional): Environment variable that should be used.
+            Defaults to os.environ if not provided.
         partner_model (str, optional): Name of model that this comm is
             partnered with. Default to None, indicating that the partner
             is not a model.
         partner_language (str, optional): Programming language of this comm's
             partner comm. Defaults to 'python'.
+        partner_mpi_ranks (list, optional): Ranks of processes of this comm's
+            partner comm(s). Defaults to [].
         datatype (schema, optional): JSON schema (with expanded core types
             defined by |yggdrasil|) that constrains the type of data that
             should be sent/received by this object. Defaults to {'type': 'bytes'}.
@@ -479,8 +483,10 @@ class CommBase(tools.YggClass):
             connection.
         is_interface (bool): True if this comm is a Python interface binding.
         language (str): Language that this comm is being called from.
+        env (dict): Environment variable that should be used.
         partner_model (str): Name of model that this comm is partnered with.
         partner_language (str): Programming language of this comm's partner comm.
+        partner_mpi_ranks (list): Ranks of processes of this comm's partner comm(s).
         serializer (:class:.DefaultSerialize): Object that will be used to
             serialize/deserialize messages to/from python objects.
         recv_timeout (float): Time that should be waited for an incoming
@@ -583,8 +589,8 @@ class CommBase(tools.YggClass):
     _finalize_message_kws = ['skip_python2language', 'after_finalize_message']
 
     def __init__(self, name, address=None, direction='send', dont_open=False,
-                 is_interface=None, language=None, partner_copies=0,
-                 partner_model=None, partner_language='python',
+                 is_interface=None, language=None, env=None, partner_copies=0,
+                 partner_model=None, partner_language='python', partner_mpi_ranks=[],
                  recv_timeout=0.0, close_on_eof_recv=True, close_on_eof_send=False,
                  single_use=False, reverse_names=False, no_suffix=False,
                  allow_multiple_comms=False,
@@ -594,34 +600,30 @@ class CommBase(tools.YggClass):
         if isinstance(kwargs.get('datatype', None), MetaschemaType):
             self.datatype = kwargs.pop('datatype')
         super(CommBase, self).__init__(name, **kwargs)
-        if not self.__class__.is_installed(language='python'):  # pragma: debug
+        if (((not is_interface)
+             and (not self.__class__.is_installed(
+                 language='python')))):  # pragma: debug
             raise RuntimeError("Comm class %s not installed" % self.__class__)
         if (partner_model is None) and (not is_interface):
             no_suffix = True
         suffix = determine_suffix(no_suffix=no_suffix,
                                   reverse_names=reverse_names,
                                   direction=direction)
+        if env is None:
+            env = os.environ.copy()
+        self.env = env
         self.name_base = name
         self.suffix = suffix
         self._name = name + suffix
         if address is None:
-            if self.name not in os.environ:
+            try:
+                self.address = check_env_for_address(self.env, self.name)
+            except RuntimeError:
                 model_name = self.model_name
                 prefix = '%s:' % model_name
                 if model_name and (not self.name.startswith(prefix)):
                     self._name = prefix + self.name
-                if (((self.name not in os.environ)
-                     and (self.name.replace(':', '__COLON__')
-                          not in os.environ))):
-                    import pprint
-                    env_str = pprint.pformat(os.environ.copy())
-                    raise RuntimeError(
-                        'Cannot see %s in env (model = %s). Env:\n%s' %
-                        (self.name, model_name, env_str))
-            try:
-                self.address = os.environ[self.name]
-            except KeyError:
-                self.address = os.environ[self.name.replace(':', '__COLON__')]
+                self.address = check_env_for_address(self.env, self.name)
         else:
             self.address = address
         self.direction = direction
@@ -644,6 +646,7 @@ class CommBase(tools.YggClass):
         if self.partner_language:
             self.partner_language_driver = import_component(
                 'model', self.partner_language)
+        self.partner_mpi_ranks = copy.copy(partner_mpi_ranks)
         self.language_driver = import_component('model', self.language)
         self.touches_model = (self.partner_model is not None)
         self.is_client = is_client
@@ -671,14 +674,15 @@ class CommBase(tools.YggClass):
         self._send_serializer = True
         self.allow_multiple_comms = allow_multiple_comms
         if (((not self.single_use)
-             and ((self.is_interface and os.environ.get('YGG_THREADING', False))
+             and ((self.is_interface and self.env.get('YGG_THREADING', False))
                   or (self.model_copies > 1) or (self.partner_copies > 1)))):
             self.allow_multiple_comms = True
         if self.single_use and (not self.is_response_server):
             self._send_serializer = False
         self.create_proxy = ((self.is_client or self.allow_multiple_comms)
                              and (not self.is_interface)
-                             and (self.direction != 'recv'))
+                             and (self.direction != 'recv')
+                             and (self._commtype != 'mpi'))
         # Add interface tag
         if self.is_interface:
             self._name += '_I'
@@ -705,7 +709,8 @@ class CommBase(tools.YggClass):
         else:
             self.open()
         self.logger._instance_name += (
-            '=>%s' % str(self.address).replace('%', '%%'))
+            '=>%s[%s]' % (str(self.address).replace('%', '%%'),
+                          self.direction.upper()))
 
     def __getstate__(self):
         if self.is_open and (self._commtype != 'buffer'):  # pragma: debug
@@ -978,20 +983,20 @@ class CommBase(tools.YggClass):
     @property
     def model_name(self):
         r"""str: Name of the model using the comm."""
-        return os.environ.get('YGG_MODEL_NAME', '')
+        return self.env.get('YGG_MODEL_NAME', '')
 
     @property
     def full_model_name(self):
         r"""str: Name of the model using the comm w/ copy suffix."""
         out = self.model_name
-        if out and ('YGG_MODEL_COPY' in os.environ):
-            out += '_copy%s' % os.environ['YGG_MODEL_COPY']
+        if out and ('YGG_MODEL_COPY' in self.env):
+            out += '_copy%s' % self.env['YGG_MODEL_COPY']
         return out
 
     @property
     def model_copies(self):
         r"""int: Number of copies of the model using the comm."""
-        return int(os.environ.get('YGG_MODEL_COPIES', '1'))
+        return int(self.env.get('YGG_MODEL_COPIES', '1'))
 
     @classmethod
     def underlying_comm_class(cls):
@@ -1623,6 +1628,11 @@ class CommBase(tools.YggClass):
 
     # TEMP COMMS
     @property
+    def get_response_comm_kwargs(self):
+        r"""dict: Keyword arguments to use for a response comm."""
+        return dict(commtype=self._commtype)
+    
+    @property
     def get_work_comm_kwargs(self):
         r"""dict: Keyword arguments for an existing work comm."""
         if self._commtype is None:
@@ -1742,7 +1752,7 @@ class CommBase(tools.YggClass):
 
         """
         header = kwargs
-        header['address'] = work_comm.address
+        header['address'] = work_comm.opp_address
         header['id'] = work_comm.uuid
         return header
 
@@ -1990,18 +2000,18 @@ class CommBase(tools.YggClass):
                 msg.args = msg.args[0]
                 msg.singular = True
             # 3. Check if the message is EOF or YGG_CLIENT_EOF
-            once_per_partner = False
             if self.is_eof(msg.args):
                 msg.flag = FLAG_EOF
-                once_per_partner = True
-            elif isinstance(msg.args, bytes) and (msg.args == YGG_CLIENT_EOF):
-                once_per_partner = True
-            if once_per_partner and (self.partner_copies > 1):
-                self.debug("Sending %s to %d model(s)", msg.args,
-                           self.partner_copies)
-                for i in range(self.partner_copies - 1):
-                    msg.add_message(args=msg.args,
-                                    header=copy.deepcopy(msg.header))
+        # Make duplicates
+        once_per_partner = ((msg.flag == FLAG_EOF)
+                            or (isinstance(msg.args, bytes)
+                                and (msg.args == YGG_CLIENT_EOF)))
+        if once_per_partner and (self.partner_copies > 1):
+            self.debug("Sending %s to %d model(s)", msg.args,
+                       self.partner_copies)
+            for i in range(self.partner_copies - 1):
+                msg.add_message(args=msg.args,
+                                header=copy.deepcopy(msg.header))
         if not skip_processing:
             # 4. Check if the message should be filtered
             if msg.flag not in [FLAG_SKIP, FLAG_EOF]:

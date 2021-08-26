@@ -2,6 +2,7 @@
 import sys
 import os
 import time
+import copy
 import signal
 import traceback
 import atexit
@@ -12,8 +13,11 @@ from collections import OrderedDict
 from yggdrasil.tools import YggClass
 from yggdrasil.config import ygg_cfg, cfg_environment, temp_config
 from yggdrasil import platform, yamlfile
-from yggdrasil.drivers import create_driver, DuplicatedModelDriver
+from yggdrasil.drivers import create_driver
 from yggdrasil.components import import_component
+from yggdrasil.multitasking import MPI
+from yggdrasil.drivers.DuplicatedModelDriver import DuplicatedModelDriver
+from yggdrasil.drivers.ModelDriver import ModelDriver
 
 
 COLOR_TRACE = '\033[30;43;22m'
@@ -246,8 +250,17 @@ class YggRunner(YggClass):
     def __init__(self, modelYmls, namespace=None, host=None, rank=0,
                  ygg_debug_level=None, rmq_debug_level=None,
                  ygg_debug_prefix=None, connection_task_method='thread',
-                 as_function=False, production_run=False):
-        super(YggRunner, self).__init__('runner')
+                 as_function=False, production_run=False,
+                 mpi_tag_start=None):
+        self.mpi_comm = None
+        name = 'runner'
+        if MPI is not None:
+            comm = MPI.COMM_WORLD
+            if comm.Get_size() > 1:
+                self.mpi_comm = comm
+                rank = comm.Get_rank()
+                name += str(rank)
+        super(YggRunner, self).__init__(name)
         if namespace is None:
             namespace = ygg_cfg.get('rmq', 'namespace', False)
         if not namespace:  # pragma: debug
@@ -256,6 +269,8 @@ class YggRunner(YggClass):
         self.host = host
         self.rank = rank
         self.connection_task_method = connection_task_method
+        self.base_dup = {}
+        self.modelcopies = {}
         self.modeldrivers = {}
         self.connectiondrivers = {}
         self.interrupt_time = 0
@@ -268,9 +283,13 @@ class YggRunner(YggClass):
         # Update environment based on config
         cfg_environment()
         # Parse yamls
-        self.drivers = yamlfile.parse_yaml(modelYmls, as_function=as_function)
-        self.connectiondrivers = self.drivers['connection']
-        self.modeldrivers = self.drivers['model']
+        self.mpi_tag_start = mpi_tag_start
+        if self.mpi_comm and (self.rank > 0):
+            pass
+        else:
+            self.drivers = yamlfile.parse_yaml(modelYmls, as_function=as_function)
+            self.connectiondrivers = self.drivers['connection']
+            self.modeldrivers = self.drivers['model']
 
     def pprint(self, *args):
         r"""Print with color."""
@@ -408,9 +427,10 @@ class YggRunner(YggClass):
         if 'working_dir' in yml:
             os.chdir(yml['working_dir'])
         try:
-            if yml.get('copies', 1) > 1:
-                instance = DuplicatedModelDriver.DuplicatedModelDriver(
-                    yml, namespace=self.namespace, rank=self.rank, **kwargs)
+            if (yml.get('copies', 1) > 1) and ('copy_index' not in yml):
+                instance = DuplicatedModelDriver(
+                    yml, namespace=self.namespace, rank=self.rank,
+                    duplicates=yml.pop('duplicates', None), **kwargs)
             else:
                 kwargs = dict(yml, **kwargs)
                 instance = create_driver(yml=yml, namespace=self.namespace,
@@ -420,6 +440,243 @@ class YggRunner(YggClass):
             os.chdir(curpath)
         return instance
 
+    def get_models(self, name, rank=None):
+        r"""Get the set of drivers referenced by a model name.
+
+        Args:
+            name (str, list): Name of model(s).
+            rank (int, optional): If provided, only models that will run on
+                MPI processes with this rank will be returned. Defaults to
+                None and is ignored.
+
+        Returns:
+            list: Set of drivers for a model.
+
+        """
+        if isinstance(name, list):
+            models = []
+            for x in name:
+                models += self.get_models(x, rank=rank)
+        elif name in self.modelcopies:
+            models = [self.modeldrivers[cpy] for cpy in self.modelcopies[name]]
+        elif name in self.modeldrivers:
+            models = [self.modeldrivers[name]]
+        else:
+            models = [self.modeldrivers[
+                DuplicatedModelDriver.get_base_name(name)]]
+            assert(models[0].get('copies', 0) > 1)
+        if rank is not None:  # pragma: debug
+            # models = [x for x in models if (x['mpi_rank'] == rank)]
+            raise NotImplementedError
+        return models
+
+    def bridge_mpi_connections(self, yml):
+        r"""Bridge connections over MPI processes."""
+        from yggdrasil.communication.MPIComm import MPIComm
+        io_map = {'inputs': 'outputs', 'outputs': 'inputs'}
+        models = {}
+        for io in io_map.keys():
+            models[io[:-1]] = [x['name'] for x in self.get_models(
+                [x.get('partner_model', None) for x in yml[io]
+                 if x.get('partner_model', None)])]
+        for io, io_opp in io_map.items():
+            for x in yml[io]:
+                model = x.get('partner_model', None)
+                if not model:
+                    continue
+                rank_map = {}
+                for m in self.get_models(model):
+                    rank_map.setdefault(m['mpi_rank'], [])
+                    rank_map[m['mpi_rank']].append(m)
+                if not any(rank > 0 for rank in rank_map.keys()):
+                    continue
+                if 'models' not in yml:
+                    yml['models'] = models
+                comms = []
+                for rank in rank_map.keys():
+                    x_copy = dict(copy.deepcopy(x),
+                                  partner_copies=len(rank_map[rank]))
+                    if rank == 0:
+                        icomm = x_copy
+                    else:
+                        icomm = dict(
+                            commtype='mpi',
+                            daemon=True,
+                            ranks=[rank],
+                            mpi_index=len(self._mpi_comms),
+                            mpi_direction=io_opp,
+                            mpi_stride=1,
+                            mpi_driver={
+                                io_opp: [{'commtype': 'mpi', 'ranks': [0],
+                                          'daemon': True}],
+                                io: [x_copy],
+                                'driver': yml['driver'],
+                                'name': (
+                                    '%s_mpi%s_%s' % (yml['name'], rank, io)),
+                                'models': {
+                                    io_opp[:-1]: models[io_opp[:-1]],
+                                    io[:-1]: [m['name'] for m in
+                                              rank_map[rank]]}})
+                        if yml['driver'].startswith('RPC'):
+                            icomm['mpi_stride'] += MPIComm._max_response
+                        self._mpi_comms.append(icomm)
+                        for m in rank_map[rank]:
+                            drv_key = 'mpi_%s_drivers' % io_opp[:-1]
+                            m.setdefault(drv_key, [])
+                            m[drv_key].append(icomm['mpi_driver']['name'])
+                    comms.append(icomm)
+                if len(comms) == 1:
+                    x.update(comms[0])
+                    self._mpi_comms[comms[0]['mpi_index']] = x
+                else:
+                    # TODO: Move to connection level?
+                    x.clear()
+                    x['commtype'] = comms
+                    if yml['driver'].startswith('RPC'):
+                        x['pattern'] = 'cycle'
+
+    def create_connection_driver(self, yml):
+        r"""Create a connection driver instance from the yaml information.
+
+        Args:
+            yml (yaml): Yaml object containing driver information.
+
+        Returns:
+            object: An instance of the specified driver.
+
+        """
+        yml['task_method'] = self.connection_task_method
+        drv = self.create_driver(yml)
+        # Transfer connection addresses to model via env
+        # TODO: Change to server that tracks connections
+        for model, env in drv.model_env.items():
+            env_key = 'env'
+            if (model not in self.modelcopies) and (model not in self.modeldrivers):
+                env_key = 'env_%s' % model
+            for x in self.get_models(model):
+                x.setdefault(env_key, {})
+                x[env_key].update(env)
+        return drv
+
+    def distribute_mpi(self):
+        r"""Distribute models between MPI processes."""
+        size = self.mpi_comm.Get_size()
+        if self.rank == 0:
+            from yggdrasil.communication.MPIComm import MPIComm
+            self.expand_duplicates()
+            # Set the rank and index for each model
+            for i, v in enumerate(self.modeldrivers.values()):
+                v['mpi_rank'] = (i + 1) % size
+                v['model_index'] = i
+                v['mpi_tag_start'] = self.mpi_tag_start
+            # Split the connections bridging MPI processes
+            self.debug("Splitting connection drivers over MPI")
+            self.all_connectiondrivers = self.connectiondrivers
+            self._mpi_comms = []
+            for driver in self.connectiondrivers.values():
+                self.bridge_mpi_connections(driver)
+            tag_start = len(ModelDriver._mpi_tags) * len(self.modeldrivers) * 5
+            if self.mpi_tag_start is not None:
+                tag_start += self.mpi_tag_start
+            tag_stride = sum([x.pop('mpi_stride') for x in self._mpi_comms])
+            connections = [[] for _ in range(size)]
+            for x in self._mpi_comms:
+                x['tag_start'] = tag_start + x.pop('mpi_index') * MPIComm._spacer_tags
+                x['tag_stride'] = tag_stride
+                io = x.pop('mpi_direction')
+                drv = x.pop('mpi_driver')
+                drv[io][0]['tag_start'] = x['tag_start']
+                drv[io][0]['tag_stride'] = x['tag_stride']
+                connections[x['ranks'][0]].append((drv['name'], drv))
+            max_len = len(max(connections, key=len))
+            for x in connections:
+                while len(x) < max_len:
+                    x.append(None)
+            # Sort models
+            self.all_modeldrivers = self.modeldrivers
+            models = [[] for _ in range(size)]
+            for i, (k, v) in enumerate(self.modeldrivers.items()):
+                x_cp = copy.deepcopy(v)
+                for k2 in ['input_drivers', 'output_drivers', 'mpi_rank']:
+                    x_cp.pop(k2, None)
+                for k2 in ['input_drivers', 'output_drivers']:
+                    x_cp[k2] = x_cp.get('mpi_%s' % k2, [])
+                # Skew models away from root process so that
+                # connection threading might not share process
+                models[v['mpi_rank']].append((k, x_cp))
+            max_len = len(max(models, key=len))
+            for x in models:
+                while len(x) < max_len:
+                    x.append(None)
+        else:
+            models = None
+            connections = None
+        self.modeldrivers = dict(
+            [x for x in self.mpi_comm.scatter(models, root=0)
+             if (x is not None)])
+        self.connectiondrivers = dict(
+            [x for x in self.mpi_comm.scatter(connections, root=0)
+             if (x is not None)])
+        self.modelcopies = self.mpi_comm.bcast(self.modelcopies, root=0)
+        self.info("Models on MPI process %d: %s", self.rank,
+                  list(self.modeldrivers.keys()))
+        # Add dummy drivers on root process to monitor remote ones
+        # and re-group copies into duplicate model w/ duplicate models
+        # before non-duplicate to allow them to start before starting
+        # local models
+        if self.rank == 0:
+            for i, (k, v) in enumerate(self.all_modeldrivers.items()):
+                if k not in self.modeldrivers:
+                    v['partner_driver'] = v['driver']
+                    v['language'] = 'mpi'
+                    v['driver'] = 'MPIPartnerModel'
+                self.modeldrivers[k] = v
+            self.connectiondrivers = self.all_connectiondrivers
+        else:
+            for v in self.modeldrivers.values():
+                for k in ['input_drivers', 'output_drivers']:
+                    v[k] = [self.connectiondrivers[x] for x in v.get(k, [])]
+        self.reduce_duplicates()
+
+    def expand_duplicates(self):
+        r"""Expand model copies so they can be split across MPI processes."""
+        self.debug("Expanding duplicated models")
+        remove_dup = []
+        add_dup = {}
+        for k, v in self.modeldrivers.items():
+            if v.get('copies', 1) > 1:
+                self.modelcopies[v['name']] = []
+                for x in DuplicatedModelDriver.get_yaml_copies(v):
+                    add_dup[x['name']] = x
+                    self.modelcopies[v['name']].append(x['name'])
+                remove_dup.append(k)
+        for k in remove_dup:
+            self.base_dup[k] = self.modeldrivers.pop(k)
+        self.modeldrivers.update(add_dup)
+
+    def reduce_duplicates(self):
+        r"""Join model duplicates after they were split between processes."""
+        self.debug("Reducing duplicated models")
+        for k in list(self.modelcopies.keys()):
+            duplicates = [self.modeldrivers.pop(cpy)
+                          for cpy in self.modelcopies.pop(k)
+                          if cpy in self.modeldrivers]
+            if duplicates:
+                if k in self.base_dup:
+                    base = self.base_dup[k]
+                else:
+                    base = dict(copy.deepcopy(duplicates[0]), name=k,
+                                input_drivers=duplicates[0].get(
+                                    'input_drivers', []),
+                                output_drivers=duplicates[0].get(
+                                    'output_drivers', []))
+                    base.pop('copy_index', None)
+                for x in duplicates:
+                    for k2 in ['input_drivers', 'output_drivers']:
+                        x[k2] = base.get(k2, [])
+                base['duplicates'] = duplicates
+                self.modeldrivers[k] = base
+        
     def loadDrivers(self):
         r"""Load all of the necessary drivers, doing the IO drivers first
         and adding IO driver environmental variables back tot he models."""
@@ -433,24 +690,35 @@ class YggRunner(YggClass):
                 driver_cls = import_component('model', driver['driver'],
                                               without_schema=True)
                 driver_cls.preparse_function(driver)
-            # Create connection drivers
+            if self.mpi_comm:
+                self.distribute_mpi()
+            # Create I/O drivers
             self.debug("Loading connection drivers")
             for driver in self.connectiondrivers.values():
                 driver['task_method'] = self.connection_task_method
-                self.create_driver(driver)
+                self.create_connection_driver(driver)
             # Create model drivers
             self.debug("Loading model drivers")
             for driver in self.modeldrivers.values():
                 self.create_driver(driver)
                 self.debug("Model %s:, env: %s",
                            driver['name'], pformat(driver['instance'].env))
-        except BaseException:  # pragma: debug
-            self.error("%s could not be created.", driver['name'])
+        except BaseException as e:  # pragma: debug
+            self.error("%s could not be created: %s", driver['name'], e)
             self.terminate()
             raise
 
     def start_server(self, name):
         r"""Start a server driver."""
+        if self.mpi_comm and (self.rank != 0):
+            return
+        # This is required if modelcopies are not joined before drivers
+        # are started
+        # if name in self.modelcopies:
+        #     assert(name not in self.modeldrivers)
+        #     for cpy in self.modelcopies[name]:
+        #         self.start_server(cpy)
+        #     return
         x = self.modeldrivers[name]['instance']
         if not x.was_started:
             self.debug("Starting server '%s' before client", x.name)
@@ -458,11 +726,20 @@ class YggRunner(YggClass):
 
     def stop_server(self, name):
         r"""Stop a server driver."""
+        # This is required if modelcopies are not joined before drivers
+        # are started
+        # if name in self.modelcopies:
+        #     assert(name not in self.modeldrivers)
+        #     for cpy in self.modelcopies[name]:
+        #         self.stop_server(cpy)
+        #     return
         x = self.modeldrivers[name]['instance']
         x.stop()
 
     def startDrivers(self):
         r"""Start drivers, starting with the IO drivers."""
+        if not self.mpi_comm or (self.rank == 0):
+            assert(not self.modelcopies)
         self.info('Starting I/O drivers and models on system '
                   + '{} in namespace {} with rank {}'.format(
                       self.host, self.namespace, self.rank))
@@ -489,10 +766,12 @@ class YggRunner(YggClass):
                     self.start_server(n2)
                 if not d.was_started:
                     d.start()
-        except BaseException:  # pragma: debug
-            self.error("%s did not start", driver['name'])
+        except BaseException as e:  # pragma: debug
+            self.error("%s did not start: %s(%s)", driver['name'], type(e), e)
             self.terminate()
             raise
+        if self.mpi_comm:
+            self.mpi_comm.barrier()
         self.debug('ALL DRIVERS STARTED')
 
     def waitModels(self, timeout=False):
@@ -544,6 +823,10 @@ class YggRunner(YggClass):
             self.error('One or more models generated errors.')
             self.printStatus()
             self.terminate()
+        if self.mpi_comm:
+            allcode = self.mpi_comm.allreduce(self.error_flag, op=MPI.SUM)
+            if not self.error_flag:
+                self.error_flag = allcode
         self.debug('Returning')
 
     # def do_model_exits(self, model):
@@ -579,6 +862,8 @@ class YggRunner(YggClass):
                 associated IO drivers.
 
         """
+        if self.mpi_comm and (self.rank != 0):
+            return
         # TODO: Exit upstream models that no longer have any open
         # output, connections when a connection is closed.
         for srv_name in model.get('client_of', []):

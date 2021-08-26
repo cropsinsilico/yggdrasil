@@ -12,10 +12,10 @@ LIBS = $(LDFLAGS)
 all: gs_lesson4_modelA gs_lesson4_modelB
 
 gs_lesson4_modelA: $(ODIR)\gs_lesson4_modelA.o
-	$(CC) /OUT:$@.exe $** /link $(LIBS)
+	$(CC) /Fe:$@.exe $** /link $(LIBS)
 
 gs_lesson4_modelB: $(ODIR)\gs_lesson4_modelB.o
-	$(CC) /OUT:$@.exe $** /link $(LIBS)
+	$(CC) /Fe:$@.exe $** /link $(LIBS)
 
 {$(SDIR)}.c{$(ODIR)}.o:
 	$(CC) /c $< -Fo$@ $(CFLAGS)

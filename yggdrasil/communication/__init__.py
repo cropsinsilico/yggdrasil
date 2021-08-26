@@ -1,5 +1,7 @@
 import subprocess
 import os
+import copy
+import pprint
 from contextlib import contextmanager
 from yggdrasil.components import import_component
 
@@ -53,6 +55,29 @@ class NoMessages(TemporaryCommunicationError):
 class FatalCommunicationError(Exception):
     r"""Raised when the comm cannot recover."""
     pass
+
+
+def check_env_for_address(env, name):
+    r"""Check for a channel name in a dictionary of environment variables.
+
+    Args:
+        env (dict): Environment variables to check.
+        name (str): Name of the channel to check for.
+
+    Returns:
+        str: The value stored in the environment variable for the channel.
+
+    Raises:
+        RuntimeError: If the channel cannot be located.
+
+    """
+    check_names = [name, name.replace(':', '__COLON__')]
+    check_names += [x.upper() for x in copy.copy(check_names)]
+    for x in check_names:
+        if x in env:
+            return env[x]
+    raise RuntimeError('Cannot see %s in env. Env:\n%s'
+                       % (name, pprint.pformat(env)))
 
 
 def import_comm(commtype=None):

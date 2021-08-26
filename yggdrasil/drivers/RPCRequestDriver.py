@@ -34,7 +34,6 @@ class RPCRequestDriver(ConnectionDriver):
         self.response_kwargs = response_kwargs
         # Parent and attributes
         super(RPCRequestDriver, self).__init__(model_request_name, **kwargs)
-        self.response_kwargs.setdefault('commtype', self.ocomm._commtype)
         self.response_drivers = {}
         self._block_response = False
 
@@ -114,7 +113,7 @@ class RPCRequestDriver(ConnectionDriver):
             out = super(RPCRequestDriver, self).remove_model(
                 direction, name)
             if out:
-                self.send_eof()
+                self.send_eof(header_kwargs={'model': name})
             return out
         
     # def send_eof(self):
@@ -168,20 +167,30 @@ class RPCRequestDriver(ConnectionDriver):
             return False
         # Start response driver
         if msg.flag != CommBase.FLAG_EOF:
+            # Remove client that signed off
+            if ((msg.header.get('raw', False)
+                 and (msg.args == CommBase.YGG_CLIENT_EOF))):  # pragma: intermittent
+                self.remove_model('input', msg.header['model'])
+                return True
             with self.lock:
                 if (not self.is_comm_open) or self._block_response:  # pragma: debug
                     self.debug("Comm closed, not creating response driver.")
                     return False
-                
-                if msg.header['response_address'] in self.response_drivers:
-                    response_driver = self.response_drivers[
-                        msg.header['response_address']]
+                key = msg.header['response_address']
+                if self.ocomm._commtype == 'fork':
+                    key = (msg.header['response_address'],
+                           self.ocomm.curr_comm_index % len(self.ocomm))
+                if key in self.response_drivers:
+                    response_driver = self.response_drivers[key]
                 else:
+                    response_kwargs = self.response_kwargs.copy()
+                    response_kwargs.update(
+                        self.ocomm.get_response_comm_kwargs)
                     drv_args = [msg.header['response_address'],
                                 msg.header['request_id']]
                     drv_kwargs = dict(
                         request_name=self.name,
-                        inputs=[self.response_kwargs.copy()],
+                        inputs=[response_kwargs],
                         outputs=[{'commtype': msg.header["commtype"]}])
                     self.debug("Creating response comm: address = %s, request_id = %s",
                                msg.header['response_address'],
@@ -189,8 +198,7 @@ class RPCRequestDriver(ConnectionDriver):
                     try:
                         response_driver = RPCResponseDriver(
                             *drv_args, **drv_kwargs)
-                        self.response_drivers[
-                            msg.header['response_address']] = response_driver
+                        self.response_drivers[key] = response_driver
                         response_driver.start()
                         self.debug("Started response comm: address = %s, request_id = %s",
                                    msg.header['response_address'],

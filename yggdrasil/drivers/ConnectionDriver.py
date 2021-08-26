@@ -8,6 +8,7 @@ from yggdrasil import multitasking
 from yggdrasil.communication import new_comm, CommBase
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.components import create_component, isinstance_component
+from yggdrasil.drivers.DuplicatedModelDriver import DuplicatedModelDriver
 
 
 def _translate_list2element(arr):
@@ -213,7 +214,8 @@ class ConnectionDriver(Driver):
     _disconnect_attr = Driver._disconnect_attr + [
         '_comm_closed', '_skip_after_loop', 'shared', 'task_thread']
 
-    def __init__(self, name, translator=None, single_use=False, onexit=None, **kwargs):
+    def __init__(self, name, translator=None, single_use=False, onexit=None,
+                 models=None, **kwargs):
         # kwargs['method'] = 'process'
         super(ConnectionDriver, self).__init__(name, **kwargs)
         # Shared attributes (set once or synced using events)
@@ -249,17 +251,19 @@ class ConnectionDriver(Driver):
         self.onexit = onexit
         # Add comms and print debug info
         self._init_comms(name, **kwargs)
-        self.models = {'input': list(self.icomm.model_env.keys()),
-                       'output': list(self.ocomm.model_env.keys())}
+        self.models = models
+        if self.models is None:
+            self.models = {'input': list(self.icomm.model_env.keys()),
+                           'output': list(self.ocomm.model_env.keys())}
         self.models_recvd = {}
         # self.debug('    env: %s', str(self.env))
         self.debug(('\n' + 80 * '=' + '\n'
                     + 'class = %s\n'
-                    + '    input: name = %s, address = %s\n'
-                    + '    output: name = %s, address = %s\n'
+                    + '    input: name = %s, address = %s, models=%s\n'
+                    + '    output: name = %s, address = %s, models=%s\n'
                     + (80 * '=')), self.__class__,
-                   self.icomm.name, self.icomm.address,
-                   self.ocomm.name, self.ocomm.address)
+                   self.icomm.name, self.icomm.address, self.models['input'],
+                   self.ocomm.name, self.ocomm.address, self.models['output'])
 
     def _init_single_comm(self, io, comm_list):
         r"""Parse keyword arguments for input/output comm."""
@@ -298,18 +302,19 @@ class ConnectionDriver(Driver):
                 # TODO: Handle recv?
                 comm_list[i]['commtype'] = [
                     dict(comm_list[i],
-                         partner_model=(
-                             '%s_copy%d' % (comm_list[i]['partner_model'], idx)))
+                         partner_model=DuplicatedModelDriver.name_format % (
+                             comm_list[i]['partner_model'], idx))
                     for idx in range(comm_list[i]['partner_copies'])]
                 for k in ForkComm.ForkComm.child_keys:
                     comm_list[i].pop(k, None)
         comm_kws['commtype'] = copy.deepcopy(comm_list)
         for x in comm_kws['commtype']:
-            if ((x.get('datatype', {}).get('from_function', False)
-                 and (x.get('datatype', {}).get('type', None)
-                      in ['any', 'instance']))):
-                x['datatype'] = {'type': 'bytes'}
-            x.get('datatype', {}).pop('from_function', False)
+            if isinstance(x.get('datatype', {}), dict):
+                if ((x.get('datatype', {}).get('from_function', False)
+                     and (x.get('datatype', {}).get('type', None)
+                          in ['any', 'instance']))):
+                    x['datatype'] = {'type': 'bytes'}
+                x.get('datatype', {}).pop('from_function', False)
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
         setattr(self, attr_comm, new_comm(**comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)
@@ -339,6 +344,8 @@ class ConnectionDriver(Driver):
         environment variables that need to be provided to the model."""
         out = {}
         for x in [self.icomm, self.ocomm]:
+            if x._commtype == 'mpi':
+                continue
             iout = x.model_env
             for k, v in iout.items():
                 if k in out:
@@ -423,6 +430,7 @@ class ConnectionDriver(Driver):
         r"""Wait until messages have been routed."""
         T = self.start_timeout(timeout, key_suffix='.route')
         while ((not T.is_out)
+               and (self.icomm.n_msg > 0)
                and (self.nrecv != self.nsent)):  # pragma: debug
             self.sleep()
         self.stop_timeout(key_suffix='.route')
@@ -799,6 +807,8 @@ class ConnectionDriver(Driver):
         if msg.header and ('model' in msg.header):
             self.models_recvd.setdefault(msg.header['model'], 0)
             self.models_recvd[msg.header['model']] += 1
+            if msg.header['model'] not in self.models['input']:
+                self.models['input'].append(msg.header['model'])
         if msg.flag == CommBase.FLAG_EOF:
             return self.on_eof(msg)
         if msg.flag == CommBase.FLAG_SUCCESS:
@@ -920,7 +930,7 @@ class ConnectionDriver(Driver):
             self.debug("1st send succeded")
         return flag
 
-    def send_eof(self):
+    def send_eof(self, **kwargs):
         r"""Send EOF message.
 
         Returns:
@@ -935,7 +945,7 @@ class ConnectionDriver(Driver):
         self.debug('Sent EOF')
         msg = CommBase.CommMessage(flag=CommBase.FLAG_EOF,
                                    args=self.ocomm.eof_msg)
-        return self.send_message(msg)
+        return self.send_message(msg, **kwargs)
 
     def send_message(self, msg, **kwargs):
         r"""Send a single message.
@@ -952,6 +962,9 @@ class ConnectionDriver(Driver):
         self.debug('')
         with self.lock:
             self._used = True
+        if (msg.header is not None) and ('model' in msg.header):
+            kwargs.setdefault('header_kwargs', {})
+            kwargs['header_kwargs'].setdefault('model', msg.header['model'])
         kws_prepare = {k: kwargs.pop(k) for k in self.ocomm._prepare_message_kws
                        if k in kwargs}
         msg_out = self.ocomm.prepare_message(msg.args, **kws_prepare)

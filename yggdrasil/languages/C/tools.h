@@ -357,6 +357,15 @@ int init_python_API() {
 static inline
 void yggLog(const char* prefix, const char* fmt, va_list ap) {
   fprintf(stdout, "%s: %d:%d ", prefix, ygg_getpid(), get_thread_id());
+  char *model_name = getenv("YGG_MODEL_NAME");
+  if (model_name != NULL) {
+    fprintf(stdout, "%s", model_name);
+    char *model_copy = getenv("YGG_MODEL_COPY");
+    if (model_copy != NULL) {
+      fprintf(stdout, "_copy%s", model_copy);
+    }
+    fprintf(stdout, " ");
+  }
   vfprintf(stdout, fmt, ap);
   fprintf(stdout, "\n");
   fflush(stdout);

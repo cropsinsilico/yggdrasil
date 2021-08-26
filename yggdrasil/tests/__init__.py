@@ -819,6 +819,12 @@ class YggTestBase(unittest.TestCase):
                 x.sleep()
             x.stop_timeout()
             ncurr_thread = self.thread_count
+        if ncurr_thread > self.nprev_thread:  # pragma: debug
+            raise AssertionError(
+                ("%d thread running, but the test started "
+                 "with %d. Running threads:\n\t%s")
+                % (ncurr_thread, self.nprev_thread,
+                   '\n\t'.join([x.name for x in threading.enumerate()])))
         self.assert_less_equal(ncurr_thread, self.nprev_thread)
         # Give files time to close
         self.cleanup_comms()
