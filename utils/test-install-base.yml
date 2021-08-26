@@ -276,6 +276,7 @@ jobs:
       run: |
         yggtest --ci --cov-append ${{ matrix.test-flags1 }}
         ./run_mpi.sh
+      continue-on-error: true
     - name: Re-run test script failures (1st)
       if: ${{ steps.test1_script.outcome == 'failure' }}
       run: |
@@ -295,6 +296,7 @@ jobs:
       run: |
         yggtest --ci --cov-append ${{ matrix.test-flags2 }}
         ./run_mpi.sh
+      continue-on-error: true
     - name: Re-run test script failures (2nd)
       if: ${{ steps.test2_script.outcome == 'failure' }}
       run: |
