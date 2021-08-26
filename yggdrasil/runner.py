@@ -205,12 +205,11 @@ class YggFunction(YggClass):
         self._stop_called = True
         for x in self.inputs.values():
             x['comm'].send_eof()
-            x['comm'].linger_close()
-        for x in self.outputs.values():
-            x['comm'].close()
-        self.model_driver['instance'].terminate()
+        self.model_driver['instance'].set_break_flag()
         self.runner.waitModels(timeout=10)
         for x in self.inputs.values():
+            x['comm'].close()
+        for x in self.outputs.values():
             x['comm'].close()
         self.runner.terminate()
         self.runner.atexit()

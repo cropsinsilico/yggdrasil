@@ -328,10 +328,16 @@ class integration_service_manager(SubCommand):
                    'if set, and based on the selected \'service-type\', if '
                    'not. For a service-type of \'flask\', this should be the '
                    'http address with the port that should be used '
-                   'and the default will be \'http://localhost:5000\'. '
+                   'and the default will be \'http://localhost:{port}\'. '
                    'For a service-type of \'rmq\', this should be an '
                    'amqp broker address and the default will be '
-                   '\'amqp://guest:guest@localhost:5672/%%2f\'.')}),
+                   '\'amqp://guest:guest@localhost:{port}/%%2f\'.')}),
+        (('--port', ),
+         {'type': int,
+          'help': ('Port that should be used to access the app. '
+                   'Defaults to 5000 for a flask service manager and '
+                   '5672 for a RabbitMQ service manager if not set '
+                   'via the PORT environment variable.')}),
         ArgumentSubparser(
             title='action', dest='action',
             description='Management action to take.',
@@ -341,6 +347,19 @@ class integration_service_manager(SubCommand):
                     help=('Start an integration service manager and/or '
                           'integration service.'),
                     arguments=[
+                        (('--remote-url', ),
+                         {'type': str,
+                          'help': ('URL that will be used to access '
+                                   'the service manager and running '
+                                   'integrations by remote requests. '
+                                   'If not provided, the environment '
+                                   'variable YGGDRASIL_SERVICE_HOST_URL '
+                                   'will be used if it is set. If it is '
+                                   'not set, the local ``address`` will '
+                                   'be used under the assumption that '
+                                   'the service manager and integration '
+                                   'services will only be connected to '
+                                   'by local integrations.')}),
                         (('--integration-name', ),
                          {'default': None,
                           'help': ('Name of integration to start. If not '
@@ -400,9 +419,7 @@ class integration_service_manager(SubCommand):
 
     @classmethod
     def func(cls, args):
-        from yggdrasil.services import (
-            IntegrationServiceManager, _default_service_type,
-            _default_commtype, _default_address)
+        from yggdrasil.services import IntegrationServiceManager
         integration_name = getattr(args, 'integration-name',
                                    getattr(args, 'integration_name', None))
         integration_yamls0 = getattr(args, 'integration-yamls',
@@ -419,21 +436,16 @@ class integration_service_manager(SubCommand):
         for_request = (
             (args.action in ['status', 'register', 'unregister'])
             or (integration_name is not None))
-        if not args.service_type:
-            args.service_type = _default_service_type
-        if not args.commtype:
-            args.commtype = _default_commtype
-        if not args.address:
-            args.address = _default_address
         x = IntegrationServiceManager(name=args.manager_name,
                                       service_type=args.service_type,
                                       commtype=args.commtype,
                                       address=args.address,
+                                      port=args.port,
                                       for_request=for_request)
         if args.action in ['start', None]:
             if integration_name is None:
                 if not x.is_running:
-                    x.run_server()
+                    x.start_server(remote_url=getattr(args, 'remote-url', None))
             else:
                 x.send_request(integration_name,
                                yamls=integration_yamls,

@@ -18,7 +18,6 @@ TODO
 ....
 
 * Add tutorial on setting up a service
-* Fix return of opp_address for flask so that RESTComms use the correct remote address
 * Finish test using the Heroku app
 * Fix bug on windows where ZMQ error occurs on shudown for service integration
 

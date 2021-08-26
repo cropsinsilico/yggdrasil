@@ -46,11 +46,21 @@ class ServiceBase(YggClass):
 
     """
 
+    default_address = None
+    default_port = None
+
     def __init__(self, name, *args, **kwargs):
         self.for_request = kwargs.pop('for_request', False)
         self.address = kwargs.pop('address', None)
+        self.port = kwargs.pop('port', None)
         if self.address is None:
             self.address = _default_address
+        if self.address is None:
+            self.address = self.default_address
+        if self.port is None:
+            self.port = self.default_port
+        if isinstance(self.address, str) and ('{port}' in self.address):
+            self.address = self.address.format(port=self.port)
         self._args = args
         self._kwargs = kwargs
         super(ServiceBase, self).__init__(name, *args, **kwargs)
@@ -100,6 +110,16 @@ class ServiceBase(YggClass):
     def setup_client(self, *args, **kwargs):
         r"""Set up the machinery for sending requests."""
         raise NotImplementedError
+
+    def start_server(self, remote_url=None):
+        r"""Start the server."""
+        if remote_url is None:
+            remote_url = os.environ.get('YGGDRASIL_SERVICE_HOST_URL', None)
+        if remote_url is None:
+            remote_url = self.address
+        self.remote_url = remote_url
+        os.environ.setdefault('YGGDRASIL_SERVICE_HOST_URL', remote_url)
+        self.run_server()
 
     def run_server(self):
         r"""Begin listening for requests."""
@@ -220,6 +240,8 @@ class FlaskService(ServiceBase):
 
     service_type = 'flask'
     default_commtype = 'rest'
+    default_address = 'http://localhost:{port}'
+    default_port = int(os.environ.get("PORT", 5000))
 
     @classmethod
     def is_installed(cls):
@@ -232,10 +254,7 @@ class FlaskService(ServiceBase):
 
     def __init__(self, *args, **kwargs):
         super(FlaskService, self).__init__(*args, **kwargs)
-        self.port = int(os.environ.get("PORT", 5000))
-        if self.address is None:
-            self.address = 'http://localhost:%d' % self.port
-        else:
+        if str(self.port) not in self.address:
             parts = self.address.split(':')
             if parts[-1].strip('/').isdigit():
                 self.port = int(parts[-1].strip('/'))
@@ -338,6 +357,7 @@ class RMQService(ServiceBase):
 
     service_type = 'rmq'
     default_commtype = 'rmq'
+    default_port = 5672
 
     @classmethod
     def is_installed(cls):
@@ -349,6 +369,7 @@ class RMQService(ServiceBase):
         from yggdrasil.communication.RMQComm import pika, get_rmq_parameters
         self.pika = pika
         if not self.address:
+            kwargs['port'] = self.port
             self.address, _, _ = get_rmq_parameters(*args, **kwargs)
         self.queue = self.name
         # Unclear why using a non-default exchange prevents the server
@@ -482,7 +503,7 @@ class RMQService(ServiceBase):
         return self.response
 
 
-def create_service_manager_class(service_type=_default_service_type):
+def create_service_manager_class(service_type=None):
     r"""Create an integration manager service with the specified base.
 
     Args:
@@ -495,6 +516,8 @@ def create_service_manager_class(service_type=_default_service_type):
             running as services.
 
     """
+    if service_type is None:
+        service_type = _default_service_type
     if isinstance(service_type, str):
         cls_map = {'flask': FlaskService, 'rmq': RMQService}
         service_type = cls_map[service_type]
@@ -513,11 +536,13 @@ def create_service_manager_class(service_type=_default_service_type):
 
         """
 
-        def __init__(self, name=None, commtype=_default_commtype, **kwargs):
+        def __init__(self, name=None, commtype=None, **kwargs):
             if name is None:
                 name = 'ygg_integrations'
             self.integrations = {}
             self.registry = IntegrationServiceRegistry()
+            if commtype is None:
+                commtype = _default_commtype
             self.commtype = commtype
             super(IntegrationServiceManager, self).__init__(name, **kwargs)
             if self.commtype is None:
@@ -639,7 +664,6 @@ def create_service_manager_class(service_type=_default_service_type):
             out.update(name=name,
                        args=name,
                        language='dummy')
-            # TODO: For flask, update the address to use the full URL
             return out
 
         @property

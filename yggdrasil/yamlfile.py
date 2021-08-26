@@ -378,7 +378,7 @@ def complete_partial_integration(existing, name, partial_commtype=None):
         for i in miss[io1]:
             dummy_channel = 'dummy_%s' % i
             dummy_comm = copy.deepcopy(existing[io1][i])
-            for k in ['address', 'for_service', 'commtype']:
+            for k in ['address', 'for_service', 'commtype', 'host']:
                 dummy_comm.pop(k, None)
             dummy_comm['name'] = dummy_channel
             if partial_commtype is not None:

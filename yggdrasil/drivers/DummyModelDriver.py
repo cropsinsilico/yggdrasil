@@ -67,7 +67,7 @@ class DummyModelDriver(InterpretedModelDriver):
         r"""Loop to check if model is still running and forward output."""
         for drv in self.runner.modeldrivers.values():
             if (drv['name'] != self.name) and drv['instance'].is_alive():
-                self.sleep(1)
+                self.wait_flag_attr('break_flag', timeout=1.0)
                 return
         self.set_break_flag()
 

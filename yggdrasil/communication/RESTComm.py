@@ -1,3 +1,4 @@
+import os
 import uuid
 import requests
 from yggdrasil.communication import CommBase, NoMessages
@@ -81,7 +82,9 @@ class RESTComm(CommBase.CommBase):
     _schema_subtype_description = 'RESTful API.'
     _schema_properties = {
         'params': {'type': 'object'},
-        'cookies': {'type': 'object'}}
+        'cookies': {'type': 'object'},
+        'host': {'type': 'string', 'default': 'http://localhost:{port}'},
+        'port': {'type': 'int'}}
     _maxMsgSize = 2048  # Based on limit for GET requests on most servers
 
     def __init__(self, *args, **kwargs):
@@ -98,20 +101,45 @@ class RESTComm(CommBase.CommBase):
         super(RESTComm, self).open(*args, **kwargs)
         self._is_open = True
 
-    @classmethod
-    def new_comm_kwargs(cls, name, host=None, **kwargs):
-        r"""Initialize keywords for a new comm."""
-        model = kwargs.get('partner_model', None)
-        if model is None:
-            model = str(uuid.uuid4()).split('-')[0]
-        args = [name]
-        if host is None:
-            host = 'http://localhost:5000'
-        if not host.endswith('/'):
-            host += '/'
-        if not kwargs.get('address', None):
-            kwargs['address'] = f'{host}{model}/{name}'
-        return args, kwargs
+    def bind(self, *args, **kwargs):
+        r"""Bind to address based on information provided."""
+        if self.address == 'address':
+            model = self.partner_model
+            if model is None:
+                model = str(uuid.uuid4()).split('-')[0]
+            if self.port is None:
+                self.port = int(os.environ.get("PORT", 5000))
+            if not self.host.endswith('/'):
+                self.host += '/'
+            if '{port}' in self.host:
+                self.host = self.host.format(port=self.port)
+            host = self.host
+            name = self.name_base
+            self.address = f'{host}{model}/{name}'
+        return super(RESTComm, self).bind(*args, **kwargs)
+
+    def opp_comm_kwargs(self, for_yaml=False):
+        r"""Get keyword arguments to initialize communication with opposite
+        comm object.
+
+        Args:
+            for_yaml (bool, optional): If True, the returned dict will only
+                contain values that can be specified in a YAML file. Defaults
+                to False.
+
+        Returns:
+            dict: Keyword arguments for opposite comm object.
+
+        """
+        out = super(RESTComm, self).opp_comm_kwargs(for_yaml=for_yaml)
+        if 'YGGDRASIL_SERVICE_HOST_URL' in os.environ:
+            out['host'] = os.environ['YGGDRASIL_SERVICE_HOST_URL']
+            if not out['host'].endswith('/'):
+                out['host'] += '/'
+            out['address'] = out['address'].replace(self.host, out['host'])
+        else:
+            out['host'] = self.host
+        return out
 
     def _close(self, *args, **kwargs):
         r"""Close the connection."""
