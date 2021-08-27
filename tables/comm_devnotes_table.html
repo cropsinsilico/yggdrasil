@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../threading.html">OpenMP Threading in Models</a></li>
@@ -204,7 +205,11 @@ systems so it is important that implementation of this communication mechanism
 properly split and send messages larger than this limit as more than one
 message.</p></td>
 </tr>
-<tr class="row-even"><td><p>rmq</p></td>
+<tr class="row-even"><td><p>mpi</p></td>
+<td><p>The partner communicator ID(s).</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>rmq</p></td>
 <td><p>AMPQ queue address of the form <code class="docutils literal notranslate"><span class="pre">&lt;url&gt;_R</span>
 <span class="pre">MQPARAM_&lt;exchange&gt;_RMQPARAM_&lt;queue&gt;</span></code>
 where <code class="docutils literal notranslate"><span class="pre">url</span></code> is the broker address (see
@@ -217,11 +222,11 @@ interface. Rather RMQ communication is included explicitly for connections
 between models that are not co-located on the same machine and are used by the
 yggdrasil framework connections on the Python side.</p></td>
 </tr>
-<tr class="row-odd"><td><p>value</p></td>
+<tr class="row-even"><td><p>value</p></td>
 <td></td>
 <td><p>[]</p></td>
 </tr>
-<tr class="row-even"><td><p>zmq</p></td>
+<tr class="row-odd"><td><p>zmq</p></td>
 <td><p>A ZeroMQ endpoint of the form
 &lt;transport&gt;://&lt;address&gt;, where the
 format of address depends on the

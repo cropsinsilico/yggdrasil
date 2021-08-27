@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>SaM &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>SaM &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../threading.html">OpenMP Threading in Models</a></li>
@@ -197,106 +198,106 @@
 <div class="section" id="mixed-version">
 <h2><a class="toc-backref" href="#id2">Mixed Version</a><a class="headerlink" href="#mixed-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 3</span><span class="cp">#include</span> <span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
+<span class="linenos"> 3</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
 <span class="linenos"> 4</span>
 <span class="linenos"> 5</span><span class="cp">#define BSIZE 1000</span>
 <span class="linenos"> 6</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="linenos"> 9</span>    <span class="kt">int</span> <span class="n">ret</span><span class="p">;</span>
-<span class="linenos">10</span>    <span class="kt">char</span> <span class="n">adata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
-<span class="linenos">11</span>    <span class="kt">char</span> <span class="n">bdata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
-<span class="linenos">12</span>    <span class="kt">char</span> <span class="n">outbuf</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
+<span class="linenos"> 8</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">adata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">bdata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">outbuf</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
 <span class="linenos">13</span>
-<span class="linenos">14</span>    <span class="c1">// Get input and output channels matching yaml</span>
-<span class="linenos">15</span>    <span class="n">yggInput_t</span> <span class="n">in1</span> <span class="o">=</span> <span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;input1_c&quot;</span><span class="p">);</span>
-<span class="linenos">16</span>    <span class="n">yggInput_t</span> <span class="n">in2</span> <span class="o">=</span> <span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;static_c&quot;</span><span class="p">);</span>
-<span class="linenos">17</span>    <span class="n">yggOutput_t</span> <span class="n">out1</span> <span class="o">=</span> <span class="n">yggOutput</span><span class="p">(</span><span class="s">&quot;output_c&quot;</span><span class="p">);</span>
-<span class="linenos">18</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Set up I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">14</span><span class="w">    </span><span class="c1">// Get input and output channels matching yaml</span>
+<span class="linenos">15</span><span class="w">    </span><span class="n">yggInput_t</span><span class="w"> </span><span class="n">in1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;input1_c&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="n">yggInput_t</span><span class="w"> </span><span class="n">in2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;static_c&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">    </span><span class="n">yggOutput_t</span><span class="w"> </span><span class="n">out1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggOutput</span><span class="p">(</span><span class="s">&quot;output_c&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Set up I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">19</span>
-<span class="linenos">20</span>    <span class="c1">// Get input from input1 channel</span>
-<span class="linenos">21</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_recv</span><span class="p">(</span><span class="n">in1</span><span class="p">,</span> <span class="n">adata</span><span class="p">,</span> <span class="n">BSIZE</span><span class="p">);</span>
-<span class="linenos">22</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">23</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR RECV from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">24</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">25</span>    <span class="p">}</span>
-<span class="linenos">26</span>    <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">adata</span><span class="p">);</span>
-<span class="linenos">27</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Received %d from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">);</span>
+<span class="linenos">20</span><span class="w">    </span><span class="c1">// Get input from input1 channel</span>
+<span class="linenos">21</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_recv</span><span class="p">(</span><span class="n">in1</span><span class="p">,</span><span class="w"> </span><span class="n">adata</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR RECV from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">adata</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Received %d from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">28</span>
-<span class="linenos">29</span>    <span class="c1">// Get input from static channel</span>
-<span class="linenos">30</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_recv</span><span class="p">(</span><span class="n">in2</span><span class="p">,</span> <span class="n">bdata</span><span class="p">,</span> <span class="n">BSIZE</span><span class="p">);</span>
-<span class="linenos">31</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">32</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR RECV from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">33</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">34</span>    <span class="p">}</span>
-<span class="linenos">35</span>    <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">bdata</span><span class="p">);</span>
-<span class="linenos">36</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Received %d from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
+<span class="linenos">29</span><span class="w">    </span><span class="c1">// Get input from static channel</span>
+<span class="linenos">30</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_recv</span><span class="p">(</span><span class="n">in2</span><span class="p">,</span><span class="w"> </span><span class="n">bdata</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">31</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">32</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR RECV from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">33</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">34</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">35</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">bdata</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">36</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Received %d from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">37</span>
-<span class="linenos">38</span>    <span class="c1">// Compute sum and send message to output channel</span>
-<span class="linenos">39</span>    <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
-<span class="linenos">40</span>    <span class="n">sprintf</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span> <span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="n">sum</span><span class="p">);</span>
-<span class="linenos">41</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_send</span><span class="p">(</span><span class="n">out1</span><span class="p">,</span> <span class="n">outbuf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">outbuf</span><span class="p">));</span>
-<span class="linenos">42</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">43</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR SEND to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">44</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">45</span>    <span class="p">}</span>
-<span class="linenos">46</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Sent to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">38</span><span class="w">    </span><span class="c1">// Compute sum and send message to output channel</span>
+<span class="linenos">39</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">40</span><span class="w">    </span><span class="n">sprintf</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">sum</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">41</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_send</span><span class="p">(</span><span class="n">out1</span><span class="p">,</span><span class="w"> </span><span class="n">outbuf</span><span class="p">,</span><span class="w"> </span><span class="n">strlen</span><span class="p">(</span><span class="n">outbuf</span><span class="p">));</span><span class="w"></span>
+<span class="linenos">42</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">43</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR SEND to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">44</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">45</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">46</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Sent to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">47</span>
-<span class="linenos">48</span>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="linenos">49</span><span class="p">}</span>
+<span class="linenos">48</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">49</span><span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 3</span><span class="cp">#include</span> <span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
+<span class="linenos"> 3</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
 <span class="linenos"> 4</span>
 <span class="linenos"> 5</span><span class="cp">#define BSIZE 1000</span>
 <span class="linenos"> 6</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="linenos"> 9</span>    <span class="kt">int</span> <span class="n">ret</span><span class="p">;</span>
-<span class="linenos">10</span>    <span class="kt">char</span> <span class="n">adata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
-<span class="linenos">11</span>    <span class="kt">char</span> <span class="n">bdata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
-<span class="linenos">12</span>    <span class="kt">char</span> <span class="n">outbuf</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
+<span class="linenos"> 8</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">adata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">bdata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">outbuf</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
 <span class="linenos">13</span>
-<span class="linenos">14</span>    <span class="c1">// Get input and output channels matching yaml</span>
-<span class="linenos">15</span>    <span class="n">YggInput</span> <span class="n">in1</span><span class="p">(</span><span class="s">&quot;input1_cpp&quot;</span><span class="p">);</span>
-<span class="linenos">16</span>    <span class="n">YggInput</span> <span class="n">in2</span><span class="p">(</span><span class="s">&quot;static_cpp&quot;</span><span class="p">);</span>
-<span class="linenos">17</span>    <span class="n">YggOutput</span> <span class="n">out1</span><span class="p">(</span><span class="s">&quot;output_cpp&quot;</span><span class="p">);</span>
-<span class="linenos">18</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Set up I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">14</span><span class="w">    </span><span class="c1">// Get input and output channels matching yaml</span>
+<span class="linenos">15</span><span class="w">    </span><span class="n">YggInput</span><span class="w"> </span><span class="n">in1</span><span class="p">(</span><span class="s">&quot;input1_cpp&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="n">YggInput</span><span class="w"> </span><span class="n">in2</span><span class="p">(</span><span class="s">&quot;static_cpp&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">    </span><span class="n">YggOutput</span><span class="w"> </span><span class="n">out1</span><span class="p">(</span><span class="s">&quot;output_cpp&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Set up I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">19</span>
-<span class="linenos">20</span>    <span class="c1">// Get input from input1 channel</span>
-<span class="linenos">21</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">in1</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">BSIZE</span><span class="p">);</span>
-<span class="linenos">22</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">23</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR RECV from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">24</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">25</span>    <span class="p">}</span>
-<span class="linenos">26</span>    <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">adata</span><span class="p">);</span>
-<span class="linenos">27</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Received %d from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">);</span>
+<span class="linenos">20</span><span class="w">    </span><span class="c1">// Get input from input1 channel</span>
+<span class="linenos">21</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">in1</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR RECV from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">adata</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Received %d from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">28</span>
-<span class="linenos">29</span>    <span class="c1">// Get input from static channel</span>
-<span class="linenos">30</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">in2</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">bdata</span><span class="p">,</span> <span class="n">BSIZE</span><span class="p">);</span>
-<span class="linenos">31</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">32</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR RECV from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">33</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">34</span>    <span class="p">}</span>
-<span class="linenos">35</span>    <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">bdata</span><span class="p">);</span>
-<span class="linenos">36</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Received %d from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
+<span class="linenos">29</span><span class="w">    </span><span class="c1">// Get input from static channel</span>
+<span class="linenos">30</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">in2</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">bdata</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">31</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">32</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR RECV from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">33</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">34</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">35</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">bdata</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">36</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Received %d from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">37</span>
-<span class="linenos">38</span>    <span class="c1">// Compute sum and send message to output channel</span>
-<span class="linenos">39</span>    <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
-<span class="linenos">40</span>    <span class="n">sprintf</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span> <span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="n">sum</span><span class="p">);</span>
-<span class="linenos">41</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">out1</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">outbuf</span><span class="p">));</span>
-<span class="linenos">42</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">43</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR SEND to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">44</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">45</span>    <span class="p">}</span>
-<span class="linenos">46</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Sent to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">47</span>    
-<span class="linenos">48</span>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="linenos">49</span><span class="p">}</span>
+<span class="linenos">38</span><span class="w">    </span><span class="c1">// Compute sum and send message to output channel</span>
+<span class="linenos">39</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">40</span><span class="w">    </span><span class="n">sprintf</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">sum</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">41</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out1</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span><span class="w"> </span><span class="n">strlen</span><span class="p">(</span><span class="n">outbuf</span><span class="p">));</span><span class="w"></span>
+<span class="linenos">42</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">43</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR SEND to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">44</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">45</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">46</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Sent to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">47</span><span class="w">    </span>
+<span class="linenos">48</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">49</span><span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>PROGRAM SaM
@@ -543,106 +544,106 @@
 <div class="section" id="mixed-w-o-matlab-version">
 <h2><a class="toc-backref" href="#id3">Mixed w/o Matlab Version</a><a class="headerlink" href="#mixed-w-o-matlab-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 3</span><span class="cp">#include</span> <span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
+<span class="linenos"> 3</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
 <span class="linenos"> 4</span>
 <span class="linenos"> 5</span><span class="cp">#define BSIZE 1000</span>
 <span class="linenos"> 6</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="linenos"> 9</span>    <span class="kt">int</span> <span class="n">ret</span><span class="p">;</span>
-<span class="linenos">10</span>    <span class="kt">char</span> <span class="n">adata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
-<span class="linenos">11</span>    <span class="kt">char</span> <span class="n">bdata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
-<span class="linenos">12</span>    <span class="kt">char</span> <span class="n">outbuf</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
+<span class="linenos"> 8</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">adata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">bdata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">outbuf</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
 <span class="linenos">13</span>
-<span class="linenos">14</span>    <span class="c1">// Get input and output channels matching yaml</span>
-<span class="linenos">15</span>    <span class="n">yggInput_t</span> <span class="n">in1</span> <span class="o">=</span> <span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;input1_c&quot;</span><span class="p">);</span>
-<span class="linenos">16</span>    <span class="n">yggInput_t</span> <span class="n">in2</span> <span class="o">=</span> <span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;static_c&quot;</span><span class="p">);</span>
-<span class="linenos">17</span>    <span class="n">yggOutput_t</span> <span class="n">out1</span> <span class="o">=</span> <span class="n">yggOutput</span><span class="p">(</span><span class="s">&quot;output_c&quot;</span><span class="p">);</span>
-<span class="linenos">18</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Set up I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">14</span><span class="w">    </span><span class="c1">// Get input and output channels matching yaml</span>
+<span class="linenos">15</span><span class="w">    </span><span class="n">yggInput_t</span><span class="w"> </span><span class="n">in1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;input1_c&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="n">yggInput_t</span><span class="w"> </span><span class="n">in2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;static_c&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">    </span><span class="n">yggOutput_t</span><span class="w"> </span><span class="n">out1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggOutput</span><span class="p">(</span><span class="s">&quot;output_c&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Set up I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">19</span>
-<span class="linenos">20</span>    <span class="c1">// Get input from input1 channel</span>
-<span class="linenos">21</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_recv</span><span class="p">(</span><span class="n">in1</span><span class="p">,</span> <span class="n">adata</span><span class="p">,</span> <span class="n">BSIZE</span><span class="p">);</span>
-<span class="linenos">22</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">23</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR RECV from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">24</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">25</span>    <span class="p">}</span>
-<span class="linenos">26</span>    <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">adata</span><span class="p">);</span>
-<span class="linenos">27</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Received %d from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">);</span>
+<span class="linenos">20</span><span class="w">    </span><span class="c1">// Get input from input1 channel</span>
+<span class="linenos">21</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_recv</span><span class="p">(</span><span class="n">in1</span><span class="p">,</span><span class="w"> </span><span class="n">adata</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR RECV from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">adata</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Received %d from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">28</span>
-<span class="linenos">29</span>    <span class="c1">// Get input from static channel</span>
-<span class="linenos">30</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_recv</span><span class="p">(</span><span class="n">in2</span><span class="p">,</span> <span class="n">bdata</span><span class="p">,</span> <span class="n">BSIZE</span><span class="p">);</span>
-<span class="linenos">31</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">32</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR RECV from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">33</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">34</span>    <span class="p">}</span>
-<span class="linenos">35</span>    <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">bdata</span><span class="p">);</span>
-<span class="linenos">36</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Received %d from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
+<span class="linenos">29</span><span class="w">    </span><span class="c1">// Get input from static channel</span>
+<span class="linenos">30</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_recv</span><span class="p">(</span><span class="n">in2</span><span class="p">,</span><span class="w"> </span><span class="n">bdata</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">31</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">32</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR RECV from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">33</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">34</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">35</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">bdata</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">36</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Received %d from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">37</span>
-<span class="linenos">38</span>    <span class="c1">// Compute sum and send message to output channel</span>
-<span class="linenos">39</span>    <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
-<span class="linenos">40</span>    <span class="n">sprintf</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span> <span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="n">sum</span><span class="p">);</span>
-<span class="linenos">41</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_send</span><span class="p">(</span><span class="n">out1</span><span class="p">,</span> <span class="n">outbuf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">outbuf</span><span class="p">));</span>
-<span class="linenos">42</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">43</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR SEND to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">44</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">45</span>    <span class="p">}</span>
-<span class="linenos">46</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Sent to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">38</span><span class="w">    </span><span class="c1">// Compute sum and send message to output channel</span>
+<span class="linenos">39</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">40</span><span class="w">    </span><span class="n">sprintf</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">sum</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">41</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_send</span><span class="p">(</span><span class="n">out1</span><span class="p">,</span><span class="w"> </span><span class="n">outbuf</span><span class="p">,</span><span class="w"> </span><span class="n">strlen</span><span class="p">(</span><span class="n">outbuf</span><span class="p">));</span><span class="w"></span>
+<span class="linenos">42</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">43</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR SEND to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">44</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">45</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">46</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Sent to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">47</span>
-<span class="linenos">48</span>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="linenos">49</span><span class="p">}</span>
+<span class="linenos">48</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">49</span><span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 3</span><span class="cp">#include</span> <span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
+<span class="linenos"> 3</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
 <span class="linenos"> 4</span>
 <span class="linenos"> 5</span><span class="cp">#define BSIZE 1000</span>
 <span class="linenos"> 6</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="linenos"> 9</span>    <span class="kt">int</span> <span class="n">ret</span><span class="p">;</span>
-<span class="linenos">10</span>    <span class="kt">char</span> <span class="n">adata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
-<span class="linenos">11</span>    <span class="kt">char</span> <span class="n">bdata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
-<span class="linenos">12</span>    <span class="kt">char</span> <span class="n">outbuf</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
+<span class="linenos"> 8</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">adata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">bdata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">outbuf</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
 <span class="linenos">13</span>
-<span class="linenos">14</span>    <span class="c1">// Get input and output channels matching yaml</span>
-<span class="linenos">15</span>    <span class="n">YggInput</span> <span class="n">in1</span><span class="p">(</span><span class="s">&quot;input1_cpp&quot;</span><span class="p">);</span>
-<span class="linenos">16</span>    <span class="n">YggInput</span> <span class="n">in2</span><span class="p">(</span><span class="s">&quot;static_cpp&quot;</span><span class="p">);</span>
-<span class="linenos">17</span>    <span class="n">YggOutput</span> <span class="n">out1</span><span class="p">(</span><span class="s">&quot;output_cpp&quot;</span><span class="p">);</span>
-<span class="linenos">18</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Set up I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">14</span><span class="w">    </span><span class="c1">// Get input and output channels matching yaml</span>
+<span class="linenos">15</span><span class="w">    </span><span class="n">YggInput</span><span class="w"> </span><span class="n">in1</span><span class="p">(</span><span class="s">&quot;input1_cpp&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="n">YggInput</span><span class="w"> </span><span class="n">in2</span><span class="p">(</span><span class="s">&quot;static_cpp&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">    </span><span class="n">YggOutput</span><span class="w"> </span><span class="n">out1</span><span class="p">(</span><span class="s">&quot;output_cpp&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Set up I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">19</span>
-<span class="linenos">20</span>    <span class="c1">// Get input from input1 channel</span>
-<span class="linenos">21</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">in1</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">BSIZE</span><span class="p">);</span>
-<span class="linenos">22</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">23</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR RECV from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">24</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">25</span>    <span class="p">}</span>
-<span class="linenos">26</span>    <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">adata</span><span class="p">);</span>
-<span class="linenos">27</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Received %d from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">);</span>
+<span class="linenos">20</span><span class="w">    </span><span class="c1">// Get input from input1 channel</span>
+<span class="linenos">21</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">in1</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR RECV from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">adata</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Received %d from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">28</span>
-<span class="linenos">29</span>    <span class="c1">// Get input from static channel</span>
-<span class="linenos">30</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">in2</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">bdata</span><span class="p">,</span> <span class="n">BSIZE</span><span class="p">);</span>
-<span class="linenos">31</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">32</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR RECV from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">33</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">34</span>    <span class="p">}</span>
-<span class="linenos">35</span>    <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">bdata</span><span class="p">);</span>
-<span class="linenos">36</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Received %d from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
+<span class="linenos">29</span><span class="w">    </span><span class="c1">// Get input from static channel</span>
+<span class="linenos">30</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">in2</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">bdata</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">31</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">32</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR RECV from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">33</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">34</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">35</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">bdata</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">36</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Received %d from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">37</span>
-<span class="linenos">38</span>    <span class="c1">// Compute sum and send message to output channel</span>
-<span class="linenos">39</span>    <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
-<span class="linenos">40</span>    <span class="n">sprintf</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span> <span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="n">sum</span><span class="p">);</span>
-<span class="linenos">41</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">out1</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">outbuf</span><span class="p">));</span>
-<span class="linenos">42</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">43</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR SEND to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">44</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">45</span>    <span class="p">}</span>
-<span class="linenos">46</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Sent to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">47</span>    
-<span class="linenos">48</span>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="linenos">49</span><span class="p">}</span>
+<span class="linenos">38</span><span class="w">    </span><span class="c1">// Compute sum and send message to output channel</span>
+<span class="linenos">39</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">40</span><span class="w">    </span><span class="n">sprintf</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">sum</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">41</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out1</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span><span class="w"> </span><span class="n">strlen</span><span class="p">(</span><span class="n">outbuf</span><span class="p">));</span><span class="w"></span>
+<span class="linenos">42</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">43</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR SEND to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">44</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">45</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">46</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Sent to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">47</span><span class="w">    </span>
+<span class="linenos">48</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">49</span><span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>PROGRAM SaM
@@ -841,55 +842,55 @@
 <div class="section" id="c-version">
 <h2><a class="toc-backref" href="#id4">C Version</a><a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 3</span><span class="cp">#include</span> <span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
+<span class="linenos"> 3</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
 <span class="linenos"> 4</span>
 <span class="linenos"> 5</span><span class="cp">#define BSIZE 1000</span>
 <span class="linenos"> 6</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="linenos"> 9</span>    <span class="kt">int</span> <span class="n">ret</span><span class="p">;</span>
-<span class="linenos">10</span>    <span class="kt">char</span> <span class="n">adata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
-<span class="linenos">11</span>    <span class="kt">char</span> <span class="n">bdata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
-<span class="linenos">12</span>    <span class="kt">char</span> <span class="n">outbuf</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
+<span class="linenos"> 8</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">adata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">bdata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">outbuf</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
 <span class="linenos">13</span>
-<span class="linenos">14</span>    <span class="c1">// Get input and output channels matching yaml</span>
-<span class="linenos">15</span>    <span class="n">yggInput_t</span> <span class="n">in1</span> <span class="o">=</span> <span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;input1_c&quot;</span><span class="p">);</span>
-<span class="linenos">16</span>    <span class="n">yggInput_t</span> <span class="n">in2</span> <span class="o">=</span> <span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;static_c&quot;</span><span class="p">);</span>
-<span class="linenos">17</span>    <span class="n">yggOutput_t</span> <span class="n">out1</span> <span class="o">=</span> <span class="n">yggOutput</span><span class="p">(</span><span class="s">&quot;output_c&quot;</span><span class="p">);</span>
-<span class="linenos">18</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Set up I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">14</span><span class="w">    </span><span class="c1">// Get input and output channels matching yaml</span>
+<span class="linenos">15</span><span class="w">    </span><span class="n">yggInput_t</span><span class="w"> </span><span class="n">in1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;input1_c&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="n">yggInput_t</span><span class="w"> </span><span class="n">in2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;static_c&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">    </span><span class="n">yggOutput_t</span><span class="w"> </span><span class="n">out1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggOutput</span><span class="p">(</span><span class="s">&quot;output_c&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Set up I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">19</span>
-<span class="linenos">20</span>    <span class="c1">// Get input from input1 channel</span>
-<span class="linenos">21</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_recv</span><span class="p">(</span><span class="n">in1</span><span class="p">,</span> <span class="n">adata</span><span class="p">,</span> <span class="n">BSIZE</span><span class="p">);</span>
-<span class="linenos">22</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">23</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR RECV from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">24</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">25</span>    <span class="p">}</span>
-<span class="linenos">26</span>    <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">adata</span><span class="p">);</span>
-<span class="linenos">27</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Received %d from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">);</span>
+<span class="linenos">20</span><span class="w">    </span><span class="c1">// Get input from input1 channel</span>
+<span class="linenos">21</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_recv</span><span class="p">(</span><span class="n">in1</span><span class="p">,</span><span class="w"> </span><span class="n">adata</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR RECV from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">adata</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Received %d from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">28</span>
-<span class="linenos">29</span>    <span class="c1">// Get input from static channel</span>
-<span class="linenos">30</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_recv</span><span class="p">(</span><span class="n">in2</span><span class="p">,</span> <span class="n">bdata</span><span class="p">,</span> <span class="n">BSIZE</span><span class="p">);</span>
-<span class="linenos">31</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">32</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR RECV from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">33</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">34</span>    <span class="p">}</span>
-<span class="linenos">35</span>    <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">bdata</span><span class="p">);</span>
-<span class="linenos">36</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Received %d from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
+<span class="linenos">29</span><span class="w">    </span><span class="c1">// Get input from static channel</span>
+<span class="linenos">30</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_recv</span><span class="p">(</span><span class="n">in2</span><span class="p">,</span><span class="w"> </span><span class="n">bdata</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">31</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">32</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR RECV from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">33</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">34</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">35</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">bdata</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">36</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Received %d from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">37</span>
-<span class="linenos">38</span>    <span class="c1">// Compute sum and send message to output channel</span>
-<span class="linenos">39</span>    <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
-<span class="linenos">40</span>    <span class="n">sprintf</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span> <span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="n">sum</span><span class="p">);</span>
-<span class="linenos">41</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_send</span><span class="p">(</span><span class="n">out1</span><span class="p">,</span> <span class="n">outbuf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">outbuf</span><span class="p">));</span>
-<span class="linenos">42</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">43</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR SEND to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">44</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">45</span>    <span class="p">}</span>
-<span class="linenos">46</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Sent to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">38</span><span class="w">    </span><span class="c1">// Compute sum and send message to output channel</span>
+<span class="linenos">39</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">40</span><span class="w">    </span><span class="n">sprintf</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">sum</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">41</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_send</span><span class="p">(</span><span class="n">out1</span><span class="p">,</span><span class="w"> </span><span class="n">outbuf</span><span class="p">,</span><span class="w"> </span><span class="n">strlen</span><span class="p">(</span><span class="n">outbuf</span><span class="p">));</span><span class="w"></span>
+<span class="linenos">42</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">43</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): ERROR SEND to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">44</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">45</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">46</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(C): Sent to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">47</span>
-<span class="linenos">48</span>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="linenos">49</span><span class="p">}</span>
+<span class="linenos">48</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">49</span><span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
@@ -919,55 +920,55 @@
 <div class="section" id="id1">
 <h2><a class="toc-backref" href="#id5">C++ Version</a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 3</span><span class="cp">#include</span> <span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
+<span class="linenos"> 3</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
 <span class="linenos"> 4</span>
 <span class="linenos"> 5</span><span class="cp">#define BSIZE 1000</span>
 <span class="linenos"> 6</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="linenos"> 9</span>    <span class="kt">int</span> <span class="n">ret</span><span class="p">;</span>
-<span class="linenos">10</span>    <span class="kt">char</span> <span class="n">adata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
-<span class="linenos">11</span>    <span class="kt">char</span> <span class="n">bdata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
-<span class="linenos">12</span>    <span class="kt">char</span> <span class="n">outbuf</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
+<span class="linenos"> 8</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">adata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">bdata</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">outbuf</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
 <span class="linenos">13</span>
-<span class="linenos">14</span>    <span class="c1">// Get input and output channels matching yaml</span>
-<span class="linenos">15</span>    <span class="n">YggInput</span> <span class="n">in1</span><span class="p">(</span><span class="s">&quot;input1_cpp&quot;</span><span class="p">);</span>
-<span class="linenos">16</span>    <span class="n">YggInput</span> <span class="n">in2</span><span class="p">(</span><span class="s">&quot;static_cpp&quot;</span><span class="p">);</span>
-<span class="linenos">17</span>    <span class="n">YggOutput</span> <span class="n">out1</span><span class="p">(</span><span class="s">&quot;output_cpp&quot;</span><span class="p">);</span>
-<span class="linenos">18</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Set up I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">14</span><span class="w">    </span><span class="c1">// Get input and output channels matching yaml</span>
+<span class="linenos">15</span><span class="w">    </span><span class="n">YggInput</span><span class="w"> </span><span class="n">in1</span><span class="p">(</span><span class="s">&quot;input1_cpp&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="n">YggInput</span><span class="w"> </span><span class="n">in2</span><span class="p">(</span><span class="s">&quot;static_cpp&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">    </span><span class="n">YggOutput</span><span class="w"> </span><span class="n">out1</span><span class="p">(</span><span class="s">&quot;output_cpp&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Set up I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">19</span>
-<span class="linenos">20</span>    <span class="c1">// Get input from input1 channel</span>
-<span class="linenos">21</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">in1</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">BSIZE</span><span class="p">);</span>
-<span class="linenos">22</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">23</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR RECV from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">24</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">25</span>    <span class="p">}</span>
-<span class="linenos">26</span>    <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">adata</span><span class="p">);</span>
-<span class="linenos">27</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Received %d from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">);</span>
+<span class="linenos">20</span><span class="w">    </span><span class="c1">// Get input from input1 channel</span>
+<span class="linenos">21</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">in1</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR RECV from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">adata</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Received %d from input1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">28</span>
-<span class="linenos">29</span>    <span class="c1">// Get input from static channel</span>
-<span class="linenos">30</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">in2</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">bdata</span><span class="p">,</span> <span class="n">BSIZE</span><span class="p">);</span>
-<span class="linenos">31</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">32</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR RECV from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">33</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">34</span>    <span class="p">}</span>
-<span class="linenos">35</span>    <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">bdata</span><span class="p">);</span>
-<span class="linenos">36</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Received %d from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
+<span class="linenos">29</span><span class="w">    </span><span class="c1">// Get input from static channel</span>
+<span class="linenos">30</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">in2</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">bdata</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">31</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">32</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR RECV from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">33</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">34</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">35</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">bdata</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">36</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Received %d from static</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
 <span class="linenos">37</span>
-<span class="linenos">38</span>    <span class="c1">// Compute sum and send message to output channel</span>
-<span class="linenos">39</span>    <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
-<span class="linenos">40</span>    <span class="n">sprintf</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span> <span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="n">sum</span><span class="p">);</span>
-<span class="linenos">41</span>    <span class="n">ret</span> <span class="o">=</span> <span class="n">out1</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">outbuf</span><span class="p">));</span>
-<span class="linenos">42</span>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">43</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR SEND to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">44</span>      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">45</span>    <span class="p">}</span>
-<span class="linenos">46</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Sent to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">47</span>    
-<span class="linenos">48</span>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="linenos">49</span><span class="p">}</span>
+<span class="linenos">38</span><span class="w">    </span><span class="c1">// Compute sum and send message to output channel</span>
+<span class="linenos">39</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">40</span><span class="w">    </span><span class="n">sprintf</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">sum</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">41</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out1</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">outbuf</span><span class="p">,</span><span class="w"> </span><span class="n">strlen</span><span class="p">(</span><span class="n">outbuf</span><span class="p">));</span><span class="w"></span>
+<span class="linenos">42</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">43</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): ERROR SEND to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">44</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">45</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">46</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;SaM(CPP): Sent to output</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">47</span><span class="w">    </span>
+<span class="linenos">48</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">49</span><span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Model YAML:</p>

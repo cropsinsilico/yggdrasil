@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.CommBase &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.communication.CommBase &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
@@ -194,7 +195,7 @@
 <span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">YGG_MSG_EOF</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">new_comm</span><span class="p">,</span> <span class="n">get_comm</span><span class="p">,</span> <span class="n">determine_suffix</span><span class="p">,</span> <span class="n">TemporaryCommunicationError</span><span class="p">,</span>
-    <span class="n">import_comm</span><span class="p">)</span>
+    <span class="n">import_comm</span><span class="p">,</span> <span class="n">check_env_for_address</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span><span class="p">,</span> <span class="n">create_component</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">MetaschemaTypeError</span><span class="p">,</span> <span class="n">type2numpy</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.MetaschemaType</span> <span class="kn">import</span> <span class="n">MetaschemaType</span>
@@ -546,11 +547,15 @@
 <span class="sd">            interface binding. Defaults to False.</span>
 <span class="sd">        language (str, optional): Programming language of the calling model.</span>
 <span class="sd">            Defaults to &#39;python&#39;.</span>
+<span class="sd">        env (dict, optional): Environment variable that should be used.</span>
+<span class="sd">            Defaults to os.environ if not provided.</span>
 <span class="sd">        partner_model (str, optional): Name of model that this comm is</span>
 <span class="sd">            partnered with. Default to None, indicating that the partner</span>
 <span class="sd">            is not a model.</span>
 <span class="sd">        partner_language (str, optional): Programming language of this comm&#39;s</span>
 <span class="sd">            partner comm. Defaults to &#39;python&#39;.</span>
+<span class="sd">        partner_mpi_ranks (list, optional): Ranks of processes of this comm&#39;s</span>
+<span class="sd">            partner comm(s). Defaults to [].</span>
 <span class="sd">        datatype (schema, optional): JSON schema (with expanded core types</span>
 <span class="sd">            defined by |yggdrasil|) that constrains the type of data that</span>
 <span class="sd">            should be sent/received by this object. Defaults to {&#39;type&#39;: &#39;bytes&#39;}.</span>
@@ -662,8 +667,10 @@
 <span class="sd">            connection.</span>
 <span class="sd">        is_interface (bool): True if this comm is a Python interface binding.</span>
 <span class="sd">        language (str): Language that this comm is being called from.</span>
+<span class="sd">        env (dict): Environment variable that should be used.</span>
 <span class="sd">        partner_model (str): Name of model that this comm is partnered with.</span>
 <span class="sd">        partner_language (str): Programming language of this comm&#39;s partner comm.</span>
+<span class="sd">        partner_mpi_ranks (list): Ranks of processes of this comm&#39;s partner comm(s).</span>
 <span class="sd">        serializer (:class:.DefaultSerialize): Object that will be used to</span>
 <span class="sd">            serialize/deserialize messages to/from python objects.</span>
 <span class="sd">        recv_timeout (float): Time that should be waited for an incoming</span>
@@ -766,8 +773,8 @@
     <span class="n">_finalize_message_kws</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;skip_python2language&#39;</span><span class="p">,</span> <span class="s1">&#39;after_finalize_message&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="n">dont_open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">is_interface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">partner_copies</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                 <span class="n">partner_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">partner_language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">,</span>
+                 <span class="n">is_interface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">partner_copies</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">partner_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">partner_language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="n">partner_mpi_ranks</span><span class="o">=</span><span class="p">[],</span>
                  <span class="n">recv_timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">close_on_eof_recv</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">close_on_eof_send</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">single_use</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reverse_names</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_suffix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">allow_multiple_comms</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -777,34 +784,30 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">MetaschemaType</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CommBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="ow">not</span> <span class="n">is_interface</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span>
+                 <span class="n">language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">)))):</span>  <span class="c1"># pragma: debug</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Comm class </span><span class="si">%s</span><span class="s2"> not installed&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">partner_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_interface</span><span class="p">):</span>
             <span class="n">no_suffix</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">suffix</span> <span class="o">=</span> <span class="n">determine_suffix</span><span class="p">(</span><span class="n">no_suffix</span><span class="o">=</span><span class="n">no_suffix</span><span class="p">,</span>
                                   <span class="n">reverse_names</span><span class="o">=</span><span class="n">reverse_names</span><span class="p">,</span>
                                   <span class="n">direction</span><span class="o">=</span><span class="n">direction</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">env</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name_base</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="n">suffix</span>
         <span class="k">if</span> <span class="n">address</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">check_env_for_address</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
                 <span class="n">model_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span>
                 <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="n">model_name</span>
                 <span class="k">if</span> <span class="n">model_name</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
-                <span class="k">if</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span>
-                     <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;__COLON__&#39;</span><span class="p">)</span>
-                          <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">))):</span>
-                    <span class="kn">import</span> <span class="nn">pprint</span>
-                    <span class="n">env_str</span> <span class="o">=</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
-                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                        <span class="s1">&#39;Cannot see </span><span class="si">%s</span><span class="s1"> in env (model = </span><span class="si">%s</span><span class="s1">). Env:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
-                        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">env_str</span><span class="p">))</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;__COLON__&#39;</span><span class="p">)]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">check_env_for_address</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">address</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span>
@@ -827,6 +830,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">partner_language</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">partner_language_driver</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span>
                 <span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">partner_language</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">partner_mpi_ranks</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">partner_mpi_ranks</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">language_driver</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">touches_model</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partner_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_client</span> <span class="o">=</span> <span class="n">is_client</span>
@@ -854,14 +858,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_send_serializer</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allow_multiple_comms</span> <span class="o">=</span> <span class="n">allow_multiple_comms</span>
         <span class="k">if</span> <span class="p">(((</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">single_use</span><span class="p">)</span>
-             <span class="ow">and</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">is_interface</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_THREADING&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+             <span class="ow">and</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">is_interface</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_THREADING&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
                   <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_copies</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partner_copies</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)))):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">allow_multiple_comms</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">single_use</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_response_server</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_send_serializer</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">create_proxy</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">is_client</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">allow_multiple_comms</span><span class="p">)</span>
                              <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interface</span><span class="p">)</span>
-                             <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">!=</span> <span class="s1">&#39;recv&#39;</span><span class="p">))</span>
+                             <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">!=</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span>
+                             <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_commtype</span> <span class="o">!=</span> <span class="s1">&#39;mpi&#39;</span><span class="p">))</span>
         <span class="c1"># Add interface tag</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interface</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">+=</span> <span class="s1">&#39;_I&#39;</span>
@@ -888,7 +893,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">_instance_name</span> <span class="o">+=</span> <span class="p">(</span>
-            <span class="s1">&#39;=&gt;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%%</span><span class="s1">&#39;</span><span class="p">))</span>
+            <span class="s1">&#39;=&gt;</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%%</span><span class="s1">&#39;</span><span class="p">),</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
 
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_commtype</span> <span class="o">!=</span> <span class="s1">&#39;buffer&#39;</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
@@ -1161,20 +1167,20 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">model_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of the model using the comm.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_MODEL_NAME&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_MODEL_NAME&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">full_model_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of the model using the comm w/ copy suffix.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span>
-        <span class="k">if</span> <span class="n">out</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;YGG_MODEL_COPY&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">):</span>
-            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;_copy</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;YGG_MODEL_COPY&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;YGG_MODEL_COPY&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;_copy</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">[</span><span class="s1">&#39;YGG_MODEL_COPY&#39;</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">model_copies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of copies of the model using the comm.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_MODEL_COPIES&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_MODEL_COPIES&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">))</span>
 
 <div class="viewcode-block" id="CommBase.underlying_comm_class"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.underlying_comm_class">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">underlying_comm_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
@@ -1806,6 +1812,11 @@
 
     <span class="c1"># TEMP COMMS</span>
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">get_response_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments to use for a response comm.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">commtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_commtype</span><span class="p">)</span>
+    
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">get_work_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for an existing work comm.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_commtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1925,7 +1936,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">header</span> <span class="o">=</span> <span class="n">kwargs</span>
-        <span class="n">header</span><span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">work_comm</span><span class="o">.</span><span class="n">address</span>
+        <span class="n">header</span><span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">work_comm</span><span class="o">.</span><span class="n">opp_address</span>
         <span class="n">header</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">work_comm</span><span class="o">.</span><span class="n">uuid</span>
         <span class="k">return</span> <span class="n">header</span></div>
 
@@ -2173,18 +2184,18 @@
                 <span class="n">msg</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">msg</span><span class="o">.</span><span class="n">singular</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="c1"># 3. Check if the message is EOF or YGG_CLIENT_EOF</span>
-            <span class="n">once_per_partner</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_eof</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">):</span>
                 <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="n">FLAG_EOF</span>
-                <span class="n">once_per_partner</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">args</span> <span class="o">==</span> <span class="n">YGG_CLIENT_EOF</span><span class="p">):</span>
-                <span class="n">once_per_partner</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">if</span> <span class="n">once_per_partner</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partner_copies</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Sending </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%d</span><span class="s2"> model(s)&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
-                           <span class="bp">self</span><span class="o">.</span><span class="n">partner_copies</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partner_copies</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-                    <span class="n">msg</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
-                                    <span class="n">header</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">))</span>
+        <span class="c1"># Make duplicates</span>
+        <span class="n">once_per_partner</span> <span class="o">=</span> <span class="p">((</span><span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="n">FLAG_EOF</span><span class="p">)</span>
+                            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
+                                <span class="ow">and</span> <span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">args</span> <span class="o">==</span> <span class="n">YGG_CLIENT_EOF</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">once_per_partner</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partner_copies</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Sending </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%d</span><span class="s2"> model(s)&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">partner_copies</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partner_copies</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
+                                <span class="n">header</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_processing</span><span class="p">:</span>
             <span class="c1"># 4. Check if the message should be filtered</span>
             <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">FLAG_SKIP</span><span class="p">,</span> <span class="n">FLAG_EOF</span><span class="p">]:</span>

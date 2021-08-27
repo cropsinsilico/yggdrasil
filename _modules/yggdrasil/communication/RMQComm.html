@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.RMQComm &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.communication.RMQComm &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
@@ -181,7 +182,8 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.communication.RMQComm</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">NoMessages</span>
+<span></span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">multitasking</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">NoMessages</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="kn">import</span> <span class="n">ygg_cfg</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -189,8 +191,8 @@
     <span class="kn">import</span> <span class="nn">pika</span>
     <span class="n">_rmq_installed</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">_pika_version_maj</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">pika</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]))</span>
-    <span class="k">if</span> <span class="n">_pika_version_maj</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;pika version 1.0 not yet supported.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">_pika_version_maj</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;pika version &lt;1.0 no longer supported.&quot;</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Could not import pika. &quot;</span>
                  <span class="o">+</span> <span class="s2">&quot;RabbitMQ support will be disabled.&quot;</span><span class="p">)</span>
@@ -243,7 +245,7 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="n">connection</span> <span class="o">=</span> <span class="n">pika</span><span class="o">.</span><span class="n">BlockingConnection</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">connection</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">raise</span> <span class="ne">BaseException</span><span class="p">(</span><span class="s2">&quot;Connection was not openned.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">BaseException</span><span class="p">(</span><span class="s2">&quot;Connection was not opened.&quot;</span><span class="p">)</span>
         <span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
     <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error when attempting to connect to the RabbitMQ server: &quot;</span>
@@ -292,13 +294,17 @@
                            <span class="s2">&quot;``exchange`` is the name of the exchange on the queue &quot;</span>
                            <span class="s2">&quot;that should be used, and ``queue`` is the name of &quot;</span>
                            <span class="s2">&quot;the queue.&quot;</span><span class="p">)</span>
+    <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">_disconnect_attr</span>
+                        <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;_opening&#39;</span><span class="p">,</span> <span class="s1">&#39;_closing&#39;</span><span class="p">])</span>
     
     <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set null connection and channel.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;rmq_lock&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">ProcessEvent</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">ProcessEvent</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_server_class</span> <span class="o">=</span> <span class="n">RMQServer</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_init_before_open</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -390,41 +396,29 @@
 
 <div class="viewcode-block" id="RMQComm.bind"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm.bind">[docs]</a>    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Declare queue to get random new queue.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span><span class="o">.</span><span class="n">has_started</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">has_started</span><span class="p">():</span>
             <span class="k">return</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">parameters</span> <span class="o">=</span> <span class="n">pika</span><span class="o">.</span><span class="n">URLParameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">pika</span><span class="o">.</span><span class="n">BlockingConnection</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">channel</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">exchange_declare</span><span class="p">(</span><span class="n">exchange</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="p">,</span>
-                                      <span class="n">auto_delete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">:</span>
-            <span class="n">exclusive</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">exclusive</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;amq.&#39;</span><span class="p">):</span>
-            <span class="n">passive</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">passive</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span>
-                                         <span class="n">exclusive</span><span class="o">=</span><span class="n">exclusive</span><span class="p">,</span>
-                                         <span class="n">passive</span><span class="o">=</span><span class="n">passive</span><span class="p">,</span>
-                                         <span class="n">auto_delete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">+=</span> <span class="n">res</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">queue</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_bind</span><span class="p">(</span><span class="n">exchange</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="p">,</span>
-                                <span class="c1"># routing_key=self.routing_key,</span>
-                                <span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">register_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">))</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">RMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="RMQComm.open"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open connection and bind/connect to queue as necessary.&quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">RMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span> <span class="o">=</span> <span class="kc">False</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">parameters</span> <span class="o">=</span> <span class="n">pika</span><span class="o">.</span><span class="n">URLParameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">pika</span><span class="o">.</span><span class="n">BlockingConnection</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">original_queue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">channel</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">exchange_declare</span><span class="p">(</span><span class="n">exchange</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="p">,</span>
+                                          <span class="n">auto_delete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">confirm_delivery</span><span class="p">()</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span>
+                <span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span> <span class="n">exclusive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">auto_delete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">passive</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">original_queue</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;amq.&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">+=</span> <span class="n">res</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">queue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_bind</span><span class="p">(</span><span class="n">exchange</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="p">,</span>
+                                    <span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">))</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">RMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the connection.</span>
@@ -434,106 +428,102 @@
 <span class="sd">                comm. Defaults to False.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">has_started</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">close_queue</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_channel</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_client</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="n">linger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 
-<div class="viewcode-block" id="RMQComm.close_queue"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm.close_queue">[docs]</a>    <span class="k">def</span> <span class="nf">close_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RMQComm.close_queue"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm.close_queue">[docs]</a>    <span class="k">def</span> <span class="nf">close_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skip_unbind</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the queue if the channel exists.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_client</span><span class="p">):</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_unbind</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span>
-                                          <span class="n">exchange</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_delete</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span>
-            <span class="k">except</span> <span class="p">(</span><span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ChannelClosed</span><span class="p">,</span>
-                    <span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionClosed</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-                <span class="k">pass</span>
-            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">raise</span></div>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_client</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_unbind</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_unbind</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span>
+                                                  <span class="n">exchange</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_delete</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span>
+                <span class="k">except</span> <span class="p">(</span><span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ChannelClosed</span><span class="p">,</span>
+                        <span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionClosed</span><span class="p">,</span>
+                        <span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ChannelWrongStateError</span><span class="p">,</span>
+                        <span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionWrongStateError</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+                    <span class="k">pass</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">raise</span></div>
 
 <div class="viewcode-block" id="RMQComm.close_channel"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm.close_channel">[docs]</a>    <span class="k">def</span> <span class="nf">close_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the channel if it exists.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="k">except</span> <span class="p">(</span><span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ChannelClosed</span><span class="p">,</span>
-                    <span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionClosed</span><span class="p">,</span>
-                    <span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ChannelAlreadyClosing</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-                <span class="k">pass</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Closing the channel&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="RMQComm.close_connection"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm.close_connection">[docs]</a>    <span class="k">def</span> <span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the connection.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="k">except</span> <span class="p">(</span><span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ChannelClosed</span><span class="p">,</span>
-                    <span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionClosed</span><span class="p">,</span>
-                    <span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ChannelAlreadyClosing</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-                <span class="k">pass</span>
-            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="k">pass</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Closing connection&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection and channel are open.&quot;&quot;&quot;</span>
-        <span class="c1"># with self._closing_thread.lock:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">is_closing</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">is_closing</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_opening</span><span class="o">.</span><span class="n">has_stopped</span><span class="p">()</span>
+                    <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">has_started</span><span class="p">()))</span>
 
 <div class="viewcode-block" id="RMQComm.get_queue_result"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm.get_queue_result">[docs]</a>    <span class="k">def</span> <span class="nf">get_queue_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the fram from passive queue declare.&quot;&quot;&quot;</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span>
-                                                 <span class="n">auto_delete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                                 <span class="n">passive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">BlockingIOError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-                <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_queue_result</span><span class="p">()</span>
-            <span class="k">except</span> <span class="p">(</span><span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ChannelClosed</span><span class="p">,</span>
-                    <span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionClosed</span><span class="p">,</span>
-                    <span class="ne">AttributeError</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">res</span></div>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span>
+                                                     <span class="n">auto_delete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                     <span class="n">passive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ChannelClosedByBroker</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+                <span class="c1"># except BlockingIOError:  # pragma: debug</span>
+                <span class="c1">#     self.sleep()</span>
+                <span class="c1">#     res = self.get_queue_result()</span>
+                <span class="c1"># except (pika.exceptions.ChannelClosed,</span>
+                <span class="c1">#         pika.exceptions.ConnectionClosed,</span>
+                <span class="c1">#         pika.exceptions.ChannelWrongStateError,</span>
+                <span class="c1">#         pika.exceptions.ConnectionWrongStateError,</span>
+                <span class="c1">#         pika.exceptions.StreamLostError,</span>
+                <span class="c1">#         AttributeError):  # pragma: debug</span>
+                <span class="c1">#     self._close()</span>
+            <span class="k">return</span> <span class="n">res</span></div>
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the queue.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_send</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_queue_result</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">message_count</span>
+        <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the queue.&quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="c1"># with self._closing_thread.lock:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
-            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_queue_result</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">message_count</span>
-        <span class="k">return</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_confirmed_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -580,8 +570,12 @@
         <span class="k">if</span> <span class="n">routing_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">routing_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;mandatory&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_publish</span><span class="p">(</span><span class="n">exchange</span><span class="p">,</span> <span class="n">routing_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_publish</span><span class="p">(</span><span class="n">exchange</span><span class="p">,</span> <span class="n">routing_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">UnroutableError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message.</span>
@@ -591,19 +585,21 @@
 <span class="sd">                message.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">method_frame</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_get</span><span class="p">(</span>
-            <span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span> <span class="n">no_ack</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">method_frame</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_ack</span><span class="p">(</span><span class="n">method_frame</span><span class="o">.</span><span class="n">delivery_tag</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">raise</span> <span class="n">NoMessages</span><span class="p">(</span><span class="s2">&quot;No messages in connection.&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
+            <span class="n">method_frame</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_get</span><span class="p">(</span>
+                <span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span> <span class="n">auto_ack</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">method_frame</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_ack</span><span class="p">(</span><span class="n">method_frame</span><span class="o">.</span><span class="n">delivery_tag</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="n">NoMessages</span><span class="p">(</span><span class="s2">&quot;No messages in connection.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RMQComm.purge"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove all messages from the associated queue.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_purge</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_purge</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span></div></div>
 </pre></div>
 

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.multitasking &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.multitasking &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../threading.html">OpenMP Threading in Models</a></li>
@@ -188,7 +189,22 @@
 <span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">queue</span>
 <span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">YggClass</span>
+<span class="n">MPI</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">_on_mpi</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">_mpi_rank</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_SUBPROCESS&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s1">&#39;YGG_MPI_RANK&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">_on_mpi</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">_mpi_rank</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;YGG_MPI_RANK&#39;</span><span class="p">])</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+        <span class="n">_on_mpi</span> <span class="o">=</span> <span class="p">(</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">_mpi_rank</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">pass</span>
 
 
 <span class="n">mp_ctx</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span>
@@ -632,6 +648,35 @@
         <span class="k">raise</span> <span class="n">AliasDisconnectError</span><span class="p">(</span><span class="s2">&quot;DummyEvent will never change to True.&quot;</span><span class="p">)</span></div></div>
 
 
+<div class="viewcode-block" id="ProcessEvent"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ProcessEvent">[docs]</a><span class="k">class</span> <span class="nc">ProcessEvent</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Multiprocessing/threading event associated with a process that has</span>
+<span class="sd">    a discreet start and end.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">started</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">task_context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">started</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ProcessEvent.start"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ProcessEvent.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the started event.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">started</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessEvent.stop"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ProcessEvent.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the stopped event.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessEvent.has_started"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ProcessEvent.has_started">[docs]</a>    <span class="k">def</span> <span class="nf">has_started</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the process has started.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">started</span><span class="o">.</span><span class="n">is_set</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessEvent.has_stopped"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ProcessEvent.has_stopped">[docs]</a>    <span class="k">def</span> <span class="nf">has_stopped</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the process has stopped.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">is_set</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessEvent.is_running"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ProcessEvent.is_running">[docs]</a>    <span class="k">def</span> <span class="nf">is_running</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the processes has started, but hasn&#39;t stopped.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">has_started</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_stopped</span><span class="p">()))</span></div></div>
+
+
 <div class="viewcode-block" id="Event"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Event">[docs]</a><span class="k">class</span> <span class="nc">Event</span><span class="p">(</span><span class="n">ContextObject</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Multiprocessing/threading event.&quot;&quot;&quot;</span>
 
@@ -655,7 +700,58 @@
             <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_base&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">val</span><span class="p">:</span>
                 <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_base&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Event</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__setstate__</span><span class="p">(</span><span class="n">state</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Event</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__setstate__</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+    <span class="c1"># @classmethod</span>
+    <span class="c1"># def from_event_set(cls, *events):</span>
+    <span class="c1">#     r&quot;&quot;&quot;Create an event that is triggered when any one of the provided</span>
+    <span class="c1">#     events is set.</span>
+
+    <span class="c1">#     Args:</span>
+    <span class="c1">#         *events: One or more events that will trigger this event.</span>
+
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     # Modified version of https://stackoverflow.com/questions/12317940/</span>
+    <span class="c1">#     # python-threading-can-i-sleep-on-two-threading-events-simultaneously/</span>
+    <span class="c1">#     # 36661113</span>
+    <span class="c1">#     or_event = cls()</span>
+
+    <span class="c1">#     def changed():</span>
+    <span class="c1">#         bools = [e.is_set() for e in events]</span>
+    <span class="c1">#         if any(bools):</span>
+    <span class="c1">#             or_event.set()</span>
+    <span class="c1">#         else:</span>
+    <span class="c1">#             or_event.clear()</span>
+    <span class="c1">#     for e in events:</span>
+    <span class="c1">#         e.add_callback(changed, trigger=&#39;set&#39;)</span>
+    <span class="c1">#         e.add_callback(changed, trigger=&#39;clear&#39;)</span>
+    <span class="c1">#     return or_event</span>
+
+<div class="viewcode-block" id="Event.add_callback"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Event.add_callback">[docs]</a>    <span class="k">def</span> <span class="nf">add_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="n">trigger</span><span class="o">=</span><span class="s1">&#39;set&#39;</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a callback that will be called when set or clear is invoked.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            callback (callable): Callable executed when set is called.</span>
+<span class="sd">            args (tuple, optional): Arguments to pass to the callback.</span>
+<span class="sd">            kwargs (dict, optional): Keyword arguments to pass to the</span>
+<span class="sd">                callback.</span>
+<span class="sd">            trigger (str, optional): Action triggering the set call.</span>
+<span class="sd">                Options are &#39;set&#39; or &#39;clear&#39;. Defaults to &#39;set&#39;.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">trigger</span><span class="si">}</span><span class="s1">_callbacks&#39;</span><span class="p">):</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">trigger</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="s1">&#39;clear&#39;</span><span class="p">])</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">trigger</span><span class="si">}</span><span class="s1">_callbacks&#39;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">trigger</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="p">,</span> <span class="n">trigger</span><span class="p">))</span>
+            
+            <span class="k">def</span> <span class="nf">callback_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">trigger</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)()</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">trigger</span><span class="si">}</span><span class="s1">_callbacks&#39;</span><span class="p">):</span>
+                    <span class="n">x</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">k</span><span class="p">)</span>
+
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="p">,</span> <span class="n">trigger</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">callback_method</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">trigger</span><span class="si">}</span><span class="s1">_callbacks&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">callback</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span></div></div>
 
 
 <div class="viewcode-block" id="DummyTask"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.DummyTask">[docs]</a><span class="k">class</span> <span class="nc">DummyTask</span><span class="p">(</span><span class="n">DummyContextObject</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
@@ -949,6 +1045,310 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 
+<div class="viewcode-block" id="TimeoutError"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.TimeoutError">[docs]</a><span class="k">class</span> <span class="nc">TimeoutError</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Error to raise when a wait times out.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">function_value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">function_value</span> <span class="o">=</span> <span class="n">function_value</span>
+        <span class="nb">super</span><span class="p">(</span><span class="ne">TimeoutError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+    
+
+<div class="viewcode-block" id="WaitableFunction"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.WaitableFunction">[docs]</a><span class="k">class</span> <span class="nc">WaitableFunction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an object that can be waited on until a function returns True.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        function (callable): Callable function that takes no arguments and</span>
+<span class="sd">            returns a boolean.</span>
+<span class="sd">        polling_interval (float, optional): Time (in seconds) that should be</span>
+<span class="sd">            waited in between function calls. Defaults to 0.1 seconds.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;function&quot;</span><span class="p">,</span> <span class="s2">&quot;polling_interval&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">polling_interval</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">polling_interval</span> <span class="o">=</span> <span class="n">polling_interval</span>
+
+<div class="viewcode-block" id="WaitableFunction.await_function"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.WaitableFunction.await_function">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">await_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Coroutine to wait for the function to return True.&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">():</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">polling_interval</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="WaitableFunction.wait"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.WaitableFunction.wait">[docs]</a>    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for the function to return True.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            timeout (float, optional): Time (in seconds) that should be</span>
+<span class="sd">                waited for the process to finish. A value of None will wait</span>
+<span class="sd">                indefinitely. Defaults to None.</span>
+<span class="sd">            on_timeout (callable, bool, str, optional): Object indicating</span>
+<span class="sd">                what action should be taken in the event that the timeout is</span>
+<span class="sd">                reached. If a callable is provided, it will be called. A</span>
+<span class="sd">                value of False will cause a TimeoutError to be raised. A</span>
+<span class="sd">                value of True will cause the function value to be returned.</span>
+<span class="sd">                A string will be used as the error message for a raised</span>
+<span class="sd">                timeout error. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            object: The result of the function call.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">new_event_loop</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span>
+                <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">await_function</span><span class="p">(),</span> <span class="n">timeout</span><span class="p">))</span>
+        <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">on_timeout</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">())</span>
+            <span class="k">elif</span> <span class="n">on_timeout</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">on_timeout</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="n">on_timeout</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">on_timeout</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">loop</span><span class="o">.</span><span class="n">shutdown_asyncgens</span><span class="p">())</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="n">loop</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="wait_on_function"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.wait_on_function">[docs]</a><span class="k">def</span> <span class="nf">wait_on_function</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">polling_interval</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for the function to return True.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        function (callable): Callable function that takes no arguments and</span>
+<span class="sd">            returns a boolean.</span>
+<span class="sd">        timeout (float, optional): Time (in seconds) that should be</span>
+<span class="sd">            waited for the process to finish. A value of None will wait</span>
+<span class="sd">            indefinitely. Defaults to None.</span>
+<span class="sd">        on_timeout (callable, bool, str, optional): Object indicating</span>
+<span class="sd">            what action should be taken in the event that the timeout is</span>
+<span class="sd">            reached. If a callable is provided, it will be called. A</span>
+<span class="sd">            value of False will cause a TimeoutError to be raised. A</span>
+<span class="sd">            value of True will cause the function value to be returned.</span>
+<span class="sd">            A string will be used as the error message for a raised</span>
+<span class="sd">            timeout error. Defaults to False.</span>
+<span class="sd">        polling_interval (float, optional): Time (in seconds) that should be</span>
+<span class="sd">            waited in between function calls. Defaults to 0.1 seconds.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        object: The result of the function call.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">WaitableFunction</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">polling_interval</span><span class="o">=</span><span class="n">polling_interval</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">on_timeout</span><span class="o">=</span><span class="n">on_timeout</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MPIRequestWrapper"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIRequestWrapper">[docs]</a><span class="k">class</span> <span class="nc">MPIRequestWrapper</span><span class="p">(</span><span class="n">WaitableFunction</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wrapper for an MPI request.&quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;request&quot;</span><span class="p">,</span> <span class="s2">&quot;completed&quot;</span><span class="p">,</span> <span class="s2">&quot;canceled&quot;</span><span class="p">,</span> <span class="s2">&quot;_result&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">completed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="n">request</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">completed</span> <span class="o">=</span> <span class="n">completed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canceled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_result</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MPIRequestWrapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">canceled</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MPIRequestWrapper.cancel"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIRequestWrapper.cancel">[docs]</a>    <span class="k">def</span> <span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cancel the request.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">()[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">canceled</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Cancel</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;object: The result of the MPI request.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">completed</span><span class="p">:</span>  <span class="c1"># pragma: intermittent</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result</span>
+
+<div class="viewcode-block" id="MPIRequestWrapper.test"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIRequestWrapper.test">[docs]</a>    <span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test to see if the request has completed.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">completed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">completed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">completed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MPIRequestWrapper.wait"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIRequestWrapper.wait">[docs]</a>    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for the request to be completed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            timeout (float, optional): Time (in seconds) that should be</span>
+<span class="sd">                waited for the process to finish. A value of None will wait</span>
+<span class="sd">                indefinitely. Defaults to None.</span>
+<span class="sd">            on_timeout (callable, bool, str, optional): Object indicating</span>
+<span class="sd">                what action should be taken in the event that the timeout is</span>
+<span class="sd">                reached. If a callable is provided, it will be called. A</span>
+<span class="sd">                value of False will cause a TimeoutError to be raised. A</span>
+<span class="sd">                value of True will cause the function value to be returned.</span>
+<span class="sd">                A string will be used as the error message for a raised</span>
+<span class="sd">                timeout error. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            object: The result of the request.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">()[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">MPIRequestWrapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                                                <span class="n">on_timeout</span><span class="o">=</span><span class="n">on_timeout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result</span></div></div>
+
+
+<div class="viewcode-block" id="MPIPartnerError"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIPartnerError">[docs]</a><span class="k">class</span> <span class="nc">MPIPartnerError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Error raised when there is an error on another process.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="MPIErrorExchange"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIErrorExchange">[docs]</a><span class="k">class</span> <span class="nc">MPIErrorExchange</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set of MPI messages to check for errors.&quot;&quot;&quot;</span>
+
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ERROR_ON_RANK0&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s1">&#39;ERROR_ON_RANKX&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+    <span class="n">closing_messages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ERROR&#39;</span><span class="p">,</span> <span class="s1">&#39;COMPLETE&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">global_tag</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">partner_ranks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">partner_ranks</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">global_tag</span><span class="o">=</span><span class="n">global_tag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_first_use</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="MPIErrorExchange.reset"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIErrorExchange.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">global_tag</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Rest comms for the next test.&quot;&quot;&quot;</span>
+        <span class="n">global_tag</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">alltoall</span><span class="p">([</span><span class="n">global_tag</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_tag</span> <span class="o">=</span> <span class="n">global_tag</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">incoming_tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="p">[</span><span class="s1">&#39;ERROR_ON_RANKX&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">global_tag</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="p">[</span><span class="s1">&#39;ERROR_ON_RANK0&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">global_tag</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">incoming_tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="p">[</span><span class="s1">&#39;ERROR_ON_RANK0&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">global_tag</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="p">[</span><span class="s1">&#39;ERROR_ON_RANKX&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">global_tag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outgoing</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">incoming</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">MPIRequestWrapper</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">irecv</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_tag</span><span class="p">),</span>
+                <span class="n">polling_interval</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">partner_ranks</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_first_use</span> <span class="o">=</span> <span class="kc">False</span></div>
+        
+<div class="viewcode-block" id="MPIErrorExchange.recv"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIErrorExchange.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for response to receive request.&quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">wait</span><span class="p">:</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="n">completed</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
+            
+            <span class="k">if</span> <span class="p">((</span><span class="n">completed</span>
+                 <span class="ow">and</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+                      <span class="ow">or</span> <span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">closing_messages</span><span class="p">)))):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">incoming</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">MPIRequestWrapper</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">irecv</span><span class="p">(</span>
+                        <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">partner_ranks</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                        <span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_tag</span><span class="p">),</span>
+                    <span class="n">polling_interval</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">completed</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">results</span></div>
+
+<div class="viewcode-block" id="MPIErrorExchange.send"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIErrorExchange.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">partner_ranks</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_tag</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">closing_messages</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outgoing</span> <span class="o">=</span> <span class="n">msg</span></div>
+
+<div class="viewcode-block" id="MPIErrorExchange.finalize"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIErrorExchange.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">failure</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Finalize an instance by waiting for completions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            failure (bool): True if there was an error.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">complete</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">complete</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sync</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;COMPLETE&#39;</span><span class="p">,</span>
+                                 <span class="n">local_error</span><span class="o">=</span><span class="n">failure</span><span class="p">,</span>
+                                 <span class="n">check_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                 <span class="n">sync_tag</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">complete</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="n">complete</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sync</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;COMPLETE&#39;</span><span class="p">,</span>
+                                     <span class="n">local_error</span><span class="o">=</span><span class="n">failure</span><span class="p">,</span>
+                                     <span class="n">check_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                     <span class="n">dont_raise</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                     <span class="n">sync_tag</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MPIErrorExchange.sync"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIErrorExchange.sync">[docs]</a>    <span class="k">def</span> <span class="nf">sync</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">get_tags</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="n">check_equal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="n">dont_raise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">local_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sync_tag</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="n">check_complete</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Synchronize processes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            local_tag (int): Next tag that will be used by the local MPI comm.</span>
+<span class="sd">            get_tags (bool, optional): If True, tags will be exchanged between</span>
+<span class="sd">                all processes. Defaults to False.</span>
+<span class="sd">            check_equal (bool, optional): If True, tags will be checked to be</span>
+<span class="sd">                equal. Defaults to False.</span>
+<span class="sd">            dont_raise (bool, optional): If True and a MPIPartnerError were</span>
+<span class="sd">                to be raised, the sync will abort. Defaults to False.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MPIPartnerError: If there was an error on one of the other MPI</span>
+<span class="sd">                processes.</span>
+<span class="sd">            AssertionError: If check_equal is True and the tags are not</span>
+<span class="sd">                equivalent.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">local_tag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">local_tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_tag</span>
+        <span class="n">remote_error</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">msg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;TAG&#39;</span>
+        <span class="k">if</span> <span class="n">local_error</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;ERROR&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outgoing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outgoing</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="n">local_tag</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">complete</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># self.recv(wait=True)[0]</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">complete</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">msg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">closing_messages</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outgoing</span> <span class="o">=</span> <span class="n">msg</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="p">[(</span><span class="kc">True</span><span class="p">,</span> <span class="p">(</span><span class="n">local_tag</span><span class="p">,</span> <span class="n">msg</span><span class="p">))]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># TODO: Check for completion (instead of error)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="n">remote_error</span> <span class="o">=</span> <span class="nb">any</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ERROR&#39;</span><span class="p">))</span>
+                           <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">results</span><span class="p">)</span>
+        <span class="n">all_tag</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">sync_tag</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">global_tag</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">all_tag</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">global_tag</span> <span class="o">=</span> <span class="n">local_tag</span>
+        <span class="k">if</span> <span class="n">remote_error</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">local_error</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">dont_raise</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="n">MPIPartnerError</span><span class="p">(</span><span class="s2">&quot;Error on another process.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">check_equal</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">remote_error</span> <span class="ow">or</span> <span class="n">local_error</span><span class="p">):</span>
+            <span class="k">assert</span><span class="p">(</span><span class="nb">all</span><span class="p">((</span><span class="n">x</span> <span class="o">==</span> <span class="n">local_tag</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_tag</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">check_complete</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">closing_messages</span>
+                       <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">results</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">get_tags</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">all_tag</span></div></div>
+            
+
 <span class="c1"># class LockedWeakValueDict(LockedDict):</span>
 <span class="c1">#     r&quot;&quot;&quot;Dictionary of weakrefs that can be shared between threads.&quot;&quot;&quot;</span>
 
@@ -1240,12 +1640,8 @@
 <span class="sd">                Defaults to None and is set based on the stack trace.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
-        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">verbose_debug</span><span class="p">(</span><span class="s1">&#39;Waiting for </span><span class="si">%s</span><span class="s1"> to finish...&#39;</span><span class="p">,</span>
-                               <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">task_method</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wait_on_function</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">(),</span>
+                              <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="BreakLoopException"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.BreakLoopException">[docs]</a><span class="k">class</span> <span class="nc">BreakLoopException</span><span class="p">(</span><span class="ne">BaseException</span><span class="p">):</span>
@@ -1344,12 +1740,10 @@
 <span class="sd">                before breaking. Defaults to 0.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
-        <span class="k">while</span> <span class="p">(((</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_loop</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loop_count</span> <span class="o">&lt;</span> <span class="n">nloop</span><span class="p">))</span>
-               <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)):</span>  <span class="c1"># pragma: debug</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">verbose_debug</span><span class="p">(</span><span class="s1">&#39;Waiting for thread/process to enter loop...&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wait_on_function</span><span class="p">(</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">was_loop</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loop_count</span> <span class="o">&gt;=</span> <span class="n">nloop</span><span class="p">)</span>
+                     <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())),</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTaskLoop.before_loop"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop.before_loop">[docs]</a>    <span class="k">def</span> <span class="nf">before_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed before the loop.&quot;&quot;&quot;</span>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.communication &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../threading.html">OpenMP Threading in Models</a></li>
@@ -181,6 +182,8 @@
   <h1>Source code for yggdrasil.communication</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
 
@@ -234,6 +237,29 @@
 <span class="k">class</span> <span class="nc">FatalCommunicationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raised when the comm cannot recover.&quot;&quot;&quot;</span>
     <span class="k">pass</span>
+
+
+<span class="k">def</span> <span class="nf">check_env_for_address</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for a channel name in a dictionary of environment variables.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        env (dict): Environment variables to check.</span>
+<span class="sd">        name (str): Name of the channel to check for.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The value stored in the environment variable for the channel.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        RuntimeError: If the channel cannot be located.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">check_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;__COLON__&#39;</span><span class="p">)]</span>
+    <span class="n">check_names</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">check_names</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">check_names</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">env</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">env</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Cannot see </span><span class="si">%s</span><span class="s1"> in env. Env:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span>
+                       <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">env</span><span class="p">)))</span>
 
 
 <span class="k">def</span> <span class="nf">import_comm</span><span class="p">(</span><span class="n">commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

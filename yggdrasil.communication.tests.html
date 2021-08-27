@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.tests package &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.communication.tests package &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
@@ -184,6 +185,9 @@
 <h1>yggdrasil.communication.tests package<a class="headerlink" href="#yggdrasil-communication-tests-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-yggdrasil.communication.tests.conftest">
+<span id="yggdrasil-communication-tests-conftest-module"></span><h2>yggdrasil.communication.tests.conftest module<a class="headerlink" href="#module-yggdrasil.communication.tests.conftest" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-yggdrasil.communication.tests.test_AsciiFileComm">
 <span id="yggdrasil-communication-tests-test-asciifilecomm-module"></span><h2>yggdrasil.communication.tests.test_AsciiFileComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_AsciiFileComm" title="Permalink to this headline">¶</a></h2>
@@ -1317,6 +1321,238 @@ communication pattern.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-yggdrasil.communication.tests.test_MPIComm">
+<span id="yggdrasil-communication-tests-test-mpicomm-module"></span><h2>yggdrasil.communication.tests.test_MPIComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_MPIComm" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.tests.test_MPIComm.</span></span><span class="sig-name descname"><span class="pre">TestMPIComm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase" title="yggdrasil.communication.tests.test_CommBase.TestCommBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_CommBase.TestCommBase</span></code></a></p>
+<p>Test class for MPIComm.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.assert_msg_equal">
+<span class="sig-name descname"><span class="pre">assert_msg_equal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.assert_msg_equal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.assert_msg_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that two messages are equivalent.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.comm">
+<span class="sig-name descname"><span class="pre">comm</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'MPIComm'</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.comm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.do_recv">
+<span class="sig-name descname"><span class="pre">do_recv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recv_meth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'recv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_recv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_msg_recv_meth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'n_msg_recv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recv_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_recv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_on_recv_eof</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_recv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recv_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_recv_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_eof_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.do_recv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.do_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic recv of a message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.do_send">
+<span class="sig-name descname"><span class="pre">do_send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">send_meth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'send'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_msg_send_meth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'n_msg_send'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">send_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_on_send_eof</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_send_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_eof_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.do_send"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.do_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic send of a message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.do_send_recv">
+<span class="sig-name descname"><span class="pre">do_send_recv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">send_meth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'send'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recv_meth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'recv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_recv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_msg_send_meth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'n_msg_send'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_msg_recv_meth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'n_msg_recv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse_comms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">send_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recv_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_recv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_on_send_eof</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_on_recv_eof</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_recv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recv_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_send_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_recv_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.do_send_recv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.do_send_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic send/recv of a message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.get_next_tag">
+<span class="sig-name descname"><span class="pre">get_next_tag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.get_next_tag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.get_next_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.inst_kwargs">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">inst_kwargs</span></span><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for tested class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.pytestmark">
+<span class="sig-name descname"><span class="pre">pytestmark</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[Mark(name='mpi',</span> <span class="pre">args=(),</span> <span class="pre">kwargs={'min_size':</span> <span class="pre">2})]</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.pytestmark" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.rank_direction">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">rank_direction</span></span><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.rank_direction" title="Permalink to this definition">¶</a></dt>
+<dd><p>MPI rank of the direction this processes is handling
+messages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.recv_instance">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">recv_instance</span></span><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.recv_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.root_direction">
+<span class="sig-name descname"><span class="pre">root_direction</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'send'</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.root_direction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.root_inst_kwargs">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">root_inst_kwargs</span></span><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.root_inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for the tested class on the rank == 0
+process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.send_instance">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">send_instance</span></span><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.send_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize comm object pair.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.setup_filters">
+<span class="sig-name descname"><span class="pre">setup_filters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.setup_filters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.setup_filters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add filters to send/recv instances for testing filters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.sync">
+<span class="sig-name descname"><span class="pre">sync</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.sync"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.sync" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.teardown">
+<span class="sig-name descname"><span class="pre">teardown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.teardown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Destroy comm object pair.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_attributes">
+<span class="sig-name descname"><span class="pre">test_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.test_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that the instance has all of the required attributes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_cleanup_comms">
+<span class="sig-name descname"><span class="pre">test_cleanup_comms</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.test_cleanup_comms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_cleanup_comms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test cleanup_comms for comm class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_drain_messages">
+<span class="sig-name descname"><span class="pre">test_drain_messages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.test_drain_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_drain_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test waiting for messages to drain.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_error_recv">
+<span class="sig-name descname"><span class="pre">test_error_recv</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_error_recv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_error_send">
+<span class="sig-name descname"><span class="pre">test_error_send</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_error_send" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_invalid_direction">
+<span class="sig-name descname"><span class="pre">test_invalid_direction</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_invalid_direction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_purge">
+<span class="sig-name descname"><span class="pre">test_purge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nrecv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrecv_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsend_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.test_purge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_purge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test purging messages from the comm.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_recv_nomsg">
+<span class="sig-name descname"><span class="pre">test_recv_nomsg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.test_recv_nomsg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_recv_nomsg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test recieve when there is no waiting message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_send_after_close">
+<span class="sig-name descname"><span class="pre">test_send_after_close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.test_send_after_close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_send_after_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sending a message after the receive comm has closed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_send_recv_after_close">
+<span class="sig-name descname"><span class="pre">test_send_recv_after_close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.test_send_recv_after_close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_send_recv_after_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test that opening twice dosn’t cause errors and that send/recv after
+close returns false.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_send_recv_raw">
+<span class="sig-name descname"><span class="pre">test_send_recv_raw</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPIComm.test_send_recv_raw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_send_recv_raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv of a small message.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_work_comm">
+<span class="sig-name descname"><span class="pre">test_work_comm</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm.test_work_comm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPICommAsync">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.tests.test_MPIComm.</span></span><span class="sig-name descname"><span class="pre">TestMPICommAsync</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPICommAsync"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPICommAsync" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm" title="yggdrasil.communication.tests.test_MPIComm.TestMPIComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_MPIComm.TestMPIComm</span></code></a></p>
+<p>Test class for asynchronous MPIComm.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPICommAsync.pytestmark">
+<span class="sig-name descname"><span class="pre">pytestmark</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[Mark(name='mpi',</span> <span class="pre">args=(),</span> <span class="pre">kwargs={'min_size':</span> <span class="pre">2}),</span> <span class="pre">Mark(name='mpi',</span> <span class="pre">args=(),</span> <span class="pre">kwargs={'min_size':</span> <span class="pre">2})]</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPICommAsync.pytestmark" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPICommAsync.test_send_after_close">
+<span class="sig-name descname"><span class="pre">test_send_after_close</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPICommAsync.test_send_after_close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPICommAsync.use_async">
+<span class="sig-name descname"><span class="pre">use_async</span></span><em class="property"> <span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPICommAsync.use_async" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPICommMultipleRecv">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.tests.test_MPIComm.</span></span><span class="sig-name descname"><span class="pre">TestMPICommMultipleRecv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_MPIComm.html#TestMPICommMultipleRecv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPICommMultipleRecv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_MPIComm.TestMPIComm" title="yggdrasil.communication.tests.test_MPIComm.TestMPIComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_MPIComm.TestMPIComm</span></code></a></p>
+<p>Test class for MPIComm with comm receiving from multiple processes.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPICommMultipleRecv.pytestmark">
+<span class="sig-name descname"><span class="pre">pytestmark</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[Mark(name='mpi',</span> <span class="pre">args=(),</span> <span class="pre">kwargs={'min_size':</span> <span class="pre">2}),</span> <span class="pre">Mark(name='mpi',</span> <span class="pre">args=(),</span> <span class="pre">kwargs={'min_size':</span> <span class="pre">3})]</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPICommMultipleRecv.pytestmark" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPICommMultipleRecv.root_direction">
+<span class="sig-name descname"><span class="pre">root_direction</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'recv'</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_MPIComm.TestMPICommMultipleRecv.root_direction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-yggdrasil.communication.tests.test_PandasFileComm">
 <span id="yggdrasil-communication-tests-test-pandasfilecomm-module"></span><h2>yggdrasil.communication.tests.test_PandasFileComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_PandasFileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -1382,14 +1618,158 @@ communication pattern.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.pytestmark">
-<span class="sig-name descname"><span class="pre">pytestmark</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[Mark(name='timeout',</span> <span class="pre">args=(),</span> <span class="pre">kwargs={'timeout':</span> <span class="pre">600}),</span> <span class="pre">Mark(name='timeout',</span> <span class="pre">args=(),</span> <span class="pre">kwargs={'timeout':</span> <span class="pre">600})]</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.pytestmark" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">pytestmark</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[Mark(name='timeout',</span> <span class="pre">args=(),</span> <span class="pre">kwargs={'timeout':</span> <span class="pre">60}),</span> <span class="pre">Mark(name='timeout',</span> <span class="pre">args=(),</span> <span class="pre">kwargs={'timeout':</span> <span class="pre">60})]</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.pytestmark" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.test_reconnect">
-<span class="sig-name descname"><span class="pre">test_reconnect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQAsyncComm.html#TestRMQAsyncComm.test_reconnect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.test_reconnect" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test reconnect after unexpected disconnect.</p>
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.test_reconnect_recv">
+<span class="sig-name descname"><span class="pre">test_reconnect_recv</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQAsyncComm.html#TestRMQAsyncComm.test_reconnect_recv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.test_reconnect_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test reconnect after unexpected disconnect of recv comm.</p>
 </dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.tests.test_RMQAsyncComm.</span></span><span class="sig-name descname"><span class="pre">TestRMQAsyncCommNamedQueue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQAsyncComm.html#TestRMQAsyncCommNamedQueue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm" title="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm</span></code></a></p>
+<p>Test for RMQAsyncComm communication class with a named queue.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.send_inst_kwargs">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">send_inst_kwargs</span></span><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.send_inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for send instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_attributes">
+<span class="sig-name descname"><span class="pre">test_attributes</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_attributes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_cleanup_comms">
+<span class="sig-name descname"><span class="pre">test_cleanup_comms</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_cleanup_comms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_drain_messages">
+<span class="sig-name descname"><span class="pre">test_drain_messages</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_drain_messages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_empty_obj_recv">
+<span class="sig-name descname"><span class="pre">test_empty_obj_recv</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_empty_obj_recv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_eof">
+<span class="sig-name descname"><span class="pre">test_eof</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_eof" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_eof_no_close">
+<span class="sig-name descname"><span class="pre">test_eof_no_close</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_eof_no_close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_error_name">
+<span class="sig-name descname"><span class="pre">test_error_name</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_error_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_error_recv">
+<span class="sig-name descname"><span class="pre">test_error_recv</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_error_recv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_error_send">
+<span class="sig-name descname"><span class="pre">test_error_send</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_error_send" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_invalid_direction">
+<span class="sig-name descname"><span class="pre">test_invalid_direction</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_invalid_direction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_purge">
+<span class="sig-name descname"><span class="pre">test_purge</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_purge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_reconnect_send">
+<span class="sig-name descname"><span class="pre">test_reconnect_send</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQAsyncComm.html#TestRMQAsyncCommNamedQueue.test_reconnect_send"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_reconnect_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test reconnect after unexpected disconnect of send comm.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_recv_nomsg">
+<span class="sig-name descname"><span class="pre">test_recv_nomsg</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_recv_nomsg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv">
+<span class="sig-name descname"><span class="pre">test_send_recv</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_after_close">
+<span class="sig-name descname"><span class="pre">test_send_recv_after_close</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_after_close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_array">
+<span class="sig-name descname"><span class="pre">test_send_recv_array</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_array" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_dict">
+<span class="sig-name descname"><span class="pre">test_send_recv_dict</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_dict_names">
+<span class="sig-name descname"><span class="pre">test_send_recv_dict_names</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_dict_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_filter_eof">
+<span class="sig-name descname"><span class="pre">test_send_recv_filter_eof</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_filter_eof" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_filter_pass">
+<span class="sig-name descname"><span class="pre">test_send_recv_filter_pass</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_filter_pass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_filter_recv_filter">
+<span class="sig-name descname"><span class="pre">test_send_recv_filter_recv_filter</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_filter_recv_filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_filter_send_filter">
+<span class="sig-name descname"><span class="pre">test_send_recv_filter_send_filter</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_filter_send_filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_nolimit">
+<span class="sig-name descname"><span class="pre">test_send_recv_nolimit</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_raw">
+<span class="sig-name descname"><span class="pre">test_send_recv_raw</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_send_recv_raw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_work_comm">
+<span class="sig-name descname"><span class="pre">test_work_comm</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_work_comm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -1419,7 +1799,7 @@ communication pattern.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQComm.TestRMQComm.pytestmark">
-<span class="sig-name descname"><span class="pre">pytestmark</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[Mark(name='timeout',</span> <span class="pre">args=(),</span> <span class="pre">kwargs={'timeout':</span> <span class="pre">600})]</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQComm.TestRMQComm.pytestmark" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">pytestmark</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[Mark(name='timeout',</span> <span class="pre">args=(),</span> <span class="pre">kwargs={'timeout':</span> <span class="pre">60})]</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQComm.TestRMQComm.pytestmark" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">

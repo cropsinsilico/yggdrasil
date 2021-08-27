@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.RPCResponseDriver &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.drivers.RPCResponseDriver &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
@@ -224,7 +225,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">response_address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Address of response comm.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">address</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">opp_address</span>
 
 <div class="viewcode-block" id="RPCResponseDriver.send_eof"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RPCResponseDriver.RPCResponseDriver.send_eof">[docs]</a>    <span class="k">def</span> <span class="nf">send_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send EOF message.</span>

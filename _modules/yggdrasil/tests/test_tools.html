@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.tests.test_tools &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.tests.test_tools &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
@@ -483,6 +484,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">interface_info</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">language_info</span><span class="p">([])(</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">language_info</span><span class="p">(</span><span class="s1">&#39;python&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestYggClass.test_wait_on_function"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_tools.TestYggClass.test_wait_on_function">[docs]</a>    <span class="k">def</span> <span class="nf">test_wait_on_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test functionality of async wait on function.&quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">func</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">wait_on_function</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                                       <span class="n">polling_interval</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                                       <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestYggClass.test_timeout"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_tools.TestYggClass.test_timeout">[docs]</a>    <span class="k">def</span> <span class="nf">test_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test functionality of timeout.&quot;&quot;&quot;</span>

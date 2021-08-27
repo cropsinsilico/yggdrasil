@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.FortranModelDriver &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.drivers.FortranModelDriver &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
@@ -590,7 +591,7 @@
                     <span class="c1"># GNU takes precedence when present</span>
                     <span class="n">cxx_lib</span> <span class="o">=</span> <span class="s1">&#39;stdc++&#39;</span>
                     <span class="n">add_cxx_lib</span> <span class="o">=</span> <span class="n">cxx_lib</span>
-            <span class="k">if</span> <span class="n">add_cxx_lib</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">add_cxx_lib</span> <span class="ow">and</span> <span class="p">(</span><span class="n">add_cxx_lib</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">):</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">[</span><span class="n">add_cxx_lib</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cxx_orig</span><span class="p">)</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="s1">&#39;fygg&#39;</span><span class="p">][</span><span class="s1">&#39;external_dependencies&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="n">add_cxx_lib</span><span class="p">)</span>
@@ -1022,7 +1023,8 @@
                     <span class="k">if</span> <span class="n">match_module</span><span class="p">:</span>
                         <span class="n">module</span> <span class="o">=</span> <span class="n">match_module</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;module&#39;</span><span class="p">]</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">module</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_module&#39;</span> <span class="o">%</span> <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span>
+                        <span class="n">module</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_module&#39;</span> <span class="o">%</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;model_name&#39;</span><span class="p">,</span>
+                                                          <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">])</span>
                         <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;module&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span>
                     <span class="n">lines</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">last_use</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;use </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">module</span><span class="p">)</span>
                     <span class="n">last_use</span> <span class="o">+=</span> <span class="mi">1</span>

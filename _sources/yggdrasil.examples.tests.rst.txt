@@ -4,6 +4,14 @@ yggdrasil.examples.tests package
 Submodules
 ----------
 
+yggdrasil.examples.tests.conftest module
+----------------------------------------
+
+.. automodule:: yggdrasil.examples.tests.conftest
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.examples.tests.test\_SaM module
 -----------------------------------------
 
@@ -176,6 +184,14 @@ yggdrasil.examples.tests.test\_model\_error module
 --------------------------------------------------
 
 .. automodule:: yggdrasil.examples.tests.test_model_error
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.examples.tests.test\_model\_error\_with\_io module
+------------------------------------------------------------
+
+.. automodule:: yggdrasil.examples.tests.test_model_error_with_io
    :members:
    :undoc-members:
    :show-inheritance:

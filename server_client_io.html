@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Server/Client I/O &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>Server/Client I/O &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -112,6 +112,7 @@
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
@@ -241,8 +242,8 @@ disconnected.</p>
 <span class="linenos">34</span>    <span class="n">inp</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">)</span>
 <span class="linenos">35</span>    <span class="n">retval</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">inp</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
 <span class="linenos">36</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
-<span class="linenos">37</span>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server: ERROR receiving parameters&#39;</span><span class="p">)</span>
-<span class="linenos">38</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Parameters = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">params</span><span class="p">)</span>
+<span class="linenos">37</span>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server(P): ERROR receiving parameters&#39;</span><span class="p">)</span>
+<span class="linenos">38</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server(P): Parameters = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">params</span><span class="p">)</span>
 <span class="linenos">39</span>
 <span class="linenos">40</span>    <span class="c1"># Create server-side rpc conneciton using model name</span>
 <span class="linenos">41</span>    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -250,22 +251,22 @@ disconnected.</p>
 <span class="linenos">43</span>    <span class="c1"># Continue receiving requests until the connection is closed when all</span>
 <span class="linenos">44</span>    <span class="c1"># clients have disconnected.</span>
 <span class="linenos">45</span>    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-<span class="linenos">46</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
+<span class="linenos">46</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server(P): receiving...&#39;</span><span class="p">)</span>
 <span class="linenos">47</span>        <span class="n">retval</span><span class="p">,</span> <span class="n">rpc_in</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
 <span class="linenos">48</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
-<span class="linenos">49</span>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
+<span class="linenos">49</span>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server(P): end of input&#39;</span><span class="p">)</span>
 <span class="linenos">50</span>            <span class="k">break</span>
 <span class="linenos">51</span>
 <span class="linenos">52</span>        <span class="c1"># Compute fibonacci number</span>
 <span class="linenos">53</span>        <span class="n">n</span> <span class="o">=</span> <span class="n">rpc_in</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="linenos">54</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+<span class="linenos">54</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server(P): Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
 <span class="linenos">55</span>        <span class="n">result</span> <span class="o">=</span> <span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-<span class="linenos">56</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+<span class="linenos">56</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server(P): Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
 <span class="linenos">57</span>
 <span class="linenos">58</span>        <span class="c1"># Send response back</span>
 <span class="linenos">59</span>        <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
 <span class="linenos">60</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-<span class="linenos">61</span>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
+<span class="linenos">61</span>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server(P): ERROR sending&#39;</span><span class="p">)</span>
 <span class="linenos">62</span>
 <span class="linenos">63</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
 <span class="linenos">64</span>

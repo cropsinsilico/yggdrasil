@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.ForkComm &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.communication.ForkComm &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
@@ -270,7 +271,8 @@
     <span class="n">_commtype</span> <span class="o">=</span> <span class="s1">&#39;fork&#39;</span>
     <span class="n">_dont_register</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">child_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;serializer_class&#39;</span><span class="p">,</span> <span class="s1">&#39;serializer_kwargs&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;format_str&#39;</span><span class="p">,</span> <span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">,</span> <span class="s1">&#39;as_array&#39;</span><span class="p">]</span>
+                  <span class="s1">&#39;format_str&#39;</span><span class="p">,</span> <span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">,</span> <span class="s1">&#39;as_array&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;partner_copies&#39;</span><span class="p">]</span>
     <span class="n">noprop_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;send_converter&#39;</span><span class="p">,</span> <span class="s1">&#39;recv_converter&#39;</span><span class="p">,</span> <span class="s1">&#39;filter&#39;</span><span class="p">,</span> <span class="s1">&#39;transform&#39;</span><span class="p">]</span>
     
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">comm_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_async</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -331,7 +333,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">ForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">is_async</span><span class="o">=</span><span class="n">is_async</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">single_use</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_server</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_client</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_client</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">!=</span> <span class="s1">&#39;cycle&#39;</span><span class="p">)))</span>
 
 <div class="viewcode-block" id="ForkComm.disconnect"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.ForkComm.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect attributes that are aliases.&quot;&quot;&quot;</span>
@@ -410,6 +412,19 @@
                 <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
 
+    <span class="c1"># @property</span>
+    <span class="c1"># def mpi_model_kws(self):</span>
+    <span class="c1">#     r&quot;&quot;&quot;dict: Mapping between model name and opposite comm keyword</span>
+    <span class="c1">#     arguments that need to be provided to the model for the MPI</span>
+    <span class="c1">#     connection.&quot;&quot;&quot;</span>
+    <span class="c1">#     out = {}</span>
+    <span class="c1">#     for x in self.comm_list:</span>
+    <span class="c1">#         iout = x.mpi_model_kws</span>
+    <span class="c1">#         for k, v in iout.items():</span>
+    <span class="c1">#             out.setdefault(k, [])</span>
+    <span class="c1">#             out[k] += v</span>
+    <span class="c1">#     return out</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">opp_comms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Name/address pairs for opposite comms.&quot;&quot;&quot;</span>
@@ -434,6 +449,12 @@
                 <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;pattern&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pair</span><span class="p">[(</span><span class="n">pair</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pattern</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">kwargs</span></div>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">get_response_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments to use for a response comm.&quot;&quot;&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">==</span> <span class="s1">&#39;cycle&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_comm</span><span class="o">.</span><span class="n">get_response_comm_kwargs</span>
+        
 <div class="viewcode-block" id="ForkComm.bind"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.ForkComm.bind">[docs]</a>    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bind in place of open.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">:</span>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.tests package &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.drivers.tests package &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
@@ -1444,6 +1445,58 @@ is received. Defaults to False.</p></li>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_ConnectionDriver.TestIpcOutputDriver.ocomm_name">
 <span class="sig-name descname"><span class="pre">ocomm_name</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'ipc'</span></em><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestIpcOutputDriver.ocomm_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiInputDriver">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.drivers.tests.test_ConnectionDriver.</span></span><span class="sig-name descname"><span class="pre">TestMpiInputDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiInputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver" title="yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiInputDriver.args">
+<span class="sig-name descname"><span class="pre">args</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'test'</span></em><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiInputDriver.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiInputDriver.driver">
+<span class="sig-name descname"><span class="pre">driver</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'InputDriver'</span></em><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiInputDriver.driver" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiInputDriver.icomm_name">
+<span class="sig-name descname"><span class="pre">icomm_name</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'mpi'</span></em><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiInputDriver.icomm_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiInputDriver.pytestmark">
+<span class="sig-name descname"><span class="pre">pytestmark</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[Mark(name='mpi',</span> <span class="pre">args=(),</span> <span class="pre">kwargs={'min_size':</span> <span class="pre">2})]</span></em><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiInputDriver.pytestmark" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiOutputDriver">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.drivers.tests.test_ConnectionDriver.</span></span><span class="sig-name descname"><span class="pre">TestMpiOutputDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiOutputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver" title="yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiOutputDriver.args">
+<span class="sig-name descname"><span class="pre">args</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'test'</span></em><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiOutputDriver.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiOutputDriver.driver">
+<span class="sig-name descname"><span class="pre">driver</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'OutputDriver'</span></em><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiOutputDriver.driver" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiOutputDriver.ocomm_name">
+<span class="sig-name descname"><span class="pre">ocomm_name</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'mpi'</span></em><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiOutputDriver.ocomm_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiOutputDriver.pytestmark">
+<span class="sig-name descname"><span class="pre">pytestmark</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[Mark(name='mpi',</span> <span class="pre">args=(),</span> <span class="pre">kwargs={'min_size':</span> <span class="pre">2})]</span></em><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestMpiOutputDriver.pytestmark" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -3201,6 +3254,37 @@ are determined from the intents.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_RPCRequestDriver.TestIPCCommRPCRequestDriver.ocomm_name">
 <span class="sig-name descname"><span class="pre">ocomm_name</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'IPCComm'</span></em><a class="headerlink" href="#yggdrasil.drivers.tests.test_RPCRequestDriver.TestIPCCommRPCRequestDriver.ocomm_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_RPCRequestDriver.TestMPICommRPCRequestDriver">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.drivers.tests.test_RPCRequestDriver.</span></span><span class="sig-name descname"><span class="pre">TestMPICommRPCRequestDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.drivers.tests.test_RPCRequestDriver.TestMPICommRPCRequestDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_RPCRequestDriver.TestRPCRequestDriver" title="yggdrasil.drivers.tests.test_RPCRequestDriver.TestRPCRequestDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_RPCRequestDriver.TestRPCRequestDriver</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_RPCRequestDriver.TestMPICommRPCRequestDriver.args">
+<span class="sig-name descname"><span class="pre">args</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'test'</span></em><a class="headerlink" href="#yggdrasil.drivers.tests.test_RPCRequestDriver.TestMPICommRPCRequestDriver.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_RPCRequestDriver.TestMPICommRPCRequestDriver.driver">
+<span class="sig-name descname"><span class="pre">driver</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'RPCRequestDriver'</span></em><a class="headerlink" href="#yggdrasil.drivers.tests.test_RPCRequestDriver.TestMPICommRPCRequestDriver.driver" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_RPCRequestDriver.TestMPICommRPCRequestDriver.icomm_name">
+<span class="sig-name descname"><span class="pre">icomm_name</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'MPIComm'</span></em><a class="headerlink" href="#yggdrasil.drivers.tests.test_RPCRequestDriver.TestMPICommRPCRequestDriver.icomm_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_RPCRequestDriver.TestMPICommRPCRequestDriver.ocomm_name">
+<span class="sig-name descname"><span class="pre">ocomm_name</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'MPIComm'</span></em><a class="headerlink" href="#yggdrasil.drivers.tests.test_RPCRequestDriver.TestMPICommRPCRequestDriver.ocomm_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_RPCRequestDriver.TestMPICommRPCRequestDriver.pytestmark">
+<span class="sig-name descname"><span class="pre">pytestmark</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[Mark(name='mpi',</span> <span class="pre">args=(),</span> <span class="pre">kwargs={'min_size':</span> <span class="pre">2})]</span></em><a class="headerlink" href="#yggdrasil.drivers.tests.test_RPCRequestDriver.TestMPICommRPCRequestDriver.pytestmark" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

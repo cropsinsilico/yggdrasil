@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.AsyncComm &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.communication.AsyncComm &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
@@ -220,13 +221,13 @@
                  <span class="s1">&#39;_backlog_received_eof&#39;</span><span class="p">,</span> <span class="s1">&#39;_used&#39;</span><span class="p">,</span> <span class="s1">&#39;_closed&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;async_recv_method&#39;</span><span class="p">,</span> <span class="s1">&#39;async_send_method&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;async_recv_kwargs&#39;</span><span class="p">,</span> <span class="s1">&#39;async_send_kwargs&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;_error_registry&#39;</span><span class="p">]</span>
+                 <span class="s1">&#39;_error_registry&#39;</span><span class="p">,</span> <span class="s1">&#39;daemon&#39;</span><span class="p">]</span>
     <span class="n">__overrides__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_input_args&#39;</span><span class="p">,</span> <span class="s1">&#39;_input_kwargs&#39;</span><span class="p">]</span>
     <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;backlog_ready&#39;</span><span class="p">,</span> <span class="s1">&#39;_backlog_thread&#39;</span><span class="p">,</span> <span class="s1">&#39;_wrapped&#39;</span><span class="p">]</span>
     <span class="n">_async_kws</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;async_recv_method&#39;</span><span class="p">,</span> <span class="s1">&#39;async_send_method&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;async_recv_kwargs&#39;</span><span class="p">,</span> <span class="s1">&#39;async_send_kwargs&#39;</span><span class="p">]</span>
+                  <span class="s1">&#39;async_recv_kwargs&#39;</span><span class="p">,</span> <span class="s1">&#39;async_send_kwargs&#39;</span><span class="p">,</span> <span class="s1">&#39;daemon&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wrapped</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wrapped</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">async_recv_method</span><span class="o">=</span><span class="s1">&#39;recv&#39;</span><span class="p">,</span> <span class="n">async_send_method</span><span class="o">=</span><span class="s1">&#39;send_message&#39;</span><span class="p">,</span>
                  <span class="n">async_recv_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">async_send_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_buffer</span> <span class="o">=</span> <span class="p">[]</span>
@@ -238,6 +239,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_received_eof</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_error_registry</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="n">daemon</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">async_recv_method</span> <span class="o">=</span> <span class="n">async_recv_method</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">async_send_method</span> <span class="o">=</span> <span class="n">async_send_method</span>
         <span class="k">if</span> <span class="n">async_recv_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -287,10 +289,12 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="o">=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommTaskLoop</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_backlog_send</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;SendBacklog&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_backlog_send</span><span class="p">,</span>
+                    <span class="n">daemon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">daemon</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;SendBacklog&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="o">=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommTaskLoop</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_backlog_recv</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;RecvBacklog&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_backlog_recv</span><span class="p">,</span>
+                    <span class="n">deamon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">daemon</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;RecvBacklog&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span>
 
     <span class="nd">@property</span>

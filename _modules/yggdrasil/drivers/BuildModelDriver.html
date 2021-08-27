@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.BuildModelDriver &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.drivers.BuildModelDriver &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
@@ -183,9 +184,34 @@
   <h1>Source code for yggdrasil.drivers.BuildModelDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">contextlib</span>
+<span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">components</span><span class="p">,</span> <span class="n">constants</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CompiledModelDriver</span><span class="p">,</span> <span class="n">CompilerBase</span><span class="p">)</span>
+
+
+<span class="n">_buildfile_locks_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
+<span class="n">_buildfile_locks</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<div class="viewcode-block" id="get_buildfile_lock"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.BuildModelDriver.get_buildfile_lock">[docs]</a><span class="k">def</span> <span class="nf">get_buildfile_lock</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a lock for a buildfile to prevent simultaneous access,</span>
+<span class="sd">    creating one as necessary.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): Build file.</span>
+<span class="sd">        context (threading.Context): Threading context.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        threading.RLock: Lock for the buildfile.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_buildfile_locks</span>
+    <span class="k">with</span> <span class="n">_buildfile_locks_lock</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_buildfile_locks</span><span class="p">:</span>
+            <span class="n">_buildfile_locks</span><span class="p">[</span><span class="n">fname</span><span class="p">]</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">_buildfile_locks</span><span class="p">[</span><span class="n">fname</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="BuildToolBase"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.BuildModelDriver.BuildToolBase">[docs]</a><span class="k">class</span> <span class="nc">BuildToolBase</span><span class="p">(</span><span class="n">CompilerBase</span><span class="p">):</span>
@@ -411,7 +437,42 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">builddir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span>
                                                           <span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">))</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;default_model_dir&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">BuildModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">parse_arguments</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BuildModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">parse_arguments</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># Add the buildfile_lock and pass the file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buildfile_lock</span> <span class="o">=</span> <span class="n">get_buildfile_lock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buildfile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mpi_rank</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_mpi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buildfile</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mpi_tags</span><span class="p">[</span><span class="s1">&#39;BUILDFILE&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="BuildModelDriver.buildfile_locked"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.BuildModelDriver.BuildModelDriver.buildfile_locked">[docs]</a>    <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+    <span class="k">def</span> <span class="nf">buildfile_locked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Context manager for locked build file.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">dry_run</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">buildfile_lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mpi_rank</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">recv_mpi</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mpi_tags</span><span class="p">[</span><span class="s1">&#39;LOCK_BUILDFILE&#39;</span><span class="p">])</span>
+            <span class="k">yield</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">dry_run</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mpi_rank</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">send_mpi</span><span class="p">(</span><span class="s1">&#39;UNLOCK_BUILDFILE&#39;</span><span class="p">,</span>
+                                  <span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mpi_tags</span><span class="p">[</span><span class="s1">&#39;UNLOCK_BUILDFILE&#39;</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">buildfile_lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BuildModelDriver.mpi_partner_init"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.BuildModelDriver.BuildModelDriver.mpi_partner_init">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">mpi_partner_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions initializing an MPIPartnerModel.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buildfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_mpi</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mpi_tags</span><span class="p">[</span><span class="s1">&#39;BUILDFILE&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buildfile_lock</span> <span class="o">=</span> <span class="n">get_buildfile_lock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buildfile</span><span class="p">,</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BuildModelDriver.partner_buildfile_lock"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.BuildModelDriver.BuildModelDriver.partner_buildfile_lock">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">partner_buildfile_lock</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions completing buildfile lock on MPIPartnerModels.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">buildfile_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_mpi</span><span class="p">(</span><span class="s1">&#39;LOCK_BUILDFILE&#39;</span><span class="p">,</span>
+                          <span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mpi_tags</span><span class="p">[</span><span class="s1">&#39;LOCK_BUILDFILE&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recv_mpi</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mpi_tags</span><span class="p">[</span><span class="s1">&#39;UNLOCK_BUILDFILE&#39;</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="BuildModelDriver.get_source_dir"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.BuildModelDriver.BuildModelDriver.get_source_dir">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_source_dir</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">source_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -677,6 +738,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;working_dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compile_working_dir</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;target_compiler&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_compiler</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;suffix&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BuildModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">compile_model</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="BuildModelDriver.cleanup"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.BuildModelDriver.BuildModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

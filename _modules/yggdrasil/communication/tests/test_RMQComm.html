@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.tests.test_RMQComm &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.communication.tests.test_RMQComm &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
@@ -196,7 +197,7 @@
 
 <div class="viewcode-block" id="TestRMQComm"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_RMQComm.TestRMQComm">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_rmq_installed</span><span class="p">,</span> <span class="s2">&quot;RMQ Server not running&quot;</span><span class="p">)</span>
 <span class="nd">@flaky</span><span class="o">.</span><span class="n">flaky</span>
-<span class="nd">@timeout</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+<span class="nd">@timeout</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">TestRMQComm</span><span class="p">(</span><span class="n">test_CommBase</span><span class="o">.</span><span class="n">TestCommBase</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test for RMQComm communication class.&quot;&quot;&quot;</span>
 

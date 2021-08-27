@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.examples.tests package &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.examples.tests package &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
@@ -184,6 +185,9 @@
 <h1>yggdrasil.examples.tests package<a class="headerlink" href="#yggdrasil-examples-tests-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-yggdrasil.examples.tests.conftest">
+<span id="yggdrasil-examples-tests-conftest-module"></span><h2>yggdrasil.examples.tests.conftest module<a class="headerlink" href="#module-yggdrasil.examples.tests.conftest" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-yggdrasil.examples.tests.test_SaM">
 <span id="yggdrasil-examples-tests-test-sam-module"></span><h2>yggdrasil.examples.tests.test_SaM module<a class="headerlink" href="#module-yggdrasil.examples.tests.test_SaM" title="Permalink to this headline">¶</a></h2>
@@ -1740,6 +1744,99 @@
 </dd></dl>
 
 </div>
+<div class="section" id="module-yggdrasil.examples.tests.test_model_error_with_io">
+<span id="yggdrasil-examples-tests-test-model-error-with-io-module"></span><h2>yggdrasil.examples.tests.test_model_error_with_io module<a class="headerlink" href="#module-yggdrasil.examples.tests.test_model_error_with_io" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.examples.tests.test_model_error_with_io.</span></span><span class="sig-name descname"><span class="pre">TestExampleModelErrorWithIO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_model_error_with_io.html#TestExampleModelErrorWithIO"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.ExampleTstBase" title="yggdrasil.examples.tests.ExampleTstBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.ExampleTstBase</span></code></a></p>
+<p>Test the model_error example.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.core_dump">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">core_dump</span></span><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.core_dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pattern for core dump that may be produced.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.example_cleanup">
+<span class="sig-name descname"><span class="pre">example_cleanup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_model_error_with_io.html#TestExampleModelErrorWithIO.example_cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.example_cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleanup files created during the test.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.example_name">
+<span class="sig-name descname"><span class="pre">example_name</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'model_error_with_io'</span></em><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.expects_error">
+<span class="sig-name descname"><span class="pre">expects_error</span></span><em class="property"> <span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.expects_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.iter_list_language">
+<span class="sig-name descname"><span class="pre">iter_list_language</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('c',</span> <span class="pre">'cmake',</span> <span class="pre">'cpp',</span> <span class="pre">'fortran',</span> <span class="pre">'make',</span> <span class="pre">'matlab',</span> <span class="pre">'python',</span> <span class="pre">'r')</span></em><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.iter_list_language" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.output_files">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">output_files</span></span><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.output_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output files for the run.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.test_c">
+<span class="sig-name descname"><span class="pre">test_c</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.test_c" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.test_cmake">
+<span class="sig-name descname"><span class="pre">test_cmake</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.test_cmake" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.test_cpp">
+<span class="sig-name descname"><span class="pre">test_cpp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.test_cpp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.test_fortran">
+<span class="sig-name descname"><span class="pre">test_fortran</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.test_fortran" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.test_make">
+<span class="sig-name descname"><span class="pre">test_make</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.test_make" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.test_matlab">
+<span class="sig-name descname"><span class="pre">test_matlab</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.test_matlab" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.test_python">
+<span class="sig-name descname"><span class="pre">test_python</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.test_python" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.test_r">
+<span class="sig-name descname"><span class="pre">test_r</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error_with_io.TestExampleModelErrorWithIO.test_r" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-yggdrasil.examples.tests.test_model_function">
 <span id="yggdrasil-examples-tests-test-model-function-module"></span><h2>yggdrasil.examples.tests.test_model_function module<a class="headerlink" href="#module-yggdrasil.examples.tests.test_model_function" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -2374,7 +2471,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.examples.tests.test_rpc_lesson3b.TestExampleRPC3b.iter_list_language">
-<span class="sig-name descname"><span class="pre">iter_list_language</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('c',)</span></em><a class="headerlink" href="#yggdrasil.examples.tests.test_rpc_lesson3b.TestExampleRPC3b.iter_list_language" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">iter_list_language</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('c',</span> <span class="pre">'cpp',</span> <span class="pre">'fortran',</span> <span class="pre">'python')</span></em><a class="headerlink" href="#yggdrasil.examples.tests.test_rpc_lesson3b.TestExampleRPC3b.iter_list_language" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -2386,6 +2483,21 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.examples.tests.test_rpc_lesson3b.TestExampleRPC3b.test_c">
 <span class="sig-name descname"><span class="pre">test_c</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_rpc_lesson3b.TestExampleRPC3b.test_c" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_rpc_lesson3b.TestExampleRPC3b.test_cpp">
+<span class="sig-name descname"><span class="pre">test_cpp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_rpc_lesson3b.TestExampleRPC3b.test_cpp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_rpc_lesson3b.TestExampleRPC3b.test_fortran">
+<span class="sig-name descname"><span class="pre">test_fortran</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_rpc_lesson3b.TestExampleRPC3b.test_fortran" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_rpc_lesson3b.TestExampleRPC3b.test_python">
+<span class="sig-name descname"><span class="pre">test_python</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_rpc_lesson3b.TestExampleRPC3b.test_python" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2546,6 +2658,11 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_c_mpi">
+<span class="sig-name descname"><span class="pre">test_c_mpi</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_c_mpi" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_c_rmq">
 <span class="sig-name descname"><span class="pre">test_c_rmq</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_c_rmq" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -2568,6 +2685,11 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_cpp_ipc">
 <span class="sig-name descname"><span class="pre">test_cpp_ipc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_cpp_ipc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_cpp_mpi">
+<span class="sig-name descname"><span class="pre">test_cpp_mpi</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_cpp_mpi" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -2596,6 +2718,11 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_fortran_mpi">
+<span class="sig-name descname"><span class="pre">test_fortran_mpi</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_fortran_mpi" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_fortran_rmq">
 <span class="sig-name descname"><span class="pre">test_fortran_rmq</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_fortran_rmq" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -2618,6 +2745,11 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_matlab_ipc">
 <span class="sig-name descname"><span class="pre">test_matlab_ipc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_matlab_ipc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_matlab_mpi">
+<span class="sig-name descname"><span class="pre">test_matlab_mpi</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_matlab_mpi" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -2646,6 +2778,11 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_python_mpi">
+<span class="sig-name descname"><span class="pre">test_python_mpi</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_python_mpi" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_python_rmq">
 <span class="sig-name descname"><span class="pre">test_python_rmq</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_python_rmq" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -2668,6 +2805,11 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_r_ipc">
 <span class="sig-name descname"><span class="pre">test_r_ipc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_r_ipc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_r_mpi">
+<span class="sig-name descname"><span class="pre">test_r_mpi</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.TestTimedPipeBase.test_r_mpi" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -2918,7 +3060,7 @@ test data for the specified type.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.examples.tests.test_transforms.TestExampleTransforms.iter_list_language">
-<span class="sig-name descname"><span class="pre">iter_list_language</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('R',</span> <span class="pre">'matlab',</span> <span class="pre">'python')</span></em><a class="headerlink" href="#yggdrasil.examples.tests.test_transforms.TestExampleTransforms.iter_list_language" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">iter_list_language</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('python',</span> <span class="pre">'matlab',</span> <span class="pre">'R')</span></em><a class="headerlink" href="#yggdrasil.examples.tests.test_transforms.TestExampleTransforms.iter_list_language" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -3129,7 +3271,7 @@ False.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.examples.tests.test_types.TestExampleTypes.iter_list_language">
-<span class="sig-name descname"><span class="pre">iter_list_language</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('cpp',</span> <span class="pre">'R',</span> <span class="pre">'matlab',</span> <span class="pre">'python',</span> <span class="pre">'c',</span> <span class="pre">'fortran')</span></em><a class="headerlink" href="#yggdrasil.examples.tests.test_types.TestExampleTypes.iter_list_language" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">iter_list_language</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('cpp',</span> <span class="pre">'python',</span> <span class="pre">'matlab',</span> <span class="pre">'R',</span> <span class="pre">'fortran',</span> <span class="pre">'c')</span></em><a class="headerlink" href="#yggdrasil.examples.tests.test_types.TestExampleTypes.iter_list_language" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -3144,7 +3286,7 @@ False.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.examples.tests.test_types.TestExampleTypes.iter_skip">
-<span class="sig-name descname"><span class="pre">iter_skip</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[({'cpp',</span> <span class="pre">'c',</span> <span class="pre">'fortran'},</span> <span class="pre">'*',</span> <span class="pre">'run_example_generic'),</span> <span class="pre">({'cpp',</span> <span class="pre">'c',</span> <span class="pre">'fortran'},</span> <span class="pre">'*',</span> <span class="pre">'run_example_pointers'),</span> <span class="pre">({'c'},</span> <span class="pre">'*',</span> <span class="pre">'run_example_c_nolengths'),</span> <span class="pre">({'c'},</span> <span class="pre">'*',</span> <span class="pre">'run_example_c_prefixes'),</span> <span class="pre">('c',</span> <span class="pre">{'string',</span> <span class="pre">'unicode',</span> <span class="pre">'bytes'},</span> <span class="pre">'run_example_c_nolengths'),</span> <span class="pre">('c',</span> <span class="pre">{'1darray',</span> <span class="pre">'ndarray'},</span> <span class="pre">'run_example_c_prefixes'),</span> <span class="pre">('*',</span> <span class="pre">{'array'},</span> <span class="pre">'run_example_split_array')]</span></em><a class="headerlink" href="#yggdrasil.examples.tests.test_types.TestExampleTypes.iter_skip" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">iter_skip</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[({'c',</span> <span class="pre">'cpp',</span> <span class="pre">'fortran'},</span> <span class="pre">'*',</span> <span class="pre">'run_example_generic'),</span> <span class="pre">({'c',</span> <span class="pre">'cpp',</span> <span class="pre">'fortran'},</span> <span class="pre">'*',</span> <span class="pre">'run_example_pointers'),</span> <span class="pre">({'c'},</span> <span class="pre">'*',</span> <span class="pre">'run_example_c_nolengths'),</span> <span class="pre">({'c'},</span> <span class="pre">'*',</span> <span class="pre">'run_example_c_prefixes'),</span> <span class="pre">('c',</span> <span class="pre">{'bytes',</span> <span class="pre">'string',</span> <span class="pre">'unicode'},</span> <span class="pre">'run_example_c_nolengths'),</span> <span class="pre">('c',</span> <span class="pre">{'1darray',</span> <span class="pre">'ndarray'},</span> <span class="pre">'run_example_c_prefixes'),</span> <span class="pre">('*',</span> <span class="pre">{'array'},</span> <span class="pre">'run_example_split_array')]</span></em><a class="headerlink" href="#yggdrasil.examples.tests.test_types.TestExampleTypes.iter_skip" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -4833,7 +4975,7 @@ driver.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.examples.tests.ExampleTstBase.iter_list_comm">
-<span class="sig-name descname"><span class="pre">iter_list_comm</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['rmq_async',</span> <span class="pre">'ipc',</span> <span class="pre">'rmq',</span> <span class="pre">'zmq',</span> <span class="pre">'buffer']</span></em><a class="headerlink" href="#yggdrasil.examples.tests.ExampleTstBase.iter_list_comm" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">iter_list_comm</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['ipc',</span> <span class="pre">'rmq_async',</span> <span class="pre">'buffer',</span> <span class="pre">'zmq',</span> <span class="pre">'mpi',</span> <span class="pre">'rmq']</span></em><a class="headerlink" href="#yggdrasil.examples.tests.ExampleTstBase.iter_list_comm" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -4874,6 +5016,17 @@ driver.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.ExampleTstBase.mpi_rank">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">mpi_rank</span></span><a class="headerlink" href="#yggdrasil.examples.tests.ExampleTstBase.mpi_rank" title="Permalink to this definition">¶</a></dt>
+<dd><p>MPI process rank.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -4939,6 +5092,12 @@ driver.</p></li>
 <dt class="sig sig-object py" id="yggdrasil.examples.tests.ExampleTstBase.setup_iteration_language">
 <span class="sig-name descname"><span class="pre">setup_iteration_language</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests.html#ExampleTstBase.setup_iteration_language"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.examples.tests.ExampleTstBase.setup_iteration_language" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform setup associated with a language iteration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.examples.tests.ExampleTstBase.setup_iteration_mpi">
+<span class="sig-name descname"><span class="pre">setup_iteration_mpi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests.html#ExampleTstBase.setup_iteration_mpi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.examples.tests.ExampleTstBase.setup_iteration_mpi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform setup associated with an MPI iteration.</p>
 </dd></dl>
 
 <dl class="py method">

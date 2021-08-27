@@ -1,0 +1,12 @@
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_error_with_io/src/model_error_with_io_modelA.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_error_with_io/src/model_error_with_io_modelB.py
+   :language: python
+   :linenos:
+
+
+(`Example in other languages <examples/model_error_with_io.html>`__)

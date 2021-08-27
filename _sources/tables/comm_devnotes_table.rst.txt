@@ -8,6 +8,7 @@ ipc      An IPC message queue key.                  The default size limit for I
                                                     systems so it is important that implementation of this communication mechanism  
                                                     properly split and send messages larger than this limit as more than one        
                                                     message.                                                                        
+mpi      The partner communicator ID(s).                                                                                            
 rmq      AMPQ queue address of the form ``<url>_R   It is not advised that new language implement a RabbitMQ communication          
          MQPARAM_<exchange>_RMQPARAM_<queue>``      interface. Rather RMQ communication is included explicitly for connections      
          where ``url`` is the broker address (see   between models that are not co-located on the same machine and are used by the  

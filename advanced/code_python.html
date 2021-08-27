@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Python Code &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>Python Code &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -105,6 +105,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../threading.html">OpenMP Threading in Models</a></li>
@@ -319,7 +320,7 @@ as subcommands or individually.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.command_line.SubCommand.call">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#SubCommand.call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.SubCommand.call" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#SubCommand.call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.SubCommand.call" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -344,7 +345,7 @@ as subcommands or individually.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.command_line.SubCommand.parse_args">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">parse_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_unknown</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#SubCommand.parse_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.SubCommand.parse_args" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">parse_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_unknown</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#SubCommand.parse_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.SubCommand.parse_args" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -614,7 +615,7 @@ library in a C or C++ program.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.run_tsts.arguments">
-<span class="sig-name descname"><span class="pre">arguments</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[(('--withcoverage',</span> <span class="pre">'--with-coverage'),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Record</span> <span class="pre">coverage</span> <span class="pre">during</span> <span class="pre">tests.'}),</span> <span class="pre">(('--verbose',</span> <span class="pre">'-v'),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Increase</span> <span class="pre">verbosity</span> <span class="pre">of</span> <span class="pre">output</span> <span class="pre">from</span> <span class="pre">the</span> <span class="pre">test</span> <span class="pre">runner'}),</span> <span class="pre">(('--nocapture',</span> <span class="pre">'-s'),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">&quot;Don't</span> <span class="pre">capture</span> <span class="pre">output</span> <span class="pre">from</span> <span class="pre">tests.&quot;}),</span> <span class="pre">(('--stop',</span> <span class="pre">'-x'),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Stop</span> <span class="pre">after</span> <span class="pre">first</span> <span class="pre">test</span> <span class="pre">failure.'}),</span> <span class="pre">(('--nologcapture',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">&quot;Don't</span> <span class="pre">capture</span> <span class="pre">output</span> <span class="pre">from</span> <span class="pre">log</span> <span class="pre">messages</span> <span class="pre">generated</span> <span class="pre">during</span> <span class="pre">tests.&quot;}),</span> <span class="pre">(('--noflaky',</span> <span class="pre">'--no-flaky'),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">&quot;Don't</span> <span class="pre">re-run</span> <span class="pre">flaky</span> <span class="pre">tests.&quot;}),</span> <span class="pre">(('--ci',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Perform</span> <span class="pre">addition</span> <span class="pre">operations</span> <span class="pre">required</span> <span class="pre">for</span> <span class="pre">testing</span> <span class="pre">on</span> <span class="pre">continuous</span> <span class="pre">integration</span> <span class="pre">services.'}),</span> <span class="pre">(('--test-suite',</span> <span class="pre">'--test-suites'),</span> <span class="pre">{'nargs':</span> <span class="pre">'+',</span> <span class="pre">'action':</span> <span class="pre">'extend',</span> <span class="pre">'type':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">'choices':</span> <span class="pre">['all',</span> <span class="pre">'top',</span> <span class="pre">'examples',</span> <span class="pre">'examples_part1',</span> <span class="pre">'examples_part2',</span> <span class="pre">'demos',</span> <span class="pre">'types',</span> <span class="pre">'timing',</span> <span class="pre">'connections',</span> <span class="pre">'models'],</span> <span class="pre">'help':</span> <span class="pre">'Test</span> <span class="pre">suite(s)</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">run.',</span> <span class="pre">'dest':</span> <span class="pre">'test_suites'}),</span> <span class="pre">(('--pytest-config',</span> <span class="pre">'-c'),</span> <span class="pre">{'help':</span> <span class="pre">'Pytest</span> <span class="pre">configuration</span> <span class="pre">file</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">instead</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">defaults.'}),</span> <span class="pre">(('--cov-config',),</span> <span class="pre">{'help':</span> <span class="pre">'Config</span> <span class="pre">file</span> <span class="pre">for</span> <span class="pre">coverage.</span> <span class="pre">Default:</span> <span class="pre">.coveragerc'}),</span> <span class="pre">(('--ignore',),</span> <span class="pre">{'action':</span> <span class="pre">'append',</span> <span class="pre">'help':</span> <span class="pre">'Ignore</span> <span class="pre">path</span> <span class="pre">during</span> <span class="pre">collection.'}),</span> <span class="pre">(('--rootdir',),</span> <span class="pre">{'help':</span> <span class="pre">'Define</span> <span class="pre">root</span> <span class="pre">directory</span> <span class="pre">for</span> <span class="pre">tests.'}),</span> <span class="pre">(('--count',),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">'default':</span> <span class="pre">1,</span> <span class="pre">'help':</span> <span class="pre">'Number</span> <span class="pre">of</span> <span class="pre">times</span> <span class="pre">to</span> <span class="pre">repeat</span> <span class="pre">a</span> <span class="pre">test.'}),</span> <span class="pre">(('--additional-info',</span> <span class="pre">'-r'),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">'default':</span> <span class="pre">'',</span> <span class="pre">'help':</span> <span class="pre">'Display</span> <span class="pre">additional</span> <span class="pre">info</span> <span class="pre">for</span> <span class="pre">test</span> <span class="pre">results.'})]</span></em><a class="headerlink" href="#yggdrasil.command_line.run_tsts.arguments" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">arguments</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[(('--withcoverage',</span> <span class="pre">'--with-coverage'),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Record</span> <span class="pre">coverage</span> <span class="pre">during</span> <span class="pre">tests.'}),</span> <span class="pre">(('--verbose',</span> <span class="pre">'-v'),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Increase</span> <span class="pre">verbosity</span> <span class="pre">of</span> <span class="pre">output</span> <span class="pre">from</span> <span class="pre">the</span> <span class="pre">test</span> <span class="pre">runner'}),</span> <span class="pre">(('--nocapture',</span> <span class="pre">'-s'),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">&quot;Don't</span> <span class="pre">capture</span> <span class="pre">output</span> <span class="pre">from</span> <span class="pre">tests.&quot;}),</span> <span class="pre">(('--stop',</span> <span class="pre">'-x'),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Stop</span> <span class="pre">after</span> <span class="pre">first</span> <span class="pre">test</span> <span class="pre">failure.'}),</span> <span class="pre">(('--nologcapture',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">&quot;Don't</span> <span class="pre">capture</span> <span class="pre">output</span> <span class="pre">from</span> <span class="pre">log</span> <span class="pre">messages</span> <span class="pre">generated</span> <span class="pre">during</span> <span class="pre">tests.&quot;}),</span> <span class="pre">(('--noflaky',</span> <span class="pre">'--no-flaky'),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">&quot;Don't</span> <span class="pre">re-run</span> <span class="pre">flaky</span> <span class="pre">tests.&quot;}),</span> <span class="pre">(('--ci',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Perform</span> <span class="pre">addition</span> <span class="pre">operations</span> <span class="pre">required</span> <span class="pre">for</span> <span class="pre">testing</span> <span class="pre">on</span> <span class="pre">continuous</span> <span class="pre">integration</span> <span class="pre">services.'}),</span> <span class="pre">(('--test-suite',</span> <span class="pre">'--test-suites'),</span> <span class="pre">{'nargs':</span> <span class="pre">'+',</span> <span class="pre">'action':</span> <span class="pre">'extend',</span> <span class="pre">'type':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">'choices':</span> <span class="pre">['all',</span> <span class="pre">'top',</span> <span class="pre">'examples',</span> <span class="pre">'examples_part1',</span> <span class="pre">'examples_part2',</span> <span class="pre">'demos',</span> <span class="pre">'types',</span> <span class="pre">'timing',</span> <span class="pre">'connections',</span> <span class="pre">'models',</span> <span class="pre">'mpi'],</span> <span class="pre">'help':</span> <span class="pre">'Test</span> <span class="pre">suite(s)</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">run.',</span> <span class="pre">'dest':</span> <span class="pre">'test_suites'}),</span> <span class="pre">(('--pytest-config',</span> <span class="pre">'-c'),</span> <span class="pre">{'help':</span> <span class="pre">'Pytest</span> <span class="pre">configuration</span> <span class="pre">file</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">instead</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">defaults.'}),</span> <span class="pre">(('--cov-config',),</span> <span class="pre">{'help':</span> <span class="pre">'Config</span> <span class="pre">file</span> <span class="pre">for</span> <span class="pre">coverage.</span> <span class="pre">Default:</span> <span class="pre">.coveragerc'}),</span> <span class="pre">(('--ignore',),</span> <span class="pre">{'action':</span> <span class="pre">'append',</span> <span class="pre">'help':</span> <span class="pre">'Ignore</span> <span class="pre">path</span> <span class="pre">during</span> <span class="pre">collection.'}),</span> <span class="pre">(('--rootdir',),</span> <span class="pre">{'help':</span> <span class="pre">'Define</span> <span class="pre">root</span> <span class="pre">directory</span> <span class="pre">for</span> <span class="pre">tests.'}),</span> <span class="pre">(('--count',),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">'default':</span> <span class="pre">1,</span> <span class="pre">'help':</span> <span class="pre">'Number</span> <span class="pre">of</span> <span class="pre">times</span> <span class="pre">to</span> <span class="pre">repeat</span> <span class="pre">a</span> <span class="pre">test.'}),</span> <span class="pre">(('--additional-info',</span> <span class="pre">'-r'),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">'default':</span> <span class="pre">'',</span> <span class="pre">'help':</span> <span class="pre">'Display</span> <span class="pre">additional</span> <span class="pre">info</span> <span class="pre">for</span> <span class="pre">test</span> <span class="pre">results.'}),</span> <span class="pre">(('--with-mpi',</span> <span class="pre">'--mpi-nproc'),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">'default':</span> <span class="pre">1,</span> <span class="pre">'help':</span> <span class="pre">'Number</span> <span class="pre">of</span> <span class="pre">MPI</span> <span class="pre">processes</span> <span class="pre">to</span> <span class="pre">run</span> <span class="pre">tests</span> <span class="pre">on.'}),</span> <span class="pre">(('--write-script',),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">'help':</span> <span class="pre">'Name</span> <span class="pre">of</span> <span class="pre">script</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">created</span> <span class="pre">to</span> <span class="pre">run</span> <span class="pre">tests.'}),</span> <span class="pre">(('--separate-test',</span> <span class="pre">'--separate-tests'),</span> <span class="pre">{'nargs':</span> <span class="pre">'+',</span> <span class="pre">'action':</span> <span class="pre">'extend',</span> <span class="pre">'type':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">'help':</span> <span class="pre">'Flags</span> <span class="pre">defining</span> <span class="pre">tests</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">run</span> <span class="pre">separately.',</span> <span class="pre">'dest':</span> <span class="pre">'separate_tests'})]</span></em><a class="headerlink" href="#yggdrasil.command_line.run_tsts.arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -665,6 +666,12 @@ False.</p></li>
 <em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">parse_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#run_tsts.parse_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.run_tsts.parse_args" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.command_line.run_tsts.write_script">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">write_script</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">argv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg_env</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#run_tsts.write_script"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.run_tsts.write_script" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a script to run the pytest command.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -706,7 +713,7 @@ False.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.update_config.arguments">
-<span class="sig-name descname"><span class="pre">arguments</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[(('languages',),</span> <span class="pre">{'nargs':</span> <span class="pre">'*',</span> <span class="pre">'default':</span> <span class="pre">[],</span> <span class="pre">'help':</span> <span class="pre">'One</span> <span class="pre">or</span> <span class="pre">more</span> <span class="pre">languages</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">configured.'}),</span> <span class="pre">(('--languages',),</span> <span class="pre">{'nargs':</span> <span class="pre">'+',</span> <span class="pre">'dest':</span> <span class="pre">'languages_flag',</span> <span class="pre">'default':</span> <span class="pre">[],</span> <span class="pre">'help':</span> <span class="pre">'One</span> <span class="pre">or</span> <span class="pre">more</span> <span class="pre">languages</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">configured.'}),</span> <span class="pre">(('--show-file',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Print</span> <span class="pre">the</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">config</span> <span class="pre">file</span> <span class="pre">without</span> <span class="pre">updating</span> <span class="pre">it.'}),</span> <span class="pre">(('--remove-file',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Remove</span> <span class="pre">the</span> <span class="pre">existing</span> <span class="pre">config</span> <span class="pre">file</span> <span class="pre">and</span> <span class="pre">return.'}),</span> <span class="pre">(('--overwrite',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Overwrite</span> <span class="pre">the</span> <span class="pre">existing</span> <span class="pre">file.'}),</span> <span class="pre">(('--disable-languages',),</span> <span class="pre">{'nargs':</span> <span class="pre">'+',</span> <span class="pre">'default':</span> <span class="pre">[],</span> <span class="pre">'choices':</span> <span class="pre">['c',</span> <span class="pre">'c++',</span> <span class="pre">'cpp',</span> <span class="pre">'cxx',</span> <span class="pre">'fortran',</span> <span class="pre">'R',</span> <span class="pre">'r',</span> <span class="pre">'matlab',</span> <span class="pre">'python',</span> <span class="pre">'cmake',</span> <span class="pre">'make',</span> <span class="pre">'lpy',</span> <span class="pre">'osr',</span> <span class="pre">'sbml',</span> <span class="pre">'executable',</span> <span class="pre">'function',</span> <span class="pre">'timesync'],</span> <span class="pre">'help':</span> <span class="pre">'One</span> <span class="pre">or</span> <span class="pre">more</span> <span class="pre">languages</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">disabled.'}),</span> <span class="pre">(('--enable-languages',),</span> <span class="pre">{'nargs':</span> <span class="pre">'+',</span> <span class="pre">'default':</span> <span class="pre">[],</span> <span class="pre">'choices':</span> <span class="pre">['c',</span> <span class="pre">'c++',</span> <span class="pre">'cpp',</span> <span class="pre">'cxx',</span> <span class="pre">'fortran',</span> <span class="pre">'R',</span> <span class="pre">'r',</span> <span class="pre">'matlab',</span> <span class="pre">'python',</span> <span class="pre">'cmake',</span> <span class="pre">'make',</span> <span class="pre">'lpy',</span> <span class="pre">'osr',</span> <span class="pre">'sbml',</span> <span class="pre">'executable',</span> <span class="pre">'function',</span> <span class="pre">'timesync'],</span> <span class="pre">'help':</span> <span class="pre">'One</span> <span class="pre">or</span> <span class="pre">more</span> <span class="pre">languages</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">enabled.'}),</span> <span class="pre">(('--quiet',</span> <span class="pre">'-q'),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Suppress</span> <span class="pre">output.'}),</span> <span class="pre">(('--allow-multiple-omp',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'default':</span> <span class="pre">None,</span> <span class="pre">'help':</span> <span class="pre">'Have</span> <span class="pre">yggdrasil</span> <span class="pre">set</span> <span class="pre">the</span> <span class="pre">environment</span> <span class="pre">variable</span> <span class="pre">KMP_DUPLICATE_LIB_OK</span> <span class="pre">to</span> <span class="pre">\'True\'</span> <span class="pre">during</span> <span class="pre">model</span> <span class="pre">runs</span> <span class="pre">to</span> <span class="pre">disable</span> <span class="pre">errors</span> <span class="pre">resembling</span> <span class="pre">&quot;OMP:</span> <span class="pre">Error</span> <span class="pre">#15:</span> <span class="pre">Initializing</span> <span class="pre">libomp.dylib...&quot;</span> <span class="pre">that</span> <span class="pre">result</span> <span class="pre">from</span> <span class="pre">having</span> <span class="pre">multiple</span> <span class="pre">versions</span> <span class="pre">of</span> <span class="pre">OpenMP</span> <span class="pre">loaded</span> <span class="pre">during</span> <span class="pre">runtime.'}),</span> <span class="pre">(('--dont-allow-multiple-omp',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'default':</span> <span class="pre">None,</span> <span class="pre">'help':</span> <span class="pre">&quot;Don't</span> <span class="pre">set</span> <span class="pre">the</span> <span class="pre">KMP_DUPLICATE_LIB_OK</span> <span class="pre">environment</span> <span class="pre">variable</span> <span class="pre">when</span> <span class="pre">running</span> <span class="pre">models</span> <span class="pre">(see</span> <span class="pre">help</span> <span class="pre">for</span> <span class="pre">'--allow-multiple-omp'</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information).&quot;}),</span> <span class="pre">(('--c-compiler',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">compiler</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">compile</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">c.'}),</span> <span class="pre">(('--c++-compiler',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">compiler</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">compile</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">c++.'}),</span> <span class="pre">(('--fortran-compiler',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">compiler</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">compile</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">fortran.'}),</span> <span class="pre">(('--c-linker',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">linker</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">link</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">c.'}),</span> <span class="pre">(('--c++-linker',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">linker</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">link</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">c++.'}),</span> <span class="pre">(('--fortran-linker',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">linker</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">link</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">fortran.'}),</span> <span class="pre">(('--c-archiver',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">archiver</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">create</span> <span class="pre">static</span> <span class="pre">libraries</span> <span class="pre">for</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">c.'}),</span> <span class="pre">(('--c++-archiver',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">archiver</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">create</span> <span class="pre">static</span> <span class="pre">libraries</span> <span class="pre">for</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">c++.'}),</span> <span class="pre">(('--fortran-archiver',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">archiver</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">create</span> <span class="pre">static</span> <span class="pre">libraries</span> <span class="pre">for</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">fortran.'})]</span></em><a class="headerlink" href="#yggdrasil.command_line.update_config.arguments" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">arguments</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[(('languages',),</span> <span class="pre">{'nargs':</span> <span class="pre">'*',</span> <span class="pre">'default':</span> <span class="pre">[],</span> <span class="pre">'help':</span> <span class="pre">'One</span> <span class="pre">or</span> <span class="pre">more</span> <span class="pre">languages</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">configured.'}),</span> <span class="pre">(('--languages',),</span> <span class="pre">{'nargs':</span> <span class="pre">'+',</span> <span class="pre">'dest':</span> <span class="pre">'languages_flag',</span> <span class="pre">'default':</span> <span class="pre">[],</span> <span class="pre">'help':</span> <span class="pre">'One</span> <span class="pre">or</span> <span class="pre">more</span> <span class="pre">languages</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">configured.'}),</span> <span class="pre">(('--show-file',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Print</span> <span class="pre">the</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">config</span> <span class="pre">file</span> <span class="pre">without</span> <span class="pre">updating</span> <span class="pre">it.'}),</span> <span class="pre">(('--remove-file',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Remove</span> <span class="pre">the</span> <span class="pre">existing</span> <span class="pre">config</span> <span class="pre">file</span> <span class="pre">and</span> <span class="pre">return.'}),</span> <span class="pre">(('--overwrite',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Overwrite</span> <span class="pre">the</span> <span class="pre">existing</span> <span class="pre">file.'}),</span> <span class="pre">(('--disable-languages',),</span> <span class="pre">{'nargs':</span> <span class="pre">'+',</span> <span class="pre">'default':</span> <span class="pre">[],</span> <span class="pre">'choices':</span> <span class="pre">['c',</span> <span class="pre">'c++',</span> <span class="pre">'cpp',</span> <span class="pre">'cxx',</span> <span class="pre">'fortran',</span> <span class="pre">'R',</span> <span class="pre">'r',</span> <span class="pre">'matlab',</span> <span class="pre">'python',</span> <span class="pre">'cmake',</span> <span class="pre">'make',</span> <span class="pre">'lpy',</span> <span class="pre">'osr',</span> <span class="pre">'sbml',</span> <span class="pre">'executable',</span> <span class="pre">'function',</span> <span class="pre">'mpi',</span> <span class="pre">'timesync'],</span> <span class="pre">'help':</span> <span class="pre">'One</span> <span class="pre">or</span> <span class="pre">more</span> <span class="pre">languages</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">disabled.'}),</span> <span class="pre">(('--enable-languages',),</span> <span class="pre">{'nargs':</span> <span class="pre">'+',</span> <span class="pre">'default':</span> <span class="pre">[],</span> <span class="pre">'choices':</span> <span class="pre">['c',</span> <span class="pre">'c++',</span> <span class="pre">'cpp',</span> <span class="pre">'cxx',</span> <span class="pre">'fortran',</span> <span class="pre">'R',</span> <span class="pre">'r',</span> <span class="pre">'matlab',</span> <span class="pre">'python',</span> <span class="pre">'cmake',</span> <span class="pre">'make',</span> <span class="pre">'lpy',</span> <span class="pre">'osr',</span> <span class="pre">'sbml',</span> <span class="pre">'executable',</span> <span class="pre">'function',</span> <span class="pre">'mpi',</span> <span class="pre">'timesync'],</span> <span class="pre">'help':</span> <span class="pre">'One</span> <span class="pre">or</span> <span class="pre">more</span> <span class="pre">languages</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">enabled.'}),</span> <span class="pre">(('--quiet',</span> <span class="pre">'-q'),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Suppress</span> <span class="pre">output.'}),</span> <span class="pre">(('--allow-multiple-omp',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'default':</span> <span class="pre">None,</span> <span class="pre">'help':</span> <span class="pre">'Have</span> <span class="pre">yggdrasil</span> <span class="pre">set</span> <span class="pre">the</span> <span class="pre">environment</span> <span class="pre">variable</span> <span class="pre">KMP_DUPLICATE_LIB_OK</span> <span class="pre">to</span> <span class="pre">\'True\'</span> <span class="pre">during</span> <span class="pre">model</span> <span class="pre">runs</span> <span class="pre">to</span> <span class="pre">disable</span> <span class="pre">errors</span> <span class="pre">resembling</span> <span class="pre">&quot;OMP:</span> <span class="pre">Error</span> <span class="pre">#15:</span> <span class="pre">Initializing</span> <span class="pre">libomp.dylib...&quot;</span> <span class="pre">that</span> <span class="pre">result</span> <span class="pre">from</span> <span class="pre">having</span> <span class="pre">multiple</span> <span class="pre">versions</span> <span class="pre">of</span> <span class="pre">OpenMP</span> <span class="pre">loaded</span> <span class="pre">during</span> <span class="pre">runtime.'}),</span> <span class="pre">(('--dont-allow-multiple-omp',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'default':</span> <span class="pre">None,</span> <span class="pre">'help':</span> <span class="pre">&quot;Don't</span> <span class="pre">set</span> <span class="pre">the</span> <span class="pre">KMP_DUPLICATE_LIB_OK</span> <span class="pre">environment</span> <span class="pre">variable</span> <span class="pre">when</span> <span class="pre">running</span> <span class="pre">models</span> <span class="pre">(see</span> <span class="pre">help</span> <span class="pre">for</span> <span class="pre">'--allow-multiple-omp'</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information).&quot;}),</span> <span class="pre">(('--c-compiler',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">compiler</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">compile</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">c.'}),</span> <span class="pre">(('--c++-compiler',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">compiler</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">compile</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">c++.'}),</span> <span class="pre">(('--fortran-compiler',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">compiler</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">compile</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">fortran.'}),</span> <span class="pre">(('--c-linker',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">linker</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">link</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">c.'}),</span> <span class="pre">(('--c++-linker',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">linker</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">link</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">c++.'}),</span> <span class="pre">(('--fortran-linker',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">linker</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">link</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">fortran.'}),</span> <span class="pre">(('--c-archiver',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">archiver</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">create</span> <span class="pre">static</span> <span class="pre">libraries</span> <span class="pre">for</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">c.'}),</span> <span class="pre">(('--c++-archiver',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">archiver</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">create</span> <span class="pre">static</span> <span class="pre">libraries</span> <span class="pre">for</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">c++.'}),</span> <span class="pre">(('--fortran-archiver',),</span> <span class="pre">{'help':</span> <span class="pre">'Name</span> <span class="pre">or</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">archiver</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">create</span> <span class="pre">static</span> <span class="pre">libraries</span> <span class="pre">for</span> <span class="pre">models</span> <span class="pre">written</span> <span class="pre">in</span> <span class="pre">fortran.'})]</span></em><a class="headerlink" href="#yggdrasil.command_line.update_config.arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -957,7 +964,7 @@ form for composing a model specification files.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.yggrun.arguments">
-<span class="sig-name descname"><span class="pre">arguments</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[(('yamlfile',),</span> <span class="pre">{'nargs':</span> <span class="pre">'+',</span> <span class="pre">'help':</span> <span class="pre">'One</span> <span class="pre">or</span> <span class="pre">more</span> <span class="pre">yaml</span> <span class="pre">specification</span> <span class="pre">files.'})]</span></em><a class="headerlink" href="#yggdrasil.command_line.yggrun.arguments" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">arguments</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[(('yamlfile',),</span> <span class="pre">{'nargs':</span> <span class="pre">'+',</span> <span class="pre">'help':</span> <span class="pre">'One</span> <span class="pre">or</span> <span class="pre">more</span> <span class="pre">yaml</span> <span class="pre">specification</span> <span class="pre">files.'}),</span> <span class="pre">(('--with-mpi',</span> <span class="pre">'--mpi-nproc'),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">'default':</span> <span class="pre">1,</span> <span class="pre">'help':</span> <span class="pre">'Number</span> <span class="pre">of</span> <span class="pre">MPI</span> <span class="pre">processes</span> <span class="pre">to</span> <span class="pre">run</span> <span class="pre">on.'}),</span> <span class="pre">(('--mpi-tag-start',),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">'default':</span> <span class="pre">0,</span> <span class="pre">'help':</span> <span class="pre">'Tag</span> <span class="pre">that</span> <span class="pre">MPI</span> <span class="pre">communications</span> <span class="pre">should</span> <span class="pre">start</span> <span class="pre">at.'})]</span></em><a class="headerlink" href="#yggdrasil.command_line.yggrun.arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1352,6 +1359,19 @@ subtype if it is None.</p></li>
 <p class="admonition-title">Todo</p>
 <p>Remove reference to environment variables for accessing config options.</p>
 </div>
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.config.ConfigEnv">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.config.</span></span><span class="sig-name descname"><span class="pre">ConfigEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_env</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/config.html#ConfigEnv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.config.ConfigEnv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Container for environment variable modification.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.config.ConfigEnv.restore">
+<span class="sig-name descname"><span class="pre">restore</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/config.html#ConfigEnv.restore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.config.ConfigEnv.restore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restore the old environment variables.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.config.YggConfigParser">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.config.</span></span><span class="sig-name descname"><span class="pre">YggConfigParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/config.html#YggConfigParser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.config.YggConfigParser" title="Permalink to this definition">¶</a></dt>
@@ -2393,6 +2413,24 @@ a dummy object.</p>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">Event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'threading'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#Event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.Event" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.ContextObject" title="yggdrasil.multitasking.ContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.ContextObject</span></code></a></p>
 <p>Multiprocessing/threading event.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.Event.add_callback">
+<span class="sig-name descname"><span class="pre">add_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callback</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trigger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'set'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#Event.add_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.Event.add_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callback that will be called when set or clear is invoked.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>callback</strong> (<em>callable</em>) – Callable executed when set is called.</p></li>
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a><em>, </em><em>optional</em>) – Arguments to pass to the callback.</p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – Keyword arguments to pass to the
+callback.</p></li>
+<li><p><strong>trigger</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Action triggering the set call.
+Options are ‘set’ or ‘clear’. Defaults to ‘set’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.Event.clear">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">clear</span></span><a class="headerlink" href="#yggdrasil.multitasking.Event.clear" title="Permalink to this definition">¶</a></dt>
@@ -2506,11 +2544,202 @@ a dummy object.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIErrorExchange">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">MPIErrorExchange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">global_tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#MPIErrorExchange"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.MPIErrorExchange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Set of MPI messages to check for errors.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIErrorExchange.closing_messages">
+<span class="sig-name descname"><span class="pre">closing_messages</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['ERROR',</span> <span class="pre">'COMPLETE']</span></em><a class="headerlink" href="#yggdrasil.multitasking.MPIErrorExchange.closing_messages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIErrorExchange.finalize">
+<span class="sig-name descname"><span class="pre">finalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">failure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#MPIErrorExchange.finalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.MPIErrorExchange.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finalize an instance by waiting for completions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>failure</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – True if there was an error.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIErrorExchange.recv">
+<span class="sig-name descname"><span class="pre">recv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wait</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#MPIErrorExchange.recv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.MPIErrorExchange.recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check for response to receive request.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIErrorExchange.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">global_tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#MPIErrorExchange.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.MPIErrorExchange.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rest comms for the next test.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIErrorExchange.send">
+<span class="sig-name descname"><span class="pre">send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#MPIErrorExchange.send"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.MPIErrorExchange.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIErrorExchange.sync">
+<span class="sig-name descname"><span class="pre">sync</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_equal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dont_raise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sync_tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_complete</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#MPIErrorExchange.sync"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.MPIErrorExchange.sync" title="Permalink to this definition">¶</a></dt>
+<dd><p>Synchronize processes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>local_tag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Next tag that will be used by the local MPI comm.</p></li>
+<li><p><strong>get_tags</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, tags will be exchanged between
+all processes. Defaults to False.</p></li>
+<li><p><strong>check_equal</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, tags will be checked to be
+equal. Defaults to False.</p></li>
+<li><p><strong>dont_raise</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True and a MPIPartnerError were
+to be raised, the sync will abort. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="#yggdrasil.multitasking.MPIPartnerError" title="yggdrasil.multitasking.MPIPartnerError"><strong>MPIPartnerError</strong></a> – If there was an error on one of the other MPI
+    processes.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.9)"><strong>AssertionError</strong></a> – If check_equal is True and the tags are not
+    equivalent.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIErrorExchange.tags">
+<span class="sig-name descname"><span class="pre">tags</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'ERROR_ON_RANK0':</span> <span class="pre">1,</span> <span class="pre">'ERROR_ON_RANKX':</span> <span class="pre">2}</span></em><a class="headerlink" href="#yggdrasil.multitasking.MPIErrorExchange.tags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIPartnerError">
+<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">MPIPartnerError</span></span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#MPIPartnerError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.MPIPartnerError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Error raised when there is an error on another process.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIRequestWrapper">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">MPIRequestWrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#MPIRequestWrapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.MPIRequestWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.WaitableFunction" title="yggdrasil.multitasking.WaitableFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.WaitableFunction</span></code></a></p>
+<p>Wrapper for an MPI request.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIRequestWrapper.cancel">
+<span class="sig-name descname"><span class="pre">cancel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#MPIRequestWrapper.cancel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.MPIRequestWrapper.cancel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cancel the request.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIRequestWrapper.canceled">
+<span class="sig-name descname"><span class="pre">canceled</span></span><a class="headerlink" href="#yggdrasil.multitasking.MPIRequestWrapper.canceled" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIRequestWrapper.completed">
+<span class="sig-name descname"><span class="pre">completed</span></span><a class="headerlink" href="#yggdrasil.multitasking.MPIRequestWrapper.completed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIRequestWrapper.request">
+<span class="sig-name descname"><span class="pre">request</span></span><a class="headerlink" href="#yggdrasil.multitasking.MPIRequestWrapper.request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIRequestWrapper.result">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">result</span></span><a class="headerlink" href="#yggdrasil.multitasking.MPIRequestWrapper.result" title="Permalink to this definition">¶</a></dt>
+<dd><p>The result of the MPI request.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIRequestWrapper.test">
+<span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#MPIRequestWrapper.test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.MPIRequestWrapper.test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test to see if the request has completed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.MPIRequestWrapper.wait">
+<span class="sig-name descname"><span class="pre">wait</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#MPIRequestWrapper.wait"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.MPIRequestWrapper.wait" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for the request to be completed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Time (in seconds) that should be
+waited for the process to finish. A value of None will wait
+indefinitely. Defaults to None.</p></li>
+<li><p><strong>on_timeout</strong> (<em>callable</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Object indicating
+what action should be taken in the event that the timeout is
+reached. If a callable is provided, it will be called. A
+value of False will cause a TimeoutError to be raised. A
+value of True will cause the function value to be returned.
+A string will be used as the error message for a raised
+timeout error. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The result of the request.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.MultiObject">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">MultiObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'threading'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#MultiObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.MultiObject" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.AliasObject" title="yggdrasil.multitasking.AliasObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.AliasObject</span></code></a></p>
 <p>Concurrent/parallel processing object using either threads
 or processes.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.ProcessEvent">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">ProcessEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#ProcessEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.ProcessEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Multiprocessing/threading event associated with a process that has
+a discreet start and end.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.ProcessEvent.has_started">
+<span class="sig-name descname"><span class="pre">has_started</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#ProcessEvent.has_started"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.ProcessEvent.has_started" title="Permalink to this definition">¶</a></dt>
+<dd><p>bool: True if the process has started.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.ProcessEvent.has_stopped">
+<span class="sig-name descname"><span class="pre">has_stopped</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#ProcessEvent.has_stopped"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.ProcessEvent.has_stopped" title="Permalink to this definition">¶</a></dt>
+<dd><p>bool: True if the process has stopped.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.ProcessEvent.is_running">
+<span class="sig-name descname"><span class="pre">is_running</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#ProcessEvent.is_running"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.ProcessEvent.is_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>bool: True if the processes has started, but hasn’t stopped.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.ProcessEvent.start">
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#ProcessEvent.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.ProcessEvent.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the started event.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.ProcessEvent.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#ProcessEvent.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.ProcessEvent.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the stopped event.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -2747,6 +2976,74 @@ from the args and kwargs arguments, respectively.</p>
 <dt class="sig sig-object py" id="yggdrasil.multitasking.Task.terminate">
 <span class="sig-name descname"><span class="pre">terminate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.multitasking.Task.terminate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.TimeoutError">
+<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">TimeoutError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#TimeoutError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.TimeoutError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">asyncio.exceptions.TimeoutError</span></code></p>
+<p>Error to raise when a wait times out.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.WaitableFunction">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">WaitableFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#WaitableFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.WaitableFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Create an object that can be waited on until a function returns True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>function</strong> (<em>callable</em>) – Callable function that takes no arguments and
+returns a boolean.</p></li>
+<li><p><strong>polling_interval</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Time (in seconds) that should be
+waited in between function calls. Defaults to 0.1 seconds.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.WaitableFunction.await_function">
+<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">await_function</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#WaitableFunction.await_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.WaitableFunction.await_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coroutine to wait for the function to return True.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.WaitableFunction.function">
+<span class="sig-name descname"><span class="pre">function</span></span><a class="headerlink" href="#yggdrasil.multitasking.WaitableFunction.function" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.WaitableFunction.polling_interval">
+<span class="sig-name descname"><span class="pre">polling_interval</span></span><a class="headerlink" href="#yggdrasil.multitasking.WaitableFunction.polling_interval" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.WaitableFunction.wait">
+<span class="sig-name descname"><span class="pre">wait</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#WaitableFunction.wait"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.WaitableFunction.wait" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for the function to return True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Time (in seconds) that should be
+waited for the process to finish. A value of None will wait
+indefinitely. Defaults to None.</p></li>
+<li><p><strong>on_timeout</strong> (<em>callable</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Object indicating
+what action should be taken in the event that the timeout is
+reached. If a callable is provided, it will be called. A
+value of False will cause a TimeoutError to be raised. A
+value of True will cause the function value to be returned.
+A string will be used as the error message for a raised
+timeout error. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The result of the function call.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -3199,6 +3496,38 @@ acquired before executing the method. Defaults to False.</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.multitasking.wait_on_function">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">wait_on_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#wait_on_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.wait_on_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for the function to return True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>function</strong> (<em>callable</em>) – Callable function that takes no arguments and
+returns a boolean.</p></li>
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Time (in seconds) that should be
+waited for the process to finish. A value of None will wait
+indefinitely. Defaults to None.</p></li>
+<li><p><strong>on_timeout</strong> (<em>callable</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Object indicating
+what action should be taken in the event that the timeout is
+reached. If a callable is provided, it will be called. A
+value of False will cause a TimeoutError to be raised. A
+value of True will cause the function value to be returned.
+A string will be used as the error message for a raised
+timeout error. Defaults to False.</p></li>
+<li><p><strong>polling_interval</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Time (in seconds) that should be
+waited in between function calls. Defaults to 0.1 seconds.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The result of the function call.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.ygg_atexit">
 <span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">ygg_atexit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#ygg_atexit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.ygg_atexit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Things to do at exit.</p>
@@ -3430,6 +3759,12 @@ exchange.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.runner.YggRunner.bridge_mpi_connections">
+<span class="sig-name descname"><span class="pre">bridge_mpi_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yml</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/runner.html#YggRunner.bridge_mpi_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.runner.YggRunner.bridge_mpi_connections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bridge connections over MPI processes.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.runner.YggRunner.cleanup">
 <span class="sig-name descname"><span class="pre">cleanup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/runner.html#YggRunner.cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.runner.YggRunner.cleanup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform cleanup operations for all drivers.</p>
@@ -3445,6 +3780,23 @@ exchange.</p>
 used to stop the drivers. Otherwise, the stop method is used.
 The stop method will try to exit gracefully while terminate
 will exit as quickly as possible. Defaults to False.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.runner.YggRunner.create_connection_driver">
+<span class="sig-name descname"><span class="pre">create_connection_driver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yml</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/runner.html#YggRunner.create_connection_driver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.runner.YggRunner.create_connection_driver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a connection driver instance from the yaml information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>yml</strong> (<em>yaml</em>) – Yaml object containing driver information.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of the specified driver.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -3467,6 +3819,12 @@ will exit as quickly as possible. Defaults to False.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.runner.YggRunner.distribute_mpi">
+<span class="sig-name descname"><span class="pre">distribute_mpi</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/runner.html#YggRunner.distribute_mpi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.runner.YggRunner.distribute_mpi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Distribute models between MPI processes.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.runner.YggRunner.do_client_exits">
 <span class="sig-name descname"><span class="pre">do_client_exits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/runner.html#YggRunner.do_client_exits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.runner.YggRunner.do_client_exits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform exits for IO drivers associated with a client model.</p>
@@ -3474,6 +3832,34 @@ will exit as quickly as possible. Defaults to False.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Dictionary of model parameters including any
 associated IO drivers.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.runner.YggRunner.expand_duplicates">
+<span class="sig-name descname"><span class="pre">expand_duplicates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/runner.html#YggRunner.expand_duplicates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.runner.YggRunner.expand_duplicates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expand model copies so they can be split across MPI processes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.runner.YggRunner.get_models">
+<span class="sig-name descname"><span class="pre">get_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/runner.html#YggRunner.get_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.runner.YggRunner.get_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the set of drivers referenced by a model name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Name of model(s).</p></li>
+<li><p><strong>rank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – If provided, only models that will run on
+MPI processes with this rank will be returned. Defaults to
+None and is ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Set of drivers for a model.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -3515,6 +3901,12 @@ and adding IO driver environmental variables back tot he models.</p>
 <dt class="sig sig-object py" id="yggdrasil.runner.YggRunner.printStatus">
 <span class="sig-name descname"><span class="pre">printStatus</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/runner.html#YggRunner.printStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.runner.YggRunner.printStatus" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print the status of all drivers, starting with the IO drivers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.runner.YggRunner.reduce_duplicates">
+<span class="sig-name descname"><span class="pre">reduce_duplicates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/runner.html#YggRunner.reduce_duplicates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.runner.YggRunner.reduce_duplicates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Join model duplicates after they were split between processes.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -6211,6 +6603,36 @@ will be debug log. Defaults to False.</p></li>
 <dt class="sig sig-object py" id="yggdrasil.tools.YggClass.verbose_debug">
 <span class="sig-name descname"><span class="pre">verbose_debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/tools.html#YggClass.verbose_debug"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tools.YggClass.verbose_debug" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log a verbose debug level message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.tools.YggClass.wait_on_function">
+<span class="sig-name descname"><span class="pre">wait_on_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/tools.html#YggClass.wait_on_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tools.YggClass.wait_on_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait util a function returns True or a time limit is reached.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum time that the calling function should
+wait before timeing out. If not provided, the attribute
+‘timeout’ is used.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Key that should be associated with the timeout
+that is created. Defaults to None and is set by the calling
+class and function/method (See <cite>get_timeout_key</cite>).</p></li>
+<li><p><strong>key_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Positive integer indicating the level of
+the calling class and function/method that should be used to
+key the timeout. 0 is the class and function/method that called
+start_timeout. Higher values use classes and function/methods
+further up in the stack. Defaults to 0.</p></li>
+<li><p><strong>key_suffix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be appended to the
+end of the generated key. Defaults to None and is ignored.</p></li>
+<li><p><strong>quiet</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, error message on timeout exceeded
+will be debug log. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.9)"><strong>KeyError</strong></a> – If the key already exists.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">

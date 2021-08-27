@@ -6,6 +6,7 @@ Commtype    Description
 buffer      Communication mechanism that should be used.                                    
 default     [DEFAULT] Communication mechanism selected based on the current platform.       
 ipc         Interprocess communication (IPC) queue.                                         
+mpi         MPI communicator.                                                               
 rmq         RabbitMQ connection.                                                            
 rmq_async   Asynchronous RabbitMQ connection.                                               
 value       Constant value.                                                                 

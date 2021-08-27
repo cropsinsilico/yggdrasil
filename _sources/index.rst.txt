@@ -22,6 +22,7 @@ Welcome to yggdrasil's documentation!
    yaml
    config
    units
+   hpc
    c_format_strings
    debugging
    threading

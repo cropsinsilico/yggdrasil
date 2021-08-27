@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.ClientComm &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.communication.ClientComm &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
@@ -231,17 +232,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">request_order</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">responses</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">get_response_comm_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;is_interface&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_interface</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;commtype&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">_commtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;recv_timeout&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">recv_timeout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;use_async&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_async</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ClientComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dont_open</span><span class="o">=</span><span class="n">dont_open</span><span class="p">,</span>
                                          <span class="n">recv_timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">recv_timeout</span><span class="p">,</span>
                                          <span class="n">is_interface</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_interface</span><span class="p">,</span>
                                          <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="n">no_suffix</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                          <span class="n">address</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">address</span><span class="p">,</span>
-                                         <span class="n">is_async</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_async</span><span class="p">)</span>
+                                         <span class="n">is_async</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_async</span><span class="p">,</span>
+                                         <span class="n">env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ClientComm.get_status_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.get_status_message">[docs]</a>    <span class="k">def</span> <span class="nf">get_status_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nindent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return lines composing a status message.</span>
@@ -390,7 +394,7 @@
             <span class="k">if</span> <span class="n">comm_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_async&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="n">comm_kwargs</span><span class="p">[</span><span class="s1">&#39;async_recv_method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;recv_message&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.client_response_comm&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">comm_kwargs</span><span class="p">)</span>
-        <span class="n">header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">address</span>
+        <span class="n">header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">opp_address</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">request_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">header</span></div>
 

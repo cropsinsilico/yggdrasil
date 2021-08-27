@@ -3,49 +3,50 @@
 Examples
 ========
 
-==========================   ===========
-Name                         Description
-==========================   ===========
-:ref:`SaM_rst`                          
-:ref:`ascii_io_rst`                     
-:ref:`backwards_rst`                    
-:ref:`conditional_io_rst`               
-:ref:`fakeplant_rst`                    
-:ref:`formatted_io1_rst`                
-:ref:`formatted_io2_rst`                
-:ref:`formatted_io3_rst`                
-:ref:`formatted_io4_rst`                
-:ref:`formatted_io5_rst`                
-:ref:`formatted_io6_rst`                
-:ref:`formatted_io7_rst`                
-:ref:`formatted_io8_rst`                
-:ref:`formatted_io9_rst`                
-:ref:`gs_lesson1_rst`                   
-:ref:`gs_lesson2_rst`                   
-:ref:`gs_lesson3_rst`                   
-:ref:`gs_lesson4_rst`                   
-:ref:`gs_lesson4b_rst`                  
-:ref:`hello_rst`                        
-:ref:`maxMsg_rst`                       
-:ref:`model_error_rst`                  
-:ref:`model_function2_rst`              
-:ref:`model_function_rst`               
-:ref:`osr_rst`                          
-:ref:`root_to_shoot_rst`                
-:ref:`rpcFib_rst`                       
-:ref:`rpc_lesson1_rst`                  
-:ref:`rpc_lesson2_rst`                  
-:ref:`rpc_lesson2b_rst`                 
-:ref:`rpc_lesson3_rst`                  
-:ref:`rpc_lesson3b_rst`                 
-:ref:`sbml1_rst`                        
-:ref:`sbml2_rst`                        
-:ref:`sbml3_rst`                        
-:ref:`timed_pipe_rst`                   
-:ref:`timesync1_rst`                    
-:ref:`timesync2_rst`                    
-:ref:`transformed_io_rst`               
-:ref:`transforms_rst`                   
-:ref:`types_rst`                        
-:ref:`wofost_rst`                       
-==========================   ===========
+==============================   ===========
+Name                             Description
+==============================   ===========
+:ref:`SaM_rst`                              
+:ref:`ascii_io_rst`                         
+:ref:`backwards_rst`                        
+:ref:`conditional_io_rst`                   
+:ref:`fakeplant_rst`                        
+:ref:`formatted_io1_rst`                    
+:ref:`formatted_io2_rst`                    
+:ref:`formatted_io3_rst`                    
+:ref:`formatted_io4_rst`                    
+:ref:`formatted_io5_rst`                    
+:ref:`formatted_io6_rst`                    
+:ref:`formatted_io7_rst`                    
+:ref:`formatted_io8_rst`                    
+:ref:`formatted_io9_rst`                    
+:ref:`gs_lesson1_rst`                       
+:ref:`gs_lesson2_rst`                       
+:ref:`gs_lesson3_rst`                       
+:ref:`gs_lesson4_rst`                       
+:ref:`gs_lesson4b_rst`                      
+:ref:`hello_rst`                            
+:ref:`maxMsg_rst`                           
+:ref:`model_error_rst`                      
+:ref:`model_error_with_io_rst`              
+:ref:`model_function2_rst`                  
+:ref:`model_function_rst`                   
+:ref:`osr_rst`                              
+:ref:`root_to_shoot_rst`                    
+:ref:`rpcFib_rst`                           
+:ref:`rpc_lesson1_rst`                      
+:ref:`rpc_lesson2_rst`                      
+:ref:`rpc_lesson2b_rst`                     
+:ref:`rpc_lesson3_rst`                      
+:ref:`rpc_lesson3b_rst`                     
+:ref:`sbml1_rst`                            
+:ref:`sbml2_rst`                            
+:ref:`sbml3_rst`                            
+:ref:`timed_pipe_rst`                       
+:ref:`timesync1_rst`                        
+:ref:`timesync2_rst`                        
+:ref:`transformed_io_rst`                   
+:ref:`transforms_rst`                       
+:ref:`types_rst`                            
+:ref:`wofost_rst`                           
+==============================   ===========

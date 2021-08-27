@@ -118,6 +118,14 @@ yggdrasil.communication.JSONFileComm module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.communication.MPIComm module
+--------------------------------------
+
+.. automodule:: yggdrasil.communication.MPIComm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.communication.MatFileComm module
 ------------------------------------------
 

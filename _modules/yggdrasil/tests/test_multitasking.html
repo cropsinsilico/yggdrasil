@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.tests.test_multitasking &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.tests.test_multitasking &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
@@ -211,13 +212,25 @@
                   <span class="nb">getattr</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="test_WaitableFunction"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_multitasking.test_WaitableFunction">[docs]</a><span class="k">def</span> <span class="nf">test_WaitableFunction</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test WaitableFunction.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">always_false</span><span class="p">():</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">WaitableFunction</span><span class="p">(</span><span class="n">always_false</span><span class="p">,</span> <span class="n">polling_interval</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">on_timeout</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="n">multitasking</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">wait</span><span class="p">,</span>
+                  <span class="n">timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">on_timeout</span><span class="o">=</span><span class="s2">&quot;Error message&quot;</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="test_TaskThread"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_multitasking.test_TaskThread">[docs]</a><span class="k">def</span> <span class="nf">test_TaskThread</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test thread based Task.&quot;&quot;&quot;</span>
     <span class="n">q</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">Task</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
     <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">q</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())</span>
     <span class="n">q</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
     <span class="n">q</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">_errored</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
-    <span class="k">assert</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">_errored</span><span class="o">.</span><span class="n">is_set</span><span class="p">())</span></div>
+    <span class="k">assert</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">_errored</span><span class="o">.</span><span class="n">is_set</span><span class="p">())</span>
+    <span class="n">q</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="mf">60.0</span><span class="p">)</span>
+    <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">q</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="test_TaskProcess"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_multitasking.test_TaskProcess">[docs]</a><span class="k">def</span> <span class="nf">test_TaskProcess</span><span class="p">():</span>

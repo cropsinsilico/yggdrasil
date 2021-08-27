@@ -4,7 +4,7 @@ Model YAML:
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson3b/client_c.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson3b/client_python.yml
    :language: yaml
    :linenos:
 

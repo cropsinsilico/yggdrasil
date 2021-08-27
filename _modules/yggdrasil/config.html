@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.config &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.config &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../threading.html">OpenMP Threading in Models</a></li>
@@ -761,6 +762,18 @@
     <span class="k">return</span> <span class="n">args</span></div>
 
 
+<div class="viewcode-block" id="ConfigEnv"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.ConfigEnv">[docs]</a><span class="k">class</span> <span class="nc">ConfigEnv</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Container for environment variable modification.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_env</span><span class="p">,</span> <span class="n">new_env</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">old_env</span> <span class="o">=</span> <span class="n">old_env</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_env</span> <span class="o">=</span> <span class="n">new_env</span>
+
+<div class="viewcode-block" id="ConfigEnv.restore"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.ConfigEnv.restore">[docs]</a>    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Restore the old environment variables.&quot;&quot;&quot;</span>
+        <span class="n">restore_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">old_env</span><span class="p">)</span></div></div>
+
+
 <div class="viewcode-block" id="acquire_env"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.acquire_env">[docs]</a><span class="k">def</span> <span class="nf">acquire_env</span><span class="p">(</span><span class="n">new_env</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the existing environment variable values and set the environment</span>
 <span class="sd">    based on the provided dictionary.</span>
@@ -792,6 +805,7 @@
     <span class="k">if</span> <span class="n">new_env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;validate_messages&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">]:</span>
         <span class="n">new_env</span><span class="p">[</span><span class="s1">&#39;validate_messages&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_env</span><span class="p">[</span><span class="s1">&#39;validate_messages&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span><span class="p">)</span>
     <span class="c1"># old_env = {k: os.environ.get(k, None) for k in _key2env.values()}</span>
+    <span class="n">set_env</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">new_env</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">k_env</span> <span class="o">=</span> <span class="n">_key2env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
         <span class="n">old_env</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k_env</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k_env</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
@@ -803,10 +817,11 @@
             <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">language</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">v</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">set_env</span><span class="p">[</span><span class="n">k_env</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
         <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">k_env</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
     <span class="k">if</span> <span class="n">new_env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;loglevel&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
         <span class="n">set_ygg_loglevel</span><span class="p">(</span><span class="n">new_env</span><span class="p">[</span><span class="s1">&#39;loglevel&#39;</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">old_env</span></div>
+    <span class="k">return</span> <span class="n">ConfigEnv</span><span class="p">(</span><span class="n">old_env</span><span class="p">,</span> <span class="n">set_env</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="restore_env"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.restore_env">[docs]</a><span class="k">def</span> <span class="nf">restore_env</span><span class="p">(</span><span class="n">old_env</span><span class="p">):</span>
@@ -841,11 +856,11 @@
         <span class="n">k</span> <span class="o">=</span> <span class="n">k0</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="n">k0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
-    <span class="n">old_env</span> <span class="o">=</span> <span class="n">acquire_env</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">cfg_env</span> <span class="o">=</span> <span class="n">acquire_env</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">yield</span>
+        <span class="k">yield</span> <span class="n">cfg_env</span>
     <span class="k">finally</span><span class="p">:</span>
-        <span class="n">restore_env</span><span class="p">(</span><span class="n">old_env</span><span class="p">)</span></div>
+        <span class="n">cfg_env</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="temp_config"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.temp_config">[docs]</a><span class="nd">@contextmanager</span>
@@ -858,11 +873,11 @@
 <span class="sd">            key/value pairs that should be added to the environment.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">old_env</span> <span class="o">=</span> <span class="n">acquire_env</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">cfg_env</span> <span class="o">=</span> <span class="n">acquire_env</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">yield</span>
+        <span class="k">yield</span> <span class="n">cfg_env</span>
     <span class="k">finally</span><span class="p">:</span>
-        <span class="n">restore_env</span><span class="p">(</span><span class="n">old_env</span><span class="p">)</span></div>
+        <span class="n">cfg_env</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span></div>
 </pre></div>
 
            </div>

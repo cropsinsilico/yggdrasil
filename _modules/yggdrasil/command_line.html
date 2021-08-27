@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.command_line &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.command_line &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../threading.html">OpenMP Threading in Models</a></li>
@@ -299,16 +300,20 @@
     <span class="n">allow_unknown</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="SubCommand.parse_args"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.SubCommand.parse_args">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">parse_args</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_unknown</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">parse_args</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_unknown</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                   <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># TODO: Check choices for positional arguments that can</span>
         <span class="c1"># have more than one element</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">args</span>
+        <span class="n">kws</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">namespace</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;namespace&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">namespace</span>
         <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">allow_unknown</span> <span class="ow">or</span> <span class="n">allow_unknown</span><span class="p">:</span>
-            <span class="n">args</span><span class="p">,</span> <span class="n">extra</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">args</span><span class="p">,</span> <span class="n">extra</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">(</span><span class="o">**</span><span class="n">kws</span><span class="p">)</span>
             <span class="n">args</span><span class="o">.</span><span class="n">_extra_commands</span> <span class="o">=</span> <span class="n">extra</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="o">**</span><span class="n">kws</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;languages&#39;</span><span class="p">]:</span>
             <span class="n">v</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -325,9 +330,9 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="SubCommand.call"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.SubCommand.call">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">parser</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_parser</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SubCommand.get_parser"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.SubCommand.get_parser">[docs]</a>    <span class="nd">@classmethod</span>
@@ -440,7 +445,13 @@
     <span class="n">arguments</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">((</span><span class="s1">&#39;yamlfile&#39;</span><span class="p">,</span> <span class="p">),</span>
          <span class="p">{</span><span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span>
-          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;One or more yaml specification files.&quot;</span><span class="p">})]</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;One or more yaml specification files.&quot;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--with-mpi&#39;</span><span class="p">,</span> <span class="s1">&#39;--mpi-nproc&#39;</span><span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Number of MPI processes to run on.&#39;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--mpi-tag-start&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Tag that MPI communications should start at.&#39;</span><span class="p">})]</span>
 
 <div class="viewcode-block" id="yggrun.add_arguments"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggrun.add_arguments">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">add_arguments</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -450,11 +461,24 @@
 
 <div class="viewcode-block" id="yggrun.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggrun.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">with_mpi</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">new_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mpiexec&#39;</span><span class="p">,</span> <span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">with_mpi</span><span class="p">)]</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">):</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s1">&#39;--with-mpi&#39;</span><span class="p">,</span> <span class="s1">&#39;--mpi-nproc&#39;</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="s1">&#39;=&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+                        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span><span class="n">new_args</span><span class="p">)</span>
         <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">runner</span><span class="p">,</span> <span class="n">config</span>
         <span class="n">prog</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">with</span> <span class="n">config</span><span class="o">.</span><span class="n">parser_config</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
             <span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">yamlfile</span><span class="p">,</span> <span class="n">ygg_debug_prefix</span><span class="o">=</span><span class="n">prog</span><span class="p">,</span>
-                       <span class="n">production_run</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">production_run</span><span class="p">)</span></div></div>
+                       <span class="n">production_run</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">production_run</span><span class="p">,</span>
+                       <span class="n">mpi_tag_start</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">mpi_tag_start</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="ygginfo"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.ygginfo">[docs]</a><span class="k">class</span> <span class="nc">ygginfo</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
@@ -1363,7 +1387,7 @@
          <span class="p">{</span><span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;extend&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
           <span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="s1">&#39;examples&#39;</span><span class="p">,</span> <span class="s1">&#39;examples_part1&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;examples_part2&#39;</span><span class="p">,</span> <span class="s1">&#39;demos&#39;</span><span class="p">,</span> <span class="s1">&#39;types&#39;</span><span class="p">,</span> <span class="s1">&#39;timing&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="s1">&#39;models&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="s1">&#39;models&#39;</span><span class="p">,</span> <span class="s1">&#39;mpi&#39;</span><span class="p">],</span>
           <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Test suite(s) that should be run.&#39;</span><span class="p">,</span>
           <span class="s1">&#39;dest&#39;</span><span class="p">:</span> <span class="s1">&#39;test_suites&#39;</span><span class="p">}),</span>
         <span class="p">((</span><span class="s1">&#39;--pytest-config&#39;</span><span class="p">,</span> <span class="s1">&#39;-c&#39;</span><span class="p">),</span>
@@ -1381,7 +1405,17 @@
           <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Number of times to repeat a test.&#39;</span><span class="p">}),</span>
         <span class="p">((</span><span class="s1">&#39;--additional-info&#39;</span><span class="p">,</span> <span class="s1">&#39;-r&#39;</span><span class="p">),</span>
          <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Display additional info for test results.&#39;</span><span class="p">})]</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Display additional info for test results.&#39;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--with-mpi&#39;</span><span class="p">,</span> <span class="s1">&#39;--mpi-nproc&#39;</span><span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Number of MPI processes to run tests on.&#39;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--write-script&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Name of script that should be created to run tests.&#39;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--separate-test&#39;</span><span class="p">,</span> <span class="s1">&#39;--separate-tests&#39;</span><span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;extend&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Flags defining tests that should be run separately.&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;dest&#39;</span><span class="p">:</span> <span class="s1">&#39;separate_tests&#39;</span><span class="p">})]</span>
     <span class="n">allow_unknown</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="run_tsts.add_arguments"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.run_tsts.add_arguments">[docs]</a>    <span class="nd">@classmethod</span>
@@ -1396,6 +1430,9 @@
         <span class="n">args</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">run_tsts</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">_extra_commands</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">ci</span><span class="p">:</span>
+            <span class="n">requires_mpi</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">test_suites</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;mpi&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">test_suites</span><span class="p">))</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">with_mpi</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">))</span>
             <span class="n">args</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">args</span><span class="o">.</span><span class="n">withcoverage</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">args</span><span class="o">.</span><span class="n">setup_cfg</span> <span class="o">=</span> <span class="s1">&#39;setup.cfg&#39;</span>
@@ -1405,14 +1442,18 @@
                 <span class="n">args</span><span class="o">.</span><span class="n">ignore</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">args</span><span class="o">.</span><span class="n">ignore</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;yggdrasil/rapidjson/&#39;</span><span class="p">)</span>
             <span class="n">args</span><span class="o">.</span><span class="n">rootdir</span> <span class="o">=</span> <span class="n">package_dir</span>
-            <span class="n">extra</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;--reruns=2&#39;</span><span class="p">,</span> <span class="s1">&#39;--reruns-delay=1&#39;</span><span class="p">,</span> <span class="s1">&#39;--timeout=900&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">requires_mpi</span><span class="p">:</span>
+                <span class="n">extra</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;--reruns=2&#39;</span><span class="p">,</span> <span class="s1">&#39;--reruns-delay=1&#39;</span><span class="p">,</span> <span class="s1">&#39;--timeout=900&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">write_script</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">write_script</span><span class="p">):</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">write_script</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">write_script</span><span class="p">)</span>
         <span class="c1"># Separate out paths from options</span>
         <span class="n">test_paths</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">test_suites</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;all&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">test_suites</span><span class="p">:</span>
                 <span class="n">args</span><span class="o">.</span><span class="n">test_suites</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="s1">&#39;examples&#39;</span><span class="p">,</span> <span class="s1">&#39;demos&#39;</span><span class="p">,</span> <span class="s1">&#39;types&#39;</span><span class="p">,</span> <span class="s1">&#39;timing&#39;</span><span class="p">,</span>
-                          <span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="s1">&#39;models&#39;</span><span class="p">]:</span>
+                          <span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="s1">&#39;models&#39;</span><span class="p">,</span> <span class="s1">&#39;mpi&#39;</span><span class="p">]:</span>
                     <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">test_suites</span><span class="p">:</span>
                         <span class="n">args</span><span class="o">.</span><span class="n">test_suites</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">test_suites</span><span class="p">:</span>
@@ -1457,6 +1498,22 @@
                     <span class="n">test_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                         <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;drivers&#39;</span><span class="p">,</span> <span class="s1">&#39;tests&#39;</span><span class="p">,</span>
                                      <span class="s1">&#39;test_*ModelDriver.py&#39;</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">x</span> <span class="o">==</span> <span class="s1">&#39;mpi&#39;</span><span class="p">:</span>
+                    <span class="n">args</span><span class="o">.</span><span class="n">enable_examples</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">with_mpi</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">args</span><span class="o">.</span><span class="n">with_mpi</span> <span class="o">=</span> <span class="mi">2</span>
+                    <span class="n">test_paths</span> <span class="o">+=</span> <span class="p">[</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;communication&#39;</span><span class="p">,</span> <span class="s1">&#39;tests&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;test_MPIComm.py&#39;</span><span class="p">),</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;examples&#39;</span><span class="p">,</span> <span class="s1">&#39;tests&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;test_gs_lesson4.py&#39;</span><span class="p">),</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;examples&#39;</span><span class="p">,</span> <span class="s1">&#39;tests&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;test_rpc_lesson3b.py&#39;</span><span class="p">)]</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>
+                        <span class="n">test_paths</span> <span class="o">+=</span> <span class="p">[</span>
+                            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;examples&#39;</span><span class="p">,</span> <span class="s1">&#39;tests&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;test_model_error_with_io.py&#39;</span><span class="p">)]</span>
+                    <span class="n">extra</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="s1">&#39;no:flaky&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">test_paths</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">extra</span><span class="p">):</span>
             <span class="n">test_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">package_dir</span><span class="p">)</span>
         <span class="c1"># Get expanded tests to allow for paths that are relative to</span>
@@ -1464,6 +1521,7 @@
         <span class="c1"># directory</span>
         <span class="n">args</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">resolve_config_parser</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
         <span class="n">args</span><span class="o">.</span><span class="n">extra</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">added_paths</span> <span class="o">=</span> <span class="n">test_paths</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">expand_and_add</span><span class="p">(</span><span class="n">extra</span> <span class="o">+</span> <span class="n">test_paths</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">extra</span><span class="p">,</span>
                            <span class="p">[</span><span class="n">package_dir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()],</span>
                            <span class="n">add_on_nomatch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1531,11 +1589,43 @@
             <span class="k">return</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="mi">0</span></div>
 
+<div class="viewcode-block" id="run_tsts.write_script"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.run_tsts.write_script">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">write_script</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="n">cfg_env</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a script to run the pytest command.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">stat</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span>
+        <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;#!/bin/bash&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cfg_env</span><span class="o">.</span><span class="n">new_env</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s1">&#39;&quot;&#39;</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;export </span><span class="si">%s</span><span class="s1">=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;export </span><span class="si">%s</span><span class="s1">=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">argv</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cfg_env</span><span class="o">.</span><span class="n">old_env</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;unset </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="s1">&#39;&quot;&#39;</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;export </span><span class="si">%s</span><span class="s1">=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;export </span><span class="si">%s</span><span class="s1">=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">write_script</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+            <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">write_script</span><span class="p">,</span> <span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span>
+                                     <span class="o">|</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_IRGRP</span> <span class="o">|</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_IXGRP</span>
+                                     <span class="o">|</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_IROTH</span> <span class="o">|</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_IXOTH</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Wrote test script to &#39;</span><span class="si">%s</span><span class="s2">&#39;:</span><span class="se">\n\t</span><span class="si">%s</span><span class="s2">&quot;</span>
+              <span class="o">%</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">write_script</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)))</span></div>
+                                     
 <div class="viewcode-block" id="run_tsts.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.run_tsts.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">config</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">platform</span>
         <span class="n">argv</span> <span class="o">=</span> <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;pytest&#39;</span><span class="p">]</span>
         <span class="c1"># test_paths = args.test_paths</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">with_mpi</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">argv</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mpiexec&#39;</span><span class="p">,</span> <span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">with_mpi</span><span class="p">)]</span> <span class="o">+</span> <span class="n">argv</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;--with-mpi&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
             <span class="n">argv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">nocapture</span><span class="p">:</span>
@@ -1564,7 +1654,7 @@
             <span class="n">argv</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">additional_info</span><span class="p">]</span>
         <span class="n">argv</span> <span class="o">+=</span> <span class="n">args</span><span class="o">.</span><span class="n">extra</span>
         <span class="c1"># Run test command and perform cleanup before logging any errors</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running </span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">argv</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
         <span class="n">new_config</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># pth_file = &#39;ygg_coverage.pth&#39;</span>
         <span class="c1"># assert(not os.path.isfile(pth_file))</span>
@@ -1575,7 +1665,7 @@
         <span class="c1">#         fd.write(&quot;import coverage; coverage.process_startup()&quot;)</span>
         <span class="n">initial_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
         <span class="n">error_code</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">with</span> <span class="n">config</span><span class="o">.</span><span class="n">parser_config</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">new_config</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">config</span><span class="o">.</span><span class="n">parser_config</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">new_config</span><span class="p">)</span> <span class="k">as</span> <span class="n">cfg_env</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="c1"># Perform CI specific pretest operations</span>
                 <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">ci</span><span class="p">:</span>
@@ -1613,12 +1703,15 @@
                     <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">([</span><span class="s2">&quot;yggdrasil&quot;</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">,</span>
                                            <span class="s2">&quot;--verbose&quot;</span><span class="p">])</span>
                 <span class="n">error_code</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">count</span><span class="p">):</span>
-                    <span class="n">x_error_code</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">x_error_code</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="n">error_code</span> <span class="o">=</span> <span class="n">x_error_code</span>
-                        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">stop</span><span class="p">:</span>
-                            <span class="k">break</span>
+                <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">write_script</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">):</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">write_script</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="n">cfg_env</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">count</span><span class="p">):</span>
+                        <span class="n">x_error_code</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">x_error_code</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">error_code</span> <span class="o">=</span> <span class="n">x_error_code</span>
+                            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">stop</span><span class="p">:</span>
+                                <span class="k">break</span>
             <span class="c1"># except BaseException:</span>
             <span class="c1">#     logger.exception(&#39;Error in running test.&#39;)</span>
             <span class="c1">#     error_code = -1</span>
@@ -1626,6 +1719,23 @@
                 <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">initial_dir</span><span class="p">)</span>
                 <span class="c1"># if os.path.isfile(pth_file):</span>
                 <span class="c1">#     os.remove(pth_file)</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">separate_tests</span> <span class="ow">and</span> <span class="p">(</span><span class="n">error_code</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="kn">import</span> <span class="nn">re</span>
+            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">write_script</span><span class="p">)</span>
+            <span class="n">new_args</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">separate_tests</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">test_suites</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">separate_tests</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">expand_and_add</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">added_paths</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span>
+                               <span class="p">[</span><span class="n">package_dir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()])</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extra</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">extra</span> <span class="k">if</span>
+                          <span class="p">((</span><span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">)</span>
+                           <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;.*test\_.*\.py.*&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)))]</span>
+            <span class="k">for</span> <span class="n">iargs</span> <span class="ow">in</span> <span class="n">new_args</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">error_code</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">error_code</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">iargs</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="o">+</span> <span class="n">args</span><span class="o">.</span><span class="n">extra</span><span class="p">),</span>
+                                      <span class="n">namespace</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">error_code</span></div></div>
 
 
@@ -1713,7 +1823,7 @@
         <span class="k">class</span> <span class="nc">NoAliasDumper</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">SafeDumper</span><span class="p">):</span>
             <span class="k">def</span> <span class="nf">ignore_aliases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="n">gitdir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">dest</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">gitdir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">gitdir</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span>
                     <span class="p">[</span><span class="s2">&quot;git&quot;</span><span class="p">,</span> <span class="s2">&quot;rev-parse&quot;</span><span class="p">,</span> <span class="s2">&quot;--git-dir&quot;</span><span class="p">],</span>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Model Drivers &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>Model Drivers &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -105,6 +105,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../threading.html">OpenMP Threading in Models</a></li>
@@ -994,6 +995,12 @@ and the default target in the build file will be used.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.MakeModelDriver.MakeModelDriver.mpi_partner_cleanup">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">mpi_partner_cleanup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MakeModelDriver.html#MakeModelDriver.mpi_partner_cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.MakeModelDriver.MakeModelDriver.mpi_partner_cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions cleaning up an MPIPartnerModel.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.drivers.MakeModelDriver.MakeModelDriver.parse_arguments">
 <span class="sig-name descname"><span class="pre">parse_arguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MakeModelDriver.html#MakeModelDriver.parse_arguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.MakeModelDriver.MakeModelDriver.parse_arguments" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sort arguments based on their syntax to determine if an argument
@@ -1186,6 +1193,12 @@ method.</p></li>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.mpi_partner_init">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">mpi_partner_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CMakeModelDriver.html#CMakeModelDriver.mpi_partner_init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.mpi_partner_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions initializing an MPIPartnerModel.</p>
 </dd></dl>
 
 <dl class="py method">

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.tests.test_CommBase &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.communication.tests.test_CommBase &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
@@ -754,7 +755,6 @@
 
         <span class="k">def</span> <span class="nf">fcond</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> vs. </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
             <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
@@ -846,7 +846,8 @@
                           <span class="n">msg_send</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span>
                           <span class="n">send_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">header_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">msg</span><span class="p">)),</span>
                           <span class="n">print_status</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">linger</span><span class="p">()</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">linger</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_send_recv_array"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_array">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv of a array message.&quot;&quot;&quot;</span>

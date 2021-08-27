@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.tests.test_RMQAsyncComm &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.communication.tests.test_RMQAsyncComm &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
@@ -195,7 +196,7 @@
 
 <div class="viewcode-block" id="TestRMQAsyncComm"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_rmq_installed</span><span class="p">,</span> <span class="s2">&quot;RMQ Server not running&quot;</span><span class="p">)</span>
 <span class="nd">@flaky</span><span class="o">.</span><span class="n">flaky</span>
-<span class="nd">@timeout</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+<span class="nd">@timeout</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">TestRMQAsyncComm</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestRMQComm</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test for RMQAsyncComm communication class.&quot;&quot;&quot;</span>
 
@@ -203,14 +204,64 @@
     <span class="n">attr_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestRMQComm</span><span class="o">.</span><span class="n">attr_list</span><span class="p">)</span>
                  <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;times_connected&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq_thread&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq_lock&#39;</span><span class="p">])</span>
 
-<div class="viewcode-block" id="TestRMQAsyncComm.test_reconnect"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.test_reconnect">[docs]</a>    <span class="k">def</span> <span class="nf">test_reconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test reconnect after unexpected disconnect.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TestRMQAsyncComm.test_reconnect_recv"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.test_reconnect_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_reconnect_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test reconnect after unexpected disconnect of recv comm.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="n">print_status</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">reply_code</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
                                             <span class="n">reply_text</span><span class="o">=</span><span class="s2">&quot;Test shutdown&quot;</span><span class="p">)</span>
-        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span>
-        <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">times_connected</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">_reconnecting</span><span class="o">.</span><span class="n">started</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">_reconnecting</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">times_connected</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">_reconnecting</span><span class="o">.</span><span class="n">has_stopped</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="n">print_status</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TestRMQAsyncCommNamedQueue"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue">[docs]</a><span class="k">class</span> <span class="nc">TestRMQAsyncCommNamedQueue</span><span class="p">(</span><span class="n">TestRMQAsyncComm</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test for RMQAsyncComm communication class with a named queue.&quot;&quot;&quot;</span>
+
+    <span class="n">test_attributes</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_cleanup_comms</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_drain_messages</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_empty_obj_recv</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_eof</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_eof_no_close</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_error_name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_error_recv</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_error_send</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_invalid_direction</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_purge</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_recv_nomsg</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_send_recv</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_send_recv_after_close</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_send_recv_array</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_send_recv_dict</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_send_recv_dict_names</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_send_recv_filter_eof</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_send_recv_filter_pass</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_send_recv_filter_recv_filter</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_send_recv_filter_send_filter</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_send_recv_nolimit</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_send_recv_raw</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_work_comm</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">send_inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for send instance.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestRMQAsyncCommNamedQueue</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">send_inst_kwargs</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;queue&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;test_queue&#39;</span>
+        <span class="k">return</span> <span class="n">out</span>
+    
+<div class="viewcode-block" id="TestRMQAsyncCommNamedQueue.test_reconnect_send"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncCommNamedQueue.test_reconnect_send">[docs]</a>    <span class="k">def</span> <span class="nf">test_reconnect_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test reconnect after unexpected disconnect of send comm.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">start_run_thread</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="n">print_status</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">reply_code</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                                            <span class="n">reply_text</span><span class="o">=</span><span class="s2">&quot;Test shutdown&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">_reconnecting</span><span class="o">.</span><span class="n">started</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">_reconnecting</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">times_connected</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">_reconnecting</span><span class="o">.</span><span class="n">has_stopped</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="n">print_status</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
         
 
 <div class="viewcode-block" id="test_not_running"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_RMQAsyncComm.test_not_running">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">_rmq_installed</span><span class="p">,</span> <span class="s2">&quot;RMQ Server running&quot;</span><span class="p">)</span>

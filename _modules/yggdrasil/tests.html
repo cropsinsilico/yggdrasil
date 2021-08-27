@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.tests &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.tests &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../threading.html">OpenMP Threading in Models</a></li>
@@ -1000,6 +1001,12 @@
                 <span class="n">x</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
             <span class="n">x</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span>
             <span class="n">ncurr_thread</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_count</span>
+        <span class="k">if</span> <span class="n">ncurr_thread</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nprev_thread</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+                <span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> thread running, but the test started &quot;</span>
+                 <span class="s2">&quot;with </span><span class="si">%d</span><span class="s2">. Running threads:</span><span class="se">\n\t</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">ncurr_thread</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nprev_thread</span><span class="p">,</span>
+                   <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">threading</span><span class="o">.</span><span class="n">enumerate</span><span class="p">()])))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_less_equal</span><span class="p">(</span><span class="n">ncurr_thread</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nprev_thread</span><span class="p">)</span>
         <span class="c1"># Give files time to close</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_comms</span><span class="p">()</span>

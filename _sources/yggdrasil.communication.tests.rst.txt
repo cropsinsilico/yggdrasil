@@ -4,6 +4,14 @@ yggdrasil.communication.tests package
 Submodules
 ----------
 
+yggdrasil.communication.tests.conftest module
+---------------------------------------------
+
+.. automodule:: yggdrasil.communication.tests.conftest
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.communication.tests.test\_AsciiFileComm module
 --------------------------------------------------------
 
@@ -56,6 +64,14 @@ yggdrasil.communication.tests.test\_IPCComm module
 --------------------------------------------------
 
 .. automodule:: yggdrasil.communication.tests.test_IPCComm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.communication.tests.test\_MPIComm module
+--------------------------------------------------
+
+.. automodule:: yggdrasil.communication.tests.test_MPIComm
    :members:
    :undoc-members:
    :show-inheritance:

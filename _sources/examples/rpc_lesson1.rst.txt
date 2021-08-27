@@ -10,8 +10,8 @@ C Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/src/server.py
-   :language: python
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/src/server.c
+   :language: c
    :linenos:
 
 .. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/src/client.c
@@ -21,7 +21,7 @@ Model Code:
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/server_python.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/server_c.yml
    :language: yaml
    :linenos:
 
@@ -36,8 +36,8 @@ C++ Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/src/server.py
-   :language: python
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/src/server.cpp
+   :language: c++
    :linenos:
 
 .. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/src/client.cpp
@@ -47,7 +47,7 @@ Model Code:
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/server_python.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/server_cpp.yml
    :language: yaml
    :linenos:
 
@@ -62,7 +62,7 @@ Fortran Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/src/server.py
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/src/server.f90
    :language: python
    :linenos:
 
@@ -73,7 +73,7 @@ Model Code:
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/server_python.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/server_fortran.yml
    :language: yaml
    :linenos:
 
@@ -88,8 +88,8 @@ Matlab Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/src/server.py
-   :language: python
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/src/server.m
+   :language: matlab
    :linenos:
 
 .. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/src/client.m
@@ -99,7 +99,7 @@ Model Code:
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/server_python.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/server_matlab.yml
    :language: yaml
    :linenos:
 
@@ -140,7 +140,7 @@ R Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/src/server.py
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/src/server.R
    :language: python
    :linenos:
 
@@ -151,7 +151,7 @@ Model Code:
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/server_python.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/server_r.yml
    :language: yaml
    :linenos:
 

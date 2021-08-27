@@ -148,6 +148,14 @@ yggdrasil.drivers.LPyModelDriver module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.drivers.MPIPartnerModel module
+----------------------------------------
+
+.. automodule:: yggdrasil.drivers.MPIPartnerModel
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.drivers.MakeModelDriver module
 ----------------------------------------
 

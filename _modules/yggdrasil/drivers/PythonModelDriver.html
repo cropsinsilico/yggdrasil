@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.PythonModelDriver &mdash; yggdrasil v1.6.4 documentation</title>
+  <title>yggdrasil.drivers.PythonModelDriver &mdash; yggdrasil v1.7.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hpc.html">High Performance Computing (HPC)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
@@ -201,7 +202,8 @@
         <span class="s1">&#39;ipc&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;platforms&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;MacOS&#39;</span><span class="p">,</span> <span class="s1">&#39;Linux&#39;</span><span class="p">],</span>
                 <span class="s1">&#39;libraries&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;sysv_ipc&#39;</span><span class="p">]},</span>
         <span class="s1">&#39;zmq&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;libraries&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;zmq&#39;</span><span class="p">]},</span>
-        <span class="s1">&#39;rmq&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;libraries&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;pika&#39;</span><span class="p">]}}</span>
+        <span class="s1">&#39;rmq&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;libraries&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;pika&#39;</span><span class="p">]},</span>
+        <span class="s1">&#39;mpi&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;libraries&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;mpi4py&#39;</span><span class="p">]}}</span>
     <span class="n">type_map</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;int&#39;</span><span class="p">:</span> <span class="s1">&#39;numpy.intX&#39;</span><span class="p">,</span>
         <span class="s1">&#39;float&#39;</span><span class="p">:</span> <span class="s1">&#39;numpy.floatX&#39;</span><span class="p">,</span>
