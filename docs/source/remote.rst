@@ -86,6 +86,19 @@ This service entry is treated as a placeholder for the ``photosynthesis`` YAML e
 
   $ yggrun canopy.yml light.yml photosynthesis_service.yml growth_python.yml fakeplant.yml
 
+Multiple services can also be included in the same entry. For example, if there were a ``growth`` service as well that should be used instead of the local ``growth`` model in the ``fakeplant`` example, the YAML entry above would be updated to
+
+.. code-block:: yaml
+
+   services:
+     - name: photosynthesis
+       type: flask
+       address: http://remote_service_manager_url/
+     - name: growth
+       type: flask
+       address: http://another_remote_service_manager_url/
+
+
 Cookie Cutter
 -------------
 

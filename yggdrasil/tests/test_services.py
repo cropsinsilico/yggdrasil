@@ -1,9 +1,9 @@
 import os
 import copy
 import pytest
-import unittest
 import subprocess
 import itertools
+import shutil
 from contextlib import contextmanager
 from yggdrasil.services import (
     IntegrationServiceManager, create_service_manager_class, ServerError)
@@ -24,36 +24,37 @@ def get_skips(service_type, partial_commtype=None, check_running=False):
     out.append(
         (not cls.is_installed(),
          f"Service type '{service_type}' not installed."))
-    if check_running and cls.is_installed():
-        cli = IntegrationServiceManager(service_type=service_type,
-                                        commtype=partial_commtype,
-                                        for_request=True)
-        out.append(
-            (not cli.is_running,
-             f"Service of type {service_type} not running."))
+    assert(not check_running)
+    # if check_running and cls.is_installed():
+    #     cli = IntegrationServiceManager(service_type=service_type,
+    #                                     commtype=partial_commtype,
+    #                                     for_request=True)
+    #     out.append(
+    #         (not cli.is_running,
+    #          f"Service of type {service_type} not running."))
     return out
 
 
-def requires_service(service_type='flask', partial_commtype=None):
-    r"""Decorator factory for marking tests that require that an yggdrasil
-    service is running.
+# def requires_service(service_type='flask', partial_commtype=None):
+#     r"""Decorator factory for marking tests that require that an yggdrasil
+#     service is running.
 
-    Args:
-        service_type (str, optional): Service type that is required.
-            Defaults to 'flask'.
+#     Args:
+#         service_type (str, optional): Service type that is required.
+#             Defaults to 'flask'.
 
-    Returns:
-        function: Decorator for test.
+#     Returns:
+#         function: Decorator for test.
 
-    """
+#     """
 
-    def wrapper(function):
-        for s in get_skips(service_type, partial_commtype=partial_commtype,
-                           check_running=True):
-            function = unittest.skipIf(*s)(function)
-        return function
+#     def wrapper(function):
+#         for s in get_skips(service_type, partial_commtype=partial_commtype,
+#                            check_running=True):
+#             function = unittest.skipIf(*s)(function)
+#         return function
     
-    return wrapper
+#     return wrapper
 
 
 def check_settings(service_type, partial_commtype=None):
@@ -65,20 +66,22 @@ def check_settings(service_type, partial_commtype=None):
 
 
 @contextmanager
-def running_service(service_type, partial_commtype=None,
-                    manager_name=None):
+def running_service(service_type, partial_commtype=None):
     r"""Context manager to run and clean-up an integration service."""
     check_settings(service_type, partial_commtype)
-    args = ["yggdrasil", "integration-service-manager",
+    args = ["python", "-m", "yggdrasil", "integration-service-manager",
             f"--service-type={service_type}"]
     if partial_commtype is not None:
         args.append(f"--commtype={partial_commtype}")
-    if manager_name is not None:
-        args.append(f"--manager-name={manager_name}")
-    cli = IntegrationServiceManager(name=manager_name,
-                                    service_type=service_type,
+    verify_flask = (service_type == 'flask')
+    if verify_flask:
+        # Flask is the default, verify that it is selected
+        service_type = None
+    cli = IntegrationServiceManager(service_type=service_type,
                                     commtype=partial_commtype,
                                     for_request=True)
+    if verify_flask:
+        assert(cli.service_type == 'flask')
     assert(not cli.is_running)
     p = subprocess.Popen(args)
     try:
@@ -88,7 +91,7 @@ def running_service(service_type, partial_commtype=None,
         assert(not cli.is_running)
         p.wait(10)
     finally:
-        if p.returncode is None:
+        if p.returncode is None:  # pragma: debug
             p.terminate()
 
 
@@ -101,9 +104,11 @@ def test_call_integration_remote():
     r"""Test with remote integration service."""
     name = 'photosynthesis'
     test_yml = ex_yamls['fakeplant']['python']
+    copy_yml = ex_yamls['fakeplant']['c']
     remote_yml = '_remote'.join(os.path.splitext(test_yml))
     yamls = copy.copy(ex_yamls['fakeplant']['all_nomatlab'])
     yamls.remove(test_yml)
+    yamls.remove(copy_yml)
     yamls.append(remote_yml)
     address = 'https://model-service-demo.herokuapp.com/'
     service_type = 'flask'
@@ -113,7 +118,8 @@ def test_call_integration_remote():
     if not cli.is_running:
         pytest.skip("Heroku app is not running.")
     try:
-        with open(remote_yml, 'w') as fd:
+        shutil.copy(copy_yml, remote_yml)
+        with open(remote_yml, 'a') as fd:
             fd.write('\n'.join(['service:',
                                 f'    name: {name}',
                                 f'    type: {service_type}',
@@ -166,14 +172,18 @@ class TestServices(object):
         assert_raises(ServerError, cli.send_request,
                       test_yml, action='invalid')
         print(cli.send_request(test_yml))
-        cli.send_request(action='status')
+        cli.printStatus()
         if cli.service_type == 'flask':
             import requests
             r = requests.get(cli.address)
             r.raise_for_status()
         cli.send_request(test_yml, action='status')
-        cli.send_request(test_yml, action='stop')
-        cli.send_request(action='status')
+        cli.send_request(test_yml, yamls=test_yml, action='stop')
+        assert_raises(ServerError, cli.send_request,
+                      ['invalid'], action='stop')
+        cli.printStatus(return_str=True)
+        cli.send_request([test_yml])
+        cli.send_request([test_yml], action='stop')
 
     def test_registered_service(self, running_service):
         r"""Test registering an integration service."""
@@ -184,7 +194,7 @@ class TestServices(object):
         test_yml = ex_yamls['fakeplant']['python']
         assert_raises(KeyError, cli.registry.remove, 'test')
         assert_raises(ServerError, cli.send_request, 'test')
-        cli.registry.add('test', test_yml)
+        cli.registry.add('test', test_yml, namespace='remote')
         print(cli.send_request('test'))
         assert_raises(ValueError, cli.registry.add, 'test', [test_yml])
         cli.send_request('test', action='stop')
@@ -192,12 +202,14 @@ class TestServices(object):
         cli.registry.remove('test')
         assert_raises(KeyError, cli.registry.remove, 'test')
         # Register from file
-        reg_coll = 'registry_collection.yml'
+        reg_coll = os.path.join(os.path.dirname(test_yml),
+                                'registry_collection.yml')
+        test_yml_base = os.path.basename(test_yml)
         with open(reg_coll, 'w') as fd:
-            fd.write(f'photosynthesis:\n  - {test_yml}')
+            fd.write(f'photosynthesis:\n  - {test_yml_base}')
         try:
             cli.registry.add(reg_coll)
-            print(cli.send_request('photosynthesis'))
+            print(cli.send_request('photosynthesis', namespace='phot'))
             assert_raises(ValueError, cli.registry.add,
                           'photosynthesis', [test_yml])
             cli.send_request('photosynthesis', action='stop')
@@ -222,7 +234,7 @@ class TestServices(object):
         integration."""
         if (((running_service.commtype != 'rest')
              or (running_service.service_type != 'flask'))):
-            pytest.skip("redundent test")
+            pytest.skip("redundent test")  # pragma: testing
         os.environ.update(FIB_ITERATIONS='3',
                           FIB_SERVER_SLEEP_SECONDS='0.01')
         yamls = ex_yamls['rpcFib']['all_nomatlab']

@@ -77,7 +77,7 @@ class ServiceBase(YggClass):
     @classmethod
     def is_installed(cls):
         r"""bool: True if the class is fully installed, False otherwise."""
-        return False
+        return False  # pragma: no cover
 
     @property
     def is_running(self):
@@ -105,11 +105,11 @@ class ServiceBase(YggClass):
 
     def setup_server(self, *args, **kwargs):
         r"""Set up the machinery for receiving requests."""
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def setup_client(self, *args, **kwargs):
         r"""Set up the machinery for sending requests."""
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def start_server(self, remote_url=None):
         r"""Start the server."""
@@ -123,15 +123,15 @@ class ServiceBase(YggClass):
 
     def run_server(self):
         r"""Begin listening for requests."""
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def respond(self, request, **kwargs):
         r"""Create a response to the request."""
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def shutdown(self, *args, **kwargs):
         r"""Shutdown the process from the server."""
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def process_request(self, request, **kwargs):
         r"""Process a request and return a response.
@@ -211,7 +211,7 @@ class ServiceBase(YggClass):
 
     def call(self, *args, **kwargs):
         r"""Send a request."""
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def send_request(self, request, **kwargs):
         r"""Send a request.
@@ -249,15 +249,15 @@ class FlaskService(ServiceBase):
         try:
             import flask  # noqa: F401
             return True
-        except ImportError:
+        except ImportError:  # pragma: debug
             return False
 
     def __init__(self, *args, **kwargs):
         super(FlaskService, self).__init__(*args, **kwargs)
-        if str(self.port) not in self.address:
-            parts = self.address.split(':')
-            if parts[-1].strip('/').isdigit():
-                self.port = int(parts[-1].strip('/'))
+        # if str(self.port) not in self.address:
+        #     parts = self.address.split(':')
+        #     if parts[-1].strip('/').isdigit():
+        #         self.port = int(parts[-1].strip('/'))
         if not self.address.endswith('/'):
             self.address += '/'
 
@@ -291,10 +291,19 @@ class FlaskService(ServiceBase):
 
     def shutdown(self):
         r"""Shutdown the process from the server."""
-        func = self.request.environ.get('werkzeug.server.shutdown')
-        if func is None:
-            raise RuntimeError('Not running with the Werkzeug Server')
-        func()
+        if not self.for_request:
+            func = self.request.environ.get('werkzeug.server.shutdown')
+            # Explicitly cleaning up the pytest coverage plugin is required
+            # to ensure that the server methods are properly covered during
+            # cleanup.
+            try:
+                from pytest_cov.embed import cleanup
+                cleanup()
+            except ImportError:  # pragma: debug
+                pass
+            if func is None:  # pragma: debug
+                raise RuntimeError('Not running with the Werkzeug Server')
+            func()  # pragma: no cover
         
     def deserialize(self, msg):
         r"""Deserialize a message.
@@ -390,9 +399,11 @@ class RMQService(ServiceBase):
 
         """
         self._init_rmq(*args, **kwargs)
-        if self.exchange:
-            self.channel.exchange_declare(exchange=self.exchange,
-                                          auto_delete=True)
+        if self.exchange:  # pragma: debug
+            # self.channel.exchange_declare(exchange=self.exchange,
+            #                               auto_delete=True)
+            raise NotImplementedError("There is a bug when using the "
+                                      "non-default exchange.")
         self.channel.queue_declare(queue=self.queue)
         self.channel.basic_qos(prefetch_count=1)
         self.consumer_tag = self.channel.basic_consume(
@@ -423,12 +434,12 @@ class RMQService(ServiceBase):
         r"""Listen for requests."""
         try:
             self.channel.start_consuming()
-        except self.pika.exceptions.ChannelWrongStateError:
+        except self.pika.exceptions.ChannelWrongStateError:  # pragma: debug
             pass
 
     def shutdown(self, in_callback=False):
         r"""Shutdown the process from the server."""
-        if not self.channel:
+        if not self.channel:  # pragma: debug
             return
         if self.for_request:
             queue = self.callback_queue
@@ -462,9 +473,11 @@ class RMQService(ServiceBase):
     def is_running(self):
         r"""bool: True if the server is running."""
         try:
+            if self.channel is None:  # pragma: debug
+                return False
             self.channel.queue_declare(queue=self.queue, passive=True)
             return True
-        except self.pika.exceptions.ChannelClosedByBroker:
+        except self.pika.exceptions.ChannelClosedByBroker:  # pragma: intermittent
             self.connection.close()
             assert(self.for_request)
             self.setup_client(*self._args, **self._kwargs)
@@ -492,7 +505,7 @@ class RMQService(ServiceBase):
                                            reply_to=self.callback_queue,
                                            correlation_id=self.corr_id),
                                        body=request)
-        except self.pika.exceptions.UnroutableError as e:
+        except self.pika.exceptions.UnroutableError as e:  # pragma: debug
             raise ClientError(e)
         T = TimeOut(timeout)
         while (self.response is None) and (not T.is_out):
@@ -559,17 +572,17 @@ def create_service_manager_class(service_type=None):
                     a network of models to run as a service. Defaults to None.
                 action (str, optional): Action that is being requested.
                     Defaults to 'start'.
-                **kwargs: Additional keyword arguments are passed to the call
-                    method.
+                **kwargs: Additional keyword arguments are included in the
+                    request.
 
             """
             if isinstance(yamls, str):
                 yamls = [yamls]
             if name is None:
                 name = yamls
-            request = dict(name=name, yamls=yamls, action=action)
+            request = dict(kwargs, name=name, yamls=yamls, action=action)
             return super(IntegrationServiceManager, self).send_request(
-                request, **kwargs)
+                request)
 
         def setup_server(self, *args, **kwargs):
             r"""Set up the machinery for receiving requests."""
@@ -586,15 +599,17 @@ def create_service_manager_class(service_type=None):
             
         def stop_server(self):
             r"""Stop the server from the client-side."""
+            assert(self.for_request)
             try:
                 response = self.send_request(action='shutdown')
-            except ClientError:
+            except ClientError:  # pragma: debug
                 return
             if platform._is_win:  # pragma: windows
                 sig = signal.SIGINT
             else:
-                sig = signal.SIGKILL
+                sig = signal.SIGTERM
             os.kill(response['pid'], sig)
+            self.shutdown()
 
         def start_integration(self, x, yamls, **kwargs):
             r"""Start an integration if it is not already running.
@@ -654,7 +669,7 @@ def create_service_manager_class(service_type=None):
                     with the specified hashable object.
 
             """
-            if x not in self.integrations:
+            if x not in self.integrations:  # pragma: debug
                 raise KeyError(f"Integration defined by {x} not running")
             m = self.integrations[x].modeldrivers['dummy_model']
             out = m['instance'].service_partner
@@ -669,7 +684,7 @@ def create_service_manager_class(service_type=None):
         @property
         def is_running(self):
             r"""bool: True if the server is running."""
-            if not super(IntegrationServiceManager, self).is_running:
+            if not super(IntegrationServiceManager, self).is_running:  # pragma: debug
                 return False
             try:
                 response = self.send_request(action='ping')
@@ -709,7 +724,7 @@ def create_service_manager_class(service_type=None):
                             for k, v in reg.items():
                                 if k not in ['name', 'yamls']:
                                     request.setdefault(k, v)
-                        else:
+                        else:  # pragma: debug
                             raise RuntimeError("No YAML files specified.")
                     self.start_integration(name, yamls, **request)
                     response = {'status': 'started'}
@@ -803,8 +818,6 @@ def IntegrationServiceManager(service_type=None, **kwargs):
                 service_type = 'rmq'
             else:
                 service_type = 'flask'
-        else:
-            service_type = _default_service_type
     cls = create_service_manager_class(service_type=service_type)
     return cls(**kwargs)
 
@@ -834,10 +847,11 @@ class IntegrationServiceRegistry(object):
             dict: Existing registry of integrations.
 
         """
+        out = {}
         if os.path.isfile(self.filename):
             with open(self.filename, 'r') as fd:
-                return yaml.safe_load(fd)
-        return {}
+                out = yaml.safe_load(fd)
+        return out
 
     def save(self, registry):
         r"""Save the registry to self.filename.

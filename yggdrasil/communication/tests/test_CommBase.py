@@ -451,6 +451,8 @@ class TestCommBase(YggTestClassInfo):
         if print_status:
             send_instance.printStatus()
             recv_instance.printStatus()
+            send_instance.printStatus(return_str=True)
+            recv_instance.printStatus(return_str=True)
         # else:
         #     send_instance.get_status_message()
         #     recv_instance.get_status_message()

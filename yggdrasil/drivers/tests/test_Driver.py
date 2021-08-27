@@ -153,6 +153,7 @@ class TestDriver(TestParam):
     def test_init_del(self):
         r"""Test driver creation and deletion."""
         self.instance.printStatus()
+        self.instance.printStatus(return_str=True)
 
     def test_run_stop(self):
         r"""Start the thread, then stop it."""

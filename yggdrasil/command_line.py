@@ -434,7 +434,7 @@ class integration_service_manager(SubCommand):
             if not os.path.isabs(integration_name):
                 integration_name = os.path.abspath(integration_name)
         for_request = (
-            (args.action in ['status', 'register', 'unregister'])
+            (args.action in ['status', 'register', 'unregister', 'stop'])
             or (integration_name is not None))
         x = IntegrationServiceManager(name=args.manager_name,
                                       service_type=args.service_type,
