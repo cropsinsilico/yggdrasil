@@ -100,11 +100,11 @@ def _make_ids(ids):
 
 
 @pytest.mark.skip
-def test_call_integration_remote():
+def test_call_integration_remote():  # pragma: testing
     r"""Test with remote integration service."""
     name = 'photosynthesis'
     test_yml = ex_yamls['fakeplant']['python']
-    copy_yml = ex_yamls['fakeplant']['c']
+    copy_yml = ex_yamls['fakeplant']['c'][0]
     remote_yml = '_remote'.join(os.path.splitext(test_yml))
     yamls = copy.copy(ex_yamls['fakeplant']['all_nomatlab'])
     yamls.remove(test_yml)
@@ -130,6 +130,7 @@ def test_call_integration_remote():
     finally:
         if os.path.isfile(remote_yml):
             os.remove(remote_yml)
+        cli.send_request(name, action='stop')
         
         
 class TestServices(object):
