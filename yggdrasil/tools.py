@@ -21,6 +21,7 @@ import uuid as uuid_gen
 import subprocess
 import importlib
 import difflib
+import contextlib
 from yggdrasil import platform, constants
 from yggdrasil.components import import_component, ComponentBase
 
@@ -132,6 +133,27 @@ def add_line_numbers(lines, for_diff=False):
             i += 1
             out.append('%2d: %s' % (i, line))
     return out
+
+
+@contextlib.contextmanager
+def timer_context(msg_format, **kwargs):
+    r"""Context that will time commands executed within it and log a message.
+
+    Args:
+        msg_format (str): Format string used to format the elapsed time. It
+            should include, at minimum, a '{elapsed}' field. Additional fields
+            may also be present and can be fulfilled by additional keywords.
+        **kwargs: Additional keyword arguments are passed to the format method
+            on msg_format to create the log message.
+
+    """
+    start = time.time()
+    try:
+        yield
+    finally:
+        end = time.time()
+        elapsed = end - start
+        logger.info(msg_format.format(elapsed=elapsed, **kwargs))
 
 
 def display_source(fname, number_lines=False, return_lines=False):

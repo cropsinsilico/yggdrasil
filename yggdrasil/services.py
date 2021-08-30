@@ -8,7 +8,7 @@ import pprint
 import functools
 from yggdrasil import runner
 from yggdrasil import platform
-from yggdrasil.tools import sleep, TimeOut, YggClass
+from yggdrasil.tools import sleep, TimeOut, YggClass, timer_context
 from yggdrasil.config import ygg_cfg
 
 
@@ -234,14 +234,18 @@ class ServiceBase(YggClass):
             object: Response.
 
         """
-        request_str = self.serialize(request)
-        if not self.for_request:
-            x = self.__class__(self.name, *self._args,
-                               **self._kwargs, for_request=True,
-                               address=self.opp_address)
-        else:
-            x = self
-        return self.process_response(x.call(request_str, **kwargs))
+        with timer_context(
+                "REQUEST TIME: {elapsed}s ({request}, kwargs={kwargs})",
+                request=request, kwargs=kwargs):
+            request_str = self.serialize(request)
+            if not self.for_request:
+                x = self.__class__(self.name, *self._args,
+                                   **self._kwargs, for_request=True,
+                                   address=self.opp_address)
+            else:
+                x = self
+            out = self.process_response(x.call(request_str, **kwargs))
+        return out
 
 
 class FlaskService(ServiceBase):
@@ -657,7 +661,8 @@ def create_service_manager_class(service_type=None):
             if x not in self.integrations:
                 raise KeyError(f"Integration defined by {x} not running")
             m = self.integrations.pop(x)
-            m.terminate()
+            if m.is_alive:
+                m.terminate()
             m.atexit()
 
         def integration_info(self, x):

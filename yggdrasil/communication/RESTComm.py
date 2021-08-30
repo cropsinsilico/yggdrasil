@@ -2,6 +2,7 @@ import os
 import uuid
 import requests
 from yggdrasil.communication import CommBase, NoMessages
+from yggdrasil.tools import timer_context
 
 
 def add_comm_server_to_app(app, send_callback=None,
@@ -144,26 +145,29 @@ class RESTComm(CommBase.CommBase):
     def _close(self, *args, **kwargs):
         r"""Close the connection."""
         self._is_open = False
-        r = requests.get(
-            self.address + '/remove',
-            params=self.params,
-            cookies=self.cookies)
+        with timer_context("RESTComm close: {elapsed}"):
+            r = requests.get(
+                self.address + '/remove',
+                params=self.params,
+                cookies=self.cookies)
         r.raise_for_status()
         
     def _send(self, payload):
-        r = requests.post(
-            self.address,
-            data=payload,
-            params=self.params,
-            cookies=self.cookies)
+        with timer_context("RESTComm send: {elapsed}"):
+            r = requests.post(
+                self.address,
+                data=payload,
+                params=self.params,
+                cookies=self.cookies)
         r.raise_for_status()
         return True
 
     def _recv(self, **kwargs):
-        r = requests.get(
-            self.address,
-            params=self.params,
-            cookies=self.cookies)
+        with timer_context("RESTComm recv: {elapsed}"):
+            r = requests.get(
+                self.address,
+                params=self.params,
+                cookies=self.cookies)
         r.raise_for_status()
         msg = r.content
         if msg == b'':
@@ -174,10 +178,11 @@ class RESTComm(CommBase.CommBase):
     def n_msg_recv(self):
         r"""int: The number of incoming messages in the connection."""
         try:
-            r = requests.get(
-                self.address + '/size',
-                params=self.params,
-                cookies=self.cookies)
+            with timer_context("RESTComm size: {elapsed}"):
+                r = requests.get(
+                    self.address + '/size',
+                    params=self.params,
+                    cookies=self.cookies)
             r.raise_for_status()
             return int(r.content)
         except requests.exceptions.RequestException:  # pragma: debug
@@ -190,10 +195,11 @@ class RESTComm(CommBase.CommBase):
 
     def purge(self):
         r"""Purge all messages from the comm."""
-        r = requests.get(
-            self.address + '/purge',
-            params=self.params,
-            cookies=self.cookies)
+        with timer_context("RESTComm purge: {elapsed}"):
+            r = requests.get(
+                self.address + '/purge',
+                params=self.params,
+                cookies=self.cookies)
         r.raise_for_status()
         self._n_sent = 0
         self._n_recv = 0
