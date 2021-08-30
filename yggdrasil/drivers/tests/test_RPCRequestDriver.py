@@ -80,6 +80,7 @@ class TestRPCRequestDriver(TestRPCRequestParam,
             assert(flag)
             assert_equal(srv_msg, msg_send)
             self.instance.printStatus()
+            self.instance.printStatus(return_str=True)
             flag = self.recv_comm.send(srv_msg)
             assert(flag)
             # Receive response on client side

@@ -356,7 +356,7 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
     def test_init_del(self):
         r"""Test driver creation and deletion."""
         self.instance.printStatus(verbose=True)
-        self.instance.printStatus(return_str=True)
+        self.instance.printStatus(verbose=True, return_str=True)
 
     def test_early_close(self):
         r"""Test early deletion of message queue."""

@@ -1,4 +1,5 @@
 import os
+import sys
 import copy
 import pytest
 import subprocess
@@ -66,13 +67,15 @@ def check_settings(service_type, partial_commtype=None):
 
 
 @contextmanager
-def running_service(service_type, partial_commtype=None):
+def running_service(service_type, partial_commtype=None, with_coverage=False):
     r"""Context manager to run and clean-up an integration service."""
     check_settings(service_type, partial_commtype)
-    args = ["python", "-m", "yggdrasil", "integration-service-manager",
+    args = [sys.executable, "-m", "yggdrasil", "integration-service-manager",
             f"--service-type={service_type}"]
     if partial_commtype is not None:
         args.append(f"--commtype={partial_commtype}")
+    if with_coverage:
+        args.append('--with-coverage')
     verify_flask = (service_type == 'flask')
     if verify_flask:
         # Flask is the default, verify that it is selected
@@ -115,6 +118,7 @@ def test_call_integration_remote():  # pragma: testing
     cli = IntegrationServiceManager(service_type=service_type,
                                     for_request=True,
                                     address=address)
+    cli.wait_for_server()
     if not cli.is_running:
         pytest.skip("Heroku app is not running.")
     try:
@@ -139,7 +143,15 @@ class TestServices(object):
     @pytest.fixture(params=itertools.product(['flask', 'rmq'], [None, 'rmq']),
                     ids=_make_ids, scope="class", autouse=True)
     def running_service(self, request):
-        with running_service(request.param[0], request.param[1]) as cli:
+        manager = request.config.pluginmanager
+        plugin_class = manager.get_plugin('pytest_cov').CovPlugin
+        plugin = None
+        for x in manager.get_plugins():
+            if isinstance(x, plugin_class):
+                plugin = x
+                break
+        with running_service(request.param[0], request.param[1],
+                             with_coverage=(plugin is not None)) as cli:
             self.cli = cli
             yield cli
             self.cli = None

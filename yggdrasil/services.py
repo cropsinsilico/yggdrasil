@@ -15,6 +15,10 @@ from yggdrasil.config import ygg_cfg
 _default_service_type = ygg_cfg.get('services', 'default_type', 'flask')
 _default_commtype = ygg_cfg.get('services', 'default_comm', None)
 _default_address = ygg_cfg.get('services', 'address', None)
+if platform._is_win:  # pragma: windows
+    _shutdown_signal = signal.SIGINT
+else:
+    _shutdown_signal = signal.SIGTERM
 
 
 class ClientError(BaseException):
@@ -111,14 +115,19 @@ class ServiceBase(YggClass):
         r"""Set up the machinery for sending requests."""
         raise NotImplementedError  # pragma: no cover
 
-    def start_server(self, remote_url=None):
+    def start_server(self, remote_url=None, with_coverage=False):
         r"""Start the server."""
         if remote_url is None:
             remote_url = os.environ.get('YGGDRASIL_SERVICE_HOST_URL', None)
         if remote_url is None:
             remote_url = self.address
-        self.remote_url = remote_url
         os.environ.setdefault('YGGDRASIL_SERVICE_HOST_URL', remote_url)
+        if with_coverage:
+            try:
+                from pytest_cov.embed import cleanup_on_signal
+                cleanup_on_signal(_shutdown_signal)
+            except ImportError:  # pragma: debug
+                pass
         self.run_server()
 
     def run_server(self):
@@ -291,19 +300,20 @@ class FlaskService(ServiceBase):
 
     def shutdown(self):
         r"""Shutdown the process from the server."""
-        if not self.for_request:
-            func = self.request.environ.get('werkzeug.server.shutdown')
-            # Explicitly cleaning up the pytest coverage plugin is required
-            # to ensure that the server methods are properly covered during
-            # cleanup.
-            try:
-                from pytest_cov.embed import cleanup
-                cleanup()
-            except ImportError:  # pragma: debug
-                pass
-            if func is None:  # pragma: debug
-                raise RuntimeError('Not running with the Werkzeug Server')
-            func()  # pragma: no cover
+        # if not self.for_request:
+        #     func = self.request.environ.get('werkzeug.server.shutdown')
+        #     # Explicitly cleaning up the pytest coverage plugin is required
+        #     # to ensure that the server methods are properly covered during
+        #     # cleanup.
+        #     try:
+        #         from pytest_cov.embed import cleanup
+        #         cleanup()
+        #     except ImportError:  # pragma: debug
+        #         pass
+        #     if func is None:  # pragma: debug
+        #         raise RuntimeError('Not running with the Werkzeug Server')
+        #     func()  # pragma: no cover
+        pass
         
     def deserialize(self, msg):
         r"""Deserialize a message.
@@ -604,11 +614,7 @@ def create_service_manager_class(service_type=None):
                 response = self.send_request(action='shutdown')
             except ClientError:  # pragma: debug
                 return
-            if platform._is_win:  # pragma: windows
-                sig = signal.SIGINT
-            else:
-                sig = signal.SIGTERM
-            os.kill(response['pid'], sig)
+            os.kill(response['pid'], _shutdown_signal)
             self.shutdown()
 
         def start_integration(self, x, yamls, **kwargs):

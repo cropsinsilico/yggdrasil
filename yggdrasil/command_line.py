@@ -370,7 +370,10 @@ class integration_service_manager(SubCommand):
                           'help': ('One or more YAML specification files '
                                    'defining the integration. This argument '
                                    'may be omitted if \'name\' refers to a '
-                                   'registered integration.')})]),
+                                   'registered integration.')}),
+                        (('--with-coverage', ),
+                         {'action': 'store_true',
+                          'help': ('Enable coverage cleanup for testing.')})]),
                 ArgumentParser(
                     name='stop',
                     help=('Stop an integration service manager or '
@@ -445,7 +448,9 @@ class integration_service_manager(SubCommand):
         if args.action in ['start', None]:
             if integration_name is None:
                 if not x.is_running:
-                    x.start_server(remote_url=getattr(args, 'remote-url', None))
+                    x.start_server(
+                        remote_url=getattr(args, 'remote-url', None),
+                        with_coverage=getattr(args, 'with-coverage', False))
             else:
                 x.send_request(integration_name,
                                yamls=integration_yamls,

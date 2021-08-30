@@ -382,6 +382,7 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                                             mpi_tag_start=mpi_tag_start)
             self.runner.run()
             self.runner.printStatus()
+            self.runner.printStatus(return_str=True)
             if self.mpi_rank != 0:
                 return
             if self.expects_error:
