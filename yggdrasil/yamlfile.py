@@ -161,7 +161,7 @@ def prep_yaml(files):
             x.setdefault('for_request', True)
             cli = IntegrationServiceManager(**x)
             response = cli.send_request(**request)
-            assert(response.pop('status') == 'started')
+            assert(response.pop('status') == 'complete')
             y['models'].append(response)
     # Standardize format of models and connections to be lists and
     # add working_dir to each

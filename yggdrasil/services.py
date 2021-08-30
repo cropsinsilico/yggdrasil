@@ -9,6 +9,7 @@ import functools
 import threading
 from yggdrasil import runner
 from yggdrasil import platform
+from yggdrasil.multitasking import WaitableFunction
 from yggdrasil.tools import sleep, TimeOut, YggClass, timer_context
 from yggdrasil.config import ygg_cfg
 
@@ -568,6 +569,7 @@ def create_service_manager_class(service_type=None):
             if name is None:
                 name = 'ygg_integrations'
             self.integrations = {}
+            self.stopped_integrations = {}
             self.registry = IntegrationServiceRegistry()
             if commtype is None:
                 commtype = _default_commtype
@@ -596,8 +598,17 @@ def create_service_manager_class(service_type=None):
             if name is None:
                 name = yamls
             request = dict(kwargs, name=name, yamls=yamls, action=action)
-            return super(IntegrationServiceManager, self).send_request(
-                request)
+            wait_for_complete = (action in ['start', 'stop', 'shutdown'])
+            out = super(IntegrationServiceManager, self).send_request(request)
+            if wait_for_complete and (out['status'] != 'complete'):
+                def is_complete():
+                    out.update(
+                        super(IntegrationServiceManager, self).send_request(
+                            request))
+                    return (out['status'] == 'complete')
+                x = WaitableFunction(is_complete, polling_interval=0.5)
+                x.wait(30, on_timeout=f"Request did not complete: {request}")
+            return out
 
         def setup_server(self, *args, **kwargs):
             r"""Set up the machinery for receiving requests."""
@@ -633,14 +644,23 @@ def create_service_manager_class(service_type=None):
                     integration that should be run as as service.
                 **kwargs: Additional keyword arguments are passed to get_runner.
 
+            Returns:
+                bool: True if the integration started, False otherwise.
+
             """
             if (x in self.integrations) and (not self.integrations[x].is_alive):
-                self.stop_integration(x)
+                if not self.stop_integration(x):
+                    return False
+            if x in self.stopped_integrations:
+                if not self.stop_integration(x):
+                    return False
+                self.stopped_integrations.pop(x)
             if x not in self.integrations:
                 self.integrations[x] = runner.get_runner(
                     yamls, complete_partial=True, as_service=True,
                     partial_commtype=self.commtype, **kwargs)
                 self.integrations[x].run(signal_handler=False)
+            return True
 
         def _stop_integration(self, x):
             r"""Finish stopping an integration in a thread."""
@@ -657,20 +677,28 @@ def create_service_manager_class(service_type=None):
                     integration service that should be stopped. If None,
                     all of the running integrations are stopped.
 
+            Returns:
+                bool: True if the integration has stopped.
+
             Raises:
                 KeyError: If there is not a running integration associated
                     with the specified hashable object.
 
             """
             if x is None:
-                for k in list(self.integrations.keys()):
-                    self.stop_integration(k)
-                return
-            if x not in self.integrations:
+                return all(self.stop_integration(k)
+                           for k in (list(self.integrations.keys())
+                                     + list(self.stopped_integrations)))
+            if x in self.stopped_integrations:
+                pass
+            elif x not in self.integrations:
                 raise KeyError(f"Integration defined by {x} not running")
-            mthread = threading.Thread(target=self._stop_integration,
-                                       args=(x,), daemon=True)
-            mthread.start()
+            else:
+                mthread = threading.Thread(target=self._stop_integration,
+                                           args=(x,), daemon=True)
+                mthread.start()
+                self.stopped_integrations[x] = mthread
+            return not self.stopped_integrations[x].is_alive()
 
         def integration_info(self, x):
             r"""Get information about an integration and how to connect to it.
@@ -744,17 +772,23 @@ def create_service_manager_class(service_type=None):
                                     request.setdefault(k, v)
                         else:  # pragma: debug
                             raise RuntimeError("No YAML files specified.")
-                    self.start_integration(name, yamls, **request)
-                    response = {'status': 'started'}
-                    response.update(self.integration_info(name))
+                    if self.start_integration(name, yamls, **request):
+                        response = {'status': 'complete'}
+                        response.update(self.integration_info(name))
+                    else:
+                        response = {'status': 'starting'}
                 elif action == 'stop':
-                    self.stop_integration(name)
-                    response = {'status': 'stopped'}
+                    if self.stop_integration(name):
+                        response = {'status': 'complete'}
+                    else:
+                        response = {'status': 'stopping'}
                 elif action == 'shutdown':
-                    self.stop_integration(None)
-                    self.shutdown()
-                    response = {'status': 'shutting down',
-                                'pid': os.getpid()}
+                    if self.stop_integration(None):
+                        self.shutdown()
+                        response = {'status': 'complete',
+                                    'pid': os.getpid()}
+                    else:
+                        response = {'status': 'shutting down'}
                 elif action == 'status':
                     response = {'status': 'done'}
                     if name is None:
