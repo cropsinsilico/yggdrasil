@@ -6,6 +6,7 @@ import traceback
 import yaml
 import pprint
 import functools
+import threading
 from yggdrasil import runner
 from yggdrasil import platform
 from yggdrasil.tools import sleep, TimeOut, YggClass, timer_context
@@ -641,6 +642,13 @@ def create_service_manager_class(service_type=None):
                     partial_commtype=self.commtype, **kwargs)
                 self.integrations[x].run(signal_handler=False)
 
+        def _stop_integration(self, x):
+            r"""Finish stopping an integration in a thread."""
+            m = self.integrations.pop(x)
+            if m.is_alive:
+                m.terminate()
+            m.atexit()
+
         def stop_integration(self, x):
             r"""Stop a running integration.
 
@@ -660,10 +668,9 @@ def create_service_manager_class(service_type=None):
                 return
             if x not in self.integrations:
                 raise KeyError(f"Integration defined by {x} not running")
-            m = self.integrations.pop(x)
-            if m.is_alive:
-                m.terminate()
-            m.atexit()
+            mthread = threading.Thread(target=self._stop_integration,
+                                       args=(x,), daemon=True)
+            mthread.start()
 
         def integration_info(self, x):
             r"""Get information about an integration and how to connect to it.
