@@ -493,7 +493,8 @@ class RMQService(ServiceBase):
                 return False
             self.channel.queue_declare(queue=self.queue, passive=True)
             return True
-        except self.pika.exceptions.ChannelClosedByBroker:  # pragma: intermittent
+        except (self.pika.exceptions.ChannelClosedByBroker,
+                self.pika.exceptions.ChannelWrongStateError):  # pragma: intermittent
             self.connection.close()
             assert(self.for_request)
             self.setup_client(*self._args, **self._kwargs)
@@ -521,7 +522,8 @@ class RMQService(ServiceBase):
                                            reply_to=self.callback_queue,
                                            correlation_id=self.corr_id),
                                        body=request)
-        except self.pika.exceptions.UnroutableError as e:  # pragma: debug
+        except (self.pika.exceptions.UnroutableError,
+                self.pika.exceptions.StreamLostError) as e:  # pragma: debug
             raise ClientError(e)
         T = TimeOut(timeout)
         while (self.response is None) and (not T.is_out):
@@ -693,6 +695,9 @@ def create_service_manager_class(service_type=None):
                 pass
             elif x not in self.integrations:
                 raise KeyError(f"Integration defined by {x} not running")
+            elif service_type == RMQService:
+                self._stop_integration(x)
+                return True
             else:
                 mthread = threading.Thread(target=self._stop_integration,
                                            args=(x,), daemon=True)
