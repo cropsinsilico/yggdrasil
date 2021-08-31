@@ -13,13 +13,15 @@ History
 * Added 'integration-service-manager' CLI for managing service managers
 * Added configuration options for services
 * Added communicator for use with REST API
+* Added ValueEvent class for returning a value with the event
+* Added methods for waiting on a function to return True
+* Refactored multitasking classes to use __slots__ for improved memory performance
 
 TODO
 ....
 
 * Add tutorial on setting up a service
 * Finish test using the Heroku app
-* Fix bug on windows where ZMQ error occurs on shudown for service integration
 
 
 1.7.0 (2021-08-26) Support for MPI communicators, MPI execution, and pika >= 1.0.0

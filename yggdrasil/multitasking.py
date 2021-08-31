@@ -193,6 +193,10 @@ class AliasMeta(type):
             add_aliased_attribute(cls, k, with_lock=cls._base_locked)
         cls._base_meth = []
         cls._base_attr = []
+        if (cls._base_class_name is None) and (name not in ['AliasObject',
+                                                            'MultiObject',
+                                                            'ContextObject']):
+            cls._base_class_name = name
         return cls
 
 
@@ -206,6 +210,8 @@ class AliasObject(object):
 
     """
 
+    __slots__ = ['_base']
+    _base_class_name = None
     _base_class = None
     _base_attr = []
     _base_meth = []
@@ -230,12 +236,23 @@ class AliasObject(object):
         return out
 
     def __getstate__(self):
-        out = self.__dict__.copy()
-        out.pop('_base_class', None)
+        out = dict()
+        
+        def add_base_slots(base):
+            out.update(
+                dict((slot, getattr(self, slot))
+                     for slot in base.__slots__
+                     if (hasattr(self, slot) and (slot != '_base_class')
+                         and (slot not in out))))
+            for x in base.__bases__:
+                if x != object:
+                    add_base_slots(x)
+        add_base_slots(self.__class__)
         return out
 
     def __setstate__(self, state):
-        self.__dict__.update(state)
+        for slot, value in state.items():
+            setattr(self, slot, value)
 
     def check_for_base(self, attr):
         r"""Raise an error if the aliased object has been disconnected."""
@@ -262,6 +279,8 @@ class AliasObject(object):
 class MultiObject(AliasObject):
     r"""Concurrent/parallel processing object using either threads
     or processes."""
+
+    __slots__ = ['task_method', 'parallel']
 
     def __init__(self, *args, task_method="threading", **kwargs):
         self.task_method = task_method
@@ -351,6 +370,8 @@ class Context(MultiObject):
 
 class DummyContextObject(object):  # pragma: no cover
 
+    __slots__ = []
+
     @property
     def context(self):
         return None
@@ -362,12 +383,16 @@ class DummyContextObject(object):  # pragma: no cover
 class ContextObject(MultiObject):
     r"""Base class for object intialized in a context."""
 
+    __slots__ = ["_managed_context", "_context", "_base_class"]
+
     def __init__(self, *args, task_method='threading',
                  task_context=None, **kwargs):
         self._managed_context = None
         if task_context is None:
             task_context = Context(task_method=task_method)
             self._managed_context = task_context
+        elif isinstance(task_context, weakref.ReferenceType):
+            task_context = task_context()
         task_method = task_context.task_method
         self._context = weakref.ref(task_context)
         self._base_class = self.get_base_class(task_context)
@@ -388,7 +413,10 @@ class ContextObject(MultiObject):
     @classmethod
     def get_base_class(cls, context):
         r"""Get instance of base class that will be represented."""
-        name = cls.__name__
+        if cls._base_class_name is None:
+            name = cls.__name__
+        else:
+            name = cls._base_class_name
         context.check_for_base(name)
         return getattr(context._base, name)
 
@@ -448,6 +476,8 @@ class RLock(ContextObject):
 
 class DummyEvent(DummyContextObject):  # pragma: no cover
 
+    __slots__ = ["_value"]
+
     def __init__(self, value=False):
         self._value = value
 
@@ -469,6 +499,8 @@ class DummyEvent(DummyContextObject):  # pragma: no cover
 class ProcessEvent(object):
     r"""Multiprocessing/threading event associated with a process that has
     a discreet start and end."""
+
+    __slots__ = ["started", "stopped"]
 
     def __init__(self, *args, **kwargs):
         self.started = Event(*args, **kwargs)
@@ -498,8 +530,29 @@ class ProcessEvent(object):
 class Event(ContextObject):
     r"""Multiprocessing/threading event."""
 
-    _base_attr = (ContextObject._base_attr
-                  + ['is_set', 'set', 'clear', 'wait'])
+    __slots__ = ["_set", "_clear", "_set_callbacks", "_clear_callbacks"]
+    _base_attr = ContextObject._base_attr + ['is_set', 'wait']
+
+    def __init__(self, *args, **kwargs):
+        self._set = None
+        self._clear = None
+        self._set_callbacks = []
+        self._clear_callbacks = []
+        super(Event, self).__init__(*args, **kwargs)
+        self._set = self._base.set
+        self._clear = self._base.clear
+
+    def set(self):
+        r"""Set the event."""
+        self._set()
+        for (x, a, k) in self._set_callbacks:
+            x(*a, **k)
+
+    def clear(self):
+        r"""Clear the event."""
+        self._clear()
+        for (x, a, k) in self._clear_callbacks:
+            x(*a, **k)
 
     @property
     def dummy_copy(self):
@@ -509,6 +562,8 @@ class Event(ContextObject):
     def __getstate__(self):
         state = super(Event, self).__getstate__()
         if not self.parallel:
+            state.pop('_set')
+            state.pop('_clear')
             state['_base'] = state['_base'].is_set()
         return state
 
@@ -516,6 +571,8 @@ class Event(ContextObject):
         if isinstance(state['_base'], bool):
             val = state['_base']
             state['_base'] = threading.Event()
+            state['_set'] = state['_base'].set
+            state['_clear'] = state['_base'].clear
             if val:
                 state['_base'].set()
         super(Event, self).__setstate__(state)
@@ -572,7 +629,30 @@ class Event(ContextObject):
             (callback, args, kwargs))
 
 
+class ValueEvent(Event):
+    r"""Class for handling storing a value that also triggers an event."""
+
+    __slots__ = ["_event_value"]
+
+    def __init__(self, *args, **kwargs):
+        self._event_value = None
+        super(ValueEvent, self).__init__(*args, **kwargs)
+
+    def set(self, value=None):
+        self._event_value = value
+        super(ValueEvent, self).set()
+
+    def clear(self):
+        self._event_value = None
+        super(ValueEvent, self).clear()
+
+    def get(self):
+        return self._event_value
+
+
 class DummyTask(DummyContextObject):  # pragma: no cover
+
+    __slots__ = ["name", "exitcode", "daemon"]
 
     def __init__(self, name='', exitcode=0, daemon=False):
         self.name = name
@@ -596,13 +676,21 @@ class DummyTask(DummyContextObject):  # pragma: no cover
 class Task(ContextObject):
     r"""Multiprocessing/threading process."""
 
-    _base_attr = ['name', 'daemon', 'authkey', 'sentinel', 'exitcode',
-                  'pid']
+    __slots__ = ["_target", "_args", "_kwargs"]
+    _base_attr = ['name', 'daemon', 'authkey', 'sentinel', 'exitcode', 'pid']
     _base_meth = ['start', 'run', 'join',
                   # Thread only
                   'getName', 'setName', 'isDaemon', 'setDaemon',
                   # Process only
                   'terminate']
+
+    def __init__(self, target=None, args=(), kwargs={}, **kws):
+        self._target = target
+        self._args = args
+        self._kwargs = kwargs
+        if self._target is not None:
+            kws['target'] = self.target
+        super(Task, self).__init__(**kws)
 
     @classmethod
     def get_base_class(cls, context):
@@ -657,12 +745,81 @@ class Task(ContextObject):
         else:
             return self._base.ident
 
+    def target(self, *args, **kwargs):
+        r"""Run the target."""
+        try:
+            self._initialize()
+            self._target(*self._args, **self._kwargs)
+        except BaseException as e:
+            self._on_error(e)
+        finally:
+            self._finalize()
+            
+    def _initialize(self):
+        r"""Initialize a run."""
+        pass
+
+    def _finalize(self):
+        r"""Finalize a run."""
+        pass
+
+    def _on_error(self, e):
+        r"""Handle an error during a run."""
+        raise
+        
     def kill(self, *args, **kwargs):
         r"""Kill the task."""
         if self.parallel and hasattr(self._base, 'kill'):
             return self._base.kill(*args, **kwargs)
         elif hasattr(self._base, 'terminate'):
             return self._base.terminate(*args, **kwargs)
+
+
+class TaskLoop(Task):
+    r"""Class for looping over a task."""
+
+    __slots__ = ["break_flag", "polling_interval", "break_stack",
+                 "_loop_target", "_loop_count"]
+
+    def __init__(self, target=None, polling_interval=0.0, **kws):
+        self.polling_interval = polling_interval
+        self.break_stack = None
+        self._loop_target = target
+        self._loop_count = 0
+        if self._loop_target is not None:
+            kws['target'] = self.loop_target
+        super(TaskLoop, self).__init__(**kws)
+        self.break_flag = Event(task_context=self._context)
+
+    def break_loop(self, break_stack=None):
+        r"""Break the task loop."""
+        if self.break_stack is None:
+            if break_stack is None:
+                import traceback
+                break_stack = ''.join(traceback.format_stack())
+            self.break_stack = break_stack
+        self.break_flag.set()
+
+    def kill(self, *args, **kwargs):
+        r"""Kill the task."""
+        self.break_loop()
+        return super(TaskLoop, self).kill(*args, **kwargs)
+
+    def loop_target(self, *args, **kwargs):
+        r"""Continue calling the target until the loop is broken."""
+        while not self.break_flag.is_set():
+            try:
+                self._loop_target(*args, **kwargs)
+            except BreakLoopException as e:
+                self.break_loop(e.break_stack)
+                break
+            if self.polling_interval:
+                self.break_flag.wait(self.polling_interval)
+            self._loop_count += 1
+
+    def _finalize(self):
+        r"""Finalize a run."""
+        self.break_loop()
 
 
 class DummyQueue(DummyContextObject):  # pragma: no cover
@@ -888,12 +1045,6 @@ class WaitableFunction(object):
         self.function = function
         self.polling_interval = polling_interval
 
-    async def await_function(self):
-        r"""Coroutine to wait for the function to return True."""
-        while not self.function():
-            await asyncio.sleep(self.polling_interval)
-        return self.function()
-
     def wait(self, timeout=None, on_timeout=False):
         r"""Wait for the function to return True.
 
@@ -913,24 +1064,25 @@ class WaitableFunction(object):
             object: The result of the function call.
 
         """
-        loop = asyncio.new_event_loop()
-        try:
-            return loop.run_until_complete(
-                asyncio.wait_for(self.await_function(), timeout))
-        except asyncio.TimeoutError as e:
-            if on_timeout is False:
-                raise TimeoutError(e, self.function())
-            elif on_timeout is True:
+        def task_target():
+            if self.function():
+                raise BreakLoopException
+        loop = TaskLoop(target=task_target,
+                        polling_interval=self.polling_interval)
+        loop.start()
+        loop.join(timeout)
+        if loop.is_alive():
+            loop.kill()
+            if on_timeout is True:
                 return self.function()
+            elif (on_timeout is False):
+                msg = f'Timeout at {timeout} s'
             elif isinstance(on_timeout, str):
-                raise TimeoutError(on_timeout, self.function())
+                msg = on_timeout
             else:
                 return on_timeout()
-        finally:
-            try:
-                loop.run_until_complete(loop.shutdown_asyncgens())
-            finally:
-                loop.close()
+            raise TimeoutError(msg, self.function())
+        return self.function()
 
 
 def wait_on_function(function, timeout=None, on_timeout=False,
@@ -1469,6 +1621,8 @@ class YggTask(YggClass):
 class BreakLoopException(BaseException):
     r"""Special exception that can be raised by the target function
     for a loop in order to break the loop."""
+
+    __slots__ = ["break_stack"]
 
     def __init__(self, *args, **kwargs):
         import traceback

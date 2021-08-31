@@ -9,8 +9,8 @@ import functools
 import threading
 from yggdrasil import runner
 from yggdrasil import platform
-from yggdrasil.multitasking import WaitableFunction
-from yggdrasil.tools import sleep, TimeOut, YggClass, timer_context
+from yggdrasil.multitasking import wait_on_function, ValueEvent
+from yggdrasil.tools import YggClass, timer_context
 from yggdrasil.config import ygg_cfg
 
 
@@ -69,6 +69,7 @@ class ServiceBase(YggClass):
             self.address = self.address.format(port=self.port)
         self._args = args
         self._kwargs = kwargs
+        self._is_running = False
         super(ServiceBase, self).__init__(name, *args, **kwargs)
         if self.for_request:
             self.setup_client(*args, **kwargs)
@@ -88,7 +89,10 @@ class ServiceBase(YggClass):
     @property
     def is_running(self):
         r"""bool: True if the server is running."""
-        return True
+        if self.for_request:
+            return True
+        else:
+            return self._is_running
     
     def wait_for_server(self, timeout=15.0):
         r"""Wait for a service to start running.
@@ -102,12 +106,8 @@ class ServiceBase(YggClass):
                 hasn't started.
 
         """
-        T = TimeOut(timeout)
-        while (not self.is_running) and (not T.is_out):
-            self.debug("Waiting for server to start")
-            sleep(0.1)
-        if not self.is_running:  # pragma: debug
-            raise RuntimeError("Server never started")
+        wait_on_function(lambda: self.is_running, timeout=timeout,
+                         on_timeout="Server never started")
 
     def setup_server(self, *args, **kwargs):
         r"""Set up the machinery for receiving requests."""
@@ -130,7 +130,11 @@ class ServiceBase(YggClass):
                 cleanup_on_signal(_shutdown_signal)
             except ImportError:  # pragma: debug
                 pass
-        self.run_server()
+        self._is_running = True
+        try:
+            self.run_server()
+        finally:
+            self._is_running = False
 
     def run_server(self):
         r"""Begin listening for requests."""
@@ -483,22 +487,12 @@ class RMQService(ServiceBase):
 
     def _on_response(self, ch, method, props, body):
         if self.corr_id == props.correlation_id:
-            self.response = body
+            self.response.set(body)
 
     @property
     def is_running(self):
         r"""bool: True if the server is running."""
-        try:
-            if self.channel is None:  # pragma: debug
-                return False
-            self.channel.queue_declare(queue=self.queue, passive=True)
-            return True
-        except (self.pika.exceptions.ChannelClosedByBroker,
-                self.pika.exceptions.ChannelWrongStateError):  # pragma: intermittent
-            self.connection.close()
-            assert(self.for_request)
-            self.setup_client(*self._args, **self._kwargs)
-            return False
+        return (super(RMQService, self).is_running and bool(self.channel))
 
     def call(self, request, timeout=10.0, **kwargs):
         r"""Send a request.
@@ -513,7 +507,7 @@ class RMQService(ServiceBase):
             str: Serialized response.
 
         """
-        self.response = None
+        self.response = ValueEvent()
         self.corr_id = str(uuid.uuid4())
         try:
             self.channel.basic_publish(exchange=self.exchange,
@@ -525,13 +519,19 @@ class RMQService(ServiceBase):
         except (self.pika.exceptions.UnroutableError,
                 self.pika.exceptions.StreamLostError) as e:  # pragma: debug
             raise ClientError(e)
-        T = TimeOut(timeout)
-        while (self.response is None) and (not T.is_out):
+        
+        def process_events():
             self.connection.process_data_events()
-            sleep(0.5)
-        if self.response is None:
+            return self.response.is_set()
+        
+        def client_error():
             raise ClientError("No response received")
-        return self.response
+
+        if not self.response.is_set():
+            wait_on_function(
+                process_events, timeout=timeout, polling_interval=0.5,
+                on_timeout=client_error)
+        return self.response.get()
 
 
 def create_service_manager_class(service_type=None):
@@ -600,7 +600,8 @@ def create_service_manager_class(service_type=None):
             if name is None:
                 name = yamls
             request = dict(kwargs, name=name, yamls=yamls, action=action)
-            wait_for_complete = (action in ['start', 'stop', 'shutdown'])
+            wait_for_complete = ((action in ['start', 'stop', 'shutdown'])
+                                 and (service_type != RMQService))
             out = super(IntegrationServiceManager, self).send_request(request)
             if wait_for_complete and (out['status'] != 'complete'):
                 def is_complete():
@@ -608,8 +609,9 @@ def create_service_manager_class(service_type=None):
                         super(IntegrationServiceManager, self).send_request(
                             request))
                     return (out['status'] == 'complete')
-                x = WaitableFunction(is_complete, polling_interval=0.5)
-                x.wait(30, on_timeout=f"Request did not complete: {request}")
+                wait_on_function(
+                    is_complete, timeout=30, polling_interval=0.5,
+                    on_timeout=f"Request did not complete: {request}")
             return out
 
         def setup_server(self, *args, **kwargs):

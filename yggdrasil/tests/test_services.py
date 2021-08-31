@@ -75,7 +75,8 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
     if partial_commtype is not None:
         args.append(f"--commtype={partial_commtype}")
     if with_coverage:
-        args += ['start', '--with-coverage']
+        args = [sys.executable, '-m', 'coverage', 'run', '-p'] + args[1:]
+        # args += ['start', '--with-coverage']
     verify_flask = (service_type == 'flask')
     if verify_flask:
         # Flask is the default, verify that it is selected
