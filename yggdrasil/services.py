@@ -1,4 +1,5 @@
 import os
+import sys
 import signal
 import uuid
 import json
@@ -76,11 +77,6 @@ class ServiceBase(YggClass):
         else:
             self.setup_server(*args, **kwargs)
 
-    @property
-    def opp_address(self):
-        r"""str: Opposite address."""
-        return self.address
-
     @classmethod
     def is_installed(cls):
         r"""bool: True if the class is fully installed, False otherwise."""
@@ -124,12 +120,15 @@ class ServiceBase(YggClass):
         if remote_url is None:
             remote_url = self.address
         os.environ.setdefault('YGGDRASIL_SERVICE_HOST_URL', remote_url)
-        if with_coverage:
-            try:
-                from pytest_cov.embed import cleanup_on_signal
-                cleanup_on_signal(_shutdown_signal)
-            except ImportError:  # pragma: debug
-                pass
+        if with_coverage:  # pragma: testing
+            def handle_shutdown(sig, frame):
+                sys.exit()
+            signal.signal(_shutdown_signal, handle_shutdown)
+            # try:
+            #     from pytest_cov.embed import cleanup_on_signal
+            #     cleanup_on_signal(_shutdown_signal)
+            # except ImportError:  # pragma: debug
+            #     pass
         self._is_running = True
         try:
             self.run_server()
@@ -244,13 +243,14 @@ class ServiceBase(YggClass):
                 "REQUEST TIME: {elapsed}s ({request}, kwargs={kwargs})",
                 request=request, kwargs=kwargs):
             request_str = self.serialize(request)
-            if not self.for_request:
-                x = self.__class__(self.name, *self._args,
-                                   **self._kwargs, for_request=True,
-                                   address=self.opp_address)
-            else:
-                x = self
-            out = self.process_response(x.call(request_str, **kwargs))
+            assert(self.for_request)
+            # if not self.for_request:
+            #     x = self.__class__(self.name, *self._args,
+            #                        **self._kwargs, for_request=True,
+            #                        address=self.opp_address)
+            # else:
+            #     x = self
+            out = self.process_response(self.call(request_str, **kwargs))
         return out
 
 

@@ -449,8 +449,8 @@ class integration_service_manager(SubCommand):
             if integration_name is None:
                 if not x.is_running:
                     x.start_server(
-                        remote_url=getattr(args, 'remote-url', None),
-                        with_coverage=getattr(args, 'with-coverage', False))
+                        remote_url=getattr(args, 'remote_url', None),
+                        with_coverage=getattr(args, 'with_coverage', False))
             else:
                 x.send_request(integration_name,
                                yamls=integration_yamls,
