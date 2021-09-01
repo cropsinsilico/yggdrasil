@@ -18,6 +18,7 @@ from yggdrasil.config import ygg_cfg
 _default_service_type = ygg_cfg.get('services', 'default_type', 'flask')
 _default_commtype = ygg_cfg.get('services', 'default_comm', None)
 _default_address = ygg_cfg.get('services', 'address', None)
+_client_id = ygg_cfg.get('services', 'client_id', None)
 if platform._is_win:  # pragma: windows
     _shutdown_signal = signal.SIGINT
 else:
@@ -562,12 +563,15 @@ def create_service_manager_class(service_type=None):
             commtype (str, optional): Communicator type that should be used
                 for the connections to services. Defaults to ('services',
                 'default_comm') configuration option, if set, and None if not.
+            is_app (bool, optional): If True, the service manager will be run
+                as an app and will not be expected to be shut down by clients.
+                Defaults to False.
             **kwargs: Additional keyword arguments are passed to the __init__
                 method for the service_type class.
 
         """
 
-        def __init__(self, name=None, commtype=None, **kwargs):
+        def __init__(self, name=None, commtype=None, is_app=False, **kwargs):
             if name is None:
                 name = 'ygg_integrations'
             self.integrations = {}
@@ -576,9 +580,21 @@ def create_service_manager_class(service_type=None):
             if commtype is None:
                 commtype = _default_commtype
             self.commtype = commtype
+            self.is_app = is_app
             super(IntegrationServiceManager, self).__init__(name, **kwargs)
             if self.commtype is None:
                 self.commtype = self.default_commtype
+
+        @property
+        def client_id(self):
+            r"""str: The ID that should be associated with a client on the
+            current machine. Defaults to the configuration entry
+            ('services', 'client_id') if it is set and is generated otherwise.
+            """
+            global _client_id
+            if _client_id is None:
+                _client_id = str(uuid.uuid4())
+            return _client_id
 
         def send_request(self, name=None, yamls=None, action='start', **kwargs):
             r"""Send a request.
@@ -599,7 +615,8 @@ def create_service_manager_class(service_type=None):
                 yamls = [yamls]
             if name is None:
                 name = yamls
-            request = dict(kwargs, name=name, yamls=yamls, action=action)
+            request = dict(kwargs, name=name, yamls=yamls, action=action,
+                           client_id=self.client_id)
             wait_for_complete = ((action in ['start', 'stop', 'shutdown'])
                                  and (service_type != RMQService))
             out = super(IntegrationServiceManager, self).send_request(request)
@@ -622,7 +639,8 @@ def create_service_manager_class(service_type=None):
                 def landing_page():
                     return self.respond({'action': 'status',
                                          'name': None,
-                                         'yamls': None})['status']
+                                         'yamls': None,
+                                         'client_id': None})['status']
                 
                 from yggdrasil.communication import RESTComm
                 RESTComm.add_comm_server_to_app(self.app)
@@ -634,13 +652,16 @@ def create_service_manager_class(service_type=None):
                 response = self.send_request(action='shutdown')
             except ClientError:  # pragma: debug
                 return
-            os.kill(response['pid'], _shutdown_signal)
+            if response.get('pid', None):
+                os.kill(response['pid'], _shutdown_signal)
             self.shutdown()
 
-        def start_integration(self, x, yamls, **kwargs):
+        def start_integration(self, client_id, x, yamls, **kwargs):
             r"""Start an integration if it is not already running.
 
             Args:
+                client_id (str): ID associated with the client requesting the
+                    integration be started.
                 x (str, tuple): Hashable object that should be used to
                     identify the integration being started in the registry of
                     running integrations.
@@ -652,31 +673,35 @@ def create_service_manager_class(service_type=None):
                 bool: True if the integration started, False otherwise.
 
             """
-            if (x in self.integrations) and (not self.integrations[x].is_alive):
-                if not self.stop_integration(x):
+            integrations = self.integrations[client_id]
+            stopped_integrations = self.stopped_integrations[client_id]
+            if (x in integrations) and (not integrations[x].is_alive):
+                if not self.stop_integration(client_id, x):
                     return False
-            if x in self.stopped_integrations:
-                if not self.stop_integration(x):
+            if x in stopped_integrations:
+                if not self.stop_integration(client_id, x):
                     return False
-                self.stopped_integrations.pop(x)
-            if x not in self.integrations:
-                self.integrations[x] = runner.get_runner(
+                stopped_integrations.pop(x)
+            if x not in integrations:
+                integrations[x] = runner.get_runner(
                     yamls, complete_partial=True, as_service=True,
                     partial_commtype=self.commtype, **kwargs)
-                self.integrations[x].run(signal_handler=False)
+                integrations[x].run(signal_handler=False)
             return True
 
-        def _stop_integration(self, x):
+        def _stop_integration(self, client_id, x):
             r"""Finish stopping an integration in a thread."""
-            m = self.integrations.pop(x)
+            m = self.integrations[client_id].pop(x)
             if m.is_alive:
                 m.terminate()
             m.atexit()
 
-        def stop_integration(self, x):
+        def stop_integration(self, client_id, x):
             r"""Stop a running integration.
 
             Args:
+                client_id (str): ID associated with the client requesting the
+                    integration be stopped.
                 x (str, tuple): Hashable object associated with the
                     integration service that should be stopped. If None,
                     all of the running integrations are stopped.
@@ -689,28 +714,32 @@ def create_service_manager_class(service_type=None):
                     with the specified hashable object.
 
             """
+            integrations = self.integrations[client_id]
+            stopped_integrations = self.stopped_integrations[client_id]
             if x is None:
-                return all(self.stop_integration(k)
-                           for k in (list(self.integrations.keys())
-                                     + list(self.stopped_integrations)))
-            if x in self.stopped_integrations:
+                return all(self.stop_integration(client_id, k)
+                           for k in (list(integrations.keys())
+                                     + list(stopped_integrations.keys())))
+            if x in stopped_integrations:
                 pass
-            elif x not in self.integrations:
+            elif x not in integrations:
                 raise KeyError(f"Integration defined by {x} not running")
             elif service_type == RMQService:
-                self._stop_integration(x)
+                self._stop_integration(client_id, x)
                 return True
             else:
                 mthread = threading.Thread(target=self._stop_integration,
-                                           args=(x,), daemon=True)
+                                           args=(client_id, x,), daemon=True)
                 mthread.start()
-                self.stopped_integrations[x] = mthread
-            return not self.stopped_integrations[x].is_alive()
+                stopped_integrations[x] = mthread
+            return not stopped_integrations[x].is_alive()
 
-        def integration_info(self, x):
+        def integration_info(self, client_id, x):
             r"""Get information about an integration and how to connect to it.
 
             Args:
+                client_id (str): ID associated with the client requesting the
+                    integration info.
                 x (str, tuple): Hashable object associated with the
                     integration to get information on.
 
@@ -722,9 +751,10 @@ def create_service_manager_class(service_type=None):
                     with the specified hashable object.
 
             """
-            if x not in self.integrations:  # pragma: debug
+            integrations = self.integrations[client_id]
+            if x not in integrations:  # pragma: debug
                 raise KeyError(f"Integration defined by {x} not running")
-            m = self.integrations[x].modeldrivers['dummy_model']
+            m = integrations[x].modeldrivers['dummy_model']
             out = m['instance'].service_partner
             name = 'dummy'
             if isinstance(x, str) and (not os.path.isfile(x)):
@@ -759,10 +789,14 @@ def create_service_manager_class(service_type=None):
             name = None
             action = None
             yamls = None
+            client_id = None
             try:
                 name = request.pop('name')
                 action = request.pop('action')
                 yamls = request.pop('yamls')
+                client_id = request.pop('client_id')
+                self.integrations.setdefault(client_id, {})
+                self.stopped_integrations.setdefault(client_id, {})
                 if isinstance(name, list):
                     name = tuple(name)
                 if action == 'start':
@@ -779,21 +813,26 @@ def create_service_manager_class(service_type=None):
                                     request.setdefault(k, v)
                         else:  # pragma: debug
                             raise RuntimeError("No YAML files specified.")
-                    if self.start_integration(name, yamls, **request):
-                        response = {'status': 'complete'}
-                        response.update(self.integration_info(name))
+                    if self.start_integration(client_id, name, yamls,
+                                              **request):
+                        response = dict(
+                            self.integration_info(client_id, name),
+                            status='complete')
                     else:
                         response = {'status': 'starting'}
                 elif action == 'stop':
-                    if self.stop_integration(name):
+                    if self.stop_integration(client_id, name):
                         response = {'status': 'complete'}
                     else:
                         response = {'status': 'stopping'}
                 elif action == 'shutdown':
-                    if self.stop_integration(None):
-                        self.shutdown()
-                        response = {'status': 'complete',
-                                    'pid': os.getpid()}
+                    if self.stop_integration(client_id, None):
+                        if self.is_app:  # pragma: no cover
+                            response = {'status': 'complete'}
+                        else:
+                            self.shutdown()
+                            response = {'status': 'complete',
+                                        'pid': os.getpid()}
                     else:
                         response = {'status': 'shutting down'}
                 elif action == 'status':
@@ -804,16 +843,24 @@ def create_service_manager_class(service_type=None):
                                'Running Services:\n%s')
                         registry_str = '\t' + '\n\t'.join(
                             pprint.pformat(self.registry.registry).splitlines())
+                        if client_id is None:
+                            clients = list(self.integrations.keys())
+                        else:
+                            clients = [client_id]
                         running_str = ''
-                        for k, v in self.integrations.items():
-                            running_str += '\t%s:\n\t\t%s' % (
-                                k, '\n\t\t'.join(v.printStatus(
-                                    return_str=True).splitlines()))
+                        for cli in clients:
+                            running_str += '\tClient %s\n' % cli
+                            for k, v in self.integrations[cli].items():
+                                running_str += '\t\t%s:\n\t\t\t%s' % (
+                                    k, '\n\t\t\t'.join(v.printStatus(
+                                        return_str=True).splitlines()))
                         args = (self.address, registry_str, running_str)
                         response['status'] = fmt % args
                     else:
-                        response['status'] = self.integrations[name].printStatus(
-                            return_str=True)
+                        assert(client_id is not None)
+                        response['status'] = (
+                            self.integrations[client_id][name].printStatus(
+                                return_str=True))
                 elif action == 'ping':
                     response = {'status': 'running'}
                 else:
@@ -822,7 +869,8 @@ def create_service_manager_class(service_type=None):
                 tb = traceback.format_exc()
                 response = {'error': str(e), 'traceback': tb}
                 if action == 'start':  # pragma: intermittent
-                    self.respond({'name': name, 'action': 'stop', 'yamls': None})
+                    self.respond({'name': name, 'action': 'stop', 'yamls': None,
+                                  'client_id': client_id})
             return response
 
         def process_response(self, response):
