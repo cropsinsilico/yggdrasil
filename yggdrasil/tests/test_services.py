@@ -103,8 +103,7 @@ def _make_ids(ids):
     return ','.join([str(x) for x in ids])
 
 
-@pytest.mark.skip
-def test_call_integration_remote():  # pragma: testing
+def test_call_integration_remote():
     r"""Test with remote integration service."""
     name = 'photosynthesis'
     test_yml = ex_yamls['fakeplant']['python']
@@ -120,7 +119,7 @@ def test_call_integration_remote():  # pragma: testing
                                     for_request=True,
                                     address=address)
     cli.wait_for_server()
-    if not cli.is_running:
+    if not cli.is_running:  # pragma: debug
         pytest.skip("Heroku app is not running.")
     try:
         shutil.copy(copy_yml, remote_yml)

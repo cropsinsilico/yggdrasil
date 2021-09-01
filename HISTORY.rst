@@ -21,7 +21,6 @@ TODO
 ....
 
 * Add tutorial on setting up a service
-* Finish test using the Heroku app
 
 
 1.7.0 (2021-08-26) Support for MPI communicators, MPI execution, and pika >= 1.0.0
