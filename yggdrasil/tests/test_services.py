@@ -157,16 +157,24 @@ class TestServices(object):
             yield cli
             self.cli = None
 
-    def call_integration_service(self, cli, yamls, test_yml, name='test'):
+    def call_integration_service(self, cli, yamls, test_yml, copy_yml=None,
+                                 name='test'):
         r"""Call an integration that includes a service."""
         remote_yml = '_remote'.join(os.path.splitext(test_yml))
         yamls = copy.copy(yamls)
         yamls.remove(test_yml)
+        if copy_yml:
+            yamls.remove(copy_yml)
         yamls.append(remote_yml)
         service_type = cli.service_type
         try:
             address = cli.address
-            with open(remote_yml, 'w') as fd:
+            if copy_yml:
+                shutil.copy(copy_yml, remote_yml)
+                remote_code = 'a'
+            else:
+                remote_code = 'w'
+            with open(remote_yml, remote_code) as fd:
                 fd.write('\n'.join(['service:',
                                     f'    name: {name}',
                                     f'    yamls: [{test_yml}]',
@@ -239,7 +247,8 @@ class TestServices(object):
         self.call_integration_service(
             running_service,
             ex_yamls['fakeplant']['all_nomatlab'],
-            ex_yamls['fakeplant']['python'])
+            ex_yamls['fakeplant']['python'],
+            copy_yml=ex_yamls['fakeplant']['c'][0])
 
     @requires_language('c')
     @requires_language('c++')

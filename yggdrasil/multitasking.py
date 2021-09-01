@@ -614,17 +614,6 @@ class Event(ContextObject):
                 Options are 'set' or 'clear'. Defaults to 'set'.
 
         """
-        if not hasattr(self, f'_{trigger}_callbacks'):
-            assert(trigger in ['set', 'clear'])
-            setattr(self, f'_{trigger}_callbacks', [])
-            setattr(self, f'_{trigger}', getattr(self._base, trigger))
-            
-            def callback_method(self):
-                getattr(self, f'_{trigger}')()
-                for (x, a, k) in getattr(self, f'_{trigger}_callbacks'):
-                    x(*a, **k)
-
-            setattr(self._base, trigger, lambda: callback_method(self))
         getattr(self, f'_{trigger}_callbacks').append(
             (callback, args, kwargs))
 

@@ -5,24 +5,15 @@ from yggdrasil.communication import CommBase, NoMessages
 from yggdrasil.tools import timer_context
 
 
-def add_comm_server_to_app(app, send_callback=None,
-                           recv_callback=None):
+def add_comm_server_to_app(app):
     r"""Add methods for handling send/receive calls server-side.
 
     Args:
         app (flask.Flask): Flask app to add methods to.
-        send_callback (callable, optional): A function that should be
-            called when the server receives a message sent by a comm.
-            Defaults to None and is ignored.
-        recv_callback (callable, optional): A function that should be
-            called when the server responds to a receive request by a comm.
-            Defaults to None and is ignored.
 
     """
     from flask import request
     app.queue = {}
-    app.send_callback = send_callback
-    app.recv_callback = recv_callback
 
     @app.route('/<model>/<channel>', methods=['GET', 'PUT', 'POST'])
     def queue(model, channel):
@@ -33,15 +24,11 @@ def add_comm_server_to_app(app, send_callback=None,
             app.queue.setdefault((model, channel), [])
             msg = request.get_data()
             app.queue[(model, channel)].append(msg)
-            if app.send_callback is not None:
-                app.send_callback(msg)
             return b''
         else:
             # Return a message from the queue when requested by a client.
             if app.queue.get((model, channel), []):
                 msg = app.queue[(model, channel)].pop(0)
-                if app.recv_callback is not None:
-                    app.recv_callback(msg)
                 return msg
             else:
                 return b''

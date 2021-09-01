@@ -15,6 +15,14 @@ class TestRESTComm(test_CommBase.TestCommBase):
     comm = 'RESTComm'
 
     @pytest.fixture(scope="class", autouse=True)
-    def running_service(self):
-        with running_service('flask', partial_commtype='rest') as cli:
+    def running_service(self, request):
+        manager = request.config.pluginmanager
+        plugin_class = manager.get_plugin('pytest_cov').CovPlugin
+        plugin = None
+        for x in manager.get_plugins():
+            if isinstance(x, plugin_class):
+                plugin = x
+                break
+        with running_service('flask', partial_commtype='rest',
+                             with_coverage=(plugin is not None)) as cli:
             yield cli
