@@ -190,7 +190,7 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None):
         complete_partial (bool, optional): If True, unpaired input/output
             channels are allowed and reserved for use (e.g. for calling the
             model as a function). Defaults to False.
-        partial_commtype (str, optional): Communicator type that should be
+        partial_commtype (dict, optional): Communicator kwargs that should be
             be used for the connections to the unpaired channels when
             complete_partial is True. Defaults to None and will be ignored.
 
@@ -338,7 +338,7 @@ def complete_partial_integration(existing, name, partial_commtype=None):
     Args:
         existing (dict): Dictionary of existing components.
         name (str): Name that should be given to the new model.
-        partial_commtype (str, optional): Communicator type that should be
+        partial_commtype (dict, optional): Communicator kwargs that should be
             be used for the connections to the unpaired channels. Defaults to
             None and will be ignored.
 
@@ -382,7 +382,7 @@ def complete_partial_integration(existing, name, partial_commtype=None):
                 dummy_comm.pop(k, None)
             dummy_comm['name'] = dummy_channel
             if partial_commtype is not None:
-                dummy_comm['commtype'] = partial_commtype
+                dummy_comm.update(partial_commtype)
             new_model[io2 + 's'].append(dummy_comm)
             new_connections.append({io1 + 's': [{'name': dummy_channel}],
                                     io2 + 's': [{'name': i}]})

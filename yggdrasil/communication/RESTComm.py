@@ -15,39 +15,40 @@ def add_comm_server_to_app(app):
     from flask import request
     app.queue = {}
 
-    @app.route('/<model>/<channel>', methods=['GET', 'PUT', 'POST'])
-    def queue(model, channel):
+    @app.route('/<client_id>/<model>/<channel>',
+               methods=['GET', 'PUT', 'POST'])
+    def queue(client_id, model, channel):
         r"""Respond to GET with queued message and add message from PUT
         or POST to the queue."""
         if request.method in ['PUT', 'POST']:
             # Queue a message when it is received from a client.
-            app.queue.setdefault((model, channel), [])
+            app.queue.setdefault((client_id, model, channel), [])
             msg = request.get_data()
-            app.queue[(model, channel)].append(msg)
+            app.queue[(client_id, model, channel)].append(msg)
             return b''
         else:
             # Return a message from the queue when requested by a client.
-            if app.queue.get((model, channel), []):
-                msg = app.queue[(model, channel)].pop(0)
+            if app.queue.get((client_id, model, channel), []):
+                msg = app.queue[(client_id, model, channel)].pop(0)
                 return msg
             else:
                 return b''
 
-    @app.route('/<model>/<channel>/size', methods=['GET'])
-    def queue_size(model, channel):
+    @app.route('/<client_id>/<model>/<channel>/size', methods=['GET'])
+    def queue_size(client_id, model, channel):
         r"""Return the size of the message queue."""
-        return str(len(app.queue.get((model, channel), [])))
+        return str(len(app.queue.get((client_id, model, channel), [])))
 
-    @app.route('/<model>/<channel>/purge', methods=['GET'])
-    def queue_purge(model, channel):
+    @app.route('/<client_id>/<model>/<channel>/purge', methods=['GET'])
+    def queue_purge(client_id, model, channel):
         r"""Return the size of the message queue."""
-        app.queue[(model, channel)] = []
+        app.queue[(client_id, model, channel)] = []
         return b''
 
-    @app.route('/<model>/<channel>/remove', methods=['GET'])
-    def queue_remove(model, channel):
+    @app.route('/<client_id>/<model>/<channel>/remove', methods=['GET'])
+    def queue_remove(client_id, model, channel):
         r"""Remove a queue."""
-        app.queue.pop((model, channel), None)
+        app.queue.pop((client_id, model, channel), None)
         return b''
 
 
@@ -69,6 +70,7 @@ class RESTComm(CommBase.CommBase):
     _commtype = 'rest'
     _schema_subtype_description = 'RESTful API.'
     _schema_properties = {
+        'client_id': {'type': 'string'},
         'params': {'type': 'object'},
         'cookies': {'type': 'object'},
         'host': {'type': 'string', 'default': 'http://localhost:{port}'},
@@ -92,6 +94,9 @@ class RESTComm(CommBase.CommBase):
     def bind(self, *args, **kwargs):
         r"""Bind to address based on information provided."""
         if self.address == 'address':
+            client_id = self.client_id
+            if client_id is None:
+                client_id = str(uuid.uuid4()).split('-')[0]
             model = self.partner_model
             if model is None:
                 model = str(uuid.uuid4()).split('-')[0]
@@ -103,7 +108,8 @@ class RESTComm(CommBase.CommBase):
                 self.host = self.host.format(port=self.port)
             host = self.host
             name = self.name_base
-            self.address = f'{host}{model}/{name}'
+            assert(client_id is not None)
+            self.address = f'{host}{client_id}/{model}/{name}'
         return super(RESTComm, self).bind(*args, **kwargs)
 
     def opp_comm_kwargs(self, for_yaml=False):

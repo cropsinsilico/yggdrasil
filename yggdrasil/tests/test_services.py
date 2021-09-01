@@ -103,6 +103,7 @@ def _make_ids(ids):
     return ','.join([str(x) for x in ids])
 
 
+@pytest.mark.skip
 def test_call_integration_remote():
     r"""Test with remote integration service."""
     name = 'photosynthesis'

@@ -683,9 +683,12 @@ def create_service_manager_class(service_type=None):
                     return False
                 stopped_integrations.pop(x)
             if x not in integrations:
+                partial_commtype = {'commtype': self.commtype}
+                if self.commtype == 'rest':
+                    partial_commtype['client_id'] = client_id
                 integrations[x] = runner.get_runner(
                     yamls, complete_partial=True, as_service=True,
-                    partial_commtype=self.commtype, **kwargs)
+                    partial_commtype=partial_commtype, **kwargs)
                 integrations[x].run(signal_handler=False)
             return True
 

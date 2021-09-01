@@ -21,6 +21,7 @@ TODO
 ....
 
 * Add tutorial on setting up a service
+* Remove log message about request times
 
 
 1.7.0 (2021-08-26) Support for MPI communicators, MPI execution, and pika >= 1.0.0

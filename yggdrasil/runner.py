@@ -254,7 +254,7 @@ class YggRunner(YggClass):
         complete_partial (bool, optional): If True, unpaired input/output
             channels are allowed and reserved for use (e.g. for calling the
             model as a function). Defaults to False.
-        partial_commtype (str, optional): Communicator type that should be
+        partial_commtype (dict, optional): Communicator kwargs that should be
             be used for the connections to the unpaired channels when
             complete_partial is True. Defaults to None and will be ignored.
 
