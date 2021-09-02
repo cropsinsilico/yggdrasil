@@ -69,13 +69,17 @@ def check_settings(service_type, partial_commtype=None):
 @contextmanager
 def running_service(service_type, partial_commtype=None, with_coverage=False):
     r"""Context manager to run and clean-up an integration service."""
+    import glob
     check_settings(service_type, partial_commtype)
     args = [sys.executable, "-m", "yggdrasil", "integration-service-manager",
             f"--service-type={service_type}"]
     if partial_commtype is not None:
         args.append(f"--commtype={partial_commtype}")
+    before = []
+    package_dir = None
     if with_coverage:
         from yggdrasil.command_line import package_dir
+        before = glob.glob('.coverage*')
         include_dir = os.path.join(package_dir, '*')
         args = [sys.executable, '-m', 'coverage', 'run', '-p',
                 f'--include={include_dir}'] + args[1:]
@@ -100,6 +104,11 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
     finally:
         if p.returncode is None:  # pragma: debug
             p.terminate()
+        if with_coverage:
+            after = glob.glob('.coverage*')
+            assert(len(after) > len(before))
+            print('before: %s\nafter: %s\npackage_dir: %s\ncwd: %s\n'
+                  % (before, after, package_dir, os.getcwd()))
 
 
 def _make_ids(ids):
