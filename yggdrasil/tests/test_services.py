@@ -75,7 +75,9 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
     if partial_commtype is not None:
         args.append(f"--commtype={partial_commtype}")
     if with_coverage:
-        args = [sys.executable, '-m', 'coverage', 'run', '-p'] + args[1:]
+        from yggdrasil.command_line import package_dir
+        args = [sys.executable, '-m', 'coverage', 'run', '-p',
+                f'--source={package_dir}'] + args[1:]
         args += ['start', '--with-coverage']
     verify_flask = (service_type == 'flask')
     if verify_flask:
@@ -103,6 +105,8 @@ def _make_ids(ids):
     return ','.join([str(x) for x in ids])
 
 
+@requires_language('c')
+@requires_language('c++')
 def test_call_integration_remote():
     r"""Test with remote integration service."""
     name = 'photosynthesis'
