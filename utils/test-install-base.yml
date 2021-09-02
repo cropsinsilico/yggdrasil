@@ -428,7 +428,7 @@ jobs:
         python-version: [3.6]
         install-method: [conda]
         test-flags1: [--long-running --languages python R matlab]
-        test-flags2: [""]
+        test-flags2: [tests/test_services.py --nocapture]
         install-c: [true]
         install-mpi: [false]
       fail-fast: false

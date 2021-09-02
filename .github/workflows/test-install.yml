@@ -987,7 +987,7 @@ jobs:
         test-flags1:
         - --long-running --languages python R matlab
         test-flags2:
-        - ''
+        - tests/test_services.py --nocapture
         install-c:
         - true
         install-mpi:
