@@ -11,7 +11,7 @@ import threading
 from yggdrasil import runner
 from yggdrasil import platform
 from yggdrasil.multitasking import wait_on_function, ValueEvent
-from yggdrasil.tools import YggClass, timer_context
+from yggdrasil.tools import YggClass
 from yggdrasil.config import ygg_cfg
 
 
@@ -240,19 +240,15 @@ class ServiceBase(YggClass):
             object: Response.
 
         """
-        with timer_context(
-                "REQUEST TIME: {elapsed}s ({request}, kwargs={kwargs})",
-                request=request, kwargs=kwargs):
-            request_str = self.serialize(request)
-            assert(self.for_request)
-            # if not self.for_request:
-            #     x = self.__class__(self.name, *self._args,
-            #                        **self._kwargs, for_request=True,
-            #                        address=self.opp_address)
-            # else:
-            #     x = self
-            out = self.process_response(self.call(request_str, **kwargs))
-        return out
+        request_str = self.serialize(request)
+        assert(self.for_request)
+        # if not self.for_request:
+        #     x = self.__class__(self.name, *self._args,
+        #                        **self._kwargs, for_request=True,
+        #                        address=self.opp_address)
+        # else:
+        #     x = self
+        return self.process_response(self.call(request_str, **kwargs))
 
 
 class FlaskService(ServiceBase):
