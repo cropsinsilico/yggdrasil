@@ -81,9 +81,22 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
         from yggdrasil.command_line import package_dir
         before = glob.glob('.coverage*')
         include_dir = os.path.join(package_dir, '*')
+        script_path = 'run_server.py'
+        lines = [
+            'from yggdrasil.services import IntegrationServiceManager',
+            'srv = IntegrationServiceManager('
+            f'    service_type=\'{service_type}\'']
+        if partial_commtype is not None:
+            lines[-1] += f', commtype=\'{partial_commtype}\''
+        lines[-1] += ')'
+        lines.append(f'srv.start_server(with_coverage={with_coverage})')
+        with open(script_path, 'w') as fd:
+            fd.write('\n'.join(lines))
         args = [sys.executable, '-m', 'coverage', 'run', '-p',
-                f'--include={include_dir}'] + args[1:]
-        args += ['start', '--with-coverage']
+                f'--include={include_dir}', script_path]
+        # args = [sys.executable, '-m', 'coverage', 'run', '-p',
+        #         f'--include={include_dir}'] + args[1:]
+        # args += ['start', '--with-coverage']
     verify_flask = (service_type == 'flask')
     if verify_flask:
         # Flask is the default, verify that it is selected
@@ -105,6 +118,8 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
         if p.returncode is None:  # pragma: debug
             p.terminate()
         if with_coverage:
+            if os.path.isfile(script_path):
+                os.remove(script_path)
             after = glob.glob('.coverage*')
             assert(len(after) > len(before))
             print('before: %s\nafter: %s\npackage_dir: %s\ncwd: %s\n'
