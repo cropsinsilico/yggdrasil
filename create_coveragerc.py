@@ -145,13 +145,18 @@ def create_coveragerc(installed_languages):
     # Set include path so that filenames in the report are absolute
     try:
         from yggdrasil.command_line import package_dir
+        section = 'source'
+        if section == 'include':
+            section_path = os.path.join(package_dir, '*')
+        else:
+            section_path = package_dir
         if not cp.has_section('run'):
             cp.add_section('run')
         incl_list = []
-        if cp.has_option('run', 'include'):
-            incl_list = cp.get('run', 'include').strip().split('\n')
-        incl_list.append(os.path.join(package_dir, '*'))
-        cp.set('run', 'include', '\n' + '\n'.join(incl_list))
+        if cp.has_option('run', section):
+            incl_list = cp.get('run', section).strip().split('\n')
+        incl_list.append(section_path)
+        cp.set('run', section, '\n' + '\n'.join(incl_list))
     except ImportError:
         pass
     # Write
