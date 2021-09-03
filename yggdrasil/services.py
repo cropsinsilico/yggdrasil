@@ -633,10 +633,20 @@ def create_service_manager_class(service_type=None):
             if service_type == FlaskService:
                 @self.app.route('/')
                 def landing_page():
-                    return self.respond({'action': 'status',
-                                         'name': None,
-                                         'yamls': None,
-                                         'client_id': None})['status']
+                    from flask import render_template
+                    import yaml
+                    kwargs = {
+                        'address': self.address,
+                        'available': {
+                            k: yaml.dump(v).splitlines()
+                            for k, v in self.registry.registry.items()},
+                        'running': {
+                            k: {k2: v2.printStatus(return_str=True).splitlines()
+                                for k2, v2 in v.items()}
+                            for k, v in self.integrations.items()}}
+                    out = render_template(
+                        'service_manager_index.html', **kwargs)
+                    return out
                 
                 from yggdrasil.communication import RESTComm
                 RESTComm.add_comm_server_to_app(self.app)
@@ -794,12 +804,13 @@ def create_service_manager_class(service_type=None):
                 action = request.pop('action')
                 yamls = request.pop('yamls')
                 client_id = request.pop('client_id')
-                self.integrations.setdefault(client_id, {})
-                self.stopped_integrations.setdefault(client_id, {})
+                if client_id is not None:
+                    self.integrations.setdefault(client_id, {})
+                    self.stopped_integrations.setdefault(client_id, {})
                 if isinstance(name, list):
                     name = tuple(name)
                 if action == 'start':
-                    if yamls is None:
+                    if not yamls:
                         reg = self.registry.registry.get(name, None)
                         if isinstance(name, tuple):
                             yamls = list(name)
