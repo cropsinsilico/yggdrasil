@@ -77,11 +77,12 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
         args.append(f"--commtype={partial_commtype}")
     before = []
     package_dir = None
+    chdir = None
     if with_coverage:
-        # from yggdrasil.command_line import package_dir
+        from yggdrasil.command_line import package_dir
         before = glob.glob('.coverage*')
-        # include_dir = os.path.join(package_dir, '*')
-        script_path = 'run_server.py'
+        script_path = os.path.expanduser(os.path.join('~', 'run_server.py'))
+        chdir = package_dir
         lines = [
             'from yggdrasil.services import IntegrationServiceManager',
             'srv = IntegrationServiceManager(']
@@ -96,6 +97,7 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
         with open(script_path, 'w') as fd:
             fd.write('\n'.join(lines))
         args = [sys.executable, script_path]
+        # include_dir = os.path.join(package_dir, '*')
         # args = [sys.executable, '-m', 'coverage', 'run', '-p',
         #         f'--include={include_dir}', script_path]
         # args = [sys.executable, '-m', 'coverage', 'run', '-p',
@@ -111,7 +113,7 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
     if verify_flask:
         assert(cli.service_type == 'flask')
     assert(not cli.is_running)
-    p = subprocess.Popen(args)
+    p = subprocess.Popen(args, cwd=chdir)
     try:
         cli.wait_for_server()
         yield cli
