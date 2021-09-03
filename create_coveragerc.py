@@ -142,6 +142,18 @@ def create_coveragerc(installed_languages):
             excl_list = rm_excl_rule(excl_list, 'pragma: no %s' % k)
     # Add new rules
     cp.set('report', 'exclude_lines', '\n' + '\n'.join(excl_list))
+    # Set include path so that filenames in the report are absolute
+    try:
+        from yggdrasil.command_line import package_dir
+        if not cp.has_section('run'):
+            cp.add_section('run')
+        incl_list = []
+        if cp.has_option('run', 'include'):
+            incl_list = cp.get('run', 'include').strip().split('\n')
+        incl_list.append(os.path.join(package_dir, '*'))
+        cp.set('run', 'include', '\n' + '\n'.join(incl_list))
+    except ImportError:
+        pass
     # Write
     with open(covrc, 'w') as fd:
         cp.write(fd)

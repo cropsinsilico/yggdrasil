@@ -78,22 +78,26 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
     before = []
     package_dir = None
     if with_coverage:
-        from yggdrasil.command_line import package_dir
+        # from yggdrasil.command_line import package_dir
         before = glob.glob('.coverage*')
-        include_dir = os.path.join(package_dir, '*')
+        # include_dir = os.path.join(package_dir, '*')
         script_path = 'run_server.py'
         lines = [
             'from yggdrasil.services import IntegrationServiceManager',
-            'srv = IntegrationServiceManager('
-            f'    service_type=\'{service_type}\'']
+            'srv = IntegrationServiceManager(']
+        if service_type is not None:
+            lines[-1] += f'service_type=\'{service_type}\''
+            if partial_commtype is not None:
+                lines[-1] += ', '
         if partial_commtype is not None:
-            lines[-1] += f', commtype=\'{partial_commtype}\''
+            lines[-1] += f'commtype=\'{partial_commtype}\''
         lines[-1] += ')'
         lines.append(f'srv.start_server(with_coverage={with_coverage})')
         with open(script_path, 'w') as fd:
             fd.write('\n'.join(lines))
-        args = [sys.executable, '-m', 'coverage', 'run', '-p',
-                f'--include={include_dir}', script_path]
+        args = [sys.executable, script_path]
+        # args = [sys.executable, '-m', 'coverage', 'run', '-p',
+        #         f'--include={include_dir}', script_path]
         # args = [sys.executable, '-m', 'coverage', 'run', '-p',
         #         f'--include={include_dir}'] + args[1:]
         # args += ['start', '--with-coverage']
