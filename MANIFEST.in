@@ -23,6 +23,7 @@ recursive-include yggdrasil/demos *.py
 recursive-include yggdrasil/tests/scripts *.py
 recursive-include yggdrasil/examples Makefile_linux
 recursive-include yggdrasil/examples Makefile_windows
+include yggdrasil/templates/*.html
 include yggdrasil/examples/gs_lesson4/src/Makefile_linux
 include yggdrasil/examples/gs_lesson4/src/Makefile_windows
 recursive-include yggdrasil/languages install.py
