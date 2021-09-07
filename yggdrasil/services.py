@@ -12,7 +12,7 @@ import logging
 from yggdrasil import runner
 from yggdrasil import platform
 from yggdrasil.multitasking import wait_on_function, ValueEvent
-from yggdrasil.tools import YggClass
+from yggdrasil.tools import YggClass, kill
 from yggdrasil.config import ygg_cfg
 
 
@@ -21,11 +21,9 @@ _default_commtype = ygg_cfg.get('services', 'default_comm', None)
 _default_address = ygg_cfg.get('services', 'address', None)
 _client_id = ygg_cfg.get('services', 'client_id', None)
 if platform._is_win:  # pragma: windows
-    _shutdown_signal_send = signal.CTRL_BREAK_EVENT
-    _shutdown_signal_recv = signal.SIGBREAK
+    _shutdown_signal = signal.SIGBREAK
 else:
-    _shutdown_signal_send = signal.SIGTERM
-    _shutdown_signal_recv = signal.SIGTERM
+    _shutdown_signal = signal.SIGTERM
 
 
 class ClientError(BaseException):
@@ -153,10 +151,10 @@ class ServiceBase(YggClass):
         if with_coverage:  # pragma: testing
             def handle_shutdown(sig, frame):
                 sys.exit()
-            signal.signal(_shutdown_signal_recv, handle_shutdown)
+            signal.signal(_shutdown_signal, handle_shutdown)
             # try:
             #     from pytest_cov.embed import cleanup_on_signal
-            #     cleanup_on_signal(_shutdown_signal_recv)
+            #     cleanup_on_signal(_shutdown_signal)
             # except ImportError:  # pragma: debug
             #     pass
         self._is_running = True
@@ -702,7 +700,7 @@ def create_service_manager_class(service_type=None):
             except ClientError:  # pragma: debug
                 return
             if response.get('pid', None):
-                os.kill(response['pid'], _shutdown_signal_send)
+                kill(response['pid'], _shutdown_signal)
             self.shutdown()
 
         def start_integration(self, client_id, x, yamls, **kwargs):

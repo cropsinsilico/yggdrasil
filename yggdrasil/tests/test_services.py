@@ -11,7 +11,7 @@ from yggdrasil.services import (
     IntegrationServiceManager, create_service_manager_class, ServerError)
 from yggdrasil.examples import yamls as ex_yamls
 from yggdrasil.tests import assert_raises, requires_language
-from yggdrasil import runner, import_as_function
+from yggdrasil import runner, import_as_function, platform
 from yggdrasil.tools import is_comm_installed
 
 
@@ -79,12 +79,14 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
         args.append(f"--commtype={partial_commtype}")
     before = []
     package_dir = None
-    chdir = None
+    process_kws = {}
     if with_coverage:
         from yggdrasil.command_line import package_dir
         before = glob.glob('.coverage*')
         script_path = os.path.expanduser(os.path.join('~', 'run_server.py'))
-        chdir = package_dir
+        process_kws['cwd'] = package_dir
+        if platform._is_win:  # pragma: windows
+            process_kws['creationflags'] = subprocess.CREATE_NEW_PROCESS_GROUP
         lines = [
             'from yggdrasil.services import IntegrationServiceManager',
             'srv = IntegrationServiceManager(']
@@ -110,7 +112,7 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
     if verify_flask:
         assert(cli.service_type == 'flask')
     assert(not cli.is_running)
-    p = subprocess.Popen(args, cwd=chdir)
+    p = subprocess.Popen(args, **process_kws)
     try:
         cli.wait_for_server()
         yield cli
