@@ -100,12 +100,6 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
         with open(script_path, 'w') as fd:
             fd.write('\n'.join(lines))
         args = [sys.executable, script_path]
-        # include_dir = os.path.join(package_dir, '*')
-        # args = [sys.executable, '-m', 'coverage', 'run', '-p',
-        #         f'--include={include_dir}', script_path]
-        # args = [sys.executable, '-m', 'coverage', 'run', '-p',
-        #         f'--include={include_dir}'] + args[1:]
-        # args += ['start', '--with-coverage']
     verify_flask = (service_type == 'flask')
     if verify_flask:
         # Flask is the default, verify that it is selected
