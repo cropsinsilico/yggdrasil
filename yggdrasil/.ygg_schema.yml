@@ -21,6 +21,8 @@ definitions:
             are sent/recieved with either columns rather than row by row. Defaults
             to False.'
           type: boolean
+        client_id:
+          type: string
         commtype:
           default: default
           description: Communication mechanism that should be used.
@@ -155,8 +157,8 @@ definitions:
             type: string
           type: array
       required:
-      - name
       - commtype
+      - name
       - datatype
       title: comm_base
       type: object
@@ -197,6 +199,8 @@ definitions:
       - additionalProperties: true
         description: Schema for comm component ['rest'] subtype.
         properties:
+          client_id:
+            type: string
           commtype:
             default: default
             description: RESTful API.
@@ -671,8 +675,8 @@ definitions:
           type: string
       required:
       - name
-      - filetype
       - working_dir
+      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -1757,8 +1761,8 @@ definitions:
       required:
       - name
       - args
-      - language
       - working_dir
+      - language
       title: model_base
       type: object
     - anyOf:

@@ -5,6 +5,7 @@ import pytest
 import subprocess
 import itertools
 import shutil
+import logging
 from contextlib import contextmanager
 from yggdrasil.services import (
     IntegrationServiceManager, create_service_manager_class, ServerError)
@@ -71,6 +72,7 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
     r"""Context manager to run and clean-up an integration service."""
     import glob
     check_settings(service_type, partial_commtype)
+    log_level = logging.ERROR
     args = [sys.executable, "-m", "yggdrasil", "integration-service-manager",
             f"--service-type={service_type}"]
     if partial_commtype is not None:
@@ -93,7 +95,8 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
         if partial_commtype is not None:
             lines[-1] += f'commtype=\'{partial_commtype}\''
         lines[-1] += ')'
-        lines.append(f'srv.start_server(with_coverage={with_coverage})')
+        lines += [f'srv.start_server(with_coverage={with_coverage},',
+                  f'                 log_level={log_level})']
         with open(script_path, 'w') as fd:
             fd.write('\n'.join(lines))
         args = [sys.executable, script_path]

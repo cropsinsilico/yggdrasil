@@ -8,6 +8,7 @@ import yaml
 import pprint
 import functools
 import threading
+import logging
 from yggdrasil import runner
 from yggdrasil import platform
 from yggdrasil.multitasking import wait_on_function, ValueEvent
@@ -114,13 +115,39 @@ class ServiceBase(YggClass):
         r"""Set up the machinery for sending requests."""
         raise NotImplementedError  # pragma: no cover
 
-    def start_server(self, remote_url=None, with_coverage=False):
-        r"""Start the server."""
+    def set_log_level(self, log_level):
+        r"""Set the logging level.
+
+        Args:
+            log_level (int): Logging level.
+
+        """
+        import logging
+        logging.basicConfig(level=log_level)
+
+    def start_server(self, remote_url=None, with_coverage=False,
+                     log_level=None):
+        r"""Start the server.
+
+        Args:
+            remote_url (str optional): Address for the URL that remote
+                integrations will use to connect to this server. Defaults to
+                None and is set based on the YGGDRASIL_SERVICE_HOST_URL
+                environment variable if it is set and is the local address
+                otherwise.
+            with_coverage (bool, optional): If True, the server is started
+                with coverage. Defaults to False.
+            log_level (int, optional): Level of log messages that should be
+                printed. Defaults to None and is ignored.
+
+        """
         if remote_url is None:
             remote_url = os.environ.get('YGGDRASIL_SERVICE_HOST_URL', None)
         if remote_url is None:
             remote_url = self.address
         os.environ.setdefault('YGGDRASIL_SERVICE_HOST_URL', remote_url)
+        if log_level is not None:
+            self.set_log_level(log_level)
         if with_coverage:  # pragma: testing
             def handle_shutdown(sig, frame):
                 sys.exit()
@@ -301,6 +328,20 @@ class FlaskService(ServiceBase):
         r"""Set up the machinery for sending requests."""
         pass
 
+    def set_log_level(self, log_level):
+        r"""Set the logging level.
+
+        Args:
+            log_level (int): Logging level.
+
+        """
+        super(FlaskService, self).set_log_level(log_level)
+        from flask.logging import default_handler
+        werkzeug_logger = logging.getLogger('werkzeug')
+        default_handler.setLevel(level=log_level)
+        self.app.logger.setLevel(level=log_level)
+        werkzeug_logger.setLevel(level=log_level)
+        
     def run_server(self):
         r"""Begin listening for requests."""
         self.app.run(host='0.0.0.0', port=self.port)
