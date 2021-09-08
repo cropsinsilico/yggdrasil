@@ -652,8 +652,8 @@ def create_service_manager_class(service_type=None):
                 yamls = [yamls]
             if name is None:
                 name = yamls
-            request = dict(kwargs, name=name, yamls=yamls, action=action,
-                           client_id=self.client_id)
+            request = dict(kwargs, name=name, yamls=yamls, action=action)
+            request.setdefault('client_id', self.client_id)
             wait_for_complete = ((action in ['start', 'stop', 'shutdown'])
                                  and (service_type != RMQService))
             out = super(IntegrationServiceManager, self).send_request(request)
@@ -817,13 +817,18 @@ def create_service_manager_class(service_type=None):
         @property
         def is_running(self):
             r"""bool: True if the server is running."""
-            if not super(IntegrationServiceManager, self).is_running:  # pragma: debug
+            if not super(IntegrationServiceManager, self).is_running:
                 return False
-            try:
-                response = self.send_request(action='ping')
-                return response['status'] == 'running'
-            except ClientError:
-                return False
+            if self.for_request:
+                try:
+                    response = self.send_request(action='ping')
+                    return response['status'] == 'running'
+                except ClientError:
+                    return False
+            else:  # pragma: debug
+                # This would only occur if a server calls is_running while it
+                # is running (perhaps in a future callback?)
+                return True
 
         def respond(self, request, **kwargs):
             r"""Create a response to the request.

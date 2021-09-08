@@ -24,6 +24,7 @@ Welcome to yggdrasil's documentation!
    units
    hpc
    remote
+   docker
    c_format_strings
    debugging
    threading

@@ -97,8 +97,11 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
         if partial_commtype is not None:
             lines[-1] += f'commtype=\'{partial_commtype}\''
         lines[-1] += ')'
-        lines += [f'srv.start_server(with_coverage={with_coverage},',
-                  f'                 log_level={log_level})']
+        lines += ['remote_url = srv.address.rstrip(\'/\')',
+                  'assert(not srv.is_running)',
+                  f'srv.start_server(with_coverage={with_coverage},',
+                  f'                 log_level={log_level},',
+                  '                 remote_url=remote_url)']
         with open(script_path, 'w') as fd:
             fd.write('\n'.join(lines))
         args = [sys.executable, script_path]
@@ -233,6 +236,7 @@ class TestServices(object):
             r = requests.get(cli.address)
             r.raise_for_status()
         cli.send_request(test_yml, action='status')
+        cli.send_request(action='status', client_id=None)
         cli.send_request(test_yml, yamls=test_yml, action='stop')
         assert_raises(ServerError, cli.send_request,
                       ['invalid'], action='stop')

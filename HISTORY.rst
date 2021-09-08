@@ -16,11 +16,15 @@ History
 * Added ValueEvent class for returning a value with the event
 * Added methods for waiting on a function to return True
 * Refactored multitasking classes to use __slots__ for improved memory performance
+* Added tools for building yggdrasil docker containers
 
 TODO
 ....
 
 * Add tutorial on setting up a service
+* Add docs on Docker building
+* Add docker tool for creating an executable
+* Disable cloning Git repositories based on YAML for services
 
 
 1.7.0 (2021-08-26) Support for MPI communicators, MPI execution, and pika >= 1.0.0

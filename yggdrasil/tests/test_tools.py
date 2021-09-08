@@ -100,6 +100,12 @@ def test_str2bytes():
         assert_equal(tools.str2bytes(x, recurse=True), exp)
 
 
+def test_timer_context():
+    r"""Test timer_context."""
+    with tools.timer_context("Test timeout: {elapsed}"):
+        print("timer context body")
+
+
 def test_display_source():
     r"""Test display_source."""
     fname = os.path.abspath(__file__)

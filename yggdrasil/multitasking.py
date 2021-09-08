@@ -413,10 +413,7 @@ class ContextObject(MultiObject):
     @classmethod
     def get_base_class(cls, context):
         r"""Get instance of base class that will be represented."""
-        if cls._base_class_name is None:
-            name = cls.__name__
-        else:
-            name = cls._base_class_name
+        name = cls._base_class_name
         context.check_for_base(name)
         return getattr(context._base, name)
 
