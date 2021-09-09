@@ -1,8 +1,8 @@
 .. _remote_rst:
 
 
-Running Integrations as Remote Services
-=======================================
+Running Integrations as Services
+================================
 
 In release 1.7.1, the ability to run models as services that can be accessed by integrations running on remote machines was added to |yggdrasil|. This feature allows models (or sets of models) to be exposed for external use without the need to have the model source code or install it on your local machine. It is intended to make it easier for scientists to share models and foster collaboration. Future releases will include tools for exploring remote models & integrations via visualizations.
 
@@ -22,6 +22,10 @@ Host Requirements
 
   Since the service manager must continue running, in many cases, you will want to start it as a background process.
 
+.. note::
+
+   For convenience, there are Docker images available that launch the service manager as a web application using `gunicorn <https://gunicorn.org/>`_. See the documentation :ref:`here <service_docker_rst>` for additional details about the Docker images and how to use them.
+
 Registering Integrations
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -36,6 +40,10 @@ For example, to register the photosynthesis model from the :ref:`fakeplant examp
   $ yggdrasil integration-service-manager register photosynthesis yggdrasil/examples/fakeplant/photosynthesis.yml
 
 When a remote integration connects to the service manager and requests the ``photosynthesis`` integration service, the model will be started and channels will be opened to its inputs (``light_intensity``, ``temperature``, ``co2``) and outputs (``photosynthesis_rate``). The remote integration can make connections to these channels in the same way it would if the ``photosynthesis`` model (and it's YAML) were part of the integration.
+
+.. note::
+
+   For security, YAML files located in remote Git repositories will not be allowed as part of integrations that the service manager runs.
 
 
 Registering Multiple Integrations at Once
@@ -99,12 +107,7 @@ Multiple services can also be included in the same entry. For example, if there 
        address: http://another_remote_service_manager_url/
 
 
-Cookie Cutter
--------------
-
-TODO
-
 Performance
 -----------
 
-It is important to keep in mind that connecting to remote integrations over an internet connection introduces a great deal of overhead and a certain degree of fragility into integrations that is not present when all models are running locally. Such connections between models make integrations dependent on the speed and reliability of the internet both at the host and client. If performant and table communication times are import for your use case, we advise looking for a way to run the integrations locally.
+It is important to keep in mind that connecting to remote integrations over an internet connection introduces a great deal of overhead and a certain degree of fragility into integrations that is not present when all models are running locally. Such connections between models make integrations dependent on the speed and reliability of the internet connection both at the host and client. If performant and stable communication times are import for your use case, we advise looking for a way to run the integrations locally.

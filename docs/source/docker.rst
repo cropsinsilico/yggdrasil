@@ -62,6 +62,47 @@ For convenience, you can also download/copy the Python script located `here <htt
 
 In addition, this script allows the paths to the YAMLs to be relative rather than absolute and, if passed the ``--pull-docker-image`` flag, it can pull the latest executable image before running it.
 
+.. _service_docker_rst:
+
+Service Images
+--------------
+
+|yggdrasil| also provides images that run |yggdrasil|'s :ref:`integration service manager <remote_rst>` as a web application. As the service images do not contain any services by default, these images are best used as bases for building your own Docker image that copies in a file containing a mapping of integrations that should be exposed as services and those directories containing models.
+
+For example, if you have a services file ``services.yml`` that defines two integrations.
+
+.. code-block:: yaml
+
+   foo:
+     - foo/model.yml
+   bar:
+     - bar/modelA.yml
+     - oth/modelB.yml
+
+Then the Dockerfile that will be able to run those services is
+
+.. code-block:: docker
+
+   FROM cropsinsilico/yggdrasil-service:1.7.0
+   COPY services.yml .
+   COPY foo ./foo
+   COPY bar ./bar
+   COPY oth ./oth
+
+After building, the new Docker image (e.g. ``docker build -t my-yggdrasil-service .``), the app is started by running the image, taking care to set the port that will be used by the app via an environment variable::
+
+  $ docker run --env PORT=5000 my-yggdrasil-service
+
+The port that should be used in production will be determined by the host machine (e.g. a port exposed on a cloud resource). Such derived Docker images are also suitable for deployment via the `Heroku <https://www.heroku.com/>`_ platform (see `this <https://devcenter.heroku.com/articles/container-registry-and-runtime>`_ tutorial on registering Docker images with Heroku).
+
+.. note::
+
+   The |yggdrasil| service manager application automatically looks for a ``services.yml`` file in the ``WORKDIR`` for the container at startup. If you put the file in another location or give it another name, you will need to set the ``INTEGRATION_SERVICES`` environment variable for the container to the file's path.
+
+.. note::
+
+   For security, YAML files located in remote Git repositories will not be allowed as part of integrations that the service manager runs; such repositories should be cloned in the Docker image instead.
+
 
 Development Images
 ------------------
@@ -81,10 +122,10 @@ The ``utils/build_docker.py`` from the |yggdrasil| repository can be used to bui
 
 To build a new Docker image containing the tagged release, ``RELEASE``, run::
 
-  $ python utils/build_docker.py release RELEASE
+  $ python utils/build_docker.py --release RELEASE
 
 To build a new Docker image containing commit, ``COMMIT``, run::
 
-  $ python utils/build_docker.py commit COMMIT
+  $ python utils/build_docker.py --commit COMMIT
 
-If you add the ``--push`` flag to either of these commands, the image will be pushed to DockerHub after it is built. If you add the ``--executable`` flag, the image will be built such that it exposes the |yggdrasil| CLI and can be used as an executable image in the way described above.
+If you add the ``--push`` flag to either of these commands, the image will be pushed to DockerHub after it is built. If you add the ``executable`` argument, the image will be built such that it exposes the |yggdrasil| CLI and can be used as an executable image in the way described above. If you add the ``service`` argument, a service image with the specified release/commit will be built.

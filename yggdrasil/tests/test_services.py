@@ -70,19 +70,16 @@ def check_settings(service_type, partial_commtype=None):
 @contextmanager
 def running_service(service_type, partial_commtype=None, with_coverage=False):
     r"""Context manager to run and clean-up an integration service."""
-    import glob
     check_settings(service_type, partial_commtype)
     log_level = logging.ERROR
     args = [sys.executable, "-m", "yggdrasil", "integration-service-manager",
             f"--service-type={service_type}"]
     if partial_commtype is not None:
         args.append(f"--commtype={partial_commtype}")
-    before = []
     package_dir = None
     process_kws = {}
     if with_coverage:
         from yggdrasil.command_line import package_dir
-        before = glob.glob('.coverage*')
         script_path = os.path.expanduser(os.path.join('~', 'run_server.py'))
         process_kws['cwd'] = package_dir
         if platform._is_win:  # pragma: windows
@@ -126,10 +123,6 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
         if with_coverage:
             if os.path.isfile(script_path):
                 os.remove(script_path)
-            after = glob.glob('.coverage*')
-            # assert(len(after) > len(before))
-            print('before: %s\nafter: %s\npackage_dir: %s\ncwd: %s\n'
-                  % (before, after, package_dir, os.getcwd()))
 
 
 def _make_ids(ids):
@@ -220,6 +213,13 @@ class TestServices(object):
         finally:
             if os.path.isfile(remote_yml):
                 os.remove(remote_yml)
+
+    def test_git_fails(self, running_service):
+        r"""Test that sending a request for a git YAML fails."""
+        cli = running_service
+        test_yml = ("git:https://github.com/cropsinsilico/example-fakemodel/"
+                    "fakemodel.yml")
+        assert_raises(ServerError, cli.send_request, test_yml, action='start')
 
     def test_integration_service(self, running_service):
         r"""Test starting/stopping an integration service via flask/rmq."""

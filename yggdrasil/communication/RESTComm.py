@@ -124,9 +124,10 @@ class RESTComm(CommBase.CommBase):
             dict: Keyword arguments for opposite comm object.
 
         """
+        from yggdrasil.services import _service_host_env
         out = super(RESTComm, self).opp_comm_kwargs(for_yaml=for_yaml)
-        if 'YGGDRASIL_SERVICE_HOST_URL' in os.environ:
-            out['host'] = os.environ['YGGDRASIL_SERVICE_HOST_URL']
+        if _service_host_env in os.environ:
+            out['host'] = os.environ[_service_host_env]
             out['address'] = out['address'].replace(self.host.rstrip('/'),
                                                     out['host'].rstrip('/'))
         else:

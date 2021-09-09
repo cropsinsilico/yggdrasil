@@ -16,6 +16,7 @@ from yggdrasil.tools import YggClass, kill
 from yggdrasil.config import ygg_cfg
 
 
+_service_host_env = 'YGGDRASIL_SERVICE_HOST_URL'
 _default_service_type = ygg_cfg.get('services', 'default_type', 'flask')
 _default_commtype = ygg_cfg.get('services', 'default_comm', None)
 _default_address = ygg_cfg.get('services', 'address', None)
@@ -142,10 +143,10 @@ class ServiceBase(YggClass):
 
         """
         if remote_url is None:
-            remote_url = os.environ.get('YGGDRASIL_SERVICE_HOST_URL', None)
+            remote_url = os.environ.get(_service_host_env, None)
         if remote_url is None:
             remote_url = self.address
-        os.environ.setdefault('YGGDRASIL_SERVICE_HOST_URL', remote_url)
+        os.environ.setdefault(_service_host_env, remote_url)
         if log_level is not None:
             self.set_log_level(log_level)
         if with_coverage:  # pragma: testing

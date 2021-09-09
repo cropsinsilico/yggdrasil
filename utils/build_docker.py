@@ -1,11 +1,13 @@
 import os
 import argparse
 import subprocess
+import json
+import urllib.request
 _utils_dir = os.path.dirname(__file__)
 
 
 def build(dockerfile, tag, flags=[], repo='cropsinsilico/yggdrasil',
-          context='.'):
+          context=_utils_dir):
     r"""Build a docker image.
 
     Args:
@@ -16,7 +18,8 @@ def build(dockerfile, tag, flags=[], repo='cropsinsilico/yggdrasil',
         repo (str, optional): DockerHub repository that the image will be
             pushed to. Defaults to 'cropsinsilico/yggdrasil'.
         context (str, optional): Directory that should be provided as the
-            context for the image. Defaults to '.'.
+            context for the image. Defaults to the directory containing this
+            script.
 
     """
     args = ['docker', 'build', '-t', f'{repo}:{tag}', '-f', dockerfile] + flags
@@ -38,7 +41,8 @@ def push_image(tag, repo='cropsinsilico/yggdrasil'):
 
 
 def params_release(version):
-    r"""Build a docker image containing an yggdrasil release.
+    r"""Get parameters to build a docker image containing an yggdrasil
+    release.
 
     Args:
         version (str): Release version to install in the image.
@@ -47,18 +51,22 @@ def params_release(version):
         dict: Docker build parameters.
 
     """
+    if version is None:
+        url = "https://api.github.com/repos/cropsinsilico/yggdrasil/tags"
+        tags = json.loads(urllib.request.urlopen(url).read())
+        version = max(tags, key=lambda x: x['name'])['name'].lstrip('v')
     dockerfile = os.path.join(_utils_dir, 'commit.Docker')
-    # dockerfile = os.path.join(_utils_dir, 'release.Docker')
     tag = f'v{version}'
     flags = ['--build-arg', f'commit=tags/v{version}']
+    # dockerfile = os.path.join(_utils_dir, 'release.Docker')
     # flags = ['--build-arg', f'version={version}']
     repo = 'cropsinsilico/yggdrasil'
     return dict(dockerfile=dockerfile, tag=tag, flags=flags, repo=repo)
 
 
 def params_commit(commit):
-    r"""Build a docker image containing a version of yggdrasil specific to a
-    commit.
+    r"""Get parameters to build a docker image containing a version of
+    yggdrasil specific to a commit.
 
     Args:
         commit (str): ID for commit to install from the yggdrasil git repo.
@@ -74,9 +82,10 @@ def params_commit(commit):
     return dict(dockerfile=dockerfile, tag=tag, flags=flags, repo=repo)
 
 
-def build_executable(params):
-    r"""Build a docker image containing a version of yggdrasil specific to a
-    commit or tagged release that can be used as an executable.
+def params_executable(params):
+    r"""Get parameters to build a docker image containing a version of
+    yggdrasil specific to a commit or tagged release that can be used as an
+    executable.
 
     Args:
         params (dict): Docker build parameters set based on the base type.
@@ -93,41 +102,67 @@ def build_executable(params):
     return dict(dockerfile=dockerfile, tag=tag, flags=flags, repo=repo)
 
 
+def params_service(params):
+    r"""Get parameters to build a docker image containing a version of
+    yggdrasil sepcific to a commit or tagged release that runs an yggdrasil
+    integration service manager.
+
+    Args:
+        params (dict): Docker build parameters set based on the base type.
+
+    Returns:
+        dict: Docker build parameters.
+
+    """
+    dockerfile = os.path.join(_utils_dir, 'service.Docker')
+    repo = params["repo"]
+    tag = params["tag"]
+    flags = ['--build-arg', f'base={repo}:{tag}']
+    repo = repo.replace('yggdrasil', 'yggdrasil-service')
+    return dict(dockerfile=dockerfile, tag=tag, flags=flags, repo=repo)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         "Build a docker image containing a version of yggdrasil.")
+    # parser.add_argument(
+    #     "type", type=str, default="environment",
+    #     choices=["environment", "executable", "service"],
+    #     help=("Type of docker image that should be built."
+    #           ""))
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        "--version", type=str,
+        help="Yggdrasil release that should be installed in the image.")
+    group.add_argument(
+        "--commit", type=str,
+        help="Yggdrasil commit that should be installed in the image.")
+    parser.add_argument(
+        "--push", action="store_true",
+        help="After successfully building the image, push it to DockerHub.")
     subparsers = parser.add_subparsers(
         dest="type",
-        help="Type of docker image that should be built.")
-    parser_rel = subparsers.add_parser(
-        "release", help="Build a docker image containing tagged release.")
-    parser_rel.add_argument(
-        "version", type=str,
-        help="Release version that should be installed in the image.")
-    parser_com = subparsers.add_parser(
-        "commit", help="Build a docker image containing a specific commit.")
-    parser_com.add_argument(
-        "commit", type=str,
-        help="Commit ID that should be installed in the image.")
-    joint_args = [
-        (("--push", ),
-         {"action": "store_true",
-          "help": ("After successfully building the image, push it to "
-                   "DockerHub.")}),
-        (("--executable", ),
-         {"action": "store_true",
-          "help": ("Build the image so that it can be used as an "
-                   "executable.")})]
-    for iparser in [parser_rel, parser_com]:
-        for ia, ik in joint_args:
-            iparser.add_argument(*ia, **ik)
+        help=("Type of docker image that should be built "
+              "(Defaults to 'environment')."))
+    parser_env = subparsers.add_parser(
+        "environment",
+        help="Image that will be used as a virutal environment.")
+    parser_exe = subparsers.add_parser(
+        "executable",
+        help="Executable image for running yggdrasil integrations.")
+    parser_srv = subparsers.add_parser(
+        "service",
+        help=("Service image for running a yggdrasil integrations service "
+              "manager web application."))
     args = parser.parse_args()
-    if args.type == 'release':
-        params = params_release(args.version)
-    elif args.type == 'commit':
+    if args.commit:
         params = params_commit(args.commit)
-    if args.executable:
-        params = build_executable(params)
+    else:
+        params = params_release(args.version)
+    if args.type == 'executable':
+        params = params_executable(params)
+    elif args.type == 'service':
+        params = params_service(params)
     dockerfile = params.pop('dockerfile')
     tag = params.pop('tag')
     build(dockerfile, tag, **params)

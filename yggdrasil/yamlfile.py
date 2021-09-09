@@ -10,7 +10,7 @@ from yggdrasil.schema import standardize, get_schema
 from urllib.parse import urlparse
 from yaml.constructor import (
     ConstructorError, BaseConstructor, Constructor, SafeConstructor)
-from yggdrasil.services import IntegrationServiceManager
+from yggdrasil.services import IntegrationServiceManager, _service_host_env
 
 
 class YAMLSpecificationError(RuntimeError):
@@ -82,6 +82,10 @@ def load_yaml(fname):
             fname = os.path.join(*splitpath)
             # check to see if the file already exists, and clone if it does not
             if not os.path.exists(fname):
+                if os.environ.get(_service_host_env, False):
+                    raise RuntimeError("Cloning of unvetted git repo is "
+                                       "not permitted on a integration "
+                                       "service manager.")
                 # create the url for cloning the repo
                 cloneurl = parsed.scheme + '://' + parsed.netloc + '/' + owner + '/' +\
                     reponame

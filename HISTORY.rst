@@ -2,7 +2,7 @@
 History
 =======
 
-1.7.1 (XXXX-XX-XX) Support for REST API based communicators, running integrations as services, and connecting to remote integration services
+1.7.1 (2021-09-09) Support for REST API based communicators, running integrations as services, and connecting to remote integration services
 ------------------
 
 * Added option to return printStatus string for YggClass subclasses via return_str keyword
@@ -16,15 +16,7 @@ History
 * Added ValueEvent class for returning a value with the event
 * Added methods for waiting on a function to return True
 * Refactored multitasking classes to use __slots__ for improved memory performance
-* Added tools for building yggdrasil docker containers
-
-TODO
-....
-
-* Add tutorial on setting up a service
-* Add docs on Docker building
-* Add docker tool for creating an executable
-* Disable cloning Git repositories based on YAML for services
+* Added tools for building yggdrasil docker containers and documentation on those tools
 
 
 1.7.0 (2021-08-26) Support for MPI communicators, MPI execution, and pika >= 1.0.0

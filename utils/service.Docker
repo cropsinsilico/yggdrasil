@@ -1,0 +1,12 @@
+ARG base
+FROM $base
+
+RUN source /opt/conda/etc/profile.d/conda.sh && \
+    conda activate env && \
+    conda install gunicorn
+
+COPY wsgi.py .
+
+ENTRYPOINT ["conda", "run", "-n", "env"]
+
+CMD ["gunicorn", "-t", "150", "--bind", "0.0.0.0:$PORT", "wsgi:app"]
