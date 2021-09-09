@@ -91,6 +91,9 @@ class DummyModelDriver(InterpretedModelDriver):
                     out['is_server'] = {io2: x['name'],
                                         io1: x['name'] + '_response'}
         for io1, io2 in dir2opp.items():
-            if not out[io2 + 's']:
-                out.pop(io2 + 's')
+            assert(out[io2 + 's'])
+            # TODO: Is there a case where a DummyModelDriver will be created
+            # for a model that does not have inputs or outputs?
+            # if not out[io2 + 's']:
+            #     out.pop(io2 + 's')
         return out

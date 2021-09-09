@@ -97,11 +97,9 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
         if partial_commtype is not None:
             lines[-1] += f'commtype=\'{partial_commtype}\''
         lines[-1] += ')'
-        lines += ['remote_url = srv.address.rstrip(\'/\')',
-                  'assert(not srv.is_running)',
+        lines += ['assert(not srv.is_running)',
                   f'srv.start_server(with_coverage={with_coverage},',
-                  f'                 log_level={log_level},',
-                  '                 remote_url=remote_url)']
+                  f'                 log_level={log_level})']
         with open(script_path, 'w') as fd:
             fd.write('\n'.join(lines))
         args = [sys.executable, script_path]
