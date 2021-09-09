@@ -52,6 +52,7 @@ requirements:
     - sysv_ipc  # [unix]
     - zeromq
   run:
+    - chevron
     - cmake  # [not win]
     - czmq
     - flaky
@@ -65,7 +66,6 @@ requirements:
     - pyperf
     - pint  # [py2k]
     - psutil
-    - pystache
     - python
     - python-rapidjson  # [not py2k]
     - pyyaml

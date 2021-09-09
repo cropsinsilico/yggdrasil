@@ -5,7 +5,7 @@ import shutil
 import subprocess
 import tempfile
 import logging
-import pystache
+import chevron
 import io as sio
 import warnings
 import xml.etree.ElementTree as ET
@@ -203,7 +203,7 @@ class OSRModelDriver(ExecutableModelDriver):
         """
         with open(src, 'r') as fd:
             src_contents = fd.read()
-        src_contents = pystache.render(
+        src_contents = chevron.render(
             sio.StringIO(src_contents).getvalue(), self.set_env())
         root = ET.fromstring(src_contents)
         timesync = self.timesync

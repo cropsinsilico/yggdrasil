@@ -1,7 +1,7 @@
 import os
 import copy
 import pprint
-import pystache
+import chevron
 import yaml
 import json
 import git
@@ -101,7 +101,7 @@ def load_yaml(fname):
             fname = os.path.join(os.getcwd(), 'stream')
     # Mustache replace vars
     yamlparsed = fd.read()
-    yamlparsed = pystache.render(
+    yamlparsed = chevron.render(
         sio.StringIO(yamlparsed).getvalue(), dict(os.environ))
     if fname.endswith('.json'):
         yamlparsed = json.loads(yamlparsed)
