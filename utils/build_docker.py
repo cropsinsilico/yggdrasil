@@ -86,9 +86,9 @@ def build_executable(params):
 
     """
     dockerfile = os.path.join(_utils_dir, 'executable.Docker')
-    repo = params["tag"]
+    repo = params["repo"]
     tag = params["tag"]
-    flags = ['--build-arg', f'base_image={repo}:{tag}']
+    flags = ['--build-arg', f'base={repo}:{tag}']
     repo = repo.replace('yggdrasil', 'yggdrasil-executable')
     return dict(dockerfile=dockerfile, tag=tag, flags=flags, repo=repo)
 

@@ -33,6 +33,10 @@ This will start a container using the image and will open a command prompt with 
   $ docker run -it --volume=/path/to/model:/model_vol cropsinsilico/yggdrasil
 
 You will then be able to access the model from inside the container and can run integrations using that model.
+
+.. note::
+
+   If the directory being mounted is not in the directory that the ``docker run`` command is being issued from, the path will need to be absolute.
   
 
 Executable Images
@@ -42,9 +46,21 @@ In addition to release images, an executable image will be published for each ta
 
   $  docker pull cropsinsilico/yggdrasil-executable
 
-Executable images are different than the release images in that they are meant to be treated as an executable and can be used to run integrations using |yggdrasil| without opening the container command line.
+Executable images are different than the release images in that they are meant to be treated as an executable and can be used to run integrations using |yggdrasil| without opening the container command line. Running the image without any arguments will display the help for the ``yggrun`` CLI.::
 
-TODO
+  $ docker run -it cropsinsilico/yggdrasil-executable
+
+YAML specification files (and any other ``yggrun`` flags) can be passed to this command to run an integration. If they are not located in a Git repository (see :ref:`this discussion <git_models_rst>` for a discussion of using repo-base models), then they must be added to the container via a mounted volume and the path provided to the command should be relative to the directory that the volume is mounted at in the container.
+
+For example, if you want to use a YAML, ``/path/to/model/model.yml`` that uses models in the ``/path/to/model/`` directory, you would add the directory containing the YAML as a volume and call the executable with YAML as input as follows::
+
+  $ docker run -it --volume=/path/to/model/:/model_vol cropsinsilico/yggdrasil-executable /model_vol/model.yml
+
+For convenience, you can also download/copy the Python script located `here <https://github.com/cropsinsilico/yggdrasil/blob/main/utils/run_docker.py>`_, which allows you to just specify the paths to the YAMLs and any other ``yggrun`` options (it will set the volumes based on the directories containing the YAMLs). The above example would then be::
+
+  $ python run_docker.py /model_vol/model.yml
+
+In addition, this script allows the paths to the YAMLs to be relative rather than absolute and, if passed the ``--pull-docker-image`` flag, it can pull the latest executable image before running it.
 
 
 Development Images

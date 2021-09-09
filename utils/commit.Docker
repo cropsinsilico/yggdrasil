@@ -30,5 +30,5 @@ RUN source /opt/conda/etc/profile.d/conda.sh && \
     conda activate env && \
     yggcompile
 RUN echo "conda activate env" > ~/.bashrc
-
+WORKDIR /home
 CMD ["/bin/bash", "--login"]
