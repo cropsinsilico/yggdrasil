@@ -42,7 +42,7 @@ requirements:
   host:
     - czmq
     - pip
-    - python
+    - python >=3.6
     - r-base
     - r-bit64
     - r-r6
@@ -58,7 +58,8 @@ requirements:
     - flaky
     - flask
     - git
-    - GitPython
+    - GitPython <=3.1.20  # [py==36]
+    - GitPython  # [py>36]
     - jsonschema
     - matplotlib-base
     - numpy >=1.13.0
@@ -66,7 +67,7 @@ requirements:
     - pyperf
     - pint  # [py2k]
     - psutil
-    - python
+    - python >=3.6
     - python-rapidjson  # [not py2k]
     - pyyaml
     - pyzmq
