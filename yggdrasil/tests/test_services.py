@@ -219,7 +219,8 @@ class TestServices(object):
         cli = running_service
         test_yml = ("git:https://github.com/cropsinsilico/example-fakemodel/"
                     "fakemodel.yml")
-        assert_raises(ServerError, cli.send_request, test_yml, action='start')
+        assert_raises(ServerError, cli.send_request, yamls=test_yml,
+                      action='start')
 
     def test_integration_service(self, running_service):
         r"""Test starting/stopping an integration service via flask/rmq."""
