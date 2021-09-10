@@ -425,11 +425,11 @@ def build_pkg(method, python=None, return_commands=False,
             build_flags += ' --no-test'
         cmds += [
             "%s clean --all" % CONDA_CMD]  # Might invalidate cache
-        if _is_win and _on_gha:
-            cmds += ["rm C:\\Miniconda\\python.exe"]
+        if not (_is_win and _on_gha):
+            cmds += [
+                # "%s deactivate" % CONDA_CMD,
+                "%s update --all" % CONDA_CMD]
         cmds += [
-            # "%s deactivate" % CONDA_CMD,
-            "%s update --all" % CONDA_CMD,
             "%s install -q -n base conda-build conda-verify" % CONDA_CMD,
             "%s build %s --python %s %s" % (
                 CONDA_CMD, 'recipe', python, build_flags),
