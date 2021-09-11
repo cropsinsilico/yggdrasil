@@ -1049,8 +1049,6 @@ def install_pkg(method, python=None, without_build=False,
         except subprocess.CalledProcessError:
             pass
     if method == 'conda':
-        if _is_osx:
-            subprocess.call(["memory_pressure"])
         src_dir = os.path.join(os.getcwd(),
                                os.path.dirname(os.path.dirname(__file__)))
         subprocess.call([python_cmd, "create_coveragerc.py"], cwd=src_dir)
