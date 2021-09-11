@@ -10,7 +10,6 @@ from yggdrasil.schema import standardize, get_schema
 from urllib.parse import urlparse
 from yaml.constructor import (
     ConstructorError, BaseConstructor, Constructor, SafeConstructor)
-from yggdrasil.services import IntegrationServiceManager, _service_host_env
 
 
 class YAMLSpecificationError(RuntimeError):
@@ -54,6 +53,7 @@ def load_yaml(fname):
         dict: Contents of yaml file.
 
     """
+    from yggdrasil.services import _service_host_env
     opened = False
     if isinstance(fname, dict):
         yamlparsed = copy.deepcopy(fname)
@@ -132,6 +132,7 @@ def prep_yaml(files):
         dict: YAML ready to be parsed using schema.
 
     """
+    from yggdrasil.services import IntegrationServiceManager
     # Load each file
     if not isinstance(files, list):
         files = [files]
