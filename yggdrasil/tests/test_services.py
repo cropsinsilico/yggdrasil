@@ -219,6 +219,8 @@ class TestServices(object):
         cli = running_service
         test_yml = ("git:https://github.com/cropsinsilico/example-fakemodel/"
                     "fakemodel.yml")
+        if os.path.isfile("cropsinsilico/example-fakemodel/fakemodel.yml"):
+            shutil.rmtree("cropsinsilico")
         assert_raises(ServerError, cli.send_request, yamls=test_yml,
                       action='start')
 
