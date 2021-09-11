@@ -1041,11 +1041,13 @@ def install_pkg(method, python=None, without_build=False,
                                  cwd=_pkg_dir))
     # Follow up if on Unix as R installation may require sudo
     if install_opts['R'] and _is_unix:
-        # cmds.append('ygginstall r --sudoR')
         R_cmd = ["ygginstall", "r"]
         if not install_opts['no_sudo']:
             R_cmd.append("--sudoR")
-        subprocess.check_call(R_cmd)
+        try:
+            subprocess.check_call(R_cmd)
+        except subprocess.CalledProcessError:
+            pass
     if method == 'conda':
         src_dir = os.path.join(os.getcwd(),
                                os.path.dirname(os.path.dirname(__file__)))
