@@ -12,7 +12,7 @@ from yggdrasil.services import (
 from yggdrasil.examples import yamls as ex_yamls
 from yggdrasil.tests import assert_raises, requires_language
 from yggdrasil import runner, import_as_function, platform
-from yggdrasil.tools import is_comm_installed
+from yggdrasil.tools import is_comm_installed, remove_path
 
 
 def get_skips(service_type, partial_commtype=None, check_running=False):
@@ -220,7 +220,7 @@ class TestServices(object):
         test_yml = ("git:https://github.com/cropsinsilico/example-fakemodel/"
                     "fakemodel.yml")
         if os.path.isfile("cropsinsilico/example-fakemodel/fakemodel.yml"):
-            shutil.rmtree("cropsinsilico")
+            remove_path("cropsinsilico", timeout=10.0)
         assert_raises(ServerError, cli.send_request, yamls=test_yml,
                       action='start')
 

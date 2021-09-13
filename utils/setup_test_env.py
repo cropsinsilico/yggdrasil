@@ -997,6 +997,7 @@ def install_pkg(method, python=None, without_build=False,
         else:
             index_channel = "file:/%s" % CONDA_INDEX
         cmds += [
+            "%s config --add channels %s" % (CONDA_CMD, index_channel),
             # Related issues if this stops working again
             # https://github.com/conda/conda/issues/466#issuecomment-378050252
             "%s install %s --update-deps -c %s yggdrasil" % (
