@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import warnings
 import difflib
+import copy
 from datetime import datetime
 PYVER = ('%s.%s' % sys.version_info[:2])
 PY2 = (sys.version_info[0] == 2)
@@ -1044,14 +1045,15 @@ def install_pkg(method, python=None, without_build=False,
         R_cmd = ["ygginstall", "r"]
         if not install_opts['no_sudo']:
             R_cmd.append("--sudoR")
-        try:
-            subprocess.check_call(R_cmd)
-        except subprocess.CalledProcessError:
-            pass
+        subprocess.check_call(R_cmd)
     if method == 'conda':
+        env = copy.copy(os.environ)
+        if (not install_opts['no_sudo']) and install_opts['R']:
+            env['YGG_USE_SUDO_FOR_R'] = '1'
         src_dir = os.path.join(os.getcwd(),
                                os.path.dirname(os.path.dirname(__file__)))
-        subprocess.call([python_cmd, "create_coveragerc.py"], cwd=src_dir)
+        subprocess.check_call([python_cmd, "create_coveragerc.py"],
+                              cwd=src_dir, env=env)
 
 
 def verify_pkg(install_opts=None):
