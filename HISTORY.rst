@@ -2,7 +2,7 @@
 History
 =======
 
-1.8.0 (2021-09-10) Support for REST API based communicators, running integrations as services, and connecting to remote integration services
+1.8.0 (2021-09-14) Support for REST API based communicators, running integrations as services, and connecting to remote integration services
 ------------------
 
 * Added option to return printStatus string for YggClass subclasses via return_str keyword

@@ -276,8 +276,9 @@ class OSRModelDriver(ExecutableModelDriver):
         if dest is None:
             dest = os.path.join(tempfile.gettempdir(), 'OpenSimRoot')
         if not os.path.isdir(dest):  # pragma: config
-            git.Repo.clone_from(cls.repository_url, dest,
-                                branch=cls.repository_branch)
+            repo = git.Repo.clone_from(cls.repository_url, dest,
+                                       branch=cls.repository_branch)
+            repo.close()
         return dest
         
     @classmethod
