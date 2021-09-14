@@ -193,7 +193,7 @@ def get_json_schema(fname_dst=None):
     return out
 
 
-def get_model_form_schema(fname_dst=None):
+def get_model_form_schema(fname_dst=None, **kwargs):
     r"""Return the yggdrasil schema that can be used to generate a form
     for creating a model specification file.
 
@@ -201,6 +201,8 @@ def get_model_form_schema(fname_dst=None):
         fname_dst (str, optional): Full path to file where the JSON
             schema should be saved. Defaults to None and no file is
             created.
+        **kwargs: Additional keyword arguments are passed to the json.dump
+            call if fname_dst is provided and ignored otherwise.
 
     Returns:
         dict: Schema structure.
@@ -210,7 +212,7 @@ def get_model_form_schema(fname_dst=None):
     out = s.model_form_schema
     if fname_dst is not None:
         with open(fname_dst, 'w') as fd:
-            json.dump(out, fd)
+            json.dump(out, fd, **kwargs)
     return out
 
 
@@ -930,24 +932,51 @@ class SchemaRegistry(object):
                     {"$ref": "#/definitions/serializer"})
         prop_add = {
             'model': {'contact_email': {'type': 'string'}}}
+        prop_replace = {
+            'comm': {
+                'transform': {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/transform"}}}}
         prop_required = {
             'model': ['args', 'inputs', 'outputs', 'repository_url']}
         prop_remove = {
-            'comm': ['is_default', 'length_map', 'serializer'],
+            'comm': ['is_default', 'length_map', 'serializer',
+                     'address', 'dont_copy', 'for_service',
+                     'send_converter', 'recv_converter', 'client_id',
+                     'cookies', 'host', 'params', 'port'],
             'file': ['is_default', 'length_map',
                      'wait_for_creation', 'working_dir',
                      'read_meth', 'in_temp',
-                     'serializer', 'datatype'],
+                     'serializer', 'datatype',
+                     'address', 'dont_copy', 'for_service',
+                     'send_converter', 'recv_converter', 'client_id',
+                     'cookies', 'host', 'params', 'port'],
             'model': ['client_of', 'is_server', 'preserve_cache',
                       'products', 'source_products', 'working_dir',
-                      'overwrite', 'skip_interpreter']}
+                      'overwrite', 'skip_interpreter', 'copies',
+                      'timesync', 'with_strace', 'with_valgrind',
+                      'valgrind_flags', 'additional_variables',
+                      'aggregation', 'interpolation', 'synonyms',
+                      'driver']}
         prop_order = {
             'model': ['name', 'repository_url', 'contact_email', 'language',
                       'args', 'inputs', 'outputs']
         }
+        for k in ['inputs', 'outputs']:
+            out['definitions']['model']['properties'][k].pop('default', None)
+            desc = out['definitions']['model']['properties'][k]['description'].split(
+                ' A full description')[0]
+            out['definitions']['model']['properties'][k]['description'] = desc
+        out['definitions']['model']['properties']['args']['minItems'] = 1
         for k, rlist in prop_remove.items():
             for p in rlist:
                 out['definitions'][k]['properties'].pop(p, None)
+        for k, rdict in prop_replace.items():
+            for r in rdict.keys():
+                if 'description' in out['definitions'][k]['properties'][r]:
+                    rdict[r]['description'] = (
+                        out['definitions'][k]['properties'][r]['description'])
+            out['definitions'][k]['properties'].update(rdict)
         for k, rlist in prop_required.items():
             out['definitions'][k].setdefault('required', [])
             for p in rlist:
@@ -960,6 +989,10 @@ class SchemaRegistry(object):
                 out['definitions'][k]['properties'][p]['propertyOrder'] = i
         out.update(out['definitions'].pop('model'))
         out['definitions'].pop('connection')
+        for x in [out] + list(out['definitions'].values()):
+            for p, v in x.get('properties', {}).items():
+                if v.get("type", None) == "boolean":
+                    v.setdefault("format", "checkbox")
         out.update(
             title='Model YAML Schema',
             description='Schema for yggdrasil model YAML input files.')

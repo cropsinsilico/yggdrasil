@@ -2,7 +2,7 @@
 History
 =======
 
-1.8.0 (2021-09-14) Support for REST API based communicators, running integrations as services, and connecting to remote integration services
+1.8.0 (2021-09-15) Support for REST API based communicators, running integrations as services, and connecting to remote integration services
 ------------------
 
 * Added option to return printStatus string for YggClass subclasses via return_str keyword
@@ -17,7 +17,7 @@ History
 * Added methods for waiting on a function to return True
 * Refactored multitasking classes to use __slots__ for improved memory performance
 * Added tools for building yggdrasil docker containers and documentation on those tools
-* Added gitrepo parameter to model YAML schema that allows for a repository to be specified in the YAML (in addition to via the command line as before)
+* Added repository_url parameter to model YAML schema that allows for a repository to be specified in the YAML (in addition to via the command line as before)
 * Added model_only and model_submission options to yggdrasil.yamfile.parse_yaml method and YAML validation CLI
 
 

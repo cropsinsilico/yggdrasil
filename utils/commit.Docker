@@ -1,8 +1,8 @@
 FROM continuumio/miniconda3
 SHELL ["/bin/bash", "--login", "-c"]
 ARG commit
-# RUN apt-get --allow-releaseinfo-change update
-RUN apt-get update -y
+RUN apt-get --allow-releaseinfo-change update -y
+# RUN apt-get update -y
 RUN source /opt/conda/etc/profile.d/conda.sh && \
     conda config --add channels conda-forge && \
     conda config --set channel_priority strict

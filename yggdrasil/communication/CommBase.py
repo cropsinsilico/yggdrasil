@@ -435,17 +435,16 @@ class CommBase(tools.YggClass):
         vars (list, optional): Names of variables to be sent/received by
             this comm. Defaults to [].
         length_map (dict, optional): Map from pointer variable names to
-
             the names of variables where their length will be stored.
             Defaults to {}.
         comm (str, optional): The comm that should be created. This only serves
             as a check that the correct class is being created. Defaults to None.
-        filter (:class:.FilterBase, optional): Callable class that will be used to
-            determine when messages should be sent/received. Defaults to None
-            and is ignored.
-        transform (:class:.TransformBase, optional): Callable class that will be
-            used to transform messages that are sent/received. Defaults to None
-            and is ignored.
+        filter (:class:.FilterBase, optional): Filter that will be used to
+            determine when messages should be sent/received. Ignored if not
+            provided.
+        transform (:class:.TransformBase, optional): One or more transformations
+            that will be applied to messages that are sent/received. Ignored if
+            not provided.
         is_default (bool, optional): If True, this comm was created to handle
             all input/output variables to/from a model. Defaults to False. This
             variable is used internally and should not be set explicitly in

@@ -86,10 +86,11 @@ class ModelDriver(Driver):
     Args:
         name (str): Unique name used to identify the model. This will
             be used to report errors associated with the model.
-        args (str or list): The full path to the file containing the
-            model program that will be run by the driver or a list
-            starting with the program file and including any arguments
-            that should be passed as input to the program.
+        args (str or list): The path to the file containing the model
+            program that will be run by the driver for the model's language
+            and/or a list of arguments that should be passed as input to the
+            model program or language executable (e.g. source code or
+            configuration file for a domain specific language).
         products (list, optional): Paths to files created by the model that
             should be cleaned up when the model exits. Entries can be absolute
             paths or paths relative to the working directory. Defaults to [].
@@ -302,25 +303,17 @@ class ModelDriver(Driver):
         'inputs': {'type': 'array', 'default': [],
                    'items': {'$ref': '#/definitions/comm'},
                    'description': (
-                       'A mapping object containing the entry for a '
-                       'model input channel or a list of input '
-                       'channel entries. If the model does not get '
-                       'input from another model, this may be '
-                       'ommitted. A full description of channel '
-                       'entries and the options available for '
-                       'channels can be found :ref:`here<'
-                       'yaml_comm_options>`.')},
+                       'Zero or more channels carrying input to the model. '
+                       'A full description of channel entries and the '
+                       'options available for channels can be found '
+                       ':ref:`here<yaml_comm_options>`.')},
         'outputs': {'type': 'array', 'default': [],
                     'items': {'$ref': '#/definitions/comm'},
                     'description': (
-                        'A mapping object containing the entry for a '
-                        'model output channel or a list of output '
-                        'channel entries. If the model does not '
-                        'output to another model, this may be '
-                        'ommitted. A full description of channel '
-                        'entries and the options available for '
-                        'channels can be found :ref:`here<'
-                        'yaml_comm_options>`.')},
+                        'Zero or more channels carrying output from the '
+                        'model. A full description of channel entries and '
+                        'the options available for channels can be found '
+                        ':ref:`here<yaml_comm_options>`.')},
         'env': {'type': 'object', 'default': {},
                 'additional_properties': {'type': 'string'}},
         'products': {'type': 'array', 'default': [],

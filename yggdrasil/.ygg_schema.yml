@@ -53,10 +53,20 @@ definitions:
           type: schema
         default_file:
           $ref: '#/definitions/file'
+          description: Comm information for a file that input should be drawn from
+            (for input comms) or that output should be sent to (for output comms)
+            in the event that a yaml does not pair the comm with another model comm
+            or a file.
         default_value:
+          description: Value that should be returned in the event that a yaml does
+            not pair the comm with another model comm or a file.
           type: any
         dont_copy:
           default: false
+          description: If True, the comm will not be duplicated in the even a model
+            is duplicated via the 'copies' parameter. Defaults to False except for
+            in the case that a model is wrapped and the comm is inside the loop or
+            that a model is a RPC input to a model server.
           type: boolean
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
@@ -77,8 +87,12 @@ definitions:
           type: array
         filter:
           $ref: '#/definitions/filter'
+          description: Filter that will be used to determine when messages should
+            be sent/received. Ignored if not provided.
         for_service:
           default: false
+          description: If True, this comm bridges the gap to an integration running
+            as a service, possibly on a remote machine. Defaults to False.
           type: boolean
         format_str:
           description: String that should be used to format/parse messages. Default
@@ -89,17 +103,24 @@ definitions:
           type: string
         is_default:
           default: false
+          description: If True, this comm was created to handle all input/output variables
+            to/from a model. Defaults to False. This variable is used internally and
+            should not be set explicitly in the YAML.
           type: boolean
         length_map:
           additionalProperties:
             type: string
-          description: Map from pointer variable names to
+          description: Map from pointer variable names to the names of variables where
+            their length will be stored. Defaults to {}.
           type: object
         name:
           description: Name used for component in log messages.
           type: string
         outside_loop:
           default: false
+          description: If True, and the comm is an input/outputs to/from a model being
+            wrapped. The receive/send calls for this comm will be outside the loop
+            for the model. Defaults to False.
           type: boolean
         params:
           description: Parameters that should be passed via URL. Defaults to None
@@ -150,6 +171,8 @@ definitions:
                 - function
                 - string
             type: array
+          description: One or more transformations that will be applied to messages
+            that are sent/received. Ignored if not provided.
         vars:
           description: Names of variables to be sent/received by this comm. Defaults
             to [].
@@ -157,9 +180,9 @@ definitions:
             type: string
           type: array
       required:
-      - name
       - datatype
       - commtype
+      - name
       title: comm_base
       type: object
     - anyOf:
@@ -347,8 +370,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - inputs
       - outputs
+      - inputs
       title: connection_base
       type: object
     - anyOf:
@@ -517,8 +540,12 @@ definitions:
           type: string
         filter:
           $ref: '#/definitions/filter'
+          description: Filter that will be used to determine when messages should
+            be sent/received. Ignored if not provided.
         for_service:
           default: false
+          description: If True, this comm bridges the gap to an integration running
+            as a service, possibly on a remote machine. Defaults to False.
           type: boolean
         format_str:
           description: String that should be used to format/parse messages. Default
@@ -546,7 +573,8 @@ definitions:
         length_map:
           additionalProperties:
             type: string
-          description: Map from pointer variable names to
+          description: Map from pointer variable names to the names of variables where
+            their length will be stored. Defaults to {}.
           type: object
         name:
           description: Name used for component in log messages.
@@ -638,6 +666,8 @@ definitions:
                 - function
                 - string
             type: array
+          description: One or more transformations that will be applied to messages
+            that are sent/received. Ignored if not provided.
         use_astropy:
           default: false
           description: If True, the astropy package will be used to serialize/deserialize
@@ -675,8 +705,8 @@ definitions:
           type: string
       required:
       - filetype
-      - name
       - working_dir
+      - name
       title: file_base
       type: object
     - anyOf:
@@ -1245,9 +1275,10 @@ definitions:
             comms can be used by more than one thread. Defaults to False.
           type: boolean
         args:
-          description: The full path to the file containing the model program that
-            will be run by the driver or a list starting with the program file and
-            including any arguments that should be passed as input to the program.
+          description: The path to the file containing the model program that will
+            be run by the driver for the model's language and/or a list of arguments
+            that should be passed as input to the model program or language executable
+            (e.g. source code or configuration file for a domain specific language).
           items:
             type: string
           type: array
@@ -1339,10 +1370,9 @@ definitions:
           type: string
         inputs:
           default: []
-          description: A mapping object containing the entry for a model input channel
-            or a list of input channel entries. If the model does not get input from
-            another model, this may be ommitted. A full description of channel entries
-            and the options available for channels can be found :ref:`here<yaml_comm_options>`.
+          description: Zero or more channels carrying input to the model. A full description
+            of channel entries and the options available for channels can be found
+            :ref:`here<yaml_comm_options>`.
           items:
             $ref: '#/definitions/comm'
           type: array
@@ -1487,10 +1517,9 @@ definitions:
           type: boolean
         outputs:
           default: []
-          description: A mapping object containing the entry for a model output channel
-            or a list of output channel entries. If the model does not output to another
-            model, this may be ommitted. A full description of channel entries and
-            the options available for channels can be found :ref:`here<yaml_comm_options>`.
+          description: Zero or more channels carrying output from the model. A full
+            description of channel entries and the options available for channels
+            can be found :ref:`here<yaml_comm_options>`.
           items:
             $ref: '#/definitions/comm'
           type: array
@@ -1764,10 +1793,10 @@ definitions:
             is used.
           type: string
       required:
-      - name
       - language
       - args
       - working_dir
+      - name
       title: model_base
       type: object
     - anyOf:

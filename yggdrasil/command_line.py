@@ -1330,7 +1330,7 @@ class yggmodelform(SubCommand):
     @classmethod
     def func(cls, args):
         from yggdrasil.schema import get_model_form_schema
-        out = get_model_form_schema(fname_dst=args.file)
+        out = get_model_form_schema(fname_dst=args.file, indent='    ')
         if not args.file:
             pprint.pprint(out)
 
