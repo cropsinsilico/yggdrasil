@@ -1046,7 +1046,11 @@ def install_pkg(method, python=None, without_build=False,
         R_cmd = ["ygginstall", "r"]
         if not install_opts['no_sudo']:
             R_cmd.append("--sudoR")
-        subprocess.check_call(R_cmd)
+        try:
+            subprocess.check_call(R_cmd)
+        except subprocess.CalledProcessError:
+            if not _is_osx:
+                raise
     if method == 'conda':
         env = copy.copy(os.environ)
         if (not install_opts['no_sudo']) and install_opts['R']:
