@@ -157,9 +157,9 @@ definitions:
             type: string
           type: array
       required:
-      - commtype
       - name
       - datatype
+      - commtype
       title: comm_base
       type: object
     - anyOf:
@@ -674,9 +674,9 @@ definitions:
             is used.
           type: string
       required:
+      - filetype
       - name
       - working_dir
-      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -1524,6 +1524,11 @@ definitions:
           items:
             type: string
           type: array
+        repository_url:
+          description: URL for the git repository containing the model source code.
+            If provided, relative paths in the model YAML definition will be considered
+            relative to the repository root directory.
+          type: string
         reset:
           default: false
           description: If True, the simulation will be reset to it's initial values
@@ -1760,9 +1765,9 @@ definitions:
           type: string
       required:
       - name
+      - language
       - args
       - working_dir
-      - language
       title: model_base
       type: object
     - anyOf:

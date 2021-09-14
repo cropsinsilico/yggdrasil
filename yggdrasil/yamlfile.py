@@ -36,6 +36,54 @@ for cls in (BaseConstructor, Constructor, SafeConstructor):
                         no_duplicates_constructor)
 
 
+def clone_github_repo(fname):
+    r"""Clone a GitHub repository, returning the path to the local copy of the
+    file pointed to by the URL if there is one.
+
+    Args:
+        fname (str): URL to a GitHub repository or a file in a GitHub
+            repository that should be cloned.
+
+
+    Returns:
+        str: Path to the local copy of the repository or file in the
+            repository.
+
+    """
+    
+    from yggdrasil.services import _service_host_env
+    # make sure we start with a full url
+    if 'http' not in fname:
+        url = 'http://github.com/' + fname
+    else:
+        url = fname
+    # get the constituent url parts
+    parsed = urlparse(url)
+    # get the path component
+    splitpath = parsed.path.split('/')
+    # the first part is the 'owner' of the repo
+    owner = splitpath[1]
+    # the second part is the repo name
+    reponame = splitpath[2]
+    # the full path is the file name and location
+    # turn the file path into an os based format
+    fname = os.path.join(*splitpath)
+    # check to see if the file already exists, and clone if it does not
+    if not os.path.exists(fname):
+        if os.environ.get(_service_host_env, False):
+            raise RuntimeError("Cloning of unvetted git repo is "
+                               "not permitted on a integration "
+                               "service manager.")
+        # create the url for cloning the repo
+        cloneurl = parsed.scheme + '://' + parsed.netloc + '/' + owner + '/' +\
+            reponame
+        # clone the repo into the appropriate directory
+        repo = git.Repo.clone_from(cloneurl, os.path.join(owner, reponame))
+        repo.close()
+        # now that it is cloned, just pass the yaml file (and path) onwards
+    return os.path.realpath(fname)
+
+
 def load_yaml(fname):
     r"""Parse a yaml file defining a run.
 
@@ -53,7 +101,6 @@ def load_yaml(fname):
         dict: Contents of yaml file.
 
     """
-    from yggdrasil.services import _service_host_env
     opened = False
     if isinstance(fname, dict):
         yamlparsed = copy.deepcopy(fname)
@@ -62,37 +109,7 @@ def load_yaml(fname):
     elif isinstance(fname, str):
         # pull foreign file
         if fname.startswith('git:'):
-            # drop the git prefix
-            fname = fname[4:]
-            # make sure we start with a full url
-            if 'http' not in fname:
-                url = 'http://github.com/' + fname
-            else:
-                url = fname
-            # get the constituent url parts
-            parsed = urlparse(url)
-            # get the path component
-            splitpath = parsed.path.split('/')
-            # the first part is the 'owner' of the repo
-            owner = splitpath[1]
-            # the second part is the repo name
-            reponame = splitpath[2]
-            # the full path is the file name and location
-            # turn the file path into an os based format
-            fname = os.path.join(*splitpath)
-            # check to see if the file already exists, and clone if it does not
-            if not os.path.exists(fname):
-                if os.environ.get(_service_host_env, False):
-                    raise RuntimeError("Cloning of unvetted git repo is "
-                                       "not permitted on a integration "
-                                       "service manager.")
-                # create the url for cloning the repo
-                cloneurl = parsed.scheme + '://' + parsed.netloc + '/' + owner + '/' +\
-                    reponame
-                # clone the repo into the appropriate directory
-                repo = git.Repo.clone_from(cloneurl, os.path.join(owner, reponame))
-                repo.close()
-                # now that it is cloned, just pass the yaml file (and path) onwards
+            fname = clone_github_repo(fname[4:])
         fname = os.path.realpath(fname)
         if not os.path.isfile(fname):
             raise IOError("Unable locate yaml file %s" % fname)
@@ -177,7 +194,11 @@ def prep_yaml(files):
         for k in comp_keys:
             for x in yml[k]:
                 if isinstance(x, dict):
-                    x.setdefault('working_dir', yml['working_dir'])
+                    if (k == 'models') and ('repository_url' in x):
+                        repo_dir = clone_github_repo(x['repository_url'])
+                        x.setdefault('working_dir', repo_dir)
+                    else:
+                        x.setdefault('working_dir', yml['working_dir'])
     # Combine models & connections
     yml_all = {}
     for k in comp_keys:
@@ -187,7 +208,8 @@ def prep_yaml(files):
     return yml_all
 
 
-def parse_yaml(files, complete_partial=False, partial_commtype=None):
+def parse_yaml(files, complete_partial=False, partial_commtype=None,
+               model_only=False, model_submission=False):
     r"""Parse list of yaml files.
 
     Args:
@@ -199,6 +221,12 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None):
         partial_commtype (dict, optional): Communicator kwargs that should be
             be used for the connections to the unpaired channels when
             complete_partial is True. Defaults to None and will be ignored.
+        model_only (bool, optional): If True, the YAML will not be evaluated
+            as a complete integration and only the individual components will
+            be parsed. Defaults to False.
+        model_submission (bool, optional): If True, the YAML will be evaluated
+            as a submission to the yggdrasil model repository and model_only
+            will be set to True. Defaults to False.
 
     Raises:
         ValueError: If the yml dictionary is missing a required keyword or
@@ -215,6 +243,18 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None):
     yml_prep = prep_yaml(files)
     # print('prepped')
     # pprint.pprint(yml_prep)
+    if model_submission:
+        models = []
+        for yml in yml_prep['models']:
+            wd = yml.pop('working_dir', None)
+            x = s.validate_model_submission(yml, normalize=True,
+                                            no_defaults=True,
+                                            required_defaults=True)
+            if wd:
+                x['working_dir'] = wd
+            models.append(x)
+        yml_prep['models'] = models
+        model_only = True
     yml_norm = s.validate(yml_prep, normalize=True,
                           no_defaults=True, required_defaults=True)
     # print('normalized')
@@ -253,6 +293,9 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None):
     for k in ['models', 'connections']:
         for yml in yml_norm[k]:
             existing = parse_component(yml, k[:-1], existing=existing)
+    # Exit early
+    if model_only:
+        return existing
     # Add stand-in model that uses unpaired channels
     if complete_partial:
         existing = complete_partial_integration(

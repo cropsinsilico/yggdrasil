@@ -61,11 +61,13 @@ def test_parse_component_error():
 @flaky.flaky(max_runs=3)
 def test_load_yaml_git():
     r"""Test loading a yaml from a remote git repository."""
+    import git
     yml = "https://github.com/cropsinsilico/example-fakemodel/fakemodel.yml"
     assert_raises(Exception, yamlfile.load_yaml, yml)
     assert('model' in yamlfile.load_yaml('git:' + yml))
     yml = "cropsinsilico/example-fakemodel/fakemodel.yml"
     assert('model' in yamlfile.load_yaml('git:' + yml))
+    git.rmtree("cropsinsilico")
     
 
 class YamlTestBase(YggTestClass):
@@ -73,6 +75,7 @@ class YamlTestBase(YggTestClass):
     _contents = tuple()
     _include = tuple()
     _use_json = False
+    _parse_kwargs = dict()
 
     def __init__(self, *args, **kwargs):
         super(YamlTestBase, self).__init__(*args, **kwargs)
@@ -140,25 +143,27 @@ class YamlTestBase(YggTestClass):
         r"""Disabled: Create a new instance of the class."""
         return None
 
-    def test_parse_yaml(self, complete_partial=False):
+    def test_parse_yaml(self, **kwargs):
         r"""Test successfully reading & parsing yaml."""
+        kwargs.update(self._parse_kwargs)
         if self.nfiles == 0:
             pass
         elif self.nfiles == 1:
-            yamlfile.parse_yaml(self.files[0], complete_partial=complete_partial)
+            yamlfile.parse_yaml(self.files[0], **kwargs)
         else:
-            yamlfile.parse_yaml(self.files, complete_partial=complete_partial)
+            yamlfile.parse_yaml(self.files, **kwargs)
 
 
 class YamlTestBaseError(YamlTestBase):
     r"""Test error for yamlfile."""
     _error = None
 
-    def test_parse_yaml(self):
+    def test_parse_yaml(self, **kwargs):
         r"""Test error reading & parsing yaml."""
+        kwargs.update(self._parse_kwargs)
         if (self._error is None) or (self.nfiles == 0):
             return
-        assert_raises(self._error, yamlfile.parse_yaml, self.files)
+        assert_raises(self._error, yamlfile.parse_yaml, self.files, **kwargs)
 
 
 class TestJSONModelOnly(YamlTestBase):
@@ -598,6 +603,7 @@ class TestYamlConnectionInputObj(YamlTestBase):
 
 class TestYamlModelFunction(YamlTestBase):
     r"""Test when missing input/output connections should be routed to a function."""
+    _parse_kwargs = {'complete_partial': True}
     _contents = (['models:',
                   '  - name: modelA',
                   '    language: c',
@@ -618,11 +624,6 @@ class TestYamlModelFunction(YamlTestBase):
                   'connections:',
                   '  - input: outputA',
                   '    output: inputB'], )
-    
-    def test_parse_yaml(self, *args, **kwargs):
-        r"""Test successfully reading & parsing yaml."""
-        kwargs.setdefault('complete_partial', True)
-        super(TestYamlModelFunction, self).test_parse_yaml(*args, **kwargs)
 
 
 class TestYamlConnectionDefaultValue(YamlTestBase):
@@ -634,6 +635,51 @@ class TestYamlConnectionDefaultValue(YamlTestBase):
                   '    inputs:',
                   '      - name: inputA',
                   '        default_value: test'],)
+
+
+class TestYamlModelOnlyKwarg(YamlTestBase):
+    r"""Test parsing with model_only=True."""
+    _parse_kwargs = {'model_only': True}
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    inputs:',
+                  '      - name: inputA'],)
+
+
+class TestYamlModelSubmission(YamlTestBase):
+    r"""Test parsing with model_submission=True."""
+    _parse_kwargs = {'model_submission': True}
+    _contents = (['model:',
+                  '  - name: FakeModel',
+                  '    repository_url: https://github.com/cropsinsilico/'
+                  'example-fakemodel',
+                  '    language: python',
+                  '    args:',
+                  '      - ./src/fakemodel.py',
+                  '      - --yggdrasil',
+                  '    inputs:',
+                  '      - name: photosynthesis_rate',
+                  '        default_file:',
+                  '          name: ./Input/input.txt',
+                  '          filetype: table',
+                  '        datatype:',
+                  '          type: bytes',
+                  '    outputs:',
+                  '      - name: growth_rate',
+                  '        default_file:',
+                  '          name: ./Output/output.txt',
+                  '          filetype: table',
+                  '        datatype:',
+                  '          type: bytes',
+                  ],)
+
+    def teardown(self):
+        r"""Remove the temporary file if it exists."""
+        import git
+        git.rmtree("cropsinsilico")
+        super(TestYamlModelSubmission, self).teardown()
 
 
 class TestYamlServerNoClient(YamlTestBaseError):

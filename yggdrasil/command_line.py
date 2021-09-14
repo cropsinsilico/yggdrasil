@@ -870,12 +870,21 @@ class validate_yaml(SubCommand):
     arguments = [
         (('yamlfile', ),
          {'nargs': '+',
-          'help': 'One or more YAML specification files.'})]
+          'help': 'One or more YAML specification files.'}),
+        (('--model-only', ),
+         {'action': 'store_true',
+          'help': ('Validate a YAML containing an isolated model without '
+                   'ensuring that it is part of a complete integration.')}),
+        (('--model-submission', ),
+         {'action': 'store_true',
+          'help': ('Validate a YAML against the schema for submissions to '
+                   'the yggdrasil model repository.')})]
 
     @classmethod
     def func(cls, args):
         from yggdrasil import yamlfile
-        yamlfile.parse_yaml(args.yamlfile)
+        yamlfile.parse_yaml(args.yamlfile, model_only=args.model_only,
+                            model_submission=args.model_submission)
         logger.info("Validation succesful.")
 
 

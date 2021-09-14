@@ -168,6 +168,10 @@ class ModelDriver(Driver):
             Defaults to False.
         copies (int, optional): The number of copies of the model that should be
             created. Defaults to 1.
+        repository_url (str, optional): URL for the git repository containing
+            the model source code. If provided, relative paths in the model
+            YAML definition will be considered relative to the repository root
+            directory.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Class Attributes:
@@ -272,6 +276,10 @@ class ModelDriver(Driver):
         allow_threading (bool): If True, comm connections will be set up so that
             the model-side comms can be used by more than one thread.
         copies (int): The number of copies of the model that should be created.
+        repository_url (str): URL for the git repository containing the model
+            source code. If provided, relative paths in the model YAML
+            definition will be considered relative to the repository root
+            directory.
 
     Raises:
         RuntimeError: If both with_strace and with_valgrind are True.
@@ -378,7 +386,8 @@ class ModelDriver(Driver):
         'outputs_in_inputs': {'type': 'boolean'},
         'logging_level': {'type': 'string', 'default': ''},
         'allow_threading': {'type': 'boolean'},
-        'copies': {'type': 'integer', 'default': 1, 'minimum': 1}}
+        'copies': {'type': 'integer', 'default': 1, 'minimum': 1},
+        'repository_url': {'type': 'string'}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     

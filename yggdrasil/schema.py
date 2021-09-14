@@ -929,10 +929,9 @@ class SchemaRegistry(object):
                 out['definitions'][x]['properties'][k].update(
                     {"$ref": "#/definitions/serializer"})
         prop_add = {
-            'model': {'repository_url': {'type': 'string'},
-                      'contact_email': {'type': 'string'}}}
+            'model': {'contact_email': {'type': 'string'}}}
         prop_required = {
-            'model': ['inputs', 'outputs', 'repository_url']}
+            'model': ['args', 'inputs', 'outputs', 'repository_url']}
         prop_remove = {
             'comm': ['is_default', 'length_map', 'serializer'],
             'file': ['is_default', 'length_map',
@@ -943,7 +942,8 @@ class SchemaRegistry(object):
                       'products', 'source_products', 'working_dir',
                       'overwrite', 'skip_interpreter']}
         prop_order = {
-            'model': ['name', 'language', 'args', 'inputs', 'outputs']
+            'model': ['name', 'repository_url', 'contact_email', 'language',
+                      'args', 'inputs', 'outputs']
         }
         for k, rlist in prop_remove.items():
             for p in rlist:
@@ -953,11 +953,11 @@ class SchemaRegistry(object):
             for p in rlist:
                 if p not in out['definitions'][k]['required']:
                     out['definitions'][k]['required'].append(p)
+        for k, adict in prop_add.items():
+            out['definitions'][k]['properties'].update(adict)
         for k, rlist in prop_order.items():
             for i, p in enumerate(rlist):
                 out['definitions'][k]['properties'][p]['propertyOrder'] = i
-        for k, adict in prop_add.items():
-            out['definitions'][k]['properties'].update(adict)
         out.update(out['definitions'].pop('model'))
         out['definitions'].pop('connection')
         out.update(
@@ -1044,6 +1044,19 @@ class SchemaRegistry(object):
             # kwargs.setdefault('no_defaults', True)
             kwargs.setdefault('schema_registry', self)
         return metaschema.validate_instance(obj, self.schema, **kwargs)
+
+    def validate_model_submission(self, obj, **kwargs):
+        r"""Validate an object against the schema for models submitted to
+        the yggdrasil model repository.
+
+        Args:
+            obj (object): Object to validate.
+            **kwargs: Additional keyword arguments are passed to
+                yggdrasil.metaschema.validate_instance.
+
+        """
+        return metaschema.validate_instance(obj, self.model_form_schema,
+                                            **kwargs)
 
     def validate_component(self, comp_name, obj, **kwargs):
         r"""Validate an object against a specific component.
