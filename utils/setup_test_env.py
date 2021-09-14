@@ -27,15 +27,22 @@ CONDA_INDEX = None
 CONDA_ROOT = None
 try:
     CONDA_CMD_WHICH = shutil.which('conda')
+    YGG_CMD_WHICH = shutil.which('yggdrasil')
 except AttributeError:
     if _is_win:
         CONDA_CMD_WHICH = None
+        YGG_CMD_WHICH = None
     else:
         try:
             CONDA_CMD_WHICH = subprocess.check_output(
                 ['which', 'conda']).strip().decode('utf-8')
         except subprocess.CalledProcessError:
             CONDA_CMD_WHICH = None
+        try:
+            YGG_CMD_WHICH = subprocess.check_output(
+                ['which', 'yggdrasil']).strip().decode('utf-8')
+        except subprocess.CalledProcessError:
+            YGG_CMD_WHICH = None
 if (not CONDA_PREFIX):
     if CONDA_CMD_WHICH:
         CONDA_PREFIX = os.path.dirname(os.path.dirname(CONDA_CMD_WHICH))
@@ -756,7 +763,6 @@ def install_deps(method, return_commands=False, verbose=False,
         fallback_to_conda = ((method == 'conda')
                              or (_is_win and _on_appveyor)
                              or install_opts['lpy'])
-    print('INSTALL_DEPS', method, fallback_to_conda)
     # Get list of packages
     pkgs = itemize_deps(method, fallback_to_conda=fallback_to_conda,
                         install_opts=install_opts, **kwargs)
@@ -1035,22 +1041,19 @@ def install_pkg(method, python=None, without_build=False,
     else:  # pragma: debug
         raise ValueError("Invalid method: '%s'" % method)
     # Print summary of what was installed
-    cmds = SUMMARY_CMDS + cmds + SUMMARY_CMDS
-    call_script(cmds)
-    if method.endswith('-dev'):
-        print(call_conda_command([python_cmd, '-m', 'pip', 'install',
-                                  '--editable', '.'],
-                                 cwd=_pkg_dir))
+    if not YGG_CMD_WHICH:
+        cmds = SUMMARY_CMDS + cmds + SUMMARY_CMDS
+        call_script(cmds)
+        if method.endswith('-dev'):
+            print(call_conda_command([python_cmd, '-m', 'pip', 'install',
+                                      '--editable', '.'],
+                                     cwd=_pkg_dir))
     # Follow up if on Unix as R installation may require sudo
     if install_opts['R'] and _is_unix:
         R_cmd = ["ygginstall", "r"]
         if not install_opts['no_sudo']:
             R_cmd.append("--sudoR")
-        try:
-            subprocess.check_call(R_cmd)
-        except subprocess.CalledProcessError:
-            if not _is_osx:
-                raise
+        subprocess.check_call(R_cmd)
     if method == 'conda':
         env = copy.copy(os.environ)
         if (not install_opts['no_sudo']) and install_opts['R']:
