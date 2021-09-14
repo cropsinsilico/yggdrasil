@@ -683,22 +683,22 @@ def remove_path(fpath, timer_class=None, timeout=None):
     else:
         return
     errors = []
-    if platform._is_win and (ftype == 'directory'):  # pragma: windows
-        fremove_base = fremove
+    # if platform._is_win and (ftype == 'directory'):  # pragma: windows
+    #     fremove_base = fremove
 
-        def fremove(path):
-            try:
-                fremove_base(path)
-            except PermissionError:
-                # https://stackoverflow.com/questions/2656322/shutil-rmtree-
-                # fails-on-windows-with-access-is-denied
-                import stat
-                if not os.access(path, os.W_OK):
-                    # Is the error an access error ?
-                    os.chmod(path, stat.S_IWUSR)
-                    fremove_base(path)
-                else:  # pragma: debug
-                    raise
+    #     def fremove(path):
+    #         try:
+    #             fremove_base(path)
+    #         except PermissionError:
+    #             # https://stackoverflow.com/questions/2656322/shutil-rmtree-
+    #             # fails-on-windows-with-access-is-denied
+    #             import stat
+    #             if not os.access(path, os.W_OK):
+    #                 # Is the error an access error ?
+    #                 os.chmod(path, stat.S_IWUSR)
+    #                 fremove_base(path)
+    #             else:  # pragma: debug
+    #                 raise
     
     def is_removed():
         if fcheck(fpath):

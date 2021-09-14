@@ -90,7 +90,8 @@ def load_yaml(fname):
                 cloneurl = parsed.scheme + '://' + parsed.netloc + '/' + owner + '/' +\
                     reponame
                 # clone the repo into the appropriate directory
-                _ = git.Repo.clone_from(cloneurl, os.path.join(owner, reponame))
+                repo = git.Repo.clone_from(cloneurl, os.path.join(owner, reponame))
+                repo.close()
                 # now that it is cloned, just pass the yaml file (and path) onwards
         fname = os.path.realpath(fname)
         if not os.path.isfile(fname):
