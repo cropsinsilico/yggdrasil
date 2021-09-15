@@ -152,6 +152,8 @@ def convert_extended2base(s):
                 elif s['type'] in type_map:
                     s['type'] = type_map[s['type']]
                     s.pop('class', None)
+                else:
+                    assert(s['type'] not in ['scalar'])
                 # Scalars not currently included in the schema
                 # elif s['type'] in ['scalar']:
                 #     s.pop("precision", None)
@@ -170,7 +172,7 @@ def convert_extended2base(s):
     return s
 
 
-def get_json_schema(fname_dst=None):
+def get_json_schema(fname_dst=None, indent=None):
     r"""Return the yggdrasil schema as a strictly JSON schema without
     any of the extended datatypes.
 
@@ -178,6 +180,8 @@ def get_json_schema(fname_dst=None):
         fname_dst (str, optional): Full path to file where the JSON
             schema should be saved. Defaults to None and no file is
             created.
+        indent (str, optional): Indentation that should be used when saving
+            the schema to a file.
 
     Returns:
         dict: Converted structure.
@@ -189,7 +193,7 @@ def get_json_schema(fname_dst=None):
     out = convert_extended2base(out)
     if fname_dst is not None:
         with open(fname_dst, 'w') as fd:
-            json.dump(out, fd)
+            json.dump(out, fd, indent=indent)
     return out
 
 

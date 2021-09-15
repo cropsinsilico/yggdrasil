@@ -4,3 +4,4 @@ pypandoc
 r-roxygen2  # [conda]
 sphinx
 sphinx_rtd_theme
+sphinx-argparse

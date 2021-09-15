@@ -2,6 +2,9 @@
 Connecting Models to Models
 ###########################
 
+.. warning::
+
+   The user interface referenced below has been deprecated.
 
 Next we will connect your growth model to an existing network of models. From 
 the user interface, load the ``hackathon2018`` integration network. 

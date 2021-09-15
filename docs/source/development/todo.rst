@@ -13,9 +13,7 @@ Documentation
 * Regenerate metaschema with $schema entry
 * Refence metaschema on website in $id or $schema?
 * Expand development section into contributing guide
-* Add section on command line utilities
 * Go through and update/prune interface documentation
-* Mark hackathon 2019 docs as deprecated since the UI is no longer live
   
 Performance
 -----------

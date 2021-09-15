@@ -211,51 +211,6 @@ class SubCommand(metaclass=SubCommandMeta):
         parser.set_defaults(func=cls.func)
 
 
-class main(SubCommand):
-    r"""Runner for yggdrasil CLI."""
-
-    name = "yggdrasil"
-    help = (
-        "Command line interface for the yggdrasil package.")
-    arguments = []
-
-    @classmethod
-    def get_parser(cls, **kwargs):
-        from yggdrasil import __version__ as ver
-        parser = super(main, cls).get_parser(**kwargs)
-        parser.add_argument('--version', action='version',
-                            version=('yggdrasil %s' % ver))
-        subparsers = parser.add_subparsers(title='subcommands',
-                                           dest='subcommand')
-        parser._ygg_subparsers = {}
-        for x in [yggrun, ygginfo, validate_yaml,
-                  yggcc, yggcompile, yggclean,
-                  ygginstall, update_config,
-                  regen_metaschema, regen_schema,
-                  yggmodelform, yggdevup, run_tsts,
-                  timing_plots, generate_gha_workflow,
-                  integration_service_manager]:
-            x.add_subparser(subparsers, args=kwargs.get('args', None))
-            parser._ygg_subparsers[x.name] = x
-        return parser
-
-    @classmethod
-    def parse_args(cls, parser, args=None, **kwargs):
-        if args is None:
-            args = sys.argv[1:]
-        if isinstance(args, list) and ('test' in args):
-            kwargs['allow_unknown'] = True
-        args = super(main, cls).parse_args(parser, args=args, **kwargs)
-        if args.subcommand:
-            args = parser._ygg_subparsers[args.subcommand].parse_args(
-                parser, args=args, **kwargs)
-        return args
-
-    @classmethod
-    def func(cls, args):
-        args.func(args)
-
-
 class yggrun(SubCommand):
     r"""Start a run."""
 
@@ -1093,6 +1048,7 @@ class ygginstall(SubCommand):
     r"""Call installation script."""
 
     name = "install"
+    help = "Complete yggdrasil installation for one or more languages."
 
     @classmethod
     def get_parser(cls, **kwargs):
@@ -1884,6 +1840,52 @@ def yggtime_paper():
     r"""Create plots for timing."""
     ReplacementWarning('yggtime_paper', 'yggdrasil timing lang2019')
     timing_plots(args=['lang2019'] + sys.argv[1:])
+
+
+class main(SubCommand):
+    r"""Runner for yggdrasil CLI."""
+
+    name = "yggdrasil"
+    help = (
+        "Command line interface for the yggdrasil package.")
+    arguments = []
+    subcommands = [yggrun, ygginfo, validate_yaml,
+                   yggcc, yggcompile, yggclean,
+                   ygginstall, update_config,
+                   regen_metaschema, regen_schema,
+                   yggmodelform, yggdevup, run_tsts,
+                   timing_plots, generate_gha_workflow,
+                   integration_service_manager]
+
+    @classmethod
+    def get_parser(cls, **kwargs):
+        from yggdrasil import __version__ as ver
+        parser = super(main, cls).get_parser(**kwargs)
+        parser.add_argument('--version', action='version',
+                            version=('yggdrasil %s' % ver))
+        subparsers = parser.add_subparsers(title='subcommands',
+                                           dest='subcommand')
+        parser._ygg_subparsers = {}
+        for x in cls.subcommands:
+            x.add_subparser(subparsers, args=kwargs.get('args', None))
+            parser._ygg_subparsers[x.name] = x
+        return parser
+
+    @classmethod
+    def parse_args(cls, parser, args=None, **kwargs):
+        if args is None:
+            args = sys.argv[1:]
+        if isinstance(args, list) and ('test' in args):
+            kwargs['allow_unknown'] = True
+        args = super(main, cls).parse_args(parser, args=args, **kwargs)
+        if args.subcommand:
+            args = parser._ygg_subparsers[args.subcommand].parse_args(
+                parser, args=args, **kwargs)
+        return args
+
+    @classmethod
+    def func(cls, args):
+        args.func(args)
 
 
 if __name__ == '__main__':

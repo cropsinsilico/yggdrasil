@@ -46,6 +46,8 @@ roxy:
 scripts:
 	python $(SOURCEDIR)/examples/make_example_rst.py
 	python $(SOURCEDIR)/make_tables_rst.py
+	python $(SOURCEDIR)/build_schema.py
+	python $(SOURCEDIR)/create_cli_docs.py
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).

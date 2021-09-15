@@ -4,7 +4,7 @@
 JSON Metaschema
 ###############
 
-|yggdrasil| uses the JSON metaschema below for evaluating schemas including
+|yggdrasil| uses :download:`this JSON metaschema <../schema/metaschema.json>` (shown below) for evaluating schemas including
 type definitions. This metaschema is an expansion of the default metaschema defined by
 `JSON schema <https://json-schema.org/>`_ with the addition of several more
 specific ``simpleTypes`` that allow validation of more complex/specific data types.
@@ -40,6 +40,6 @@ metaschema include:
     Unicode objects that will be encoded as bytes using utf-8 encoding.
     
 
-.. literalinclude:: /../../yggdrasil/.ygg_metaschema.json
+.. literalinclude:: ../schema/metaschema.json
    :language: json
    :linenos:

@@ -733,3 +733,98 @@ def docs2args(docs, keys=['Args:', 'Arguments:']):
             out[curr_arg] = {'type': x_match.group(2),
                              'description': x_match.group(3)}
     return out
+
+
+def document_cli(fname, headline_char='*'):
+    r"""Get documentation for all yggdrasil command line interfaces.
+
+    Args:
+        fname (str): Path to file where CLI documentation should be saved.
+        headline_char (str, optional): Character that should be used to
+            mark the title. Defaults to '*'.
+
+    Returns:
+        list: Documentation lines.
+
+    """
+    import pkg_resources
+    fname_py = os.path.splitext(fname)[0] + '.py'
+    fname_py_base = os.path.abspath(fname_py)
+    deprecated = ['cisrun']
+    entrypoints = {
+        ep.name: ep.load() for ep in pkg_resources.iter_entry_points(
+            'console_scripts')
+        if (ep.module_name.startswith('yggdrasil')
+            and ep.name not in deprecated)}
+    out_def = []
+    out = [".. _cli_rst:", "",
+           "Command Line Interface (CLI)",
+           "############################", ""]
+    out += document_cli_subcommand('yggdrasil', entrypoints['yggdrasil'],
+                                   dummy_file=fname_py_base,
+                                   dummy_def=out_def,
+                                   headline_char=headline_char)
+    for name, sub in entrypoints.items():
+        if (name in ['yggdrasil']) or (not hasattr(sub, 'get_parser')):
+            continue
+        if sub in entrypoints['yggdrasil'].subcommands:
+            alias = f"yggdrasil {sub.name}"
+        else:
+            alias = None
+        out += document_cli_subcommand(name, sub, alias=alias,
+                                       dummy_file=fname_py_base,
+                                       dummy_def=out_def,
+                                       headline_char=headline_char)
+    with open(fname, 'w') as fd:
+        fd.write('\n'.join(out))
+    with open(fname_py, 'w') as fd:
+        fd.write('\n'.join(out_def))
+    return out
+
+
+def document_cli_subcommand(prog, sub, alias=None, dummy_file=None,
+                            headline_char='*', dummy_def=None):
+    r"""Get documentation for a command line interface.
+
+    Args:
+        prog (str): Program that calls the subcommand class.
+        sub (yggdrasil.command_line.SubCommand): Class for the subcommand.
+        alias (str, optional): Command that prog is an alias for. Defaults
+            to None and is ignored.
+        dummy_file (str, optional): Full path to file where an alias function
+            will be stored. Defaults to None and the original module will be
+            used.
+        dummy_def (list, optional): Existing list that the dummy definition
+            lines should be added to. Must be provided if dummy_file is.
+        headline_char (str, optional): Character that should be used to
+            mark the title. Defaults to '*'.
+
+    Returns:
+        list: Documentation lines.
+
+    """
+    out = [f".. _cli_{prog}_rst:", "",
+           f"``{prog}`` Command",
+           headline_char * (len(prog) + 12),
+           ""]
+    if alias is None:
+        out += [".. argparse::"]
+        if dummy_file is None:
+            out += [
+                # f"   :ref: {sub.__module__}.{sub.__name__}.get_parser",
+                f"   :module: {sub.__module__}",
+                f"   :func: {sub.__name__}.get_parser",
+            ]
+        else:
+            assert(dummy_def is not None)
+            dummy_def += [
+                f"def {prog}():",
+                f"    from {sub.__module__} import {sub.__name__}",
+                f"    return {sub.__name__}.get_parser()", "", ""]
+            out += [
+                f"   :filename: {dummy_file}",
+                f"   :func: {prog}"]
+        out += [f"   :prog: {prog}"]
+    else:
+        out += [f"Alias for ``{alias}``"]
+    return out + ["", ""]

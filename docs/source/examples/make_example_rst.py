@@ -79,12 +79,17 @@ def get_rel_path(fname, upone=False):
     return os.path.relpath(fname, top_dir)
 
 
+def get_default_lang(k):
+    if k == 'rpc_lesson3b':
+        return 'cpp'
+    else:
+        for x in _default_lang:
+            if x in source[k]:
+                return x
+
+
 def write_src_ref(fd, k):
-    default = None
-    for x in _default_lang:
-        if x in source[k]:
-            default = x
-            break
+    default = get_default_lang(k)
     assert(default)
     write_src(fd, k, default, upone=True)
     fd.write('\n')
@@ -92,11 +97,7 @@ def write_src_ref(fd, k):
 
     
 def write_yml_ref(fd, k):
-    default = None
-    for x in _default_lang:
-        if x in source[k]:
-            default = x
-            break
+    default = get_default_lang(k)
     assert(default)
     write_yml(fd, k, default, upone=True)
     fd.write('\n')

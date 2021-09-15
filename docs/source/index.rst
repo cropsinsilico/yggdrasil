@@ -22,6 +22,7 @@ Welcome to yggdrasil's documentation!
    yaml
    config
    units
+   cli
    hpc
    remote
    docker
@@ -35,6 +36,7 @@ Welcome to yggdrasil's documentation!
    hackathon2018/index
    hackathon2019/index
    hackathon2021/index
+   glossary
    
 Indices and tables
 ==================
