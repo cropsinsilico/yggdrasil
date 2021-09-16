@@ -9,7 +9,7 @@ as_array             boolean             If True, each of the arguments being se
 default_flow_style   boolean             If True, nested collections will be serialized in the block style. If False,       ['yaml']                            
                                          they will always be serialized in the flow style. See `PyYAML Documentation                                            
                                          <https://pyyaml.org/wiki/PyYAMLDocumentation>`_.                                                                       
-delimiter            string              Delimiter that should be used to separate name/value pairs in the map. Defaults    ['wofost', 'table', 'map', 'pandas']
+delimiter            string              Delimiter that should be used to separate name/value pairs in the map. Defaults    ['wofost', 'pandas', 'table', 'map']
                                          to \t.                                                                                                                 
 encoded_datatype     schema              JSON schema describing the type that serialized objects should conform to.         ['functional']                      
                                          Defaults to the class attribute default_encoded_datatype. If either                                                    
@@ -29,7 +29,7 @@ func_deserialize     function            Callable object that takes objects of a
 func_serialize       function            Callable object that takes Python objects as input and returns a representation    ['functional']                      
                                          that conforms to encoded_datatype. Defaults to None and the default                                                    
                                          serialization for encoded_datatype will be used.                                                                       
-indent               ['string', 'int']   String or number of spaces that should be used to indent each level within the     ['yaml', 'json']                    
+indent               ['string', 'int']   String or number of spaces that should be used to indent each level within the     ['json', 'yaml']                    
                                          seiralized structure. Defaults to '\t'.                                                                                
 no_header            boolean             If True, headers will not be read or serialized from/to tables. Defaults to        ['pandas']                          
                                          False.                                                                                                                 
