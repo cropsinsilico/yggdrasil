@@ -17,13 +17,14 @@ History
 * Added methods for waiting on a function to return True
 * Refactored multitasking classes to use __slots__ for improved memory performance
 * Added tools for building yggdrasil docker containers and documentation on those tools
-* Added repository_url parameter to model YAML schema that allows for a repository to be specified in the YAML (in addition to via the command line as before)
+* Added repository_url, description, and contact_email parameters to model YAML schema that allows for a repository to be specified in the YAML (in addition to via the command line as before)
 * Added model_only and model_submission options to yggdrasil.yamfile.parse_yaml method and YAML validation CLI
 * Added generated documentation on command line utilities
 * Added a glossary of terms
 * Included downloadable versions of the schemas in the documentation
 * Moved console_scripts list into a text file
 * Note deprecation of the old GUI in the docs for the 2018 & 2019 hackathons
+* Added validate_model_submission method for validating model repository submissions
 
 1.7.0 (2021-08-26) Support for MPI communicators, MPI execution, and pika >= 1.0.0
 ------------------

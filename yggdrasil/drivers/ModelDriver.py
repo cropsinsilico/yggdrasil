@@ -173,6 +173,12 @@ class ModelDriver(Driver):
             the model source code. If provided, relative paths in the model
             YAML definition will be considered relative to the repository root
             directory.
+        description (str, optional): Description of the model. This parameter
+            is only used in the model repository or when providing the model
+            as a service.
+        contact_email (str, optional): Email address that should be used to
+            contact the maintainer of the model. This parameter is only used
+            in the model repository.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Class Attributes:
@@ -281,6 +287,12 @@ class ModelDriver(Driver):
             source code. If provided, relative paths in the model YAML
             definition will be considered relative to the repository root
             directory.
+        description (str): Description of the model. This parameter is only
+            used in the model repository or when providing the model as a
+            service.
+        contact_email (str): Email address that should be used to contact the
+            maintainer of the model. This parameter is only used in the model
+            repository.
 
     Raises:
         RuntimeError: If both with_strace and with_valgrind are True.
@@ -380,7 +392,9 @@ class ModelDriver(Driver):
         'logging_level': {'type': 'string', 'default': ''},
         'allow_threading': {'type': 'boolean'},
         'copies': {'type': 'integer', 'default': 1, 'minimum': 1},
-        'repository_url': {'type': 'string'}}
+        'repository_url': {'type': 'string'},
+        'description': {'type': 'string'},
+        'contact_email': {'type': 'string'}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     

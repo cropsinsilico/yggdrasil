@@ -1112,3 +1112,28 @@ class IntegrationServiceRegistry(object):
                                  f"    Registry:\n{old}\n    New:\n{new}")
             registry[k] = v
         self.save(registry)
+
+
+def validate_model_submission(fname):
+    r"""Validate a YAML file according to the standards for submission to
+    the yggdrasil model repository.
+
+    Args:
+        fname (str): YAML file to validate.
+
+    """
+    import glob
+    from yggdrasil import yamlfile, runner
+    # 1-2. YAML syntax and schema
+    yml = yamlfile.parse_yaml(fname, model_submission=True)
+    # 3a. LICENSE
+    repo_dir = yml['models'][0]['working_dir']
+    patterns = ['LICENSE', 'LICENSE.*']
+    for x in patterns:
+        if ((glob.glob(os.path.join(repo_dir, x.upper()))
+             or glob.glob(os.path.join(repo_dir, x.lower())))):
+            break
+    else:
+        raise RuntimeError("Model repository does not contain a LICENSE file.")
+    # 4. Run
+    runner.run(fname)

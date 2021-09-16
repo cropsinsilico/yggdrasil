@@ -23,4 +23,4 @@ ygginstall=yggdrasil.command_line:ygginstall
 yggclean=yggdrasil.command_line:yggclean
 yggmodelform=yggdrasil.command_line:yggmodelform
 yggdevup=yggdrasil.command_line:yggdevup
-ygggha=yggdrasil.command_line:generate_gha_workflow'
+ygggha=yggdrasil.command_line:generate_gha_workflow

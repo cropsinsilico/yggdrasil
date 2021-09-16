@@ -295,7 +295,7 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
             existing = parse_component(yml, k[:-1], existing=existing)
     # Exit early
     if model_only:
-        return existing
+        return yml_norm
     # Add stand-in model that uses unpaired channels
     if complete_partial:
         existing = complete_partial_integration(

@@ -887,6 +887,46 @@ class SchemaRegistry(object):
         return out
 
     @property
+    def model_form_schema_props(self):
+        r"""dict: Information about how properties should be modified for the
+        model form schema."""
+        prop = {
+            # 'add': {},
+            'replace': {
+                'comm': {
+                    'transform': {
+                        "type": "array",
+                        "items": {"$ref": "#/definitions/transform"}}}},
+            'required': {
+                'model': ['args', 'inputs', 'outputs', 'description',
+                          'repository_url']},
+            'remove': {
+                'comm': ['is_default', 'length_map', 'serializer',
+                         'address', 'dont_copy', 'for_service',
+                         'send_converter', 'recv_converter', 'client_id',
+                         'cookies', 'host', 'params', 'port'],
+                'file': ['is_default', 'length_map',
+                         'wait_for_creation', 'working_dir',
+                         'read_meth', 'in_temp',
+                         'serializer', 'datatype',
+                         'address', 'dont_copy', 'for_service',
+                         'send_converter', 'recv_converter', 'client_id',
+                         'cookies', 'host', 'params', 'port'],
+                'model': ['client_of', 'is_server', 'preserve_cache',
+                          'products', 'source_products', 'working_dir',
+                          'overwrite', 'skip_interpreter', 'copies',
+                          'timesync', 'with_strace', 'with_valgrind',
+                          'valgrind_flags', 'additional_variables',
+                          'aggregation', 'interpolation', 'synonyms',
+                          'driver']},
+            'order': {
+                'model': ['name', 'repository_url', 'contact_email',
+                          'language', 'description', 'args', 'inputs',
+                          'outputs']},
+        }
+        return prop
+        
+    @property
     def model_form_schema(self):
         r"""dict: Schema for generating a model YAML form."""
         from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
@@ -934,61 +974,30 @@ class SchemaRegistry(object):
                 out['definitions'][x]['properties'][k].pop('oneOf', None)
                 out['definitions'][x]['properties'][k].update(
                     {"$ref": "#/definitions/serializer"})
-        prop_add = {
-            'model': {'contact_email': {'type': 'string'}}}
-        prop_replace = {
-            'comm': {
-                'transform': {
-                    "type": "array",
-                    "items": {"$ref": "#/definitions/transform"}}}}
-        prop_required = {
-            'model': ['args', 'inputs', 'outputs', 'repository_url']}
-        prop_remove = {
-            'comm': ['is_default', 'length_map', 'serializer',
-                     'address', 'dont_copy', 'for_service',
-                     'send_converter', 'recv_converter', 'client_id',
-                     'cookies', 'host', 'params', 'port'],
-            'file': ['is_default', 'length_map',
-                     'wait_for_creation', 'working_dir',
-                     'read_meth', 'in_temp',
-                     'serializer', 'datatype',
-                     'address', 'dont_copy', 'for_service',
-                     'send_converter', 'recv_converter', 'client_id',
-                     'cookies', 'host', 'params', 'port'],
-            'model': ['client_of', 'is_server', 'preserve_cache',
-                      'products', 'source_products', 'working_dir',
-                      'overwrite', 'skip_interpreter', 'copies',
-                      'timesync', 'with_strace', 'with_valgrind',
-                      'valgrind_flags', 'additional_variables',
-                      'aggregation', 'interpolation', 'synonyms',
-                      'driver']}
-        prop_order = {
-            'model': ['name', 'repository_url', 'contact_email', 'language',
-                      'args', 'inputs', 'outputs']
-        }
+        prop = self.model_form_schema_props
         for k in ['inputs', 'outputs']:
             out['definitions']['model']['properties'][k].pop('default', None)
             desc = out['definitions']['model']['properties'][k]['description'].split(
                 ' A full description')[0]
             out['definitions']['model']['properties'][k]['description'] = desc
         out['definitions']['model']['properties']['args']['minItems'] = 1
-        for k, rlist in prop_remove.items():
+        for k, rlist in prop['remove'].items():
             for p in rlist:
                 out['definitions'][k]['properties'].pop(p, None)
-        for k, rdict in prop_replace.items():
+        for k, rdict in prop['replace'].items():
             for r in rdict.keys():
                 if 'description' in out['definitions'][k]['properties'][r]:
                     rdict[r]['description'] = (
                         out['definitions'][k]['properties'][r]['description'])
             out['definitions'][k]['properties'].update(rdict)
-        for k, rlist in prop_required.items():
+        for k, rlist in prop['required'].items():
             out['definitions'][k].setdefault('required', [])
             for p in rlist:
                 if p not in out['definitions'][k]['required']:
                     out['definitions'][k]['required'].append(p)
-        for k, adict in prop_add.items():
-            out['definitions'][k]['properties'].update(adict)
-        for k, rlist in prop_order.items():
+        # for k, adict in prop['add'].items():
+        #     out['definitions'][k]['properties'].update(adict)
+        for k, rlist in prop['order'].items():
             for i, p in enumerate(rlist):
                 out['definitions'][k]['properties'][p]['propertyOrder'] = i
         out.update(out['definitions'].pop('model'))

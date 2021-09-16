@@ -181,8 +181,8 @@ definitions:
           type: array
       required:
       - datatype
-      - commtype
       - name
+      - commtype
       title: comm_base
       type: object
     - anyOf:
@@ -370,8 +370,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - outputs
       - inputs
+      - outputs
       title: connection_base
       type: object
     - anyOf:
@@ -705,8 +705,8 @@ definitions:
           type: string
       required:
       - filetype
-      - working_dir
       - name
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -1319,6 +1319,10 @@ definitions:
           description: Build type/configuration that should be built. Defaults to
             'Release'.
           type: string
+        contact_email:
+          description: Email address that should be used to contact the maintainer
+            of the model. This parameter is only used in the model repository.
+          type: string
         copies:
           default: 1
           description: The number of copies of the model that should be created. Defaults
@@ -1332,6 +1336,10 @@ definitions:
             use any of the files located there since OSR always assumes the included
             file paths are relative. Defaults to False.
           type: boolean
+        description:
+          description: Description of the model. This parameter is only used in the
+            model repository or when providing the model as a service.
+          type: string
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
@@ -1793,10 +1801,10 @@ definitions:
             is used.
           type: string
       required:
-      - language
       - args
-      - working_dir
       - name
+      - working_dir
+      - language
       title: model_base
       type: object
     - anyOf:

@@ -4,6 +4,7 @@ include *.svg
 include *.txt
 recursive-include yggdrasil *.cfg
 recursive-include yggdrasil *.yml
+recursive-include yggdrasil *.yaml
 recursive-include yggdrasil *.sh
 recursive-include yggdrasil *.m
 recursive-include yggdrasil *.R

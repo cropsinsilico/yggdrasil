@@ -8,7 +8,8 @@ import shutil
 import logging
 from contextlib import contextmanager
 from yggdrasil.services import (
-    IntegrationServiceManager, create_service_manager_class, ServerError)
+    IntegrationServiceManager, create_service_manager_class, ServerError,
+    validate_model_submission)
 from yggdrasil.examples import yamls as ex_yamls
 from yggdrasil.tests import assert_raises, requires_language
 from yggdrasil import runner, import_as_function, platform
@@ -331,3 +332,18 @@ class TestServices(object):
             fmodel.stop()
         finally:
             cli.registry.remove(name)
+
+
+def test_validate_model_submission():
+    r"""Test validate_model_submission"""
+    import git
+    try:
+        fname = os.path.join(os.path.dirname(__file__), 'yamls',
+                             'FakePlant.yaml')
+        validate_model_submission(fname)
+        os.remove(os.path.join('cropsinsilico', 'example-fakemodel',
+                               'LICENSE'))
+        assert_raises(RuntimeError, validate_model_submission, fname)
+    finally:
+        if os.path.isfile('cropsinsilico/example-fakemodel/fakemodel.yml'):
+            git.rmtree("cropsinsilico")
