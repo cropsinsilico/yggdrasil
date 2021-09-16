@@ -152,6 +152,8 @@ def convert_extended2base(s):
                 elif s['type'] in type_map:
                     s['type'] = type_map[s['type']]
                     s.pop('class', None)
+                else:
+                    assert(s['type'] not in ['scalar'])
                 # Scalars not currently included in the schema
                 # elif s['type'] in ['scalar']:
                 #     s.pop("precision", None)
@@ -170,7 +172,7 @@ def convert_extended2base(s):
     return s
 
 
-def get_json_schema(fname_dst=None):
+def get_json_schema(fname_dst=None, indent=None):
     r"""Return the yggdrasil schema as a strictly JSON schema without
     any of the extended datatypes.
 
@@ -178,6 +180,8 @@ def get_json_schema(fname_dst=None):
         fname_dst (str, optional): Full path to file where the JSON
             schema should be saved. Defaults to None and no file is
             created.
+        indent (str, optional): Indentation that should be used when saving
+            the schema to a file.
 
     Returns:
         dict: Converted structure.
@@ -189,11 +193,11 @@ def get_json_schema(fname_dst=None):
     out = convert_extended2base(out)
     if fname_dst is not None:
         with open(fname_dst, 'w') as fd:
-            json.dump(out, fd)
+            json.dump(out, fd, indent=indent)
     return out
 
 
-def get_model_form_schema(fname_dst=None):
+def get_model_form_schema(fname_dst=None, **kwargs):
     r"""Return the yggdrasil schema that can be used to generate a form
     for creating a model specification file.
 
@@ -201,6 +205,8 @@ def get_model_form_schema(fname_dst=None):
         fname_dst (str, optional): Full path to file where the JSON
             schema should be saved. Defaults to None and no file is
             created.
+        **kwargs: Additional keyword arguments are passed to the json.dump
+            call if fname_dst is provided and ignored otherwise.
 
     Returns:
         dict: Schema structure.
@@ -210,7 +216,7 @@ def get_model_form_schema(fname_dst=None):
     out = s.model_form_schema
     if fname_dst is not None:
         with open(fname_dst, 'w') as fd:
-            json.dump(out, fd)
+            json.dump(out, fd, **kwargs)
     return out
 
 
@@ -881,6 +887,46 @@ class SchemaRegistry(object):
         return out
 
     @property
+    def model_form_schema_props(self):
+        r"""dict: Information about how properties should be modified for the
+        model form schema."""
+        prop = {
+            # 'add': {},
+            'replace': {
+                'comm': {
+                    'transform': {
+                        "type": "array",
+                        "items": {"$ref": "#/definitions/transform"}}}},
+            'required': {
+                'model': ['args', 'inputs', 'outputs', 'description',
+                          'repository_url']},
+            'remove': {
+                'comm': ['is_default', 'length_map', 'serializer',
+                         'address', 'dont_copy', 'for_service',
+                         'send_converter', 'recv_converter', 'client_id',
+                         'cookies', 'host', 'params', 'port'],
+                'file': ['is_default', 'length_map',
+                         'wait_for_creation', 'working_dir',
+                         'read_meth', 'in_temp',
+                         'serializer', 'datatype',
+                         'address', 'dont_copy', 'for_service',
+                         'send_converter', 'recv_converter', 'client_id',
+                         'cookies', 'host', 'params', 'port'],
+                'model': ['client_of', 'is_server', 'preserve_cache',
+                          'products', 'source_products', 'working_dir',
+                          'overwrite', 'skip_interpreter', 'copies',
+                          'timesync', 'with_strace', 'with_valgrind',
+                          'valgrind_flags', 'additional_variables',
+                          'aggregation', 'interpolation', 'synonyms',
+                          'driver']},
+            'order': {
+                'model': ['name', 'repository_url', 'contact_email',
+                          'language', 'description', 'args', 'inputs',
+                          'outputs']},
+        }
+        return prop
+        
+    @property
     def model_form_schema(self):
         r"""dict: Schema for generating a model YAML form."""
         from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
@@ -928,38 +974,38 @@ class SchemaRegistry(object):
                 out['definitions'][x]['properties'][k].pop('oneOf', None)
                 out['definitions'][x]['properties'][k].update(
                     {"$ref": "#/definitions/serializer"})
-        prop_add = {
-            'model': {'repository_url': {'type': 'string'},
-                      'contact_email': {'type': 'string'}}}
-        prop_required = {
-            'model': ['inputs', 'outputs', 'repository_url']}
-        prop_remove = {
-            'comm': ['is_default', 'length_map', 'serializer'],
-            'file': ['is_default', 'length_map',
-                     'wait_for_creation', 'working_dir',
-                     'read_meth', 'in_temp',
-                     'serializer', 'datatype'],
-            'model': ['client_of', 'is_server', 'preserve_cache',
-                      'products', 'source_products', 'working_dir',
-                      'overwrite', 'skip_interpreter']}
-        prop_order = {
-            'model': ['name', 'language', 'args', 'inputs', 'outputs']
-        }
-        for k, rlist in prop_remove.items():
+        prop = self.model_form_schema_props
+        for k in ['inputs', 'outputs']:
+            out['definitions']['model']['properties'][k].pop('default', None)
+            desc = out['definitions']['model']['properties'][k]['description'].split(
+                ' A full description')[0]
+            out['definitions']['model']['properties'][k]['description'] = desc
+        out['definitions']['model']['properties']['args']['minItems'] = 1
+        for k, rlist in prop['remove'].items():
             for p in rlist:
                 out['definitions'][k]['properties'].pop(p, None)
-        for k, rlist in prop_required.items():
+        for k, rdict in prop['replace'].items():
+            for r in rdict.keys():
+                if 'description' in out['definitions'][k]['properties'][r]:
+                    rdict[r]['description'] = (
+                        out['definitions'][k]['properties'][r]['description'])
+            out['definitions'][k]['properties'].update(rdict)
+        for k, rlist in prop['required'].items():
             out['definitions'][k].setdefault('required', [])
             for p in rlist:
                 if p not in out['definitions'][k]['required']:
                     out['definitions'][k]['required'].append(p)
-        for k, rlist in prop_order.items():
+        # for k, adict in prop['add'].items():
+        #     out['definitions'][k]['properties'].update(adict)
+        for k, rlist in prop['order'].items():
             for i, p in enumerate(rlist):
                 out['definitions'][k]['properties'][p]['propertyOrder'] = i
-        for k, adict in prop_add.items():
-            out['definitions'][k]['properties'].update(adict)
         out.update(out['definitions'].pop('model'))
         out['definitions'].pop('connection')
+        for x in [out] + list(out['definitions'].values()):
+            for p, v in x.get('properties', {}).items():
+                if v.get("type", None) == "boolean":
+                    v.setdefault("format", "checkbox")
         out.update(
             title='Model YAML Schema',
             description='Schema for yggdrasil model YAML input files.')
@@ -1044,6 +1090,19 @@ class SchemaRegistry(object):
             # kwargs.setdefault('no_defaults', True)
             kwargs.setdefault('schema_registry', self)
         return metaschema.validate_instance(obj, self.schema, **kwargs)
+
+    def validate_model_submission(self, obj, **kwargs):
+        r"""Validate an object against the schema for models submitted to
+        the yggdrasil model repository.
+
+        Args:
+            obj (object): Object to validate.
+            **kwargs: Additional keyword arguments are passed to
+                yggdrasil.metaschema.validate_instance.
+
+        """
+        return metaschema.validate_instance(obj, self.model_form_schema,
+                                            **kwargs)
 
     def validate_component(self, comp_name, obj, **kwargs):
         r"""Validate an object against a specific component.

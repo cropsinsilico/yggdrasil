@@ -136,7 +136,7 @@ def check_enabled_languages(language, return_decorators=False):
 
 
 def requires_language(language, installed=True):
-    r"""Decorator factroy for marking tests that require a specific
+    r"""Decorator factory for marking tests that require a specific
     language.
 
     Args:

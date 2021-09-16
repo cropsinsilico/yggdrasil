@@ -157,12 +157,16 @@ class ForkComm(CommBase.CommBase):
             x.disconnect()
         super(ForkComm, self).disconnect()
         
-    def printStatus(self, nindent=0, **kwargs):
+    def printStatus(self, nindent=0, return_str=False, **kwargs):
         r"""Print status of the communicator."""
-        super(ForkComm, self).printStatus(nindent=nindent,
-                                          **kwargs)
+        out = super(ForkComm, self).printStatus(nindent=nindent,
+                                                return_str=return_str,
+                                                **kwargs)
         for x in self.comm_list:
-            x.printStatus(nindent=nindent + 1)
+            x_out = x.printStatus(nindent=nindent + 1, return_str=return_str)
+            if return_str:
+                out += '\n' + x_out
+        return out
 
     def __len__(self):
         return len(self.comm_list)
@@ -250,16 +254,22 @@ class ForkComm(CommBase.CommBase):
             out.update(**x.opp_comms)
         return out
 
-    def opp_comm_kwargs(self):
+    def opp_comm_kwargs(self, for_yaml=False):
         r"""Get keyword arguments to initialize communication with opposite
         comm object.
+
+        Args:
+            for_yaml (bool, optional): If True, the returned dict will only
+                contain values that can be specified in a YAML file. Defaults
+                to False.
 
         Returns:
             dict: Keyword arguments for opposite comm object.
 
         """
-        kwargs = super(ForkComm, self).opp_comm_kwargs()
-        kwargs['comm_list'] = [x.opp_comm_kwargs() for x in self.comm_list]
+        kwargs = super(ForkComm, self).opp_comm_kwargs(for_yaml=for_yaml)
+        kwargs['comm_list'] = [x.opp_comm_kwargs(for_yaml=for_yaml)
+                               for x in self.comm_list]
         for pair in _pattern_pairs:
             if self.pattern in pair:
                 kwargs['pattern'] = pair[(pair.index(self.pattern) + 1) % 2]

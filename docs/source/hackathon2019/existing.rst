@@ -2,6 +2,10 @@
 Introduction to the User Interface
 ##################################
 
+.. warning::
+
+   The user interface referenced below has been deprecated.
+
 Starting the Jupyter Hub
 ========================
 

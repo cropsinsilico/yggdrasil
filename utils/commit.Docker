@@ -1,0 +1,34 @@
+FROM continuumio/miniconda3
+SHELL ["/bin/bash", "--login", "-c"]
+ARG commit
+RUN apt-get --allow-releaseinfo-change update -y
+# RUN apt-get update -y
+RUN source /opt/conda/etc/profile.d/conda.sh && \
+    conda config --add channels conda-forge && \
+    conda config --set channel_priority strict
+
+RUN git clone --recurse-submodules https://github.com/cropsinsilico/yggdrasil.git && \
+    cd yggdrasil && \
+    git checkout $commit
+WORKDIR /yggdrasil
+RUN source /opt/conda/etc/profile.d/conda.sh && \
+    python utils/setup_test_env.py env --env-name=env conda 3.9
+RUN source /opt/conda/etc/profile.d/conda.sh && \
+    conda activate env && \
+    python utils/setup_test_env.py install conda-dev --always-yes --no-sudo --install-mpi --install-rmq --install-docs --install-sbml --install-omp --python-only
+
+# Required so that gcc & g++ are available as paths in OpenSimRoot make
+RUN source /opt/conda/etc/profile.d/conda.sh && \
+    conda activate env && \
+    # cp $CC $(dirname $CC)/gcc && \
+    cp $CXX $(dirname $CXX)/g++
+RUN source /opt/conda/etc/profile.d/conda.sh && \
+    conda activate env && \
+    yggconfig && \
+    ygginfo --verbose
+RUN source /opt/conda/etc/profile.d/conda.sh && \
+    conda activate env && \
+    yggcompile
+RUN echo "conda activate env" > ~/.bashrc
+WORKDIR /home
+CMD ["/bin/bash", "--login"]

@@ -211,50 +211,6 @@ class SubCommand(metaclass=SubCommandMeta):
         parser.set_defaults(func=cls.func)
 
 
-class main(SubCommand):
-    r"""Runner for yggdrasil CLI."""
-
-    name = "yggdrasil"
-    help = (
-        "Command line interface for the yggdrasil package.")
-    arguments = []
-
-    @classmethod
-    def get_parser(cls, **kwargs):
-        from yggdrasil import __version__ as ver
-        parser = super(main, cls).get_parser(**kwargs)
-        parser.add_argument('--version', action='version',
-                            version=('yggdrasil %s' % ver))
-        subparsers = parser.add_subparsers(title='subcommands',
-                                           dest='subcommand')
-        parser._ygg_subparsers = {}
-        for x in [yggrun, ygginfo, validate_yaml,
-                  yggcc, yggcompile, yggclean,
-                  ygginstall, update_config,
-                  regen_metaschema, regen_schema,
-                  yggmodelform, yggdevup, run_tsts,
-                  timing_plots, generate_gha_workflow]:
-            x.add_subparser(subparsers, args=kwargs.get('args', None))
-            parser._ygg_subparsers[x.name] = x
-        return parser
-
-    @classmethod
-    def parse_args(cls, parser, args=None, **kwargs):
-        if args is None:
-            args = sys.argv[1:]
-        if isinstance(args, list) and ('test' in args):
-            kwargs['allow_unknown'] = True
-        args = super(main, cls).parse_args(parser, args=args, **kwargs)
-        if args.subcommand:
-            args = parser._ygg_subparsers[args.subcommand].parse_args(
-                parser, args=args, **kwargs)
-        return args
-
-    @classmethod
-    def func(cls, args):
-        args.func(args)
-
-
 class yggrun(SubCommand):
     r"""Start a run."""
 
@@ -297,6 +253,177 @@ class yggrun(SubCommand):
             runner.run(args.yamlfile, ygg_debug_prefix=prog,
                        production_run=args.production_run,
                        mpi_tag_start=args.mpi_tag_start)
+
+
+class integration_service_manager(SubCommand):
+    r"""Start or manage the yggdrasil service manager."""
+
+    name = "integration-service-manager"
+    help = "Start or manage a integration service manager."
+    arguments = [
+        (('--manager-name', ),
+         {'help': "Name that will be used to identify the service manager."}),
+        (('--service-type', ),
+         {'choices': ['flask', 'rmq'],
+          'help': ("Type of service that should be started. If not "
+                   "provided, the default will be the (\'services\', "
+                   "\'default_type\') configuration option, if set, and "
+                   "will otherwise be \'flask\'.")}),
+        (('--commtype', ),
+         {'type': str,
+          'help': ("Type of communicator that should be used for connections "
+                   "to services. If not provided, the default will be "
+                   "determined by the (\'services\', \'default_comm\') "
+                   "configuration option, if set.")}),
+        (('--address', ),
+         {'type': str,
+          'help': ('URL for requests to the service manager. '
+                   'If not provided, the default will be determined by the '
+                   '(\'services\', \'default_type\') configuration option, '
+                   'if set, and based on the selected \'service-type\', if '
+                   'not. For a service-type of \'flask\', this should be the '
+                   'http address with the port that should be used '
+                   'and the default will be \'http://localhost:{port}\'. '
+                   'For a service-type of \'rmq\', this should be an '
+                   'amqp broker address and the default will be '
+                   '\'amqp://guest:guest@localhost:{port}/%%2f\'.')}),
+        (('--port', ),
+         {'type': int,
+          'help': ('Port that should be used to access the app. '
+                   'Defaults to 5000 for a flask service manager and '
+                   '5672 for a RabbitMQ service manager if not set '
+                   'via the PORT environment variable.')}),
+        ArgumentSubparser(
+            title='action', dest='action',
+            description='Management action to take.',
+            parsers=[
+                ArgumentParser(
+                    name='start',
+                    help=('Start an integration service manager and/or '
+                          'integration service.'),
+                    arguments=[
+                        (('--remote-url', ),
+                         {'type': str,
+                          'help': ('URL that will be used to access '
+                                   'the service manager and running '
+                                   'integrations by remote requests. '
+                                   'If not provided, the environment '
+                                   'variable YGGDRASIL_SERVICE_HOST_URL '
+                                   'will be used if it is set. If it is '
+                                   'not set, the local ``address`` will '
+                                   'be used under the assumption that '
+                                   'the service manager and integration '
+                                   'services will only be connected to '
+                                   'by local integrations.')}),
+                        (('--integration-name', ),
+                         {'default': None,
+                          'help': ('Name of integration to start. If not '
+                                   'provided, a service manager will be '
+                                   'started.')}),
+                        (('--integration-yamls', ),
+                         {'nargs': '+',
+                          'help': ('One or more YAML specification files '
+                                   'defining the integration. This argument '
+                                   'may be omitted if \'name\' refers to a '
+                                   'registered integration.')}),
+                        (('--with-coverage', ),
+                         {'action': 'store_true',
+                          'help': ('Enable coverage cleanup for testing.')})]),
+                ArgumentParser(
+                    name='stop',
+                    help=('Stop an integration service manager or '
+                          'an integration service.'),
+                    arguments=[
+                        (('--integration-name', ),
+                         {'default': None,
+                          'help': ('Name of integration to stop. If not '
+                                   'provided, the service manager will be '
+                                   'stopped as will all of the running '
+                                   'services.')})]),
+                ArgumentParser(
+                    name='status',
+                    help=('Get list of available services and the status '
+                          'of any running services.')),
+                ArgumentParser(
+                    name='register',
+                    help='Register an integration with the service manager.',
+                    arguments=[
+                        (('integration-name', ),
+                         {'type': str,
+                          'help': ('The name that the integration should be '
+                                   'registered under or the path to a YAML '
+                                   'file containing a list of one or more '
+                                   'mappings between name and YAML '
+                                   'specification files for integrations '
+                                   'that should be registered.')}),
+                        (('integration-yamls', ),
+                         {'nargs': '*',
+                          'help': ('One or more YAML specification files '
+                                   'defining the integration.')})]),
+                ArgumentParser(
+                    name='unregister',
+                    help='Unregister an integration with the service manager.',
+                    arguments=[
+                        (('integration-name', ),
+                         {'type': str,
+                          'help': ('The name of the integration to remove '
+                                   'from the registry or the path to a YAML '
+                                   'file containing a list of one or more '
+                                   'mappings between integration name and '
+                                   'YAML specification files for '
+                                   'integrations that should be '
+                                   'unregistered.')})]),
+            ])]
+
+    @classmethod
+    def func(cls, args):
+        from yggdrasil.services import IntegrationServiceManager
+        integration_name = getattr(args, 'integration-name',
+                                   getattr(args, 'integration_name', None))
+        integration_yamls0 = getattr(args, 'integration-yamls',
+                                     getattr(args, 'integration_yamls', None))
+        integration_yamls = []
+        if integration_yamls0:
+            for yml in integration_yamls0:
+                if not os.path.isabs(yml):
+                    yml = os.path.abspath(yml)
+                integration_yamls.append(yml)
+        elif integration_name and os.path.isfile(integration_name):
+            if not os.path.isabs(integration_name):
+                integration_name = os.path.abspath(integration_name)
+        for_request = (
+            (args.action in ['status', 'register', 'unregister', 'stop'])
+            or (integration_name is not None))
+        x = IntegrationServiceManager(name=args.manager_name,
+                                      service_type=args.service_type,
+                                      commtype=args.commtype,
+                                      address=args.address,
+                                      port=args.port,
+                                      for_request=for_request)
+        if args.action in ['start', None]:
+            if integration_name is None:
+                if not x.is_running:
+                    x.start_server(
+                        remote_url=getattr(args, 'remote_url', None),
+                        with_coverage=getattr(args, 'with_coverage', False))
+            else:
+                x.send_request(integration_name,
+                               yamls=integration_yamls,
+                               action='start')
+        elif args.action == 'stop':
+            if integration_name is None:
+                x.stop_server()
+            else:
+                x.send_request(integration_name, action='stop')
+        elif args.action == 'status':
+            x.printStatus()
+        elif args.action == 'register':
+            x.registry.add(name=integration_name,
+                           yamls=integration_yamls)
+        elif args.action == 'unregister':
+            x.registry.remove(name=integration_name)
+        else:
+            raise NotImplementedError(args.action)
 
 
 class ygginfo(SubCommand):
@@ -698,12 +825,21 @@ class validate_yaml(SubCommand):
     arguments = [
         (('yamlfile', ),
          {'nargs': '+',
-          'help': 'One or more YAML specification files.'})]
+          'help': 'One or more YAML specification files.'}),
+        (('--model-only', ),
+         {'action': 'store_true',
+          'help': ('Validate a YAML containing an isolated model without '
+                   'ensuring that it is part of a complete integration.')}),
+        (('--model-submission', ),
+         {'action': 'store_true',
+          'help': ('Validate a YAML against the schema for submissions to '
+                   'the yggdrasil model repository.')})]
 
     @classmethod
     def func(cls, args):
         from yggdrasil import yamlfile
-        yamlfile.parse_yaml(args.yamlfile)
+        yamlfile.parse_yaml(args.yamlfile, model_only=args.model_only,
+                            model_submission=args.model_submission)
         logger.info("Validation succesful.")
 
 
@@ -912,6 +1048,7 @@ class ygginstall(SubCommand):
     r"""Call installation script."""
 
     name = "install"
+    help = "Complete yggdrasil installation for one or more languages."
 
     @classmethod
     def get_parser(cls, **kwargs):
@@ -1149,7 +1286,7 @@ class yggmodelform(SubCommand):
     @classmethod
     def func(cls, args):
         from yggdrasil.schema import get_model_form_schema
-        out = get_model_form_schema(fname_dst=args.file)
+        out = get_model_form_schema(fname_dst=args.file, indent='    ')
         if not args.file:
             pprint.pprint(out)
 
@@ -1703,6 +1840,52 @@ def yggtime_paper():
     r"""Create plots for timing."""
     ReplacementWarning('yggtime_paper', 'yggdrasil timing lang2019')
     timing_plots(args=['lang2019'] + sys.argv[1:])
+
+
+class main(SubCommand):
+    r"""Runner for yggdrasil CLI."""
+
+    name = "yggdrasil"
+    help = (
+        "Command line interface for the yggdrasil package.")
+    arguments = []
+    subcommands = [yggrun, ygginfo, validate_yaml,
+                   yggcc, yggcompile, yggclean,
+                   ygginstall, update_config,
+                   regen_metaschema, regen_schema,
+                   yggmodelform, yggdevup, run_tsts,
+                   timing_plots, generate_gha_workflow,
+                   integration_service_manager]
+
+    @classmethod
+    def get_parser(cls, **kwargs):
+        from yggdrasil import __version__ as ver
+        parser = super(main, cls).get_parser(**kwargs)
+        parser.add_argument('--version', action='version',
+                            version=('yggdrasil %s' % ver))
+        subparsers = parser.add_subparsers(title='subcommands',
+                                           dest='subcommand')
+        parser._ygg_subparsers = {}
+        for x in cls.subcommands:
+            x.add_subparser(subparsers, args=kwargs.get('args', None))
+            parser._ygg_subparsers[x.name] = x
+        return parser
+
+    @classmethod
+    def parse_args(cls, parser, args=None, **kwargs):
+        if args is None:
+            args = sys.argv[1:]
+        if isinstance(args, list) and ('test' in args):
+            kwargs['allow_unknown'] = True
+        args = super(main, cls).parse_args(parser, args=args, **kwargs)
+        if args.subcommand:
+            args = parser._ygg_subparsers[args.subcommand].parse_args(
+                parser, args=args, **kwargs)
+        return args
+
+    @classmethod
+    def func(cls, args):
+        args.func(args)
 
 
 if __name__ == '__main__':

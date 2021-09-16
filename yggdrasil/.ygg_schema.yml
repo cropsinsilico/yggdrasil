@@ -8,6 +8,10 @@ definitions:
         - args
       description: Base schema for all subtypes of comm components.
       properties:
+        address:
+          description: Communication info. Default to None and address is taken from
+            the environment variable.
+          type: string
         args:
           description: '[DEPRECATED] Arguments that should be provided to the driver.'
           type: string
@@ -17,6 +21,8 @@ definitions:
             are sent/recieved with either columns rather than row by row. Defaults
             to False.'
           type: boolean
+        client_id:
+          type: string
         commtype:
           default: default
           description: Communication mechanism that should be used.
@@ -25,11 +31,15 @@ definitions:
           - default
           - ipc
           - mpi
+          - rest
           - rmq
           - rmq_async
           - value
           - zmq
           type: string
+        cookies:
+          description: Cookies to send to the server. Defaults to None and is ignored.
+          type: object
         count:
           default: 1
           type: integer
@@ -43,10 +53,20 @@ definitions:
           type: schema
         default_file:
           $ref: '#/definitions/file'
+          description: Comm information for a file that input should be drawn from
+            (for input comms) or that output should be sent to (for output comms)
+            in the event that a yaml does not pair the comm with another model comm
+            or a file.
         default_value:
+          description: Value that should be returned in the event that a yaml does
+            not pair the comm with another model comm or a file.
           type: any
         dont_copy:
           default: false
+          description: If True, the comm will not be duplicated in the even a model
+            is duplicated via the 'copies' parameter. Defaults to False except for
+            in the case that a model is wrapped and the comm is inside the loop or
+            that a model is a RPC input to a model server.
           type: boolean
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
@@ -67,24 +87,47 @@ definitions:
           type: array
         filter:
           $ref: '#/definitions/filter'
+          description: Filter that will be used to determine when messages should
+            be sent/received. Ignored if not provided.
+        for_service:
+          default: false
+          description: If True, this comm bridges the gap to an integration running
+            as a service, possibly on a remote machine. Defaults to False.
+          type: boolean
         format_str:
           description: String that should be used to format/parse messages. Default
             to None.
           type: string
+        host:
+          default: http://localhost:{port}
+          type: string
         is_default:
           default: false
+          description: If True, this comm was created to handle all input/output variables
+            to/from a model. Defaults to False. This variable is used internally and
+            should not be set explicitly in the YAML.
           type: boolean
         length_map:
           additionalProperties:
             type: string
-          description: Map from pointer variable names to
+          description: Map from pointer variable names to the names of variables where
+            their length will be stored. Defaults to {}.
           type: object
         name:
           description: Name used for component in log messages.
           type: string
         outside_loop:
           default: false
+          description: If True, and the comm is an input/outputs to/from a model being
+            wrapped. The receive/send calls for this comm will be outside the loop
+            for the model. Defaults to False.
           type: boolean
+        params:
+          description: Parameters that should be passed via URL. Defaults to None
+            and is ignored.
+          type: object
+        port:
+          type: int
         recv_converter:
           anyOf:
           - $ref: '#/definitions/transform'
@@ -128,6 +171,8 @@ definitions:
                 - function
                 - string
             type: array
+          description: One or more transformations that will be applied to messages
+            that are sent/received. Ignored if not provided.
         vars:
           description: Names of variables to be sent/received by this comm. Defaults
             to [].
@@ -135,9 +180,9 @@ definitions:
             type: string
           type: array
       required:
+      - datatype
       - name
       - commtype
-      - datatype
       title: comm_base
       type: object
     - anyOf:
@@ -173,6 +218,31 @@ definitions:
             - buffer
             type: string
         title: BufferComm
+        type: object
+      - additionalProperties: true
+        description: Schema for comm component ['rest'] subtype.
+        properties:
+          client_id:
+            type: string
+          commtype:
+            default: default
+            description: RESTful API.
+            enum:
+            - rest
+            type: string
+          cookies:
+            description: Cookies to send to the server. Defaults to None and is ignored.
+            type: object
+          host:
+            default: http://localhost:{port}
+            type: string
+          params:
+            description: Parameters that should be passed via URL. Defaults to None
+              and is ignored.
+            type: object
+          port:
+            type: int
+        title: RESTComm
         type: object
       - additionalProperties: true
         description: Schema for comm component ['value'] subtype.
@@ -300,8 +370,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - outputs
       - inputs
+      - outputs
       title: connection_base
       type: object
     - anyOf:
@@ -388,6 +458,10 @@ definitions:
         - args
       description: Base schema for all subtypes of file components.
       properties:
+        address:
+          description: Communication info. Default to None and address is taken from
+            the environment variable.
+          type: string
         append:
           default: false
           description: If True and writing, file is openned in append mode. If True
@@ -466,6 +540,13 @@ definitions:
           type: string
         filter:
           $ref: '#/definitions/filter'
+          description: Filter that will be used to determine when messages should
+            be sent/received. Ignored if not provided.
+        for_service:
+          default: false
+          description: If True, this comm bridges the gap to an integration running
+            as a service, possibly on a remote machine. Defaults to False.
+          type: boolean
         format_str:
           description: String that should be used to format/parse messages. Default
             to None.
@@ -492,7 +573,8 @@ definitions:
         length_map:
           additionalProperties:
             type: string
-          description: Map from pointer variable names to
+          description: Map from pointer variable names to the names of variables where
+            their length will be stored. Defaults to {}.
           type: object
         name:
           description: Name used for component in log messages.
@@ -584,6 +666,8 @@ definitions:
                 - function
                 - string
             type: array
+          description: One or more transformations that will be applied to messages
+            that are sent/received. Ignored if not provided.
         use_astropy:
           default: false
           description: If True, the astropy package will be used to serialize/deserialize
@@ -620,9 +704,9 @@ definitions:
             is used.
           type: string
       required:
+      - filetype
       - name
       - working_dir
-      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -1191,9 +1275,10 @@ definitions:
             comms can be used by more than one thread. Defaults to False.
           type: boolean
         args:
-          description: The full path to the file containing the model program that
-            will be run by the driver or a list starting with the program file and
-            including any arguments that should be passed as input to the program.
+          description: The path to the file containing the model program that will
+            be run by the driver for the model's language and/or a list of arguments
+            that should be passed as input to the model program or language executable
+            (e.g. source code or configuration file for a domain specific language).
           items:
             type: string
           type: array
@@ -1234,6 +1319,10 @@ definitions:
           description: Build type/configuration that should be built. Defaults to
             'Release'.
           type: string
+        contact_email:
+          description: Email address that should be used to contact the maintainer
+            of the model. This parameter is only used in the model repository.
+          type: string
         copies:
           default: 1
           description: The number of copies of the model that should be created. Defaults
@@ -1247,6 +1336,10 @@ definitions:
             use any of the files located there since OSR always assumes the included
             file paths are relative. Defaults to False.
           type: boolean
+        description:
+          description: Description of the model. This parameter is only used in the
+            model repository or when providing the model as a service.
+          type: string
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
@@ -1285,10 +1378,9 @@ definitions:
           type: string
         inputs:
           default: []
-          description: A mapping object containing the entry for a model input channel
-            or a list of input channel entries. If the model does not get input from
-            another model, this may be ommitted. A full description of channel entries
-            and the options available for channels can be found :ref:`here<yaml_comm_options>`.
+          description: Zero or more channels carrying input to the model. A full description
+            of channel entries and the options available for channels can be found
+            :ref:`here<yaml_comm_options>`.
           items:
             $ref: '#/definitions/comm'
           type: array
@@ -1380,9 +1472,9 @@ definitions:
           - cmake
           - cpp
           - cxx
+          - dummy
           - executable
           - fortran
-          - function
           - lpy
           - make
           - matlab
@@ -1433,10 +1525,9 @@ definitions:
           type: boolean
         outputs:
           default: []
-          description: A mapping object containing the entry for a model output channel
-            or a list of output channel entries. If the model does not output to another
-            model, this may be ommitted. A full description of channel entries and
-            the options available for channels can be found :ref:`here<yaml_comm_options>`.
+          description: Zero or more channels carrying output from the model. A full
+            description of channel entries and the options available for channels
+            can be found :ref:`here<yaml_comm_options>`.
           items:
             $ref: '#/definitions/comm'
           type: array
@@ -1470,6 +1561,11 @@ definitions:
           items:
             type: string
           type: array
+        repository_url:
+          description: URL for the git repository containing the model source code.
+            If provided, relative paths in the model YAML definition will be considered
+            relative to the repository root directory.
+          type: string
         reset:
           default: false
           description: If True, the simulation will be reset to it's initial values
@@ -1705,46 +1801,13 @@ definitions:
             is used.
           type: string
       required:
-      - language
-      - name
       - args
+      - name
       - working_dir
+      - language
       title: model_base
       type: object
     - anyOf:
-      - additionalProperties: true
-        description: Schema for model component ['function'] subtype.
-        properties:
-          interpreter:
-            description: Name or path of interpreter executable that should be used
-              to run the model. If not provided, the interpreter will be determined
-              based on configuration options for the language (if present) and the
-              default_interpreter class attribute.
-            type: string
-          interpreter_flags:
-            default: []
-            description: Flags that should be passed to the interpreter when running
-              the model. If not provided, the flags are determined based on configuration
-              options for the language (if present) and the default_interpreter_flags
-              class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: The programming language that the model is written in. A
-              list of available languages can be found :ref:`here <schema_table_model_subtype_rst>`.
-            enum:
-            - function
-            type: string
-          skip_interpreter:
-            default: false
-            description: If True, no interpreter will be added to the arguments. This
-              should only be used for subclasses that will not be invoking the model
-              via the command line. Defaults to False.
-            type: boolean
-        title: FunctionModelDriver
-        type: object
       - additionalProperties: true
         description: Schema for model component ['make'] subtype.
         properties:
@@ -2504,6 +2567,39 @@ definitions:
             - f2008
             type: string
         title: FortranModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['dummy'] subtype.
+        properties:
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: The programming language that the model is written in. A
+              list of available languages can be found :ref:`here <schema_table_model_subtype_rst>`.
+            enum:
+            - dummy
+            type: string
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+        title: DummyModelDriver
         type: object
     description: Schema for model components.
     title: model

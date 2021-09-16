@@ -1,5 +1,5 @@
 {% set name = "yggdrasil" %}
-{% set version = "1.7.0" %}
+{% set version = "1.8.0" %}
 
 package:
   name: {{ name|lower }}
@@ -52,11 +52,14 @@ requirements:
     - sysv_ipc  # [unix]
     - zeromq
   run:
+    - chevron
     - cmake  # [not win]
     - czmq
     - flaky
+    - flask
     - git
-    - GitPython
+    - GitPython <=3.1.20  # [py==36]
+    - GitPython  # [py>36]
     - jsonschema
     - matplotlib-base
     - numpy >=1.13.0
@@ -64,7 +67,6 @@ requirements:
     - pyperf
     - pint  # [py2k]
     - psutil
-    - pystache
     - python
     - python-rapidjson  # [not py2k]
     - pyyaml
@@ -75,6 +77,7 @@ requirements:
     - r-reticulate
     - r-units
     - r-zeallot
+    - requests
     - scipy
     - six
     - sysv_ipc  # [unix]

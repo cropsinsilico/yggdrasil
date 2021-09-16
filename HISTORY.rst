@@ -2,6 +2,30 @@
 History
 =======
 
+1.8.0 (2021-09-15) Support for REST API based communicators, running integrations as services, and connecting to remote integration services
+------------------
+
+* Added option to return printStatus string for YggClass subclasses via return_str keyword
+* Added classes for managing models as services via Flask or RabbitMQ
+* Transitioned from as_function to complete_partial keyword in parse_yaml that can be used for services as well as functions
+* Added client side instrumentation for connecting to remote model services and tests
+* Added support for registering integrations that can be called locally as services
+* Added 'integration-service-manager' CLI for managing service managers
+* Added configuration options for services
+* Added communicator for use with REST API
+* Added ValueEvent class for returning a value with the event
+* Added methods for waiting on a function to return True
+* Refactored multitasking classes to use __slots__ for improved memory performance
+* Added tools for building yggdrasil docker containers and documentation on those tools
+* Added repository_url, description, and contact_email parameters to model YAML schema that allows for a repository to be specified in the YAML (in addition to via the command line as before)
+* Added model_only and model_submission options to yggdrasil.yamfile.parse_yaml method and YAML validation CLI
+* Added generated documentation on command line utilities
+* Added a glossary of terms
+* Included downloadable versions of the schemas in the documentation
+* Moved console_scripts list into a text file
+* Note deprecation of the old GUI in the docs for the 2018 & 2019 hackathons
+* Added validate_model_submission method for validating model repository submissions
+
 1.7.0 (2021-08-26) Support for MPI communicators, MPI execution, and pika >= 1.0.0
 ------------------
 

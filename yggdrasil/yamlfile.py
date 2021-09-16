@@ -1,7 +1,7 @@
 import os
 import copy
 import pprint
-import pystache
+import chevron
 import yaml
 import json
 import git
@@ -36,6 +36,54 @@ for cls in (BaseConstructor, Constructor, SafeConstructor):
                         no_duplicates_constructor)
 
 
+def clone_github_repo(fname):
+    r"""Clone a GitHub repository, returning the path to the local copy of the
+    file pointed to by the URL if there is one.
+
+    Args:
+        fname (str): URL to a GitHub repository or a file in a GitHub
+            repository that should be cloned.
+
+
+    Returns:
+        str: Path to the local copy of the repository or file in the
+            repository.
+
+    """
+    
+    from yggdrasil.services import _service_host_env
+    # make sure we start with a full url
+    if 'http' not in fname:
+        url = 'http://github.com/' + fname
+    else:
+        url = fname
+    # get the constituent url parts
+    parsed = urlparse(url)
+    # get the path component
+    splitpath = parsed.path.split('/')
+    # the first part is the 'owner' of the repo
+    owner = splitpath[1]
+    # the second part is the repo name
+    reponame = splitpath[2]
+    # the full path is the file name and location
+    # turn the file path into an os based format
+    fname = os.path.join(*splitpath)
+    # check to see if the file already exists, and clone if it does not
+    if not os.path.exists(fname):
+        if os.environ.get(_service_host_env, False):
+            raise RuntimeError("Cloning of unvetted git repo is "
+                               "not permitted on a integration "
+                               "service manager.")
+        # create the url for cloning the repo
+        cloneurl = parsed.scheme + '://' + parsed.netloc + '/' + owner + '/' +\
+            reponame
+        # clone the repo into the appropriate directory
+        repo = git.Repo.clone_from(cloneurl, os.path.join(owner, reponame))
+        repo.close()
+        # now that it is cloned, just pass the yaml file (and path) onwards
+    return os.path.realpath(fname)
+
+
 def load_yaml(fname):
     r"""Parse a yaml file defining a run.
 
@@ -61,32 +109,7 @@ def load_yaml(fname):
     elif isinstance(fname, str):
         # pull foreign file
         if fname.startswith('git:'):
-            # drop the git prefix
-            fname = fname[4:]
-            # make sure we start with a full url
-            if 'http' not in fname:
-                url = 'http://github.com/' + fname
-            else:
-                url = fname
-            # get the constituent url parts
-            parsed = urlparse(url)
-            # get the path component
-            splitpath = parsed.path.split('/')
-            # the first part is the 'owner' of the repo
-            owner = splitpath[1]
-            # the second part is the repo name
-            reponame = splitpath[2]
-            # the full path is the file name and location
-            # turn the file path into an os based format
-            fname = os.path.join(*splitpath)
-            # check to see if the file already exists, and clone if it does not
-            if not os.path.exists(fname):
-                # create the url for cloning the repo
-                cloneurl = parsed.scheme + '://' + parsed.netloc + '/' + owner + '/' +\
-                    reponame
-                # clone the repo into the appropriate directory
-                _ = git.Repo.clone_from(cloneurl, os.path.join(owner, reponame))
-                # now that it is cloned, just pass the yaml file (and path) onwards
+            fname = clone_github_repo(fname[4:])
         fname = os.path.realpath(fname)
         if not os.path.isfile(fname):
             raise IOError("Unable locate yaml file %s" % fname)
@@ -100,7 +123,7 @@ def load_yaml(fname):
             fname = os.path.join(os.getcwd(), 'stream')
     # Mustache replace vars
     yamlparsed = fd.read()
-    yamlparsed = pystache.render(
+    yamlparsed = chevron.render(
         sio.StringIO(yamlparsed).getvalue(), dict(os.environ))
     if fname.endswith('.json'):
         yamlparsed = json.loads(yamlparsed)
@@ -127,6 +150,7 @@ def prep_yaml(files):
         dict: YAML ready to be parsed using schema.
 
     """
+    from yggdrasil.services import IntegrationServiceManager
     # Load each file
     if not isinstance(files, list):
         files = [files]
@@ -141,6 +165,27 @@ def prep_yaml(files):
                 if not os.path.isabs(f):
                     f = os.path.join(y['working_dir'], f)
                 yamls.append(load_yaml(f))
+    # Replace references to services with service descriptions
+    for i, y in enumerate(yamls):
+        services = y.pop('services', [])
+        if 'service' in y:
+            services.append(y.pop('service'))
+        if services:
+            y.setdefault('models', [])
+            if 'model' in y:
+                y['models'].append(y.pop('model'))
+        for x in services:
+            request = {'action': 'start'}
+            for k in ['name', 'yamls']:
+                if k in x:
+                    request[k] = x.pop(k)
+            if 'type' in x:
+                x.setdefault('service_type', x.pop('type'))
+            x.setdefault('for_request', True)
+            cli = IntegrationServiceManager(**x)
+            response = cli.send_request(**request)
+            assert(response.pop('status') == 'complete')
+            y['models'].append(response)
     # Standardize format of models and connections to be lists and
     # add working_dir to each
     comp_keys = ['models', 'connections']
@@ -149,7 +194,11 @@ def prep_yaml(files):
         for k in comp_keys:
             for x in yml[k]:
                 if isinstance(x, dict):
-                    x.setdefault('working_dir', yml['working_dir'])
+                    if (k == 'models') and ('repository_url' in x):
+                        repo_dir = clone_github_repo(x['repository_url'])
+                        x.setdefault('working_dir', repo_dir)
+                    else:
+                        x.setdefault('working_dir', yml['working_dir'])
     # Combine models & connections
     yml_all = {}
     for k in comp_keys:
@@ -159,20 +208,31 @@ def prep_yaml(files):
     return yml_all
 
 
-def parse_yaml(files, as_function=False):
+def parse_yaml(files, complete_partial=False, partial_commtype=None,
+               model_only=False, model_submission=False):
     r"""Parse list of yaml files.
 
     Args:
         files (str, list): Either the path to a single yaml file or a list of
             yaml files.
-        as_function (bool, optional): If True, the missing input/output channels
-            will be created for using model(s) as a function. Defaults to False.
+        complete_partial (bool, optional): If True, unpaired input/output
+            channels are allowed and reserved for use (e.g. for calling the
+            model as a function). Defaults to False.
+        partial_commtype (dict, optional): Communicator kwargs that should be
+            be used for the connections to the unpaired channels when
+            complete_partial is True. Defaults to None and will be ignored.
+        model_only (bool, optional): If True, the YAML will not be evaluated
+            as a complete integration and only the individual components will
+            be parsed. Defaults to False.
+        model_submission (bool, optional): If True, the YAML will be evaluated
+            as a submission to the yggdrasil model repository and model_only
+            will be set to True. Defaults to False.
 
     Raises:
-        ValueError: If the yml dictionary is missing a required keyword or has
-            an invalid value.
-        RuntimeError: If one of the I/O channels is not initialized with driver
-            information.
+        ValueError: If the yml dictionary is missing a required keyword or
+            has an invalid value.
+        RuntimeError: If one of the I/O channels is not initialized with
+            driver information.
 
     Returns:
         dict: Dictionary of information parsed from the yamls.
@@ -183,6 +243,18 @@ def parse_yaml(files, as_function=False):
     yml_prep = prep_yaml(files)
     # print('prepped')
     # pprint.pprint(yml_prep)
+    if model_submission:
+        models = []
+        for yml in yml_prep['models']:
+            wd = yml.pop('working_dir', None)
+            x = s.validate_model_submission(yml, normalize=True,
+                                            no_defaults=True,
+                                            required_defaults=True)
+            if wd:
+                x['working_dir'] = wd
+            models.append(x)
+        yml_prep['models'] = models
+        model_only = True
     yml_norm = s.validate(yml_prep, normalize=True,
                           no_defaults=True, required_defaults=True)
     # print('normalized')
@@ -221,9 +293,13 @@ def parse_yaml(files, as_function=False):
     for k in ['models', 'connections']:
         for yml in yml_norm[k]:
             existing = parse_component(yml, k[:-1], existing=existing)
-    # Add stand-in for function that will call to remote models
-    if as_function:
-        existing = add_model_function(existing)
+    # Exit early
+    if model_only:
+        return yml_norm
+    # Add stand-in model that uses unpaired channels
+    if complete_partial:
+        existing = complete_partial_integration(
+            existing, complete_partial, partial_commtype=partial_commtype)
     # Create server/client connections
     for srv, srv_info in existing['server'].items():
         clients = srv_info['clients']
@@ -305,19 +381,25 @@ def parse_yaml(files, as_function=False):
     return existing
 
 
-def add_model_function(existing):
-    r"""Patch input/output channels that are not connected to a function model.
+def complete_partial_integration(existing, name, partial_commtype=None):
+    r"""Patch input/output channels that are not connected to a stand-in model.
 
     Args:
         existing (dict): Dictionary of existing components.
+        name (str): Name that should be given to the new model.
+        partial_commtype (dict, optional): Communicator kwargs that should be
+            be used for the connections to the unpaired channels. Defaults to
+            None and will be ignored.
 
     Returns:
         dict: Updated dictionary of components.
 
     """
-    new_model = {'name': 'function_model',
-                 'language': 'function',
-                 'args': 'function',
+    if isinstance(name, bool):
+        name = 'dummy_model'
+    new_model = {'name': name,
+                 'language': 'dummy',
+                 'args': 'dummy',
                  'working_dir': os.getcwd(),
                  'inputs': [],
                  'outputs': []}
@@ -327,25 +409,31 @@ def add_model_function(existing):
     dir2opp = {'input': 'output', 'output': 'input'}
     for io in dir2opp.keys():
         miss[io] = [k for k in existing[io].keys()
-                    if not ((io == 'input') and (k in existing['server']))]
+                    if not (((io == 'input') and (k in existing['server']))
+                            or existing[io][k].get('is_default', False))]
     for srv_info in existing['server'].values():
         if not srv_info['clients']:
             new_model.setdefault('client_of', [])
             new_model['client_of'].append(srv_info['model_name'])
+    # TODO: Check that there arn't any missing servers
     # for conn in existing['connection'].values():
     #     for io1, io2 in dir2opp.items():
     #         if ((io1 + 's') in conn):
     #             for x in conn[io1 + 's']:
     #                 if x in miss[io2]:
     #                     miss[io2].remove(x)
-    # Create connections to function model
+    # Create connections to dummy model
     for io1, io2 in dir2opp.items():
         for i in miss[io1]:
-            function_channel = 'function_%s' % i
-            function_comm = copy.deepcopy(existing[io1][i])
-            function_comm['name'] = function_channel
-            new_model[io2 + 's'].append(function_comm)
-            new_connections.append({io1 + 's': [{'name': function_channel}],
+            dummy_channel = 'dummy_%s' % i
+            dummy_comm = copy.deepcopy(existing[io1][i])
+            for k in ['address', 'for_service', 'commtype', 'host']:
+                dummy_comm.pop(k, None)
+            dummy_comm['name'] = dummy_channel
+            if partial_commtype is not None:
+                dummy_comm.update(partial_commtype)
+            new_model[io2 + 's'].append(dummy_comm)
+            new_connections.append({io1 + 's': [{'name': dummy_channel}],
                                     io2 + 's': [{'name': i}]})
     # Parse new components
     existing = parse_component(new_model, 'model', existing=existing)

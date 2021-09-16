@@ -130,6 +130,34 @@ class TestEvent(TstContextObject, YggTestClass):
         self.instance.set()
         super(TestEvent, self).test_pickle()
 
+    def test_callback(self):
+        r"""Test callabacks."""
+        def set_callback():
+            self.state = 'set'
+
+        def clear_callback():
+            self.state = 'clear'
+
+        self.instance.add_callback(set_callback, trigger='set')
+        self.instance.add_callback(clear_callback, trigger='clear')
+        self.instance.set()
+        assert(self.state == 'set')
+        self.instance.clear()
+        assert(self.state == 'clear')
+
+
+class TestValueEvent(TestEvent):
+
+    _cls = 'ValueEvent'
+
+    def test_value(self):
+        r"""Test setting/clearning event value."""
+        self.assert_equal(self.instance.get(), None)
+        self.instance.set('test')
+        self.assert_equal(self.instance.get(), 'test')
+        self.instance.clear()
+        self.assert_equal(self.instance.get(), None)
+
 
 class TestTask(TstContextObject, YggTestClass):
 

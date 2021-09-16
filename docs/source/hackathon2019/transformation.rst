@@ -139,6 +139,10 @@ was closed due to an error.
 Adding a Model to the UI
 ========================
 
+.. warning::
+
+   The user interface referenced below has been deprecated.
+   
 To add your growth model to the model palatte first clear your canvas by
 clicking on the ``Clear`` button and then clicked the ``Create a New Model``
 link in the top left of the ``Model Composer`` tab.

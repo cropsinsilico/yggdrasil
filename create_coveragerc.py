@@ -1,5 +1,6 @@
 import os
 import sys
+import site
 PY_MAJOR_VERSION = sys.version_info[0]
 IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
 _on_gha = bool(os.environ.get('GITHUB_ACTIONS', False))
@@ -14,6 +15,7 @@ except ImportError:
         from configparser import RawConfigParser as HandyConfigParser
     except ImportError:
         HandyConfigParser = None
+_package_dir = os.path.join(site.getsitepackages()[0], 'yggdrasil')
 
 
 def add_excl_rule(excl_list, new_rule):
@@ -142,6 +144,24 @@ def create_coveragerc(installed_languages):
             excl_list = rm_excl_rule(excl_list, 'pragma: no %s' % k)
     # Add new rules
     cp.set('report', 'exclude_lines', '\n' + '\n'.join(excl_list))
+    # Set include path so that filenames in the report are absolute
+    if os.path.isdir(_package_dir):
+        PACKAGE_DIR = _package_dir
+    else:
+        PACKAGE_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                                   'yggdrasil')
+    section = 'source'
+    if section == 'include':
+        section_path = os.path.join(PACKAGE_DIR, '*')
+    else:
+        section_path = PACKAGE_DIR
+    if not cp.has_section('run'):
+        cp.add_section('run')
+    incl_list = []
+    if cp.has_option('run', section):
+        incl_list = cp.get('run', section).strip().split('\n')
+    incl_list.append(section_path)
+    cp.set('run', section, '\n' + '\n'.join(incl_list))
     # Write
     with open(covrc, 'w') as fd:
         cp.write(fd)
@@ -151,8 +171,11 @@ def create_coveragerc(installed_languages):
 def run():
     r"""Run coverage creation function after getting a list of installed
     languages."""
-    LANG_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                             'yggdrasil', 'languages')
+    if os.path.isdir(_package_dir):
+        LANG_PATH = os.path.join(_package_dir, 'languages')
+    else:
+        LANG_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                                 'yggdrasil', 'languages')
     sys.path.insert(0, LANG_PATH)
     try:
         import install_languages

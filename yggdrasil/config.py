@@ -89,7 +89,19 @@ _cfg_map = {
         'help': 'Run production level tests when encountered.'},
     ('general', 'default_comm'): {
         'env': 'YGG_DEFAULT_COMM', 'type': str,
-        'help': 'Comm type that should be used by default.'}
+        'help': 'Comm type that should be used by default.'},
+    # ('services', 'default_type'): {
+    #     'env': 'YGG_DEFAULT_SERVICE_TYPE', 'type': str,
+    #     'help': ('Type of service manager that should be used by default, '
+    #              'including for new local service managers.')},
+    # ('services', 'default_address'): {
+    #     'env': 'YGG_DEFAULT_SERVICE_ADDRESS', 'type': str,
+    #     'help': ('Address that should be used by default for new local '
+    #              'service managers.')},
+    # ('services', 'default_comm'): {
+    #     'env': 'YGG_DEFAULT_SERVICE_COMM', 'type': str,
+    #     'help': ('Comm type that should be used by default for connections '
+    #              'between integrations and running integration services.')},
 }
 _key2env = {}
 for k, v in _cfg_map.items():

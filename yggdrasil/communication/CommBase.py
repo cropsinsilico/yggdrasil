@@ -435,17 +435,16 @@ class CommBase(tools.YggClass):
         vars (list, optional): Names of variables to be sent/received by
             this comm. Defaults to [].
         length_map (dict, optional): Map from pointer variable names to
-
             the names of variables where their length will be stored.
             Defaults to {}.
         comm (str, optional): The comm that should be created. This only serves
             as a check that the correct class is being created. Defaults to None.
-        filter (:class:.FilterBase, optional): Callable class that will be used to
-            determine when messages should be sent/received. Defaults to None
-            and is ignored.
-        transform (:class:.TransformBase, optional): Callable class that will be
-            used to transform messages that are sent/received. Defaults to None
-            and is ignored.
+        filter (:class:.FilterBase, optional): Filter that will be used to
+            determine when messages should be sent/received. Ignored if not
+            provided.
+        transform (:class:.TransformBase, optional): One or more transformations
+            that will be applied to messages that are sent/received. Ignored if
+            not provided.
         is_default (bool, optional): If True, this comm was created to handle
             all input/output variables to/from a model. Defaults to False. This
             variable is used internally and should not be set explicitly in
@@ -467,6 +466,9 @@ class CommBase(tools.YggClass):
         default_value (object, optional): Value that should be returned in
             the event that a yaml does not pair the comm with another
             model comm or a file.
+        for_service (bool, optional): If True, this comm bridges the gap to
+            an integration running as a service, possibly on a remote machine.
+            Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Class Attributes:
@@ -526,6 +528,7 @@ class CommBase(tools.YggClass):
     _schema_required = ['name', 'commtype', 'datatype']
     _schema_properties = {
         'name': {'type': 'string'},
+        'address': {'type': 'string'},
         'commtype': {'type': 'string', 'default': 'default',
                      'description': ('Communication mechanism '
                                      'that should be used.')},
@@ -569,7 +572,8 @@ class CommBase(tools.YggClass):
                          'default': False},
         'dont_copy': {'type': 'boolean', 'default': False},
         'default_file': {'$ref': '#/definitions/file'},
-        'default_value': {'type': 'any'}}
+        'default_value': {'type': 'any'},
+        'for_service': {'type': 'boolean', 'default': False}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _default_serializer_class = None
@@ -675,14 +679,15 @@ class CommBase(tools.YggClass):
         self.allow_multiple_comms = allow_multiple_comms
         if (((not self.single_use)
              and ((self.is_interface and self.env.get('YGG_THREADING', False))
-                  or (self.model_copies > 1) or (self.partner_copies > 1)))):
+                  or (self.model_copies > 1) or (self.partner_copies > 1)
+                  or self.for_service))):
             self.allow_multiple_comms = True
         if self.single_use and (not self.is_response_server):
             self._send_serializer = False
         self.create_proxy = ((self.is_client or self.allow_multiple_comms)
                              and (not self.is_interface)
                              and (self.direction != 'recv')
-                             and (self._commtype != 'mpi'))
+                             and (self._commtype not in ['mpi', 'rest']))
         # Add interface tag
         if self.is_interface:
             self._name += '_I'
@@ -909,7 +914,7 @@ class CommBase(tools.YggClass):
     #         out += '[%s]' % model_name
     #     return out
         
-    def printStatus(self, *args, level='info', **kwargs):
+    def printStatus(self, *args, level='info', return_str=False, **kwargs):
         r"""Print status of the communicator."""
         nindent = kwargs.get('nindent', 0)
         lines, prefix = self.get_status_message(*args, **kwargs)
@@ -917,6 +922,8 @@ class CommBase(tools.YggClass):
             lines.append('%sWork comms:' % prefix)
             for v in self._work_comms.values():
                 lines += v.get_status_message(nindent=nindent + 1)[0]
+        if return_str:
+            return '\n'.join(lines)
         getattr(self, level)('\n'.join(lines))
 
     @property
@@ -1101,9 +1108,14 @@ class CommBase(tools.YggClass):
         r"""dict: Name/address pairs for opposite comms."""
         return {self.opp_name: self.opp_address}
 
-    def opp_comm_kwargs(self):
+    def opp_comm_kwargs(self, for_yaml=False):
         r"""Get keyword arguments to initialize communication with opposite
         comm object.
+
+        Args:
+            for_yaml (bool, optional): If True, the returned dict will only
+                contain values that can be specified in a YAML file. Defaults
+                to False.
 
         Returns:
             dict: Keyword arguments for opposite comm object.
@@ -1112,13 +1124,21 @@ class CommBase(tools.YggClass):
         kwargs = {'commtype': self._commtype, 'use_async': self.is_async,
                   'allow_multiple_comms': self.allow_multiple_comms}
         kwargs['address'] = self.opp_address
-        kwargs['serializer'] = self.serializer
+        if not for_yaml:
+            kwargs['serializer'] = self.serializer
+        kwargs.update(self.serializer.input_kwargs)
         # TODO: Pass copies/partner_copies in kwargs?
         if self.direction == 'send':
             kwargs['direction'] = 'recv'
         else:
             kwargs['direction'] = 'send'
-        kwargs.update(self.serializer.input_kwargs)
+        if for_yaml:
+            kwargs['datatype'] = kwargs['datatype']._typedef
+            for k in ['use_async', 'allow_multiple_comms', 'direction',
+                      'comment', 'newline', 'seritype']:
+                kwargs.pop(k, None)
+        if self.for_service:
+            kwargs['for_service'] = True
         return kwargs
 
     def bind(self):

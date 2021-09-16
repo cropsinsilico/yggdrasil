@@ -96,7 +96,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                 '%-15s: %s' % ('nrecv (backlog)', self.n_msg_backlog_recv))
         kwargs.setdefault('extra_lines_after', [])
         kwargs['extra_lines_after'] += lines
-        self._wrapped.printStatus(*args, **kwargs)
+        return self._wrapped.printStatus(*args, **kwargs)
         
     @property
     def backlog_thread(self):

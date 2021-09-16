@@ -1,0 +1,31 @@
+<!doctype html>
+<title>Yggdrasil Service Manager</title>
+<h1>Yggdrasil Service Manager</h1>
+{% if name %}
+<h2>{{ name }} Status</h2>
+<p>{{ status }}</p>
+{% else %}
+<h2>Address</h2>
+<p>{{ address }}</p>
+<h2>Available Services</h2>
+{% for integration, body in available.items() %}
+<h3>{{ integration }}</h3>
+  <p>
+    {% for line in body %}
+    {{ line }}<br>
+    {% endfor %}
+  </p>
+{% endfor %}
+<h2>Running Services</h2>
+{% for client, integrations in running.items() %}
+<h3>Client {{ client }}</h3>
+{% for integration, body in integrations.items() %}
+<h4>Integration {{ integration }}</h4>
+  <p>
+    {% for line in body %}
+    {{ line }}<br>
+    {% endfor %}
+  </p>
+{% endfor %}
+{% endfor %}
+{% endif %}

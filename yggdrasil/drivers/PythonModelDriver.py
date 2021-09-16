@@ -19,7 +19,8 @@ class PythonModelDriver(InterpretedModelDriver):
                 'libraries': ['sysv_ipc']},
         'zmq': {'libraries': ['zmq']},
         'rmq': {'libraries': ['pika']},
-        'mpi': {'libraries': ['mpi4py']}}
+        'mpi': {'libraries': ['mpi4py']},
+        'rest': {'libraries': ['requests']}}
     type_map = {
         'int': 'numpy.intX',
         'float': 'numpy.floatX',

@@ -20,6 +20,65 @@ except ImportError:
 _rmq_param_sep = '_RMQPARAM_'
 
 
+def get_rmq_parameters(url=None, user=None, username=None,
+                       password=None, host=None, virtual_host=None,
+                       vhost=None, port=None, exchange=None, queue=''):
+    r"""Get RabbitMQ connection parameters.
+
+    Args:
+        url (str, optional): Address of RMQ server that includes all the
+            necessary information. If this is provided, the remaining arguments
+            are ignored. Defaults to None and the connection parameters are
+            taken from the other arguments.
+        user (str, optional): RabbitMQ server username. Defaults to config
+            option 'user' in section 'rmq' if it exists and 'guest' if it
+            does not.
+        username (str, optional): Alias for user.
+        password (str, optional): RabbitMQ server password. Defaults to
+            config option 'password' in section 'rmq' if it exists and
+            'guest' if it does not.
+        host (str, optional): RabbitMQ server host. Defaults to config option
+            'host' in section 'rmq' if it exists and 'localhost' if it
+            does not. If 'localhost', the output of socket.gethostname()
+            is used.
+        virtual_host (str, optional): RabbitMQ server virtual host. Defaults
+            to config option 'vhost' in section 'rmq' if it exists and '/'
+            if it does not.
+        vhost (str, optional): Alias for virtual_host.
+        port (str, optional): Port on host to use. Defaults to config option
+            'port' in section 'rmq' if it exists and '5672' if it does not.
+        exchange (str, optional): RabbitMQ exchange. Defaults to config
+            option 'namespace' in section 'rmq' if it exits and '' if it does
+            not.
+        queue (str, optional): Name of the queue that messages will be
+            send to or received from. If an empty string, the queue will
+            be a random string and exclusive to a receiving comm. Defaults
+            to ''.
+
+    Returns:
+        tuple: The connection url, exchange, & queue.
+
+    """
+    if url is None:
+        if user is None:
+            user = username or ygg_cfg.get('rmq', 'user', 'guest')
+        if password is None:
+            password = ygg_cfg.get('rmq', 'password', 'guest')
+        if host is None:
+            host = ygg_cfg.get('rmq', 'host', 'localhost')
+        if virtual_host is None:
+            virtual_host = vhost or ygg_cfg.get('rmq', 'vhost', '/')
+        if virtual_host == '/':
+            virtual_host = '%2f'
+        if port is None:
+            port = ygg_cfg.get('rmq', 'port', '5672')
+        url = 'amqp://%s:%s@%s:%s/%s' % (
+            user, password, host, port, virtual_host)
+    if exchange is None:
+        exchange = ygg_cfg.get('rmq', 'namespace', '')
+    return url, exchange, queue
+
+
 def check_rmq_server(url=None, **kwargs):
     r"""Check that connection to a RabbitMQ server is possible.
 
@@ -178,36 +237,27 @@ class RMQComm(CommBase.CommBase):
         """
         args = [name]
         if 'address' not in kwargs:
-            if user is None:
-                user = ygg_cfg.get('rmq', 'user', 'guest')
-            if password is None:
-                password = ygg_cfg.get('rmq', 'password', 'guest')
-            if host is None:
-                host = ygg_cfg.get('rmq', 'host', 'localhost')
-            # if host == 'localhost':
-            #     host = socket.gethostname()
-            if virtual_host is None:
-                virtual_host = ygg_cfg.get('rmq', 'vhost', '/')
-            if virtual_host == '/':
-                virtual_host = '%2f'
-            if port is None:
-                port = ygg_cfg.get('rmq', 'port', '5672')
-            if exchange is None:
-                exchange = ygg_cfg.get('rmq', 'namespace', '')
-            url = 'amqp://%s:%s@%s:%s/%s' % (
-                user, password, host, port, virtual_host)
+            (url, exchange, queue) = get_rmq_parameters(
+                user=user, password=password, host=host,
+                virtual_host=virtual_host, port=port, exchange=exchange,
+                queue=queue)
             kwargs['address'] = _rmq_param_sep.join([url, exchange, queue])
         return args, kwargs
 
-    def opp_comm_kwargs(self):
+    def opp_comm_kwargs(self, for_yaml=False):
         r"""Get keyword arguments to initialize communication with opposite
         comm object.
+
+        Args:
+            for_yaml (bool, optional): If True, the returned dict will only
+                contain values that can be specified in a YAML file. Defaults
+                to False.
 
         Returns:
             dict: Keyword arguments for opposite comm object.
 
         """
-        kwargs = super(RMQComm, self).opp_comm_kwargs()
+        kwargs = super(RMQComm, self).opp_comm_kwargs(for_yaml=for_yaml)
         return kwargs
 
     def bind(self):

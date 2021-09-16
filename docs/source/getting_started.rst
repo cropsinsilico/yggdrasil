@@ -56,6 +56,8 @@ or including multiple models in a single YAML file.
 .. include:: examples/gs_lesson2_yml.rst
 
 
+.. _git_models_rst:
+
 Running remote models
 ---------------------
 

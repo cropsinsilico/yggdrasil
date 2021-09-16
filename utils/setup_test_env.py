@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import warnings
 import difflib
+import copy
 from datetime import datetime
 PYVER = ('%s.%s' % sys.version_info[:2])
 PY2 = (sys.version_info[0] == 2)
@@ -26,15 +27,22 @@ CONDA_INDEX = None
 CONDA_ROOT = None
 try:
     CONDA_CMD_WHICH = shutil.which('conda')
+    YGG_CMD_WHICH = shutil.which('yggdrasil')
 except AttributeError:
     if _is_win:
         CONDA_CMD_WHICH = None
+        YGG_CMD_WHICH = None
     else:
         try:
             CONDA_CMD_WHICH = subprocess.check_output(
                 ['which', 'conda']).strip().decode('utf-8')
         except subprocess.CalledProcessError:
             CONDA_CMD_WHICH = None
+        try:
+            YGG_CMD_WHICH = subprocess.check_output(
+                ['which', 'yggdrasil']).strip().decode('utf-8')
+        except subprocess.CalledProcessError:
+            YGG_CMD_WHICH = None
 if (not CONDA_PREFIX):
     if CONDA_CMD_WHICH:
         CONDA_PREFIX = os.path.dirname(os.path.dirname(CONDA_CMD_WHICH))
@@ -424,9 +432,12 @@ def build_pkg(method, python=None, return_commands=False,
             # package on Github Actions
             build_flags += ' --no-test'
         cmds += [
-            "%s clean --all" % CONDA_CMD,  # Might invalidate cache
-            # "%s deactivate" % CONDA_CMD,
-            "%s update --all" % CONDA_CMD,
+            "%s clean --all" % CONDA_CMD]  # Might invalidate cache
+        if not (_is_win and _on_gha):
+            cmds += [
+                # "%s deactivate" % CONDA_CMD,
+                "%s update --all" % CONDA_CMD]
+        cmds += [
             "%s install -q -n base conda-build conda-verify" % CONDA_CMD,
             "%s build %s --python %s %s" % (
                 CONDA_CMD, 'recipe', python, build_flags),
@@ -752,7 +763,6 @@ def install_deps(method, return_commands=False, verbose=False,
         fallback_to_conda = ((method == 'conda')
                              or (_is_win and _on_appveyor)
                              or install_opts['lpy'])
-    print('INSTALL_DEPS', method, fallback_to_conda)
     # Get list of packages
     pkgs = itemize_deps(method, fallback_to_conda=fallback_to_conda,
                         install_opts=install_opts, **kwargs)
@@ -815,8 +825,8 @@ def install_deps(method, return_commands=False, verbose=False,
     if not only_python:
         if pkgs['apt']:
             if install_opts['no_sudo']:
-                cmds += ["apt update"]
-                cmds += ["apt-get install %s" % ' '.join(pkgs['apt'])]
+                cmds += ["apt -y update"]
+                cmds += ["apt-get -y install %s" % ' '.join(pkgs['apt'])]
             else:
                 cmds += ["sudo apt update"]
                 cmds += ["sudo apt-get install %s" % ' '.join(pkgs['apt'])]
@@ -993,6 +1003,7 @@ def install_pkg(method, python=None, without_build=False,
         else:
             index_channel = "file:/%s" % CONDA_INDEX
         cmds += [
+            "%s config --add channels %s" % (CONDA_CMD, index_channel),
             # Related issues if this stops working again
             # https://github.com/conda/conda/issues/466#issuecomment-378050252
             "%s install %s --update-deps -c %s yggdrasil" % (
@@ -1030,23 +1041,27 @@ def install_pkg(method, python=None, without_build=False,
     else:  # pragma: debug
         raise ValueError("Invalid method: '%s'" % method)
     # Print summary of what was installed
-    cmds = SUMMARY_CMDS + cmds + SUMMARY_CMDS
-    call_script(cmds)
-    if method.endswith('-dev'):
-        print(call_conda_command([python_cmd, '-m', 'pip', 'install',
-                                  '--editable', '.'],
-                                 cwd=_pkg_dir))
+    if not YGG_CMD_WHICH:
+        cmds = SUMMARY_CMDS + cmds + SUMMARY_CMDS
+        call_script(cmds)
+        if method.endswith('-dev'):
+            print(call_conda_command([python_cmd, '-m', 'pip', 'install',
+                                      '--editable', '.'],
+                                     cwd=_pkg_dir))
     # Follow up if on Unix as R installation may require sudo
     if install_opts['R'] and _is_unix:
-        # cmds.append('ygginstall r --sudoR')
         R_cmd = ["ygginstall", "r"]
         if not install_opts['no_sudo']:
             R_cmd.append("--sudoR")
         subprocess.check_call(R_cmd)
     if method == 'conda':
+        env = copy.copy(os.environ)
+        if (not install_opts['no_sudo']) and install_opts['R']:
+            env['YGG_USE_SUDO_FOR_R'] = '1'
         src_dir = os.path.join(os.getcwd(),
                                os.path.dirname(os.path.dirname(__file__)))
-        subprocess.check_call([python_cmd, "create_coveragerc.py"], cwd=src_dir)
+        subprocess.check_call([python_cmd, "create_coveragerc.py"],
+                              cwd=src_dir, env=env)
 
 
 def verify_pkg(install_opts=None):

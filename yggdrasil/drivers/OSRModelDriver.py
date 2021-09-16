@@ -5,7 +5,7 @@ import shutil
 import subprocess
 import tempfile
 import logging
-import pystache
+import chevron
 import io as sio
 import warnings
 import xml.etree.ElementTree as ET
@@ -203,7 +203,7 @@ class OSRModelDriver(ExecutableModelDriver):
         """
         with open(src, 'r') as fd:
             src_contents = fd.read()
-        src_contents = pystache.render(
+        src_contents = chevron.render(
             sio.StringIO(src_contents).getvalue(), self.set_env())
         root = ET.fromstring(src_contents)
         timesync = self.timesync
@@ -276,8 +276,9 @@ class OSRModelDriver(ExecutableModelDriver):
         if dest is None:
             dest = os.path.join(tempfile.gettempdir(), 'OpenSimRoot')
         if not os.path.isdir(dest):  # pragma: config
-            git.Repo.clone_from(cls.repository_url, dest,
-                                branch=cls.repository_branch)
+            repo = git.Repo.clone_from(cls.repository_url, dest,
+                                       branch=cls.repository_branch)
+            repo.close()
         return dest
         
     @classmethod

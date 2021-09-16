@@ -1,0 +1,26 @@
+FROM continuumio/miniconda3
+SHELL ["/bin/bash", "--login", "-c"]
+ARG version
+RUN source /opt/conda/etc/profile.d/conda.sh && \
+    conda config --add channels conda-forge && \
+    conda config --set channel_priority strict
+
+RUN source /opt/conda/etc/profile.d/conda.sh && \
+    conda create -n env python=3.9 yggdrasil=$version
+
+# Required so that gcc & g++ are available as paths in OpenSimRoot make
+RUN source /opt/conda/etc/profile.d/conda.sh && \
+    conda activate env && \
+    cp $CC $(dirname $CC)/gcc && \
+    cp $CXX $(dirname $CXX)/g++
+RUN source /opt/conda/etc/profile.d/conda.sh && \
+    conda activate env && \
+    yggconfig && \
+    ygginfo --verbose
+RUN source /opt/conda/etc/profile.d/conda.sh && \
+    conda activate env && \
+    yggcompile
+WORKDIR /home
+RUN echo "conda activate env" > ~/.bashrc
+
+CMD ["/bin/bash", "--login"]

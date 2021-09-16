@@ -5,6 +5,8 @@ from yggdrasil.communication import CommBase, NoMessages
 class LockedBuffer(multitasking.Queue):
     r"""Buffer intended to be shared between threads/processes."""
 
+    __slots__ = ["_closed"]
+
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('task_method', 'process')
         super(LockedBuffer, self).__init__(*args, **kwargs)

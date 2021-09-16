@@ -21,6 +21,7 @@ import uuid as uuid_gen
 import subprocess
 import importlib
 import difflib
+import contextlib
 from yggdrasil import platform, constants
 from yggdrasil.components import import_component, ComponentBase
 
@@ -132,6 +133,27 @@ def add_line_numbers(lines, for_diff=False):
             i += 1
             out.append('%2d: %s' % (i, line))
     return out
+
+
+@contextlib.contextmanager
+def timer_context(msg_format, **kwargs):
+    r"""Context that will time commands executed within it and log a message.
+
+    Args:
+        msg_format (str): Format string used to format the elapsed time. It
+            should include, at minimum, a '{elapsed}' field. Additional fields
+            may also be present and can be fulfilled by additional keywords.
+        **kwargs: Additional keyword arguments are passed to the format method
+            on msg_format to create the log message.
+
+    """
+    start = time.time()
+    try:
+        yield
+    finally:
+        end = time.time()
+        elapsed = end - start
+        logger.info(msg_format.format(elapsed=elapsed, **kwargs))
 
 
 def display_source(fname, number_lines=False, return_lines=False):
@@ -661,6 +683,22 @@ def remove_path(fpath, timer_class=None, timeout=None):
     else:
         return
     errors = []
+    # if platform._is_win and (ftype == 'directory'):  # pragma: windows
+    #     fremove_base = fremove
+
+    #     def fremove(path):
+    #         try:
+    #             fremove_base(path)
+    #         except PermissionError:
+    #             # https://stackoverflow.com/questions/2656322/shutil-rmtree-
+    #             # fails-on-windows-with-access-is-denied
+    #             import stat
+    #             if not os.access(path, os.W_OK):
+    #                 # Is the error an access error ?
+    #                 os.chmod(path, stat.S_IWUSR)
+    #                 fremove_base(path)
+    #             else:  # pragma: debug
+    #                 raise
     
     def is_removed():
         if fcheck(fpath):
@@ -1573,10 +1611,14 @@ class YggClass(ComponentBase):
         """
         return print_encoded(msg, *args, **kwargs)
 
-    def printStatus(self, level='info'):
+    def printStatus(self, level='info', return_str=False):
         r"""Print the class status."""
-        getattr(self.logger, level)('%s(%s): ', self.__module__,
-                                    self.print_name)
+        fmt = '%s(%s): '
+        args = (self.__module__, self.print_name)
+        if return_str:
+            msg, _ = self.logger.process(fmt, {})
+            return msg % args
+        getattr(self.logger, level)(fmt, *args)
 
     def _task_with_output(self, func, *args, **kwargs):
         self.sched_out = func(*args, **kwargs)
