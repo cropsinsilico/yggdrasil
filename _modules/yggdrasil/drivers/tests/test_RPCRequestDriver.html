@@ -1,75 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.drivers.tests.test_RPCRequestDriver &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.drivers.tests.test_RPCRequestDriver &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
-
-    
+    <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -77,18 +36,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../includeme.html">Overview</a></li>
@@ -103,7 +51,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
@@ -114,73 +65,34 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
-        
           <li><a href="../../drivers.html">yggdrasil.drivers</a> &raquo;</li>
-        
       <li>yggdrasil.drivers.tests.test_RPCRequestDriver</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for yggdrasil.drivers.tests.test_RPCRequestDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pytest</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
@@ -189,7 +101,7 @@
 <span class="kn">import</span> <span class="nn">yggdrasil.drivers.tests.test_ConnectionDriver</span> <span class="k">as</span> <span class="nn">parent</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.tests.test_ConnectionDriver</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_default_comm</span><span class="p">,</span> <span class="n">_zmq_installed</span><span class="p">,</span> <span class="n">_ipc_installed</span><span class="p">,</span> <span class="n">_rmq_installed</span><span class="p">,</span>
-    <span class="n">_mpi_installed</span><span class="p">)</span>
+    <span class="n">_mpi_installed</span><span class="p">,</span> <span class="n">_rest_installed</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="TestRPCRequestParam"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_RPCRequestDriver.TestRPCRequestParam">[docs]</a><span class="k">class</span> <span class="nc">TestRPCRequestParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestConnectionParam</span><span class="p">):</span>
@@ -264,6 +176,7 @@
             <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
             <span class="n">assert_equal</span><span class="p">(</span><span class="n">srv_msg</span><span class="p">,</span> <span class="n">msg_send</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="n">return_str</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">srv_msg</span><span class="p">)</span>
             <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
             <span class="c1"># Receive response on client side</span>
@@ -288,11 +201,21 @@
     <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="n">_default_comm</span><span class="p">,</span> <span class="s1">&#39;ValueComm&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">,</span>
              <span class="s1">&#39;BufferComm&#39;</span><span class="p">,</span> <span class="s1">&#39;buffer&#39;</span><span class="p">]:</span>  <span class="c1"># pragma: debug</span>
         <span class="k">continue</span>
+    <span class="n">base_class</span> <span class="o">=</span> <span class="n">TestRPCRequestDriver</span>
+    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RESTComm&#39;</span><span class="p">,</span> <span class="s1">&#39;rest&#39;</span><span class="p">]:</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.tests.test_services</span> <span class="kn">import</span> <span class="n">running_service</span>
+        
+        <span class="k">class</span> <span class="nc">BaseRESTClass</span><span class="p">(</span><span class="n">TestRPCRequestDriver</span><span class="p">):</span>
+            <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;class&quot;</span><span class="p">,</span> <span class="n">autouse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">def</span> <span class="nf">running_service</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">with</span> <span class="n">running_service</span><span class="p">(</span><span class="s1">&#39;flask&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cli</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">cli</span>
+        <span class="n">base_class</span> <span class="o">=</span> <span class="n">BaseRESTClass</span>
     <span class="n">tcls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;Test</span><span class="si">%s</span><span class="s1">RPCRequestDriver&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span>
-                <span class="p">(</span><span class="n">TestRPCRequestDriver</span><span class="p">,</span> <span class="p">),</span> <span class="p">{</span><span class="s1">&#39;ocomm_name&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span>
-                                           <span class="s1">&#39;icomm_name&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span>
-                                           <span class="s1">&#39;driver&#39;</span><span class="p">:</span> <span class="s1">&#39;RPCRequestDriver&#39;</span><span class="p">,</span>
-                                           <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="s1">&#39;test&#39;</span><span class="p">})</span>
+                <span class="p">(</span><span class="n">base_class</span><span class="p">,</span> <span class="p">),</span> <span class="p">{</span><span class="s1">&#39;ocomm_name&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span>
+                                 <span class="s1">&#39;icomm_name&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span>
+                                 <span class="s1">&#39;driver&#39;</span><span class="p">:</span> <span class="s1">&#39;RPCRequestDriver&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="s1">&#39;test&#39;</span><span class="p">})</span>
     <span class="c1"># Flags</span>
     <span class="n">flag_func</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RMQComm&#39;</span><span class="p">,</span> <span class="s1">&#39;RMQAsyncComm&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq_async&#39;</span><span class="p">]:</span>
@@ -310,6 +233,9 @@
                      <span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_mpi_installed</span><span class="p">,</span>
                                      <span class="s2">&quot;MPI library not installed&quot;</span><span class="p">),</span>
                      <span class="n">pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">mpi</span><span class="p">(</span><span class="n">min_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)]</span>
+    <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RESTComm&#39;</span><span class="p">,</span> <span class="s1">&#39;rest&#39;</span><span class="p">]:</span>
+        <span class="n">flag_func</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_rest_installed</span><span class="p">,</span>
+                                    <span class="s2">&quot;REST library not installed&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">flag_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flag_func</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">flag_func</span> <span class="o">=</span> <span class="p">[</span><span class="n">flag_func</span><span class="p">]</span>
@@ -317,50 +243,36 @@
             <span class="n">tcls</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">tcls</span><span class="p">)</span>
     <span class="c1"># Add class to globals</span>
     <span class="nb">globals</span><span class="p">()[</span><span class="n">tcls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">tcls</span>
-    <span class="k">del</span> <span class="n">tcls</span>
+    <span class="k">del</span> <span class="n">tcls</span><span class="p">,</span> <span class="n">base_class</span>
+    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RESTComm&#39;</span><span class="p">,</span> <span class="s1">&#39;rest&#39;</span><span class="p">]:</span>
+        <span class="k">del</span> <span class="n">BaseRESTClass</span>
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

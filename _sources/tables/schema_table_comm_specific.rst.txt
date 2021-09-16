@@ -1,7 +1,12 @@
 .. _schema_table_comm_specific_rst:
 
-======   =======   =======================
-Option   Type      Valid For 'Commtype' Of
-======   =======   =======================
-count    integer   ['value']              
-======   =======   =======================
+=========   =======   ================================================================================   =======================
+Option      Type      Description                                                                        Valid For 'Commtype' Of
+=========   =======   ================================================================================   =======================
+client_id   string                                                                                       ['rest']               
+cookies     object    Cookies to send to the server. Defaults to None and is ignored.                    ['rest']               
+count       integer                                                                                      ['value']              
+host        string                                                                                       ['rest']               
+params      object    Parameters that should be passed via URL. Defaults to None and is ignored.         ['rest']               
+port        int                                                                                          ['rest']               
+=========   =======   ================================================================================   =======================

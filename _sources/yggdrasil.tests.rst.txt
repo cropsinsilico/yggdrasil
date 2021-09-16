@@ -68,6 +68,14 @@ yggdrasil.tests.test\_schema module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.tests.test\_services module
+-------------------------------------
+
+.. automodule:: yggdrasil.tests.test_services
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.tests.test\_tests module
 ----------------------------------
 

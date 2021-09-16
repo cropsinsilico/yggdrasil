@@ -7,8 +7,12 @@ allow_threading       If True, comm connections will be set up so that the model
                       used by more than one thread.                                                                                                  
 args                  Argument(s) for running the model on the command line.                                        list                             
 client_of             The names of server models that this model is a client of.                                    list                             
+contact_email         Email address that should be used to contact the maintainer of the model. This                str                              
+                      parameter is only used in the model repository.                                                                                
 copies                The number of copies of the model that should be created.                                     int                              
 copy_index            Index of model in set of copies.                                                              int                              
+description           Description of the model. This parameter is only used in the model repository or              str                              
+                      when providing the model as a service.                                                                                         
 function              The name of the model function that should be wrapped.                                        str                              
 is_server             If True, the model is assumed to be a server and an instance of                               bool, dict                       
                       :class:`yggdrasil.drivers.ServerDriver` is started. If a dict, the input/output                                                
@@ -28,6 +32,9 @@ overwrite             If True, any existing compilation products will be overwri
 process               Process used to run the model.                                                                :class:`yggdrasil.tools.YggPopen`
 products              Files created by running the model. This includes compilation products such as                list                             
                       executables and/or object files.                                                                                               
+repository_url        URL for the git repository containing the model source code. If provided,                     str                              
+                      relative paths in the model YAML definition will be considered relative to the                                                 
+                      repository root directory.                                                                                                     
 source_products       Files created by running the model that are source files. These files will be                 list                             
                       removed without checking their extension so users should avoid adding files to                                                 
                       this list unless they are sure they should be deleted.                                                                         

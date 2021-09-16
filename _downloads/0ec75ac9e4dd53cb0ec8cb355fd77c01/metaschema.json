@@ -1,0 +1,300 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "default": {},
+    "definitions": {
+        "positiveInteger": {
+            "minimum": 0,
+            "type": "integer"
+        },
+        "positiveIntegerDefault0": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/positiveInteger"
+                },
+                {
+                    "default": 0
+                }
+            ]
+        },
+        "schemaArray": {
+            "items": {
+                "$ref": "#"
+            },
+            "minItems": 1,
+            "type": "array"
+        },
+        "simpleTypes": {
+            "enum": [
+                "array",
+                "boolean",
+                "integer",
+                "null",
+                "number",
+                "object",
+                "string",
+                "1darray",
+                "any",
+                "bytes",
+                "class",
+                "complex",
+                "float",
+                "function",
+                "instance",
+                "int",
+                "ndarray",
+                "obj",
+                "ply",
+                "scalar",
+                "schema",
+                "uint",
+                "unicode"
+            ]
+        },
+        "stringArray": {
+            "items": {
+                "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+        }
+    },
+    "dependencies": {
+        "exclusiveMaximum": [
+            "maximum"
+        ],
+        "exclusiveMinimum": [
+            "minimum"
+        ]
+    },
+    "description": "Core schema meta-schema",
+    "id": "http://json-schema.org/draft-04/schema#",
+    "properties": {
+        "$schema": {
+            "format": "uri",
+            "type": "string"
+        },
+        "additionalItems": {
+            "anyOf": [
+                {
+                    "type": "boolean"
+                },
+                {
+                    "$ref": "#"
+                }
+            ],
+            "default": {}
+        },
+        "additionalProperties": {
+            "anyOf": [
+                {
+                    "type": "boolean"
+                },
+                {
+                    "$ref": "#"
+                }
+            ],
+            "default": {}
+        },
+        "allOf": {
+            "$ref": "#/definitions/schemaArray"
+        },
+        "anyOf": {
+            "$ref": "#/definitions/schemaArray"
+        },
+        "args": {
+            "description": "Arguments required to recreate a class instance.",
+            "type": "array"
+        },
+        "class": {
+            "anyOf": [
+                {
+                    "type": "class"
+                },
+                {
+                    "items": {
+                        "type": "class"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                }
+            ],
+            "description": "One or more classes that the object should be an instance of."
+        },
+        "default": {},
+        "definitions": {
+            "additionalProperties": {
+                "$ref": "#"
+            },
+            "default": {},
+            "type": "object"
+        },
+        "dependencies": {
+            "additionalProperties": {
+                "anyOf": [
+                    {
+                        "$ref": "#"
+                    },
+                    {
+                        "$ref": "#/definitions/stringArray"
+                    }
+                ]
+            },
+            "type": "object"
+        },
+        "description": {
+            "type": "string"
+        },
+        "enum": {
+            "type": "array"
+        },
+        "exclusiveMaximum": {
+            "default": false,
+            "type": "boolean"
+        },
+        "exclusiveMinimum": {
+            "default": false,
+            "type": "boolean"
+        },
+        "format": {
+            "type": "string"
+        },
+        "id": {
+            "format": "uri",
+            "type": "string"
+        },
+        "items": {
+            "anyOf": [
+                {
+                    "$ref": "#"
+                },
+                {
+                    "$ref": "#/definitions/schemaArray"
+                }
+            ],
+            "default": {}
+        },
+        "kwargs": {
+            "description": "Keyword arguments required to recreate a class instance.",
+            "type": "object"
+        },
+        "length": {
+            "description": "Number of elements in the 1D array.",
+            "minimum": 1,
+            "type": "number"
+        },
+        "maxItems": {
+            "$ref": "#/definitions/positiveInteger"
+        },
+        "maxLength": {
+            "$ref": "#/definitions/positiveInteger"
+        },
+        "maxProperties": {
+            "$ref": "#/definitions/positiveInteger"
+        },
+        "maximum": {
+            "type": "number"
+        },
+        "minItems": {
+            "$ref": "#/definitions/positiveIntegerDefault0"
+        },
+        "minLength": {
+            "$ref": "#/definitions/positiveIntegerDefault0"
+        },
+        "minProperties": {
+            "$ref": "#/definitions/positiveIntegerDefault0"
+        },
+        "minimum": {
+            "type": "number"
+        },
+        "multipleOf": {
+            "exclusiveMinimum": true,
+            "minimum": 0,
+            "type": "number"
+        },
+        "not": {
+            "$ref": "#"
+        },
+        "oneOf": {
+            "$ref": "#/definitions/schemaArray"
+        },
+        "pattern": {
+            "format": "regex",
+            "type": "string"
+        },
+        "patternProperties": {
+            "additionalProperties": {
+                "$ref": "#"
+            },
+            "default": {},
+            "type": "object"
+        },
+        "precision": {
+            "description": "The size (in bits) of each item.",
+            "minimum": 1,
+            "type": "number"
+        },
+        "properties": {
+            "additionalProperties": {
+                "$ref": "#"
+            },
+            "default": {},
+            "type": "object"
+        },
+        "required": {
+            "$ref": "#/definitions/stringArray"
+        },
+        "shape": {
+            "description": "Shape of the ND array in each dimension.",
+            "items": {
+                "minimum": 1,
+                "type": "integer"
+            },
+            "type": "array"
+        },
+        "subtype": {
+            "description": "The base type for each item.",
+            "enum": [
+                "bytes",
+                "complex",
+                "float",
+                "int",
+                "uint",
+                "unicode"
+            ],
+            "type": "string"
+        },
+        "temptype": {
+            "description": "The type of the data for a single message.",
+            "type": "schema"
+        },
+        "title": {
+            "type": "string"
+        },
+        "type": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/simpleTypes"
+                },
+                {
+                    "items": {
+                        "$ref": "#/definitions/simpleTypes"
+                    },
+                    "minItems": 1,
+                    "type": "array",
+                    "uniqueItems": true
+                }
+            ]
+        },
+        "uniqueItems": {
+            "default": false,
+            "type": "boolean"
+        },
+        "units": {
+            "description": "Physical units.",
+            "type": "string"
+        }
+    },
+    "title": "Ygg meta-schema for data type schemas",
+    "type": "object"
+}

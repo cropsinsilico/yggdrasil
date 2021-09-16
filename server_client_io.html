@@ -1,77 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Server/Client I/O &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Server/Client I/O &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Autowrapping Model Functions" href="autowrap.html" />
     <link rel="prev" title="Formatted I/O" href="formatted_io.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -79,18 +39,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
@@ -112,7 +61,10 @@
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
@@ -123,74 +75,34 @@
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Server/Client I/O</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/server_client_io.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="server-client-i-o">
+             
+  <section id="server-client-i-o">
 <span id="server-client-io-rst"></span><h1>Server/Client I/O<a class="headerlink" href="#server-client-i-o" title="Permalink to this headline">¶</a></h1>
 <p>Often you will want to call one model from another like a functions. This
 would required sending the input variable(s) to the model being called and
@@ -198,7 +110,7 @@ then sending the output variables(s) back to the calling model. We refer to
 this as a Remote Procedure Call (RPC). The model being called can be considered
 a server providing its calculations as a service to the client (the calling model).
 The yggdrasil provides options for treating models as server and clients.</p>
-<div class="section" id="one-server-one-client">
+<section id="one-server-one-client">
 <h2>One Server, One Client<a class="headerlink" href="#one-server-one-client" title="Permalink to this headline">¶</a></h2>
 <p>In the example below, the “server” model computes the nth number in the
 Fibonacci sequence and the “client” model calls the server to get a certain
@@ -375,8 +287,8 @@ Models acting as servers can have as many inputs/outputs as desired in addition 
 the RPC connections. While the example input is not used to modify the output
 in this example, such a comm could be used to initialize a model with
 parameters and/or initial conditions.</p>
-</div>
-<div class="section" id="using-existing-inputs-outputs">
+</section>
+<section id="using-existing-inputs-outputs">
 <h2>Using Existing Inputs/Outputs<a class="headerlink" href="#using-existing-inputs-outputs" title="Permalink to this headline">¶</a></h2>
 <p>Models that have already been integrated via yggdrasil can also be turned
 into servers without modifying the code. Instead of passing a boolean to
@@ -389,8 +301,8 @@ interface comm.</p>
 <p class="admonition-title">Todo</p>
 <p>Example source code and YAML of server replacing an existing input/output</p>
 </div>
-</div>
-<div class="section" id="one-server-two-clients">
+</section>
+<section id="one-server-two-clients">
 <h2>One Server, Two Clients<a class="headerlink" href="#one-server-two-clients" title="Permalink to this headline">¶</a></h2>
 <p>There is no limit on the number of clients that can connect to a single
 server. In the example below, the server is the same as above. The client
@@ -567,8 +479,8 @@ source code.</p>
 <p>(<a class="reference external" href="examples/rpc_lesson2.html">Example in other languages</a>)</p>
 <p>During runtime, request messages from both clients will be routed to the
 server model which will process the requests in the order they are received.</p>
-</div>
-<div class="section" id="two-servers-two-clients">
+</section>
+<section id="two-servers-two-clients">
 <h2>Two Servers, Two Clients<a class="headerlink" href="#two-servers-two-clients" title="Permalink to this headline">¶</a></h2>
 <p>There is also no limit on the number of copies of a server model that can be
 used to responsd to RPC requests from the clients. In the example below, the
@@ -624,8 +536,8 @@ are run as specified by the model <code class="docutils literal notranslate"><sp
 use of an internal state by the server model as there is no way for a client
 to be sure that the same server model is responding to its requests and only
 its requests.</p>
-</div>
-<div class="section" id="wrapped-function-server">
+</section>
+<section id="wrapped-function-server">
 <h2>Wrapped Function Server<a class="headerlink" href="#wrapped-function-server" title="Permalink to this headline">¶</a></h2>
 <p>Models that are created by letting yggdrasil automatically
 <a class="reference internal" href="autowrap.html#autowrap-rst"><span class="std std-ref">wrap a function</span></a> can also act as servers and/or clients.
@@ -700,55 +612,38 @@ RPC calls, they can be specified explicitly by providing the <code class="docuti
 parameter with a map that contains <code class="docutils literal notranslate"><span class="pre">input</span></code> and <code class="docutils literal notranslate"><span class="pre">output</span></code> parameters that
 map to the names of function input/output variables (as in the case of
 using existing input/output channels above).</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="autowrap.html" class="btn btn-neutral float-right" title="Autowrapping Model Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="formatted_io.html" class="btn btn-neutral float-left" title="Formatted I/O" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="autowrap.html" class="btn btn-neutral float-right" title="Autowrapping Model Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

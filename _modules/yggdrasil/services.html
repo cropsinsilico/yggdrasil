@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>yggdrasil.services &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> yggdrasil
+          </a>
+              <div class="version">
+                v1.8.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../timesync_io.html">Timestep Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker.html">Docker Containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../threading.html">OpenMP Threading in Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">yggdrasil</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>yggdrasil.services</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for yggdrasil.services</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">signal</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">runner</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.multitasking</span> <span class="kn">import</span> <span class="n">wait_on_function</span><span class="p">,</span> <span class="n">ValueEvent</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">YggClass</span><span class="p">,</span> <span class="n">kill</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="kn">import</span> <span class="n">ygg_cfg</span>
+
+
+<span class="n">_service_host_env</span> <span class="o">=</span> <span class="s1">&#39;YGGDRASIL_SERVICE_HOST_URL&#39;</span>
+<span class="n">_default_service_type</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;services&#39;</span><span class="p">,</span> <span class="s1">&#39;default_type&#39;</span><span class="p">,</span> <span class="s1">&#39;flask&#39;</span><span class="p">)</span>
+<span class="n">_default_commtype</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;services&#39;</span><span class="p">,</span> <span class="s1">&#39;default_comm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">_default_address</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;services&#39;</span><span class="p">,</span> <span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">_client_id</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;services&#39;</span><span class="p">,</span> <span class="s1">&#39;client_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+    <span class="n">_shutdown_signal</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGBREAK</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">_shutdown_signal</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span>
+
+
+<div class="viewcode-block" id="ClientError"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ClientError">[docs]</a><span class="k">class</span> <span class="nc">ClientError</span><span class="p">(</span><span class="ne">BaseException</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Error raised by errors when calling the server from the client.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ServerError"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServerError">[docs]</a><span class="k">class</span> <span class="nc">ServerError</span><span class="p">(</span><span class="ne">BaseException</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Error raised when there was an error on the server.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ServiceBase"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase">[docs]</a><span class="k">class</span> <span class="nc">ServiceBase</span><span class="p">(</span><span class="n">YggClass</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for sending/responding to service requests.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): Name that should be used to initialize an address for the</span>
+<span class="sd">            service.</span>
+<span class="sd">        for_request (bool, optional): If True, a client-side connection is</span>
+<span class="sd">            initialized. If False a server-side connection is initialized.</span>
+<span class="sd">            Defaults to False.</span>
+<span class="sd">        address (str, optional): The address that the service can be accessed</span>
+<span class="sd">            from. Defaults to (&#39;services&#39;, &#39;address&#39;) configuration option, if</span>
+<span class="sd">            set, and None if not.</span>
+<span class="sd">        *args: Additional arguments are used to initialize the client/server</span>
+<span class="sd">            connection.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are used to initialize the</span>
+<span class="sd">            client/server connection.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">default_address</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">default_port</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">for_request</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;for_request&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;port&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">_default_address</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_address</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_port</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{port}</span><span class="s1">&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ServiceBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">for_request</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setup_client</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setup_server</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ServiceBase.is_installed"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the class is fully installed, False otherwise.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># pragma: no cover</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_running</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the server is running.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">for_request</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span>
+    
+<div class="viewcode-block" id="ServiceBase.wait_for_server"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.wait_for_server">[docs]</a>    <span class="k">def</span> <span class="nf">wait_for_server</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">15.0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for a service to start running.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            timeout (float, optional): Time (in seconds) that should be waited</span>
+<span class="sd">                for the server to start. Defaults to 15.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            RuntimeError: If the time limit is reached and the server still</span>
+<span class="sd">                hasn&#39;t started.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">wait_on_function</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                         <span class="n">on_timeout</span><span class="o">=</span><span class="s2">&quot;Server never started&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ServiceBase.setup_server"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.setup_server">[docs]</a>    <span class="k">def</span> <span class="nf">setup_server</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set up the machinery for receiving requests.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># pragma: no cover</span></div>
+
+<div class="viewcode-block" id="ServiceBase.setup_client"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.setup_client">[docs]</a>    <span class="k">def</span> <span class="nf">setup_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set up the machinery for sending requests.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># pragma: no cover</span></div>
+
+<div class="viewcode-block" id="ServiceBase.set_log_level"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.set_log_level">[docs]</a>    <span class="k">def</span> <span class="nf">set_log_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_level</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the logging level.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            log_level (int): Logging level.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">logging</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">log_level</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ServiceBase.start_server"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.start_server">[docs]</a>    <span class="k">def</span> <span class="nf">start_server</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">with_coverage</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">log_level</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start the server.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            remote_url (str optional): Address for the URL that remote</span>
+<span class="sd">                integrations will use to connect to this server. Defaults to</span>
+<span class="sd">                None and is set based on the YGGDRASIL_SERVICE_HOST_URL</span>
+<span class="sd">                environment variable if it is set and is the local address</span>
+<span class="sd">                otherwise.</span>
+<span class="sd">            with_coverage (bool, optional): If True, the server is started</span>
+<span class="sd">                with coverage. Defaults to False.</span>
+<span class="sd">            log_level (int, optional): Level of log messages that should be</span>
+<span class="sd">                printed. Defaults to None and is ignored.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">remote_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">remote_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_service_host_env</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">remote_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">remote_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">_service_host_env</span><span class="p">,</span> <span class="n">remote_url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">log_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_log_level</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">with_coverage</span><span class="p">:</span>  <span class="c1"># pragma: testing</span>
+            <span class="k">def</span> <span class="nf">handle_shutdown</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+            <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">_shutdown_signal</span><span class="p">,</span> <span class="n">handle_shutdown</span><span class="p">)</span>
+            <span class="c1"># try:</span>
+            <span class="c1">#     from pytest_cov.embed import cleanup_on_signal</span>
+            <span class="c1">#     cleanup_on_signal(_shutdown_signal)</span>
+            <span class="c1"># except ImportError:  # pragma: debug</span>
+            <span class="c1">#     pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_server</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="ServiceBase.run_server"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.run_server">[docs]</a>    <span class="k">def</span> <span class="nf">run_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Begin listening for requests.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># pragma: no cover</span></div>
+
+<div class="viewcode-block" id="ServiceBase.respond"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.respond">[docs]</a>    <span class="k">def</span> <span class="nf">respond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a response to the request.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># pragma: no cover</span></div>
+
+<div class="viewcode-block" id="ServiceBase.shutdown"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.shutdown">[docs]</a>    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Shutdown the process from the server.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># pragma: no cover</span></div>
+
+<div class="viewcode-block" id="ServiceBase.process_request"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.process_request">[docs]</a>    <span class="k">def</span> <span class="nf">process_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process a request and return a response.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request (str): Serialized request that should be processed.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the respond</span>
+<span class="sd">                method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Serialized response.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">respond</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ServiceBase.process_response"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.process_response">[docs]</a>    <span class="k">def</span> <span class="nf">process_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process a response.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            response (str): Serialized response that should be processed.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            object: The deserialized, processed response.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">response</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ServiceBase.deserialize"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (str): Message to deserialize.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            object: Deserialized message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ServiceBase.serialize"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (object): Message to serialize.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Serialized message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ServiceBase.deserialize_request"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.deserialize_request">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a request message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request (str): Serialized request.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            object: Deserialized request.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">request</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ServiceBase.serialize_response"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.serialize_response">[docs]</a>    <span class="k">def</span> <span class="nf">serialize_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a response message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request (object): Request to serialize.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Serialized request.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">response</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ServiceBase.call"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a request.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># pragma: no cover</span></div>
+
+<div class="viewcode-block" id="ServiceBase.send_request"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.ServiceBase.send_request">[docs]</a>    <span class="k">def</span> <span class="nf">send_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a request.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request (object): Request to send.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the call</span>
+<span class="sd">                method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            object: Response.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">request_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">for_request</span><span class="p">)</span>
+        <span class="c1"># if not self.for_request:</span>
+        <span class="c1">#     x = self.__class__(self.name, *self._args,</span>
+        <span class="c1">#                        **self._kwargs, for_request=True,</span>
+        <span class="c1">#                        address=self.opp_address)</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     x = self</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_response</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">request_str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="FlaskService"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.FlaskService">[docs]</a><span class="k">class</span> <span class="nc">FlaskService</span><span class="p">(</span><span class="n">ServiceBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Flask based service.&quot;&quot;&quot;</span>
+
+    <span class="n">service_type</span> <span class="o">=</span> <span class="s1">&#39;flask&#39;</span>
+    <span class="n">default_commtype</span> <span class="o">=</span> <span class="s1">&#39;rest&#39;</span>
+    <span class="n">default_address</span> <span class="o">=</span> <span class="s1">&#39;http://localhost:</span><span class="si">{port}</span><span class="s1">&#39;</span>
+    <span class="n">default_port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PORT&quot;</span><span class="p">,</span> <span class="mi">5000</span><span class="p">))</span>
+
+<div class="viewcode-block" id="FlaskService.is_installed"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.FlaskService.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the class is fully installed, False otherwise.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">flask</span>  <span class="c1"># noqa: F401</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FlaskService</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># if str(self.port) not in self.address:</span>
+        <span class="c1">#     parts = self.address.split(&#39;:&#39;)</span>
+        <span class="c1">#     if parts[-1].strip(&#39;/&#39;).isdigit():</span>
+        <span class="c1">#         self.port = int(parts[-1].strip(&#39;/&#39;))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
+
+<div class="viewcode-block" id="FlaskService.setup_server"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.FlaskService.setup_server">[docs]</a>    <span class="k">def</span> <span class="nf">setup_server</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set up the machinery for receiving requests.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: Arguments are ignored.</span>
+<span class="sd">            **kwargs: Keyword arguments are ignored.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+        <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">request</span>
+        <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">jsonify</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="n">request</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jsonify</span> <span class="o">=</span> <span class="n">jsonify</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+        <span class="nd">@self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+        <span class="k">def</span> <span class="nf">_target</span><span class="p">(</span><span class="o">*</span><span class="n">req_args</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">req_args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FlaskService.setup_client"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.FlaskService.setup_client">[docs]</a>    <span class="k">def</span> <span class="nf">setup_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set up the machinery for sending requests.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="FlaskService.set_log_level"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.FlaskService.set_log_level">[docs]</a>    <span class="k">def</span> <span class="nf">set_log_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_level</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the logging level.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            log_level (int): Logging level.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FlaskService</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_log_level</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">flask.logging</span> <span class="kn">import</span> <span class="n">default_handler</span>
+        <span class="n">werkzeug_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;werkzeug&#39;</span><span class="p">)</span>
+        <span class="n">default_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">log_level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">log_level</span><span class="p">)</span>
+        <span class="n">werkzeug_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">log_level</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="FlaskService.run_server"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.FlaskService.run_server">[docs]</a>    <span class="k">def</span> <span class="nf">run_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Begin listening for requests.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FlaskService.shutdown"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.FlaskService.shutdown">[docs]</a>    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Shutdown the process from the server.&quot;&quot;&quot;</span>
+        <span class="c1"># if not self.for_request:</span>
+        <span class="c1">#     func = self.request.environ.get(&#39;werkzeug.server.shutdown&#39;)</span>
+        <span class="c1">#     # Explicitly cleaning up the pytest coverage plugin is required</span>
+        <span class="c1">#     # to ensure that the server methods are properly covered during</span>
+        <span class="c1">#     # cleanup.</span>
+        <span class="c1">#     try:</span>
+        <span class="c1">#         from pytest_cov.embed import cleanup</span>
+        <span class="c1">#         cleanup()</span>
+        <span class="c1">#     except ImportError:  # pragma: debug</span>
+        <span class="c1">#         pass</span>
+        <span class="c1">#     if func is None:  # pragma: debug</span>
+        <span class="c1">#         raise RuntimeError(&#39;Not running with the Werkzeug Server&#39;)</span>
+        <span class="c1">#     func()  # pragma: no cover</span>
+        <span class="k">pass</span></div>
+        
+<div class="viewcode-block" id="FlaskService.deserialize"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.FlaskService.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (str): Message to deserialize.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            object: Deserialized message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">msg</span>  <span class="c1"># should already be deserialized</span></div>
+
+<div class="viewcode-block" id="FlaskService.serialize"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.FlaskService.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (object): Message to serialize.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Serialized message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">msg</span>  <span class="c1"># should already be serialized</span></div>
+    
+<div class="viewcode-block" id="FlaskService.serialize_response"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.FlaskService.serialize_response">[docs]</a>    <span class="k">def</span> <span class="nf">serialize_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a response message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request (object): Request to serialize.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Serialized request.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">jsonify</span><span class="p">(</span><span class="n">response</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FlaskService.call"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.FlaskService.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a request.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request (object): JSON serializable request.</span>
+<span class="sd">            **kwargs: Keyword arguments are ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            object: Response.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">requests</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ClientError</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div></div>
+        
+
+<div class="viewcode-block" id="RMQService"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.RMQService">[docs]</a><span class="k">class</span> <span class="nc">RMQService</span><span class="p">(</span><span class="n">ServiceBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;RabbitMQ based service.&quot;&quot;&quot;</span>
+
+    <span class="n">service_type</span> <span class="o">=</span> <span class="s1">&#39;rmq&#39;</span>
+    <span class="n">default_commtype</span> <span class="o">=</span> <span class="s1">&#39;rmq&#39;</span>
+    <span class="n">default_port</span> <span class="o">=</span> <span class="mi">5672</span>
+
+<div class="viewcode-block" id="RMQService.is_installed"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.RMQService.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the class is fully installed, False otherwise.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.communication.RMQComm</span> <span class="kn">import</span> <span class="n">check_rmq_server</span>
+        <span class="k">return</span> <span class="n">check_rmq_server</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_init_rmq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.communication.RMQComm</span> <span class="kn">import</span> <span class="n">pika</span><span class="p">,</span> <span class="n">get_rmq_parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pika</span> <span class="o">=</span> <span class="n">pika</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;port&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_rmq_parameters</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="c1"># Unclear why using a non-default exchange prevents the server</span>
+        <span class="c1"># from starting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exchange</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="n">pika</span><span class="o">.</span><span class="n">URLParameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">pika</span><span class="o">.</span><span class="n">BlockingConnection</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">channel</span><span class="p">()</span>
+
+<div class="viewcode-block" id="RMQService.setup_server"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.RMQService.setup_server">[docs]</a>    <span class="k">def</span> <span class="nf">setup_server</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set up the machinery for receiving requests.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: Arguments are used to initialize the RabbitMQ connections</span>
+<span class="sd">                via _init_rmq.</span>
+<span class="sd">            **kwargs: Keyword arguments are used to initialize the RabbitMQ</span>
+<span class="sd">                connections via _init_rmq.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_rmq</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="c1"># self.channel.exchange_declare(exchange=self.exchange,</span>
+            <span class="c1">#                               auto_delete=True)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;There is a bug when using the &quot;</span>
+                                      <span class="s2">&quot;non-default exchange.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_qos</span><span class="p">(</span><span class="n">prefetch_count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">consumer_tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_consume</span><span class="p">(</span>
+            <span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span>
+            <span class="n">on_message_callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_request</span><span class="p">)</span>
+        <span class="n">cb</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shutdown</span><span class="p">,</span> <span class="n">in_callback</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">add_on_cancel_callback</span><span class="p">(</span><span class="n">cb</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="RMQService.setup_client"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.RMQService.setup_client">[docs]</a>    <span class="k">def</span> <span class="nf">setup_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set up the machinery for sending requests.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: Arguments are used to initialize the RabbitMQ connections</span>
+<span class="sd">                via _init_rmq.</span>
+<span class="sd">            **kwargs: Keyword arguments are used to initialize the RabbitMQ</span>
+<span class="sd">                connections via _init_rmq.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_rmq</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">exclusive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callback_queue</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">queue</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">consumer_tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_consume</span><span class="p">(</span>
+            <span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">callback_queue</span><span class="p">,</span>
+            <span class="n">on_message_callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_response</span><span class="p">,</span>
+            <span class="n">auto_ack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RMQService.run_server"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.RMQService.run_server">[docs]</a>    <span class="k">def</span> <span class="nf">run_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Listen for requests.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">start_consuming</span><span class="p">()</span>
+        <span class="k">except</span> <span class="bp">self</span><span class="o">.</span><span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ChannelWrongStateError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="RMQService.shutdown"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.RMQService.shutdown">[docs]</a>    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_callback</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Shutdown the process from the server.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">for_request</span><span class="p">:</span>
+            <span class="n">queue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback_queue</span>
+            <span class="n">in_callback</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">queue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">in_callback</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_cancel</span><span class="p">(</span><span class="n">consumer_tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">consumer_tag</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">for_request</span><span class="p">:</span>
+                <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_delete</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="n">queue</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">_on_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_request</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+        <span class="n">ch</span><span class="o">.</span><span class="n">basic_publish</span><span class="p">(</span><span class="n">exchange</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="p">,</span>
+                         <span class="n">routing_key</span><span class="o">=</span><span class="n">props</span><span class="o">.</span><span class="n">reply_to</span><span class="p">,</span>
+                         <span class="n">properties</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pika</span><span class="o">.</span><span class="n">BasicProperties</span><span class="p">(</span>
+                             <span class="n">correlation_id</span><span class="o">=</span><span class="n">props</span><span class="o">.</span><span class="n">correlation_id</span><span class="p">),</span>
+                         <span class="n">body</span><span class="o">=</span><span class="n">response</span><span class="p">)</span>
+        <span class="n">ch</span><span class="o">.</span><span class="n">basic_ack</span><span class="p">(</span><span class="n">delivery_tag</span><span class="o">=</span><span class="n">method</span><span class="o">.</span><span class="n">delivery_tag</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_on_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">corr_id</span> <span class="o">==</span> <span class="n">props</span><span class="o">.</span><span class="n">correlation_id</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_running</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the server is running.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">RMQService</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">is_running</span> <span class="ow">and</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">))</span>
+
+<div class="viewcode-block" id="RMQService.call"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.RMQService.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a request.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request (str): Serialized request.</span>
+<span class="sd">            timeout (float, optional): Time (in seconds) that should be waited</span>
+<span class="sd">                for a response to be returned. Defaults to 10.</span>
+<span class="sd">            **kwargs: Keyword arguments are ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Serialized response.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response</span> <span class="o">=</span> <span class="n">ValueEvent</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">corr_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_publish</span><span class="p">(</span><span class="n">exchange</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="p">,</span>
+                                       <span class="n">routing_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span>
+                                       <span class="n">properties</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pika</span><span class="o">.</span><span class="n">BasicProperties</span><span class="p">(</span>
+                                           <span class="n">reply_to</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">callback_queue</span><span class="p">,</span>
+                                           <span class="n">correlation_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">corr_id</span><span class="p">),</span>
+                                       <span class="n">body</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">UnroutableError</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">StreamLostError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="n">ClientError</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        
+        <span class="k">def</span> <span class="nf">process_events</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">process_data_events</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">is_set</span><span class="p">()</span>
+        
+        <span class="k">def</span> <span class="nf">client_error</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">ClientError</span><span class="p">(</span><span class="s2">&quot;No response received&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
+            <span class="n">wait_on_function</span><span class="p">(</span>
+                <span class="n">process_events</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">polling_interval</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                <span class="n">on_timeout</span><span class="o">=</span><span class="n">client_error</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">get</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="create_service_manager_class"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.create_service_manager_class">[docs]</a><span class="k">def</span> <span class="nf">create_service_manager_class</span><span class="p">(</span><span class="n">service_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an integration manager service with the specified base.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        service_type (ServiceBase, str, optional): Base class that should be</span>
+<span class="sd">            used. Defaults to (&#39;services&#39;, &#39;default_type&#39;) configuration</span>
+<span class="sd">            options, if set, and &#39;flask&#39; if not.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        type: Subclass of ServiceBase to handle starting/stopping integrations</span>
+<span class="sd">            running as services.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">service_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">service_type</span> <span class="o">=</span> <span class="n">_default_service_type</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">service_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">cls_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;flask&#39;</span><span class="p">:</span> <span class="n">FlaskService</span><span class="p">,</span> <span class="s1">&#39;rmq&#39;</span><span class="p">:</span> <span class="n">RMQService</span><span class="p">}</span>
+        <span class="n">service_type</span> <span class="o">=</span> <span class="n">cls_map</span><span class="p">[</span><span class="n">service_type</span><span class="p">]</span>
+
+    <span class="k">class</span> <span class="nc">IntegrationServiceManager</span><span class="p">(</span><span class="n">service_type</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Manager to track running integrations.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): Name that should be used to initialize an address for</span>
+<span class="sd">                the service. Defaults to &#39;ygg_integrations&#39;.</span>
+<span class="sd">            commtype (str, optional): Communicator type that should be used</span>
+<span class="sd">                for the connections to services. Defaults to (&#39;services&#39;,</span>
+<span class="sd">                &#39;default_comm&#39;) configuration option, if set, and None if not.</span>
+<span class="sd">            is_app (bool, optional): If True, the service manager will be run</span>
+<span class="sd">                as an app and will not be expected to be shut down by clients.</span>
+<span class="sd">                Defaults to False.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the __init__</span>
+<span class="sd">                method for the service_type class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_app</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;ygg_integrations&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">integrations</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stopped_integrations</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">registry</span> <span class="o">=</span> <span class="n">IntegrationServiceRegistry</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">commtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">commtype</span> <span class="o">=</span> <span class="n">_default_commtype</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">commtype</span> <span class="o">=</span> <span class="n">commtype</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_app</span> <span class="o">=</span> <span class="n">is_app</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">IntegrationServiceManager</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">commtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">commtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_commtype</span>
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">client_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: The ID that should be associated with a client on the</span>
+<span class="sd">            current machine. Defaults to the configuration entry</span>
+<span class="sd">            (&#39;services&#39;, &#39;client_id&#39;) if it is set and is generated otherwise.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">global</span> <span class="n">_client_id</span>
+            <span class="k">if</span> <span class="n">_client_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_client_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">_client_id</span>
+
+        <span class="k">def</span> <span class="nf">send_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">yamls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a request.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                name (str, tuple, optional): A hashable object that will be</span>
+<span class="sd">                    used to reference the integration. If not provided,</span>
+<span class="sd">                    the yamls keyword will be used.</span>
+<span class="sd">                yamls (list, str, optional): One or more YAML files defining</span>
+<span class="sd">                    a network of models to run as a service. Defaults to None.</span>
+<span class="sd">                action (str, optional): Action that is being requested.</span>
+<span class="sd">                    Defaults to &#39;start&#39;.</span>
+<span class="sd">                **kwargs: Additional keyword arguments are included in the</span>
+<span class="sd">                    request.</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">yamls</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">yamls</span> <span class="o">=</span> <span class="p">[</span><span class="n">yamls</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">yamls</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">yamls</span><span class="o">=</span><span class="n">yamls</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="n">action</span><span class="p">)</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;client_id&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">)</span>
+            <span class="n">wait_for_complete</span> <span class="o">=</span> <span class="p">((</span><span class="n">action</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="s1">&#39;stop&#39;</span><span class="p">,</span> <span class="s1">&#39;shutdown&#39;</span><span class="p">])</span>
+                                 <span class="ow">and</span> <span class="p">(</span><span class="n">service_type</span> <span class="o">!=</span> <span class="n">RMQService</span><span class="p">))</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">IntegrationServiceManager</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">send_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">wait_for_complete</span> <span class="ow">and</span> <span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;complete&#39;</span><span class="p">):</span>
+                <span class="k">def</span> <span class="nf">is_complete</span><span class="p">():</span>
+                    <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                        <span class="nb">super</span><span class="p">(</span><span class="n">IntegrationServiceManager</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">send_request</span><span class="p">(</span>
+                            <span class="n">request</span><span class="p">))</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;complete&#39;</span><span class="p">)</span>
+                <span class="n">wait_on_function</span><span class="p">(</span>
+                    <span class="n">is_complete</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">polling_interval</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                    <span class="n">on_timeout</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Request did not complete: </span><span class="si">{</span><span class="n">request</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">out</span>
+
+        <span class="k">def</span> <span class="nf">setup_server</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set up the machinery for receiving requests.&quot;&quot;&quot;</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">IntegrationServiceManager</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup_server</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">service_type</span> <span class="o">==</span> <span class="n">FlaskService</span><span class="p">:</span>
+                <span class="nd">@self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+                <span class="k">def</span> <span class="nf">landing_page</span><span class="p">():</span>
+                    <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">render_template</span>
+                    <span class="kn">import</span> <span class="nn">yaml</span>
+                    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s1">&#39;address&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span>
+                        <span class="s1">&#39;available&#39;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="n">k</span><span class="p">:</span> <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+                            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+                        <span class="s1">&#39;running&#39;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="n">k</span><span class="p">:</span> <span class="p">{</span><span class="n">k2</span><span class="p">:</span> <span class="n">v2</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="n">return_str</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+                                <span class="k">for</span> <span class="n">k2</span><span class="p">,</span> <span class="n">v2</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+                            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrations</span><span class="o">.</span><span class="n">items</span><span class="p">()}}</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="n">render_template</span><span class="p">(</span>
+                        <span class="s1">&#39;service_manager_index.html&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">out</span>
+                
+                <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">RESTComm</span>
+                <span class="n">RESTComm</span><span class="o">.</span><span class="n">add_comm_server_to_app</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">)</span>
+            
+        <span class="k">def</span> <span class="nf">stop_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop the server from the client-side.&quot;&quot;&quot;</span>
+            <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">for_request</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;shutdown&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">ClientError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">kill</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s1">&#39;pid&#39;</span><span class="p">],</span> <span class="n">_shutdown_signal</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">start_integration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">yamls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start an integration if it is not already running.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                client_id (str): ID associated with the client requesting the</span>
+<span class="sd">                    integration be started.</span>
+<span class="sd">                x (str, tuple): Hashable object that should be used to</span>
+<span class="sd">                    identify the integration being started in the registry of</span>
+<span class="sd">                    running integrations.</span>
+<span class="sd">                yamls (list): Set of YAML specification files defining the</span>
+<span class="sd">                    integration that should be run as as service.</span>
+<span class="sd">                **kwargs: Additional keyword arguments are passed to get_runner.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                bool: True if the integration started, False otherwise.</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">integrations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrations</span><span class="p">[</span><span class="n">client_id</span><span class="p">]</span>
+            <span class="n">stopped_integrations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopped_integrations</span><span class="p">[</span><span class="n">client_id</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">integrations</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">integrations</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">is_alive</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_integration</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">stopped_integrations</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_integration</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="n">stopped_integrations</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">integrations</span><span class="p">:</span>
+                <span class="n">partial_commtype</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">commtype</span><span class="p">}</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">commtype</span> <span class="o">==</span> <span class="s1">&#39;rest&#39;</span><span class="p">:</span>
+                    <span class="n">partial_commtype</span><span class="p">[</span><span class="s1">&#39;client_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">client_id</span>
+                <span class="n">integrations</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">get_runner</span><span class="p">(</span>
+                    <span class="n">yamls</span><span class="p">,</span> <span class="n">complete_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">as_service</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">partial_commtype</span><span class="o">=</span><span class="n">partial_commtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">integrations</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">signal_handler</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">def</span> <span class="nf">_stop_integration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Finish stopping an integration in a thread.&quot;&quot;&quot;</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrations</span><span class="p">[</span><span class="n">client_id</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">is_alive</span><span class="p">:</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">atexit</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">stop_integration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop a running integration.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                client_id (str): ID associated with the client requesting the</span>
+<span class="sd">                    integration be stopped.</span>
+<span class="sd">                x (str, tuple): Hashable object associated with the</span>
+<span class="sd">                    integration service that should be stopped. If None,</span>
+<span class="sd">                    all of the running integrations are stopped.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                bool: True if the integration has stopped.</span>
+
+<span class="sd">            Raises:</span>
+<span class="sd">                KeyError: If there is not a running integration associated</span>
+<span class="sd">                    with the specified hashable object.</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">integrations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrations</span><span class="p">[</span><span class="n">client_id</span><span class="p">]</span>
+            <span class="n">stopped_integrations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopped_integrations</span><span class="p">[</span><span class="n">client_id</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stop_integration</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+                           <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">integrations</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                                     <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">stopped_integrations</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">stopped_integrations</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">integrations</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Integration defined by </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> not running&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">service_type</span> <span class="o">==</span> <span class="n">RMQService</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_stop_integration</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mthread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_stop_integration</span><span class="p">,</span>
+                                           <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="n">x</span><span class="p">,),</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">mthread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+                <span class="n">stopped_integrations</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">mthread</span>
+            <span class="k">return</span> <span class="ow">not</span> <span class="n">stopped_integrations</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">integration_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get information about an integration and how to connect to it.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                client_id (str): ID associated with the client requesting the</span>
+<span class="sd">                    integration info.</span>
+<span class="sd">                x (str, tuple): Hashable object associated with the</span>
+<span class="sd">                    integration to get information on.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                dict: Information about the integration.</span>
+
+<span class="sd">            Raises:</span>
+<span class="sd">                KeyError: If there is not a running integration associated</span>
+<span class="sd">                    with the specified hashable object.</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">integrations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrations</span><span class="p">[</span><span class="n">client_id</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">integrations</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Integration defined by </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> not running&quot;</span><span class="p">)</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">integrations</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">modeldrivers</span><span class="p">[</span><span class="s1">&#39;dummy_model&#39;</span><span class="p">]</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">service_partner</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;dummy&#39;</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                       <span class="n">args</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                       <span class="n">language</span><span class="o">=</span><span class="s1">&#39;dummy&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">out</span>
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">is_running</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the server is running.&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">(</span><span class="n">IntegrationServiceManager</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">for_request</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;ping&#39;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;running&#39;</span>
+                <span class="k">except</span> <span class="n">ClientError</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="c1"># This would only occur if a server calls is_running while it</span>
+                <span class="c1"># is running (perhaps in a future callback?)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">def</span> <span class="nf">respond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a response to the request.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                request (dict): Request to respond to.</span>
+<span class="sd">                **kwargs: Additional keyword arguments are ignored.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                dict: Response to the request.</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">yamls</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">client_id</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+                <span class="n">action</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">)</span>
+                <span class="n">yamls</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;yamls&#39;</span><span class="p">)</span>
+                <span class="n">client_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;client_id&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">client_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">integrations</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="p">{})</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">stopped_integrations</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;start&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">yamls</span><span class="p">:</span>
+                        <span class="n">reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                            <span class="n">yamls</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+                            <span class="n">yamls</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                        <span class="k">elif</span> <span class="n">reg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">yamls</span> <span class="o">=</span> <span class="n">reg</span><span class="p">[</span><span class="s1">&#39;yamls&#39;</span><span class="p">]</span>
+                            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">reg</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;yamls&#39;</span><span class="p">]:</span>
+                                    <span class="n">request</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No YAML files specified.&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_integration</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">yamls</span><span class="p">,</span>
+                                              <span class="o">**</span><span class="n">request</span><span class="p">):</span>
+                        <span class="n">response</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">integration_info</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span>
+                            <span class="n">status</span><span class="o">=</span><span class="s1">&#39;complete&#39;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">response</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;starting&#39;</span><span class="p">}</span>
+                <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;stop&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_integration</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+                        <span class="n">response</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;complete&#39;</span><span class="p">}</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">response</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;stopping&#39;</span><span class="p">}</span>
+                <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;shutdown&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_integration</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_app</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                            <span class="n">response</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;complete&#39;</span><span class="p">}</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+                            <span class="n">response</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;complete&#39;</span><span class="p">,</span>
+                                        <span class="s1">&#39;pid&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()}</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">response</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;shutting down&#39;</span><span class="p">}</span>
+                <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;status&#39;</span><span class="p">:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;done&#39;</span><span class="p">}</span>
+                    <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">fmt</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Address: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
+                               <span class="s1">&#39;Available Services:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
+                               <span class="s1">&#39;Running Services:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="n">registry_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                            <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">registry</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
+                        <span class="k">if</span> <span class="n">client_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">clients</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">integrations</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">clients</span> <span class="o">=</span> <span class="p">[</span><span class="n">client_id</span><span class="p">]</span>
+                        <span class="n">running_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                        <span class="k">for</span> <span class="n">cli</span> <span class="ow">in</span> <span class="n">clients</span><span class="p">:</span>
+                            <span class="n">running_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Client </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cli</span>
+                            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrations</span><span class="p">[</span><span class="n">cli</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                                <span class="n">running_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t\t</span><span class="si">%s</span><span class="s1">:</span><span class="se">\n\t\t\t</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                                    <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n\t\t\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span>
+                                        <span class="n">return_str</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()))</span>
+                        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="n">registry_str</span><span class="p">,</span> <span class="n">running_str</span><span class="p">)</span>
+                        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fmt</span> <span class="o">%</span> <span class="n">args</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">assert</span><span class="p">(</span><span class="n">client_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">integrations</span><span class="p">[</span><span class="n">client_id</span><span class="p">][</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span>
+                                <span class="n">return_str</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;ping&#39;</span><span class="p">:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;running&#39;</span><span class="p">}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported action: &#39;</span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">tb</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="s1">&#39;traceback&#39;</span><span class="p">:</span> <span class="n">tb</span><span class="p">}</span>
+                <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;start&#39;</span><span class="p">:</span>  <span class="c1"># pragma: intermittent</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">respond</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;stop&#39;</span><span class="p">,</span> <span class="s1">&#39;yamls&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                                  <span class="s1">&#39;client_id&#39;</span><span class="p">:</span> <span class="n">client_id</span><span class="p">})</span>
+            <span class="k">return</span> <span class="n">response</span>
+
+        <span class="k">def</span> <span class="nf">process_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process a response.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                response (str): Serialized response that should be processed.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                object: The deserialized, processed response.</span>
+
+<span class="sd">            Raises:</span>
+<span class="sd">                ServerError: If the response indicates there was an error on</span>
+<span class="sd">                    the server during the creation of the response.</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span>
+                <span class="n">IntegrationServiceManager</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">process_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;error&#39;</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ServerError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s1">&#39;traceback&#39;</span><span class="p">],</span>
+                                              <span class="n">response</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]))</span>
+            <span class="k">return</span> <span class="n">response</span>
+
+        <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">return_str</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print the status of the service manager including available</span>
+<span class="sd">            and running services.&quot;&quot;&quot;</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">return_str</span><span class="p">:</span>
+                <span class="n">msg</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">status</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">],</span> <span class="p">{})</span>
+                <span class="k">return</span> <span class="n">msg</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">level</span><span class="p">)(</span><span class="n">status</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">])</span>
+            
+    <span class="k">return</span> <span class="n">IntegrationServiceManager</span></div>
+
+
+<div class="viewcode-block" id="IntegrationServiceManager"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.IntegrationServiceManager">[docs]</a><span class="k">def</span> <span class="nf">IntegrationServiceManager</span><span class="p">(</span><span class="n">service_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start a management service to track running integrations.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        service_type (ServiceBase, str, optional): Base class that should be</span>
+<span class="sd">            used. Defaults to (&#39;services&#39;, &#39;default_type&#39;) configuration</span>
+<span class="sd">            options, if set, and &#39;flask&#39; if not. If there is an address</span>
+<span class="sd">            provided, the service type will be determined by parsing the</span>
+<span class="sd">            address.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are used to intialized the</span>
+<span class="sd">            manager class instance.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">service_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;amqp://&#39;</span><span class="p">):</span>
+                <span class="n">service_type</span> <span class="o">=</span> <span class="s1">&#39;rmq&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">service_type</span> <span class="o">=</span> <span class="s1">&#39;flask&#39;</span>
+    <span class="bp">cls</span> <span class="o">=</span> <span class="n">create_service_manager_class</span><span class="p">(</span><span class="n">service_type</span><span class="o">=</span><span class="n">service_type</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="IntegrationServiceRegistry"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.IntegrationServiceRegistry">[docs]</a><span class="k">class</span> <span class="nc">IntegrationServiceRegistry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for managing integration services.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename (str, optional): File where the registry will be/is stored.</span>
+<span class="sd">            Defaults to &#39;~/.yggdrasil_services.yml&#39;.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">,</span> <span class="s1">&#39;.yggdrasil_services.yml&#39;</span><span class="p">)):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">registry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Existing registry of integrations.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+<div class="viewcode-block" id="IntegrationServiceRegistry.load"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.IntegrationServiceRegistry.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load the dictionary of existing integrations that have been</span>
+<span class="sd">        registered.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Existing registry of integrations.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="IntegrationServiceRegistry.save"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.IntegrationServiceRegistry.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Save the registry to self.filename.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            registry (dict): Dictionary of integrations to save.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+            <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">registry</span><span class="p">,</span> <span class="n">fd</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="IntegrationServiceRegistry.load_collection"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.IntegrationServiceRegistry.load_collection">[docs]</a>    <span class="k">def</span> <span class="nf">load_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read a collection of integration registry entries from an YAML.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): Full path to a YAML file containing one or more</span>
+<span class="sd">                registry entries mapping between integration name and YAML</span>
+<span class="sd">                specification files.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Loaded registry entries.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
+        <span class="n">base_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="IntegrationServiceRegistry.remove"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.IntegrationServiceRegistry.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove an integration service from the registry.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): Name associated with the integration service that</span>
+<span class="sd">                should be removed from the registry.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            KeyError: If there is not an integration service associated with</span>
+<span class="sd">                the specified name.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">registry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">load_collection</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">registry</span><span class="p">:</span>
+                <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;There is not an integration service &quot;</span>
+                               <span class="sa">f</span><span class="s2">&quot;registered under the name &#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&#39;. Existing &quot;</span>
+                               <span class="sa">f</span><span class="s2">&quot;services are </span><span class="si">{</span><span class="n">keys</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">registry</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">registry</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="IntegrationServiceRegistry.add"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.IntegrationServiceRegistry.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">yamls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add an integration service to the registry.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): Name that will be used to access the integration</span>
+<span class="sd">                service when starting or stopping it.</span>
+<span class="sd">            yamls (str, list): Set of one or more YAML specification files</span>
+<span class="sd">                defining the integration.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are added to the new entry.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If there is already an integration with the specified</span>
+<span class="sd">                name.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">registry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">yamls</span><span class="p">)</span>
+            <span class="n">collection</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">yamls</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
+                          <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_collection</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">yamls</span><span class="p">)</span>
+            <span class="n">collection</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">yamls</span><span class="o">=</span><span class="n">yamls</span><span class="p">)}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">collection</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">registry</span><span class="p">:</span>
+                <span class="n">old</span> <span class="o">=</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">registry</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+                <span class="n">new</span> <span class="o">=</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;There is an registry integration &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;associated with the name &#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&#39;. Remove &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;the registry entry before adding a new &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;one.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;    Registry:</span><span class="se">\n</span><span class="si">{</span><span class="n">old</span><span class="si">}</span><span class="se">\n</span><span class="s2">    New:</span><span class="se">\n</span><span class="si">{</span><span class="n">new</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">registry</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">registry</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="validate_model_submission"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.services.validate_model_submission">[docs]</a><span class="k">def</span> <span class="nf">validate_model_submission</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate a YAML file according to the standards for submission to</span>
+<span class="sd">    the yggdrasil model repository.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fname (str): YAML file to validate.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">glob</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">yamlfile</span><span class="p">,</span> <span class="n">runner</span>
+    <span class="c1"># 1-2. YAML syntax and schema</span>
+    <span class="n">yml</span> <span class="o">=</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_yaml</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">model_submission</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># 3a. LICENSE</span>
+    <span class="n">repo_dir</span> <span class="o">=</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;models&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;working_dir&#39;</span><span class="p">]</span>
+    <span class="n">patterns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LICENSE&#39;</span><span class="p">,</span> <span class="s1">&#39;LICENSE.*&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">patterns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">repo_dir</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+             <span class="ow">or</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">repo_dir</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">())))):</span>
+            <span class="k">break</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model repository does not contain a LICENSE file.&quot;</span><span class="p">)</span>
+    <span class="c1"># 4. Run</span>
+    <span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

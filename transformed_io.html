@@ -1,77 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Transformed I/O &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Transformed I/O &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Timestep Synchronization" href="timesync_io.html" />
     <link rel="prev" title="Conditional I/O" href="conditional_io.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -79,18 +39,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
@@ -114,7 +63,10 @@
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
@@ -125,77 +77,37 @@
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Transformed I/O</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/transformed_io.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="transformed-i-o">
+             
+  <section id="transformed-i-o">
 <span id="transformed-io-rst"></span><h1>Transformed I/O<a class="headerlink" href="#transformed-i-o" title="Permalink to this headline">¶</a></h1>
 <p>In addition to I/O <a class="reference internal" href="examples/conditional_io.html#conditional-io-rst"><span class="std std-ref">filters</span></a>, yggdrasil also provides methods for specifying transformations that should be performed on input/output received/returned by a model. In addition to type specific operations (e.g. mapping field names, selecting columns), yggdrasil also supports generic transformations via arbitrary Python statements and/or Python functions.</p>
-<div class="section" id="transformed-output">
+<section id="transformed-output">
 <h2>Transformed Output<a class="headerlink" href="#transformed-output" title="Permalink to this headline">¶</a></h2>
 <p>In the example below, the output from model A is passed to both model B and C, however model B and C expect slightly different forms of the varaible, which as output by model A, is a rate with units of g/s. In the case of model B, it expects an input value in the form of a rate multiplied by 10 to account for accumulation across 10 producers. In the case of Model C, it expects an input value in the form of a rate density, requiring the value returned by model A to be normalized by an area.</p>
 <p>Model Code:</p>
@@ -272,10 +184,10 @@
 <p>(<a class="reference external" href="examples/transformed_io.html">Example in other languages</a>)</p>
 <p><code class="docutils literal notranslate"><span class="pre">transform</span></code> values are maps with parameters specifying how the input/output should be transformed before being receieved/returned by a model. In the above example, the transform for model B uses a Python expression (the <code class="docutils literal notranslate"><span class="pre">statement</span></code> parameter) in terms of <code class="docutils literal notranslate"><span class="pre">%x%</span></code> which stands in for the variable being based by the comm. Alternately, the transform for model C uses a reference to a Python function. <code class="docutils literal notranslate"><span class="pre">function</span></code> values take the form <code class="docutils literal notranslate"><span class="pre">&lt;filename&gt;:&lt;function</span> <span class="pre">name&gt;</span></code> where <code class="docutils literal notranslate"><span class="pre">filename</span></code> is the full path to the location of a Python source file containing the desired function that should be used to transform the received data and <code class="docutils literal notranslate"><span class="pre">function</span> <span class="pre">name</span></code> is the name of the desired function. Functions used in such cases should take a single argument (the variable or tuple of variables being passed by the connection), and return the transformed value. The path to the file containing the function can be absolute or relative to the directory containing the yaml file.</p>
 <p>Additional <code class="docutils literal notranslate"><span class="pre">transform</span></code> parameter options are provided below.</p>
-</div>
-<div class="section" id="transform-options">
+</section>
+<section id="transform-options">
 <h2>Transform Options<a class="headerlink" href="#transform-options" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="general-transform-options">
+<section id="general-transform-options">
 <h3>General Transform Options<a class="headerlink" href="#general-transform-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-transform-general-rst">
 <colgroup>
@@ -310,8 +222,8 @@ created.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="transform-types">
+</section>
+<section id="transform-types">
 <h3>Transform Types<a class="headerlink" href="#transform-types" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-transform-subtype-rst">
 <colgroup>
@@ -342,8 +254,8 @@ created.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="type-specific-transform-options">
+</section>
+<section id="type-specific-transform-options">
 <h3>Type Specific Transform Options<a class="headerlink" href="#type-specific-transform-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-transform-specific-rst">
 <colgroup>
@@ -411,56 +323,39 @@ more complex relationships are required, use the FunctionTransform class.</p></t
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="timesync_io.html" class="btn btn-neutral float-right" title="Timestep Synchronization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="conditional_io.html" class="btn btn-neutral float-left" title="Conditional I/O" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="timesync_io.html" class="btn btn-neutral float-right" title="Timestep Synchronization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

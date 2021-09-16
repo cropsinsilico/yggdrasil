@@ -1,77 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.languages.Python package &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.languages.Python package &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="C Code" href="code_c.html" />
     <link rel="prev" title="Python Code" href="code_python.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -79,18 +39,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
@@ -105,7 +54,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../threading.html">OpenMP Threading in Models</a></li>
@@ -113,7 +65,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Advanced</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="serialization.html">Serialization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schema.html">Schemas</a></li>
 <li class="toctree-l2"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="model_drivers.html#model-base-classes">Model Base Classes</a></li>
@@ -137,6 +89,7 @@
 <li class="toctree-l4"><a class="reference internal" href="code_python.html#module-yggdrasil.runner">yggdrasil.runner module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="code_python.html#module-yggdrasil.scanf">yggdrasil.scanf module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="code_python.html#module-yggdrasil.schema">yggdrasil.schema module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_python.html#module-yggdrasil.services">yggdrasil.services module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="code_python.html#module-yggdrasil.timing">yggdrasil.timing module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="code_python.html#module-yggdrasil.tools">yggdrasil.tools module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="code_python.html#module-yggdrasil.units">yggdrasil.units module</a></li>
@@ -158,88 +111,45 @@
 <li class="toctree-l1"><a class="reference internal" href="../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="index.html">Advanced</a> &raquo;</li>
-        
           <li><a href="code.html">Code</a> &raquo;</li>
-        
           <li><a href="code_python.html">Python Code</a> &raquo;</li>
-        
       <li>yggdrasil.languages.Python package</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/advanced/yggdrasil_code.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="yggdrasil-languages-python-package">
+             
+  <section id="yggdrasil-languages-python-package">
 <h1>yggdrasil.languages.Python package<a class="headerlink" href="#yggdrasil-languages-python-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-yggdrasil.languages.Python.CisInterface">
+</section>
+<section id="module-yggdrasil.languages.Python.CisInterface">
 <span id="yggdrasil-languages-python-cisinterface-module"></span><h2>yggdrasil.languages.Python.CisInterface module<a class="headerlink" href="#module-yggdrasil.languages.Python.CisInterface" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-yggdrasil.languages.Python.YggInterface">
+</section>
+<section id="module-yggdrasil.languages.Python.YggInterface">
 <span id="yggdrasil-languages-python-ygginterface-module"></span><h2>yggdrasil.languages.Python.YggInterface module<a class="headerlink" href="#module-yggdrasil.languages.Python.YggInterface" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.languages.Python.YggInterface.InterfaceComm">
@@ -769,8 +679,8 @@ to ‘timesync’.</p></li>
 <dd><p>int: The maximum message size.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.languages.Python.test_CisInterface">
+</section>
+<section id="module-yggdrasil.languages.Python.test_CisInterface">
 <span id="yggdrasil-languages-python-test-cisinterface-module"></span><h2>yggdrasil.languages.Python.test_CisInterface module<a class="headerlink" href="#module-yggdrasil.languages.Python.test_CisInterface" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.languages.Python.test_CisInterface.TestCisAsciiArrayInput">
@@ -910,8 +820,8 @@ to ‘timesync’.</p></li>
 <dd><p>Bases: <a class="reference internal" href="../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServerMatlab" title="yggdrasil.languages.Python.test_YggInterface.TestYggRpcServerMatlab"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggRpcServerMatlab</span></code></a></p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.languages.Python.test_YggInterface">
+</section>
+<section id="module-yggdrasil.languages.Python.test_YggInterface">
 <span id="yggdrasil-languages-python-test-ygginterface-module"></span><h2>yggdrasil.languages.Python.test_YggInterface module<a class="headerlink" href="#module-yggdrasil.languages.Python.test_YggInterface" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.languages.Python.test_YggInterface.ModelEnv">
@@ -1307,22 +1217,22 @@ that should be used for the test. Defaults to ‘YggOutput’.</p></li>
 <dd><p>Test max message size.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.languages.Python">
+</section>
+<section id="module-yggdrasil.languages.Python">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil.languages.Python" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
-<div class="section" id="yggdrasil-serialize-package">
+</section>
+</section>
+<section id="yggdrasil-serialize-package">
 <h1>yggdrasil.serialize package<a class="headerlink" href="#yggdrasil-serialize-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
+<section id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 </div>
-</div>
-<div class="section" id="id1">
+</section>
+<section id="id1">
 <h2>Submodules<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-yggdrasil.serialize.AsciiMapSerialize">
+</section>
+<section id="module-yggdrasil.serialize.AsciiMapSerialize">
 <span id="yggdrasil-serialize-asciimapserialize-module"></span><h2>yggdrasil.serialize.AsciiMapSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.AsciiMapSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.AsciiMapSerialize.AsciiMapSerialize">
@@ -1416,8 +1326,8 @@ the concatenated serialization were deserialized.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.AsciiTableSerialize">
+</section>
+<section id="module-yggdrasil.serialize.AsciiTableSerialize">
 <span id="yggdrasil-serialize-asciitableserialize-module"></span><h2>yggdrasil.serialize.AsciiTableSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.AsciiTableSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize">
@@ -1659,8 +1569,8 @@ method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.DefaultSerialize">
+</section>
+<section id="module-yggdrasil.serialize.DefaultSerialize">
 <span id="yggdrasil-serialize-defaultserialize-module"></span><h2>yggdrasil.serialize.DefaultSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.DefaultSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.DefaultSerialize.DefaultSerialize">
@@ -1784,8 +1694,8 @@ method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.DirectSerialize">
+</section>
+<section id="module-yggdrasil.serialize.DirectSerialize">
 <span id="yggdrasil-serialize-directserialize-module"></span><h2>yggdrasil.serialize.DirectSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.DirectSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.DirectSerialize.DirectSerialize">
@@ -1889,8 +1799,8 @@ extra_kwargs (dict): Extra keyword arguments not used to</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.FunctionalSerialize">
+</section>
+<section id="module-yggdrasil.serialize.FunctionalSerialize">
 <span id="yggdrasil-serialize-functionalserialize-module"></span><h2>yggdrasil.serialize.FunctionalSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.FunctionalSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.FunctionalSerialize.FunctionalSerialize">
@@ -1953,8 +1863,8 @@ constructor.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.JSONSerialize">
+</section>
+<section id="module-yggdrasil.serialize.JSONSerialize">
 <span id="yggdrasil-serialize-jsonserialize-module"></span><h2>yggdrasil.serialize.JSONSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.JSONSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.JSONSerialize.JSONSerialize">
@@ -2053,8 +1963,8 @@ the concatenated serialization were deserialized.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.MatSerialize">
+</section>
+<section id="module-yggdrasil.serialize.MatSerialize">
 <span id="yggdrasil-serialize-matserialize-module"></span><h2>yggdrasil.serialize.MatSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.MatSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.MatSerialize.MatSerialize">
@@ -2146,8 +2056,8 @@ the concatenated serialization were deserialized.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.ObjSerialize">
+</section>
+<section id="module-yggdrasil.serialize.ObjSerialize">
 <span id="yggdrasil-serialize-objserialize-module"></span><h2>yggdrasil.serialize.ObjSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.ObjSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.ObjSerialize.ObjSerialize">
@@ -2211,8 +2121,8 @@ serialized.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.PandasSerialize">
+</section>
+<section id="module-yggdrasil.serialize.PandasSerialize">
 <span id="yggdrasil-serialize-pandasserialize-module"></span><h2>yggdrasil.serialize.PandasSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.PandasSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.PandasSerialize.PandasSerialize">
@@ -2516,8 +2426,8 @@ to files serialized using this class.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.PickleSerialize">
+</section>
+<section id="module-yggdrasil.serialize.PickleSerialize">
 <span id="yggdrasil-serialize-pickleserialize-module"></span><h2>yggdrasil.serialize.PickleSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.PickleSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.PickleSerialize.PickleSerialize">
@@ -2622,8 +2532,8 @@ or more frames.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.PlySerialize">
+</section>
+<section id="module-yggdrasil.serialize.PlySerialize">
 <span id="yggdrasil-serialize-plyserialize-module"></span><h2>yggdrasil.serialize.PlySerialize module<a class="headerlink" href="#module-yggdrasil.serialize.PlySerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.PlySerialize.PlySerialize">
@@ -2757,8 +2667,8 @@ serialized.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.SerializeBase">
+</section>
+<section id="module-yggdrasil.serialize.SerializeBase">
 <span id="yggdrasil-serialize-serializebase-module"></span><h2>yggdrasil.serialize.SerializeBase module<a class="headerlink" href="#module-yggdrasil.serialize.SerializeBase" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase">
@@ -3372,8 +3282,8 @@ provided serialization spec is not compatible with the type definition.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.WOFOSTParamSerialize">
+</section>
+<section id="module-yggdrasil.serialize.WOFOSTParamSerialize">
 <span id="yggdrasil-serialize-wofostparamserialize-module"></span><h2>yggdrasil.serialize.WOFOSTParamSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.WOFOSTParamSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize">
@@ -3478,8 +3388,8 @@ the concatenated serialization were deserialized.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.YAMLSerialize">
+</section>
+<section id="module-yggdrasil.serialize.YAMLSerialize">
 <span id="yggdrasil-serialize-yamlserialize-module"></span><h2>yggdrasil.serialize.YAMLSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.YAMLSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.YAMLSerialize.YAMLSerialize">
@@ -3551,22 +3461,22 @@ serialized in the flow style. See
 
 </dd></dl>
 
-</div>
-<div class="section" id="id2">
+</section>
+<section id="id2">
 <h2>Module contents<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-yggdrasil.serialize"></span></div>
-</div>
-<div class="section" id="yggdrasil-metaschema-datatypes-package">
+<span class="target" id="module-yggdrasil.serialize"></span></section>
+</section>
+<section id="yggdrasil-metaschema-datatypes-package">
 <h1>yggdrasil.metaschema.datatypes package<a class="headerlink" href="#yggdrasil-metaschema-datatypes-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id3">
+<section id="id3">
 <h2>Subpackages<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 </div>
-</div>
-<div class="section" id="id4">
+</section>
+<section id="id4">
 <h2>Submodules<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.AnyMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.AnyMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-anymetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.AnyMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.AnyMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.AnyMetaschemaType.AnyMetaschemaType">
@@ -3736,8 +3646,8 @@ type, the returned boolean will always be True.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.ArrayMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.ArrayMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-arraymetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.ArrayMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.ArrayMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.ArrayMetaschemaType.NDArrayMetaschemaType">
@@ -3845,8 +3755,8 @@ the object fails to be validated. Defaults to False.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.ClassMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.ClassMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-classmetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.ClassMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.ClassMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.ClassMetaschemaType.ClassMetaschemaType">
@@ -3945,8 +3855,8 @@ be used to make relative paths absolute. Defaults to None.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.ContainerMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.ContainerMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-containermetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.ContainerMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.ContainerMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.ContainerMetaschemaType.ContainerMetaschemaType">
@@ -4125,8 +4035,8 @@ will be copied to the typedef associated with the instance.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.FixedMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.FixedMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-fixedmetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.FixedMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.FixedMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType">
@@ -4372,8 +4282,8 @@ should be set on the fixed class.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.FunctionMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.FunctionMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-functionmetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.FunctionMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.FunctionMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.FunctionMetaschemaType.FunctionMetaschemaType">
@@ -4397,8 +4307,8 @@ should be set on the fixed class.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.InstanceMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.InstanceMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-instancemetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.InstanceMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.InstanceMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.InstanceMetaschemaType.InstanceMetaschemaType">
@@ -4510,8 +4420,8 @@ the object fails to be validated. Defaults to False.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-jsonarraymetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType.JSONArrayMetaschemaType">
@@ -4644,8 +4554,8 @@ the object fails to be validated. Defaults to False.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.JSONMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.JSONMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-jsonmetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.JSONMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.JSONMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.JSONMetaschemaType.JSONBooleanMetaschemaType">
@@ -4927,8 +4837,8 @@ object.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-jsonobjectmetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType.JSONObjectMetaschemaType">
@@ -4999,8 +4909,8 @@ aid in coercing the type.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.MetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.MetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-metaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.MetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.MetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType">
@@ -5758,8 +5668,8 @@ the object fails to be validated. Defaults to False.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.MultiMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.MultiMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-multimetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.MultiMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.MultiMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.MultiMetaschemaType.MultiMetaschemaType">
@@ -6007,8 +5917,8 @@ classes.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.ObjMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.ObjMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-objmetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.ObjMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.ObjMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict">
@@ -6330,8 +6240,8 @@ if the file already exists.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.PlyMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.PlyMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-plymetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.PlyMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.PlyMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict">
@@ -6903,8 +6813,8 @@ plural.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.ScalarMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.ScalarMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-scalarmetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.ScalarMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.ScalarMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.ScalarMetaschemaType.BytesMetaschemaType">
@@ -7298,7 +7208,7 @@ typedef from message metadata.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.ScalarMetaschemaType.ScalarMetaschemaType.python_types">
-<span class="sig-name descname"><span class="pre">python_types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">(&lt;class</span> <span class="pre">'unyt.array.unyt_quantity'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex256'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.str_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'complex'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'bytes'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.bytes_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.unsignedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'float'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.signedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int8'&gt;)</span></em><a class="headerlink" href="#yggdrasil.metaschema.datatypes.ScalarMetaschemaType.ScalarMetaschemaType.python_types" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">python_types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex256'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.str_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'complex'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'bytes'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.bytes_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.unsignedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'float'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_quantity'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.signedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int8'&gt;)</span></em><a class="headerlink" href="#yggdrasil.metaschema.datatypes.ScalarMetaschemaType.ScalarMetaschemaType.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -7464,8 +7374,8 @@ the object fails to be validated. Defaults to False.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.SchemaMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.SchemaMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-schemametaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.SchemaMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.SchemaMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.SchemaMetaschemaType.SchemaMetaschemaType">
@@ -7594,8 +7504,8 @@ the object fails to be validated. Defaults to False.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.conversions">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.conversions">
 <span id="yggdrasil-metaschema-datatypes-conversions-module"></span><h2>yggdrasil.metaschema.datatypes.conversions module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.conversions" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.conversions.get_conversion">
@@ -7675,8 +7585,8 @@ the object fails to be validated. Defaults to False.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="id5">
+</section>
+<section id="id5">
 <h2>Module contents<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-yggdrasil.metaschema.datatypes"></span><dl class="py exception">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.MetaschemaTypeError">
@@ -8088,19 +7998,19 @@ object.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="yggdrasil-drivers-package">
+</section>
+</section>
+<section id="yggdrasil-drivers-package">
 <h1>yggdrasil.drivers package<a class="headerlink" href="#yggdrasil-drivers-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id6">
+<section id="id6">
 <h2>Subpackages<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 </div>
-</div>
-<div class="section" id="id7">
+</section>
+<section id="id7">
 <h2>Submodules<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-yggdrasil.drivers.BuildModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.BuildModelDriver">
 <span id="yggdrasil-drivers-buildmodeldriver-module"></span><h2>yggdrasil.drivers.BuildModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.BuildModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.BuildModelDriver.BuildModelDriver">
@@ -8750,8 +8660,8 @@ creating one as necessary.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.CMakeModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.CMakeModelDriver">
 <span id="yggdrasil-drivers-cmakemodeldriver-module"></span><h2>yggdrasil.drivers.CMakeModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.CMakeModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.CMakeModelDriver.CMakeBuilder">
@@ -9595,8 +9505,8 @@ class’s method.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.CModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.CModelDriver">
 <span id="yggdrasil-drivers-cmodeldriver-module"></span><h2>yggdrasil.drivers.CModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.CModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.CModelDriver.ARArchiver">
@@ -11217,8 +11127,8 @@ checking environment variables for default settings.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.CPPModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.CPPModelDriver">
 <span id="yggdrasil-drivers-cppmodeldriver-module"></span><h2>yggdrasil.drivers.CPPModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.CPPModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.CPPModelDriver.CPPCompilerBase">
@@ -11857,8 +11767,8 @@ checking environment variables for default settings.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.CompiledModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.CompiledModelDriver">
 <span id="yggdrasil-drivers-compiledmodeldriver-module"></span><h2>yggdrasil.drivers.CompiledModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.CompiledModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.CompiledModelDriver.ArchiverBase">
@@ -15209,8 +15119,8 @@ ignored.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.ConnectionDriver">
+</section>
+<section id="module-yggdrasil.drivers.ConnectionDriver">
 <span id="yggdrasil-drivers-connectiondriver-module"></span><h2>yggdrasil.drivers.ConnectionDriver module<a class="headerlink" href="#module-yggdrasil.drivers.ConnectionDriver" title="Permalink to this headline">¶</a></h2>
 <p>Module for funneling messages from one comm to another.</p>
 <dl class="py class">
@@ -15650,7 +15560,7 @@ model. Defaults to False.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.drivers.ConnectionDriver.ConnectionDriver.printStatus">
-<span class="sig-name descname"><span class="pre">printStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beg_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/ConnectionDriver.html#ConnectionDriver.printStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.printStatus" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">printStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beg_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_str</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/ConnectionDriver.html#ConnectionDriver.printStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.printStatus" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print information on the status of the ConnectionDriver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -15660,6 +15570,8 @@ model. Defaults to False.</p></li>
 <li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the status of
 individual comms will be displayed. Defaults to
 False.</p></li>
+<li><p><strong>return_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the message string is
+returned. Defaults to False.</p></li>
 </ul>
 </dd>
 </dl>
@@ -15845,8 +15757,8 @@ any left or the communication channel is closed.</p>
 <dd><p>Decorator for methods that should be run remotely.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.DSLModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.DSLModelDriver">
 <span id="yggdrasil-drivers-dslmodeldriver-module"></span><h2>yggdrasil.drivers.DSLModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.DSLModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.DSLModelDriver.DSLModelDriver">
@@ -16005,8 +15917,8 @@ the model finishes running. Defaults to True.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.Driver">
+</section>
+<section id="module-yggdrasil.drivers.Driver">
 <span id="yggdrasil-drivers-driver-module"></span><h2>yggdrasil.drivers.Driver module<a class="headerlink" href="#module-yggdrasil.drivers.Driver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.Driver.Driver">
@@ -16134,8 +16046,155 @@ communication drivers.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.DuplicatedModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.DummyModelDriver">
+<span id="yggdrasil-drivers-dummymodeldriver-module"></span><h2>yggdrasil.drivers.DummyModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.DummyModelDriver" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.drivers.DummyModelDriver.</span></span><span class="sig-name descname"><span class="pre">DummyModelDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/DummyModelDriver.html#DummyModelDriver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver" title="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver</span></code></a></p>
+<p>Class that stands-in to act as a model utilizing unmatched
+input/output channels.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.base_languages">
+<span class="sig-name descname"><span class="pre">base_languages</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['python']</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.base_languages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.before_loop">
+<span class="sig-name descname"><span class="pre">before_loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/DummyModelDriver.html#DummyModelDriver.before_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.before_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions before loop.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.before_start">
+<span class="sig-name descname"><span class="pre">before_start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/DummyModelDriver.html#DummyModelDriver.before_start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.before_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions to perform before the run starts.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.cfg">
+<span class="sig-name descname"><span class="pre">cfg</span></span><em class="property"> <span class="pre">=</span> <span class="pre">&lt;yggdrasil.config.YggConfigParser</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.cfg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.comms_implicit">
+<span class="sig-name descname"><span class="pre">comms_implicit</span></span><em class="property"> <span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.comms_implicit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.default_interpreter">
+<span class="sig-name descname"><span class="pre">default_interpreter</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'dummy'</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.default_interpreter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.default_interpreter_flags">
+<span class="sig-name descname"><span class="pre">default_interpreter_flags</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[]</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.default_interpreter_flags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.executable_type">
+<span class="sig-name descname"><span class="pre">executable_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'other'</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.executable_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.full_language">
+<span class="sig-name descname"><span class="pre">full_language</span></span><em class="property"> <span class="pre">=</span> <span class="pre">False</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.full_language" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.inverse_type_map">
+<span class="sig-name descname"><span class="pre">inverse_type_map</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.inverse_type_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.is_configured">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">is_configured</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/DummyModelDriver.html#DummyModelDriver.is_configured"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.is_configured" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the appropriate configuration has been performed (e.g.
+installation of supporting libraries etc.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if the language has been configured.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.is_language_installed">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">is_language_installed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/DummyModelDriver.html#DummyModelDriver.is_language_installed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.is_language_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if this model driver is installed on the current
+machine.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Truth of if this model driver can be run on the current</dt><dd><p>machine.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.language">
+<span class="sig-name descname"><span class="pre">language</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'dummy'</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.language" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.language_ext">
+<span class="sig-name descname"><span class="pre">language_ext</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[]</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.language_ext" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.language_version">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">language_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/DummyModelDriver.html#DummyModelDriver.language_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.language_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the version of this language.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> – Keyword arguments are passed to cls.run_executable.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Version of compiler/interpreter for this language.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.no_executable">
+<span class="sig-name descname"><span class="pre">no_executable</span></span><em class="property"> <span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.no_executable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.run_loop">
+<span class="sig-name descname"><span class="pre">run_loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/DummyModelDriver.html#DummyModelDriver.run_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.run_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loop to check if model is still running and forward output.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.service_partner">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">service_partner</span></span><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.service_partner" title="Permalink to this definition">¶</a></dt>
+<dd><p>YAML representation of the dummy model that should
+stand-in for the model client-side.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-yggdrasil.drivers.DuplicatedModelDriver">
 <span id="yggdrasil-drivers-duplicatedmodeldriver-module"></span><h2>yggdrasil.drivers.DuplicatedModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.DuplicatedModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.DuplicatedModelDriver.DuplicatedModelDriver">
@@ -16271,8 +16330,8 @@ described by the provided yaml.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.ExecutableModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.ExecutableModelDriver">
 <span id="yggdrasil-drivers-executablemodeldriver-module"></span><h2>yggdrasil.drivers.ExecutableModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.ExecutableModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver">
@@ -16400,8 +16459,8 @@ language is installed.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.FileInputDriver">
+</section>
+<section id="module-yggdrasil.drivers.FileInputDriver">
 <span id="yggdrasil-drivers-fileinputdriver-module"></span><h2>yggdrasil.drivers.FileInputDriver module<a class="headerlink" href="#module-yggdrasil.drivers.FileInputDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.FileInputDriver.FileInputDriver">
@@ -16419,8 +16478,8 @@ language is installed.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.FileOutputDriver">
+</section>
+<section id="module-yggdrasil.drivers.FileOutputDriver">
 <span id="yggdrasil-drivers-fileoutputdriver-module"></span><h2>yggdrasil.drivers.FileOutputDriver module<a class="headerlink" href="#module-yggdrasil.drivers.FileOutputDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.FileOutputDriver.FileOutputDriver">
@@ -16438,8 +16497,8 @@ language is installed.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.FortranModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.FortranModelDriver">
 <span id="yggdrasil-drivers-fortranmodeldriver-module"></span><h2>yggdrasil.drivers.FortranModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.FortranModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.FortranModelDriver.FortranCompilerBase">
@@ -16818,7 +16877,7 @@ the precise declaration that should be used.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.drivers.FortranModelDriver.FortranModelDriver.internal_libraries">
-<span class="sig-name descname"><span class="pre">internal_libraries</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'c_wrappers':</span> <span class="pre">{'external_dependencies':</span> <span class="pre">[('c',</span> <span class="pre">'rapidjson'),</span> <span class="pre">('c',</span> <span class="pre">'python'),</span> <span class="pre">('c',</span> <span class="pre">'numpy')],</span> <span class="pre">'include_dirs':</span> <span class="pre">['/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/fortran'],</span> <span class="pre">'internal_dependencies':</span> <span class="pre">[('c',</span> <span class="pre">'ygg')],</span> <span class="pre">'language':</span> <span class="pre">'c',</span> <span class="pre">'libtype':</span> <span class="pre">'object',</span> <span class="pre">'source':</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/fortran/c_wrappers.c'},</span> <span class="pre">'fygg':</span> <span class="pre">{'external_dependencies':</span> <span class="pre">[('c',</span> <span class="pre">'rapidjson'),</span> <span class="pre">('c',</span> <span class="pre">'python'),</span> <span class="pre">('c',</span> <span class="pre">'numpy'),</span> <span class="pre">'stdc++'],</span> <span class="pre">'include_dirs':</span> <span class="pre">['/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/C/communication',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/C/serialize',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/C',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/C'],</span> <span class="pre">'internal_dependencies':</span> <span class="pre">[('c',</span> <span class="pre">'regex'),</span> <span class="pre">('c',</span> <span class="pre">'datatypes'),</span> <span class="pre">('c',</span> <span class="pre">'python_wrapper'),</span> <span class="pre">('c',</span> <span class="pre">'ygg'),</span> <span class="pre">'c_wrappers'],</span> <span class="pre">'libtype':</span> <span class="pre">'static',</span> <span class="pre">'source':</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/fortran/YggInterface.f90'}}</span></em><a class="headerlink" href="#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.internal_libraries" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">internal_libraries</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'c_wrappers':</span> <span class="pre">{'external_dependencies':</span> <span class="pre">[('c',</span> <span class="pre">'rapidjson'),</span> <span class="pre">('c',</span> <span class="pre">'python'),</span> <span class="pre">('c',</span> <span class="pre">'numpy')],</span> <span class="pre">'include_dirs':</span> <span class="pre">['/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/fortran'],</span> <span class="pre">'internal_dependencies':</span> <span class="pre">[('c',</span> <span class="pre">'ygg')],</span> <span class="pre">'language':</span> <span class="pre">'c',</span> <span class="pre">'libtype':</span> <span class="pre">'object',</span> <span class="pre">'source':</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/fortran/c_wrappers.c'},</span> <span class="pre">'fygg':</span> <span class="pre">{'external_dependencies':</span> <span class="pre">[('c',</span> <span class="pre">'rapidjson'),</span> <span class="pre">('c',</span> <span class="pre">'python'),</span> <span class="pre">('c',</span> <span class="pre">'numpy'),</span> <span class="pre">'stdc++'],</span> <span class="pre">'include_dirs':</span> <span class="pre">['/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/C/communication',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/C/serialize',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/C'],</span> <span class="pre">'internal_dependencies':</span> <span class="pre">[('c',</span> <span class="pre">'regex'),</span> <span class="pre">('c',</span> <span class="pre">'datatypes'),</span> <span class="pre">('c',</span> <span class="pre">'python_wrapper'),</span> <span class="pre">('c',</span> <span class="pre">'ygg'),</span> <span class="pre">'c_wrappers'],</span> <span class="pre">'libtype':</span> <span class="pre">'static',</span> <span class="pre">'source':</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/fortran/YggInterface.f90'}}</span></em><a class="headerlink" href="#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.internal_libraries" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -17289,145 +17348,8 @@ parent class’s method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.FunctionModelDriver">
-<span id="yggdrasil-drivers-functionmodeldriver-module"></span><h2>yggdrasil.drivers.FunctionModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.FunctionModelDriver" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.drivers.FunctionModelDriver.</span></span><span class="sig-name descname"><span class="pre">FunctionModelDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/FunctionModelDriver.html#FunctionModelDriver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver" title="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver</span></code></a></p>
-<p>Class that acts as a functional interface to input/output channels
-that are not connected.</p>
-<p>Args:</p>
-<p>Attributes:</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.base_languages">
-<span class="sig-name descname"><span class="pre">base_languages</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['python']</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.base_languages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.before_loop">
-<span class="sig-name descname"><span class="pre">before_loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/FunctionModelDriver.html#FunctionModelDriver.before_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.before_loop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Actions before loop.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.before_start">
-<span class="sig-name descname"><span class="pre">before_start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/FunctionModelDriver.html#FunctionModelDriver.before_start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.before_start" title="Permalink to this definition">¶</a></dt>
-<dd><p>Actions to perform before the run starts.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.cfg">
-<span class="sig-name descname"><span class="pre">cfg</span></span><em class="property"> <span class="pre">=</span> <span class="pre">&lt;yggdrasil.config.YggConfigParser</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.cfg" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.comms_implicit">
-<span class="sig-name descname"><span class="pre">comms_implicit</span></span><em class="property"> <span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.comms_implicit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.default_interpreter">
-<span class="sig-name descname"><span class="pre">default_interpreter</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'function'</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.default_interpreter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.default_interpreter_flags">
-<span class="sig-name descname"><span class="pre">default_interpreter_flags</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[]</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.default_interpreter_flags" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.executable_type">
-<span class="sig-name descname"><span class="pre">executable_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'other'</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.executable_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.full_language">
-<span class="sig-name descname"><span class="pre">full_language</span></span><em class="property"> <span class="pre">=</span> <span class="pre">False</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.full_language" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.inverse_type_map">
-<span class="sig-name descname"><span class="pre">inverse_type_map</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.inverse_type_map" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.is_configured">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">is_configured</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/FunctionModelDriver.html#FunctionModelDriver.is_configured"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.is_configured" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the appropriate configuration has been performed (e.g.
-installation of supporting libraries etc.)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>True if the language has been configured.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.is_language_installed">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">is_language_installed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/FunctionModelDriver.html#FunctionModelDriver.is_language_installed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.is_language_installed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this model driver is installed on the current
-machine.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><dl class="simple">
-<dt>Truth of if this model driver can be run on the current</dt><dd><p>machine.</p>
-</dd>
-</dl>
-</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.language">
-<span class="sig-name descname"><span class="pre">language</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'function'</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.language" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.language_ext">
-<span class="sig-name descname"><span class="pre">language_ext</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[]</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.language_ext" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.language_version">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">language_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/FunctionModelDriver.html#FunctionModelDriver.language_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.language_version" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine the version of this language.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> – Keyword arguments are passed to cls.run_executable.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Version of compiler/interpreter for this language.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.no_executable">
-<span class="sig-name descname"><span class="pre">no_executable</span></span><em class="property"> <span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.no_executable" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.run_loop">
-<span class="sig-name descname"><span class="pre">run_loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/FunctionModelDriver.html#FunctionModelDriver.run_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.run_loop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loop to check if model is still running and forward output.</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-yggdrasil.drivers.InputDriver">
+</section>
+<section id="module-yggdrasil.drivers.InputDriver">
 <span id="yggdrasil-drivers-inputdriver-module"></span><h2>yggdrasil.drivers.InputDriver module<a class="headerlink" href="#module-yggdrasil.drivers.InputDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.InputDriver.InputDriver">
@@ -17447,8 +17369,8 @@ connect to.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.InterpretedModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.InterpretedModelDriver">
 <span id="yggdrasil-drivers-interpretedmodeldriver-module"></span><h2>yggdrasil.drivers.InterpretedModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.InterpretedModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver">
@@ -17792,7 +17714,7 @@ and which ones are arguments.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id23">
-<span class="sig-name descname"><span class="pre">paths_to_add</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/SBML',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/function',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/Python',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/LPy',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/MATLAB',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/R']</span></em><a class="headerlink" href="#id23" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">paths_to_add</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/dummy',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/MATLAB',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/Python',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/R',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/SBML',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/LPy']</span></em><a class="headerlink" href="#id23" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -17859,8 +17781,8 @@ method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.LPyModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.LPyModelDriver">
 <span id="yggdrasil-drivers-lpymodeldriver-module"></span><h2>yggdrasil.drivers.LPyModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.LPyModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.LPyModelDriver.LPyModelDriver">
@@ -17941,13 +17863,13 @@ method.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.drivers.LPyModelDriver.LPyModelDriver.supported_comms">
-<span class="sig-name descname"><span class="pre">supported_comms</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['ipc',</span> <span class="pre">'rmq_async',</span> <span class="pre">'buffer',</span> <span class="pre">'value',</span> <span class="pre">'zmq',</span> <span class="pre">'mpi',</span> <span class="pre">'rmq']</span></em><a class="headerlink" href="#yggdrasil.drivers.LPyModelDriver.LPyModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">supported_comms</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['rest',</span> <span class="pre">'mpi',</span> <span class="pre">'rmq',</span> <span class="pre">'buffer',</span> <span class="pre">'ipc',</span> <span class="pre">'rmq_async',</span> <span class="pre">'zmq',</span> <span class="pre">'value']</span></em><a class="headerlink" href="#yggdrasil.drivers.LPyModelDriver.LPyModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.MPIPartnerModel">
+</section>
+<section id="module-yggdrasil.drivers.MPIPartnerModel">
 <span id="yggdrasil-drivers-mpipartnermodel-module"></span><h2>yggdrasil.drivers.MPIPartnerModel module<a class="headerlink" href="#module-yggdrasil.drivers.MPIPartnerModel" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel">
@@ -18144,8 +18066,8 @@ has not started.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.MakeModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.MakeModelDriver">
 <span id="yggdrasil-drivers-makemodeldriver-module"></span><h2>yggdrasil.drivers.MakeModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.MakeModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.MakeModelDriver.MakeCompiler">
@@ -18614,8 +18536,8 @@ class’s method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.MatlabModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.MatlabModelDriver">
 <span id="yggdrasil-drivers-matlabmodeldriver-module"></span><h2>yggdrasil.drivers.MatlabModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.MatlabModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver">
@@ -19458,8 +19380,8 @@ removed so it is not deleted. Defaults to False.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.ModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.ModelDriver">
 <span id="yggdrasil-drivers-modeldriver-module"></span><h2>yggdrasil.drivers.ModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.ModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.ModelDriver.ModelDriver">
@@ -19471,10 +19393,11 @@ removed so it is not deleted. Defaults to False.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Unique name used to identify the model. This will
 be used to report errors associated with the model.</p></li>
-<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – The full path to the file containing the
-model program that will be run by the driver or a list
-starting with the program file and including any arguments
-that should be passed as input to the program.</p></li>
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – The path to the file containing the model
+program that will be run by the driver for the model’s language
+and/or a list of arguments that should be passed as input to the
+model program or language executable (e.g. source code or
+configuration file for a domain specific language).</p></li>
 <li><p><strong>products</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Paths to files created by the model that
 should be cleaned up when the model exits. Entries can be absolute
 paths or paths relative to the working directory. Defaults to [].</p></li>
@@ -19553,6 +19476,16 @@ so that the model-side comms can be used by more than one thread.
 Defaults to False.</p></li>
 <li><p><strong>copies</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – The number of copies of the model that should be
 created. Defaults to 1.</p></li>
+<li><p><strong>repository_url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – URL for the git repository containing
+the model source code. If provided, relative paths in the model
+YAML definition will be considered relative to the repository root
+directory.</p></li>
+<li><p><strong>description</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Description of the model. This parameter
+is only used in the model repository or when providing the model
+as a service.</p></li>
+<li><p><strong>contact_email</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Email address that should be used to
+contact the maintainer of the model. This parameter is only used
+in the model repository.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</p></li>
 </ul>
 </dd>
@@ -19593,7 +19526,7 @@ to use them. [REQUIRED]</p>
 loops, while loops). [REQUIRED]</p>
 </dd>
 <dt>version_flags (list): Flags that should be called with the language</dt><dd><p>executable to determine the version of the compiler/interpreter.
-Defaults to [‘–version’].</p>
+Defaults to [’–version’].</p>
 </dd>
 <dt>outputs_in_inputs (bool): If True, outputs are passed by pointer as</dt><dd><p>inputs for modification and the return value should be a flag.
 Defaults to False.</p>
@@ -19901,6 +19834,46 @@ the model-side comms can be used by more than one thread.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.ModelDriver.ModelDriver.repository_url">
+<span class="sig-name descname"><span class="pre">repository_url</span></span><a class="headerlink" href="#yggdrasil.drivers.ModelDriver.ModelDriver.repository_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>URL for the git repository containing the model
+source code. If provided, relative paths in the model YAML
+definition will be considered relative to the repository root
+directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.ModelDriver.ModelDriver.description">
+<span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#yggdrasil.drivers.ModelDriver.ModelDriver.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of the model. This parameter is only
+used in the model repository or when providing the model as a
+service.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.ModelDriver.ModelDriver.contact_email">
+<span class="sig-name descname"><span class="pre">contact_email</span></span><a class="headerlink" href="#yggdrasil.drivers.ModelDriver.ModelDriver.contact_email" title="Permalink to this definition">¶</a></dt>
+<dd><p>Email address that should be used to contact the
+maintainer of the model. This parameter is only used in the model
+repository.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -22254,8 +22227,8 @@ without checking that they are not source files.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.OSRModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.OSRModelDriver">
 <span id="yggdrasil-drivers-osrmodeldriver-module"></span><h2>yggdrasil.drivers.OSRModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.OSRModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.OSRModelDriver.OSRModelDriver">
@@ -22568,8 +22541,8 @@ method.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.OutputDriver">
+</section>
+<section id="module-yggdrasil.drivers.OutputDriver">
 <span id="yggdrasil-drivers-outputdriver-module"></span><h2>yggdrasil.drivers.OutputDriver module<a class="headerlink" href="#module-yggdrasil.drivers.OutputDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.OutputDriver.OutputDriver">
@@ -22589,8 +22562,8 @@ connect to.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.PythonModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.PythonModelDriver">
 <span id="yggdrasil-drivers-pythonmodeldriver-module"></span><h2>yggdrasil.drivers.PythonModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.PythonModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.PythonModelDriver.PythonModelDriver">
@@ -22736,12 +22709,12 @@ method.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comm_options">
-<span class="sig-name descname"><span class="pre">supported_comm_options</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'ipc':</span> <span class="pre">{'libraries':</span> <span class="pre">['sysv_ipc'],</span> <span class="pre">'platforms':</span> <span class="pre">['MacOS',</span> <span class="pre">'Linux']},</span> <span class="pre">'mpi':</span> <span class="pre">{'libraries':</span> <span class="pre">['mpi4py']},</span> <span class="pre">'rmq':</span> <span class="pre">{'libraries':</span> <span class="pre">['pika']},</span> <span class="pre">'zmq':</span> <span class="pre">{'libraries':</span> <span class="pre">['zmq']}}</span></em><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comm_options" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">supported_comm_options</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'ipc':</span> <span class="pre">{'libraries':</span> <span class="pre">['sysv_ipc'],</span> <span class="pre">'platforms':</span> <span class="pre">['MacOS',</span> <span class="pre">'Linux']},</span> <span class="pre">'mpi':</span> <span class="pre">{'libraries':</span> <span class="pre">['mpi4py']},</span> <span class="pre">'rest':</span> <span class="pre">{'libraries':</span> <span class="pre">['requests']},</span> <span class="pre">'rmq':</span> <span class="pre">{'libraries':</span> <span class="pre">['pika']},</span> <span class="pre">'zmq':</span> <span class="pre">{'libraries':</span> <span class="pre">['zmq']}}</span></em><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comm_options" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comms">
-<span class="sig-name descname"><span class="pre">supported_comms</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['ipc',</span> <span class="pre">'rmq_async',</span> <span class="pre">'buffer',</span> <span class="pre">'value',</span> <span class="pre">'zmq',</span> <span class="pre">'mpi',</span> <span class="pre">'rmq']</span></em><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">supported_comms</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['rest',</span> <span class="pre">'mpi',</span> <span class="pre">'rmq',</span> <span class="pre">'buffer',</span> <span class="pre">'ipc',</span> <span class="pre">'rmq_async',</span> <span class="pre">'zmq',</span> <span class="pre">'value']</span></em><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -22794,8 +22767,8 @@ parent class’s method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.RModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.RModelDriver">
 <span id="yggdrasil-drivers-rmodeldriver-module"></span><h2>yggdrasil.drivers.RModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.RModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.RModelDriver.RModelDriver">
@@ -22879,7 +22852,7 @@ the compilation executable. Defaults to False.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.drivers.RModelDriver.RModelDriver.interface_dependencies">
-<span class="sig-name descname"><span class="pre">interface_dependencies</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['bit64',</span> <span class="pre">'R6',</span> <span class="pre">'units',</span> <span class="pre">'zeallot',</span> <span class="pre">'reticulate',</span> <span class="pre">'Rcpp']</span></em><a class="headerlink" href="#yggdrasil.drivers.RModelDriver.RModelDriver.interface_dependencies" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">interface_dependencies</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['units',</span> <span class="pre">'bit64',</span> <span class="pre">'reticulate',</span> <span class="pre">'Rcpp',</span> <span class="pre">'zeallot',</span> <span class="pre">'R6']</span></em><a class="headerlink" href="#yggdrasil.drivers.RModelDriver.RModelDriver.interface_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -23102,8 +23075,8 @@ class’s method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.RPCRequestDriver">
+</section>
+<section id="module-yggdrasil.drivers.RPCRequestDriver">
 <span id="yggdrasil-drivers-rpcrequestdriver-module"></span><h2>yggdrasil.drivers.RPCRequestDriver module<a class="headerlink" href="#module-yggdrasil.drivers.RPCRequestDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.RPCRequestDriver.RPCRequestDriver">
@@ -23277,8 +23250,8 @@ header.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.RPCResponseDriver">
+</section>
+<section id="module-yggdrasil.drivers.RPCResponseDriver">
 <span id="yggdrasil-drivers-rpcresponsedriver-module"></span><h2>yggdrasil.drivers.RPCResponseDriver module<a class="headerlink" href="#module-yggdrasil.drivers.RPCResponseDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.RPCResponseDriver.RPCResponseDriver">
@@ -23366,8 +23339,8 @@ created to respond to.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.SBMLModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.SBMLModelDriver">
 <span id="yggdrasil-drivers-sbmlmodeldriver-module"></span><h2>yggdrasil.drivers.SBMLModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.SBMLModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.SBMLModelDriver.SBMLModelDriver">
@@ -23499,8 +23472,8 @@ This option is ignored if only_output_final_step is True.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.TimeSyncModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.TimeSyncModelDriver">
 <span id="yggdrasil-drivers-timesyncmodeldriver-module"></span><h2>yggdrasil.drivers.TimeSyncModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.TimeSyncModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.TimeSyncModelDriver.TimeSyncModelDriver">
@@ -23710,8 +23683,8 @@ empty dictionary.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="id26">
+</section>
+<section id="id26">
 <h2>Module contents<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-yggdrasil.drivers"></span><p>IO and Model drivers.</p>
 <dl class="py function">
@@ -23740,19 +23713,19 @@ class.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="yggdrasil-communication-package">
+</section>
+</section>
+<section id="yggdrasil-communication-package">
 <h1>yggdrasil.communication package<a class="headerlink" href="#yggdrasil-communication-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id27">
+<section id="id27">
 <h2>Subpackages<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 </div>
-</div>
-<div class="section" id="id28">
+</section>
+<section id="id28">
 <h2>Submodules<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-yggdrasil.communication.AsciiFileComm">
+</section>
+<section id="module-yggdrasil.communication.AsciiFileComm">
 <span id="yggdrasil-communication-asciifilecomm-module"></span><h2>yggdrasil.communication.AsciiFileComm module<a class="headerlink" href="#module-yggdrasil.communication.AsciiFileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.AsciiFileComm.AsciiFileComm">
@@ -23803,8 +23776,8 @@ recv (list): List of objects that will be received from a test</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.AsciiMapComm">
+</section>
+<section id="module-yggdrasil.communication.AsciiMapComm">
 <span id="yggdrasil-communication-asciimapcomm-module"></span><h2>yggdrasil.communication.AsciiMapComm module<a class="headerlink" href="#module-yggdrasil.communication.AsciiMapComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.AsciiMapComm.AsciiMapComm">
@@ -23821,8 +23794,8 @@ recv (list): List of objects that will be received from a test</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.AsciiTableComm">
+</section>
+<section id="module-yggdrasil.communication.AsciiTableComm">
 <span id="yggdrasil-communication-asciitablecomm-module"></span><h2>yggdrasil.communication.AsciiTableComm module<a class="headerlink" href="#module-yggdrasil.communication.AsciiTableComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.AsciiTableComm.AsciiTableComm">
@@ -23831,8 +23804,8 @@ recv (list): List of objects that will be received from a test</p>
 <p>Class for handling I/O from/to a file on disk.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.AsyncComm">
+</section>
+<section id="module-yggdrasil.communication.AsyncComm">
 <span id="yggdrasil-communication-asynccomm-module"></span><h2>yggdrasil.communication.AsyncComm module<a class="headerlink" href="#module-yggdrasil.communication.AsyncComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.AsyncComm.AsyncComm">
@@ -24381,8 +24354,8 @@ method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.BufferComm">
+</section>
+<section id="module-yggdrasil.communication.BufferComm">
 <span id="yggdrasil-communication-buffercomm-module"></span><h2>yggdrasil.communication.BufferComm module<a class="headerlink" href="#module-yggdrasil.communication.BufferComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.BufferComm.BufferComm">
@@ -24575,8 +24548,8 @@ a dummy object.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.ClientComm">
+</section>
+<section id="module-yggdrasil.communication.ClientComm">
 <span id="yggdrasil-communication-clientcomm-module"></span><h2>yggdrasil.communication.ClientComm module<a class="headerlink" href="#module-yggdrasil.communication.ClientComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.ClientComm.ClientComm">
@@ -24866,15 +24839,20 @@ comm. Defaults to None.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.ClientComm.ClientComm.opp_comm_kwargs">
-<span class="sig-name descname"><span class="pre">opp_comm_kwargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/ClientComm.html#ClientComm.opp_comm_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ClientComm.ClientComm.opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">opp_comm_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">for_yaml</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/ClientComm.html#ClientComm.opp_comm_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ClientComm.ClientComm.opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get keyword arguments to initialize communication with opposite
 comm object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Keyword arguments for opposite comm object.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>for_yaml</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned dict will only
+contain values that can be specified in a YAML file. Defaults
+to False.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Keyword arguments for opposite comm object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -24979,8 +24957,8 @@ comm’s send_message method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.CommBase">
+</section>
+<section id="module-yggdrasil.communication.CommBase">
 <span id="yggdrasil-communication-commbase-module"></span><h2>yggdrasil.communication.CommBase module<a class="headerlink" href="#module-yggdrasil.communication.CommBase" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.CommBase.CommBase">
@@ -25073,18 +25051,17 @@ received objects. Defaults to None.</p></li>
 sent objects. Defaults to None.</p></li>
 <li><p><strong>vars</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Names of variables to be sent/received by
 this comm. Defaults to [].</p></li>
-<li><p><strong>length_map</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – <p>Map from pointer variable names to</p>
-<p>the names of variables where their length will be stored.
-Defaults to {}.</p>
-</p></li>
+<li><p><strong>length_map</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – Map from pointer variable names to
+the names of variables where their length will be stored.
+Defaults to {}.</p></li>
 <li><p><strong>comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The comm that should be created. This only serves
 as a check that the correct class is being created. Defaults to None.</p></li>
-<li><p><strong>(</strong> – class:.FilterBase, optional): Callable class that will be used to
-determine when messages should be sent/received. Defaults to None
-and is ignored.</p></li>
-<li><p><strong>(</strong> – class:.TransformBase, optional): Callable class that will be
-used to transform messages that are sent/received. Defaults to None
-and is ignored.</p></li>
+<li><p><strong>(</strong> – class:.FilterBase, optional): Filter that will be used to
+determine when messages should be sent/received. Ignored if not
+provided.</p></li>
+<li><p><strong>(</strong> – class:.TransformBase, optional): One or more transformations
+that will be applied to messages that are sent/received. Ignored if
+not provided.</p></li>
 <li><p><strong>is_default</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, this comm was created to handle
 all input/output variables to/from a model. Defaults to False. This
 variable is used internally and should not be set explicitly in
@@ -25106,6 +25083,9 @@ model comm or a file.</p></li>
 <li><p><strong>default_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a><em>, </em><em>optional</em>) – Value that should be returned in
 the event that a yaml does not pair the comm with another
 model comm or a file.</p></li>
+<li><p><strong>for_service</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, this comm bridges the gap to
+an integration running as a service, possibly on a remote machine.
+Defaults to False.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keywords arguments are passed to parent class.</p></li>
 </ul>
 </dd>
@@ -26180,15 +26160,20 @@ environment variables that need to be provided to the model.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.CommBase.CommBase.opp_comm_kwargs">
-<span class="sig-name descname"><span class="pre">opp_comm_kwargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/CommBase.html#CommBase.opp_comm_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">opp_comm_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">for_yaml</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/CommBase.html#CommBase.opp_comm_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get keyword arguments to initialize communication with opposite
 comm object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Keyword arguments for opposite comm object.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>for_yaml</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned dict will only
+contain values that can be specified in a YAML file. Defaults
+to False.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Keyword arguments for opposite comm object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -26275,7 +26260,7 @@ None and is ignored.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.CommBase.CommBase.printStatus">
-<span class="sig-name descname"><span class="pre">printStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'info'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/CommBase.html#CommBase.printStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.printStatus" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">printStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'info'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_str</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/CommBase.html#CommBase.printStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.printStatus" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print status of the communicator.</p>
 </dd></dl>
 
@@ -27022,8 +27007,8 @@ the registry, but it won’t be closed. Defaults to False.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.DefaultComm">
+</section>
+<section id="module-yggdrasil.communication.DefaultComm">
 <span id="yggdrasil-communication-defaultcomm-module"></span><h2>yggdrasil.communication.DefaultComm module<a class="headerlink" href="#module-yggdrasil.communication.DefaultComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.DefaultComm.DefaultComm">
@@ -27032,8 +27017,8 @@ the registry, but it won’t be closed. Defaults to False.</p></li>
 <p>Simple wrapper for default class that allows it to be registered.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.ErrorComm">
+</section>
+<section id="module-yggdrasil.communication.ErrorComm">
 <span id="yggdrasil-communication-errorcomm-module"></span><h2>yggdrasil.communication.ErrorComm module<a class="headerlink" href="#module-yggdrasil.communication.ErrorComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.communication.ErrorComm.ErrorComm">
@@ -27063,8 +27048,8 @@ constructor.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.FileComm">
+</section>
+<section id="module-yggdrasil.communication.FileComm">
 <span id="yggdrasil-communication-filecomm-module"></span><h2>yggdrasil.communication.FileComm module<a class="headerlink" href="#module-yggdrasil.communication.FileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.FileComm.FileComm">
@@ -27461,15 +27446,20 @@ supported languages.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.FileComm.FileComm.opp_comm_kwargs">
-<span class="sig-name descname"><span class="pre">opp_comm_kwargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/FileComm.html#FileComm.opp_comm_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">opp_comm_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">for_yaml</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/FileComm.html#FileComm.opp_comm_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get keyword arguments to initialize communication with opposite
 comm object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Keyword arguments for opposite comm object.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>for_yaml</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned dict will only
+contain values that can be specified in a YAML file. Defaults
+to False.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Keyword arguments for opposite comm object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -27573,8 +27563,8 @@ to False.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.ForkComm">
+</section>
+<section id="module-yggdrasil.communication.ForkComm">
 <span id="yggdrasil-communication-forkcomm-module"></span><h2>yggdrasil.communication.ForkComm module<a class="headerlink" href="#module-yggdrasil.communication.ForkComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.ForkComm.ForkComm">
@@ -27894,15 +27884,20 @@ environment variables that need to be provided to the model.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.ForkComm.ForkComm.opp_comm_kwargs">
-<span class="sig-name descname"><span class="pre">opp_comm_kwargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/ForkComm.html#ForkComm.opp_comm_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ForkComm.ForkComm.opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">opp_comm_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">for_yaml</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/ForkComm.html#ForkComm.opp_comm_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ForkComm.ForkComm.opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get keyword arguments to initialize communication with opposite
 comm object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Keyword arguments for opposite comm object.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>for_yaml</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned dict will only
+contain values that can be specified in a YAML file. Defaults
+to False.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Keyword arguments for opposite comm object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -27941,7 +27936,7 @@ methods for the forked comms.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.ForkComm.ForkComm.printStatus">
-<span class="sig-name descname"><span class="pre">printStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nindent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/ForkComm.html#ForkComm.printStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ForkComm.ForkComm.printStatus" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">printStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nindent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_str</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/ForkComm.html#ForkComm.printStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ForkComm.ForkComm.printStatus" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print status of the communicator.</p>
 </dd></dl>
 
@@ -28053,8 +28048,8 @@ method for each communicator.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.IPCComm">
+</section>
+<section id="module-yggdrasil.communication.IPCComm">
 <span id="yggdrasil-communication-ipccomm-module"></span><h2>yggdrasil.communication.IPCComm module<a class="headerlink" href="#module-yggdrasil.communication.IPCComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.IPCComm.IPCComm">
@@ -28274,8 +28269,8 @@ list.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.JSONFileComm">
+</section>
+<section id="module-yggdrasil.communication.JSONFileComm">
 <span id="yggdrasil-communication-jsonfilecomm-module"></span><h2>yggdrasil.communication.JSONFileComm module<a class="headerlink" href="#module-yggdrasil.communication.JSONFileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.JSONFileComm.JSONFileComm">
@@ -28292,8 +28287,8 @@ list.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.MPIComm">
+</section>
+<section id="module-yggdrasil.communication.MPIComm">
 <span id="yggdrasil-communication-mpicomm-module"></span><h2>yggdrasil.communication.MPIComm module<a class="headerlink" href="#module-yggdrasil.communication.MPIComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py exception">
 <dt class="sig sig-object py" id="yggdrasil.communication.MPIComm.MPIClosedError">
@@ -28721,8 +28716,8 @@ method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.MatFileComm">
+</section>
+<section id="module-yggdrasil.communication.MatFileComm">
 <span id="yggdrasil-communication-matfilecomm-module"></span><h2>yggdrasil.communication.MatFileComm module<a class="headerlink" href="#module-yggdrasil.communication.MatFileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.MatFileComm.MatFileComm">
@@ -28739,8 +28734,8 @@ method.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.NetCDFFileComm">
+</section>
+<section id="module-yggdrasil.communication.NetCDFFileComm">
 <span id="yggdrasil-communication-netcdffilecomm-module"></span><h2>yggdrasil.communication.NetCDFFileComm module<a class="headerlink" href="#module-yggdrasil.communication.NetCDFFileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.NetCDFFileComm.NetCDFFileComm">
@@ -28880,8 +28875,8 @@ is inefficient.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.ObjFileComm">
+</section>
+<section id="module-yggdrasil.communication.ObjFileComm">
 <span id="yggdrasil-communication-objfilecomm-module"></span><h2>yggdrasil.communication.ObjFileComm module<a class="headerlink" href="#module-yggdrasil.communication.ObjFileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.ObjFileComm.ObjFileComm">
@@ -28899,8 +28894,8 @@ stored.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.PandasFileComm">
+</section>
+<section id="module-yggdrasil.communication.PandasFileComm">
 <span id="yggdrasil-communication-pandasfilecomm-module"></span><h2>yggdrasil.communication.PandasFileComm module<a class="headerlink" href="#module-yggdrasil.communication.PandasFileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.PandasFileComm.PandasFileComm">
@@ -28920,8 +28915,8 @@ columns. Defaults to ‘t’.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.PickleFileComm">
+</section>
+<section id="module-yggdrasil.communication.PickleFileComm">
 <span id="yggdrasil-communication-picklefilecomm-module"></span><h2>yggdrasil.communication.PickleFileComm module<a class="headerlink" href="#module-yggdrasil.communication.PickleFileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.PickleFileComm.PickleFileComm">
@@ -28938,8 +28933,8 @@ columns. Defaults to ‘t’.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.PlyFileComm">
+</section>
+<section id="module-yggdrasil.communication.PlyFileComm">
 <span id="yggdrasil-communication-plyfilecomm-module"></span><h2>yggdrasil.communication.PlyFileComm module<a class="headerlink" href="#module-yggdrasil.communication.PlyFileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.PlyFileComm.PlyFileComm">
@@ -28957,8 +28952,114 @@ stored.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.RMQAsyncComm">
+</section>
+<section id="module-yggdrasil.communication.RESTComm">
+<span id="yggdrasil-communication-restcomm-module"></span><h2>yggdrasil.communication.RESTComm module<a class="headerlink" href="#module-yggdrasil.communication.RESTComm" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.communication.RESTComm.RESTComm">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.RESTComm.</span></span><span class="sig-name descname"><span class="pre">RESTComm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/RESTComm.html#RESTComm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.RESTComm.RESTComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase" title="yggdrasil.communication.CommBase.CommBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.CommBase.CommBase</span></code></a></p>
+<p>Class for handling I/O via a RESTful API. The provided address should
+be an HTTP address to a server running a flask app that has been equipped
+to respond to send/receive calls via the add_comm_server_to_app method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – Parameters that should be passed via URL.
+Defaults to None and is ignored.</p></li>
+<li><p><strong>cookies</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – Cookies to send to the server. Defaults to
+None and is ignored.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments will be passed to the base
+class.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.RESTComm.RESTComm.bind">
+<span class="sig-name descname"><span class="pre">bind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/RESTComm.html#RESTComm.bind"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.RESTComm.RESTComm.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bind to address based on information provided.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.RESTComm.RESTComm.is_open">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_open</span></span><a class="headerlink" href="#yggdrasil.communication.RESTComm.RESTComm.is_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the connection is open.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.RESTComm.RESTComm.n_msg_recv">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n_msg_recv</span></span><a class="headerlink" href="#yggdrasil.communication.RESTComm.RESTComm.n_msg_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of incoming messages in the connection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.RESTComm.RESTComm.n_msg_send">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n_msg_send</span></span><a class="headerlink" href="#yggdrasil.communication.RESTComm.RESTComm.n_msg_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of outgoing messages in the connection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.RESTComm.RESTComm.open">
+<span class="sig-name descname"><span class="pre">open</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/RESTComm.html#RESTComm.open"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.RESTComm.RESTComm.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the connection.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.RESTComm.RESTComm.opp_comm_kwargs">
+<span class="sig-name descname"><span class="pre">opp_comm_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">for_yaml</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/RESTComm.html#RESTComm.opp_comm_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.RESTComm.RESTComm.opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get keyword arguments to initialize communication with opposite
+comm object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>for_yaml</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned dict will only
+contain values that can be specified in a YAML file. Defaults
+to False.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Keyword arguments for opposite comm object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.RESTComm.RESTComm.purge">
+<span class="sig-name descname"><span class="pre">purge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/RESTComm.html#RESTComm.purge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.RESTComm.RESTComm.purge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Purge all messages from the comm.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.communication.RESTComm.add_comm_server_to_app">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.RESTComm.</span></span><span class="sig-name descname"><span class="pre">add_comm_server_to_app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/RESTComm.html#add_comm_server_to_app"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.RESTComm.add_comm_server_to_app" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add methods for handling send/receive calls server-side.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>app</strong> (<em>flask.Flask</em>) – Flask app to add methods to.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-yggdrasil.communication.RMQAsyncComm">
 <span id="yggdrasil-communication-rmqasynccomm-module"></span><h2>yggdrasil.communication.RMQAsyncComm module<a class="headerlink" href="#module-yggdrasil.communication.RMQAsyncComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.RMQAsyncComm.RMQAsyncComm">
@@ -29255,8 +29356,8 @@ the queue.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.RMQComm">
+</section>
+<section id="module-yggdrasil.communication.RMQComm">
 <span id="yggdrasil-communication-rmqcomm-module"></span><h2>yggdrasil.communication.RMQComm module<a class="headerlink" href="#module-yggdrasil.communication.RMQComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.RMQComm.RMQComm">
@@ -29465,15 +29566,20 @@ arguments for the new comm.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.RMQComm.RMQComm.opp_comm_kwargs">
-<span class="sig-name descname"><span class="pre">opp_comm_kwargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/RMQComm.html#RMQComm.opp_comm_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.RMQComm.RMQComm.opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">opp_comm_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">for_yaml</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/RMQComm.html#RMQComm.opp_comm_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.RMQComm.RMQComm.opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get keyword arguments to initialize communication with opposite
 comm object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Keyword arguments for opposite comm object.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>for_yaml</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned dict will only
+contain values that can be specified in a YAML file. Defaults
+to False.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Keyword arguments for opposite comm object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -29554,8 +29660,54 @@ config value.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.ServerComm">
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.communication.RMQComm.get_rmq_parameters">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.RMQComm.</span></span><span class="sig-name descname"><span class="pre">get_rmq_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">virtual_host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vhost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exchange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/RMQComm.html#get_rmq_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.RMQComm.get_rmq_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get RabbitMQ connection parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Address of RMQ server that includes all the
+necessary information. If this is provided, the remaining arguments
+are ignored. Defaults to None and the connection parameters are
+taken from the other arguments.</p></li>
+<li><p><strong>user</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – RabbitMQ server username. Defaults to config
+option ‘user’ in section ‘rmq’ if it exists and ‘guest’ if it
+does not.</p></li>
+<li><p><strong>username</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Alias for user.</p></li>
+<li><p><strong>password</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – RabbitMQ server password. Defaults to
+config option ‘password’ in section ‘rmq’ if it exists and
+‘guest’ if it does not.</p></li>
+<li><p><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – RabbitMQ server host. Defaults to config option
+‘host’ in section ‘rmq’ if it exists and ‘localhost’ if it
+does not. If ‘localhost’, the output of socket.gethostname()
+is used.</p></li>
+<li><p><strong>virtual_host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – RabbitMQ server virtual host. Defaults
+to config option ‘vhost’ in section ‘rmq’ if it exists and ‘/’
+if it does not.</p></li>
+<li><p><strong>vhost</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Alias for virtual_host.</p></li>
+<li><p><strong>port</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Port on host to use. Defaults to config option
+‘port’ in section ‘rmq’ if it exists and ‘5672’ if it does not.</p></li>
+<li><p><strong>exchange</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – RabbitMQ exchange. Defaults to config
+option ‘namespace’ in section ‘rmq’ if it exits and ‘’ if it does
+not.</p></li>
+<li><p><strong>queue</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Name of the queue that messages will be
+send to or received from. If an empty string, the queue will
+be a random string and exclusive to a receiving comm. Defaults
+to ‘’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The connection url, exchange, &amp; queue.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-yggdrasil.communication.ServerComm">
 <span id="yggdrasil-communication-servercomm-module"></span><h2>yggdrasil.communication.ServerComm module<a class="headerlink" href="#module-yggdrasil.communication.ServerComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.ServerComm.Request">
@@ -29825,15 +29977,20 @@ comm. Defaults to None.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.ServerComm.ServerComm.opp_comm_kwargs">
-<span class="sig-name descname"><span class="pre">opp_comm_kwargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/ServerComm.html#ServerComm.opp_comm_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ServerComm.ServerComm.opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">opp_comm_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">for_yaml</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/ServerComm.html#ServerComm.opp_comm_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ServerComm.ServerComm.opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get keyword arguments to initialize communication with opposite
 comm object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Keyword arguments for opposite comm object.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>for_yaml</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned dict will only
+contain values that can be specified in a YAML file. Defaults
+to False.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Keyword arguments for opposite comm object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -29985,8 +30142,8 @@ comm’s send_message method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.ValueComm">
+</section>
+<section id="module-yggdrasil.communication.ValueComm">
 <span id="yggdrasil-communication-valuecomm-module"></span><h2>yggdrasil.communication.ValueComm module<a class="headerlink" href="#module-yggdrasil.communication.ValueComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.ValueComm.ValueComm">
@@ -30096,8 +30253,8 @@ supported languages.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.WOFOSTParamFileComm">
+</section>
+<section id="module-yggdrasil.communication.WOFOSTParamFileComm">
 <span id="yggdrasil-communication-wofostparamfilecomm-module"></span><h2>yggdrasil.communication.WOFOSTParamFileComm module<a class="headerlink" href="#module-yggdrasil.communication.WOFOSTParamFileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.WOFOSTParamFileComm.WOFOSTParamFileComm">
@@ -30106,8 +30263,8 @@ supported languages.</p>
 <p>Class for handling I/O from/to a WOFOST parameter file on disk.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.YAMLFileComm">
+</section>
+<section id="module-yggdrasil.communication.YAMLFileComm">
 <span id="yggdrasil-communication-yamlfilecomm-module"></span><h2>yggdrasil.communication.YAMLFileComm module<a class="headerlink" href="#module-yggdrasil.communication.YAMLFileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.YAMLFileComm.YAMLFileComm">
@@ -30124,8 +30281,8 @@ supported languages.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.ZMQComm">
+</section>
+<section id="module-yggdrasil.communication.ZMQComm">
 <span id="yggdrasil-communication-zmqcomm-module"></span><h2>yggdrasil.communication.ZMQComm module<a class="headerlink" href="#module-yggdrasil.communication.ZMQComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.ZMQComm.ZMQComm">
@@ -30528,15 +30685,20 @@ arguments for the new comm.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.ZMQComm.ZMQComm.opp_comm_kwargs">
-<span class="sig-name descname"><span class="pre">opp_comm_kwargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/ZMQComm.html#ZMQComm.opp_comm_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ZMQComm.ZMQComm.opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">opp_comm_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">for_yaml</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/ZMQComm.html#ZMQComm.opp_comm_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ZMQComm.ZMQComm.opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get keyword arguments to initialize communication with opposite
 comm object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Keyword arguments for opposite comm object.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>for_yaml</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned dict will only
+contain values that can be specified in a YAML file. Defaults
+to False.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Keyword arguments for opposite comm object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -30957,8 +31119,8 @@ None and is not added to the address.</p></li>
 <span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.ZMQComm.</span></span><span class="sig-name descname"><span class="pre">set_context_opts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/communication/ZMQComm.html#set_context_opts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ZMQComm.set_context_opts" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</div>
-<div class="section" id="id42">
+</section>
+<section id="id42">
 <h2>Module contents<a class="headerlink" href="#id42" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-yggdrasil.communication"></span><dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.communication.cleanup_comms">
@@ -31026,67 +31188,50 @@ class method new_comm.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="yggdrasil-examples-package">
+</section>
+</section>
+<section id="yggdrasil-examples-package">
 <h1>yggdrasil.examples package<a class="headerlink" href="#yggdrasil-examples-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id43">
+<section id="id43">
 <h2>Subpackages<a class="headerlink" href="#id43" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 </div>
-</div>
-<div class="section" id="id44">
+</section>
+<section id="id44">
 <h2>Module contents<a class="headerlink" href="#id44" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-yggdrasil.examples"></span><p>Tools for accessing examples from python.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="code_c.html" class="btn btn-neutral float-right" title="C Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="code_python.html" class="btn btn-neutral float-left" title="Python Code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="code_c.html" class="btn btn-neutral float-right" title="C Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

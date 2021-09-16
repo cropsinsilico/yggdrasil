@@ -139,6 +139,10 @@ was closed due to an error.
 Registering Model
 =================
 
+.. warning::
+
+   The user interface referenced below has been deprecated.
+
 Next we will use the user-interface to register the model and connect it to 
 some files to replicate the original behavior of the model. First, go to 
 the user interface located `here <https://hackathon.cis.ndslabs.org/>`_. 

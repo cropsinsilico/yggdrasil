@@ -1,75 +1,35 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.serialize package &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.serialize package &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -77,18 +37,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
@@ -103,7 +52,10 @@
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
@@ -114,76 +66,36 @@
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>yggdrasil.serialize package</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/yggdrasil.serialize.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="yggdrasil-serialize-package">
+             
+  <section id="yggdrasil-serialize-package">
 <h1>yggdrasil.serialize package<a class="headerlink" href="#yggdrasil-serialize-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
+<section id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
@@ -203,11 +115,11 @@
 </li>
 </ul>
 </div>
-</div>
-<div class="section" id="submodules">
+</section>
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-yggdrasil.serialize.AsciiMapSerialize">
+</section>
+<section id="module-yggdrasil.serialize.AsciiMapSerialize">
 <span id="yggdrasil-serialize-asciimapserialize-module"></span><h2>yggdrasil.serialize.AsciiMapSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.AsciiMapSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.AsciiMapSerialize.AsciiMapSerialize">
@@ -301,8 +213,8 @@ the concatenated serialization were deserialized.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.AsciiTableSerialize">
+</section>
+<section id="module-yggdrasil.serialize.AsciiTableSerialize">
 <span id="yggdrasil-serialize-asciitableserialize-module"></span><h2>yggdrasil.serialize.AsciiTableSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.AsciiTableSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize">
@@ -544,8 +456,8 @@ method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.DefaultSerialize">
+</section>
+<section id="module-yggdrasil.serialize.DefaultSerialize">
 <span id="yggdrasil-serialize-defaultserialize-module"></span><h2>yggdrasil.serialize.DefaultSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.DefaultSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.DefaultSerialize.DefaultSerialize">
@@ -669,8 +581,8 @@ method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.DirectSerialize">
+</section>
+<section id="module-yggdrasil.serialize.DirectSerialize">
 <span id="yggdrasil-serialize-directserialize-module"></span><h2>yggdrasil.serialize.DirectSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.DirectSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.DirectSerialize.DirectSerialize">
@@ -774,8 +686,8 @@ extra_kwargs (dict): Extra keyword arguments not used to</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.FunctionalSerialize">
+</section>
+<section id="module-yggdrasil.serialize.FunctionalSerialize">
 <span id="yggdrasil-serialize-functionalserialize-module"></span><h2>yggdrasil.serialize.FunctionalSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.FunctionalSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.FunctionalSerialize.FunctionalSerialize">
@@ -838,8 +750,8 @@ constructor.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.JSONSerialize">
+</section>
+<section id="module-yggdrasil.serialize.JSONSerialize">
 <span id="yggdrasil-serialize-jsonserialize-module"></span><h2>yggdrasil.serialize.JSONSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.JSONSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.JSONSerialize.JSONSerialize">
@@ -938,8 +850,8 @@ the concatenated serialization were deserialized.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.MatSerialize">
+</section>
+<section id="module-yggdrasil.serialize.MatSerialize">
 <span id="yggdrasil-serialize-matserialize-module"></span><h2>yggdrasil.serialize.MatSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.MatSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.MatSerialize.MatSerialize">
@@ -1031,8 +943,8 @@ the concatenated serialization were deserialized.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.ObjSerialize">
+</section>
+<section id="module-yggdrasil.serialize.ObjSerialize">
 <span id="yggdrasil-serialize-objserialize-module"></span><h2>yggdrasil.serialize.ObjSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.ObjSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.ObjSerialize.ObjSerialize">
@@ -1096,8 +1008,8 @@ serialized.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.PandasSerialize">
+</section>
+<section id="module-yggdrasil.serialize.PandasSerialize">
 <span id="yggdrasil-serialize-pandasserialize-module"></span><h2>yggdrasil.serialize.PandasSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.PandasSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.PandasSerialize.PandasSerialize">
@@ -1401,8 +1313,8 @@ to files serialized using this class.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.PickleSerialize">
+</section>
+<section id="module-yggdrasil.serialize.PickleSerialize">
 <span id="yggdrasil-serialize-pickleserialize-module"></span><h2>yggdrasil.serialize.PickleSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.PickleSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.PickleSerialize.PickleSerialize">
@@ -1507,8 +1419,8 @@ or more frames.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.PlySerialize">
+</section>
+<section id="module-yggdrasil.serialize.PlySerialize">
 <span id="yggdrasil-serialize-plyserialize-module"></span><h2>yggdrasil.serialize.PlySerialize module<a class="headerlink" href="#module-yggdrasil.serialize.PlySerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.PlySerialize.PlySerialize">
@@ -1642,8 +1554,8 @@ serialized.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.SerializeBase">
+</section>
+<section id="module-yggdrasil.serialize.SerializeBase">
 <span id="yggdrasil-serialize-serializebase-module"></span><h2>yggdrasil.serialize.SerializeBase module<a class="headerlink" href="#module-yggdrasil.serialize.SerializeBase" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase">
@@ -2257,8 +2169,8 @@ provided serialization spec is not compatible with the type definition.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.WOFOSTParamSerialize">
+</section>
+<section id="module-yggdrasil.serialize.WOFOSTParamSerialize">
 <span id="yggdrasil-serialize-wofostparamserialize-module"></span><h2>yggdrasil.serialize.WOFOSTParamSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.WOFOSTParamSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize">
@@ -2363,8 +2275,8 @@ the concatenated serialization were deserialized.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize.YAMLSerialize">
+</section>
+<section id="module-yggdrasil.serialize.YAMLSerialize">
 <span id="yggdrasil-serialize-yamlserialize-module"></span><h2>yggdrasil.serialize.YAMLSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.YAMLSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.YAMLSerialize.YAMLSerialize">
@@ -2436,54 +2348,38 @@ serialized in the flow style. See
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.serialize">
+</section>
+<section id="module-yggdrasil.serialize">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil.serialize" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

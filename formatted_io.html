@@ -1,77 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Formatted I/O &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Formatted I/O &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Server/Client I/O" href="server_client_io.html" />
     <link rel="prev" title="Getting started" href="getting_started.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -79,18 +39,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
@@ -116,7 +65,10 @@
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
@@ -127,78 +79,38 @@
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Formatted I/O</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/formatted_io.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="formatted-i-o">
+             
+  <section id="formatted-i-o">
 <span id="formatted-io-rst"></span><h1>Formatted I/O<a class="headerlink" href="#formatted-i-o" title="Permalink to this headline">¶</a></h1>
 <p>In addition to passing raw strings, the yggdrasil framework also has
 support for formatting/processing messages from/to language native objects.</p>
-<div class="section" id="scalars">
+<section id="scalars">
 <h2>Scalars<a class="headerlink" href="#scalars" title="Permalink to this headline">¶</a></h2>
 <p>The format of messages containing scalar variables (strings, integers, and
 floating point numbers) can be specified using a C-style format string
@@ -293,8 +205,8 @@ rather than all at once:</p>
 </pre></div>
 </div>
 <p>(<a class="reference external" href="examples/formatted_io1.html">Example in other languages</a>)</p>
-</div>
-<div class="section" id="tables-by-row">
+</section>
+<section id="tables-by-row">
 <h2>Tables by Row<a class="headerlink" href="#tables-by-row" title="Permalink to this headline">¶</a></h2>
 <p>Tables can also be passed in a similar manner. For input from a table, the format
 string does not need to be provided and will be determined by the source of the
@@ -390,8 +302,8 @@ row-by-row including verification that each row conforms with the table.</p>
 </pre></div>
 </div>
 <p>(<a class="reference external" href="examples/formatted_io2.html">Example in other languages</a>)</p>
-</div>
-<div class="section" id="tables-as-arrays">
+</section>
+<section id="tables-as-arrays">
 <h2>Tables as Arrays<a class="headerlink" href="#tables-as-arrays" title="Permalink to this headline">¶</a></h2>
 <p>Tables can also be passed as arrays. In Python and Matlab, this is done using
 separate classes/functions. In C and C++, this is done by passing 1 to the <code class="docutils literal notranslate"><span class="pre">as_array</span></code>
@@ -493,8 +405,8 @@ should be read/written in their entirety as arrays.</p>
 </pre></div>
 </div>
 <p>(<a class="reference external" href="examples/formatted_io3.html">Example in other languages</a>)</p>
-</div>
-<div class="section" id="tables-as-pandas-data-frames">
+</section>
+<section id="tables-as-pandas-data-frames">
 <h2>Tables as Pandas Data Frames<a class="headerlink" href="#tables-as-pandas-data-frames" title="Permalink to this headline">¶</a></h2>
 <p>In Python, tables can also be passed as <a class="reference external" href="https://pandas.pydata.org/">Pandas</a>
 data frames.</p>
@@ -600,8 +512,8 @@ receiving end of sent Pandas data frames will receive arrays in the
 proper native data type. In addition, a model written in Python can
 receive any array sent by another model (whether or not it is Python)
 as a Pandas data frame.</p>
-</div>
-<div class="section" id="d-structures-as-ply-obj">
+</section>
+<section id="d-structures-as-ply-obj">
 <h2>3D Structures as Ply/Obj<a class="headerlink" href="#d-structures-as-ply-obj" title="Permalink to this headline">¶</a></h2>
 <p>3D structures can be passed around in <a class="reference external" href="http://paulbourke.net/dataformats/ply/">Ply</a>
 or <a class="reference external" href="http://paulbourke.net/dataformats/obj/">Obj</a> formats.</p>
@@ -700,8 +612,8 @@ Ply/Obj file formats.</p>
 (<code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.PlySerialize.PlyDict</span></code> or
 <code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.ObjSerialize.ObjDict</span></code>) while in
 C/C++ it is returned as a structure (<code class="xref c c-type docutils literal notranslate"><span class="pre">ply_t</span></code> or <code class="xref c c-type docutils literal notranslate"><span class="pre">obj_t</span></code>).</p>
-</div>
-<div class="section" id="id1">
+</section>
+<section id="id1">
 <h2>Tables as Pandas Data Frames<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>In Python, tables can also be passed as <a class="reference external" href="https://pandas.pydata.org/">Pandas</a>
 data frames.</p>
@@ -807,8 +719,8 @@ receiving end of sent Pandas data frames will receive arrays in the
 proper native data type. In addition, a model written in Python can
 receive any array sent by another model (whether or not it is Python)
 as a Pandas data frame.</p>
-</div>
-<div class="section" id="config-style-mappings">
+</section>
+<section id="config-style-mappings">
 <h2>Config style Mappings<a class="headerlink" href="#config-style-mappings" title="Permalink to this headline">¶</a></h2>
 <p>Simple mapping (key/value) data can be passed around in a colon/tab
 delimited format.</p>
@@ -908,8 +820,8 @@ delimiter and then a value.</p>
 <p>(<a class="reference external" href="examples/formatted_io7.html">Example in other languages</a>)</p>
 <p>In Python the data is returned as a dictionary with one key/value for each
 line in the file.</p>
-</div>
-<div class="section" id="json-files">
+</section>
+<section id="json-files">
 <h2>JSON Files<a class="headerlink" href="#json-files" title="Permalink to this headline">¶</a></h2>
 <p>More complex nested structures can be passed around using JSON serialization.</p>
 <p>Model Code:</p>
@@ -1007,8 +919,8 @@ JSON files.</p>
 <p>(<a class="reference external" href="examples/formatted_io8.html">Example in other languages</a>)</p>
 <p>In Python, the data is returned in the type determined by the
 <a class="reference external" href="https://docs.python.org/3/library/json.html">json</a> package.</p>
-</div>
-<div class="section" id="yaml-files">
+</section>
+<section id="yaml-files">
 <h2>YAML Files<a class="headerlink" href="#yaml-files" title="Permalink to this headline">¶</a></h2>
 <p>More complex nested structures can also be represented using the YAML syntax.</p>
 <p>Model Code:</p>
@@ -1106,55 +1018,38 @@ YAML files.</p>
 <p>(<a class="reference external" href="examples/formatted_io9.html">Example in other languages</a>)</p>
 <p>In Python, the data is returned in the type determined by the
 <a class="reference external" href="https://pyyaml.org/wiki/PyYAMLDocumentation">PyYAML</a> package.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="server_client_io.html" class="btn btn-neutral float-right" title="Server/Client I/O" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="server_client_io.html" class="btn btn-neutral float-right" title="Server/Client I/O" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

@@ -1,75 +1,35 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.tests package &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.tests package &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -77,18 +37,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
@@ -103,7 +52,10 @@
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
@@ -114,79 +66,39 @@
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>yggdrasil.tests package</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/yggdrasil.tests.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="yggdrasil-tests-package">
+             
+  <section id="yggdrasil-tests-package">
 <h1>yggdrasil.tests package<a class="headerlink" href="#yggdrasil-tests-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-yggdrasil.tests.test_command_line">
+</section>
+<section id="module-yggdrasil.tests.test_command_line">
 <span id="yggdrasil-tests-test-command-line-module"></span><h2>yggdrasil.tests.test_command_line module<a class="headerlink" href="#module-yggdrasil.tests.test_command_line" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.tests.test_command_line.test_update_config">
@@ -194,8 +106,8 @@
 <dd><p>Test the yggconfig entry point.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.tests.test_components">
+</section>
+<section id="module-yggdrasil.tests.test_components">
 <span id="yggdrasil-tests-test-components-module"></span><h2>yggdrasil.tests.test_components module<a class="headerlink" href="#module-yggdrasil.tests.test_components" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.tests.test_components.test_create_component">
@@ -209,8 +121,8 @@
 <dd><p>Test dynamic import of component.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.tests.test_config">
+</section>
+<section id="module-yggdrasil.tests.test_config">
 <span id="yggdrasil-tests-test-config-module"></span><h2>yggdrasil.tests.test_config module<a class="headerlink" href="#module-yggdrasil.tests.test_config" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.tests.test_config.test_YggConfigParser">
@@ -236,8 +148,8 @@
 <dd><p>Test updating configuration for installed languages.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.tests.test_multitasking">
+</section>
+<section id="module-yggdrasil.tests.test_multitasking">
 <span id="yggdrasil-tests-test-multitasking-module"></span><h2>yggdrasil.tests.test_multitasking module<a class="headerlink" href="#module-yggdrasil.tests.test_multitasking" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.tests.test_multitasking.LockedTstClass">
@@ -299,6 +211,12 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_multitasking.TestEvent.test_callback">
+<span class="sig-name descname"><span class="pre">test_callback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_multitasking.html#TestEvent.test_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_multitasking.TestEvent.test_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test callabacks.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.tests.test_multitasking.TestEvent.test_pickle">
 <span class="sig-name descname"><span class="pre">test_pickle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_multitasking.html#TestEvent.test_pickle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_multitasking.TestEvent.test_pickle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test pickling and unpickling the object.</p>
@@ -332,6 +250,18 @@
 <dt class="sig sig-object py" id="yggdrasil.tests.test_multitasking.TestTask.check_decoded">
 <span class="sig-name descname"><span class="pre">check_decoded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decoded</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_multitasking.html#TestTask.check_decoded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_multitasking.TestTask.check_decoded" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check that object was decoded correctly.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_multitasking.TestValueEvent">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.tests.test_multitasking.</span></span><span class="sig-name descname"><span class="pre">TestValueEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_multitasking.html#TestValueEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_multitasking.TestValueEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_multitasking.TestEvent" title="yggdrasil.tests.test_multitasking.TestEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_multitasking.TestEvent</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_multitasking.TestValueEvent.test_value">
+<span class="sig-name descname"><span class="pre">test_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_multitasking.html#TestValueEvent.test_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_multitasking.TestValueEvent.test_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test setting/clearning event value.</p>
 </dd></dl>
 
 </dd></dl>
@@ -456,8 +386,8 @@
 <dd><p>Test WaitableFunction.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.tests.test_platform">
+</section>
+<section id="module-yggdrasil.tests.test_platform">
 <span id="yggdrasil-tests-test-platform-module"></span><h2>yggdrasil.tests.test_platform module<a class="headerlink" href="#module-yggdrasil.tests.test_platform" title="Permalink to this headline">¶</a></h2>
 <p>Tests for platform compatiblity.</p>
 <dl class="py function">
@@ -466,8 +396,8 @@
 <dd><p>Test that only one OS selected.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.tests.test_runner">
+</section>
+<section id="module-yggdrasil.tests.test_runner">
 <span id="yggdrasil-tests-test-runner-module"></span><h2>yggdrasil.tests.test_runner module<a class="headerlink" href="#module-yggdrasil.tests.test_runner" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.tests.test_runner.test_Arunner_interrupt">
@@ -523,8 +453,8 @@
 <dd><p>Start a runner, then stop it early.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.tests.test_scanf">
+</section>
+<section id="module-yggdrasil.tests.test_scanf">
 <span id="yggdrasil-tests-test-scanf-module"></span><h2>yggdrasil.tests.test_scanf module<a class="headerlink" href="#module-yggdrasil.tests.test_scanf" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.tests.test_scanf.test_scanf">
@@ -532,8 +462,8 @@
 <dd><p>Test scanf.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.tests.test_schema">
+</section>
+<section id="module-yggdrasil.tests.test_schema">
 <span id="yggdrasil-tests-test-schema-module"></span><h2>yggdrasil.tests.test_schema module<a class="headerlink" href="#module-yggdrasil.tests.test_schema" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.tests.test_schema.filter_func_ex">
@@ -607,8 +537,96 @@
 <dd><p>Test script to update constants and check that they have not changed.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.tests.test_tests">
+</section>
+<section id="module-yggdrasil.tests.test_services">
+<span id="yggdrasil-tests-test-services-module"></span><h2>yggdrasil.tests.test_services module<a class="headerlink" href="#module-yggdrasil.tests.test_services" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_services.TestServices">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.tests.test_services.</span></span><span class="sig-name descname"><span class="pre">TestServices</span></span><a class="reference internal" href="_modules/yggdrasil/tests/test_services.html#TestServices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_services.TestServices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class to test integration services.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_services.TestServices.call_integration_service">
+<span class="sig-name descname"><span class="pre">call_integration_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cli</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yamls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_yml</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_yml</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'test'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_services.html#TestServices.call_integration_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_services.TestServices.call_integration_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call an integration that includes a service.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_services.TestServices.running_service">
+<span class="sig-name descname"><span class="pre">running_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_services.html#TestServices.running_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_services.TestServices.running_service" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_services.TestServices.test_calling_integration_service">
+<span class="sig-name descname"><span class="pre">test_calling_integration_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">running_service</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_services.html#TestServices.test_calling_integration_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_services.TestServices.test_calling_integration_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test calling an integrations as a service in an integration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_services.TestServices.test_calling_server_as_service">
+<span class="sig-name descname"><span class="pre">test_calling_server_as_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">running_service</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_services.html#TestServices.test_calling_server_as_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_services.TestServices.test_calling_server_as_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test calling an integration service that is a server in an
+integration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_services.TestServices.test_calling_service_as_function">
+<span class="sig-name descname"><span class="pre">test_calling_service_as_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">running_service</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_services.html#TestServices.test_calling_service_as_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_services.TestServices.test_calling_service_as_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test calling an integrations as a service in an integration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_services.TestServices.test_git_fails">
+<span class="sig-name descname"><span class="pre">test_git_fails</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">running_service</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_services.html#TestServices.test_git_fails"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_services.TestServices.test_git_fails" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test that sending a request for a git YAML fails.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_services.TestServices.test_integration_service">
+<span class="sig-name descname"><span class="pre">test_integration_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">running_service</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_services.html#TestServices.test_integration_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_services.TestServices.test_integration_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test starting/stopping an integration service via flask/rmq.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_services.TestServices.test_registered_service">
+<span class="sig-name descname"><span class="pre">test_registered_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">running_service</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_services.html#TestServices.test_registered_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_services.TestServices.test_registered_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test registering an integration service.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_services.check_settings">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.tests.test_services.</span></span><span class="sig-name descname"><span class="pre">check_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial_commtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_services.html#check_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_services.check_settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the requested settings are available, skipping if not.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_services.get_skips">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.tests.test_services.</span></span><span class="sig-name descname"><span class="pre">get_skips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial_commtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_running</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_services.html#get_skips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_services.get_skips" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a list of conditions and skip messages.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_services.running_service">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.tests.test_services.</span></span><span class="sig-name descname"><span class="pre">running_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial_commtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_coverage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_services.html#running_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_services.running_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Context manager to run and clean-up an integration service.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_services.test_call_integration_remote">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.tests.test_services.</span></span><span class="sig-name descname"><span class="pre">test_call_integration_remote</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_services.html#test_call_integration_remote"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_services.test_call_integration_remote" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test with remote integration service.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_services.test_validate_model_submission">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.tests.test_services.</span></span><span class="sig-name descname"><span class="pre">test_validate_model_submission</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_services.html#test_validate_model_submission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_services.test_validate_model_submission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test validate_model_submission</p>
+</dd></dl>
+
+</section>
+<section id="module-yggdrasil.tests.test_tests">
 <span id="yggdrasil-tests-test-tests-module"></span><h2>yggdrasil.tests.test_tests module<a class="headerlink" href="#module-yggdrasil.tests.test_tests" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.tests.test_tests.TestYggTest">
@@ -641,8 +659,8 @@
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.tests.test_timing">
+</section>
+<section id="module-yggdrasil.tests.test_timing">
 <span id="yggdrasil-tests-test-timing-module"></span><h2>yggdrasil.tests.test_timing module<a class="headerlink" href="#module-yggdrasil.tests.test_timing" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.tests.test_timing.TestTimedRun">
@@ -984,8 +1002,8 @@
 <dd><p>Test error when test cannot be performed.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.tests.test_tools">
+</section>
+<section id="module-yggdrasil.tests.test_tools">
 <span id="yggdrasil-tests-test-tools-module"></span><h2>yggdrasil.tests.test_tools module<a class="headerlink" href="#module-yggdrasil.tests.test_tools" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.tests.test_tools.DummyProxyObject">
@@ -1168,8 +1186,14 @@
 <dd><p>Test str2bytes.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.tests.test_units">
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_tools.test_timer_context">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.tests.test_tools.</span></span><span class="sig-name descname"><span class="pre">test_timer_context</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_tools.html#test_timer_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_tools.test_timer_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test timer_context.</p>
+</dd></dl>
+
+</section>
+<section id="module-yggdrasil.tests.test_units">
 <span id="yggdrasil-tests-test-units-module"></span><h2>yggdrasil.tests.test_units module<a class="headerlink" href="#module-yggdrasil.tests.test_units" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.tests.test_units.DummyUnits">
@@ -1262,8 +1286,8 @@
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.tests.test_yamlfile">
+</section>
+<section id="module-yggdrasil.tests.test_yamlfile">
 <span id="yggdrasil-tests-test-yamlfile-module"></span><h2>yggdrasil.tests.test_yamlfile module<a class="headerlink" href="#module-yggdrasil.tests.test_yamlfile" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.tests.test_yamlfile.TestJSONModelOnly">
@@ -1515,12 +1539,6 @@
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.tests.test_yamlfile.</span></span><span class="sig-name descname"><span class="pre">TestYamlModelFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlModelFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlModelFunction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
 <p>Test when missing input/output connections should be routed to a function.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.tests.test_yamlfile.TestYamlModelFunction.test_parse_yaml">
-<span class="sig-name descname"><span class="pre">test_parse_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlModelFunction.test_parse_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlModelFunction.test_parse_yaml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test successfully reading &amp; parsing yaml.</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py class">
@@ -1528,6 +1546,26 @@
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.tests.test_yamlfile.</span></span><span class="sig-name descname"><span class="pre">TestYamlModelOnly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlModelOnly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlModelOnly" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
 <p>Test parsing of different numbers/styles of models.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_yamlfile.TestYamlModelOnlyKwarg">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.tests.test_yamlfile.</span></span><span class="sig-name descname"><span class="pre">TestYamlModelOnlyKwarg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlModelOnlyKwarg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlModelOnlyKwarg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test parsing with model_only=True.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_yamlfile.TestYamlModelSubmission">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.tests.test_yamlfile.</span></span><span class="sig-name descname"><span class="pre">TestYamlModelSubmission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlModelSubmission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlModelSubmission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test parsing with model_submission=True.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.tests.test_yamlfile.TestYamlModelSubmission.teardown">
+<span class="sig-name descname"><span class="pre">teardown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlModelSubmission.teardown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlModelSubmission.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the temporary file if it exists.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -1632,7 +1670,7 @@ there is more than one input/output.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.tests.test_yamlfile.YamlTestBase.test_parse_yaml">
-<span class="sig-name descname"><span class="pre">test_parse_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">as_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#YamlTestBase.test_parse_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBase.test_parse_yaml" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">test_parse_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#YamlTestBase.test_parse_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBase.test_parse_yaml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test successfully reading &amp; parsing yaml.</p>
 </dd></dl>
 
@@ -1656,7 +1694,7 @@ there is more than one input/output.</p>
 <p>Test error for yamlfile.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.tests.test_yamlfile.YamlTestBaseError.test_parse_yaml">
-<span class="sig-name descname"><span class="pre">test_parse_yaml</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#YamlTestBaseError.test_parse_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError.test_parse_yaml" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">test_parse_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#YamlTestBaseError.test_parse_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError.test_parse_yaml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test error reading &amp; parsing yaml.</p>
 </dd></dl>
 
@@ -1692,8 +1730,8 @@ there is more than one input/output.</p>
 <dd><p>Test errors in parse_component.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.tests">
+</section>
+<section id="module-yggdrasil.tests">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil.tests" title="Permalink to this headline">¶</a></h2>
 <p>Testing things.</p>
 <dl class="py function">
@@ -2204,51 +2242,35 @@ open file descriptors.</p></li>
 <p>Test class for a YggClass with IOInfo available.</p>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

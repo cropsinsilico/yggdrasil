@@ -1,0 +1,10 @@
+yggdrasil.languages.dummy package
+=================================
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.languages.dummy
+   :members:
+   :undoc-members:
+   :show-inheritance:

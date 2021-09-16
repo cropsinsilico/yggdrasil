@@ -1,75 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.schema &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.schema &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -77,18 +36,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Overview</a></li>
@@ -103,7 +51,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../threading.html">OpenMP Threading in Models</a></li>
@@ -114,71 +65,33 @@
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../index.html">Module code</a> &raquo;</li>
-        
       <li>yggdrasil.schema</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for yggdrasil.schema</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">copy</span>
@@ -334,6 +247,8 @@
                 <span class="k">elif</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">type_map</span><span class="p">:</span>
                     <span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">type_map</span><span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]]</span>
                     <span class="n">s</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;scalar&#39;</span><span class="p">])</span>
                 <span class="c1"># Scalars not currently included in the schema</span>
                 <span class="c1"># elif s[&#39;type&#39;] in [&#39;scalar&#39;]:</span>
                 <span class="c1">#     s.pop(&quot;precision&quot;, None)</span>
@@ -352,7 +267,7 @@
     <span class="k">return</span> <span class="n">s</span></div>
 
 
-<div class="viewcode-block" id="get_json_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.get_json_schema">[docs]</a><span class="k">def</span> <span class="nf">get_json_schema</span><span class="p">(</span><span class="n">fname_dst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="get_json_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.get_json_schema">[docs]</a><span class="k">def</span> <span class="nf">get_json_schema</span><span class="p">(</span><span class="n">fname_dst</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the yggdrasil schema as a strictly JSON schema without</span>
 <span class="sd">    any of the extended datatypes.</span>
 
@@ -360,6 +275,8 @@
 <span class="sd">        fname_dst (str, optional): Full path to file where the JSON</span>
 <span class="sd">            schema should be saved. Defaults to None and no file is</span>
 <span class="sd">            created.</span>
+<span class="sd">        indent (str, optional): Indentation that should be used when saving</span>
+<span class="sd">            the schema to a file.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Converted structure.</span>
@@ -371,11 +288,11 @@
     <span class="n">out</span> <span class="o">=</span> <span class="n">convert_extended2base</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">fname_dst</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname_dst</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
-            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">fd</span><span class="p">)</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="get_model_form_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.get_model_form_schema">[docs]</a><span class="k">def</span> <span class="nf">get_model_form_schema</span><span class="p">(</span><span class="n">fname_dst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="get_model_form_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.get_model_form_schema">[docs]</a><span class="k">def</span> <span class="nf">get_model_form_schema</span><span class="p">(</span><span class="n">fname_dst</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the yggdrasil schema that can be used to generate a form</span>
 <span class="sd">    for creating a model specification file.</span>
 
@@ -383,6 +300,8 @@
 <span class="sd">        fname_dst (str, optional): Full path to file where the JSON</span>
 <span class="sd">            schema should be saved. Defaults to None and no file is</span>
 <span class="sd">            created.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to the json.dump</span>
+<span class="sd">            call if fname_dst is provided and ignored otherwise.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Schema structure.</span>
@@ -392,7 +311,7 @@
     <span class="n">out</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">model_form_schema</span>
     <span class="k">if</span> <span class="n">fname_dst</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname_dst</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
-            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">fd</span><span class="p">)</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">out</span></div>
 
 
@@ -1063,6 +982,46 @@
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">model_form_schema_props</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Information about how properties should be modified for the</span>
+<span class="sd">        model form schema.&quot;&quot;&quot;</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="c1"># &#39;add&#39;: {},</span>
+            <span class="s1">&#39;replace&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;transform&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/transform&quot;</span><span class="p">}}}},</span>
+            <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;repository_url&#39;</span><span class="p">]},</span>
+            <span class="s1">&#39;remove&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;is_default&#39;</span><span class="p">,</span> <span class="s1">&#39;length_map&#39;</span><span class="p">,</span> <span class="s1">&#39;serializer&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;dont_copy&#39;</span><span class="p">,</span> <span class="s1">&#39;for_service&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;send_converter&#39;</span><span class="p">,</span> <span class="s1">&#39;recv_converter&#39;</span><span class="p">,</span> <span class="s1">&#39;client_id&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;cookies&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;params&#39;</span><span class="p">,</span> <span class="s1">&#39;port&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;is_default&#39;</span><span class="p">,</span> <span class="s1">&#39;length_map&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;wait_for_creation&#39;</span><span class="p">,</span> <span class="s1">&#39;working_dir&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;read_meth&#39;</span><span class="p">,</span> <span class="s1">&#39;in_temp&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;serializer&#39;</span><span class="p">,</span> <span class="s1">&#39;datatype&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;dont_copy&#39;</span><span class="p">,</span> <span class="s1">&#39;for_service&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;send_converter&#39;</span><span class="p">,</span> <span class="s1">&#39;recv_converter&#39;</span><span class="p">,</span> <span class="s1">&#39;client_id&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;cookies&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;params&#39;</span><span class="p">,</span> <span class="s1">&#39;port&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;client_of&#39;</span><span class="p">,</span> <span class="s1">&#39;is_server&#39;</span><span class="p">,</span> <span class="s1">&#39;preserve_cache&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;products&#39;</span><span class="p">,</span> <span class="s1">&#39;source_products&#39;</span><span class="p">,</span> <span class="s1">&#39;working_dir&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;overwrite&#39;</span><span class="p">,</span> <span class="s1">&#39;skip_interpreter&#39;</span><span class="p">,</span> <span class="s1">&#39;copies&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;timesync&#39;</span><span class="p">,</span> <span class="s1">&#39;with_strace&#39;</span><span class="p">,</span> <span class="s1">&#39;with_valgrind&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;valgrind_flags&#39;</span><span class="p">,</span> <span class="s1">&#39;additional_variables&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;aggregation&#39;</span><span class="p">,</span> <span class="s1">&#39;interpolation&#39;</span><span class="p">,</span> <span class="s1">&#39;synonyms&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;driver&#39;</span><span class="p">]},</span>
+            <span class="s1">&#39;order&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;repository_url&#39;</span><span class="p">,</span> <span class="s1">&#39;contact_email&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;outputs&#39;</span><span class="p">]},</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">prop</span>
+        
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">model_form_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for generating a model YAML form.&quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.ScalarMetaschemaProperties</span> <span class="kn">import</span> <span class="p">(</span>
@@ -1110,38 +1069,38 @@
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;oneOf&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
                     <span class="p">{</span><span class="s2">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/serializer&quot;</span><span class="p">})</span>
-        <span class="n">prop_add</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;repository_url&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
-                      <span class="s1">&#39;contact_email&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}}}</span>
-        <span class="n">prop_required</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="s1">&#39;repository_url&#39;</span><span class="p">]}</span>
-        <span class="n">prop_remove</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;is_default&#39;</span><span class="p">,</span> <span class="s1">&#39;length_map&#39;</span><span class="p">,</span> <span class="s1">&#39;serializer&#39;</span><span class="p">],</span>
-            <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;is_default&#39;</span><span class="p">,</span> <span class="s1">&#39;length_map&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;wait_for_creation&#39;</span><span class="p">,</span> <span class="s1">&#39;working_dir&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;read_meth&#39;</span><span class="p">,</span> <span class="s1">&#39;in_temp&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;serializer&#39;</span><span class="p">,</span> <span class="s1">&#39;datatype&#39;</span><span class="p">],</span>
-            <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;client_of&#39;</span><span class="p">,</span> <span class="s1">&#39;is_server&#39;</span><span class="p">,</span> <span class="s1">&#39;preserve_cache&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;products&#39;</span><span class="p">,</span> <span class="s1">&#39;source_products&#39;</span><span class="p">,</span> <span class="s1">&#39;working_dir&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;overwrite&#39;</span><span class="p">,</span> <span class="s1">&#39;skip_interpreter&#39;</span><span class="p">]}</span>
-        <span class="n">prop_order</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">]</span>
-        <span class="p">}</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">rlist</span> <span class="ow">in</span> <span class="n">prop_remove</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_form_schema_props</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">]:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;model&#39;</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">desc</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;model&#39;</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+                <span class="s1">&#39; A full description&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;model&#39;</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;model&#39;</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;args&#39;</span><span class="p">][</span><span class="s1">&#39;minItems&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">rlist</span> <span class="ow">in</span> <span class="n">prop</span><span class="p">[</span><span class="s1">&#39;remove&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rlist</span><span class="p">:</span>
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">rlist</span> <span class="ow">in</span> <span class="n">prop_required</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">rdict</span> <span class="ow">in</span> <span class="n">prop</span><span class="p">[</span><span class="s1">&#39;replace&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rdict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s1">&#39;description&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">r</span><span class="p">]:</span>
+                    <span class="n">rdict</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">r</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">])</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">rdict</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">rlist</span> <span class="ow">in</span> <span class="n">prop</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="p">[])</span>
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rlist</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;required&#39;</span><span class="p">]:</span>
                     <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;required&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">rlist</span> <span class="ow">in</span> <span class="n">prop_order</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># for k, adict in prop[&#39;add&#39;].items():</span>
+        <span class="c1">#     out[&#39;definitions&#39;][k][&#39;properties&#39;].update(adict)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">rlist</span> <span class="ow">in</span> <span class="n">prop</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rlist</span><span class="p">):</span>
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">p</span><span class="p">][</span><span class="s1">&#39;propertyOrder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">adict</span> <span class="ow">in</span> <span class="n">prop_add</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">adict</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">))</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">out</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;properties&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;boolean&quot;</span><span class="p">:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;format&quot;</span><span class="p">,</span> <span class="s2">&quot;checkbox&quot;</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
             <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Model YAML Schema&#39;</span><span class="p">,</span>
             <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Schema for yggdrasil model YAML input files.&#39;</span><span class="p">)</span>
@@ -1226,6 +1185,19 @@
             <span class="c1"># kwargs.setdefault(&#39;no_defaults&#39;, True)</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;schema_registry&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">metaschema</span><span class="o">.</span><span class="n">validate_instance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SchemaRegistry.validate_model_submission"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.validate_model_submission">[docs]</a>    <span class="k">def</span> <span class="nf">validate_model_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object against the schema for models submitted to</span>
+<span class="sd">        the yggdrasil model repository.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            obj (object): Object to validate.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to</span>
+<span class="sd">                yggdrasil.metaschema.validate_instance.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">metaschema</span><span class="o">.</span><span class="n">validate_instance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_form_schema</span><span class="p">,</span>
+                                            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.validate_component"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.validate_component">[docs]</a>    <span class="k">def</span> <span class="nf">validate_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp_name</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object against a specific component.</span>
@@ -1888,46 +1860,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

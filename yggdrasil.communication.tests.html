@@ -1,75 +1,35 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.communication.tests package &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.communication.tests package &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -77,18 +37,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
@@ -103,7 +52,10 @@
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
@@ -114,82 +66,42 @@
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>yggdrasil.communication.tests package</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/yggdrasil.communication.tests.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="yggdrasil-communication-tests-package">
+             
+  <section id="yggdrasil-communication-tests-package">
 <h1>yggdrasil.communication.tests package<a class="headerlink" href="#yggdrasil-communication-tests-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-yggdrasil.communication.tests.conftest">
+</section>
+<section id="module-yggdrasil.communication.tests.conftest">
 <span id="yggdrasil-communication-tests-conftest-module"></span><h2>yggdrasil.communication.tests.conftest module<a class="headerlink" href="#module-yggdrasil.communication.tests.conftest" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-yggdrasil.communication.tests.test_AsciiFileComm">
+</section>
+<section id="module-yggdrasil.communication.tests.test_AsciiFileComm">
 <span id="yggdrasil-communication-tests-test-asciifilecomm-module"></span><h2>yggdrasil.communication.tests.test_AsciiFileComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_AsciiFileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_AsciiFileComm.TestAsciiFileComm">
@@ -214,8 +126,8 @@
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.tests.test_AsciiTableComm">
+</section>
+<section id="module-yggdrasil.communication.tests.test_AsciiTableComm">
 <span id="yggdrasil-communication-tests-test-asciitablecomm-module"></span><h2>yggdrasil.communication.tests.test_AsciiTableComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_AsciiTableComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm">
@@ -278,8 +190,8 @@
 <dd><p>Test read of asciitable without format.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.tests.test_BufferComm">
+</section>
+<section id="module-yggdrasil.communication.tests.test_BufferComm">
 <span id="yggdrasil-communication-tests-test-buffercomm-module"></span><h2>yggdrasil.communication.tests.test_BufferComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_BufferComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_BufferComm.TestBufferComm">
@@ -310,8 +222,8 @@
 <dd><p>Test the pop method of the LockedBuffer class.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.tests.test_CommBase">
+</section>
+<section id="module-yggdrasil.communication.tests.test_CommBase">
 <span id="yggdrasil-communication-tests-test-commbase-module"></span><h2>yggdrasil.communication.tests.test_CommBase module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_CommBase" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_CommBase.TestCommBase">
@@ -835,8 +747,8 @@ close returns false.</p>
 <dd><p>Test registry of comm.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.tests.test_FileComm">
+</section>
+<section id="module-yggdrasil.communication.tests.test_FileComm">
 <span id="yggdrasil-communication-tests-test-filecomm-module"></span><h2>yggdrasil.communication.tests.test_FileComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_FileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_FileComm.TestFileComm">
@@ -981,8 +893,8 @@ close returns false.</p>
 <dd><p>Test FileComm waiting for creation.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.tests.test_ForkComm">
+</section>
+<section id="module-yggdrasil.communication.tests.test_ForkComm">
 <span id="yggdrasil-communication-tests-test-forkcomm-module"></span><h2>yggdrasil.communication.tests.test_ForkComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_ForkComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm">
@@ -1240,8 +1152,8 @@ communication pattern.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.tests.test_IPCComm">
+</section>
+<section id="module-yggdrasil.communication.tests.test_IPCComm">
 <span id="yggdrasil-communication-tests-test-ipccomm-module"></span><h2>yggdrasil.communication.tests.test_IPCComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_IPCComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_IPCComm.TestIPCComm">
@@ -1320,8 +1232,8 @@ communication pattern.</p>
 <dd><p>Test return of get_queue if IPC library is not installed.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.tests.test_MPIComm">
+</section>
+<section id="module-yggdrasil.communication.tests.test_MPIComm">
 <span id="yggdrasil-communication-tests-test-mpicomm-module"></span><h2>yggdrasil.communication.tests.test_MPIComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_MPIComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_MPIComm.TestMPIComm">
@@ -1552,8 +1464,8 @@ close returns false.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.tests.test_PandasFileComm">
+</section>
+<section id="module-yggdrasil.communication.tests.test_PandasFileComm">
 <span id="yggdrasil-communication-tests-test-pandasfilecomm-module"></span><h2>yggdrasil.communication.tests.test_PandasFileComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_PandasFileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_PandasFileComm.TestPandasFileComm">
@@ -1598,8 +1510,28 @@ close returns false.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.tests.test_RMQAsyncComm">
+</section>
+<section id="module-yggdrasil.communication.tests.test_RESTComm">
+<span id="yggdrasil-communication-tests-test-restcomm-module"></span><h2>yggdrasil.communication.tests.test_RESTComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_RESTComm" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RESTComm.TestRESTComm">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.tests.test_RESTComm.</span></span><span class="sig-name descname"><span class="pre">TestRESTComm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RESTComm.html#TestRESTComm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RESTComm.TestRESTComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase" title="yggdrasil.communication.tests.test_CommBase.TestCommBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_CommBase.TestCommBase</span></code></a></p>
+<p>Test for RESTComm communication class.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RESTComm.TestRESTComm.comm">
+<span class="sig-name descname"><span class="pre">comm</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'RESTComm'</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_RESTComm.TestRESTComm.comm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RESTComm.TestRESTComm.running_service">
+<span class="sig-name descname"><span class="pre">running_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RESTComm.html#TestRESTComm.running_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RESTComm.TestRESTComm.running_service" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-yggdrasil.communication.tests.test_RMQAsyncComm">
 <span id="yggdrasil-communication-tests-test-rmqasynccomm-module"></span><h2>yggdrasil.communication.tests.test_RMQAsyncComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_RMQAsyncComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm">
@@ -1779,8 +1711,8 @@ close returns false.</p>
 <dd><p>Test raise of an error if a RMQ server is not running.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.tests.test_RMQComm">
+</section>
+<section id="module-yggdrasil.communication.tests.test_RMQComm">
 <span id="yggdrasil-communication-tests-test-rmqcomm-module"></span><h2>yggdrasil.communication.tests.test_RMQComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_RMQComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_RMQComm.TestRMQComm">
@@ -1821,8 +1753,8 @@ close returns false.</p>
 <dd><p>Test checking for server w/ URL.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.tests.test_ServerComm">
+</section>
+<section id="module-yggdrasil.communication.tests.test_ServerComm">
 <span id="yggdrasil-communication-tests-test-servercomm-module"></span><h2>yggdrasil.communication.tests.test_ServerComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_ServerComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ServerComm.TestServerComm">
@@ -1926,8 +1858,8 @@ close returns false.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.tests.test_ValueComm">
+</section>
+<section id="module-yggdrasil.communication.tests.test_ValueComm">
 <span id="yggdrasil-communication-tests-test-valuecomm-module"></span><h2>yggdrasil.communication.tests.test_ValueComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_ValueComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ValueComm.TestValueComm">
@@ -2062,8 +1994,8 @@ close returns false.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.tests.test_ZMQComm">
+</section>
+<section id="module-yggdrasil.communication.tests.test_ZMQComm">
 <span id="yggdrasil-communication-tests-test-zmqcomm-module"></span><h2>yggdrasil.communication.tests.test_ZMQComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_ZMQComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ZMQComm.TestZMQComm">
@@ -2316,54 +2248,38 @@ dealer has connected.</p>
 <dd><p>Test raise of an error in the event of an invalid protocol.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.communication.tests">
+</section>
+<section id="module-yggdrasil.communication.tests">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil.communication.tests" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

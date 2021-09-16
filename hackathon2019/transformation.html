@@ -1,77 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Model Transformation &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Model Transformation &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Connecting Models to Models" href="connection.html" />
     <link rel="prev" title="Introduction to the User Interface" href="existing.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -79,18 +39,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
@@ -105,7 +54,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../threading.html">OpenMP Threading in Models</a></li>
@@ -141,76 +93,35 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="index.html">Welcome to the 2019 Crops in Silico Hackathon!</a> &raquo;</li>
-        
       <li>Model Transformation</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/hackathon2019/transformation.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="model-transformation">
+             
+  <section id="model-transformation">
 <h1>Model Transformation<a class="headerlink" href="#model-transformation" title="Permalink to this headline">¶</a></h1>
 <p>For the next part of this example we will be transforming a
 toy growth model written in Python. Within the <code class="docutils literal notranslate"><span class="pre">hackathon2019</span></code>
@@ -233,13 +144,13 @@ the file.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd ../
 </pre></div>
 </div>
-<div class="section" id="adding-api-calls">
+<section id="adding-api-calls">
 <h2>Adding API Calls<a class="headerlink" href="#adding-api-calls" title="Permalink to this headline">¶</a></h2>
 <p>The first step in transforming this model is to replace the calls
 reading/writing input/output from/to files with API calls that will
 instead receive/send input/output from/to the yggdrasil framework.
 There is a yggdrasil API in C, C++, Python and Matlab (R is under development).</p>
-<div class="section" id="importing-the-api">
+<section id="importing-the-api">
 <h3>Importing the API<a class="headerlink" href="#importing-the-api" title="Permalink to this headline">¶</a></h3>
 <p>Since the test
 model is in Python, we first need to import the necessary classes, this can be
@@ -248,8 +159,8 @@ accomplished with the line:</p>
 </pre></div>
 </div>
 <p>This imports the Python API classes for connecting to input and output channels.</p>
-</div>
-<div class="section" id="connecting-to-channels">
+</section>
+<section id="connecting-to-channels">
 <h3>Connecting to Channels<a class="headerlink" href="#connecting-to-channels" title="Permalink to this headline">¶</a></h3>
 <p>Next we need to tell the model to connect to input/output channels. This can
 be done by replacing the lines:</p>
@@ -266,8 +177,8 @@ be done by replacing the lines:</p>
 <code class="docutils literal notranslate"><span class="pre">photosynthesis_rate</span></code>. The second creates an <code class="docutils literal notranslate"><span class="pre">output</span></code> object that connects
 to a channel called <code class="docutils literal notranslate"><span class="pre">growth_rate</span></code> that takes the form of a float followed by
 a newline character.</p>
-</div>
-<div class="section" id="loop-over-input-run-calculation-send-to-output">
+</section>
+<section id="loop-over-input-run-calculation-send-to-output">
 <h3>Loop over input, run calculation, &amp; send to output<a class="headerlink" href="#loop-over-input-run-calculation-send-to-output" title="Permalink to this headline">¶</a></h3>
 <p>The next step in our model loops over the input photosynthesis rates,
 calculating the growth rate. When we are using input from yggdrasil,
@@ -334,10 +245,14 @@ does not need to be replicated. Finally, the line:</p>
 indicates if the send was successful or not. This flag should be checked to
 ensure that you do not continue looping in the event that the output channel
 was closed due to an error.</p>
-</div>
-</div>
-<div class="section" id="adding-a-model-to-the-ui">
+</section>
+</section>
+<section id="adding-a-model-to-the-ui">
 <h2>Adding a Model to the UI<a class="headerlink" href="#adding-a-model-to-the-ui" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The user interface referenced below has been deprecated.</p>
+</div>
 <p>To add your growth model to the model palatte first clear your canvas by
 clicking on the <code class="docutils literal notranslate"><span class="pre">Clear</span></code> button and then clicked the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">a</span> <span class="pre">New</span> <span class="pre">Model</span></code>
 link in the top left of the <code class="docutils literal notranslate"><span class="pre">Model</span> <span class="pre">Composer</span></code> tab.</p>
@@ -358,13 +273,13 @@ clicking submit. Now, if you click on the magnifying glass,</p>
 <img alt="../_images/interface_show_models1.png" src="../_images/interface_show_models1.png" />
 <p>you will see your model among those listed.</p>
 <img alt="../_images/interface_model_list1.png" src="../_images/interface_model_list1.png" />
-</div>
-<div class="section" id="connecting-models-to-files">
+</section>
+<section id="connecting-models-to-files">
 <h2>Connecting Models to Files<a class="headerlink" href="#connecting-models-to-files" title="Permalink to this headline">¶</a></h2>
 <p>Now that we have added your model, we can create a network that connects your
 model’s input/output channels to files, essentially performing the same function
 as the original model.</p>
-<div class="section" id="adding-your-model">
+<section id="adding-your-model">
 <h3>Adding Your Model<a class="headerlink" href="#adding-your-model" title="Permalink to this headline">¶</a></h3>
 <p>To add your model to the canvas, click the blue <code class="docutils literal notranslate"><span class="pre">+</span></code> button
 next to your model in the model palatte.</p>
@@ -373,8 +288,8 @@ next to your model in the model palatte.</p>
 <img alt="../_images/interface_model_selected1.png" src="../_images/interface_model_selected1.png" />
 <p>Your model input and output channels are represented by white dots. Inputs are on
 the left and outputs are on the right. But we need something to connect them to.</p>
-</div>
-<div class="section" id="input-file">
+</section>
+<section id="input-file">
 <h3>Input File<a class="headerlink" href="#input-file" title="Permalink to this headline">¶</a></h3>
 <p>First we will add an input file. From the model palette, select an input port.</p>
 <img alt="../_images/interface_select_input1.png" src="../_images/interface_select_input1.png" />
@@ -388,8 +303,8 @@ and a read method of <code class="docutils literal notranslate"><span class="pre
 from a tab-delimited table line-by-line from the indicated file. Once you click
 <code class="docutils literal notranslate"><span class="pre">Save</span></code>, you may need to move the input port into a better location.</p>
 <img alt="../_images/interface_no_connections_input.png" src="../_images/interface_no_connections_input.png" />
-</div>
-<div class="section" id="output-file">
+</section>
+<section id="output-file">
 <h3>Output File<a class="headerlink" href="#output-file" title="Permalink to this headline">¶</a></h3>
 <p>Next we will add an output file. From th emodel palette, select an output port.</p>
 <img alt="../_images/interface_select_output1.png" src="../_images/interface_select_output1.png" />
@@ -401,8 +316,8 @@ you should select the <code class="docutils literal notranslate"><span class="pr
 <code class="docutils literal notranslate"><span class="pre">hackathon2019/Output/growth_rate.txt</span></code>,
 and a write method of <code class="docutils literal notranslate"><span class="pre">table</span></code>. This tells the output port that it should write values
 to a tab-delimited table line-by-line in the indicated file.</p>
-</div>
-<div class="section" id="making-connections">
+</section>
+<section id="making-connections">
 <h3>Making Connections<a class="headerlink" href="#making-connections" title="Permalink to this headline">¶</a></h3>
 <p>Now that we have added all of the necessary pieces, we need to connect them. You
 can rearange the different components on the canvas by dragging and dropping them. The
@@ -417,8 +332,8 @@ your model</p>
 <img alt="../_images/interface_output_dot1.png" src="../_images/interface_output_dot1.png" />
 <p>and then click on the input port’s dot.</p>
 <img alt="../_images/interface_output_connection1.png" src="../_images/interface_output_connection1.png" />
-</div>
-<div class="section" id="creating-the-yaml">
+</section>
+<section id="creating-the-yaml">
 <h3>Creating the YAML<a class="headerlink" href="#creating-the-yaml" title="Permalink to this headline">¶</a></h3>
 <p>Once you are finished creating your input and output connections, you can
 use the interface to create your YAML file. If you click the <code class="docutils literal notranslate"><span class="pre">Manifest</span></code>
@@ -429,9 +344,9 @@ running your model with connections to the file.</p>
 <img alt="../_images/interface_manifest1.png" src="../_images/interface_manifest1.png" />
 <p>You can then copy that information to your clipboard and past it into a new file
 called <code class="docutils literal notranslate"><span class="pre">growth_to_file.yml</span></code> in the <code class="docutils literal notranslate"><span class="pre">ygg_home</span></code> directory.</p>
-</div>
-</div>
-<div class="section" id="running-the-model-to-file-integration">
+</section>
+</section>
+<section id="running-the-model-to-file-integration">
 <h2>Running the Model-to-File Integration<a class="headerlink" href="#running-the-model-to-file-integration" title="Permalink to this headline">¶</a></h2>
 <p>You can run the integration you just created by executing:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggrun growth_to_file.yml
@@ -447,55 +362,38 @@ should look like this:</p>
 <span class="mf">10.000000</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="connection.html" class="btn btn-neutral float-right" title="Connecting Models to Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="existing.html" class="btn btn-neutral float-left" title="Introduction to the User Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="connection.html" class="btn btn-neutral float-right" title="Connecting Models to Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

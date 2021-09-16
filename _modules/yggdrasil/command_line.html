@@ -1,75 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.command_line &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.command_line &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -77,18 +36,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Overview</a></li>
@@ -103,7 +51,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../threading.html">OpenMP Threading in Models</a></li>
@@ -114,71 +65,33 @@
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../index.html">Module code</a> &raquo;</li>
-        
       <li>yggdrasil.command_line</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for yggdrasil.command_line</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/python</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -393,50 +306,6 @@
         <span class="n">parser</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">func</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.main">[docs]</a><span class="k">class</span> <span class="nc">main</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Runner for yggdrasil CLI.&quot;&quot;&quot;</span>
-
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;yggdrasil&quot;</span>
-    <span class="n">help</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;Command line interface for the yggdrasil package.&quot;</span><span class="p">)</span>
-    <span class="n">arguments</span> <span class="o">=</span> <span class="p">[]</span>
-
-<div class="viewcode-block" id="main.get_parser"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.main.get_parser">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_parser</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">ver</span>
-        <span class="n">parser</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">main</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_parser</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--version&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;version&#39;</span><span class="p">,</span>
-                            <span class="n">version</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;yggdrasil </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">ver</span><span class="p">))</span>
-        <span class="n">subparsers</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;subcommands&#39;</span><span class="p">,</span>
-                                           <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;subcommand&#39;</span><span class="p">)</span>
-        <span class="n">parser</span><span class="o">.</span><span class="n">_ygg_subparsers</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">yggrun</span><span class="p">,</span> <span class="n">ygginfo</span><span class="p">,</span> <span class="n">validate_yaml</span><span class="p">,</span>
-                  <span class="n">yggcc</span><span class="p">,</span> <span class="n">yggcompile</span><span class="p">,</span> <span class="n">yggclean</span><span class="p">,</span>
-                  <span class="n">ygginstall</span><span class="p">,</span> <span class="n">update_config</span><span class="p">,</span>
-                  <span class="n">regen_metaschema</span><span class="p">,</span> <span class="n">regen_schema</span><span class="p">,</span>
-                  <span class="n">yggmodelform</span><span class="p">,</span> <span class="n">yggdevup</span><span class="p">,</span> <span class="n">run_tsts</span><span class="p">,</span>
-                  <span class="n">timing_plots</span><span class="p">,</span> <span class="n">generate_gha_workflow</span><span class="p">]:</span>
-            <span class="n">x</span><span class="o">.</span><span class="n">add_subparser</span><span class="p">(</span><span class="n">subparsers</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
-            <span class="n">parser</span><span class="o">.</span><span class="n">_ygg_subparsers</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
-        <span class="k">return</span> <span class="n">parser</span></div>
-
-<div class="viewcode-block" id="main.parse_args"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.main.parse_args">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">parse_args</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">args</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;test&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">):</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;allow_unknown&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">main</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">subcommand</span><span class="p">:</span>
-            <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">_ygg_subparsers</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">subcommand</span><span class="p">]</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span>
-                <span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">args</span></div>
-
-<div class="viewcode-block" id="main.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.main.func">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="n">args</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div></div>
-
-
 <div class="viewcode-block" id="yggrun"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggrun">[docs]</a><span class="k">class</span> <span class="nc">yggrun</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start a run.&quot;&quot;&quot;</span>
 
@@ -479,6 +348,177 @@
             <span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">yamlfile</span><span class="p">,</span> <span class="n">ygg_debug_prefix</span><span class="o">=</span><span class="n">prog</span><span class="p">,</span>
                        <span class="n">production_run</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">production_run</span><span class="p">,</span>
                        <span class="n">mpi_tag_start</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">mpi_tag_start</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="integration_service_manager"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.integration_service_manager">[docs]</a><span class="k">class</span> <span class="nc">integration_service_manager</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start or manage the yggdrasil service manager.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;integration-service-manager&quot;</span>
+    <span class="n">help</span> <span class="o">=</span> <span class="s2">&quot;Start or manage a integration service manager.&quot;</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">((</span><span class="s1">&#39;--manager-name&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Name that will be used to identify the service manager.&quot;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--service-type&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;flask&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq&#39;</span><span class="p">],</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Type of service that should be started. If not &quot;</span>
+                   <span class="s2">&quot;provided, the default will be the (</span><span class="se">\&#39;</span><span class="s2">services</span><span class="se">\&#39;</span><span class="s2">, &quot;</span>
+                   <span class="s2">&quot;</span><span class="se">\&#39;</span><span class="s2">default_type</span><span class="se">\&#39;</span><span class="s2">) configuration option, if set, and &quot;</span>
+                   <span class="s2">&quot;will otherwise be </span><span class="se">\&#39;</span><span class="s2">flask</span><span class="se">\&#39;</span><span class="s2">.&quot;</span><span class="p">)}),</span>
+        <span class="p">((</span><span class="s1">&#39;--commtype&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Type of communicator that should be used for connections &quot;</span>
+                   <span class="s2">&quot;to services. If not provided, the default will be &quot;</span>
+                   <span class="s2">&quot;determined by the (</span><span class="se">\&#39;</span><span class="s2">services</span><span class="se">\&#39;</span><span class="s2">, </span><span class="se">\&#39;</span><span class="s2">default_comm</span><span class="se">\&#39;</span><span class="s2">) &quot;</span>
+                   <span class="s2">&quot;configuration option, if set.&quot;</span><span class="p">)}),</span>
+        <span class="p">((</span><span class="s1">&#39;--address&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;URL for requests to the service manager. &#39;</span>
+                   <span class="s1">&#39;If not provided, the default will be determined by the &#39;</span>
+                   <span class="s1">&#39;(</span><span class="se">\&#39;</span><span class="s1">services</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="s1">default_type</span><span class="se">\&#39;</span><span class="s1">) configuration option, &#39;</span>
+                   <span class="s1">&#39;if set, and based on the selected </span><span class="se">\&#39;</span><span class="s1">service-type</span><span class="se">\&#39;</span><span class="s1">, if &#39;</span>
+                   <span class="s1">&#39;not. For a service-type of </span><span class="se">\&#39;</span><span class="s1">flask</span><span class="se">\&#39;</span><span class="s1">, this should be the &#39;</span>
+                   <span class="s1">&#39;http address with the port that should be used &#39;</span>
+                   <span class="s1">&#39;and the default will be </span><span class="se">\&#39;</span><span class="s1">http://localhost:</span><span class="si">{port}</span><span class="se">\&#39;</span><span class="s1">. &#39;</span>
+                   <span class="s1">&#39;For a service-type of </span><span class="se">\&#39;</span><span class="s1">rmq</span><span class="se">\&#39;</span><span class="s1">, this should be an &#39;</span>
+                   <span class="s1">&#39;amqp broker address and the default will be &#39;</span>
+                   <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">amqp://guest:guest@localhost:</span><span class="si">{port}</span><span class="s1">/</span><span class="si">%%</span><span class="s1">2f</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)}),</span>
+        <span class="p">((</span><span class="s1">&#39;--port&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Port that should be used to access the app. &#39;</span>
+                   <span class="s1">&#39;Defaults to 5000 for a flask service manager and &#39;</span>
+                   <span class="s1">&#39;5672 for a RabbitMQ service manager if not set &#39;</span>
+                   <span class="s1">&#39;via the PORT environment variable.&#39;</span><span class="p">)}),</span>
+        <span class="n">ArgumentSubparser</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;action&#39;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Management action to take.&#39;</span><span class="p">,</span>
+            <span class="n">parsers</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">ArgumentParser</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;start&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Start an integration service manager and/or &#39;</span>
+                          <span class="s1">&#39;integration service.&#39;</span><span class="p">),</span>
+                    <span class="n">arguments</span><span class="o">=</span><span class="p">[</span>
+                        <span class="p">((</span><span class="s1">&#39;--remote-url&#39;</span><span class="p">,</span> <span class="p">),</span>
+                         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;URL that will be used to access &#39;</span>
+                                   <span class="s1">&#39;the service manager and running &#39;</span>
+                                   <span class="s1">&#39;integrations by remote requests. &#39;</span>
+                                   <span class="s1">&#39;If not provided, the environment &#39;</span>
+                                   <span class="s1">&#39;variable YGGDRASIL_SERVICE_HOST_URL &#39;</span>
+                                   <span class="s1">&#39;will be used if it is set. If it is &#39;</span>
+                                   <span class="s1">&#39;not set, the local ``address`` will &#39;</span>
+                                   <span class="s1">&#39;be used under the assumption that &#39;</span>
+                                   <span class="s1">&#39;the service manager and integration &#39;</span>
+                                   <span class="s1">&#39;services will only be connected to &#39;</span>
+                                   <span class="s1">&#39;by local integrations.&#39;</span><span class="p">)}),</span>
+                        <span class="p">((</span><span class="s1">&#39;--integration-name&#39;</span><span class="p">,</span> <span class="p">),</span>
+                         <span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Name of integration to start. If not &#39;</span>
+                                   <span class="s1">&#39;provided, a service manager will be &#39;</span>
+                                   <span class="s1">&#39;started.&#39;</span><span class="p">)}),</span>
+                        <span class="p">((</span><span class="s1">&#39;--integration-yamls&#39;</span><span class="p">,</span> <span class="p">),</span>
+                         <span class="p">{</span><span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;One or more YAML specification files &#39;</span>
+                                   <span class="s1">&#39;defining the integration. This argument &#39;</span>
+                                   <span class="s1">&#39;may be omitted if </span><span class="se">\&#39;</span><span class="s1">name</span><span class="se">\&#39;</span><span class="s1"> refers to a &#39;</span>
+                                   <span class="s1">&#39;registered integration.&#39;</span><span class="p">)}),</span>
+                        <span class="p">((</span><span class="s1">&#39;--with-coverage&#39;</span><span class="p">,</span> <span class="p">),</span>
+                         <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Enable coverage cleanup for testing.&#39;</span><span class="p">)})]),</span>
+                <span class="n">ArgumentParser</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;stop&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Stop an integration service manager or &#39;</span>
+                          <span class="s1">&#39;an integration service.&#39;</span><span class="p">),</span>
+                    <span class="n">arguments</span><span class="o">=</span><span class="p">[</span>
+                        <span class="p">((</span><span class="s1">&#39;--integration-name&#39;</span><span class="p">,</span> <span class="p">),</span>
+                         <span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Name of integration to stop. If not &#39;</span>
+                                   <span class="s1">&#39;provided, the service manager will be &#39;</span>
+                                   <span class="s1">&#39;stopped as will all of the running &#39;</span>
+                                   <span class="s1">&#39;services.&#39;</span><span class="p">)})]),</span>
+                <span class="n">ArgumentParser</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Get list of available services and the status &#39;</span>
+                          <span class="s1">&#39;of any running services.&#39;</span><span class="p">)),</span>
+                <span class="n">ArgumentParser</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;register&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Register an integration with the service manager.&#39;</span><span class="p">,</span>
+                    <span class="n">arguments</span><span class="o">=</span><span class="p">[</span>
+                        <span class="p">((</span><span class="s1">&#39;integration-name&#39;</span><span class="p">,</span> <span class="p">),</span>
+                         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;The name that the integration should be &#39;</span>
+                                   <span class="s1">&#39;registered under or the path to a YAML &#39;</span>
+                                   <span class="s1">&#39;file containing a list of one or more &#39;</span>
+                                   <span class="s1">&#39;mappings between name and YAML &#39;</span>
+                                   <span class="s1">&#39;specification files for integrations &#39;</span>
+                                   <span class="s1">&#39;that should be registered.&#39;</span><span class="p">)}),</span>
+                        <span class="p">((</span><span class="s1">&#39;integration-yamls&#39;</span><span class="p">,</span> <span class="p">),</span>
+                         <span class="p">{</span><span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;One or more YAML specification files &#39;</span>
+                                   <span class="s1">&#39;defining the integration.&#39;</span><span class="p">)})]),</span>
+                <span class="n">ArgumentParser</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;unregister&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Unregister an integration with the service manager.&#39;</span><span class="p">,</span>
+                    <span class="n">arguments</span><span class="o">=</span><span class="p">[</span>
+                        <span class="p">((</span><span class="s1">&#39;integration-name&#39;</span><span class="p">,</span> <span class="p">),</span>
+                         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;The name of the integration to remove &#39;</span>
+                                   <span class="s1">&#39;from the registry or the path to a YAML &#39;</span>
+                                   <span class="s1">&#39;file containing a list of one or more &#39;</span>
+                                   <span class="s1">&#39;mappings between integration name and &#39;</span>
+                                   <span class="s1">&#39;YAML specification files for &#39;</span>
+                                   <span class="s1">&#39;integrations that should be &#39;</span>
+                                   <span class="s1">&#39;unregistered.&#39;</span><span class="p">)})]),</span>
+            <span class="p">])]</span>
+
+<div class="viewcode-block" id="integration_service_manager.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.integration_service_manager.func">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.services</span> <span class="kn">import</span> <span class="n">IntegrationServiceManager</span>
+        <span class="n">integration_name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;integration-name&#39;</span><span class="p">,</span>
+                                   <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;integration_name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="n">integration_yamls0</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;integration-yamls&#39;</span><span class="p">,</span>
+                                     <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;integration_yamls&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="n">integration_yamls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">integration_yamls0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">yml</span> <span class="ow">in</span> <span class="n">integration_yamls0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">yml</span><span class="p">):</span>
+                    <span class="n">yml</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">yml</span><span class="p">)</span>
+                <span class="n">integration_yamls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yml</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">integration_name</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">integration_name</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">integration_name</span><span class="p">):</span>
+                <span class="n">integration_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">integration_name</span><span class="p">)</span>
+        <span class="n">for_request</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;register&#39;</span><span class="p">,</span> <span class="s1">&#39;unregister&#39;</span><span class="p">,</span> <span class="s1">&#39;stop&#39;</span><span class="p">])</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="n">integration_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">IntegrationServiceManager</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">manager_name</span><span class="p">,</span>
+                                      <span class="n">service_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">service_type</span><span class="p">,</span>
+                                      <span class="n">commtype</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">commtype</span><span class="p">,</span>
+                                      <span class="n">address</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">address</span><span class="p">,</span>
+                                      <span class="n">port</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+                                      <span class="n">for_request</span><span class="o">=</span><span class="n">for_request</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">integration_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+                    <span class="n">x</span><span class="o">.</span><span class="n">start_server</span><span class="p">(</span>
+                        <span class="n">remote_url</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;remote_url&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                        <span class="n">with_coverage</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;with_coverage&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">send_request</span><span class="p">(</span><span class="n">integration_name</span><span class="p">,</span>
+                               <span class="n">yamls</span><span class="o">=</span><span class="n">integration_yamls</span><span class="p">,</span>
+                               <span class="n">action</span><span class="o">=</span><span class="s1">&#39;start&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;stop&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">integration_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">stop_server</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">send_request</span><span class="p">(</span><span class="n">integration_name</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;stop&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;status&#39;</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;register&#39;</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">integration_name</span><span class="p">,</span>
+                           <span class="n">yamls</span><span class="o">=</span><span class="n">integration_yamls</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;unregister&#39;</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">integration_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">action</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="ygginfo"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.ygginfo">[docs]</a><span class="k">class</span> <span class="nc">ygginfo</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
@@ -880,12 +920,21 @@
     <span class="n">arguments</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">((</span><span class="s1">&#39;yamlfile&#39;</span><span class="p">,</span> <span class="p">),</span>
          <span class="p">{</span><span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span>
-          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;One or more YAML specification files.&#39;</span><span class="p">})]</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;One or more YAML specification files.&#39;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--model-only&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Validate a YAML containing an isolated model without &#39;</span>
+                   <span class="s1">&#39;ensuring that it is part of a complete integration.&#39;</span><span class="p">)}),</span>
+        <span class="p">((</span><span class="s1">&#39;--model-submission&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Validate a YAML against the schema for submissions to &#39;</span>
+                   <span class="s1">&#39;the yggdrasil model repository.&#39;</span><span class="p">)})]</span>
 
 <div class="viewcode-block" id="validate_yaml.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.validate_yaml.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">yamlfile</span>
-        <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_yaml</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">yamlfile</span><span class="p">)</span>
+        <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_yaml</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">yamlfile</span><span class="p">,</span> <span class="n">model_only</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">model_only</span><span class="p">,</span>
+                            <span class="n">model_submission</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">model_submission</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Validation succesful.&quot;</span><span class="p">)</span></div></div>
 
 
@@ -1094,6 +1143,7 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call installation script.&quot;&quot;&quot;</span>
 
     <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;install&quot;</span>
+    <span class="n">help</span> <span class="o">=</span> <span class="s2">&quot;Complete yggdrasil installation for one or more languages.&quot;</span>
 
 <div class="viewcode-block" id="ygginstall.get_parser"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.ygginstall.get_parser">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_parser</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1331,7 +1381,7 @@
 <div class="viewcode-block" id="yggmodelform.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggmodelform.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="kn">import</span> <span class="n">get_model_form_schema</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">get_model_form_schema</span><span class="p">(</span><span class="n">fname_dst</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">file</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">get_model_form_schema</span><span class="p">(</span><span class="n">fname_dst</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;    &#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">file</span><span class="p">:</span>
             <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div></div>
 
@@ -1887,52 +1937,82 @@
     <span class="n">timing_plots</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lang2019&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span></div>
 
 
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.main">[docs]</a><span class="k">class</span> <span class="nc">main</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Runner for yggdrasil CLI.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;yggdrasil&quot;</span>
+    <span class="n">help</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Command line interface for the yggdrasil package.&quot;</span><span class="p">)</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">subcommands</span> <span class="o">=</span> <span class="p">[</span><span class="n">yggrun</span><span class="p">,</span> <span class="n">ygginfo</span><span class="p">,</span> <span class="n">validate_yaml</span><span class="p">,</span>
+                   <span class="n">yggcc</span><span class="p">,</span> <span class="n">yggcompile</span><span class="p">,</span> <span class="n">yggclean</span><span class="p">,</span>
+                   <span class="n">ygginstall</span><span class="p">,</span> <span class="n">update_config</span><span class="p">,</span>
+                   <span class="n">regen_metaschema</span><span class="p">,</span> <span class="n">regen_schema</span><span class="p">,</span>
+                   <span class="n">yggmodelform</span><span class="p">,</span> <span class="n">yggdevup</span><span class="p">,</span> <span class="n">run_tsts</span><span class="p">,</span>
+                   <span class="n">timing_plots</span><span class="p">,</span> <span class="n">generate_gha_workflow</span><span class="p">,</span>
+                   <span class="n">integration_service_manager</span><span class="p">]</span>
+
+<div class="viewcode-block" id="main.get_parser"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.main.get_parser">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_parser</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">ver</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">main</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_parser</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--version&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;version&#39;</span><span class="p">,</span>
+                            <span class="n">version</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;yggdrasil </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">ver</span><span class="p">))</span>
+        <span class="n">subparsers</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;subcommands&#39;</span><span class="p">,</span>
+                                           <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;subcommand&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">_ygg_subparsers</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">subcommands</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">add_subparser</span><span class="p">(</span><span class="n">subparsers</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">_ygg_subparsers</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">return</span> <span class="n">parser</span></div>
+
+<div class="viewcode-block" id="main.parse_args"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.main.parse_args">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parse_args</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;test&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;allow_unknown&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">main</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">subcommand</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">_ygg_subparsers</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">subcommand</span><span class="p">]</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span>
+                <span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">args</span></div>
+
+<div class="viewcode-block" id="main.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.main.func">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div></div>
+
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">yggrun</span><span class="p">()</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

@@ -1,75 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.drivers.ModelDriver &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.drivers.ModelDriver &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-
-    
+    <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -77,18 +36,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
@@ -103,7 +51,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
@@ -114,73 +65,34 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../../index.html">Module code</a> &raquo;</li>
-        
           <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
-        
       <li>yggdrasil.drivers.ModelDriver</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for yggdrasil.drivers.ModelDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
@@ -270,10 +182,11 @@
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): Unique name used to identify the model. This will</span>
 <span class="sd">            be used to report errors associated with the model.</span>
-<span class="sd">        args (str or list): The full path to the file containing the</span>
-<span class="sd">            model program that will be run by the driver or a list</span>
-<span class="sd">            starting with the program file and including any arguments</span>
-<span class="sd">            that should be passed as input to the program.</span>
+<span class="sd">        args (str or list): The path to the file containing the model</span>
+<span class="sd">            program that will be run by the driver for the model&#39;s language</span>
+<span class="sd">            and/or a list of arguments that should be passed as input to the</span>
+<span class="sd">            model program or language executable (e.g. source code or</span>
+<span class="sd">            configuration file for a domain specific language).</span>
 <span class="sd">        products (list, optional): Paths to files created by the model that</span>
 <span class="sd">            should be cleaned up when the model exits. Entries can be absolute</span>
 <span class="sd">            paths or paths relative to the working directory. Defaults to [].</span>
@@ -352,6 +265,16 @@
 <span class="sd">            Defaults to False.</span>
 <span class="sd">        copies (int, optional): The number of copies of the model that should be</span>
 <span class="sd">            created. Defaults to 1.</span>
+<span class="sd">        repository_url (str, optional): URL for the git repository containing</span>
+<span class="sd">            the model source code. If provided, relative paths in the model</span>
+<span class="sd">            YAML definition will be considered relative to the repository root</span>
+<span class="sd">            directory.</span>
+<span class="sd">        description (str, optional): Description of the model. This parameter</span>
+<span class="sd">            is only used in the model repository or when providing the model</span>
+<span class="sd">            as a service.</span>
+<span class="sd">        contact_email (str, optional): Email address that should be used to</span>
+<span class="sd">            contact the maintainer of the model. This parameter is only used</span>
+<span class="sd">            in the model repository.</span>
 <span class="sd">        **kwargs: Additional keyword arguments are passed to parent class.</span>
 
 <span class="sd">    Class Attributes:</span>
@@ -456,6 +379,16 @@
 <span class="sd">        allow_threading (bool): If True, comm connections will be set up so that</span>
 <span class="sd">            the model-side comms can be used by more than one thread.</span>
 <span class="sd">        copies (int): The number of copies of the model that should be created.</span>
+<span class="sd">        repository_url (str): URL for the git repository containing the model</span>
+<span class="sd">            source code. If provided, relative paths in the model YAML</span>
+<span class="sd">            definition will be considered relative to the repository root</span>
+<span class="sd">            directory.</span>
+<span class="sd">        description (str): Description of the model. This parameter is only</span>
+<span class="sd">            used in the model repository or when providing the model as a</span>
+<span class="sd">            service.</span>
+<span class="sd">        contact_email (str): Email address that should be used to contact the</span>
+<span class="sd">            maintainer of the model. This parameter is only used in the model</span>
+<span class="sd">            repository.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        RuntimeError: If both with_strace and with_valgrind are True.</span>
@@ -478,25 +411,17 @@
         <span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span>
                    <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/comm&#39;</span><span class="p">},</span>
                    <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span>
-                       <span class="s1">&#39;A mapping object containing the entry for a &#39;</span>
-                       <span class="s1">&#39;model input channel or a list of input &#39;</span>
-                       <span class="s1">&#39;channel entries. If the model does not get &#39;</span>
-                       <span class="s1">&#39;input from another model, this may be &#39;</span>
-                       <span class="s1">&#39;ommitted. A full description of channel &#39;</span>
-                       <span class="s1">&#39;entries and the options available for &#39;</span>
-                       <span class="s1">&#39;channels can be found :ref:`here&lt;&#39;</span>
-                       <span class="s1">&#39;yaml_comm_options&gt;`.&#39;</span><span class="p">)},</span>
+                       <span class="s1">&#39;Zero or more channels carrying input to the model. &#39;</span>
+                       <span class="s1">&#39;A full description of channel entries and the &#39;</span>
+                       <span class="s1">&#39;options available for channels can be found &#39;</span>
+                       <span class="s1">&#39;:ref:`here&lt;yaml_comm_options&gt;`.&#39;</span><span class="p">)},</span>
         <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span>
                     <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/comm&#39;</span><span class="p">},</span>
                     <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span>
-                        <span class="s1">&#39;A mapping object containing the entry for a &#39;</span>
-                        <span class="s1">&#39;model output channel or a list of output &#39;</span>
-                        <span class="s1">&#39;channel entries. If the model does not &#39;</span>
-                        <span class="s1">&#39;output to another model, this may be &#39;</span>
-                        <span class="s1">&#39;ommitted. A full description of channel &#39;</span>
-                        <span class="s1">&#39;entries and the options available for &#39;</span>
-                        <span class="s1">&#39;channels can be found :ref:`here&lt;&#39;</span>
-                        <span class="s1">&#39;yaml_comm_options&gt;`.&#39;</span><span class="p">)},</span>
+                        <span class="s1">&#39;Zero or more channels carrying output from the &#39;</span>
+                        <span class="s1">&#39;model. A full description of channel entries and &#39;</span>
+                        <span class="s1">&#39;the options available for channels can be found &#39;</span>
+                        <span class="s1">&#39;:ref:`here&lt;yaml_comm_options&gt;`.&#39;</span><span class="p">)},</span>
         <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{},</span>
                 <span class="s1">&#39;additional_properties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}},</span>
         <span class="s1">&#39;products&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span>
@@ -562,7 +487,10 @@
         <span class="s1">&#39;outputs_in_inputs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">},</span>
         <span class="s1">&#39;logging_level&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">},</span>
         <span class="s1">&#39;allow_threading&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">},</span>
-        <span class="s1">&#39;copies&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;integer&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;minimum&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}</span>
+        <span class="s1">&#39;copies&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;integer&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;minimum&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="s1">&#39;repository_url&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+        <span class="s1">&#39;contact_email&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}}</span>
     <span class="n">_schema_excluded_from_class</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;working_dir&#39;</span><span class="p">]</span>
     <span class="n">_schema_excluded_from_class_validation</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">]</span>
     
@@ -1731,6 +1659,7 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform after run_loop has finished. Mainly checking</span>
 <span class="sd">        if there was an error and then handling it.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_mpi_partner</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">queue_thread</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
@@ -4339,46 +4268,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

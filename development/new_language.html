@@ -1,77 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Adding Support for a New Language &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Adding Support for a New Language &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Defining New Datatypes" href="new_datatype.html" />
     <link rel="prev" title="Release Steps" href="release.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -79,18 +39,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
@@ -105,7 +54,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../threading.html">OpenMP Threading in Models</a></li>
@@ -136,81 +88,40 @@
 <li class="toctree-l1"><a class="reference internal" href="../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="index.html">Development</a> &raquo;</li>
-        
       <li>Adding Support for a New Language</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/development/new_language.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="adding-support-for-a-new-language">
+             
+  <section id="adding-support-for-a-new-language">
 <h1>Adding Support for a New Language<a class="headerlink" href="#adding-support-for-a-new-language" title="Permalink to this headline">¶</a></h1>
 <p>The yggdrasil package has been redesigned to make adding support for a new language
 as easy as possible, but developers will need some Python programming knowledge and
 a descent familiarity with the language being added.</p>
-<div class="section" id="write-the-language-driver">
+<section id="write-the-language-driver">
 <h2>Write the Language Driver<a class="headerlink" href="#write-the-language-driver" title="Permalink to this headline">¶</a></h2>
 <p>The first step in adding language support is to write a driver for the language.
 Model drivers take care of things like writting any necessary wrappers, compiling
@@ -227,14 +138,14 @@ their class by defining the following class attributes:</p>
 dependencies are installed.</p>
 <p>Model drivers should go in the <code class="docutils literal notranslate"><span class="pre">yggdrasil/drivers</span></code> directory and tests should
 go in the <code class="docutils literal notranslate"><span class="pre">yggdrasil/drivers/tests</span></code> directory.</p>
-<div class="section" id="interpreted-languages">
+<section id="interpreted-languages">
 <h3>Interpreted Languages<a class="headerlink" href="#interpreted-languages" title="Permalink to this headline">¶</a></h3>
 <p>Additional class attributes specific to interpreted model drivers include:</p>
-</div>
-<div class="section" id="compiled-languages">
+</section>
+<section id="compiled-languages">
 <h3>Compiled Languages<a class="headerlink" href="#compiled-languages" title="Permalink to this headline">¶</a></h3>
 <p>Additional class attributes specific to compiled model drivers include:</p>
-<div class="section" id="compilation-tools">
+<section id="compilation-tools">
 <h4>Compilation Tools<a class="headerlink" href="#compilation-tools" title="Permalink to this headline">¶</a></h4>
 <p>For compiled languages, yggdrasil allows multiple compilation tools to be defined for
 the same language, particularly when different tools are required on different
@@ -256,10 +167,10 @@ developers should add the new language to the accepted list of languages on the
 class associated with the archiver. For archivers, the base class is
 <a class="reference internal" href="../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.ArchiverBase" title="yggdrasil.drivers.CompiledModelDriver.ArchiverBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.CompiledModelDriver.ArchiverBase</span></code></a>.
 The behavior of the archiver is defined by these class attributes:</p>
-</div>
-</div>
-</div>
-<div class="section" id="write-the-language-communication-interface">
+</section>
+</section>
+</section>
+<section id="write-the-language-communication-interface">
 <h2>Write the Language Communication Interface<a class="headerlink" href="#write-the-language-communication-interface" title="Permalink to this headline">¶</a></h2>
 <p>The second phase of adding support for a new language is to write the language
 interface. This step is more involved than writing the model driver for the
@@ -276,7 +187,7 @@ already supports (e.g. the R interface uses the
 <a class="reference external" href="https://rstudio.github.io/reticulate/">reticulate</a> package to
 call the Python interface from R). If such a tool exists, then the developers task is
 must easier.</p>
-<div class="section" id="from-an-interface-in-a-supported-language-recommnded">
+<section id="from-an-interface-in-a-supported-language-recommnded">
 <h3>From an Interface in a Supported Language (Recommnded)<a class="headerlink" href="#from-an-interface-in-a-supported-language-recommnded" title="Permalink to this headline">¶</a></h3>
 <p>If there is an existing tool for accessing code written in one of the supporting
 languages, the developer will use that tool to wrap the interface from the already
@@ -304,10 +215,10 @@ variable precision integers and float). In such cases, the developer adding the
 language may need to write a conversion function that handles these
 inconsistencies.</p></li>
 </ol>
-</div>
-<div class="section" id="from-scratch">
+</section>
+<section id="from-scratch">
 <h3>From Scratch<a class="headerlink" href="#from-scratch" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="create-comm-class-object">
+<section id="create-comm-class-object">
 <h4>Create “Comm” Class/Object<a class="headerlink" href="#create-comm-class-object" title="Permalink to this headline">¶</a></h4>
 <p>For a language to added,
 there must be an interface to at least one of the supported communication
@@ -322,8 +233,8 @@ environment variable with the name <code class="docutils literal notranslate"><s
 is providing input to the model and <code class="docutils literal notranslate"><span class="pre">'&lt;channel_name&gt;_OUT'</span></code> if the channel is
 handling output from the model. The exact content of the environment variable
 depends on the communication mechanisms as shown in the table below.</p>
-</div>
-<div class="section" id="required-methods-functions">
+</section>
+<section id="required-methods-functions">
 <h4>Required Methods/Functions<a class="headerlink" href="#required-methods-functions" title="Permalink to this headline">¶</a></h4>
 <p>The interface must also provide methods/functions for accesing the underlying
 communication class’s methods for sending and receiving messages. This is
@@ -359,7 +270,11 @@ message.</p></td>
 <td><p>The partner communicator ID(s).</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>rmq</p></td>
+<tr class="row-odd"><td><p>rest</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>rmq</p></td>
 <td><p>AMPQ queue address of the form <code class="docutils literal notranslate"><span class="pre">&lt;url&gt;_R</span>
 <span class="pre">MQPARAM_&lt;exchange&gt;_RMQPARAM_&lt;queue&gt;</span></code>
 where <code class="docutils literal notranslate"><span class="pre">url</span></code> is the broker address (see
@@ -372,11 +287,11 @@ interface. Rather RMQ communication is included explicitly for connections
 between models that are not co-located on the same machine and are used by the
 yggdrasil framework connections on the Python side.</p></td>
 </tr>
-<tr class="row-even"><td><p>value</p></td>
+<tr class="row-odd"><td><p>value</p></td>
 <td></td>
 <td><p>[]</p></td>
 </tr>
-<tr class="row-odd"><td><p>zmq</p></td>
+<tr class="row-even"><td><p>zmq</p></td>
 <td><p>A ZeroMQ endpoint of the form
 &lt;transport&gt;://&lt;address&gt;, where the
 format of address depends on the
@@ -400,8 +315,8 @@ under the key ‘zmq_reply_worker’.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="implement-serialization">
+</section>
+<section id="implement-serialization">
 <h4>Implement Serialization<a class="headerlink" href="#implement-serialization" title="Permalink to this headline">¶</a></h4>
 <p>The most involved part of writing the interface will be writing the
 serialization and deserialization routines. The specific serialization protocol
@@ -409,8 +324,8 @@ used by yggdrasil is described in detail here <a class="reference internal" href
 The developer adding support for the new language will need to add support for
 serialization of all of the datatypes listed in
 <a class="reference internal" href="../tables/datatype_mapping_table.html#datatype-mapping-table-rst"><span class="std std-ref">this table</span></a>.</p>
-</div>
-<div class="section" id="sending-large-messages">
+</section>
+<section id="sending-large-messages">
 <h4>Sending Large Messages<a class="headerlink" href="#sending-large-messages" title="Permalink to this headline">¶</a></h4>
 <p>Most communication mechanisms have limits on the sizes of messages that can be
 sent as single messages (e.g. 2048 for IPC on MacOS). To overcome this yggdrasil
@@ -437,10 +352,10 @@ deserialize them.</p></li>
 </ol>
 <p>When creating an interface in a new language, the developer must replicate this
 behavior.</p>
-</div>
-</div>
-</div>
-<div class="section" id="installation-script-optional">
+</section>
+</section>
+</section>
+<section id="installation-script-optional">
 <h2>Installation Script [OPTIONAL]<a class="headerlink" href="#installation-script-optional" title="Permalink to this headline">¶</a></h2>
 <p>If there are additional steps that should be taken during the installation of
 yggdrasil to allow a language to be supported (e.g. installing dependencies
@@ -458,55 +373,38 @@ not covered if MATLAB is not supported while lines marked with <code class="docu
 are not covered if MATLAB is installed). If not set, the lower case version of
 the language directory name is assumed for the pragmas. This does not change the
 behavior of the code, only how the coverage report is generated.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="new_datatype.html" class="btn btn-neutral float-right" title="Defining New Datatypes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="release.html" class="btn btn-neutral float-left" title="Release Steps" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="new_datatype.html" class="btn btn-neutral float-right" title="Defining New Datatypes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

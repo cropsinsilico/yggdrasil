@@ -3,9 +3,10 @@
 ==================   ================================================================================   ========   ===========
 Option               Description                                                                        Required   Type       
 ==================   ================================================================================   ========   ===========
-args                 The full path to the file containing the model program that will be run by the     X          str or list
-                     driver or a list starting with the program file and including any arguments that                         
-                     should be passed as input to the program.                                                                
+args                 The path to the file containing the model program that will be run by the driver   X          str or list
+                     for the model's language and/or a list of arguments that should be passed as                             
+                     input to the model program or language executable (e.g. source code or                                   
+                     configuration file for a domain specific language).                                                      
 name                 Unique name used to identify the model. This will be used to report errors         X          str        
                      associated with the model.                                                                               
 allow_threading      If True, comm connections will be set up so that the model-side comms can be                  bool       
@@ -17,9 +18,13 @@ client_of            The names of one or more models that this model will call a
                      underscore `<server_model>_<client_model>`. There will be one channel created                            
                      for each server the model is a client of. Defaults to empty list. Use of                                 
                      `client_of` with `function` is not currently supported.                                                  
+contact_email        Email address that should be used to contact the maintainer of the model. This                str        
+                     parameter is only used in the model repository.                                                          
 copies               The number of copies of the model that should be created. Defaults to 1.                      int        
 copy_index           Index of model in set of copies. Defaults to -1 indicating there is only one                  int        
                      copy of the model.                                                                                       
+description          Description of the model. This parameter is only used in the model repository or              str        
+                     when providing the model as a service.                                                                   
 function             If provided, an integrated model is created by wrapping the function named here.              str        
                      The function must be located within the file specified by the source file listed                         
                      in the first argument. If not provided, the model must contain it's own calls to                         
@@ -55,6 +60,9 @@ preserve_cache       If True model products will be kept following the run, othe
 products             Paths to files created by the model that should be cleaned up when the model                  list       
                      exits. Entries can be absolute paths or paths relative to the working directory.                         
                      Defaults to [].                                                                                          
+repository_url       URL for the git repository containing the model source code. If provided,                     str        
+                     relative paths in the model YAML definition will be considered relative to the                           
+                     repository root directory.                                                                               
 source_products      Files created by running the model that are source files. These files will be                 list       
                      removed without checking their extension so users should avoid adding files to                           
                      this list unless they are sure they should be deleted. Defaults to [].                                   

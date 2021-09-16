@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Running Integrations as Services &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Docker Containers" href="docker.html" />
+    <link rel="prev" title="High Performance Computing (HPC)" href="hpc.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> yggdrasil
+          </a>
+              <div class="version">
+                v1.8.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timesync_io.html">Timestep Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Running Integrations as Services</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-an-integration-as-a-service">Setting Up an Integration as a Service</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#host-requirements">Host Requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#registering-integrations">Registering Integrations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#registering-multiple-integrations-at-once">Registering Multiple Integrations at Once</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#connecting-an-integration-to-a-remote-service">Connecting an Integration to a Remote Service</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#client-requirements">Client Requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#service-yaml-entry">Service YAML Entry</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#performance">Performance</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">Docker Containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">yggdrasil</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Running Integrations as Services</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/remote.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="running-integrations-as-services">
+<span id="remote-rst"></span><h1>Running Integrations as Services<a class="headerlink" href="#running-integrations-as-services" title="Permalink to this headline">¶</a></h1>
+<p>In release 1.7.1, the ability to run models as services that can be accessed by integrations running on remote machines was added to yggdrasil. This feature allows models (or sets of models) to be exposed for external use without the need to have the model source code or install it on your local machine. It is intended to make it easier for scientists to share models and foster collaboration. Future releases will include tools for exploring remote models &amp; integrations via visualizations.</p>
+<section id="setting-up-an-integration-as-a-service">
+<h2>Setting Up an Integration as a Service<a class="headerlink" href="#setting-up-an-integration-as-a-service" title="Permalink to this headline">¶</a></h2>
+<section id="host-requirements">
+<h3>Host Requirements<a class="headerlink" href="#host-requirements" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>yggdrasil must be installed</p></li>
+<li><p>A port must be available that can be used to serve a Flask REST API. The port should be either set via the <code class="docutils literal notranslate"><span class="pre">--port</span></code> flag to the <code class="docutils literal notranslate"><span class="pre">integration-service-manager</span> <span class="pre">start</span></code> command (last requirement) or in the <code class="docutils literal notranslate"><span class="pre">PORT</span></code> environment variable before starting the service manager.</p></li>
+<li><p>The URL that will be used by remote integrations to contact the service manager must be specified either via the <code class="docutils literal notranslate"><span class="pre">--remote-url</span></code> flag to the <code class="docutils literal notranslate"><span class="pre">integration-service-manager</span> <span class="pre">start</span></code> command (last requirement) or in the <code class="docutils literal notranslate"><span class="pre">YGGDRASIL_SERVICE_HOST_URL</span></code> environment variable before starting the service manager.</p></li>
+<li><p>The integrations that will be requested must be located on the host machine (including YAMLs and source code) and must be registered as services (see below).</p></li>
+<li><p>A yggdrasil service manager must be started via:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggdrasil integration-service-manager [--port PORT] start [--remote-url REMOTE_URL]
+</pre></div>
+</div>
+<p>Since the service manager must continue running, in many cases, you will want to start it as a background process.</p>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For convenience, there are Docker images available that launch the service manager as a web application using <a class="reference external" href="https://gunicorn.org/">gunicorn</a>. See the documentation <a class="reference internal" href="docker.html#service-docker-rst"><span class="std std-ref">here</span></a> for additional details about the Docker images and how to use them.</p>
+</div>
+</section>
+<section id="registering-integrations">
+<h3>Registering Integrations<a class="headerlink" href="#registering-integrations" title="Permalink to this headline">¶</a></h3>
+<p>In order for an integration to be run on the host machine, it must first be registered via yggdrasil’s <code class="docutils literal notranslate"><span class="pre">integration-service-manager</span></code> CLI. Usage is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggdrasil integration-service-manager register &lt;integration-name&gt; &lt;integration-yamls ...&gt;
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">integration-name</span></code> is a unique name that will be allocated with the integration and used in requests to connect to or query the status of the integration service. <code class="docutils literal notranslate"><span class="pre">integration-yamls</span></code> is one ore more YAML specification files defining the integration. Any inputs or outputs that are not connected to another model or file in the YAML, will be available for connection by remote models.</p>
+<p>For example, to register the photosynthesis model from the <a class="reference internal" href="examples/fakeplant.html#fakeplant-rst"><span class="std std-ref">fakeplant example</span></a>, we would run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggdrasil integration-service-manager register photosynthesis yggdrasil/examples/fakeplant/photosynthesis.yml
+</pre></div>
+</div>
+<p>When a remote integration connects to the service manager and requests the <code class="docutils literal notranslate"><span class="pre">photosynthesis</span></code> integration service, the model will be started and channels will be opened to its inputs (<code class="docutils literal notranslate"><span class="pre">light_intensity</span></code>, <code class="docutils literal notranslate"><span class="pre">temperature</span></code>, <code class="docutils literal notranslate"><span class="pre">co2</span></code>) and outputs (<code class="docutils literal notranslate"><span class="pre">photosynthesis_rate</span></code>). The remote integration can make connections to these channels in the same way it would if the <code class="docutils literal notranslate"><span class="pre">photosynthesis</span></code> model (and it’s YAML) were part of the integration.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For security, YAML files located in remote Git repositories will not be allowed as part of integrations that the service manager runs.</p>
+</div>
+</section>
+<section id="registering-multiple-integrations-at-once">
+<h3>Registering Multiple Integrations at Once<a class="headerlink" href="#registering-multiple-integrations-at-once" title="Permalink to this headline">¶</a></h3>
+<p>To save time, yggdrasil also allows you to register multiple integrations at once from a YAML file containing a set of mappings between integration names and the YAML specification files defining them. The example services file below defines two integrations, each specified by one YAML file.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">photosynthesis</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">yggdrasil/examples/fakeplant/photosynthesis.yml</span>
+<span class="nt">rpcFibSrv</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">yggdrasil/examples/rpcFib/rpcFibSrv_c.yml</span>
+</pre></div>
+</div>
+<p>To register all of the integrations contained in this file, you would run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggdrasil integration-service-manager register SERVICES_FILE
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">SERVICES_FILE</span></code> is the full path to the file.</p>
+</section>
+</section>
+<section id="connecting-an-integration-to-a-remote-service">
+<h2>Connecting an Integration to a Remote Service<a class="headerlink" href="#connecting-an-integration-to-a-remote-service" title="Permalink to this headline">¶</a></h2>
+<section id="client-requirements">
+<h3>Client Requirements<a class="headerlink" href="#client-requirements" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>yggdrasil must be installed</p></li>
+<li><p>You must be able to connect to the remote host’s service manager. You can check the status via:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggdrasil integration-service-manager --address ADDRESS status
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">ADDRESS</span></code> field is required and must be the URL for the service manager (i.e. the value set in <code class="docutils literal notranslate"><span class="pre">YGGDRASIL_SERVICE_HOST_URL</span></code> or via <code class="docutils literal notranslate"><span class="pre">--remote-url</span></code> in the command to start the service manager).</p>
+</li>
+</ul>
+</section>
+<section id="service-yaml-entry">
+<h3>Service YAML Entry<a class="headerlink" href="#service-yaml-entry" title="Permalink to this headline">¶</a></h3>
+<p>Integrations can connect to remote integration services by including <code class="docutils literal notranslate"><span class="pre">service</span></code> entries in the YAML integration specification files. For example, the entry below requests the <code class="docutils literal notranslate"><span class="pre">photosynthesis</span></code> integration service from the yggdrasil flask service manager located at <a class="reference external" href="http://remote_service_manager_url/">http://remote_service_manager_url/</a>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">service</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">flask</span>
+  <span class="nt">address</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">http://remote_service_manager_url/</span>
+</pre></div>
+</div>
+<p>This service entry is treated as a placeholder for the <code class="docutils literal notranslate"><span class="pre">photosynthesis</span></code> YAML entry. As such, it can be directly swapped for the <code class="docutils literal notranslate"><span class="pre">photosynthesis.yml</span></code> file in running the <code class="docutils literal notranslate"><span class="pre">fakeplant</span></code> example assuming that all of the other models are locally available. For example, if the service entry were saved to <code class="docutils literal notranslate"><span class="pre">photosynthesis_service.yml</span></code>, we could run the <code class="docutils literal notranslate"><span class="pre">fakeplant</span></code> example, but using the remote copy of the <code class="docutils literal notranslate"><span class="pre">photosynthesis</span></code> model via:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggrun canopy.yml light.yml photosynthesis_service.yml growth_python.yml fakeplant.yml
+</pre></div>
+</div>
+<p>Multiple services can also be included in the same entry. For example, if there were a <code class="docutils literal notranslate"><span class="pre">growth</span></code> service as well that should be used instead of the local <code class="docutils literal notranslate"><span class="pre">growth</span></code> model in the <code class="docutils literal notranslate"><span class="pre">fakeplant</span></code> example, the YAML entry above would be updated to</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">services</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis</span>
+    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">flask</span>
+    <span class="nt">address</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">http://remote_service_manager_url/</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">growth</span>
+    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">flask</span>
+    <span class="nt">address</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">http://another_remote_service_manager_url/</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="performance">
+<h2>Performance<a class="headerlink" href="#performance" title="Permalink to this headline">¶</a></h2>
+<p>It is important to keep in mind that connecting to remote integrations over an internet connection introduces a great deal of overhead and a certain degree of fragility into integrations that is not present when all models are running locally. Such connections between models make integrations dependent on the speed and reliability of the internet connection both at the host and client. If performant and stable communication times are import for your use case, we advise looking for a way to run the integrations locally.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="hpc.html" class="btn btn-neutral float-left" title="High Performance Computing (HPC)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="docker.html" class="btn btn-neutral float-right" title="Docker Containers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

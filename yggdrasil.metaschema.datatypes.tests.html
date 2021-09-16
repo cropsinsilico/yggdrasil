@@ -1,75 +1,35 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.metaschema.datatypes.tests package &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.metaschema.datatypes.tests package &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -77,18 +37,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
@@ -103,7 +52,10 @@
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
@@ -114,79 +66,39 @@
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>yggdrasil.metaschema.datatypes.tests package</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/yggdrasil.metaschema.datatypes.tests.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="yggdrasil-metaschema-datatypes-tests-package">
+             
+  <section id="yggdrasil-metaschema-datatypes-tests-package">
 <h1>yggdrasil.metaschema.datatypes.tests package<a class="headerlink" href="#yggdrasil-metaschema-datatypes-tests-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests.test_AnyMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests.test_AnyMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-tests-test-anymetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.tests.test_AnyMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests.test_AnyMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_AnyMetaschemaType.TestAnyMetaschemaType">
@@ -207,8 +119,8 @@
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests.test_ArrayMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests.test_ArrayMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-tests-test-arraymetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.tests.test_ArrayMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests.test_ArrayMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_ArrayMetaschemaType.TestNDArrayMetaschemaType">
@@ -236,8 +148,8 @@
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests.test_ClassMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests.test_ClassMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-tests-test-classmetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.tests.test_ClassMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests.test_ClassMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_ClassMetaschemaType.TestClassMetaschemaType">
@@ -271,8 +183,8 @@
 <p>Valid class for testing.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests.test_ContainerMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests.test_ContainerMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-tests-test-containermetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.tests.test_ContainerMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests.test_ContainerMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_ContainerMetaschemaType.test_container_errors">
@@ -280,8 +192,8 @@
 <dd><p>Test implementation errors on bare container class.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests.test_FunctionMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests.test_FunctionMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-tests-test-functionmetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.tests.test_FunctionMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests.test_FunctionMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_FunctionMetaschemaType.TestFunctionMetaschemaType">
@@ -308,8 +220,8 @@
 <dd><p>Valid function for testing.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests.test_InstanceMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests.test_InstanceMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-tests-test-instancemetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.tests.test_InstanceMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests.test_InstanceMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_InstanceMetaschemaType.TestInstanceMetaschemaType">
@@ -324,8 +236,8 @@
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests.test_JSONArrayMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests.test_JSONArrayMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-tests-test-jsonarraymetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.tests.test_JSONArrayMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests.test_JSONArrayMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_JSONArrayMetaschemaType.TestJSONArrayMetaschemaType">
@@ -370,8 +282,8 @@
 <dd><p>Test serialization of coerced types.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests.test_JSONMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests.test_JSONMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-tests-test-jsonmetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.tests.test_JSONMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests.test_JSONMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONBooleanMetaschemaType">
@@ -438,8 +350,8 @@
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests.test_JSONObjectMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests.test_JSONObjectMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-tests-test-jsonobjectmetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.tests.test_JSONObjectMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests.test_JSONObjectMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_JSONObjectMetaschemaType.TestJSONObjectMetaschemaType">
@@ -460,8 +372,8 @@
 <dd><p>Test serialization of coerced types.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests.test_MetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests.test_MetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-tests-test-metaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.tests.test_MetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests.test_MetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType">
@@ -631,8 +543,8 @@
 <p>Meta class for setting up test information.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests.test_MultiMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests.test_MultiMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-tests-test-multimetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.tests.test_MultiMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests.test_MultiMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_MultiMetaschemaType.TestMultiMetaschemaType">
@@ -670,8 +582,8 @@
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-tests-test-objmetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict">
@@ -759,8 +671,8 @@ texcoords/normals on last element.</p>
 <dd><p>Test create_schema.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests.test_PlyMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests.test_PlyMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-tests-test-plymetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.tests.test_PlyMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests.test_PlyMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict">
@@ -913,8 +825,8 @@ against counts based on singular elements.</p>
 <dd><p>Test errors in translate_py2ply.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests.test_ScalarMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests.test_ScalarMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-tests-test-scalarmetaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.tests.test_ScalarMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests.test_ScalarMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType">
@@ -961,8 +873,8 @@ against counts based on singular elements.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests.test_SchemaMetaschemaType">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests.test_SchemaMetaschemaType">
 <span id="yggdrasil-metaschema-datatypes-tests-test-schemametaschematype-module"></span><h2>yggdrasil.metaschema.datatypes.tests.test_SchemaMetaschemaType module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests.test_SchemaMetaschemaType" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_SchemaMetaschemaType.TestSchemaMetaschemaType">
@@ -983,8 +895,8 @@ against counts based on singular elements.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests.test_conversions">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests.test_conversions">
 <span id="yggdrasil-metaschema-datatypes-tests-test-conversions-module"></span><h2>yggdrasil.metaschema.datatypes.tests.test_conversions module<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests.test_conversions" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_conversions.test_ply2obj">
@@ -998,8 +910,8 @@ against counts based on singular elements.</p>
 <dd><p>Test errors in register_conversion.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.datatypes.tests">
+</section>
+<section id="module-yggdrasil.metaschema.datatypes.tests">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil.metaschema.datatypes.tests" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.datatypes.tests.test_add_type_from_schema_errors">
@@ -1061,51 +973,35 @@ against counts based on singular elements.</p>
 <dd><p>Test access to registry dictionary operations.</p>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

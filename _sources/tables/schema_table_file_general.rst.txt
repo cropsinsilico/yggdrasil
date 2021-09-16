@@ -7,6 +7,8 @@ filetype            string    X          The type of file that will be read from
                                          :ref:`here <schema_table_file_subtype_rst>`)                                    
 name                string    X          Name used for component in log messages.                                        
 working_dir         string    X          Working directory. If not provided, the current working directory is used.      
+address             string               Communication info. Default to None and address is taken from the environment   
+                                         variable.                                                                       
 append              boolean              If True and writing, file is openned in append mode. If True and reading, file  
                                          is kept open even if the end of the file is reached to allow for another process
                                          to write to the file in append mode. Defaults to False.                         
@@ -20,7 +22,10 @@ field_names         array                [DEPRECATED] Field names that should be
 field_units         array                [DEPRECATED] Field units that should be used to convert fields in sent/received 
                                          tables. This keyword is only valid for table-like datatypes. If not provided,   
                                          all fields are assumed to be unitless.                                          
-filter                                                                                                                   
+filter                                   Filter that will be used to determine when messages should be sent/received.    
+                                         Ignored if not provided.                                                        
+for_service         boolean              If True, this comm bridges the gap to an integration running as a service,      
+                                         possibly on a remote machine. Defaults to False.                                
 format_str          string               String that should be used to format/parse messages. Default to None.           
 in_temp             boolean              If True, the path will be considered relative to the platform temporary         
                                          directory. Defaults to False.                                                   
@@ -28,10 +33,12 @@ is_series           boolean              If True, input/output will be done to a
                                          will be processed until the end is reached. If writing, each output will be to a
                                          new file in the series. The addressed is assumed to contain a format for the    
                                          index of the file. Defaults to False.                                           
-length_map          object               Map from pointer variable names to                                              
+length_map          object               Map from pointer variable names to the names of variables where their length    
+                                         will be stored. Defaults to {}.                                                 
 recv_converter                           Converter that should be used on received objects. Defaults to None.            
 send_converter                           Converter that should be used on sent objects. Defaults to None.                
-transform                                                                                                                
+transform                                One or more transformations that will be applied to messages that are           
+                                         sent/received. Ignored if not provided.                                         
 vars                array                Names of variables to be sent/received by this comm. Defaults to [].            
 wait_for_creation   float                Time (in seconds) that should be waited before opening for the file to be       
                                          created if it dosn't exist. Defaults to 0 s and file will attempt to be opened  

@@ -84,6 +84,14 @@ yggdrasil.communication.tests.test\_PandasFileComm module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.communication.tests.test\_RESTComm module
+---------------------------------------------------
+
+.. automodule:: yggdrasil.communication.tests.test_RESTComm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.communication.tests.test\_RMQAsyncComm module
 -------------------------------------------------------
 

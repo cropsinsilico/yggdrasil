@@ -76,6 +76,14 @@ yggdrasil.drivers.Driver module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.drivers.DummyModelDriver module
+-----------------------------------------
+
+.. automodule:: yggdrasil.drivers.DummyModelDriver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.drivers.DuplicatedModelDriver module
 ----------------------------------------------
 
@@ -112,14 +120,6 @@ yggdrasil.drivers.FortranModelDriver module
 -------------------------------------------
 
 .. automodule:: yggdrasil.drivers.FortranModelDriver
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-yggdrasil.drivers.FunctionModelDriver module
---------------------------------------------
-
-.. automodule:: yggdrasil.drivers.FunctionModelDriver
    :members:
    :undoc-members:
    :show-inheritance:

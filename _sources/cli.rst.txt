@@ -1,0 +1,171 @@
+.. _cli_rst:
+
+Command Line Interface (CLI)
+############################
+
+.. _cli_yggdrasil_rst:
+
+``yggdrasil`` Command
+*********************
+
+.. argparse::
+   :filename: /home/runner/work/yggdrasil/yggdrasil/docs/source/cli.py
+   :func: yggdrasil
+   :prog: yggdrasil
+
+
+.. _cli_yggcc_rst:
+
+``yggcc`` Command
+*****************
+
+Alias for ``yggdrasil compile``
+
+
+.. _cli_yggccflags_rst:
+
+``yggccflags`` Command
+**********************
+
+.. argparse::
+   :filename: /home/runner/work/yggdrasil/yggdrasil/docs/source/cli.py
+   :func: yggccflags
+   :prog: yggccflags
+
+
+.. _cli_yggcctool_rst:
+
+``yggcctool`` Command
+*********************
+
+.. argparse::
+   :filename: /home/runner/work/yggdrasil/yggdrasil/docs/source/cli.py
+   :func: yggcctool
+   :prog: yggcctool
+
+
+.. _cli_yggclean_rst:
+
+``yggclean`` Command
+********************
+
+Alias for ``yggdrasil clean``
+
+
+.. _cli_yggcompile_rst:
+
+``yggcompile`` Command
+**********************
+
+Alias for ``yggdrasil compile-deps``
+
+
+.. _cli_yggconfig_rst:
+
+``yggconfig`` Command
+*********************
+
+Alias for ``yggdrasil config``
+
+
+.. _cli_yggdevup_rst:
+
+``yggdevup`` Command
+********************
+
+Alias for ``yggdrasil dev-update``
+
+
+.. _cli_ygggha_rst:
+
+``ygggha`` Command
+******************
+
+Alias for ``yggdrasil gha``
+
+
+.. _cli_ygginfo_rst:
+
+``ygginfo`` Command
+*******************
+
+Alias for ``yggdrasil info``
+
+
+.. _cli_ygginstall_rst:
+
+``ygginstall`` Command
+**********************
+
+Alias for ``yggdrasil install``
+
+
+.. _cli_yggldflags_rst:
+
+``yggldflags`` Command
+**********************
+
+.. argparse::
+   :filename: /home/runner/work/yggdrasil/yggdrasil/docs/source/cli.py
+   :func: yggldflags
+   :prog: yggldflags
+
+
+.. _cli_yggldtool_rst:
+
+``yggldtool`` Command
+*********************
+
+.. argparse::
+   :filename: /home/runner/work/yggdrasil/yggdrasil/docs/source/cli.py
+   :func: yggldtool
+   :prog: yggldtool
+
+
+.. _cli_yggmetaschema_rst:
+
+``yggmetaschema`` Command
+*************************
+
+Alias for ``yggdrasil metaschema``
+
+
+.. _cli_yggmodelform_rst:
+
+``yggmodelform`` Command
+************************
+
+Alias for ``yggdrasil model-form-schema``
+
+
+.. _cli_yggrun_rst:
+
+``yggrun`` Command
+******************
+
+Alias for ``yggdrasil run``
+
+
+.. _cli_yggschema_rst:
+
+``yggschema`` Command
+*********************
+
+Alias for ``yggdrasil schema``
+
+
+.. _cli_yggtest_rst:
+
+``yggtest`` Command
+*******************
+
+Alias for ``yggdrasil test``
+
+
+.. _cli_yggvalidate_rst:
+
+``yggvalidate`` Command
+***********************
+
+Alias for ``yggdrasil validate``
+

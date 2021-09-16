@@ -1,77 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>YAML Files &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>YAML Files &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Configuration Files" href="config.html" />
     <link rel="prev" title="Timestep Synchronization" href="timesync_io.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -79,18 +39,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
@@ -134,7 +83,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
@@ -145,74 +97,34 @@
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>YAML Files</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/yaml.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="yaml-files">
+             
+  <section id="yaml-files">
 <span id="yaml-rst"></span><h1>YAML Files<a class="headerlink" href="#yaml-files" title="Permalink to this headline">¶</a></h1>
 <p>Models and communication between models during are specified by the user in one
 or more YAML files. YAML files have a human readable structure that can be parsed
@@ -228,7 +140,7 @@ or a mix of both.</p></li>
 <li><p>Mappings: Mapping entries use a colon and a space (: ) to seperate a
 <code class="docutils literal notranslate"><span class="pre">key:</span> <span class="pre">value</span></code> pair. Keys are text and values can be text or a collection.</p></li>
 </ul>
-<div class="section" id="models">
+<section id="models">
 <h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
 <p>At the root level of a yggdrasil YAML, should be a mapping key <code class="docutils literal notranslate"><span class="pre">model:</span></code>
 or <code class="docutils literal notranslate"><span class="pre">models:</span></code>. This denotes information pertaining to the model(s) that should
@@ -287,8 +199,8 @@ options for communication channels).</p>
     <span class="o">-</span> <span class="n">out_channel_name3</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="connections">
+</section>
+<section id="connections">
 <h2>Connections<a class="headerlink" href="#connections" title="Permalink to this headline">¶</a></h2>
 <p>In order to connect models inputs/outputs to files and/or other model
 inputs/outputs, the yaml(s) must all contain a <code class="docutils literal notranslate"><span class="pre">connections</span></code> key/value pair.
@@ -340,8 +252,8 @@ available options, can be found <a class="reference internal" href="#yaml-conn-o
 connect communication channels/files. Any additional keys in the connection
 entry will be passed to the input/output driver that is created for the
 connection.</p>
-</div>
-<div class="section" id="validation">
+</section>
+<section id="validation">
 <h2>Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>
 <p>yggdrasil uses a <a class="reference internal" href="advanced/schema.html#schema-rst"><span class="std std-ref">JSON schema</span></a> to validate the provided
 YAML specification files. If you would like to validate a set of YAML specification
@@ -349,10 +261,10 @@ files without running the integration, this can be done via the <code class="doc
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggvalidate name1.yml name2.yml ...
 </pre></div>
 </div>
-</div>
-<div class="section" id="model-options">
+</section>
+<section id="model-options">
 <span id="yaml-model-options"></span><h2>Model Options<a class="headerlink" href="#model-options" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="general-model-options">
+<section id="general-model-options">
 <h3>General Model Options<a class="headerlink" href="#general-model-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-model-general-rst">
 <colgroup>
@@ -372,9 +284,10 @@ files without running the integration, this can be done via the <code class="doc
 <tr class="row-even"><td><p>args</p></td>
 <td><p>array</p></td>
 <td><p>X</p></td>
-<td><p>The full path to the file containing the model program that will be run by the
-driver or a list starting with the program file and including any arguments that
-should be passed as input to the program.</p></td>
+<td><p>The path to the file containing the model program that will be run by the driver
+for the model’s language and/or a list of arguments that should be passed as
+input to the model program or language executable (e.g. source code or
+configuration file for a domain specific language).</p></td>
 </tr>
 <tr class="row-odd"><td><p>language</p></td>
 <td><p>string</p></td>
@@ -410,10 +323,22 @@ underscore <cite>&lt;server_model&gt;_&lt;client_model&gt;</cite>. There will be
 for each server the model is a client of. Defaults to empty list. Use of
 <cite>client_of</cite> with <cite>function</cite> is not currently supported.</p></td>
 </tr>
-<tr class="row-even"><td><p>copies</p></td>
+<tr class="row-even"><td><p>contact_email</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>Email address that should be used to contact the maintainer of the model. This
+parameter is only used in the model repository.</p></td>
+</tr>
+<tr class="row-odd"><td><p>copies</p></td>
 <td><p>integer</p></td>
 <td></td>
 <td><p>The number of copies of the model that should be created. Defaults to 1.</p></td>
+</tr>
+<tr class="row-even"><td><p>description</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>Description of the model. This parameter is only used in the model repository or
+when providing the model as a service.</p></td>
 </tr>
 <tr class="row-odd"><td><p>driver</p></td>
 <td><p>string</p></td>
@@ -437,10 +362,9 @@ the yggdrasil interface.</p></td>
 <tr class="row-even"><td><p>inputs</p></td>
 <td><p>array</p></td>
 <td></td>
-<td><p>A mapping object containing the entry for a model input channel or a list of
-input channel entries. If the model does not get input from another model, this
-may be ommitted. A full description of channel entries and the options available
-for channels can be found <a class="reference internal" href="#yaml-comm-options"><span class="std std-ref">here</span></a>.</p></td>
+<td><p>Zero or more channels carrying input to the model. A full description of channel
+entries and the options available for channels can be found
+<a class="reference internal" href="#yaml-comm-options"><span class="std std-ref">here</span></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>is_server</p></td>
 <td></td>
@@ -471,10 +395,9 @@ variables.</p></td>
 <tr class="row-even"><td><p>outputs</p></td>
 <td><p>array</p></td>
 <td></td>
-<td><p>A mapping object containing the entry for a model output channel or a list of
-output channel entries. If the model does not output to another model, this may
-be ommitted. A full description of channel entries and the options available for
-channels can be found <a class="reference internal" href="#yaml-comm-options"><span class="std std-ref">here</span></a>.</p></td>
+<td><p>Zero or more channels carrying output from the model. A full description of
+channel entries and the options available for channels can be found
+<a class="reference internal" href="#yaml-comm-options"><span class="std std-ref">here</span></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>outputs_in_inputs</p></td>
 <td><p>boolean</p></td>
@@ -508,19 +431,26 @@ will be cleaned up. Defaults to False. This keyword is superceeded by overwrite.
 exits. Entries can be absolute paths or paths relative to the working directory.
 Defaults to [].</p></td>
 </tr>
-<tr class="row-odd"><td><p>source_products</p></td>
+<tr class="row-odd"><td><p>repository_url</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>URL for the git repository containing the model source code. If provided,
+relative paths in the model YAML definition will be considered relative to the
+repository root directory.</p></td>
+</tr>
+<tr class="row-even"><td><p>source_products</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>Files created by running the model that are source files. These files will be
 removed without checking their extension so users should avoid adding files to
 this list unless they are sure they should be deleted. Defaults to [].</p></td>
 </tr>
-<tr class="row-even"><td><p>strace_flags</p></td>
+<tr class="row-odd"><td><p>strace_flags</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>Flags to pass to strace (or dtrace). Defaults to [].</p></td>
 </tr>
-<tr class="row-odd"><td><p>timesync</p></td>
+<tr class="row-even"><td><p>timesync</p></td>
 <td></td>
 <td></td>
 <td><p>If set, the model is assumed to call a send then receive of the state at each
@@ -529,26 +459,26 @@ If a string is provided, it is assumed to be the name of the server that will
 handle timestep synchronization. If a boolean is provided, the name of the
 server will be assumed to be ‘timestep’. Defaults to False.</p></td>
 </tr>
-<tr class="row-even"><td><p>valgrind_flags</p></td>
+<tr class="row-odd"><td><p>valgrind_flags</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>Flags to pass to valgrind. Defaults to [].</p></td>
 </tr>
-<tr class="row-odd"><td><p>with_strace</p></td>
+<tr class="row-even"><td><p>with_strace</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True, the command is run with strace (on Linux) or dtrace (on MacOS).
 Defaults to False.</p></td>
 </tr>
-<tr class="row-even"><td><p>with_valgrind</p></td>
+<tr class="row-odd"><td><p>with_valgrind</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True, the command is run with valgrind. Defaults to False.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="available-languages">
+</section>
+<section id="available-languages">
 <h3>Available Languages<a class="headerlink" href="#available-languages" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-model-subtype-rst">
 <colgroup>
@@ -579,17 +509,17 @@ Defaults to False.</p></td>
 <td><p>Model is written in C/C++ and has a CMake build system.</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>executable</p></td>
+<tr class="row-even"><td><p>dummy</p></td>
+<td><p>The programming language that the model is written in. A list of available
+languages can be found <a class="reference internal" href="#schema-table-model-subtype-rst"><span class="std std-ref">here</span></a>.</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>executable</p></td>
 <td><p>[DEFAULT] Model is an executable.</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>fortran</p></td>
+<tr class="row-even"><td><p>fortran</p></td>
 <td><p>Model is written in Fortran.</p></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><p>function</p></td>
-<td><p>The programming language that the model is written in. A list of available
-languages can be found <a class="reference internal" href="#schema-table-model-subtype-rst"><span class="std std-ref">here</span></a>.</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>lpy</p></td>
@@ -627,15 +557,15 @@ to monitor it on the root process.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="language-specific-model-options">
+</section>
+<section id="language-specific-model-options">
 <h3>Language Specific Model Options<a class="headerlink" href="#language-specific-model-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-model-specific-rst">
 <colgroup>
-<col style="width: 12%" />
+<col style="width: 13%" />
 <col style="width: 4%" />
-<col style="width: 45%" />
-<col style="width: 39%" />
+<col style="width: 46%" />
+<col style="width: 38%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -672,7 +602,7 @@ be relative to working_dir or absolute.</p></td>
 provided, the compiler will be determined based on configuration options for the
 language (if present) and the registered compilers that are available on the
 current operating system.</p></td>
-<td><p>[‘c’, ‘cxx’, ‘make’, ‘fortran’, ‘cpp’, ‘c++’, ‘cmake’]</p></td>
+<td><p>[‘make’, ‘fortran’, ‘cxx’, ‘c++’, ‘cmake’, ‘cpp’, ‘c’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>compiler_flags</p></td>
 <td><p>array</p></td>
@@ -680,7 +610,7 @@ current operating system.</p></td>
 the compiler flags will be determined based on configuration options for the
 language (if present), the compiler defaults, and the default_compiler_flags
 class attribute.</p></td>
-<td><p>[‘c’, ‘cxx’, ‘make’, ‘fortran’, ‘cpp’, ‘c++’, ‘cmake’]</p></td>
+<td><p>[‘make’, ‘fortran’, ‘cxx’, ‘c++’, ‘cmake’, ‘cpp’, ‘c’]</p></td>
 </tr>
 <tr class="row-even"><td><p>configuration</p></td>
 <td><p>string</p></td>
@@ -744,14 +674,14 @@ be determined by the target language driver.</p></td>
 <td><p>Name or path of interpreter executable that should be used to run the model. If
 not provided, the interpreter will be determined based on configuration options
 for the language (if present) and the default_interpreter class attribute.</p></td>
-<td><p>[‘matlab’, ‘sbml’, ‘timesync’, ‘r’, ‘lpy’, ‘R’, ‘function’, ‘python’]</p></td>
+<td><p>[‘lpy’, ‘python’, ‘r’, ‘dummy’, ‘sbml’, ‘R’, ‘matlab’, ‘timesync’]</p></td>
 </tr>
 <tr class="row-even"><td><p>interpreter_flags</p></td>
 <td><p>array</p></td>
 <td><p>Flags that should be passed to the interpreter when running the model. If not
 provided, the flags are determined based on configuration options for the
 language (if present) and the default_interpreter_flags class attribute.</p></td>
-<td><p>[‘matlab’, ‘sbml’, ‘timesync’, ‘r’, ‘lpy’, ‘R’, ‘function’, ‘python’]</p></td>
+<td><p>[‘lpy’, ‘python’, ‘r’, ‘dummy’, ‘sbml’, ‘R’, ‘matlab’, ‘timesync’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>linker</p></td>
 <td><p>string</p></td>
@@ -759,7 +689,7 @@ language (if present) and the default_interpreter_flags class attribute.</p></td
 provided, the linker will be determined based on configuration options for the
 language (if present) and the registered linkers that are available on the
 current operating system</p></td>
-<td><p>[‘c’, ‘cxx’, ‘make’, ‘fortran’, ‘cpp’, ‘c++’, ‘cmake’]</p></td>
+<td><p>[‘make’, ‘fortran’, ‘cxx’, ‘c++’, ‘cmake’, ‘cpp’, ‘c’]</p></td>
 </tr>
 <tr class="row-even"><td><p>linker_flags</p></td>
 <td><p>array</p></td>
@@ -767,7 +697,7 @@ current operating system</p></td>
 the linker flags will be determined based on configuration options for the
 language (if present), the linker defaults, and the default_linker_flags class
 attribute.</p></td>
-<td><p>[‘c’, ‘cxx’, ‘make’, ‘fortran’, ‘cpp’, ‘c++’, ‘cmake’]</p></td>
+<td><p>[‘make’, ‘fortran’, ‘cxx’, ‘c++’, ‘cmake’, ‘cpp’, ‘c’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>makedir</p></td>
 <td><p>string</p></td>
@@ -804,7 +734,7 @@ selections will be returned.</p></td>
 <td><p>If True, no interpreter will be added to the arguments. This should only be used
 for subclasses that will not be invoking the model via the command line.
 Defaults to False.</p></td>
-<td><p>[‘matlab’, ‘sbml’, ‘timesync’, ‘r’, ‘lpy’, ‘R’, ‘function’, ‘python’]</p></td>
+<td><p>[‘lpy’, ‘python’, ‘r’, ‘dummy’, ‘sbml’, ‘R’, ‘matlab’, ‘timesync’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>skip_start_time</p></td>
 <td><p>boolean</p></td>
@@ -817,7 +747,7 @@ False. This option is ignored if only_output_final_step is True.</p></td>
 <td><p>Source files that should be compiled into an executable. Defaults to an empty
 list and the driver will search for a source file based on the model executable
 (the first model argument).</p></td>
-<td><p>[‘c’, ‘cxx’, ‘make’, ‘fortran’, ‘cpp’, ‘c++’, ‘cmake’]</p></td>
+<td><p>[‘make’, ‘fortran’, ‘cxx’, ‘c++’, ‘cmake’, ‘cpp’, ‘c’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>sourcedir</p></td>
 <td><p>string</p></td>
@@ -914,11 +844,11 @@ symunit. Defaults to False.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-<div class="section" id="input-output-options">
+</section>
+</section>
+<section id="input-output-options">
 <span id="yaml-comm-options"></span><h2>Input/Output Options<a class="headerlink" href="#input-output-options" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="general-input-output-comm-options">
+<section id="general-input-output-comm-options">
 <h3>General Input/Output Comm Options<a class="headerlink" href="#general-input-output-comm-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-comm-general-rst">
 <colgroup>
@@ -953,55 +883,74 @@ the type of data that should be sent/received by this object. Defaults to
 <td><p>X</p></td>
 <td><p>Name used for component in log messages.</p></td>
 </tr>
-<tr class="row-odd"><td><p>args</p></td>
+<tr class="row-odd"><td><p>address</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>Communication info. Default to None and address is taken from the environment
+variable.</p></td>
+</tr>
+<tr class="row-even"><td><p>args</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>[DEPRECATED] Arguments that should be provided to the driver.</p></td>
 </tr>
-<tr class="row-even"><td><p>as_array</p></td>
+<tr class="row-odd"><td><p>as_array</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>[DEPRECATED] If True and the datatype is table-like, tables are sent/recieved
 with either columns rather than row by row. Defaults to False.</p></td>
 </tr>
-<tr class="row-odd"><td><p>default_file</p></td>
+<tr class="row-even"><td><p>default_file</p></td>
 <td></td>
 <td></td>
-<td></td>
+<td><p>Comm information for a file that input should be drawn from (for input comms) or
+that output should be sent to (for output comms) in the event that a yaml does
+not pair the comm with another model comm or a file.</p></td>
 </tr>
-<tr class="row-even"><td><p>default_value</p></td>
+<tr class="row-odd"><td><p>default_value</p></td>
 <td><p>any</p></td>
 <td></td>
-<td></td>
+<td><p>Value that should be returned in the event that a yaml does not pair the comm
+with another model comm or a file.</p></td>
 </tr>
-<tr class="row-odd"><td><p>dont_copy</p></td>
+<tr class="row-even"><td><p>dont_copy</p></td>
 <td><p>boolean</p></td>
 <td></td>
-<td></td>
+<td><p>If True, the comm will not be duplicated in the even a model is duplicated via
+the ‘copies’ parameter. Defaults to False except for in the case that a model is
+wrapped and the comm is inside the loop or that a model is a RPC input to a
+model server.</p></td>
 </tr>
-<tr class="row-even"><td><p>driver</p></td>
+<tr class="row-odd"><td><p>driver</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>field_names</p></td>
+<tr class="row-even"><td><p>field_names</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>[DEPRECATED] Field names that should be used to label fields in sent/received
 tables. This keyword is only valid for table-like datatypes. If not provided,
 field names are created based on the field order.</p></td>
 </tr>
-<tr class="row-even"><td><p>field_units</p></td>
+<tr class="row-odd"><td><p>field_units</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>[DEPRECATED] Field units that should be used to convert fields in sent/received
 tables. This keyword is only valid for table-like datatypes. If not provided,
 all fields are assumed to be unitless.</p></td>
 </tr>
-<tr class="row-odd"><td><p>filter</p></td>
+<tr class="row-even"><td><p>filter</p></td>
 <td></td>
 <td></td>
+<td><p>Filter that will be used to determine when messages should be sent/received.
+Ignored if not provided.</p></td>
+</tr>
+<tr class="row-odd"><td><p>for_service</p></td>
+<td><p>boolean</p></td>
 <td></td>
+<td><p>If True, this comm bridges the gap to an integration running as a service,
+possibly on a remote machine. Defaults to False.</p></td>
 </tr>
 <tr class="row-even"><td><p>format_str</p></td>
 <td><p>string</p></td>
@@ -1011,17 +960,22 @@ all fields are assumed to be unitless.</p></td>
 <tr class="row-odd"><td><p>is_default</p></td>
 <td><p>boolean</p></td>
 <td></td>
-<td></td>
+<td><p>If True, this comm was created to handle all input/output variables to/from a
+model. Defaults to False. This variable is used internally and should not be set
+explicitly in the YAML.</p></td>
 </tr>
 <tr class="row-even"><td><p>length_map</p></td>
 <td><p>object</p></td>
 <td></td>
-<td><p>Map from pointer variable names to</p></td>
+<td><p>Map from pointer variable names to the names of variables where their length
+will be stored. Defaults to {}.</p></td>
 </tr>
 <tr class="row-odd"><td><p>outside_loop</p></td>
 <td><p>boolean</p></td>
 <td></td>
-<td></td>
+<td><p>If True, and the comm is an input/outputs to/from a model being wrapped. The
+receive/send calls for this comm will be outside the loop for the model.
+Defaults to False.</p></td>
 </tr>
 <tr class="row-even"><td><p>recv_converter</p></td>
 <td></td>
@@ -1036,7 +990,8 @@ all fields are assumed to be unitless.</p></td>
 <tr class="row-even"><td><p>transform</p></td>
 <td></td>
 <td></td>
-<td></td>
+<td><p>One or more transformations that will be applied to messages that are
+sent/received. Ignored if not provided.</p></td>
 </tr>
 <tr class="row-odd"><td><p>vars</p></td>
 <td><p>array</p></td>
@@ -1045,8 +1000,8 @@ all fields are assumed to be unitless.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="available-comm-types">
+</section>
+<section id="available-comm-types">
 <h3>Available Comm Types<a class="headerlink" href="#available-comm-types" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-comm-subtype-rst">
 <colgroup>
@@ -1071,25 +1026,28 @@ all fields are assumed to be unitless.</p></td>
 <tr class="row-odd"><td><p>mpi</p></td>
 <td><p>MPI communicator.</p></td>
 </tr>
-<tr class="row-even"><td><p>rmq</p></td>
+<tr class="row-even"><td><p>rest</p></td>
+<td><p>RESTful API.</p></td>
+</tr>
+<tr class="row-odd"><td><p>rmq</p></td>
 <td><p>RabbitMQ connection.</p></td>
 </tr>
-<tr class="row-odd"><td><p>rmq_async</p></td>
+<tr class="row-even"><td><p>rmq_async</p></td>
 <td><p>Asynchronous RabbitMQ connection.</p></td>
 </tr>
-<tr class="row-even"><td><p>value</p></td>
+<tr class="row-odd"><td><p>value</p></td>
 <td><p>Constant value.</p></td>
 </tr>
-<tr class="row-odd"><td><p>zmq</p></td>
+<tr class="row-even"><td><p>zmq</p></td>
 <td><p>ZeroMQ socket.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-<div class="section" id="file-options">
+</section>
+</section>
+<section id="file-options">
 <span id="yaml-file-options"></span><h2>File Options<a class="headerlink" href="#file-options" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="general-file-options">
+<section id="general-file-options">
 <h3>General File Options<a class="headerlink" href="#general-file-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-file-general-rst">
 <colgroup>
@@ -1122,47 +1080,60 @@ all fields are assumed to be unitless.</p></td>
 <td><p>X</p></td>
 <td><p>Working directory. If not provided, the current working directory is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>append</p></td>
+<tr class="row-odd"><td><p>address</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>Communication info. Default to None and address is taken from the environment
+variable.</p></td>
+</tr>
+<tr class="row-even"><td><p>append</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True and writing, file is openned in append mode. If True and reading, file
 is kept open even if the end of the file is reached to allow for another process
 to write to the file in append mode. Defaults to False.</p></td>
 </tr>
-<tr class="row-even"><td><p>args</p></td>
+<tr class="row-odd"><td><p>args</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>[DEPRECATED] Arguments that should be provided to the driver.</p></td>
 </tr>
-<tr class="row-odd"><td><p>as_array</p></td>
+<tr class="row-even"><td><p>as_array</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>[DEPRECATED] If True and the datatype is table-like, tables are sent/recieved
 with either columns rather than row by row. Defaults to False.</p></td>
 </tr>
-<tr class="row-even"><td><p>driver</p></td>
+<tr class="row-odd"><td><p>driver</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>field_names</p></td>
+<tr class="row-even"><td><p>field_names</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>[DEPRECATED] Field names that should be used to label fields in sent/received
 tables. This keyword is only valid for table-like datatypes. If not provided,
 field names are created based on the field order.</p></td>
 </tr>
-<tr class="row-even"><td><p>field_units</p></td>
+<tr class="row-odd"><td><p>field_units</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>[DEPRECATED] Field units that should be used to convert fields in sent/received
 tables. This keyword is only valid for table-like datatypes. If not provided,
 all fields are assumed to be unitless.</p></td>
 </tr>
-<tr class="row-odd"><td><p>filter</p></td>
+<tr class="row-even"><td><p>filter</p></td>
 <td></td>
 <td></td>
+<td><p>Filter that will be used to determine when messages should be sent/received.
+Ignored if not provided.</p></td>
+</tr>
+<tr class="row-odd"><td><p>for_service</p></td>
+<td><p>boolean</p></td>
 <td></td>
+<td><p>If True, this comm bridges the gap to an integration running as a service,
+possibly on a remote machine. Defaults to False.</p></td>
 </tr>
 <tr class="row-even"><td><p>format_str</p></td>
 <td><p>string</p></td>
@@ -1186,7 +1157,8 @@ index of the file. Defaults to False.</p></td>
 <tr class="row-odd"><td><p>length_map</p></td>
 <td><p>object</p></td>
 <td></td>
-<td><p>Map from pointer variable names to</p></td>
+<td><p>Map from pointer variable names to the names of variables where their length
+will be stored. Defaults to {}.</p></td>
 </tr>
 <tr class="row-even"><td><p>recv_converter</p></td>
 <td></td>
@@ -1201,7 +1173,8 @@ index of the file. Defaults to False.</p></td>
 <tr class="row-even"><td><p>transform</p></td>
 <td></td>
 <td></td>
-<td></td>
+<td><p>One or more transformations that will be applied to messages that are
+sent/received. Ignored if not provided.</p></td>
 </tr>
 <tr class="row-odd"><td><p>vars</p></td>
 <td><p>array</p></td>
@@ -1217,8 +1190,8 @@ immediately.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="available-file-types">
+</section>
+<section id="available-file-types">
 <h3>Available File Types<a class="headerlink" href="#available-file-types" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-file-subtype-rst">
 <colgroup>
@@ -1277,8 +1250,8 @@ for 3D structures.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="file-type-specific-options">
+</section>
+<section id="file-type-specific-options">
 <h3>File Type Specific Options<a class="headerlink" href="#file-type-specific-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-file-specific-rst">
 <colgroup>
@@ -1298,13 +1271,13 @@ for 3D structures.</p></td>
 <tr class="row-even"><td><p>comment</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
-<td><p>[‘json’, ‘yaml’, ‘netcdf’, ‘pickle’, ‘mat’, ‘pandas’, ‘obj’, ‘table’, ‘ascii’, ‘wofost’, ‘ply’, ‘map’]</p></td>
+<td><p>[‘obj’, ‘mat’, ‘netcdf’, ‘pandas’, ‘json’, ‘ascii’, ‘map’, ‘yaml’, ‘wofost’, ‘table’, ‘ply’, ‘pickle’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>datatype</p></td>
 <td><p>schema</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
-<td><p>[‘json’, ‘yaml’, ‘netcdf’, ‘pickle’, ‘mat’, ‘pandas’, ‘obj’, ‘table’, ‘ascii’, ‘wofost’, ‘ply’, ‘map’]</p></td>
+<td><p>[‘obj’, ‘mat’, ‘netcdf’, ‘pandas’, ‘json’, ‘ascii’, ‘map’, ‘yaml’, ‘wofost’, ‘table’, ‘ply’, ‘pickle’]</p></td>
 </tr>
 <tr class="row-even"><td><p>default_flow_style</p></td>
 <td><p>boolean</p></td>
@@ -1316,7 +1289,7 @@ they will always be serialized in the flow style. See <a class="reference extern
 <td><p>string</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘table’, ‘wofost’, ‘pandas’, ‘map’]</p></td>
+<td><p>[‘wofost’, ‘table’, ‘map’, ‘pandas’]</p></td>
 </tr>
 <tr class="row-even"><td><p>encoding</p></td>
 <td><p>string</p></td>
@@ -1327,12 +1300,12 @@ to t.</p></td>
 <td><p>[‘string’, ‘int’]</p></td>
 <td><p>String or number of spaces that should be used to indent each level within the
 seiralized structure. Defaults to ‘t’.</p></td>
-<td><p>[‘json’, ‘yaml’]</p></td>
+<td><p>[‘yaml’, ‘json’]</p></td>
 </tr>
 <tr class="row-even"><td><p>newline</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
-<td><p>[‘json’, ‘yaml’, ‘netcdf’, ‘pickle’, ‘mat’, ‘pandas’, ‘obj’, ‘table’, ‘ascii’, ‘wofost’, ‘ply’, ‘map’]</p></td>
+<td><p>[‘obj’, ‘mat’, ‘netcdf’, ‘pandas’, ‘json’, ‘ascii’, ‘map’, ‘yaml’, ‘wofost’, ‘table’, ‘ply’, ‘pickle’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>no_header</p></td>
 <td><p>boolean</p></td>
@@ -1388,11 +1361,11 @@ Defaults to False.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-<div class="section" id="connection-options">
+</section>
+</section>
+<section id="connection-options">
 <span id="yaml-conn-options"></span><h2>Connection Options<a class="headerlink" href="#connection-options" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="general-connection-options">
+<section id="general-connection-options">
 <h3>General Connection Options<a class="headerlink" href="#general-connection-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-connection-general-rst">
 <colgroup>
@@ -1456,8 +1429,8 @@ the messages in the order they are provided.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="available-connection-types">
+</section>
+<section id="available-connection-types">
 <h3>Available Connection Types<a class="headerlink" href="#available-connection-types" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-connection-subtype-rst">
 <colgroup>
@@ -1493,8 +1466,8 @@ the messages in the order they are provided.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="additional-options">
+</section>
+<section id="additional-options">
 <h3>Additional Options<a class="headerlink" href="#additional-options" title="Permalink to this headline">¶</a></h3>
 <p>In addition the the options above, there are several comm (channel/file)
 options that are also valid options for connections for convenience (i.e. at
@@ -1537,9 +1510,9 @@ of available file types.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-<div class="section" id="driver-method">
+</section>
+</section>
+<section id="driver-method">
 <h2>Driver Method<a class="headerlink" href="#driver-method" title="Permalink to this headline">¶</a></h2>
 <p>For backwards compatibility, yggdrasil also allows connections to be specified
 using drivers. In this scheme, there is no <code class="docutils literal notranslate"><span class="pre">connections</span></code> section in the yaml(s).
@@ -1579,55 +1552,38 @@ location of the YAML file.</p></td>
 driver. A full description of the available input/output drivers and potential
 arguments can be found <a class="reference internal" href="advanced/io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</p>
 <p>In general, this method of specifying connections is not recommended.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="config.html" class="btn btn-neutral float-right" title="Configuration Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="timesync_io.html" class="btn btn-neutral float-left" title="Timestep Synchronization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="config.html" class="btn btn-neutral float-right" title="Configuration Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

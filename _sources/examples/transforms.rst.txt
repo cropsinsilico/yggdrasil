@@ -71,8 +71,8 @@ Model YAML:
 
 
 
-Fortran Version
----------------
+Dummy Version
+-------------
 
 Model Code:
 
@@ -93,8 +93,8 @@ Model YAML:
 
 
 
-Function Version
-----------------
+Fortran Version
+---------------
 
 Model Code:
 

@@ -1,11 +1,11 @@
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson3b/src/server.py
-   :language: python
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson3b/src/server.cpp
+   :language: c++
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson3b/src/client.py
-   :language: python
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson3b/src/client.cpp
+   :language: c++
    :linenos:
 
 

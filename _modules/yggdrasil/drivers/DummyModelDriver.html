@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>yggdrasil.drivers.DummyModelDriver &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> yggdrasil
+          </a>
+              <div class="version">
+                v1.8.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Docker Containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">yggdrasil</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
+      <li>yggdrasil.drivers.DummyModelDriver</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for yggdrasil.drivers.DummyModelDriver</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">yggdrasil.drivers.InterpretedModelDriver</span> <span class="kn">import</span> <span class="n">InterpretedModelDriver</span>
+
+
+<div class="viewcode-block" id="DummyModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.DummyModelDriver.DummyModelDriver">[docs]</a><span class="k">class</span> <span class="nc">DummyModelDriver</span><span class="p">(</span><span class="n">InterpretedModelDriver</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class that stands-in to act as a model utilizing unmatched</span>
+<span class="sd">    input/output channels.&quot;&quot;&quot;</span>
+    
+    <span class="n">executable_type</span> <span class="o">=</span> <span class="s1">&#39;other&#39;</span>
+    <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;dummy&#39;</span>
+    <span class="n">full_language</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">base_languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;python&#39;</span><span class="p">]</span>
+    <span class="n">language_ext</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">no_executable</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">comms_implicit</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runner</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;runner&#39;</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DummyModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DummyModelDriver.is_language_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.is_language_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_language_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this model driver is installed on the current</span>
+<span class="sd">        machine.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: Truth of if this model driver can be run on the current</span>
+<span class="sd">                machine.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># This is being run so python exists</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="DummyModelDriver.is_configured"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.is_configured">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_configured</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the appropriate configuration has been performed (e.g.</span>
+<span class="sd">        installation of supporting libraries etc.)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the language has been configured.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># There are not any config options</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="DummyModelDriver.language_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.language_version">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">language_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this language.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to cls.run_executable.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Version of compiler/interpreter for this language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;0&#39;</span></div>
+    
+<div class="viewcode-block" id="DummyModelDriver.before_start"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform before the run starts.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+                                
+<div class="viewcode-block" id="DummyModelDriver.before_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.before_loop">[docs]</a>    <span class="k">def</span> <span class="nf">before_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions before loop.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="DummyModelDriver.run_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Loop to check if model is still running and forward output.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">drv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">runner</span><span class="o">.</span><span class="n">modeldrivers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">drv</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="ow">and</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">wait_flag_attr</span><span class="p">(</span><span class="s1">&#39;break_flag&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">service_partner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: YAML representation of the dummy model that should</span>
+<span class="sd">        stand-in for the model client-side.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="n">dir2opp</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="s1">&#39;input&#39;</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">io1</span><span class="p">,</span> <span class="n">io2</span> <span class="ow">in</span> <span class="n">dir2opp</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">drv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">yml</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_drivers&#39;</span> <span class="o">%</span> <span class="n">io1</span><span class="p">]:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">drv</span><span class="p">[</span><span class="n">io1</span> <span class="o">+</span> <span class="s1">&#39;s&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                <span class="n">comm</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">],</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">comm&#39;</span> <span class="o">%</span> <span class="n">io2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">opp_comm_kwargs</span><span class="p">(</span><span class="n">for_yaml</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+                    <span class="n">drv</span><span class="p">[</span><span class="n">io1</span> <span class="o">+</span> <span class="s1">&#39;s&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;partner_model&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">io2</span> <span class="o">+</span> <span class="s1">&#39;s&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_connection_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;rpc_&#39;</span><span class="p">):</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="n">io2</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">)</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">io1</span> <span class="o">+</span> <span class="s1">&#39;s&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_response&#39;</span><span class="p">})</span>
+                    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;is_server&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">io2</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                                        <span class="n">io1</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_response&#39;</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">io1</span><span class="p">,</span> <span class="n">io2</span> <span class="ow">in</span> <span class="n">dir2opp</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">io2</span> <span class="o">+</span> <span class="s1">&#39;s&#39;</span><span class="p">])</span>
+            <span class="c1"># TODO: Is there a case where a DummyModelDriver will be created</span>
+            <span class="c1"># for a model that does not have inputs or outputs?</span>
+            <span class="c1"># if not out[io2 + &#39;s&#39;]:</span>
+            <span class="c1">#     out.pop(io2 + &#39;s&#39;)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

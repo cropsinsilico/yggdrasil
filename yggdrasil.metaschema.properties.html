@@ -1,75 +1,35 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.metaschema.properties package &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.metaschema.properties package &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -77,18 +37,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
@@ -103,7 +52,10 @@
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
@@ -114,76 +66,36 @@
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>yggdrasil.metaschema.properties package</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/yggdrasil.metaschema.properties.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="yggdrasil-metaschema-properties-package">
+             
+  <section id="yggdrasil-metaschema-properties-package">
 <h1>yggdrasil.metaschema.properties package<a class="headerlink" href="#yggdrasil-metaschema-properties-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
+<section id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
@@ -204,11 +116,11 @@
 </li>
 </ul>
 </div>
-</div>
-<div class="section" id="submodules">
+</section>
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-yggdrasil.metaschema.properties.AnyMetaschemaProperties">
+</section>
+<section id="module-yggdrasil.metaschema.properties.AnyMetaschemaProperties">
 <span id="yggdrasil-metaschema-properties-anymetaschemaproperties-module"></span><h2>yggdrasil.metaschema.properties.AnyMetaschemaProperties module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.AnyMetaschemaProperties" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty">
@@ -271,8 +183,8 @@ value using cls.compare.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.properties.ArgsMetaschemaProperty">
+</section>
+<section id="module-yggdrasil.metaschema.properties.ArgsMetaschemaProperty">
 <span id="yggdrasil-metaschema-properties-argsmetaschemaproperty-module"></span><h2>yggdrasil.metaschema.properties.ArgsMetaschemaProperty module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.ArgsMetaschemaProperty" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty">
@@ -330,8 +242,8 @@ value using cls.compare.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.properties.ArrayMetaschemaProperties">
+</section>
+<section id="module-yggdrasil.metaschema.properties.ArrayMetaschemaProperties">
 <span id="yggdrasil-metaschema-properties-arraymetaschemaproperties-module"></span><h2>yggdrasil.metaschema.properties.ArrayMetaschemaProperties module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.ArrayMetaschemaProperties" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty">
@@ -351,7 +263,7 @@ value using cls.compare.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.python_types">
-<span class="sig-name descname"><span class="pre">python_types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">(&lt;class</span> <span class="pre">'unyt.array.unyt_array'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.ndarray'&gt;)</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">python_types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">(&lt;class</span> <span class="pre">'numpy.ndarray'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_array'&gt;)</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -390,7 +302,7 @@ value using cls.compare.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.python_types">
-<span class="sig-name descname"><span class="pre">python_types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">(&lt;class</span> <span class="pre">'unyt.array.unyt_array'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.ndarray'&gt;)</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">python_types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">(&lt;class</span> <span class="pre">'numpy.ndarray'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_array'&gt;)</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -405,8 +317,8 @@ value using cls.compare.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.properties.ClassMetaschemaProperty">
+</section>
+<section id="module-yggdrasil.metaschema.properties.ClassMetaschemaProperty">
 <span id="yggdrasil-metaschema-properties-classmetaschemaproperty-module"></span><h2>yggdrasil.metaschema.properties.ClassMetaschemaProperty module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.ClassMetaschemaProperty" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty">
@@ -461,8 +373,8 @@ the second.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.properties.DefaultProperty">
+</section>
+<section id="module-yggdrasil.metaschema.properties.DefaultProperty">
 <span id="yggdrasil-metaschema-properties-defaultproperty-module"></span><h2>yggdrasil.metaschema.properties.DefaultProperty module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.DefaultProperty" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.DefaultProperty.DefaultMetaschemaProperty">
@@ -482,8 +394,8 @@ the second.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties">
+</section>
+<section id="module-yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties">
 <span id="yggdrasil-metaschema-properties-jsonarraymetaschemaproperties-module"></span><h2>yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty">
@@ -519,8 +431,8 @@ the second.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties">
+</section>
+<section id="module-yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties">
 <span id="yggdrasil-metaschema-properties-jsonobjectmetaschemaproperties-module"></span><h2>yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty">
@@ -568,8 +480,8 @@ the second.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.properties.KwargsMetaschemaProperty">
+</section>
+<section id="module-yggdrasil.metaschema.properties.KwargsMetaschemaProperty">
 <span id="yggdrasil-metaschema-properties-kwargsmetaschemaproperty-module"></span><h2>yggdrasil.metaschema.properties.KwargsMetaschemaProperty module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.KwargsMetaschemaProperty" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty">
@@ -627,8 +539,8 @@ the second.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.properties.MetaschemaProperty">
+</section>
+<section id="module-yggdrasil.metaschema.properties.MetaschemaProperty">
 <span id="yggdrasil-metaschema-properties-metaschemaproperty-module"></span><h2>yggdrasil.metaschema.properties.MetaschemaProperty module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.MetaschemaProperty" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty">
@@ -827,8 +739,8 @@ not be registered. Defaults to False.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.properties.ScalarMetaschemaProperties">
+</section>
+<section id="module-yggdrasil.metaschema.properties.ScalarMetaschemaProperties">
 <span id="yggdrasil-metaschema-properties-scalarmetaschemaproperties-module"></span><h2>yggdrasil.metaschema.properties.ScalarMetaschemaProperties module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.ScalarMetaschemaProperties" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty">
@@ -860,7 +772,7 @@ not be registered. Defaults to False.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.python_types">
-<span class="sig-name descname"><span class="pre">python_types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex256'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.str_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.ndarray'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_array'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'complex'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'bytes'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.bytes_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.unsignedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'float'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.signedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_quantity'&gt;)</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">python_types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex256'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_array'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.str_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.ndarray'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'complex'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'bytes'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.bytes_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.unsignedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'float'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_quantity'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.signedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int8'&gt;)</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -870,7 +782,7 @@ not be registered. Defaults to False.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.types">
-<span class="sig-name descname"><span class="pre">types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('bytes',</span> <span class="pre">'int',</span> <span class="pre">'scalar',</span> <span class="pre">'uint',</span> <span class="pre">'1darray',</span> <span class="pre">'float',</span> <span class="pre">'ndarray',</span> <span class="pre">'complex',</span> <span class="pre">'unicode')</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('ndarray',</span> <span class="pre">'float',</span> <span class="pre">'scalar',</span> <span class="pre">'1darray',</span> <span class="pre">'uint',</span> <span class="pre">'int',</span> <span class="pre">'complex',</span> <span class="pre">'unicode',</span> <span class="pre">'bytes')</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -899,7 +811,7 @@ not be registered. Defaults to False.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.python_types">
-<span class="sig-name descname"><span class="pre">python_types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex256'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.str_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.ndarray'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_array'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'complex'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'bytes'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.bytes_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.unsignedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'float'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.signedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_quantity'&gt;)</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">python_types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex256'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_array'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.str_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.ndarray'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'complex'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'bytes'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.bytes_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.unsignedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'float'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_quantity'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.signedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int8'&gt;)</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -909,7 +821,7 @@ not be registered. Defaults to False.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.types">
-<span class="sig-name descname"><span class="pre">types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('1darray',</span> <span class="pre">'ndarray',</span> <span class="pre">'scalar')</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('ndarray',</span> <span class="pre">'scalar',</span> <span class="pre">'1darray')</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -938,7 +850,7 @@ not be registered. Defaults to False.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.python_types">
-<span class="sig-name descname"><span class="pre">python_types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex256'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.str_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.ndarray'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_array'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'complex'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'bytes'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.bytes_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.unsignedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'float'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.signedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_quantity'&gt;)</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">python_types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex256'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_array'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.str_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.ndarray'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'complex'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'bytes'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.bytes_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.unsignedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'float'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_quantity'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.signedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int8'&gt;)</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -948,7 +860,7 @@ not be registered. Defaults to False.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.types">
-<span class="sig-name descname"><span class="pre">types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('bytes',</span> <span class="pre">'int',</span> <span class="pre">'scalar',</span> <span class="pre">'uint',</span> <span class="pre">'1darray',</span> <span class="pre">'float',</span> <span class="pre">'ndarray',</span> <span class="pre">'complex',</span> <span class="pre">'unicode')</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('ndarray',</span> <span class="pre">'float',</span> <span class="pre">'scalar',</span> <span class="pre">'1darray',</span> <span class="pre">'uint',</span> <span class="pre">'int',</span> <span class="pre">'complex',</span> <span class="pre">'unicode',</span> <span class="pre">'bytes')</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -987,8 +899,8 @@ not be registered. Defaults to False.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.properties.TitleMetaschemaProperty">
+</section>
+<section id="module-yggdrasil.metaschema.properties.TitleMetaschemaProperty">
 <span id="yggdrasil-metaschema-properties-titlemetaschemaproperty-module"></span><h2>yggdrasil.metaschema.properties.TitleMetaschemaProperty module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.TitleMetaschemaProperty" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty">
@@ -1002,18 +914,18 @@ not be registered. Defaults to False.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.python_types">
-<span class="sig-name descname"><span class="pre">python_types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">(&lt;class</span> <span class="pre">'unyt.array.unyt_quantity'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'type'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'NoneType'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex256'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.str_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'method'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'tuple'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.ndarray'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_array'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'complex'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'bytes'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.bytes_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.unsignedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numbers.Number'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'dict'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'bool'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'function'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'float'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'builtin_function_or_method'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.signedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'list'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'pandas.core.frame.DataFrame'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'object'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int8'&gt;)</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">python_types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'type'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numbers.Number'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'NoneType'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex256'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_array'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.str_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'method'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'tuple'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.ndarray'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'pandas.core.frame.DataFrame'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'complex'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'bytes'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.bytes_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'object'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.unsignedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'dict'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'bool'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'function'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'float'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_quantity'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'builtin_function_or_method'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.signedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'list'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int8'&gt;)</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.types">
-<span class="sig-name descname"><span class="pre">types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('scalar',</span> <span class="pre">'uint',</span> <span class="pre">'complex',</span> <span class="pre">'unicode',</span> <span class="pre">'integer',</span> <span class="pre">'number',</span> <span class="pre">'boolean',</span> <span class="pre">'int',</span> <span class="pre">'instance',</span> <span class="pre">'class',</span> <span class="pre">'any',</span> <span class="pre">'object',</span> <span class="pre">'string',</span> <span class="pre">'array',</span> <span class="pre">'float',</span> <span class="pre">'bytes',</span> <span class="pre">'1darray',</span> <span class="pre">'function',</span> <span class="pre">'ndarray',</span> <span class="pre">'null')</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('ndarray',</span> <span class="pre">'integer',</span> <span class="pre">'function',</span> <span class="pre">'class',</span> <span class="pre">'1darray',</span> <span class="pre">'boolean',</span> <span class="pre">'string',</span> <span class="pre">'int',</span> <span class="pre">'object',</span> <span class="pre">'unicode',</span> <span class="pre">'any',</span> <span class="pre">'bytes',</span> <span class="pre">'array',</span> <span class="pre">'uint',</span> <span class="pre">'null',</span> <span class="pre">'number',</span> <span class="pre">'complex',</span> <span class="pre">'float',</span> <span class="pre">'scalar',</span> <span class="pre">'instance')</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.properties.TypeMetaschemaProperty">
+</section>
+<section id="module-yggdrasil.metaschema.properties.TypeMetaschemaProperty">
 <span id="yggdrasil-metaschema-properties-typemetaschemaproperty-module"></span><h2>yggdrasil.metaschema.properties.TypeMetaschemaProperty module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.TypeMetaschemaProperty" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty">
@@ -1091,18 +1003,18 @@ is ignored.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.python_types">
-<span class="sig-name descname"><span class="pre">python_types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'type'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'trimesh.base.Trimesh'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'NoneType'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex256'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.str_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'method'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'tuple'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.ndarray'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_array'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'complex'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'bytes'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.bytes_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.unsignedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numbers.Number'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'dict'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'bool'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'function'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'float'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'builtin_function_or_method'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.signedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'list'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'pandas.core.frame.DataFrame'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'object'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_quantity'&gt;)</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">python_types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">(&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'type'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numbers.Number'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'NoneType'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex256'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_array'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.str_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'method'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'tuple'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.ndarray'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex128'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'pandas.core.frame.DataFrame'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'complex'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'bytes'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.bytes_'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.unsignedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'dict'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'bool'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.complex64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'function'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'float'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'unyt.array.unyt_quantity'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'builtin_function_or_method'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.signedinteger'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'list'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'trimesh.base.Trimesh'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'object'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int8'&gt;)</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.types">
-<span class="sig-name descname"><span class="pre">types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('scalar',</span> <span class="pre">'uint',</span> <span class="pre">'obj',</span> <span class="pre">'complex',</span> <span class="pre">'unicode',</span> <span class="pre">'integer',</span> <span class="pre">'number',</span> <span class="pre">'boolean',</span> <span class="pre">'ply',</span> <span class="pre">'int',</span> <span class="pre">'schema',</span> <span class="pre">'instance',</span> <span class="pre">'class',</span> <span class="pre">'object',</span> <span class="pre">'string',</span> <span class="pre">'any',</span> <span class="pre">'array',</span> <span class="pre">'float',</span> <span class="pre">'bytes',</span> <span class="pre">'1darray',</span> <span class="pre">'function',</span> <span class="pre">'ndarray',</span> <span class="pre">'null')</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">types</span></span><em class="property"> <span class="pre">=</span> <span class="pre">('ndarray',</span> <span class="pre">'obj',</span> <span class="pre">'integer',</span> <span class="pre">'function',</span> <span class="pre">'class',</span> <span class="pre">'1darray',</span> <span class="pre">'boolean',</span> <span class="pre">'string',</span> <span class="pre">'int',</span> <span class="pre">'object',</span> <span class="pre">'unicode',</span> <span class="pre">'bytes',</span> <span class="pre">'any',</span> <span class="pre">'array',</span> <span class="pre">'uint',</span> <span class="pre">'null',</span> <span class="pre">'number',</span> <span class="pre">'complex',</span> <span class="pre">'schema',</span> <span class="pre">'float',</span> <span class="pre">'scalar',</span> <span class="pre">'ply',</span> <span class="pre">'instance')</span></em><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.metaschema.properties">
+</section>
+<section id="module-yggdrasil.metaschema.properties">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil.metaschema.properties" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.metaschema.properties.MetaschemaPropertyMeta">
@@ -1170,51 +1082,35 @@ class, None is returned. Defaults to False.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

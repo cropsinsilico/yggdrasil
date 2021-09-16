@@ -3,9 +3,10 @@
 ==================   =======   ========   ================================================================================
 Option               Type      Required   Description                                                                     
 ==================   =======   ========   ================================================================================
-args                 array     X          The full path to the file containing the model program that will be run by the  
-                                          driver or a list starting with the program file and including any arguments that
-                                          should be passed as input to the program.                                       
+args                 array     X          The path to the file containing the model program that will be run by the driver
+                                          for the model's language and/or a list of arguments that should be passed as    
+                                          input to the model program or language executable (e.g. source code or          
+                                          configuration file for a domain specific language).                             
 language             string    X          The programming language that the model is written in. A list of available      
                                           languages can be found :ref:`here <schema_table_model_subtype_rst>`. (Options   
                                           described :ref:`here <schema_table_model_subtype_rst>`)                         
@@ -20,7 +21,11 @@ client_of            array                The names of one or more models that t
                                           underscore `<server_model>_<client_model>`. There will be one channel created   
                                           for each server the model is a client of. Defaults to empty list. Use of        
                                           `client_of` with `function` is not currently supported.                         
+contact_email        string               Email address that should be used to contact the maintainer of the model. This  
+                                          parameter is only used in the model repository.                                 
 copies               integer              The number of copies of the model that should be created. Defaults to 1.        
+description          string               Description of the model. This parameter is only used in the model repository or
+                                          when providing the model as a service.                                          
 driver               string               [DEPRECATED] Name of driver class that should be used.                          
 env                  object               Dictionary of environment variables that should be set when the driver starts.  
                                           Defaults to {}.                                                                 
@@ -28,10 +33,9 @@ function             string               If provided, an integrated model is cr
                                           The function must be located within the file specified by the source file listed
                                           in the first argument. If not provided, the model must contain it's own calls to
                                           the |yggdrasil| interface.                                                      
-inputs               array                A mapping object containing the entry for a model input channel or a list of    
-                                          input channel entries. If the model does not get input from another model, this 
-                                          may be ommitted. A full description of channel entries and the options available
-                                          for channels can be found :ref:`here<yaml_comm_options>`.                       
+inputs               array                Zero or more channels carrying input to the model. A full description of channel
+                                          entries and the options available for channels can be found                     
+                                          :ref:`here<yaml_comm_options>`.                                                 
 is_server                                 If `True`, the model is assumed to be a server for one or more client models and
                                           an instance of :class:`yggdrasil.drivers.ServerDriver` is started. The          
                                           corresponding channel that should be passed to the yggdrasil API will be the    
@@ -46,10 +50,9 @@ iter_function_over   array                Variable(s) that should be received or
 logging_level        string               The level of logging messages that should be displayed by the model. Defaults to
                                           the logging level as determined by the configuration file and environment       
                                           variables.                                                                      
-outputs              array                A mapping object containing the entry for a model output channel or a list of   
-                                          output channel entries. If the model does not output to another model, this may 
-                                          be ommitted. A full description of channel entries and the options available for
-                                          channels can be found :ref:`here<yaml_comm_options>`.                           
+outputs              array                Zero or more channels carrying output from the model. A full description of     
+                                          channel entries and the options available for channels can be found             
+                                          :ref:`here<yaml_comm_options>`.                                                 
 outputs_in_inputs    boolean              If True, outputs from wrapped model functions are passed by pointer as inputs   
                                           for modification and the return value will be a flag. If False, outputs are     
                                           limited to return values. Defaults to the value of the class attribute          
@@ -66,6 +69,9 @@ preserve_cache       boolean              If True model products will be kept fo
 products             array                Paths to files created by the model that should be cleaned up when the model    
                                           exits. Entries can be absolute paths or paths relative to the working directory.
                                           Defaults to [].                                                                 
+repository_url       string               URL for the git repository containing the model source code. If provided,       
+                                          relative paths in the model YAML definition will be considered relative to the  
+                                          repository root directory.                                                      
 source_products      array                Files created by running the model that are source files. These files will be   
                                           removed without checking their extension so users should avoid adding files to  
                                           this list unless they are sure they should be deleted. Defaults to [].          

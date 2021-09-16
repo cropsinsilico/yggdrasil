@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Command Line Interface (CLI) &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="High Performance Computing (HPC)" href="hpc.html" />
+    <link rel="prev" title="Units" href="units.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> yggdrasil
+          </a>
+              <div class="version">
+                v1.8.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timesync_io.html">Timestep Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Command Line Interface (CLI)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#yggdrasil-command"><code class="docutils literal notranslate"><span class="pre">yggdrasil</span></code> Command</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#subcommands">subcommands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Sub-commands:">Sub-commands:</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#run">run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#info">info</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#validate">validate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#compile">compile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#compile-deps">compile-deps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clean">clean</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#install">install</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config">config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metaschema">metaschema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schema">schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model-form-schema">model-form-schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dev-update">dev-update</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#test">test</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#timing">timing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gha">gha</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#integration-service-manager">integration-service-manager</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#yggcc-command"><code class="docutils literal notranslate"><span class="pre">yggcc</span></code> Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#yggccflags-command"><code class="docutils literal notranslate"><span class="pre">yggccflags</span></code> Command</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#yggcctool-command"><code class="docutils literal notranslate"><span class="pre">yggcctool</span></code> Command</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#yggclean-command"><code class="docutils literal notranslate"><span class="pre">yggclean</span></code> Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#yggcompile-command"><code class="docutils literal notranslate"><span class="pre">yggcompile</span></code> Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#yggconfig-command"><code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#yggdevup-command"><code class="docutils literal notranslate"><span class="pre">yggdevup</span></code> Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ygggha-command"><code class="docutils literal notranslate"><span class="pre">ygggha</span></code> Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ygginfo-command"><code class="docutils literal notranslate"><span class="pre">ygginfo</span></code> Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ygginstall-command"><code class="docutils literal notranslate"><span class="pre">ygginstall</span></code> Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#yggldflags-command"><code class="docutils literal notranslate"><span class="pre">yggldflags</span></code> Command</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#yggldtool-command"><code class="docutils literal notranslate"><span class="pre">yggldtool</span></code> Command</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#yggmetaschema-command"><code class="docutils literal notranslate"><span class="pre">yggmetaschema</span></code> Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#yggmodelform-command"><code class="docutils literal notranslate"><span class="pre">yggmodelform</span></code> Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#yggrun-command"><code class="docutils literal notranslate"><span class="pre">yggrun</span></code> Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#yggschema-command"><code class="docutils literal notranslate"><span class="pre">yggschema</span></code> Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#yggtest-command"><code class="docutils literal notranslate"><span class="pre">yggtest</span></code> Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#yggvalidate-command"><code class="docutils literal notranslate"><span class="pre">yggvalidate</span></code> Command</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">Docker Containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">yggdrasil</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Command Line Interface (CLI)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cli.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="command-line-interface-cli">
+<span id="cli-rst"></span><h1>Command Line Interface (CLI)<a class="headerlink" href="#command-line-interface-cli" title="Permalink to this headline">¶</a></h1>
+<section id="yggdrasil-command">
+<span id="cli-yggdrasil-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggdrasil</span></code> Command<a class="headerlink" href="#yggdrasil-command" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggdrasil</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">version</span><span class="p">]</span>
+                 <span class="p">{</span><span class="n">run</span><span class="p">,</span><span class="n">info</span><span class="p">,</span><span class="n">validate</span><span class="p">,</span><span class="nb">compile</span><span class="p">,</span><span class="nb">compile</span><span class="o">-</span><span class="n">deps</span><span class="p">,</span><span class="n">clean</span><span class="p">,</span><span class="n">install</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">metaschema</span><span class="p">,</span><span class="n">schema</span><span class="p">,</span><span class="n">model</span><span class="o">-</span><span class="n">form</span><span class="o">-</span><span class="n">schema</span><span class="p">,</span><span class="n">dev</span><span class="o">-</span><span class="n">update</span><span class="p">,</span><span class="n">test</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span><span class="n">gha</span><span class="p">,</span><span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span><span class="p">}</span>
+                 <span class="o">...</span>
+</pre></div>
+</div>
+<section id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>--version</kbd></dt>
+<dd><p>show program’s version number and exit</p>
+</dd>
+</dl>
+</section>
+<section id="subcommands">
+<h3>subcommands<a class="headerlink" href="#subcommands" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>subcommand</kbd></dt>
+<dd><p>Possible choices: run, info, validate, compile, compile-deps, clean, install, config, metaschema, schema, model-form-schema, dev-update, test, timing, gha, integration-service-manager</p>
+</dd>
+</dl>
+</section>
+<section id="Sub-commands:">
+<h3>Sub-commands:<a class="headerlink" href="#Sub-commands:" title="Permalink to this headline">¶</a></h3>
+<section id="run">
+<h4>run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h4>
+<p>Run an integration.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">run</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">mpi</span> <span class="n">WITH_MPI</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">mpi</span><span class="o">-</span><span class="n">tag</span><span class="o">-</span><span class="n">start</span> <span class="n">MPI_TAG_START</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">--</span><span class="n">loglevel</span> <span class="n">LOGLEVEL</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">rmq</span><span class="o">-</span><span class="n">loglevel</span> <span class="n">RMQ_LOGLEVEL</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">--</span><span class="n">client</span><span class="o">-</span><span class="n">loglevel</span> <span class="n">CLIENT_LOGLEVEL</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">validate</span><span class="o">-</span><span class="n">components</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">--</span><span class="n">validate</span><span class="o">-</span><span class="n">messages</span> <span class="p">{</span><span class="kc">False</span><span class="p">,</span><span class="kc">True</span><span class="p">,</span><span class="n">First</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">namespace</span> <span class="n">NAMESPACE</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">--</span><span class="n">host</span> <span class="n">HOST</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">vhost</span> <span class="n">VHOST</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">user</span> <span class="n">USER</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">--</span><span class="n">password</span> <span class="n">PASSWORD</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cluster</span> <span class="n">CLUSTER</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">--</span><span class="n">default</span><span class="o">-</span><span class="n">comm</span> <span class="n">DEFAULT_COMM</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">production</span><span class="o">-</span><span class="n">run</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span>
+              <span class="n">yamlfile</span> <span class="p">[</span><span class="n">yamlfile</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="Positional Arguments">
+<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>yamlfile</kbd></dt>
+<dd><p>One or more yaml specification files.</p>
+</dd>
+</dl>
+</section>
+<section id="Named Arguments_repeat1">
+<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat1" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>--with-mpi, --mpi-nproc</kbd></dt>
+<dd><p>Number of MPI processes to run on.</p>
+<p>Default: 1</p>
+</dd>
+<dt><kbd>--mpi-tag-start</kbd></dt>
+<dd><p>Tag that MPI communications should start at.</p>
+<p>Default: 0</p>
+</dd>
+<dt><kbd>--loglevel</kbd></dt>
+<dd><p>Logging level for yggdrasil operations.</p>
+</dd>
+<dt><kbd>--rmq-loglevel, --rmqloglevel</kbd></dt>
+<dd><p>Logging level for RabbitMQ operations.</p>
+</dd>
+<dt><kbd>--client-loglevel, --clientloglevel</kbd></dt>
+<dd><p>Logging level for yggdrasil operations on model processes.</p>
+</dd>
+<dt><kbd>--validate-components, --validatecomponents</kbd></dt>
+<dd><p>Validate components on creation using their JSON schema (Decreases performance).</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--validate-messages, --validatemessages</kbd></dt>
+<dd><p>Possible choices: False, True, First</p>
+<p>Which messages should be validated during communication. ‘True’: all messages (decreases performance), ‘False’: no messages, or ‘First’: only the first message a comm sends/receives.</p>
+</dd>
+<dt><kbd>--namespace</kbd></dt>
+<dd><p>RabbitMQ namespace.</p>
+</dd>
+<dt><kbd>--host</kbd></dt>
+<dd><p>RabbitMQ host address.</p>
+</dd>
+<dt><kbd>--vhost</kbd></dt>
+<dd><p>RabbitMQ virtual host address.</p>
+</dd>
+<dt><kbd>--user</kbd></dt>
+<dd><p>RabbitMQ username.</p>
+</dd>
+<dt><kbd>--password</kbd></dt>
+<dd><p>RabbitMQ password.</p>
+</dd>
+<dt><kbd>--cluster</kbd></dt>
+<dd><p>Cluster that should be used.</p>
+</dd>
+<dt><kbd>--default-comm, --defaultcomm</kbd></dt>
+<dd><p>Comm type that should be used by default.</p>
+</dd>
+<dt><kbd>--production-run</kbd></dt>
+<dd><p>Turn off safe guards in order to improve performance. This is equivalent to ‘–validate-components –validate-messages=True’</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--debug</kbd></dt>
+<dd><p>Turn on debugging utilties including increased logging and validation. This is equivalent to ‘–loglevel=DEBUG –client-loglevel=DEBUG –validate-components=False –validate-messages=False’</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="info">
+<h4>info<a class="headerlink" href="#info" title="Permalink to this headline">¶</a></h4>
+<p>Display information about the current yggdrasil installation.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">info</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">languages</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">comms</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span>
+               <span class="p">{</span><span class="n">compiler</span><span class="p">,</span><span class="n">linker</span><span class="p">,</span><span class="n">archiver</span><span class="p">}</span> <span class="o">...</span>
+</pre></div>
+</div>
+<section id="Named Arguments_repeat2">
+<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat2" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>--no-languages</kbd></dt>
+<dd><p>Don’t print information about individual languages.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--no-comms</kbd></dt>
+<dd><p>Don’t print information about individual comms.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--verbose, -v</kbd></dt>
+<dd><p>Increase the verbosity of the printed information.</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+<section id="tool">
+<h5>tool<a class="headerlink" href="#tool" title="Permalink to this headline">¶</a></h5>
+<p>Compilation tool types to get info about.</p>
+<dl class="option-list">
+<dt><kbd>tool</kbd></dt>
+<dd><p>Possible choices: compiler, linker, archiver</p>
+</dd>
+</dl>
+</section>
+<section id="Sub-commands:_repeat1">
+<h5>Sub-commands:<a class="headerlink" href="#Sub-commands:_repeat1" title="Permalink to this headline">¶</a></h5>
+<section id="compiler">
+<h6>compiler<a class="headerlink" href="#compiler" title="Permalink to this headline">¶</a></h6>
+<p>Get information about a compiler.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">info</span> <span class="n">compiler</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">flags</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fullpath</span><span class="p">]</span>
+                        <span class="p">{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">}</span>
+</pre></div>
+</div>
+<section id="Positional Arguments_repeat1">
+<h7>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat1" title="Permalink to this headline">¶</a></h7>
+<dl class="option-list">
+<dt><kbd>language</kbd></dt>
+<dd><p>Possible choices: c, c++, cpp, cxx, fortran</p>
+<p>Language to get tool information for.</p>
+</dd>
+</dl>
+</section>
+<section id="Named Arguments_repeat3">
+<h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat3" title="Permalink to this headline">¶</a></h7>
+<dl class="option-list">
+<dt><kbd>--toolname</kbd></dt>
+<dd><p>Name of tool to get information for. If not provided, information for the default tool will be returned.</p>
+</dd>
+<dt><kbd>--flags</kbd></dt>
+<dd><p>Display the flags that yggdrasil will  pass to the tool when it is called.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--fullpath</kbd></dt>
+<dd><p>Get the full path to the tool exectuable.</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="linker">
+<h6>linker<a class="headerlink" href="#linker" title="Permalink to this headline">¶</a></h6>
+<p>Get information about a linker.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">info</span> <span class="n">linker</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">flags</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fullpath</span><span class="p">]</span>
+                      <span class="p">[</span><span class="o">--</span><span class="n">library</span><span class="p">]</span>
+                      <span class="p">{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">}</span>
+</pre></div>
+</div>
+<section id="Positional Arguments_repeat2">
+<h7>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat2" title="Permalink to this headline">¶</a></h7>
+<dl class="option-list">
+<dt><kbd>language</kbd></dt>
+<dd><p>Possible choices: c, c++, cpp, cxx, fortran</p>
+<p>Language to get tool information for.</p>
+</dd>
+</dl>
+</section>
+<section id="Named Arguments_repeat4">
+<h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat4" title="Permalink to this headline">¶</a></h7>
+<dl class="option-list">
+<dt><kbd>--toolname</kbd></dt>
+<dd><p>Name of tool to get information for. If not provided, information for the default tool will be returned.</p>
+</dd>
+<dt><kbd>--flags</kbd></dt>
+<dd><p>Display the flags that yggdrasil will  pass to the tool when it is called.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--fullpath</kbd></dt>
+<dd><p>Get the full path to the tool exectuable.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--library</kbd></dt>
+<dd><p>Get flags for linking a library.</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="archiver">
+<h6>archiver<a class="headerlink" href="#archiver" title="Permalink to this headline">¶</a></h6>
+<p>Get information about a archiver.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">info</span> <span class="n">archiver</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">flags</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fullpath</span><span class="p">]</span>
+                        <span class="p">{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">}</span>
+</pre></div>
+</div>
+<section id="Positional Arguments_repeat3">
+<h7>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat3" title="Permalink to this headline">¶</a></h7>
+<dl class="option-list">
+<dt><kbd>language</kbd></dt>
+<dd><p>Possible choices: c, c++, cpp, cxx, fortran</p>
+<p>Language to get tool information for.</p>
+</dd>
+</dl>
+</section>
+<section id="Named Arguments_repeat5">
+<h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat5" title="Permalink to this headline">¶</a></h7>
+<dl class="option-list">
+<dt><kbd>--toolname</kbd></dt>
+<dd><p>Name of tool to get information for. If not provided, information for the default tool will be returned.</p>
+</dd>
+<dt><kbd>--flags</kbd></dt>
+<dd><p>Display the flags that yggdrasil will  pass to the tool when it is called.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--fullpath</kbd></dt>
+<dd><p>Get the full path to the tool exectuable.</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+</section>
+</section>
+<section id="validate">
+<h4>validate<a class="headerlink" href="#validate" title="Permalink to this headline">¶</a></h4>
+<p>Validate a set of YAML specification files for an integration.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">validate</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">model</span><span class="o">-</span><span class="n">only</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">model</span><span class="o">-</span><span class="n">submission</span><span class="p">]</span>
+                   <span class="n">yamlfile</span> <span class="p">[</span><span class="n">yamlfile</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="Positional Arguments_repeat4">
+<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat4" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>yamlfile</kbd></dt>
+<dd><p>One or more YAML specification files.</p>
+</dd>
+</dl>
+</section>
+<section id="Named Arguments_repeat6">
+<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat6" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>--model-only</kbd></dt>
+<dd><p>Validate a YAML containing an isolated model without ensuring that it is part of a complete integration.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--model-submission</kbd></dt>
+<dd><p>Validate a YAML against the schema for submissions to the yggdrasil model repository.</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="compile">
+<h4>compile<a class="headerlink" href="#compile" title="Permalink to this headline">¶</a></h4>
+<p>Compile a program from source files for use in an yggdrasil integration.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="nb">compile</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">language</span> <span class="p">{</span><span class="kc">None</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">r</span><span class="p">}]</span>
+                  <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">flags</span> <span class="p">[</span><span class="n">FLAGS</span> <span class="p">[</span><span class="n">FLAGS</span> <span class="o">...</span><span class="p">]]]</span>
+                  <span class="p">[</span><span class="o">--</span><span class="n">use</span><span class="o">-</span><span class="n">ccache</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">Rpkg</span><span class="o">-</span><span class="n">language</span> <span class="n">RPKG_LANGUAGE</span><span class="p">]</span>
+                  <span class="n">source</span> <span class="p">[</span><span class="n">source</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="Positional Arguments_repeat5">
+<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat5" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>source</kbd></dt>
+<dd><p>One or more source files or the directory containing an R package.</p>
+</dd>
+</dl>
+</section>
+<section id="Named Arguments_repeat7">
+<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat7" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>--language</kbd></dt>
+<dd><p>Possible choices: None, c, c++, cpp, cxx, fortran, R, r</p>
+<p>Language of the source code. If not provided, the language will be determined from the source extension.</p>
+</dd>
+<dt><kbd>--toolname</kbd></dt>
+<dd><p>Name of compilation tool that should be used</p>
+</dd>
+<dt><kbd>--flags</kbd></dt>
+<dd><p>Additional flags that should be added to the compilation command</p>
+</dd>
+<dt><kbd>--use-ccache</kbd></dt>
+<dd><p>Run compilation with ccache.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--Rpkg-language</kbd></dt>
+<dd><p>Language that R package is written in (only used if the specified language is R).</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="compile-deps">
+<h4>compile-deps<a class="headerlink" href="#compile-deps" title="Permalink to this headline">¶</a></h4>
+<p>Compile yggdrasil dependency libraries. Existing libraries are first deleted.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="nb">compile</span><span class="o">-</span><span class="n">deps</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="n">language</span> <span class="p">[</span><span class="n">language</span> <span class="o">...</span><span class="p">]]</span>
+</pre></div>
+</div>
+<section id="Positional Arguments_repeat6">
+<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat6" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>language</kbd></dt>
+<dd><p>One or more languages to compile dependencies for.</p>
+<p>Default: [‘all’]</p>
+</dd>
+</dl>
+</section>
+<section id="Named Arguments_repeat8">
+<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat8" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>--toolname</kbd></dt>
+<dd><p>Name of compilation tool that should be used</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="clean">
+<h4>clean<a class="headerlink" href="#clean" title="Permalink to this headline">¶</a></h4>
+<p>Remove dependency libraries compiled by yggdrasil.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">clean</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="n">language</span> <span class="p">[</span><span class="n">language</span> <span class="o">...</span><span class="p">]]</span>
+</pre></div>
+</div>
+<section id="Positional Arguments_repeat7">
+<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat7" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>language</kbd></dt>
+<dd><p>One or more languages to clean up dependencies for.</p>
+<p>Default: [‘all’]</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="install">
+<h4>install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h4>
+<p>Complete yggdrasil installation for one or more languages.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">install</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="config">
+<h4>config<a class="headerlink" href="#config" title="Permalink to this headline">¶</a></h4>
+<p>Update the user config file.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">config</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">languages</span> <span class="n">LANGUAGES_FLAG</span> <span class="p">[</span><span class="n">LANGUAGES_FLAG</span> <span class="o">...</span><span class="p">]]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">show</span><span class="o">-</span><span class="n">file</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">remove</span><span class="o">-</span><span class="n">file</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">overwrite</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">languages</span> <span class="p">{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">r</span><span class="p">,</span><span class="n">matlab</span><span class="p">,</span><span class="n">python</span><span class="p">,</span><span class="n">cmake</span><span class="p">,</span><span class="n">make</span><span class="p">,</span><span class="n">lpy</span><span class="p">,</span><span class="n">osr</span><span class="p">,</span><span class="n">sbml</span><span class="p">,</span><span class="n">dummy</span><span class="p">,</span><span class="n">executable</span><span class="p">,</span><span class="n">mpi</span><span class="p">,</span><span class="n">timesync</span><span class="p">}</span> <span class="p">[{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">r</span><span class="p">,</span><span class="n">matlab</span><span class="p">,</span><span class="n">python</span><span class="p">,</span><span class="n">cmake</span><span class="p">,</span><span class="n">make</span><span class="p">,</span><span class="n">lpy</span><span class="p">,</span><span class="n">osr</span><span class="p">,</span><span class="n">sbml</span><span class="p">,</span><span class="n">dummy</span><span class="p">,</span><span class="n">executable</span><span class="p">,</span><span class="n">mpi</span><span class="p">,</span><span class="n">timesync</span><span class="p">}</span> <span class="o">...</span><span class="p">]]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">languages</span> <span class="p">{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">r</span><span class="p">,</span><span class="n">matlab</span><span class="p">,</span><span class="n">python</span><span class="p">,</span><span class="n">cmake</span><span class="p">,</span><span class="n">make</span><span class="p">,</span><span class="n">lpy</span><span class="p">,</span><span class="n">osr</span><span class="p">,</span><span class="n">sbml</span><span class="p">,</span><span class="n">dummy</span><span class="p">,</span><span class="n">executable</span><span class="p">,</span><span class="n">mpi</span><span class="p">,</span><span class="n">timesync</span><span class="p">}</span> <span class="p">[{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">r</span><span class="p">,</span><span class="n">matlab</span><span class="p">,</span><span class="n">python</span><span class="p">,</span><span class="n">cmake</span><span class="p">,</span><span class="n">make</span><span class="p">,</span><span class="n">lpy</span><span class="p">,</span><span class="n">osr</span><span class="p">,</span><span class="n">sbml</span><span class="p">,</span><span class="n">dummy</span><span class="p">,</span><span class="n">executable</span><span class="p">,</span><span class="n">mpi</span><span class="p">,</span><span class="n">timesync</span><span class="p">}</span> <span class="o">...</span><span class="p">]]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">quiet</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">allow</span><span class="o">-</span><span class="n">multiple</span><span class="o">-</span><span class="n">omp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dont</span><span class="o">-</span><span class="n">allow</span><span class="o">-</span><span class="n">multiple</span><span class="o">-</span><span class="n">omp</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">c</span><span class="o">-</span><span class="n">compiler</span> <span class="n">C_COMPILER</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">c</span><span class="o">++-</span><span class="n">compiler</span> <span class="n">C</span><span class="o">++</span><span class="n">_COMPILER</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">fortran</span><span class="o">-</span><span class="n">compiler</span> <span class="n">FORTRAN_COMPILER</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">c</span><span class="o">-</span><span class="n">linker</span> <span class="n">C_LINKER</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">c</span><span class="o">++-</span><span class="n">linker</span> <span class="n">C</span><span class="o">++</span><span class="n">_LINKER</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fortran</span><span class="o">-</span><span class="n">linker</span> <span class="n">FORTRAN_LINKER</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">c</span><span class="o">-</span><span class="n">archiver</span> <span class="n">C_ARCHIVER</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">c</span><span class="o">++-</span><span class="n">archiver</span> <span class="n">C</span><span class="o">++</span><span class="n">_ARCHIVER</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">fortran</span><span class="o">-</span><span class="n">archiver</span> <span class="n">FORTRAN_ARCHIVER</span><span class="p">]</span>
+                 <span class="p">[</span><span class="n">languages</span> <span class="p">[</span><span class="n">languages</span> <span class="o">...</span><span class="p">]]</span>
+</pre></div>
+</div>
+<section id="Positional Arguments_repeat8">
+<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat8" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>languages</kbd></dt>
+<dd><p>One or more languages that should be configured.</p>
+<p>Default: []</p>
+</dd>
+</dl>
+</section>
+<section id="Named Arguments_repeat9">
+<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat9" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>--languages</kbd></dt>
+<dd><p>One or more languages that should be configured.</p>
+<p>Default: []</p>
+</dd>
+<dt><kbd>--show-file</kbd></dt>
+<dd><p>Print the path to the config file without updating it.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--remove-file</kbd></dt>
+<dd><p>Remove the existing config file and return.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--overwrite</kbd></dt>
+<dd><p>Overwrite the existing file.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--disable-languages</kbd></dt>
+<dd><p>Possible choices: c, c++, cpp, cxx, fortran, R, r, matlab, python, cmake, make, lpy, osr, sbml, dummy, executable, mpi, timesync</p>
+<p>One or more languages that should be disabled.</p>
+<p>Default: []</p>
+</dd>
+<dt><kbd>--enable-languages</kbd></dt>
+<dd><p>Possible choices: c, c++, cpp, cxx, fortran, R, r, matlab, python, cmake, make, lpy, osr, sbml, dummy, executable, mpi, timesync</p>
+<p>One or more languages that should be enabled.</p>
+<p>Default: []</p>
+</dd>
+<dt><kbd>--quiet, -q</kbd></dt>
+<dd><p>Suppress output.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--allow-multiple-omp</kbd></dt>
+<dd><p>Have yggdrasil set the environment variable KMP_DUPLICATE_LIB_OK to ‘True’ during model runs to disable errors resembling “OMP: Error #15: Initializing libomp.dylib…” that result from having multiple versions of OpenMP loaded during runtime.</p>
+</dd>
+<dt><kbd>--dont-allow-multiple-omp</kbd></dt>
+<dd><p>Don’t set the KMP_DUPLICATE_LIB_OK environment variable when running models (see help for ‘–allow-multiple-omp’ for more information).</p>
+</dd>
+<dt><kbd>--c-compiler</kbd></dt>
+<dd><p>Name or path to compiler that should be used to compile models written in c.</p>
+</dd>
+<dt><kbd>--c++-compiler</kbd></dt>
+<dd><p>Name or path to compiler that should be used to compile models written in c++.</p>
+</dd>
+<dt><kbd>--fortran-compiler</kbd></dt>
+<dd><p>Name or path to compiler that should be used to compile models written in fortran.</p>
+</dd>
+<dt><kbd>--c-linker</kbd></dt>
+<dd><p>Name or path to linker that should be used to link models written in c.</p>
+</dd>
+<dt><kbd>--c++-linker</kbd></dt>
+<dd><p>Name or path to linker that should be used to link models written in c++.</p>
+</dd>
+<dt><kbd>--fortran-linker</kbd></dt>
+<dd><p>Name or path to linker that should be used to link models written in fortran.</p>
+</dd>
+<dt><kbd>--c-archiver</kbd></dt>
+<dd><p>Name or path to archiver that should be used to create static libraries for models written in c.</p>
+</dd>
+<dt><kbd>--c++-archiver</kbd></dt>
+<dd><p>Name or path to archiver that should be used to create static libraries for models written in c++.</p>
+</dd>
+<dt><kbd>--fortran-archiver</kbd></dt>
+<dd><p>Name or path to archiver that should be used to create static libraries for models written in fortran.</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="metaschema">
+<h4>metaschema<a class="headerlink" href="#metaschema" title="Permalink to this headline">¶</a></h4>
+<p>Regenerate the yggdrasil metaschema.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">metaschema</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="schema">
+<h4>schema<a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h4>
+<p>Regenerate the yggdrasil schema.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">schema</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">only</span><span class="o">-</span><span class="n">constants</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="Named Arguments_repeat10">
+<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat10" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>--only-constants</kbd></dt>
+<dd><p>Only update the constants.py file without updating the schema.</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="model-form-schema">
+<h4>model-form-schema<a class="headerlink" href="#model-form-schema" title="Permalink to this headline">¶</a></h4>
+<p>Save/print the JSON schema for generating the model specification form.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">model</span><span class="o">-</span><span class="n">form</span><span class="o">-</span><span class="n">schema</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">file</span> <span class="n">FILE</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="Named Arguments_repeat11">
+<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat11" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>--file</kbd></dt>
+<dd><p>Path to file where the schema should be saved.</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="dev-update">
+<h4>dev-update<a class="headerlink" href="#dev-update" title="Permalink to this headline">¶</a></h4>
+<p>Perform cleanup and reinitialization following an update to the code during development.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">dev</span><span class="o">-</span><span class="n">update</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="test">
+<h4>test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h4>
+<p>Run yggdrasil tests.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">test</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">withcoverage</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">nocapture</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">stop</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">nologcapture</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">noflaky</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">ci</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">test</span><span class="o">-</span><span class="n">suite</span> <span class="p">{</span><span class="nb">all</span><span class="p">,</span><span class="n">top</span><span class="p">,</span><span class="n">examples</span><span class="p">,</span><span class="n">examples_part1</span><span class="p">,</span><span class="n">examples_part2</span><span class="p">,</span><span class="n">demos</span><span class="p">,</span><span class="n">types</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span><span class="n">connections</span><span class="p">,</span><span class="n">models</span><span class="p">,</span><span class="n">mpi</span><span class="p">}</span> <span class="p">[{</span><span class="nb">all</span><span class="p">,</span><span class="n">top</span><span class="p">,</span><span class="n">examples</span><span class="p">,</span><span class="n">examples_part1</span><span class="p">,</span><span class="n">examples_part2</span><span class="p">,</span><span class="n">demos</span><span class="p">,</span><span class="n">types</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span><span class="n">connections</span><span class="p">,</span><span class="n">models</span><span class="p">,</span><span class="n">mpi</span><span class="p">}</span> <span class="o">...</span><span class="p">]]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">pytest</span><span class="o">-</span><span class="n">config</span> <span class="n">PYTEST_CONFIG</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cov</span><span class="o">-</span><span class="n">config</span> <span class="n">COV_CONFIG</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">ignore</span> <span class="n">IGNORE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">rootdir</span> <span class="n">ROOTDIR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">count</span> <span class="n">COUNT</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">additional</span><span class="o">-</span><span class="n">info</span> <span class="n">ADDITIONAL_INFO</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">mpi</span> <span class="n">WITH_MPI</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">write</span><span class="o">-</span><span class="n">script</span> <span class="n">WRITE_SCRIPT</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">separate</span><span class="o">-</span><span class="n">test</span> <span class="n">SEPARATE_TESTS</span> <span class="p">[</span><span class="n">SEPARATE_TESTS</span> <span class="o">...</span><span class="p">]]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">loglevel</span> <span class="n">LOGLEVEL</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">rmq</span><span class="o">-</span><span class="n">loglevel</span> <span class="n">RMQ_LOGLEVEL</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">client</span><span class="o">-</span><span class="n">loglevel</span> <span class="n">CLIENT_LOGLEVEL</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">validate</span><span class="o">-</span><span class="n">components</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">validate</span><span class="o">-</span><span class="n">messages</span> <span class="p">{</span><span class="kc">False</span><span class="p">,</span><span class="kc">True</span><span class="p">,</span><span class="n">First</span><span class="p">}]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">namespace</span> <span class="n">NAMESPACE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">host</span> <span class="n">HOST</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">vhost</span> <span class="n">VHOST</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">user</span> <span class="n">USER</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">password</span> <span class="n">PASSWORD</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cluster</span> <span class="n">CLUSTER</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">examples</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">demos</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">language</span> <span class="n">LANGUAGE</span> <span class="p">[</span><span class="n">LANGUAGE</span> <span class="o">...</span><span class="p">]]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">skip</span><span class="o">-</span><span class="n">language</span> <span class="n">SKIP_LANGUAGE</span> <span class="p">[</span><span class="n">SKIP_LANGUAGE</span> <span class="o">...</span><span class="p">]]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">long</span><span class="o">-</span><span class="n">running</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">production</span><span class="o">-</span><span class="n">runs</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">default</span><span class="o">-</span><span class="n">comm</span> <span class="n">DEFAULT_COMM</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">production</span><span class="o">-</span><span class="n">run</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="Named Arguments_repeat12">
+<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat12" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>--withcoverage, --with-coverage</kbd></dt>
+<dd><p>Record coverage during tests.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--verbose, -v</kbd></dt>
+<dd><p>Increase verbosity of output from the test runner</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--nocapture, -s</kbd></dt>
+<dd><p>Don’t capture output from tests.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--stop, -x</kbd></dt>
+<dd><p>Stop after first test failure.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--nologcapture</kbd></dt>
+<dd><p>Don’t capture output from log messages generated during tests.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--noflaky, --no-flaky</kbd></dt>
+<dd><p>Don’t re-run flaky tests.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--ci</kbd></dt>
+<dd><p>Perform addition operations required for testing on continuous integration services.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--test-suite, --test-suites</kbd></dt>
+<dd><p>Possible choices: all, top, examples, examples_part1, examples_part2, demos, types, timing, connections, models, mpi</p>
+<p>Test suite(s) that should be run.</p>
+</dd>
+<dt><kbd>--pytest-config, -c</kbd></dt>
+<dd><p>Pytest configuration file that should be used instead of the defaults.</p>
+</dd>
+<dt><kbd>--cov-config</kbd></dt>
+<dd><p>Config file for coverage. Default: .coveragerc</p>
+</dd>
+<dt><kbd>--ignore</kbd></dt>
+<dd><p>Ignore path during collection.</p>
+</dd>
+<dt><kbd>--rootdir</kbd></dt>
+<dd><p>Define root directory for tests.</p>
+</dd>
+<dt><kbd>--count</kbd></dt>
+<dd><p>Number of times to repeat a test.</p>
+<p>Default: 1</p>
+</dd>
+<dt><kbd>--additional-info, -r</kbd></dt>
+<dd><p>Display additional info for test results.</p>
+<p>Default: “”</p>
+</dd>
+<dt><kbd>--with-mpi, --mpi-nproc</kbd></dt>
+<dd><p>Number of MPI processes to run tests on.</p>
+<p>Default: 1</p>
+</dd>
+<dt><kbd>--write-script</kbd></dt>
+<dd><p>Name of script that should be created to run tests.</p>
+</dd>
+<dt><kbd>--separate-test, --separate-tests</kbd></dt>
+<dd><p>Flags defining tests that should be run separately.</p>
+</dd>
+<dt><kbd>--loglevel</kbd></dt>
+<dd><p>Logging level for yggdrasil operations.</p>
+</dd>
+<dt><kbd>--rmq-loglevel, --rmqloglevel</kbd></dt>
+<dd><p>Logging level for RabbitMQ operations.</p>
+</dd>
+<dt><kbd>--client-loglevel, --clientloglevel</kbd></dt>
+<dd><p>Logging level for yggdrasil operations on model processes.</p>
+</dd>
+<dt><kbd>--validate-components, --validatecomponents</kbd></dt>
+<dd><p>Validate components on creation using their JSON schema (Decreases performance).</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--validate-messages, --validatemessages</kbd></dt>
+<dd><p>Possible choices: False, True, First</p>
+<p>Which messages should be validated during communication. ‘True’: all messages (decreases performance), ‘False’: no messages, or ‘First’: only the first message a comm sends/receives.</p>
+</dd>
+<dt><kbd>--namespace</kbd></dt>
+<dd><p>RabbitMQ namespace.</p>
+</dd>
+<dt><kbd>--host</kbd></dt>
+<dd><p>RabbitMQ host address.</p>
+</dd>
+<dt><kbd>--vhost</kbd></dt>
+<dd><p>RabbitMQ virtual host address.</p>
+</dd>
+<dt><kbd>--user</kbd></dt>
+<dd><p>RabbitMQ username.</p>
+</dd>
+<dt><kbd>--password</kbd></dt>
+<dd><p>RabbitMQ password.</p>
+</dd>
+<dt><kbd>--cluster</kbd></dt>
+<dd><p>Cluster that should be used.</p>
+</dd>
+<dt><kbd>--with-examples, --enable-examples, --withexamples, --enableexamples</kbd></dt>
+<dd><p>Run example tests when encountered.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--with-demos, --enable-demos, --withdemos, --enabledemos</kbd></dt>
+<dd><p>Run demo tests when encountered.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--language, --languages</kbd></dt>
+<dd><p>Language(s) that sould not be tested.</p>
+<p>Default: []</p>
+</dd>
+<dt><kbd>--skip-language, --skip-languages, --skiplanguage, --skiplanguages</kbd></dt>
+<dd><p>Language(s) that sould not be tested.</p>
+<p>Default: []</p>
+</dd>
+<dt><kbd>--long-running, --enable-long, --longrunning, --enablelong</kbd></dt>
+<dd><p>Run long tests when encounterd.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--enable-production-runs, --enableproductionruns</kbd></dt>
+<dd><p>Run production level tests when encountered.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--default-comm, --defaultcomm</kbd></dt>
+<dd><p>Comm type that should be used by default.</p>
+</dd>
+<dt><kbd>--production-run</kbd></dt>
+<dd><p>Turn off safe guards in order to improve performance. This is equivalent to ‘–validate-components –validate-messages=True’</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--debug</kbd></dt>
+<dd><p>Turn on debugging utilties including increased logging and validation. This is equivalent to ‘–loglevel=DEBUG –client-loglevel=DEBUG –validate-components=False –validate-messages=False’</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="timing">
+<h4>timing<a class="headerlink" href="#timing" title="Permalink to this headline">¶</a></h4>
+<p>Create performance plots using timing results.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">timing</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">{</span><span class="n">commtype</span><span class="p">,</span><span class="n">language</span><span class="p">,</span><span class="n">os</span><span class="p">,</span><span class="n">python</span><span class="p">,</span><span class="n">lang2019</span><span class="p">}</span> <span class="o">...</span>
+</pre></div>
+</div>
+<section id="comparison">
+<h5>comparison<a class="headerlink" href="#comparison" title="Permalink to this headline">¶</a></h5>
+<p>Comparison plot that should be created.</p>
+<dl class="option-list">
+<dt><kbd>comparison</kbd></dt>
+<dd><p>Possible choices: commtype, language, os, python, lang2019</p>
+</dd>
+</dl>
+</section>
+<section id="Sub-commands:_repeat2">
+<h5>Sub-commands:<a class="headerlink" href="#Sub-commands:_repeat2" title="Permalink to this headline">¶</a></h5>
+<section id="commtype">
+<h6>commtype<a class="headerlink" href="#commtype" title="Permalink to this headline">¶</a></h6>
+<p>Compare different communication avenues.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">timing</span> <span class="n">commtype</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="language">
+<h6>language<a class="headerlink" href="#language" title="Permalink to this headline">¶</a></h6>
+<p>Compare different programming languages.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">timing</span> <span class="n">language</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="os">
+<h6>os<a class="headerlink" href="#os" title="Permalink to this headline">¶</a></h6>
+<p>Compare different operating systems.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">timing</span> <span class="n">os</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="python">
+<h6>python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h6>
+<p>Compare different versions of Python.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">timing</span> <span class="n">python</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="lang2019">
+<h6>lang2019<a class="headerlink" href="#lang2019" title="Permalink to this headline">¶</a></h6>
+<p>Create plots from Lang (2019) paper.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">timing</span> <span class="n">lang2019</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="gha">
+<h4>gha<a class="headerlink" href="#gha" title="Permalink to this headline">¶</a></h4>
+<p>Generate a Github Actions (GHA) workflow yaml file from a version of the file that uses anchors (not supported by GHA as of 2021-01-14).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">gha</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">base</span> <span class="n">BASE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dest</span> <span class="n">DEST</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="Named Arguments_repeat13">
+<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat13" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>--base, --base-file</kbd></dt>
+<dd><p>Version of GHA workflow yaml that contains anchors.</p>
+</dd>
+<dt><kbd>--dest</kbd></dt>
+<dd><p>Name of target GHA workflow yaml file.</p>
+</dd>
+<dt><kbd>--verbose</kbd></dt>
+<dd><p>Print yaml contents.</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="integration-service-manager">
+<h4>integration-service-manager<a class="headerlink" href="#integration-service-manager" title="Permalink to this headline">¶</a></h4>
+<p>Start or manage a integration service manager.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">manager</span><span class="o">-</span><span class="n">name</span> <span class="n">MANAGER_NAME</span><span class="p">]</span>
+                                      <span class="p">[</span><span class="o">--</span><span class="n">service</span><span class="o">-</span><span class="nb">type</span> <span class="p">{</span><span class="n">flask</span><span class="p">,</span><span class="n">rmq</span><span class="p">}]</span>
+                                      <span class="p">[</span><span class="o">--</span><span class="n">commtype</span> <span class="n">COMMTYPE</span><span class="p">]</span>
+                                      <span class="p">[</span><span class="o">--</span><span class="n">address</span> <span class="n">ADDRESS</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">port</span> <span class="n">PORT</span><span class="p">]</span>
+                                      <span class="p">{</span><span class="n">start</span><span class="p">,</span><span class="n">stop</span><span class="p">,</span><span class="n">status</span><span class="p">,</span><span class="n">register</span><span class="p">,</span><span class="n">unregister</span><span class="p">}</span>
+                                      <span class="o">...</span>
+</pre></div>
+</div>
+<section id="Named Arguments_repeat14">
+<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat14" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>--manager-name</kbd></dt>
+<dd><p>Name that will be used to identify the service manager.</p>
+</dd>
+<dt><kbd>--service-type</kbd></dt>
+<dd><p>Possible choices: flask, rmq</p>
+<p>Type of service that should be started. If not provided, the default will be the (‘services’, ‘default_type’) configuration option, if set, and will otherwise be ‘flask’.</p>
+</dd>
+<dt><kbd>--commtype</kbd></dt>
+<dd><p>Type of communicator that should be used for connections to services. If not provided, the default will be determined by the (‘services’, ‘default_comm’) configuration option, if set.</p>
+</dd>
+<dt><kbd>--address</kbd></dt>
+<dd><p>URL for requests to the service manager. If not provided, the default will be determined by the (‘services’, ‘default_type’) configuration option, if set, and based on the selected ‘service-type’, if not. For a service-type of ‘flask’, this should be the http address with the port that should be used and the default will be ‘<a class="reference external" href="http://localhost">http://localhost</a>:{port}’. For a service-type of ‘rmq’, this should be an amqp broker address and the default will be ‘amqp://guest:guest&#64;localhost:{port}/%2f’.</p>
+</dd>
+<dt><kbd>--port</kbd></dt>
+<dd><p>Port that should be used to access the app. Defaults to 5000 for a flask service manager and 5672 for a RabbitMQ service manager if not set via the PORT environment variable.</p>
+</dd>
+</dl>
+</section>
+<section id="action">
+<h5>action<a class="headerlink" href="#action" title="Permalink to this headline">¶</a></h5>
+<p>Management action to take.</p>
+<dl class="option-list">
+<dt><kbd>action</kbd></dt>
+<dd><p>Possible choices: start, stop, status, register, unregister</p>
+</dd>
+</dl>
+</section>
+<section id="Sub-commands:_repeat3">
+<h5>Sub-commands:<a class="headerlink" href="#Sub-commands:_repeat3" title="Permalink to this headline">¶</a></h5>
+<section id="start">
+<h6>start<a class="headerlink" href="#start" title="Permalink to this headline">¶</a></h6>
+<p>Start an integration service manager and/or integration service.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span> <span class="n">start</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">remote</span><span class="o">-</span><span class="n">url</span> <span class="n">REMOTE_URL</span><span class="p">]</span>
+                                            <span class="p">[</span><span class="o">--</span><span class="n">integration</span><span class="o">-</span><span class="n">name</span> <span class="n">INTEGRATION_NAME</span><span class="p">]</span>
+                                            <span class="p">[</span><span class="o">--</span><span class="n">integration</span><span class="o">-</span><span class="n">yamls</span> <span class="n">INTEGRATION_YAMLS</span> <span class="p">[</span><span class="n">INTEGRATION_YAMLS</span> <span class="o">...</span><span class="p">]]</span>
+                                            <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">coverage</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="Named Arguments_repeat15">
+<h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat15" title="Permalink to this headline">¶</a></h7>
+<dl class="option-list">
+<dt><kbd>--remote-url</kbd></dt>
+<dd><p>URL that will be used to access the service manager and running integrations by remote requests. If not provided, the environment variable YGGDRASIL_SERVICE_HOST_URL will be used if it is set. If it is not set, the local <code class="docutils literal notranslate"><span class="pre">address</span></code> will be used under the assumption that the service manager and integration services will only be connected to by local integrations.</p>
+</dd>
+<dt><kbd>--integration-name</kbd></dt>
+<dd><p>Name of integration to start. If not provided, a service manager will be started.</p>
+</dd>
+<dt><kbd>--integration-yamls</kbd></dt>
+<dd><p>One or more YAML specification files defining the integration. This argument may be omitted if ‘name’ refers to a registered integration.</p>
+</dd>
+<dt><kbd>--with-coverage</kbd></dt>
+<dd><p>Enable coverage cleanup for testing.</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="stop">
+<h6>stop<a class="headerlink" href="#stop" title="Permalink to this headline">¶</a></h6>
+<p>Stop an integration service manager or an integration service.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span> <span class="n">stop</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
+                                           <span class="p">[</span><span class="o">--</span><span class="n">integration</span><span class="o">-</span><span class="n">name</span> <span class="n">INTEGRATION_NAME</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="Named Arguments_repeat16">
+<h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat16" title="Permalink to this headline">¶</a></h7>
+<dl class="option-list">
+<dt><kbd>--integration-name</kbd></dt>
+<dd><p>Name of integration to stop. If not provided, the service manager will be stopped as will all of the running services.</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="status">
+<h6>status<a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h6>
+<p>Get list of available services and the status of any running services.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span> <span class="n">status</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="register">
+<h6>register<a class="headerlink" href="#register" title="Permalink to this headline">¶</a></h6>
+<p>Register an integration with the service manager.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span> <span class="n">register</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
+                                               <span class="n">integration</span><span class="o">-</span><span class="n">name</span>
+                                               <span class="p">[</span><span class="n">integration</span><span class="o">-</span><span class="n">yamls</span> <span class="p">[</span><span class="n">integration</span><span class="o">-</span><span class="n">yamls</span> <span class="o">...</span><span class="p">]]</span>
+</pre></div>
+</div>
+<section id="Positional Arguments_repeat9">
+<h7>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat9" title="Permalink to this headline">¶</a></h7>
+<dl class="option-list">
+<dt><kbd>integration-name</kbd></dt>
+<dd><p>The name that the integration should be registered under or the path to a YAML file containing a list of one or more mappings between name and YAML specification files for integrations that should be registered.</p>
+</dd>
+<dt><kbd>integration-yamls</kbd></dt>
+<dd><p>One or more YAML specification files defining the integration.</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="unregister">
+<h6>unregister<a class="headerlink" href="#unregister" title="Permalink to this headline">¶</a></h6>
+<p>Unregister an integration with the service manager.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span> <span class="n">unregister</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">integration</span><span class="o">-</span><span class="n">name</span>
+</pre></div>
+</div>
+<section id="Positional Arguments_repeat10">
+<h7>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat10" title="Permalink to this headline">¶</a></h7>
+<dl class="option-list">
+<dt><kbd>integration-name</kbd></dt>
+<dd><p>The name of the integration to remove from the registry or the path to a YAML file containing a list of one or more mappings between integration name and YAML specification files for integrations that should be unregistered.</p>
+</dd>
+</dl>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section id="yggcc-command">
+<span id="cli-yggcc-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggcc</span></code> Command<a class="headerlink" href="#yggcc-command" title="Permalink to this headline">¶</a></h2>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">compile</span></code></p>
+</section>
+<section id="yggccflags-command">
+<span id="cli-yggccflags-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggccflags</span></code> Command<a class="headerlink" href="#yggccflags-command" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggccflags</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>--cpp</kbd></dt>
+<dd><p>Get the compilation flags used for C++ programs.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--toolname</kbd></dt>
+<dd><p>Name of the tool that associated flags be returned for.</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="yggcctool-command">
+<span id="cli-yggcctool-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggcctool</span></code> Command<a class="headerlink" href="#yggcctool-command" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggcctool</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fullpath</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>--cpp</kbd></dt>
+<dd><p>Get the compiler used for C++ programs.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--fullpath</kbd></dt>
+<dd><p>Get the full path to the tool exectuable.</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="yggclean-command">
+<span id="cli-yggclean-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggclean</span></code> Command<a class="headerlink" href="#yggclean-command" title="Permalink to this headline">¶</a></h2>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">clean</span></code></p>
+</section>
+<section id="yggcompile-command">
+<span id="cli-yggcompile-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggcompile</span></code> Command<a class="headerlink" href="#yggcompile-command" title="Permalink to this headline">¶</a></h2>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">compile-deps</span></code></p>
+</section>
+<section id="yggconfig-command">
+<span id="cli-yggconfig-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> Command<a class="headerlink" href="#yggconfig-command" title="Permalink to this headline">¶</a></h2>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">config</span></code></p>
+</section>
+<section id="yggdevup-command">
+<span id="cli-yggdevup-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggdevup</span></code> Command<a class="headerlink" href="#yggdevup-command" title="Permalink to this headline">¶</a></h2>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">dev-update</span></code></p>
+</section>
+<section id="ygggha-command">
+<span id="cli-ygggha-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">ygggha</span></code> Command<a class="headerlink" href="#ygggha-command" title="Permalink to this headline">¶</a></h2>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">gha</span></code></p>
+</section>
+<section id="ygginfo-command">
+<span id="cli-ygginfo-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">ygginfo</span></code> Command<a class="headerlink" href="#ygginfo-command" title="Permalink to this headline">¶</a></h2>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">info</span></code></p>
+</section>
+<section id="ygginstall-command">
+<span id="cli-ygginstall-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">ygginstall</span></code> Command<a class="headerlink" href="#ygginstall-command" title="Permalink to this headline">¶</a></h2>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">install</span></code></p>
+</section>
+<section id="yggldflags-command">
+<span id="cli-yggldflags-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggldflags</span></code> Command<a class="headerlink" href="#yggldflags-command" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggldflags</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>--cpp</kbd></dt>
+<dd><p>Get the compilation flags used for C++ programs.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--toolname</kbd></dt>
+<dd><p>Name of the tool that associated flags be returned for.</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="yggldtool-command">
+<span id="cli-yggldtool-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggldtool</span></code> Command<a class="headerlink" href="#yggldtool-command" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggldtool</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fullpath</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>--cpp</kbd></dt>
+<dd><p>Get the linker used for C++ programs.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--fullpath</kbd></dt>
+<dd><p>Get the full path to the tool exectuable.</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="yggmetaschema-command">
+<span id="cli-yggmetaschema-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggmetaschema</span></code> Command<a class="headerlink" href="#yggmetaschema-command" title="Permalink to this headline">¶</a></h2>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">metaschema</span></code></p>
+</section>
+<section id="yggmodelform-command">
+<span id="cli-yggmodelform-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggmodelform</span></code> Command<a class="headerlink" href="#yggmodelform-command" title="Permalink to this headline">¶</a></h2>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">model-form-schema</span></code></p>
+</section>
+<section id="yggrun-command">
+<span id="cli-yggrun-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggrun</span></code> Command<a class="headerlink" href="#yggrun-command" title="Permalink to this headline">¶</a></h2>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">run</span></code></p>
+</section>
+<section id="yggschema-command">
+<span id="cli-yggschema-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggschema</span></code> Command<a class="headerlink" href="#yggschema-command" title="Permalink to this headline">¶</a></h2>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">schema</span></code></p>
+</section>
+<section id="yggtest-command">
+<span id="cli-yggtest-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggtest</span></code> Command<a class="headerlink" href="#yggtest-command" title="Permalink to this headline">¶</a></h2>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">test</span></code></p>
+</section>
+<section id="yggvalidate-command">
+<span id="cli-yggvalidate-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggvalidate</span></code> Command<a class="headerlink" href="#yggvalidate-command" title="Permalink to this headline">¶</a></h2>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">validate</span></code></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="units.html" class="btn btn-neutral float-left" title="Units" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="hpc.html" class="btn btn-neutral float-right" title="High Performance Computing (HPC)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

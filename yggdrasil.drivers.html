@@ -1,75 +1,35 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.drivers package &mdash; yggdrasil v1.7.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.drivers package &mdash; yggdrasil v1.8.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.7.0
+                v1.8.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -77,18 +37,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
@@ -103,7 +52,10 @@
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface (CLI)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">Docker Containers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
@@ -114,76 +66,36 @@
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>yggdrasil.drivers package</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/yggdrasil.drivers.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="yggdrasil-drivers-package">
+             
+  <section id="yggdrasil-drivers-package">
 <h1>yggdrasil.drivers package<a class="headerlink" href="#yggdrasil-drivers-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
+<section id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
@@ -215,11 +127,11 @@
 </li>
 </ul>
 </div>
-</div>
-<div class="section" id="submodules">
+</section>
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-yggdrasil.drivers.BuildModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.BuildModelDriver">
 <span id="yggdrasil-drivers-buildmodeldriver-module"></span><h2>yggdrasil.drivers.BuildModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.BuildModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.BuildModelDriver.BuildModelDriver">
@@ -869,8 +781,8 @@ creating one as necessary.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.CMakeModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.CMakeModelDriver">
 <span id="yggdrasil-drivers-cmakemodeldriver-module"></span><h2>yggdrasil.drivers.CMakeModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.CMakeModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.CMakeModelDriver.CMakeBuilder">
@@ -1714,8 +1626,8 @@ class’s method.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.CModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.CModelDriver">
 <span id="yggdrasil-drivers-cmodeldriver-module"></span><h2>yggdrasil.drivers.CModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.CModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.CModelDriver.ARArchiver">
@@ -3336,8 +3248,8 @@ checking environment variables for default settings.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.CPPModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.CPPModelDriver">
 <span id="yggdrasil-drivers-cppmodeldriver-module"></span><h2>yggdrasil.drivers.CPPModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.CPPModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.CPPModelDriver.CPPCompilerBase">
@@ -3976,8 +3888,8 @@ checking environment variables for default settings.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.CompiledModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.CompiledModelDriver">
 <span id="yggdrasil-drivers-compiledmodeldriver-module"></span><h2>yggdrasil.drivers.CompiledModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.CompiledModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.CompiledModelDriver.ArchiverBase">
@@ -7328,8 +7240,8 @@ ignored.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.ConnectionDriver">
+</section>
+<section id="module-yggdrasil.drivers.ConnectionDriver">
 <span id="yggdrasil-drivers-connectiondriver-module"></span><h2>yggdrasil.drivers.ConnectionDriver module<a class="headerlink" href="#module-yggdrasil.drivers.ConnectionDriver" title="Permalink to this headline">¶</a></h2>
 <p>Module for funneling messages from one comm to another.</p>
 <dl class="py class">
@@ -7769,7 +7681,7 @@ model. Defaults to False.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.drivers.ConnectionDriver.ConnectionDriver.printStatus">
-<span class="sig-name descname"><span class="pre">printStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beg_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/ConnectionDriver.html#ConnectionDriver.printStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.printStatus" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">printStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beg_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_str</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/ConnectionDriver.html#ConnectionDriver.printStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.printStatus" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print information on the status of the ConnectionDriver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -7779,6 +7691,8 @@ model. Defaults to False.</p></li>
 <li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the status of
 individual comms will be displayed. Defaults to
 False.</p></li>
+<li><p><strong>return_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the message string is
+returned. Defaults to False.</p></li>
 </ul>
 </dd>
 </dl>
@@ -7964,8 +7878,8 @@ any left or the communication channel is closed.</p>
 <dd><p>Decorator for methods that should be run remotely.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.DSLModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.DSLModelDriver">
 <span id="yggdrasil-drivers-dslmodeldriver-module"></span><h2>yggdrasil.drivers.DSLModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.DSLModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.DSLModelDriver.DSLModelDriver">
@@ -8124,8 +8038,8 @@ the model finishes running. Defaults to True.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.Driver">
+</section>
+<section id="module-yggdrasil.drivers.Driver">
 <span id="yggdrasil-drivers-driver-module"></span><h2>yggdrasil.drivers.Driver module<a class="headerlink" href="#module-yggdrasil.drivers.Driver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.Driver.Driver">
@@ -8253,8 +8167,155 @@ communication drivers.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.DuplicatedModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.DummyModelDriver">
+<span id="yggdrasil-drivers-dummymodeldriver-module"></span><h2>yggdrasil.drivers.DummyModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.DummyModelDriver" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.drivers.DummyModelDriver.</span></span><span class="sig-name descname"><span class="pre">DummyModelDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/DummyModelDriver.html#DummyModelDriver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver" title="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver</span></code></a></p>
+<p>Class that stands-in to act as a model utilizing unmatched
+input/output channels.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.base_languages">
+<span class="sig-name descname"><span class="pre">base_languages</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['python']</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.base_languages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.before_loop">
+<span class="sig-name descname"><span class="pre">before_loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/DummyModelDriver.html#DummyModelDriver.before_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.before_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions before loop.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.before_start">
+<span class="sig-name descname"><span class="pre">before_start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/DummyModelDriver.html#DummyModelDriver.before_start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.before_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions to perform before the run starts.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.cfg">
+<span class="sig-name descname"><span class="pre">cfg</span></span><em class="property"> <span class="pre">=</span> <span class="pre">&lt;yggdrasil.config.YggConfigParser</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.cfg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.comms_implicit">
+<span class="sig-name descname"><span class="pre">comms_implicit</span></span><em class="property"> <span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.comms_implicit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.default_interpreter">
+<span class="sig-name descname"><span class="pre">default_interpreter</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'dummy'</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.default_interpreter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.default_interpreter_flags">
+<span class="sig-name descname"><span class="pre">default_interpreter_flags</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[]</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.default_interpreter_flags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.executable_type">
+<span class="sig-name descname"><span class="pre">executable_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'other'</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.executable_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.full_language">
+<span class="sig-name descname"><span class="pre">full_language</span></span><em class="property"> <span class="pre">=</span> <span class="pre">False</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.full_language" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.inverse_type_map">
+<span class="sig-name descname"><span class="pre">inverse_type_map</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.inverse_type_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.is_configured">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">is_configured</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/DummyModelDriver.html#DummyModelDriver.is_configured"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.is_configured" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the appropriate configuration has been performed (e.g.
+installation of supporting libraries etc.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if the language has been configured.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.is_language_installed">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">is_language_installed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/DummyModelDriver.html#DummyModelDriver.is_language_installed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.is_language_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if this model driver is installed on the current
+machine.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Truth of if this model driver can be run on the current</dt><dd><p>machine.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.language">
+<span class="sig-name descname"><span class="pre">language</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'dummy'</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.language" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.language_ext">
+<span class="sig-name descname"><span class="pre">language_ext</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[]</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.language_ext" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.language_version">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">language_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/DummyModelDriver.html#DummyModelDriver.language_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.language_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the version of this language.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> – Keyword arguments are passed to cls.run_executable.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Version of compiler/interpreter for this language.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.no_executable">
+<span class="sig-name descname"><span class="pre">no_executable</span></span><em class="property"> <span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.no_executable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.run_loop">
+<span class="sig-name descname"><span class="pre">run_loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/DummyModelDriver.html#DummyModelDriver.run_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.run_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loop to check if model is still running and forward output.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.drivers.DummyModelDriver.DummyModelDriver.service_partner">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">service_partner</span></span><a class="headerlink" href="#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.service_partner" title="Permalink to this definition">¶</a></dt>
+<dd><p>YAML representation of the dummy model that should
+stand-in for the model client-side.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-yggdrasil.drivers.DuplicatedModelDriver">
 <span id="yggdrasil-drivers-duplicatedmodeldriver-module"></span><h2>yggdrasil.drivers.DuplicatedModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.DuplicatedModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.DuplicatedModelDriver.DuplicatedModelDriver">
@@ -8390,8 +8451,8 @@ described by the provided yaml.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.ExecutableModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.ExecutableModelDriver">
 <span id="yggdrasil-drivers-executablemodeldriver-module"></span><h2>yggdrasil.drivers.ExecutableModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.ExecutableModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver">
@@ -8519,8 +8580,8 @@ language is installed.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.FileInputDriver">
+</section>
+<section id="module-yggdrasil.drivers.FileInputDriver">
 <span id="yggdrasil-drivers-fileinputdriver-module"></span><h2>yggdrasil.drivers.FileInputDriver module<a class="headerlink" href="#module-yggdrasil.drivers.FileInputDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.FileInputDriver.FileInputDriver">
@@ -8538,8 +8599,8 @@ language is installed.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.FileOutputDriver">
+</section>
+<section id="module-yggdrasil.drivers.FileOutputDriver">
 <span id="yggdrasil-drivers-fileoutputdriver-module"></span><h2>yggdrasil.drivers.FileOutputDriver module<a class="headerlink" href="#module-yggdrasil.drivers.FileOutputDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.FileOutputDriver.FileOutputDriver">
@@ -8557,8 +8618,8 @@ language is installed.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.FortranModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.FortranModelDriver">
 <span id="yggdrasil-drivers-fortranmodeldriver-module"></span><h2>yggdrasil.drivers.FortranModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.FortranModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.FortranModelDriver.FortranCompilerBase">
@@ -8937,7 +8998,7 @@ the precise declaration that should be used.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.drivers.FortranModelDriver.FortranModelDriver.internal_libraries">
-<span class="sig-name descname"><span class="pre">internal_libraries</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'c_wrappers':</span> <span class="pre">{'external_dependencies':</span> <span class="pre">[('c',</span> <span class="pre">'rapidjson'),</span> <span class="pre">('c',</span> <span class="pre">'python'),</span> <span class="pre">('c',</span> <span class="pre">'numpy')],</span> <span class="pre">'include_dirs':</span> <span class="pre">['/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/fortran'],</span> <span class="pre">'internal_dependencies':</span> <span class="pre">[('c',</span> <span class="pre">'ygg')],</span> <span class="pre">'language':</span> <span class="pre">'c',</span> <span class="pre">'libtype':</span> <span class="pre">'object',</span> <span class="pre">'source':</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/fortran/c_wrappers.c'},</span> <span class="pre">'fygg':</span> <span class="pre">{'external_dependencies':</span> <span class="pre">[('c',</span> <span class="pre">'rapidjson'),</span> <span class="pre">('c',</span> <span class="pre">'python'),</span> <span class="pre">('c',</span> <span class="pre">'numpy'),</span> <span class="pre">'stdc++'],</span> <span class="pre">'include_dirs':</span> <span class="pre">['/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/C/communication',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/C/serialize',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/C',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/C'],</span> <span class="pre">'internal_dependencies':</span> <span class="pre">[('c',</span> <span class="pre">'regex'),</span> <span class="pre">('c',</span> <span class="pre">'datatypes'),</span> <span class="pre">('c',</span> <span class="pre">'python_wrapper'),</span> <span class="pre">('c',</span> <span class="pre">'ygg'),</span> <span class="pre">'c_wrappers'],</span> <span class="pre">'libtype':</span> <span class="pre">'static',</span> <span class="pre">'source':</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/fortran/YggInterface.f90'}}</span></em><a class="headerlink" href="#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.internal_libraries" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">internal_libraries</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'c_wrappers':</span> <span class="pre">{'external_dependencies':</span> <span class="pre">[('c',</span> <span class="pre">'rapidjson'),</span> <span class="pre">('c',</span> <span class="pre">'python'),</span> <span class="pre">('c',</span> <span class="pre">'numpy')],</span> <span class="pre">'include_dirs':</span> <span class="pre">['/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/fortran'],</span> <span class="pre">'internal_dependencies':</span> <span class="pre">[('c',</span> <span class="pre">'ygg')],</span> <span class="pre">'language':</span> <span class="pre">'c',</span> <span class="pre">'libtype':</span> <span class="pre">'object',</span> <span class="pre">'source':</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/fortran/c_wrappers.c'},</span> <span class="pre">'fygg':</span> <span class="pre">{'external_dependencies':</span> <span class="pre">[('c',</span> <span class="pre">'rapidjson'),</span> <span class="pre">('c',</span> <span class="pre">'python'),</span> <span class="pre">('c',</span> <span class="pre">'numpy'),</span> <span class="pre">'stdc++'],</span> <span class="pre">'include_dirs':</span> <span class="pre">['/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/C/communication',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/C/serialize',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/C'],</span> <span class="pre">'internal_dependencies':</span> <span class="pre">[('c',</span> <span class="pre">'regex'),</span> <span class="pre">('c',</span> <span class="pre">'datatypes'),</span> <span class="pre">('c',</span> <span class="pre">'python_wrapper'),</span> <span class="pre">('c',</span> <span class="pre">'ygg'),</span> <span class="pre">'c_wrappers'],</span> <span class="pre">'libtype':</span> <span class="pre">'static',</span> <span class="pre">'source':</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/fortran/YggInterface.f90'}}</span></em><a class="headerlink" href="#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.internal_libraries" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -9408,145 +9469,8 @@ parent class’s method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.FunctionModelDriver">
-<span id="yggdrasil-drivers-functionmodeldriver-module"></span><h2>yggdrasil.drivers.FunctionModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.FunctionModelDriver" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.drivers.FunctionModelDriver.</span></span><span class="sig-name descname"><span class="pre">FunctionModelDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/FunctionModelDriver.html#FunctionModelDriver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver" title="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver</span></code></a></p>
-<p>Class that acts as a functional interface to input/output channels
-that are not connected.</p>
-<p>Args:</p>
-<p>Attributes:</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.base_languages">
-<span class="sig-name descname"><span class="pre">base_languages</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['python']</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.base_languages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.before_loop">
-<span class="sig-name descname"><span class="pre">before_loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/FunctionModelDriver.html#FunctionModelDriver.before_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.before_loop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Actions before loop.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.before_start">
-<span class="sig-name descname"><span class="pre">before_start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/FunctionModelDriver.html#FunctionModelDriver.before_start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.before_start" title="Permalink to this definition">¶</a></dt>
-<dd><p>Actions to perform before the run starts.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.cfg">
-<span class="sig-name descname"><span class="pre">cfg</span></span><em class="property"> <span class="pre">=</span> <span class="pre">&lt;yggdrasil.config.YggConfigParser</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.cfg" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.comms_implicit">
-<span class="sig-name descname"><span class="pre">comms_implicit</span></span><em class="property"> <span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.comms_implicit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.default_interpreter">
-<span class="sig-name descname"><span class="pre">default_interpreter</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'function'</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.default_interpreter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.default_interpreter_flags">
-<span class="sig-name descname"><span class="pre">default_interpreter_flags</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[]</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.default_interpreter_flags" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.executable_type">
-<span class="sig-name descname"><span class="pre">executable_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'other'</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.executable_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.full_language">
-<span class="sig-name descname"><span class="pre">full_language</span></span><em class="property"> <span class="pre">=</span> <span class="pre">False</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.full_language" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.inverse_type_map">
-<span class="sig-name descname"><span class="pre">inverse_type_map</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.inverse_type_map" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.is_configured">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">is_configured</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/FunctionModelDriver.html#FunctionModelDriver.is_configured"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.is_configured" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the appropriate configuration has been performed (e.g.
-installation of supporting libraries etc.)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>True if the language has been configured.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.is_language_installed">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">is_language_installed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/FunctionModelDriver.html#FunctionModelDriver.is_language_installed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.is_language_installed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this model driver is installed on the current
-machine.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><dl class="simple">
-<dt>Truth of if this model driver can be run on the current</dt><dd><p>machine.</p>
-</dd>
-</dl>
-</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.language">
-<span class="sig-name descname"><span class="pre">language</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'function'</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.language" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.language_ext">
-<span class="sig-name descname"><span class="pre">language_ext</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[]</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.language_ext" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.language_version">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">language_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/FunctionModelDriver.html#FunctionModelDriver.language_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.language_version" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine the version of this language.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> – Keyword arguments are passed to cls.run_executable.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Version of compiler/interpreter for this language.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.no_executable">
-<span class="sig-name descname"><span class="pre">no_executable</span></span><em class="property"> <span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.no_executable" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.run_loop">
-<span class="sig-name descname"><span class="pre">run_loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/FunctionModelDriver.html#FunctionModelDriver.run_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.FunctionModelDriver.FunctionModelDriver.run_loop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loop to check if model is still running and forward output.</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-yggdrasil.drivers.InputDriver">
+</section>
+<section id="module-yggdrasil.drivers.InputDriver">
 <span id="yggdrasil-drivers-inputdriver-module"></span><h2>yggdrasil.drivers.InputDriver module<a class="headerlink" href="#module-yggdrasil.drivers.InputDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.InputDriver.InputDriver">
@@ -9566,8 +9490,8 @@ connect to.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.InterpretedModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.InterpretedModelDriver">
 <span id="yggdrasil-drivers-interpretedmodeldriver-module"></span><h2>yggdrasil.drivers.InterpretedModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.InterpretedModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver">
@@ -9911,7 +9835,7 @@ and which ones are arguments.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id15">
-<span class="sig-name descname"><span class="pre">paths_to_add</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/SBML',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/function',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/Python',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/LPy',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/MATLAB',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/R']</span></em><a class="headerlink" href="#id15" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">paths_to_add</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/dummy',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/MATLAB',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/Python',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/R',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/SBML',</span> <span class="pre">'/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/languages/LPy']</span></em><a class="headerlink" href="#id15" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -9978,8 +9902,8 @@ method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.LPyModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.LPyModelDriver">
 <span id="yggdrasil-drivers-lpymodeldriver-module"></span><h2>yggdrasil.drivers.LPyModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.LPyModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.LPyModelDriver.LPyModelDriver">
@@ -10060,13 +9984,13 @@ method.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.drivers.LPyModelDriver.LPyModelDriver.supported_comms">
-<span class="sig-name descname"><span class="pre">supported_comms</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['ipc',</span> <span class="pre">'rmq_async',</span> <span class="pre">'buffer',</span> <span class="pre">'value',</span> <span class="pre">'zmq',</span> <span class="pre">'mpi',</span> <span class="pre">'rmq']</span></em><a class="headerlink" href="#yggdrasil.drivers.LPyModelDriver.LPyModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">supported_comms</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['rest',</span> <span class="pre">'mpi',</span> <span class="pre">'rmq',</span> <span class="pre">'buffer',</span> <span class="pre">'ipc',</span> <span class="pre">'rmq_async',</span> <span class="pre">'zmq',</span> <span class="pre">'value']</span></em><a class="headerlink" href="#yggdrasil.drivers.LPyModelDriver.LPyModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.MPIPartnerModel">
+</section>
+<section id="module-yggdrasil.drivers.MPIPartnerModel">
 <span id="yggdrasil-drivers-mpipartnermodel-module"></span><h2>yggdrasil.drivers.MPIPartnerModel module<a class="headerlink" href="#module-yggdrasil.drivers.MPIPartnerModel" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel">
@@ -10263,8 +10187,8 @@ has not started.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.MakeModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.MakeModelDriver">
 <span id="yggdrasil-drivers-makemodeldriver-module"></span><h2>yggdrasil.drivers.MakeModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.MakeModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.MakeModelDriver.MakeCompiler">
@@ -10733,8 +10657,8 @@ class’s method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.MatlabModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.MatlabModelDriver">
 <span id="yggdrasil-drivers-matlabmodeldriver-module"></span><h2>yggdrasil.drivers.MatlabModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.MatlabModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver">
@@ -11577,8 +11501,8 @@ removed so it is not deleted. Defaults to False.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.ModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.ModelDriver">
 <span id="yggdrasil-drivers-modeldriver-module"></span><h2>yggdrasil.drivers.ModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.ModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.ModelDriver.ModelDriver">
@@ -11590,10 +11514,11 @@ removed so it is not deleted. Defaults to False.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Unique name used to identify the model. This will
 be used to report errors associated with the model.</p></li>
-<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – The full path to the file containing the
-model program that will be run by the driver or a list
-starting with the program file and including any arguments
-that should be passed as input to the program.</p></li>
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – The path to the file containing the model
+program that will be run by the driver for the model’s language
+and/or a list of arguments that should be passed as input to the
+model program or language executable (e.g. source code or
+configuration file for a domain specific language).</p></li>
 <li><p><strong>products</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Paths to files created by the model that
 should be cleaned up when the model exits. Entries can be absolute
 paths or paths relative to the working directory. Defaults to [].</p></li>
@@ -11672,6 +11597,16 @@ so that the model-side comms can be used by more than one thread.
 Defaults to False.</p></li>
 <li><p><strong>copies</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – The number of copies of the model that should be
 created. Defaults to 1.</p></li>
+<li><p><strong>repository_url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – URL for the git repository containing
+the model source code. If provided, relative paths in the model
+YAML definition will be considered relative to the repository root
+directory.</p></li>
+<li><p><strong>description</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Description of the model. This parameter
+is only used in the model repository or when providing the model
+as a service.</p></li>
+<li><p><strong>contact_email</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Email address that should be used to
+contact the maintainer of the model. This parameter is only used
+in the model repository.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</p></li>
 </ul>
 </dd>
@@ -11712,7 +11647,7 @@ to use them. [REQUIRED]</p>
 loops, while loops). [REQUIRED]</p>
 </dd>
 <dt>version_flags (list): Flags that should be called with the language</dt><dd><p>executable to determine the version of the compiler/interpreter.
-Defaults to [‘–version’].</p>
+Defaults to [’–version’].</p>
 </dd>
 <dt>outputs_in_inputs (bool): If True, outputs are passed by pointer as</dt><dd><p>inputs for modification and the return value should be a flag.
 Defaults to False.</p>
@@ -12020,6 +11955,46 @@ the model-side comms can be used by more than one thread.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.ModelDriver.ModelDriver.repository_url">
+<span class="sig-name descname"><span class="pre">repository_url</span></span><a class="headerlink" href="#yggdrasil.drivers.ModelDriver.ModelDriver.repository_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>URL for the git repository containing the model
+source code. If provided, relative paths in the model YAML
+definition will be considered relative to the repository root
+directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.ModelDriver.ModelDriver.description">
+<span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#yggdrasil.drivers.ModelDriver.ModelDriver.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of the model. This parameter is only
+used in the model repository or when providing the model as a
+service.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.drivers.ModelDriver.ModelDriver.contact_email">
+<span class="sig-name descname"><span class="pre">contact_email</span></span><a class="headerlink" href="#yggdrasil.drivers.ModelDriver.ModelDriver.contact_email" title="Permalink to this definition">¶</a></dt>
+<dd><p>Email address that should be used to contact the
+maintainer of the model. This parameter is only used in the model
+repository.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -14373,8 +14348,8 @@ without checking that they are not source files.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.OSRModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.OSRModelDriver">
 <span id="yggdrasil-drivers-osrmodeldriver-module"></span><h2>yggdrasil.drivers.OSRModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.OSRModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.OSRModelDriver.OSRModelDriver">
@@ -14687,8 +14662,8 @@ method.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.OutputDriver">
+</section>
+<section id="module-yggdrasil.drivers.OutputDriver">
 <span id="yggdrasil-drivers-outputdriver-module"></span><h2>yggdrasil.drivers.OutputDriver module<a class="headerlink" href="#module-yggdrasil.drivers.OutputDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.OutputDriver.OutputDriver">
@@ -14708,8 +14683,8 @@ connect to.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.PythonModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.PythonModelDriver">
 <span id="yggdrasil-drivers-pythonmodeldriver-module"></span><h2>yggdrasil.drivers.PythonModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.PythonModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.PythonModelDriver.PythonModelDriver">
@@ -14855,12 +14830,12 @@ method.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comm_options">
-<span class="sig-name descname"><span class="pre">supported_comm_options</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'ipc':</span> <span class="pre">{'libraries':</span> <span class="pre">['sysv_ipc'],</span> <span class="pre">'platforms':</span> <span class="pre">['MacOS',</span> <span class="pre">'Linux']},</span> <span class="pre">'mpi':</span> <span class="pre">{'libraries':</span> <span class="pre">['mpi4py']},</span> <span class="pre">'rmq':</span> <span class="pre">{'libraries':</span> <span class="pre">['pika']},</span> <span class="pre">'zmq':</span> <span class="pre">{'libraries':</span> <span class="pre">['zmq']}}</span></em><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comm_options" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">supported_comm_options</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'ipc':</span> <span class="pre">{'libraries':</span> <span class="pre">['sysv_ipc'],</span> <span class="pre">'platforms':</span> <span class="pre">['MacOS',</span> <span class="pre">'Linux']},</span> <span class="pre">'mpi':</span> <span class="pre">{'libraries':</span> <span class="pre">['mpi4py']},</span> <span class="pre">'rest':</span> <span class="pre">{'libraries':</span> <span class="pre">['requests']},</span> <span class="pre">'rmq':</span> <span class="pre">{'libraries':</span> <span class="pre">['pika']},</span> <span class="pre">'zmq':</span> <span class="pre">{'libraries':</span> <span class="pre">['zmq']}}</span></em><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comm_options" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comms">
-<span class="sig-name descname"><span class="pre">supported_comms</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['ipc',</span> <span class="pre">'rmq_async',</span> <span class="pre">'buffer',</span> <span class="pre">'value',</span> <span class="pre">'zmq',</span> <span class="pre">'mpi',</span> <span class="pre">'rmq']</span></em><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">supported_comms</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['rest',</span> <span class="pre">'mpi',</span> <span class="pre">'rmq',</span> <span class="pre">'buffer',</span> <span class="pre">'ipc',</span> <span class="pre">'rmq_async',</span> <span class="pre">'zmq',</span> <span class="pre">'value']</span></em><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -14913,8 +14888,8 @@ parent class’s method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.RModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.RModelDriver">
 <span id="yggdrasil-drivers-rmodeldriver-module"></span><h2>yggdrasil.drivers.RModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.RModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.RModelDriver.RModelDriver">
@@ -14998,7 +14973,7 @@ the compilation executable. Defaults to False.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.drivers.RModelDriver.RModelDriver.interface_dependencies">
-<span class="sig-name descname"><span class="pre">interface_dependencies</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['bit64',</span> <span class="pre">'R6',</span> <span class="pre">'units',</span> <span class="pre">'zeallot',</span> <span class="pre">'reticulate',</span> <span class="pre">'Rcpp']</span></em><a class="headerlink" href="#yggdrasil.drivers.RModelDriver.RModelDriver.interface_dependencies" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">interface_dependencies</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['units',</span> <span class="pre">'bit64',</span> <span class="pre">'reticulate',</span> <span class="pre">'Rcpp',</span> <span class="pre">'zeallot',</span> <span class="pre">'R6']</span></em><a class="headerlink" href="#yggdrasil.drivers.RModelDriver.RModelDriver.interface_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -15221,8 +15196,8 @@ class’s method.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.RPCRequestDriver">
+</section>
+<section id="module-yggdrasil.drivers.RPCRequestDriver">
 <span id="yggdrasil-drivers-rpcrequestdriver-module"></span><h2>yggdrasil.drivers.RPCRequestDriver module<a class="headerlink" href="#module-yggdrasil.drivers.RPCRequestDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.RPCRequestDriver.RPCRequestDriver">
@@ -15396,8 +15371,8 @@ header.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.RPCResponseDriver">
+</section>
+<section id="module-yggdrasil.drivers.RPCResponseDriver">
 <span id="yggdrasil-drivers-rpcresponsedriver-module"></span><h2>yggdrasil.drivers.RPCResponseDriver module<a class="headerlink" href="#module-yggdrasil.drivers.RPCResponseDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.RPCResponseDriver.RPCResponseDriver">
@@ -15485,8 +15460,8 @@ created to respond to.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.SBMLModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.SBMLModelDriver">
 <span id="yggdrasil-drivers-sbmlmodeldriver-module"></span><h2>yggdrasil.drivers.SBMLModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.SBMLModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.SBMLModelDriver.SBMLModelDriver">
@@ -15618,8 +15593,8 @@ This option is ignored if only_output_final_step is True.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers.TimeSyncModelDriver">
+</section>
+<section id="module-yggdrasil.drivers.TimeSyncModelDriver">
 <span id="yggdrasil-drivers-timesyncmodeldriver-module"></span><h2>yggdrasil.drivers.TimeSyncModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.TimeSyncModelDriver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.drivers.TimeSyncModelDriver.TimeSyncModelDriver">
@@ -15829,8 +15804,8 @@ empty dictionary.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-yggdrasil.drivers">
+</section>
+<section id="module-yggdrasil.drivers">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil.drivers" title="Permalink to this headline">¶</a></h2>
 <p>IO and Model drivers.</p>
 <dl class="py function">
@@ -15859,51 +15834,35 @@ class.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
