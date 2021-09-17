@@ -3,6 +3,8 @@
 hello
 =====================
 
+A single model receives input from a file, sends the input as output to a file and back to itself, receives its own output, and sends that as output to a file in the temporary directory. The input & output files are specified via the `default_file` parameter in the model inputs/outputs and the connection demonstrates the use of the `onexit` parameter.
+
 .. contents:: :local:
 
 C Version
@@ -10,14 +12,14 @@ C Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/hello/src/hello.c
+.. literalinclude:: /../../yggdrasil/examples/hello/src/hello.c
    :language: c
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/hello/hello_c.yml
+.. literalinclude:: /../../yggdrasil/examples/hello/hello_c.yml
    :language: yaml
    :linenos:
 
@@ -28,14 +30,14 @@ C++ Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/hello/src/hello.cpp
+.. literalinclude:: /../../yggdrasil/examples/hello/src/hello.cpp
    :language: c++
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/hello/hello_cpp.yml
+.. literalinclude:: /../../yggdrasil/examples/hello/hello_cpp.yml
    :language: yaml
    :linenos:
 
@@ -46,14 +48,14 @@ Fortran Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/hello/src/hello.f90
+.. literalinclude:: /../../yggdrasil/examples/hello/src/hello.f90
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/hello/hello_fortran.yml
+.. literalinclude:: /../../yggdrasil/examples/hello/hello_fortran.yml
    :language: yaml
    :linenos:
 
@@ -64,14 +66,14 @@ Matlab Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/hello/src/hello.m
+.. literalinclude:: /../../yggdrasil/examples/hello/src/hello.m
    :language: matlab
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/hello/hello_matlab.yml
+.. literalinclude:: /../../yggdrasil/examples/hello/hello_matlab.yml
    :language: yaml
    :linenos:
 
@@ -82,14 +84,14 @@ Python Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/hello/src/hello.py
+.. literalinclude:: /../../yggdrasil/examples/hello/src/hello.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/hello/hello_python.yml
+.. literalinclude:: /../../yggdrasil/examples/hello/hello_python.yml
    :language: yaml
    :linenos:
 
@@ -100,14 +102,14 @@ R Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/hello/src/hello.R
+.. literalinclude:: /../../yggdrasil/examples/hello/src/hello.R
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/hello/hello_r.yml
+.. literalinclude:: /../../yggdrasil/examples/hello/hello_r.yml
    :language: yaml
    :linenos:
 

@@ -1,34 +1,72 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.AsyncComm &mdash; yggdrasil v1.8.0 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+  <title>yggdrasil.communication.AsyncComm &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
                 v1.8.0
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -36,8 +74,19 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
@@ -68,37 +117,79 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
           <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../communication.html">yggdrasil.communication</a> &raquo;</li>
+        
       <li>yggdrasil.communication.AsyncComm</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <h1>Source code for yggdrasil.communication.AsyncComm</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">multitasking</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">ProxyObject</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">ComponentBaseUnregistered</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">multitasking</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="k">import</span> <span class="n">ProxyObject</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">ComponentBaseUnregistered</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">CommBase</span><span class="p">,</span> <span class="n">TemporaryCommunicationError</span><span class="p">)</span>
 
 
@@ -107,7 +198,7 @@
 <span class="n">FLAG_TRYAGAIN</span> <span class="o">=</span> <span class="mi">2</span>
 
 
-<div class="viewcode-block" id="AsyncComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm">[docs]</a><span class="k">class</span> <span class="nc">AsyncComm</span><span class="p">(</span><span class="n">ProxyObject</span><span class="p">,</span> <span class="n">ComponentBaseUnregistered</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm">[docs]</a><span class="k">class</span> <span class="nc">AsyncComm</span><span class="p">(</span><span class="n">ProxyObject</span><span class="p">,</span> <span class="n">ComponentBaseUnregistered</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling asynchronous I/O.</span>
 
 <span class="sd">    Args:</span>
@@ -139,7 +230,7 @@
     <span class="n">_async_kws</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;async_recv_method&#39;</span><span class="p">,</span> <span class="s1">&#39;async_send_method&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;async_recv_kwargs&#39;</span><span class="p">,</span> <span class="s1">&#39;async_send_kwargs&#39;</span><span class="p">,</span> <span class="s1">&#39;daemon&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wrapped</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wrapped</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">async_recv_method</span><span class="o">=</span><span class="s1">&#39;recv&#39;</span><span class="p">,</span> <span class="n">async_send_method</span><span class="o">=</span><span class="s1">&#39;send_message&#39;</span><span class="p">,</span>
                  <span class="n">async_recv_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">async_send_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_buffer</span> <span class="o">=</span> <span class="p">[]</span>
@@ -177,10 +268,10 @@
         <span class="n">rv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">wrapped</span><span class="p">,</span> <span class="p">)</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">rv</span><span class="p">)</span>
 
-<div class="viewcode-block" id="AsyncComm.precheck"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.precheck">[docs]</a>    <span class="k">def</span> <span class="nf">precheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.precheck"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.precheck">[docs]</a>    <span class="k">def</span> <span class="nf">precheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">precheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AsyncComm.printStatus"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.printStatus"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print status of the communicator.&quot;&quot;&quot;</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;open (backlog)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">),</span>
                  <span class="s1">&#39;</span><span class="si">%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;close called (backlog)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span><span class="p">)]</span>
@@ -218,19 +309,19 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span><span class="o">.</span><span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">return</span> <span class="n">out</span>
 
-<div class="viewcode-block" id="AsyncComm.atexit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+<div class="viewcode-block" id="AsyncComm.atexit"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close operations.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">linger</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="AsyncComm.open"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.open"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the connection by connecting to the queue.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="AsyncComm.close"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.close"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the connection.</span>
 
 <span class="sd">        Args:</span>
@@ -373,7 +464,7 @@
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_buffer</span>
 
-<div class="viewcode-block" id="AsyncComm.add_backlog"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.add_backlog">[docs]</a>    <span class="k">def</span> <span class="nf">add_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.add_backlog"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.add_backlog">[docs]</a>    <span class="k">def</span> <span class="nf">add_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a message to the backlog of messages.</span>
 
 <span class="sd">        Args:</span>
@@ -388,7 +479,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_buffer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">backlog_ready</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="AsyncComm.pop_backlog"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.pop_backlog">[docs]</a>    <span class="k">def</span> <span class="nf">pop_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.pop_backlog"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.pop_backlog">[docs]</a>    <span class="k">def</span> <span class="nf">pop_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pop a message from the front of the backlog.</span>
 
 <span class="sd">        Returns:</span>
@@ -403,7 +494,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">backlog_ready</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="AsyncComm.run_backlog_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.run_backlog_send">[docs]</a>    <span class="k">def</span> <span class="nf">run_backlog_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.run_backlog_send"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.run_backlog_send">[docs]</a>    <span class="k">def</span> <span class="nf">run_backlog_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue trying to send buffered messages.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_backlog</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Stopping because send_backlog failed&quot;</span><span class="p">)</span>
@@ -414,7 +505,7 @@
             <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_confirmed_send</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog_send</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="AsyncComm.run_backlog_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.run_backlog_recv">[docs]</a>    <span class="k">def</span> <span class="nf">run_backlog_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.run_backlog_recv"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.run_backlog_recv">[docs]</a>    <span class="k">def</span> <span class="nf">run_backlog_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue buffering received messages.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">main_terminated</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Main thread terminated&quot;</span><span class="p">)</span>
@@ -429,7 +520,7 @@
             <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_confirmed_recv</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="AsyncComm.send_direct"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.send_direct">[docs]</a>    <span class="k">def</span> <span class="nf">send_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.send_direct"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.send_direct">[docs]</a>    <span class="k">def</span> <span class="nf">send_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message directly to the underlying comm.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">periodic_debug</span><span class="p">(</span><span class="s2">&quot;send_direct&quot;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">1000</span><span class="p">)(</span>
             <span class="s2">&quot;Sending message to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
@@ -448,7 +539,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">async_flag</span></div>
 
-<div class="viewcode-block" id="AsyncComm.recv_direct"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_direct">[docs]</a>    <span class="k">def</span> <span class="nf">recv_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.recv_direct"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_direct">[docs]</a>    <span class="k">def</span> <span class="nf">recv_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message directly from the underlying comm.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">periodic_debug</span><span class="p">(</span><span class="s2">&quot;recv_direct&quot;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">1000</span><span class="p">)(</span>
             <span class="s2">&quot;Receiving message from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
@@ -477,7 +568,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">async_flag</span><span class="p">,</span> <span class="n">msg</span></div>
 
-<div class="viewcode-block" id="AsyncComm.send_backlog"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.send_backlog">[docs]</a>    <span class="k">def</span> <span class="nf">send_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.send_backlog"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.send_backlog">[docs]</a>    <span class="k">def</span> <span class="nf">send_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message from the send backlog to the queue.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backlog_buffer</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">flag</span> <span class="o">=</span> <span class="kc">True</span>
@@ -490,7 +581,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">confirm_send</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">flag</span></div>
 
-<div class="viewcode-block" id="AsyncComm.recv_backlog"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_backlog">[docs]</a>    <span class="k">def</span> <span class="nf">recv_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.recv_backlog"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_backlog">[docs]</a>    <span class="k">def</span> <span class="nf">recv_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for any messages in the queue and add them to the recv</span>
 <span class="sd">        backlog.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">:</span>
@@ -507,7 +598,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">confirm_recv</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">flag</span></div>
 
-<div class="viewcode-block" id="AsyncComm.send_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.send_message">[docs]</a>    <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.send_message"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.send_message">[docs]</a>    <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message encapsulated in a CommMessage object.</span>
 
 <span class="sd">        Args:</span>
@@ -523,7 +614,7 @@
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dont_prepare&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
-<div class="viewcode-block" id="AsyncComm.send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dont_prepare</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.send"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dont_prepare</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message to the backlog.</span>
 
 <span class="sd">        Args:</span>
@@ -552,7 +643,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_used</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="AsyncComm.send_eof"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.send_eof">[docs]</a>    <span class="k">def</span> <span class="nf">send_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.send_eof"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.send_eof">[docs]</a>    <span class="k">def</span> <span class="nf">send_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send the EOF message as a short message.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
@@ -565,7 +656,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AsyncComm.recv_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_message">[docs]</a>    <span class="k">def</span> <span class="nf">recv_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.recv_message"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_message">[docs]</a>    <span class="k">def</span> <span class="nf">recv_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message.</span>
 
 <span class="sd">        Args:</span>
@@ -583,7 +674,7 @@
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dont_finalize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
-<div class="viewcode-block" id="AsyncComm.recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_message_object</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dont_finalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<div class="viewcode-block" id="AsyncComm.recv"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_message_object</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dont_finalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message.</span>
 
@@ -647,7 +738,7 @@
             <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">flag</span><span class="p">),</span> <span class="n">out</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="AsyncComm.purge"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.purge"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Purge all messages from the comm.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
@@ -655,61 +746,77 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_buffer</span> <span class="o">=</span> <span class="p">[]</span></div>
 
     <span class="c1"># ALIASES</span>
-<div class="viewcode-block" id="AsyncComm.send_nolimit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.send_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.send_nolimit"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.send_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for send_nolimit on wrapped comm.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AsyncComm.recv_nolimit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.recv_nolimit"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for recv_nolimit on wrapped comm.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AsyncComm.send_array"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.send_array">[docs]</a>    <span class="k">def</span> <span class="nf">send_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.send_array"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.send_array">[docs]</a>    <span class="k">def</span> <span class="nf">send_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for send_array on wrapped comm.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">send_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AsyncComm.recv_array"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_array">[docs]</a>    <span class="k">def</span> <span class="nf">recv_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.recv_array"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_array">[docs]</a>    <span class="k">def</span> <span class="nf">recv_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for recv_array on wrapped comm.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">recv_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AsyncComm.send_dict"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.send_dict">[docs]</a>    <span class="k">def</span> <span class="nf">send_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.send_dict"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.send_dict">[docs]</a>    <span class="k">def</span> <span class="nf">send_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for send_dict on wrapped comm.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">send_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AsyncComm.recv_dict"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_dict">[docs]</a>    <span class="k">def</span> <span class="nf">recv_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.recv_dict"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_dict">[docs]</a>    <span class="k">def</span> <span class="nf">recv_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for recv_dict on wrapped comm.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">recv_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
     
-<div class="viewcode-block" id="AsyncComm.drain_server_signon_messages"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.drain_server_signon_messages">[docs]</a>    <span class="k">def</span> <span class="nf">drain_server_signon_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.drain_server_signon_messages"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.drain_server_signon_messages">[docs]</a>    <span class="k">def</span> <span class="nf">drain_server_signon_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Drain server signon messages. This should only be used</span>
 <span class="sd">        for testing purposes.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div></div>
 </pre></div>
 
            </div>
+           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
-  </div>
+    <p>
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

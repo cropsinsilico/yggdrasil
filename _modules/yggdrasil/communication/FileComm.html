@@ -1,34 +1,72 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.FileComm &mdash; yggdrasil v1.8.0 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+  <title>yggdrasil.communication.FileComm &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
                 v1.8.0
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -36,8 +74,19 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
@@ -68,41 +117,83 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
           <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../communication.html">yggdrasil.communication</a> &raquo;</li>
+        
       <li>yggdrasil.communication.FileComm</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <h1>Source code for yggdrasil.communication.FileComm</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.serialize.SerializeBase</span> <span class="kn">import</span> <span class="n">SerializeBase</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">CommBase</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.serialize.SerializeBase</span> <span class="k">import</span> <span class="n">SerializeBase</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">CommBase</span>
 
 
-<div class="viewcode-block" id="FileComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm">[docs]</a><span class="k">class</span> <span class="nc">FileComm</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm">[docs]</a><span class="k">class</span> <span class="nc">FileComm</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O from/to a file on disk.</span>
 
 <span class="sd">    &gt;&gt;&gt; x = FileComm(&#39;test_send&#39;, address=&#39;test_file.txt&#39;, direction=&#39;send&#39;)</span>
@@ -187,7 +278,7 @@
     <span class="n">_mode_as_bytes</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">_synchronous_read</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;close_on_eof_send&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;partner_language&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Files don&#39;t have partner comms</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">FileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -227,7 +318,7 @@
 <span class="sd">        valid file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">concats_as_str</span>
             
-<div class="viewcode-block" id="FileComm.before_registration"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="FileComm.before_registration"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
 <span class="sd">        to registration.&quot;&quot;&quot;</span>
@@ -240,7 +331,7 @@
             <span class="k">del</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">[</span><span class="s1">&#39;seritype&#39;</span><span class="p">]</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">_commtype</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_filetype</span></div>
 
-<div class="viewcode-block" id="FileComm.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="FileComm.get_testing_options"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">read_meth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
@@ -290,7 +381,7 @@
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;recv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;recv_partial&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
-<div class="viewcode-block" id="FileComm.is_installed"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="FileComm.is_installed"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the necessary libraries are installed for this</span>
 <span class="sd">        communication class.</span>
@@ -310,12 +401,12 @@
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span></div>
         
-<div class="viewcode-block" id="FileComm.underlying_comm_class"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.underlying_comm_class">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="FileComm.underlying_comm_class"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.underlying_comm_class">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">underlying_comm_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of underlying communication class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_filetype</span></div>
 
-<div class="viewcode-block" id="FileComm.close_registry_entry"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.close_registry_entry">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="FileComm.close_registry_entry"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.close_registry_entry">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">close_registry_entry</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close a registry entry.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="kc">False</span>
@@ -324,7 +415,7 @@
             <span class="n">out</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="FileComm.new_comm_kwargs"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.new_comm_kwargs">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="FileComm.new_comm_kwargs"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.new_comm_kwargs">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">new_comm_kwargs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize communication with new queue.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;file</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_extension</span><span class="p">)</span>
@@ -348,7 +439,7 @@
             <span class="n">io_mode</span> <span class="o">+=</span> <span class="s1">&#39;b&#39;</span>
         <span class="k">return</span> <span class="n">io_mode</span>
 
-<div class="viewcode-block" id="FileComm.opp_comm_kwargs"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.opp_comm_kwargs">[docs]</a>    <span class="k">def</span> <span class="nf">opp_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">for_yaml</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.opp_comm_kwargs"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.opp_comm_kwargs">[docs]</a>    <span class="k">def</span> <span class="nf">opp_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">for_yaml</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get keyword arguments to initialize communication with opposite</span>
 <span class="sd">        comm object.</span>
 
@@ -372,21 +463,21 @@
         <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
 
     <span class="c1"># Methods related to header</span>
-<div class="viewcode-block" id="FileComm.enable_header"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.enable_header">[docs]</a>    <span class="k">def</span> <span class="nf">enable_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.enable_header"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.enable_header">[docs]</a>    <span class="k">def</span> <span class="nf">enable_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn on header so that it will be written.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">header_was_read</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">header_was_written</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">has_header</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">enable_file_header</span><span class="p">()</span></div>
     
-<div class="viewcode-block" id="FileComm.disable_header"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.disable_header">[docs]</a>    <span class="k">def</span> <span class="nf">disable_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.disable_header"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.disable_header">[docs]</a>    <span class="k">def</span> <span class="nf">disable_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn off header so that it will not be written.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">header_was_read</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">header_was_written</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">has_header</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">disable_file_header</span><span class="p">()</span></div>
     
-<div class="viewcode-block" id="FileComm.read_header"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.read_header">[docs]</a>    <span class="k">def</span> <span class="nf">read_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.read_header"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.read_header">[docs]</a>    <span class="k">def</span> <span class="nf">read_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read header lines from the file and update serializer info.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_was_read</span><span class="p">:</span>
             <span class="k">return</span>
@@ -396,7 +487,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">change_position</span><span class="p">(</span><span class="o">*</span><span class="n">pos</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">header_was_read</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="FileComm.write_header"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.write_header">[docs]</a>    <span class="k">def</span> <span class="nf">write_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.write_header"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.write_header">[docs]</a>    <span class="k">def</span> <span class="nf">write_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write header lines to the file based on the serializer info.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_was_written</span><span class="p">:</span>
             <span class="k">return</span>
@@ -418,12 +509,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">file_seek</span><span class="p">(</span><span class="n">prev_pos</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
 
-<div class="viewcode-block" id="FileComm.file_tell"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.file_tell">[docs]</a>    <span class="k">def</span> <span class="nf">file_tell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.file_tell"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.file_tell">[docs]</a>    <span class="k">def</span> <span class="nf">file_tell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Current position in the file.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="FileComm.file_seek"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.file_seek">[docs]</a>    <span class="k">def</span> <span class="nf">file_seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">whence</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.file_seek"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.file_seek">[docs]</a>    <span class="k">def</span> <span class="nf">file_seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">whence</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Move in the file to the specified position.</span>
 
 <span class="sd">        Args:</span>
@@ -437,18 +528,18 @@
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">whence</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FileComm.file_flush"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.file_flush">[docs]</a>    <span class="k">def</span> <span class="nf">file_flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.file_flush"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.file_flush">[docs]</a>    <span class="k">def</span> <span class="nf">file_flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Flush the file.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="FileComm.record_position"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.record_position">[docs]</a>    <span class="k">def</span> <span class="nf">record_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.record_position"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.record_position">[docs]</a>    <span class="k">def</span> <span class="nf">record_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Record the current position in the file/series.&quot;&quot;&quot;</span>
         <span class="n">_rec_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_tell</span><span class="p">()</span>
         <span class="n">_rec_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_series_index</span>
         <span class="k">return</span> <span class="n">_rec_pos</span><span class="p">,</span> <span class="n">_rec_ind</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_was_read</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_was_written</span></div>
 
-<div class="viewcode-block" id="FileComm.reset_position"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.reset_position">[docs]</a>    <span class="k">def</span> <span class="nf">reset_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.reset_position"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.reset_position">[docs]</a>    <span class="k">def</span> <span class="nf">reset_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Move to the front of the file and allow header to be read again.</span>
 
 <span class="sd">        Args:</span>
@@ -462,7 +553,7 @@
         <span class="k">if</span> <span class="n">truncate</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="FileComm.change_position"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.change_position">[docs]</a>    <span class="k">def</span> <span class="nf">change_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_pos</span><span class="p">,</span> <span class="n">series_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="FileComm.change_position"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.change_position">[docs]</a>    <span class="k">def</span> <span class="nf">change_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_pos</span><span class="p">,</span> <span class="n">series_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">header_was_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">header_was_written</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Change the position in the file/series.</span>
 
@@ -490,7 +581,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">header_was_read</span> <span class="o">=</span> <span class="n">header_was_read</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">header_was_written</span> <span class="o">=</span> <span class="n">header_was_written</span></div>
 
-<div class="viewcode-block" id="FileComm.advance_in_file"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.advance_in_file">[docs]</a>    <span class="k">def</span> <span class="nf">advance_in_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_pos</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.advance_in_file"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.advance_in_file">[docs]</a>    <span class="k">def</span> <span class="nf">advance_in_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_pos</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Advance to a certain position in the current file.</span>
 
 <span class="sd">        Args:</span>
@@ -505,7 +596,7 @@
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
                     <span class="k">raise</span></div>
 
-<div class="viewcode-block" id="FileComm.advance_in_series"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.advance_in_series">[docs]</a>    <span class="k">def</span> <span class="nf">advance_in_series</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series_index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.advance_in_series"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.advance_in_series">[docs]</a>    <span class="k">def</span> <span class="nf">advance_in_series</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series_index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Advance to a certain file in a series.</span>
 
 <span class="sd">        Args:</span>
@@ -535,7 +626,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">header_was_written</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="FileComm.get_series_address"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.get_series_address">[docs]</a>    <span class="k">def</span> <span class="nf">get_series_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.get_series_address"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.get_series_address">[docs]</a>    <span class="k">def</span> <span class="nf">get_series_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the address of a file in the series.</span>
 
 <span class="sd">        Args:</span>
@@ -597,7 +688,7 @@
                     <span class="k">raise</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fd</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="FileComm.open"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.open"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the file.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">FileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
@@ -616,7 +707,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry_key</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">FileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_close</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FileComm.remove_file"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.remove_file">[docs]</a>    <span class="k">def</span> <span class="nf">remove_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.remove_file"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.remove_file">[docs]</a>    <span class="k">def</span> <span class="nf">remove_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the file.&quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_closed</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_series</span><span class="p">:</span>
@@ -697,7 +788,7 @@
                 <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">return</span> <span class="n">out</span>
 
-<div class="viewcode-block" id="FileComm.prepare_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.prepare_message">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.prepare_message"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.prepare_message">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform actions preparing to send a message.</span>
 
 <span class="sd">        Args:</span>
@@ -718,7 +809,7 @@
             <span class="c1"># self.close()</span>
         <span class="k">return</span> <span class="n">msg</span></div>
         
-<div class="viewcode-block" id="FileComm.serialize"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.serialize"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message using the associated serializer.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">concats_as_str</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_tell</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
@@ -828,7 +919,7 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">file_seek</span><span class="p">(</span><span class="n">prev_pos</span> <span class="o">+</span> <span class="n">len1</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">flag</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FileComm.purge"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FileComm.purge"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Purge all messages from the comm.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -839,30 +930,46 @@
 </pre></div>
 
            </div>
+           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
-  </div>
+    <p>
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

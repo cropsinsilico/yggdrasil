@@ -1,34 +1,72 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.NetCDFFileComm &mdash; yggdrasil v1.8.0 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+  <title>yggdrasil.communication.NetCDFFileComm &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
                 v1.8.0
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -36,8 +74,19 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
@@ -68,43 +117,85 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
           <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../communication.html">yggdrasil.communication</a> &raquo;</li>
+        
       <li>yggdrasil.communication.NetCDFFileComm</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <h1>Source code for yggdrasil.communication.NetCDFFileComm</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">netcdf</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication.FileComm</span> <span class="kn">import</span> <span class="n">FileComm</span>
+<span class="kn">from</span> <span class="nn">scipy.io</span> <span class="k">import</span> <span class="n">netcdf</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">units</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication.FileComm</span> <span class="k">import</span> <span class="n">FileComm</span>
 
 
-<div class="viewcode-block" id="NetCDFFileComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm">[docs]</a><span class="k">class</span> <span class="nc">NetCDFFileComm</span><span class="p">(</span><span class="n">FileComm</span><span class="p">):</span>
+<div class="viewcode-block" id="NetCDFFileComm"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm">[docs]</a><span class="k">class</span> <span class="nc">NetCDFFileComm</span><span class="p">(</span><span class="n">FileComm</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O from/to an netCDF file.</span>
 
 
@@ -130,13 +221,13 @@
     <span class="n">_mode_as_bytes</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">_synchronous_read</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;read_meth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;read&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">NetCDFFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="NetCDFFileComm.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="NetCDFFileComm.get_testing_options"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
@@ -205,17 +296,17 @@
 <span class="sd">        valid file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="NetCDFFileComm.serialize"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="NetCDFFileComm.serialize"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Don&#39;t serialize for netCDF since using a serializer</span>
 <span class="sd">        is inefficient.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">obj</span></div>
 
-<div class="viewcode-block" id="NetCDFFileComm.deserialize"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="NetCDFFileComm.deserialize"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Don&#39;t deserialize for netCDF since using a serializer</span>
 <span class="sd">        is inefficient.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">msg</span><span class="p">,</span> <span class="p">{}</span></div>
 
-<div class="viewcode-block" id="NetCDFFileComm.transform_type_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.transform_type_recv">[docs]</a>    <span class="k">def</span> <span class="nf">transform_type_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<div class="viewcode-block" id="NetCDFFileComm.transform_type_recv"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.transform_type_recv">[docs]</a>    <span class="k">def</span> <span class="nf">transform_type_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">x_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
         <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">x_dtype</span><span class="o">.</span><span class="n">char</span><span class="p">,</span> <span class="n">x_dtype</span><span class="o">.</span><span class="n">itemsize</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">typecode</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
@@ -233,7 +324,7 @@
                 <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">x</span></div>
 
-<div class="viewcode-block" id="NetCDFFileComm.transform_type_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.transform_type_send">[docs]</a>    <span class="k">def</span> <span class="nf">transform_type_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<div class="viewcode-block" id="NetCDFFileComm.transform_type_send"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.transform_type_send">[docs]</a>    <span class="k">def</span> <span class="nf">transform_type_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">x_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
         <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">x_dtype</span><span class="o">.</span><span class="n">char</span><span class="p">,</span> <span class="n">x_dtype</span><span class="o">.</span><span class="n">itemsize</span>
         <span class="n">typecode_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="s1">&#39;i&#39;</span><span class="p">}</span>
@@ -269,11 +360,11 @@
             <span class="n">out</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_address</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span>
         <span class="k">return</span> <span class="n">out</span>
 
-<div class="viewcode-block" id="NetCDFFileComm.file_tell"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.file_tell">[docs]</a>    <span class="k">def</span> <span class="nf">file_tell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NetCDFFileComm.file_tell"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.file_tell">[docs]</a>    <span class="k">def</span> <span class="nf">file_tell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Current position in the file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span></div>
     
-<div class="viewcode-block" id="NetCDFFileComm.file_seek"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.file_seek">[docs]</a>    <span class="k">def</span> <span class="nf">file_seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">whence</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">):</span>
+<div class="viewcode-block" id="NetCDFFileComm.file_seek"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.file_seek">[docs]</a>    <span class="k">def</span> <span class="nf">file_seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">whence</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Move in the file to the specified position.</span>
 
 <span class="sd">        Args:</span>
@@ -292,7 +383,7 @@
         <span class="k">elif</span> <span class="n">whence</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_size</span></div>
         
-<div class="viewcode-block" id="NetCDFFileComm.file_flush"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.file_flush">[docs]</a>    <span class="k">def</span> <span class="nf">file_flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NetCDFFileComm.file_flush"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.file_flush">[docs]</a>    <span class="k">def</span> <span class="nf">file_flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Flush the file.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">NetCDFFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">file_flush</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -373,30 +464,46 @@
 </pre></div>
 
            </div>
+           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
-  </div>
+    <p>
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

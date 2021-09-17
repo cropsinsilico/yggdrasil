@@ -1,34 +1,72 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema.datatypes.conversions &mdash; yggdrasil v1.8.0 documentation</title>
-      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  
+  <title>yggdrasil.metaschema.datatypes.conversions &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
                 v1.8.0
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -36,8 +74,19 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
@@ -68,32 +117,75 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../glossary.html">Glossary</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../index.html">yggdrasil</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
+        
           <li><a href="../datatypes.html">yggdrasil.metaschema.datatypes</a> &raquo;</li>
+        
       <li>yggdrasil.metaschema.datatypes.conversions</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <h1>Source code for yggdrasil.metaschema.datatypes.conversions</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">copy</span>
 
@@ -101,7 +193,7 @@
 <span class="n">_conversion_registry</span> <span class="o">=</span> <span class="p">{}</span>
 
 
-<div class="viewcode-block" id="register_conversion"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.conversions.register_conversion">[docs]</a><span class="k">def</span> <span class="nf">register_conversion</span><span class="p">(</span><span class="n">from_type</span><span class="p">,</span> <span class="n">to_type</span><span class="p">):</span>
+<div class="viewcode-block" id="register_conversion"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.conversions.register_conversion">[docs]</a><span class="k">def</span> <span class="nf">register_conversion</span><span class="p">(</span><span class="n">from_type</span><span class="p">,</span> <span class="n">to_type</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Register a conversion function for going between types.</span>
 
 <span class="sd">    Args:</span>
@@ -124,7 +216,7 @@
     <span class="k">return</span> <span class="n">decorator</span></div>
 
 
-<div class="viewcode-block" id="get_conversion"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.conversions.get_conversion">[docs]</a><span class="k">def</span> <span class="nf">get_conversion</span><span class="p">(</span><span class="n">from_type</span><span class="p">,</span> <span class="n">to_type</span><span class="p">):</span>
+<div class="viewcode-block" id="get_conversion"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.conversions.get_conversion">[docs]</a><span class="k">def</span> <span class="nf">get_conversion</span><span class="p">(</span><span class="n">from_type</span><span class="p">,</span> <span class="n">to_type</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a conversion function for moving from one type to the other.</span>
 
 <span class="sd">    Args:</span>
@@ -140,7 +232,7 @@
     <span class="k">return</span> <span class="n">_conversion_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ply2obj"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.conversions.ply2obj">[docs]</a><span class="nd">@register_conversion</span><span class="p">(</span><span class="s1">&#39;ply&#39;</span><span class="p">,</span> <span class="s1">&#39;obj&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="ply2obj"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.conversions.ply2obj">[docs]</a><span class="nd">@register_conversion</span><span class="p">(</span><span class="s1">&#39;ply&#39;</span><span class="p">,</span> <span class="s1">&#39;obj&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">ply2obj</span><span class="p">(</span><span class="n">ply</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a Ply object to an Obj object.</span>
 
@@ -169,7 +261,7 @@
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="obj2ply"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.conversions.obj2ply">[docs]</a><span class="nd">@register_conversion</span><span class="p">(</span><span class="s1">&#39;obj&#39;</span><span class="p">,</span> <span class="s1">&#39;ply&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="obj2ply"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.conversions.obj2ply">[docs]</a><span class="nd">@register_conversion</span><span class="p">(</span><span class="s1">&#39;obj&#39;</span><span class="p">,</span> <span class="s1">&#39;ply&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">obj2ply</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert an Obj object to a Ply object.</span>
 
@@ -205,30 +297,46 @@
 </pre></div>
 
            </div>
+           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
-  </div>
+    <p>
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

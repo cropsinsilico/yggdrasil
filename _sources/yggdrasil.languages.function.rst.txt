@@ -1,0 +1,10 @@
+yggdrasil.languages.function package
+====================================
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.languages.function
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,34 +1,72 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.CMakeModelDriver &mdash; yggdrasil v1.8.0 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+  <title>yggdrasil.drivers.CMakeModelDriver &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
                 v1.8.0
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -36,8 +74,19 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
@@ -68,31 +117,73 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
           <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
+        
       <li>yggdrasil.drivers.CMakeModelDriver</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <h1>Source code for yggdrasil.drivers.CMakeModelDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
@@ -101,20 +192,20 @@
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">sysconfig</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">constants</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">LinkerBase</span><span class="p">,</span> <span class="n">get_compilation_tool</span><span class="p">,</span> <span class="n">get_compatible_tool</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.BuildModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.BuildModelDriver</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">BuildModelDriver</span><span class="p">,</span> <span class="n">BuildToolBase</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="kn">import</span> <span class="n">CModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="k">import</span> <span class="n">CModelDriver</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="CMakeConfigure"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure">[docs]</a><span class="k">class</span> <span class="nc">CMakeConfigure</span><span class="p">(</span><span class="n">BuildToolBase</span><span class="p">):</span>
+<div class="viewcode-block" id="CMakeConfigure"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure">[docs]</a><span class="k">class</span> <span class="nc">CMakeConfigure</span><span class="p">(</span><span class="n">BuildToolBase</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;CMake configuration tool.&quot;&quot;&quot;</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;cmake&#39;</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cmake&#39;</span><span class="p">]</span>
@@ -136,7 +227,7 @@
                      <span class="s1">&#39;cmake_install.cmake&#39;</span><span class="p">,</span> <span class="s1">&#39;CMakeFiles&#39;</span><span class="p">]</span>
     <span class="n">remove_product_exts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CMakeFiles&#39;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="CMakeConfigure.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="CMakeConfigure.before_registration"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
 <span class="sd">        to registration including things like platform dependent properties and</span>
@@ -155,7 +246,7 @@
     <span class="c1"># The method generator and generator2toolset will only be called</span>
     <span class="c1"># if the VC 15 build tools are installed by MSVC 19+ which is not</span>
     <span class="c1"># currently supported by Appveyor CI.</span>
-<div class="viewcode-block" id="CMakeConfigure.generator"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.generator">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeConfigure.generator"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.generator">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">generator</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">return_default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the generator that should be used.</span>
 
@@ -187,7 +278,7 @@
                     <span class="k">break</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="CMakeConfigure.generator2toolset"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.generator2toolset">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeConfigure.generator2toolset"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.generator2toolset">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">generator2toolset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">generator</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the toolset string option that corresponds to the provided</span>
 <span class="sd">        generator name.</span>
@@ -222,7 +313,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Failed to locate toolset for generator: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">generator</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
-<div class="viewcode-block" id="CMakeConfigure.append_product"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.append_product">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeConfigure.append_product"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.append_product">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">append_product</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">new</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append a product to the specified list along with additional values</span>
 <span class="sd">        indicated by cls.product_exts.</span>
@@ -242,7 +333,7 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeConfigure</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">append_product</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span>
                                                          <span class="n">new</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
-<div class="viewcode-block" id="CMakeConfigure.get_output_file"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.get_output_file">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeConfigure.get_output_file"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.get_output_file">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_output_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dont_link</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dont_build</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">sourcedir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">builddir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -292,7 +383,7 @@
                 <span class="n">builddir</span><span class="o">=</span><span class="n">builddir</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="n">working_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="CMakeConfigure.call"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.call">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeConfigure.call"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.call">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call the tool with the provided arguments. If the first argument</span>
 <span class="sd">        resembles the name of the tool executable, the executable will not be</span>
@@ -329,7 +420,7 @@
             <span class="k">raise</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="CMakeConfigure.get_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.get_flags">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeConfigure.get_flags"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.get_flags">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sourcedir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">builddir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_compiler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">target_linker</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of configuration/generation flags.</span>
@@ -423,7 +514,7 @@
             <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-DCMAKE_LINKER=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">linker</span><span class="o">.</span><span class="n">get_executable</span><span class="p">(</span><span class="n">full_path</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="CMakeConfigure.get_executable_command"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.get_executable_command">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeConfigure.get_executable_command"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.get_executable_command">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_executable_command</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the command required to run the tool using the specified</span>
 <span class="sd">        arguments and options.</span>
@@ -454,7 +545,7 @@
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;sourcedir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeConfigure</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_executable_command</span><span class="p">(</span><span class="n">new_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
     
-<div class="viewcode-block" id="CMakeConfigure.fix_path"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.fix_path">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeConfigure.fix_path"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.fix_path">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fix_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">is_gnu</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Fix paths so that they conform to the format expected by the OS</span>
 <span class="sd">        and/or build tool.&quot;&quot;&quot;</span>
@@ -467,7 +558,7 @@
                 <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">x</span></div>
         
-<div class="viewcode-block" id="CMakeConfigure.create_include"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.create_include">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeConfigure.create_include"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.create_include">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">create_include</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span>
                        <span class="n">compiler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compiler_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">linker</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">linker_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -648,7 +739,7 @@
             <span class="k">return</span> <span class="n">pretarget_lines</span></div></div>
 
     
-<div class="viewcode-block" id="CMakeBuilder"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder">[docs]</a><span class="k">class</span> <span class="nc">CMakeBuilder</span><span class="p">(</span><span class="n">LinkerBase</span><span class="p">):</span>
+<div class="viewcode-block" id="CMakeBuilder"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder">[docs]</a><span class="k">class</span> <span class="nc">CMakeBuilder</span><span class="p">(</span><span class="n">LinkerBase</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;CMake build tool.&quot;&quot;&quot;</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;cmake&#39;</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cmake&#39;</span><span class="p">]</span>
@@ -661,7 +752,7 @@
     <span class="n">executable_ext</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="n">tool_suffix_format</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
-<div class="viewcode-block" id="CMakeBuilder.call"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder.call">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeBuilder.call"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder.call">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print contents of CMakeCache.txt before raising error.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
@@ -680,7 +771,7 @@
                 <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Cache file does not exist: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cache</span><span class="p">)</span>
             <span class="k">raise</span></div>
 
-<div class="viewcode-block" id="CMakeBuilder.extract_kwargs"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder.extract_kwargs">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeBuilder.extract_kwargs"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder.extract_kwargs">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">extract_kwargs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs_ex</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Extract linker kwargs, leaving behind just compiler kwargs.</span>
 
@@ -700,7 +791,7 @@
                                      <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;builddir&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">])</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeBuilder</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">extract_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs_ex</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CMakeBuilder.get_output_file"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder.get_output_file">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeBuilder.get_output_file"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder.get_output_file">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_output_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">builddir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the appropriate output file that will result when bulding</span>
 <span class="sd">        a given directory.</span>
@@ -740,7 +831,7 @@
             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">builddir</span><span class="p">,</span> <span class="n">target</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="CMakeBuilder.get_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder.get_flags">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeBuilder.get_flags"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder.get_flags">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">builddir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of build flags for building a project using cmake.</span>
 
@@ -769,7 +860,7 @@
                                                  <span class="n">builddir</span><span class="o">=</span><span class="n">builddir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="CMakeBuilder.get_executable_command"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder.get_executable_command">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeBuilder.get_executable_command"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder.get_executable_command">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_executable_command</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the command required to run the tool using the specified</span>
 <span class="sd">        arguments and options.</span>
@@ -800,7 +891,7 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeBuilder</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_executable_command</span><span class="p">([],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
     
 
-<div class="viewcode-block" id="CMakeModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver">[docs]</a><span class="k">class</span> <span class="nc">CMakeModelDriver</span><span class="p">(</span><span class="n">BuildModelDriver</span><span class="p">):</span>
+<div class="viewcode-block" id="CMakeModelDriver"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver">[docs]</a><span class="k">class</span> <span class="nc">CMakeModelDriver</span><span class="p">(</span><span class="n">BuildModelDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running cmake compiled drivers. Before running the</span>
 <span class="sd">    cmake command, the cmake commands for setting the necessary compiler &amp; linker</span>
 <span class="sd">    flags for the interface&#39;s C/C++ library are written to a file called</span>
@@ -846,13 +937,13 @@
     <span class="n">use_env_vars</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">buildfile_base</span> <span class="o">=</span> <span class="s1">&#39;CMakeLists.txt&#39;</span>
 
-<div class="viewcode-block" id="CMakeModelDriver.mpi_partner_init"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.mpi_partner_init">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeModelDriver.mpi_partner_init"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.mpi_partner_init">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">mpi_partner_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions initializing an MPIPartnerModel.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CMakeModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">mpi_partner_init</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">partner_buildfile_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
         
-<div class="viewcode-block" id="CMakeModelDriver.parse_arguments"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="CMakeModelDriver.parse_arguments"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort arguments based on their syntax to determine if an argument</span>
 <span class="sd">        is a source file, compilation flag, or runtime option/flag that should</span>
 <span class="sd">        be passed to the model executable.</span>
@@ -881,7 +972,7 @@
 <span class="sd">        updated w/ yggdrasil compilation flags.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;_ygg_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buildfile</span><span class="p">))</span>
     
-<div class="viewcode-block" id="CMakeModelDriver.write_wrappers"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.write_wrappers">[docs]</a>    <span class="k">def</span> <span class="nf">write_wrappers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="CMakeModelDriver.write_wrappers"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.write_wrappers">[docs]</a>    <span class="k">def</span> <span class="nf">write_wrappers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write any wrappers needed to compile and/or run a model.</span>
 
 <span class="sd">        Args:</span>
@@ -963,7 +1054,7 @@
                 <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="CMakeModelDriver.get_language_for_buildfile"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.get_language_for_buildfile">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeModelDriver.get_language_for_buildfile"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.get_language_for_buildfile">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_language_for_buildfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">buildfile</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the target language based on the contents of a build</span>
 <span class="sd">        file.</span>
@@ -989,7 +1080,7 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_language_for_buildfile</span><span class="p">(</span>
             <span class="n">buildfile</span><span class="p">)</span>  <span class="c1"># pragma: debug</span></div>
 
-<div class="viewcode-block" id="CMakeModelDriver.fix_path"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.fix_path">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeModelDriver.fix_path"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.fix_path">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fix_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">for_env</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update a path.</span>
 
@@ -1010,7 +1101,7 @@
             <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="CMakeModelDriver.get_target_language_info"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.get_target_language_info">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeModelDriver.get_target_language_info"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.get_target_language_info">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_target_language_info</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">target_compiler_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                  <span class="n">target_linker_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                  <span class="n">compiler_flag_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1115,7 +1206,7 @@
                     <span class="n">drv</span><span class="o">.</span><span class="n">get_compiler_flags</span><span class="p">(</span><span class="o">**</span><span class="n">drv_kws</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
-<div class="viewcode-block" id="CMakeModelDriver.compile_model"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.compile_model">[docs]</a>    <span class="k">def</span> <span class="nf">compile_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="CMakeModelDriver.compile_model"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.compile_model">[docs]</a>    <span class="k">def</span> <span class="nf">compile_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile model executable(s) and appends any products produced by</span>
 <span class="sd">        the compilation that should be removed after the run is complete.</span>
 
@@ -1149,7 +1240,7 @@
             <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">compile_model</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="CMakeModelDriver.prune_sh_gcc"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.prune_sh_gcc">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeModelDriver.prune_sh_gcc"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.prune_sh_gcc">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">prune_sh_gcc</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">gcc</span><span class="p">):</span>  <span class="c1"># pragma: appveyor</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove instances of sh.exe from the path that are not</span>
 <span class="sd">        associated with the selected gcc compiler. This can happen</span>
@@ -1183,7 +1274,7 @@
                 <span class="k">break</span>
         <span class="k">return</span> <span class="n">path</span></div>
 
-<div class="viewcode-block" id="CMakeModelDriver.update_compiler_kwargs"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.update_compiler_kwargs">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CMakeModelDriver.update_compiler_kwargs"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.update_compiler_kwargs">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">update_compiler_kwargs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update keyword arguments supplied to the compiler get_flags method</span>
 <span class="sd">        for various options.</span>
@@ -1223,30 +1314,46 @@
 </pre></div>
 
            </div>
+           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
-  </div>
+    <p>
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

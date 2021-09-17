@@ -1,35 +1,72 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  <meta charset="utf-8" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rpc_lesson3 &mdash; yggdrasil v1.8.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+  <title>rpc_lesson3 &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-    <script src="../_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
                 v1.8.0
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -37,8 +74,19 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
@@ -69,32 +117,74 @@
 <li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
       <li>rpc_lesson3</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
+          
             <a href="../_sources/examples/rpc_lesson3.rst.txt" rel="nofollow"> View page source</a>
+          
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
-  <section id="rpc-lesson3">
+            
+  <div class="section" id="rpc-lesson3">
 <span id="rpc-lesson3-rst"></span><h1>rpc_lesson3<a class="headerlink" href="#rpc-lesson3" title="Permalink to this headline">¶</a></h1>
+<p>Two models run in a client-server, remote procedure call (RPC) communication pattern. The client model <cite>client</cite> sends requests and receives response to/from the server model <cite>server</cite> via the deprecated <cite>call</cite> method. The server model receives requests and send responses. The <cite>client</cite> model receives request data from a file and send responses to a file. In the case of both models, yggdrasil auto-wraps functions with interface calls at runtime. This example demostrates the RPC pattern through the use of the <cite>client_of</cite> and <cite>is_server</cite> model parameters and the RPC interface classes/functions in conjunction with automated wrapping of model functions, including the use of the <cite>global_scope</cite> interface parameter when autowrapping functions that contain interface calls themselves.</p>
 <div class="contents local topic" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#c-version" id="id2">C Version</a></p></li>
@@ -105,385 +195,650 @@
 <li><p><a class="reference internal" href="#r-version" id="id7">R Version</a></p></li>
 </ul>
 </div>
-<section id="c-version">
+<div class="section" id="c-version">
 <h2><a class="toc-backref" href="#id2">C Version</a><a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="kt">int</span><span class="w"> </span><span class="nf">model_function</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">in_buf</span><span class="p">,</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">length_in_buf</span><span class="p">,</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">		   </span><span class="kt">char</span><span class="w"> </span><span class="o">**</span><span class="n">out_buf</span><span class="p">,</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="o">*</span><span class="n">length_out_buf</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C): %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">in_buf</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="n">length_out_buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">length_in_buf</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="n">out_buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">length_in_buf</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="n">memcpy</span><span class="p">(</span><span class="n">out_buf</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">in_buf</span><span class="p">,</span><span class="w"> </span><span class="n">length_in_buf</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="n">out_buf</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">length_in_buf</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;\0&#39;</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">11</span><span class="p">};</span><span class="w"></span>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">model_function</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">in_buf</span><span class="p">,</span> <span class="kt">uint64_t</span> <span class="n">length_in_buf</span><span class="p">,</span>
+		   <span class="kt">char</span> <span class="o">**</span><span class="n">out_buf</span><span class="p">,</span> <span class="kt">uint64_t</span> <span class="o">*</span><span class="n">length_out_buf</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C): %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">in_buf</span><span class="p">);</span>
+  <span class="n">length_out_buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">length_in_buf</span><span class="p">;</span>
+  <span class="n">out_buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">length_in_buf</span><span class="p">);</span>
+  <span class="n">memcpy</span><span class="p">(</span><span class="n">out_buf</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">in_buf</span><span class="p">,</span> <span class="n">length_in_buf</span><span class="p">);</span>
+  <span class="n">out_buf</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">length_in_buf</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">};</span>
 </pre></div>
-</div>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 3</span>
-<span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="kt">int</span><span class="w"> </span><span class="nf">model_function</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">in_buf</span><span class="p">,</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">length_in_buf</span><span class="p">,</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">		   </span><span class="kt">char</span><span class="o">**</span><span class="w"> </span><span class="n">out_buf</span><span class="p">,</span><span class="w"> </span><span class="kt">uint64_t</span><span class="o">*</span><span class="w"> </span><span class="n">length_out_buf</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="c1">// The WITH_GLOBAL_SCOPE macro is required to ensure that the comm persists</span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="c1">// between function calls</span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="n">WITH_GLOBAL_SCOPE</span><span class="p">(</span><span class="n">yggRpc_t</span><span class="w"> </span><span class="n">rpc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggRpcClient</span><span class="p">(</span><span class="s">&quot;server_client&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%s&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%s&quot;</span><span class="p">));</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C): %s (length = %d)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">in_buf</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">length_in_buf</span><span class="p">));</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rpcCallRealloc</span><span class="p">(</span><span class="n">rpc</span><span class="p">,</span><span class="w"> </span><span class="n">in_buf</span><span class="p">,</span><span class="w"> </span><span class="n">length_in_buf</span><span class="p">,</span><span class="w"> </span><span class="n">out_buf</span><span class="p">,</span><span class="w"> </span><span class="n">length_out_buf</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C): RPC CALL ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">17</span><span class="p">}</span><span class="w"></span>
+</td></tr></table></div>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+
+
+<span class="kt">int</span> <span class="nf">model_function</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">in_buf</span><span class="p">,</span> <span class="kt">uint64_t</span> <span class="n">length_in_buf</span><span class="p">,</span>
+		   <span class="kt">char</span><span class="o">**</span> <span class="n">out_buf</span><span class="p">,</span> <span class="kt">uint64_t</span><span class="o">*</span> <span class="n">length_out_buf</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// The WITH_GLOBAL_SCOPE macro is required to ensure that the comm persists</span>
+  <span class="c1">// between function calls</span>
+  <span class="n">WITH_GLOBAL_SCOPE</span><span class="p">(</span><span class="n">yggRpc_t</span> <span class="n">rpc</span> <span class="o">=</span> <span class="n">yggRpcClient</span><span class="p">(</span><span class="s">&quot;server_client&quot;</span><span class="p">,</span> <span class="s">&quot;%s&quot;</span><span class="p">,</span> <span class="s">&quot;%s&quot;</span><span class="p">));</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C): %s (length = %d)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">in_buf</span><span class="p">,</span> <span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">length_in_buf</span><span class="p">));</span>
+  <span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">rpcCallRealloc</span><span class="p">(</span><span class="n">rpc</span><span class="p">,</span> <span class="n">in_buf</span><span class="p">,</span> <span class="n">length_in_buf</span><span class="p">,</span> <span class="n">out_buf</span><span class="p">,</span> <span class="n">length_out_buf</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C): RPC CALL ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
-<span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-<span class="linenos"> 5</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-<span class="linenos"> 6</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.c</span>
-<span class="linenos"> 7</span>  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-<span class="linenos"> 8</span>  <span class="nt">is_server</span><span class="p">:</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
-<span class="linenos"> 9</span>    <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
-<span class="linenos">10</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
-<span class="linenos">11</span>  <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
-<span class="linenos">12</span>  <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
+
+<span class="nt">model</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.c</span>
+  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+  <span class="nt">is_server</span><span class="p">:</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
+    <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
+    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
+  <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
+  <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
 </pre></div>
-</div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
-<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.c</span>
-<span class="linenos"> 5</span>  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-<span class="linenos"> 6</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-<span class="linenos"> 7</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 8</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
-<span class="linenos"> 9</span>    <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">10</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
-<span class="linenos">11</span>      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
-<span class="linenos">12</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">13</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
-<span class="linenos">14</span>    <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">15</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
-<span class="linenos">16</span>      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</td></tr></table></div>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
+  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.c</span>
+  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+  <span class="nt">inputs</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
+    <span class="nt">default_file</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
+  <span class="nt">outputs</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
+    <span class="nt">default_file</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
+      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 </pre></div>
+</td></tr></table></div>
 </div>
-</section>
-<section id="id1">
+<div class="section" id="id1">
 <h2><a class="toc-backref" href="#id3">C++ Version</a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="kt">int</span><span class="w"> </span><span class="nf">model_function</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">in_buf</span><span class="p">,</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">length_in_buf</span><span class="p">,</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">		   </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="o">&amp;</span><span class="n">out_buf</span><span class="p">,</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="o">&amp;</span><span class="n">length_out_buf</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;server(C++): &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">in_buf</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="n">length_out_buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">length_in_buf</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="n">out_buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">realloc</span><span class="p">(</span><span class="n">out_buf</span><span class="p">,</span><span class="w"> </span><span class="n">length_in_buf</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="n">memcpy</span><span class="p">(</span><span class="n">out_buf</span><span class="p">,</span><span class="w"> </span><span class="n">in_buf</span><span class="p">,</span><span class="w"> </span><span class="n">length_in_buf</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="n">out_buf</span><span class="p">[</span><span class="n">length_in_buf</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;\0&#39;</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">11</span><span class="p">};</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">model_function</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">in_buf</span><span class="p">,</span> <span class="kt">uint64_t</span> <span class="n">length_in_buf</span><span class="p">,</span>
+		   <span class="kt">char</span><span class="o">*</span> <span class="o">&amp;</span><span class="n">out_buf</span><span class="p">,</span> <span class="kt">uint64_t</span> <span class="o">&amp;</span><span class="n">length_out_buf</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;server(C++): &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">in_buf</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+  <span class="n">length_out_buf</span> <span class="o">=</span> <span class="n">length_in_buf</span><span class="p">;</span>
+  <span class="n">out_buf</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">realloc</span><span class="p">(</span><span class="n">out_buf</span><span class="p">,</span> <span class="n">length_in_buf</span><span class="p">);</span>
+  <span class="n">memcpy</span><span class="p">(</span><span class="n">out_buf</span><span class="p">,</span> <span class="n">in_buf</span><span class="p">,</span> <span class="n">length_in_buf</span><span class="p">);</span>
+  <span class="n">out_buf</span><span class="p">[</span><span class="n">length_in_buf</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">};</span>
 </pre></div>
-</div>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-<span class="linenos"> 3</span>
-<span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="kt">int</span><span class="w"> </span><span class="nf">model_function</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">in_buf</span><span class="p">,</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">length_in_buf</span><span class="p">,</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">		   </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="o">&amp;</span><span class="n">out_buf</span><span class="p">,</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="o">&amp;</span><span class="n">length_out_buf</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="c1">// The WITH_GLOBAL_SCOPE macro is required to ensure that the comm persists</span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="c1">// between function calls</span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="n">WITH_GLOBAL_SCOPE</span><span class="p">(</span><span class="n">YggRpcClient</span><span class="w"> </span><span class="n">rpc</span><span class="p">(</span><span class="s">&quot;server_client&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%s&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%s&quot;</span><span class="p">));</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;client(C++): &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">in_buf</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; (length = &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">length_in_buf</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;)&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rpc</span><span class="p">.</span><span class="n">callRealloc</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">in_buf</span><span class="p">,</span><span class="w"> </span><span class="n">length_in_buf</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">out_buf</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">length_out_buf</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;client(C++): RPC CALL ERROR&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">17</span><span class="p">}</span><span class="w"></span>
+</td></tr></table></div>
+<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+
+
+<span class="kt">int</span> <span class="nf">model_function</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">in_buf</span><span class="p">,</span> <span class="kt">uint64_t</span> <span class="n">length_in_buf</span><span class="p">,</span>
+		   <span class="kt">char</span><span class="o">*</span> <span class="o">&amp;</span><span class="n">out_buf</span><span class="p">,</span> <span class="kt">uint64_t</span> <span class="o">&amp;</span><span class="n">length_out_buf</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// The WITH_GLOBAL_SCOPE macro is required to ensure that the comm persists</span>
+  <span class="c1">// between function calls</span>
+  <span class="n">WITH_GLOBAL_SCOPE</span><span class="p">(</span><span class="n">YggRpcClient</span> <span class="n">rpc</span><span class="p">(</span><span class="s">&quot;server_client&quot;</span><span class="p">,</span> <span class="s">&quot;%s&quot;</span><span class="p">,</span> <span class="s">&quot;%s&quot;</span><span class="p">));</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;client(C++): &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">in_buf</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; (length = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">length_in_buf</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;)&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">rpc</span><span class="p">.</span><span class="n">callRealloc</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">in_buf</span><span class="p">,</span> <span class="n">length_in_buf</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">out_buf</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">length_out_buf</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;client(C++): RPC CALL ERROR&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
-<span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-<span class="linenos">5</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.cpp</span>
-<span class="linenos">7</span>  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-<span class="linenos">8</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
+
+<span class="nt">model</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
+  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.cpp</span>
+  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
 </pre></div>
-</div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
-<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
-<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.cpp</span>
-<span class="linenos"> 5</span>  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-<span class="linenos"> 6</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-<span class="linenos"> 7</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 8</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
-<span class="linenos"> 9</span>    <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">10</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
-<span class="linenos">11</span>      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
-<span class="linenos">12</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">13</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
-<span class="linenos">14</span>    <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">15</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
-<span class="linenos">16</span>      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</td></tr></table></div>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
+  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
+  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.cpp</span>
+  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+  <span class="nt">inputs</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
+    <span class="nt">default_file</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
+  <span class="nt">outputs</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
+    <span class="nt">default_file</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
+      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 </pre></div>
+</td></tr></table></div>
 </div>
-</section>
-<section id="fortran-version">
+<div class="section" id="fortran-version">
 <h2><a class="toc-backref" href="#id4">Fortran Version</a><a class="headerlink" href="#fortran-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">function</span> <span class="n">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">,</span> <span class="n">out_buf</span><span class="p">)</span> <span class="n">result</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-<span class="linenos">2</span>  <span class="n">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="n">intent</span><span class="p">(</span><span class="ow">in</span><span class="p">)</span> <span class="p">::</span> <span class="n">in_buf</span>
-<span class="linenos">3</span>  <span class="n">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="n">pointer</span> <span class="p">::</span> <span class="n">out_buf</span>
-<span class="linenos">4</span>  <span class="n">logical</span> <span class="p">::</span> <span class="n">out</span>
-<span class="linenos">5</span>  <span class="n">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(&quot;server(Fortran): &quot;,A)&#39;</span><span class="p">)</span> <span class="n">in_buf</span>
-<span class="linenos">6</span>  <span class="n">out</span> <span class="o">=</span> <span class="o">.</span><span class="n">true</span><span class="o">.</span>
-<span class="linenos">7</span>  <span class="n">allocate</span><span class="p">(</span><span class="n">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">in_buf</span><span class="p">))</span> <span class="p">::</span> <span class="n">out_buf</span><span class="p">)</span>
-<span class="linenos">8</span>  <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
-<span class="linenos">9</span><span class="n">end</span> <span class="n">function</span> <span class="n">model_function</span>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">function</span> <span class="n">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">,</span> <span class="n">out_buf</span><span class="p">)</span> <span class="n">result</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+  <span class="n">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="n">intent</span><span class="p">(</span><span class="ow">in</span><span class="p">)</span> <span class="p">::</span> <span class="n">in_buf</span>
+  <span class="n">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="n">pointer</span> <span class="p">::</span> <span class="n">out_buf</span>
+  <span class="n">logical</span> <span class="p">::</span> <span class="n">out</span>
+  <span class="n">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(&quot;server(Fortran): &quot;,A)&#39;</span><span class="p">)</span> <span class="n">in_buf</span>
+  <span class="n">out</span> <span class="o">=</span> <span class="o">.</span><span class="n">true</span><span class="o">.</span>
+  <span class="n">allocate</span><span class="p">(</span><span class="n">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">in_buf</span><span class="p">))</span> <span class="p">::</span> <span class="n">out_buf</span><span class="p">)</span>
+  <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
+<span class="n">end</span> <span class="n">function</span> <span class="n">model_function</span>
 </pre></div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="n">function</span> <span class="n">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">,</span> <span class="n">out_buf</span><span class="p">)</span> <span class="n">result</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
-<span class="linenos"> 2</span>  <span class="n">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="n">intent</span><span class="p">(</span><span class="ow">in</span><span class="p">)</span> <span class="p">::</span> <span class="n">in_buf</span>
-<span class="linenos"> 3</span>  <span class="nb">type</span><span class="p">(</span><span class="n">yggchar_r</span><span class="p">)</span> <span class="p">::</span> <span class="n">out_buf</span>
-<span class="linenos"> 4</span>  <span class="n">logical</span> <span class="p">::</span> <span class="n">ret</span>
-<span class="linenos"> 5</span>  <span class="nb">type</span><span class="p">(</span><span class="n">yggcomm</span><span class="p">)</span> <span class="p">::</span> <span class="n">rpc</span>
-<span class="linenos"> 6</span>  <span class="n">WITH_GLOBAL_SCOPE</span><span class="p">(</span><span class="n">rpc</span> <span class="o">=</span> <span class="n">ygg_rpc_client</span><span class="p">(</span><span class="s2">&quot;server_client&quot;</span><span class="p">))</span>
-<span class="linenos"> 7</span>  <span class="n">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(&quot;client(F): &quot;,A,&quot; (length = &quot;,I3,&quot;)&quot;)&#39;</span><span class="p">)</span> <span class="n">in_buf</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_buf</span><span class="p">)</span>
-<span class="linenos"> 8</span>  <span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_rpc_call_realloc</span><span class="p">(</span><span class="n">rpc</span><span class="p">,</span> <span class="n">yggarg</span><span class="p">(</span><span class="n">in_buf</span><span class="p">),</span> <span class="n">yggarg</span><span class="p">(</span><span class="n">out_buf</span><span class="p">))</span>
-<span class="linenos"> 9</span>  <span class="k">if</span> <span class="p">(</span><span class="o">.</span><span class="ow">not</span><span class="o">.</span><span class="n">ret</span><span class="p">)</span> <span class="n">then</span>
-<span class="linenos">10</span>     <span class="n">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(&quot;client(F): RPC CALL ERROR&quot;)&#39;</span><span class="p">)</span>
-<span class="linenos">11</span>     <span class="n">stop</span> <span class="mi">1</span>
-<span class="linenos">12</span>  <span class="n">end</span> <span class="k">if</span>
-<span class="linenos">13</span><span class="n">end</span> <span class="n">function</span> <span class="n">model_function</span>
+</td></tr></table></div>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">function</span> <span class="n">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">,</span> <span class="n">out_buf</span><span class="p">)</span> <span class="n">result</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+  <span class="n">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="n">intent</span><span class="p">(</span><span class="ow">in</span><span class="p">)</span> <span class="p">::</span> <span class="n">in_buf</span>
+  <span class="nb">type</span><span class="p">(</span><span class="n">yggchar_r</span><span class="p">)</span> <span class="p">::</span> <span class="n">out_buf</span>
+  <span class="n">logical</span> <span class="p">::</span> <span class="n">ret</span>
+  <span class="nb">type</span><span class="p">(</span><span class="n">yggcomm</span><span class="p">)</span> <span class="p">::</span> <span class="n">rpc</span>
+  <span class="n">WITH_GLOBAL_SCOPE</span><span class="p">(</span><span class="n">rpc</span> <span class="o">=</span> <span class="n">ygg_rpc_client</span><span class="p">(</span><span class="s2">&quot;server_client&quot;</span><span class="p">))</span>
+  <span class="n">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(&quot;client(F): &quot;,A,&quot; (length = &quot;,I3,&quot;)&quot;)&#39;</span><span class="p">)</span> <span class="n">in_buf</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_buf</span><span class="p">)</span>
+  <span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_rpc_call_realloc</span><span class="p">(</span><span class="n">rpc</span><span class="p">,</span> <span class="n">yggarg</span><span class="p">(</span><span class="n">in_buf</span><span class="p">),</span> <span class="n">yggarg</span><span class="p">(</span><span class="n">out_buf</span><span class="p">))</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">.</span><span class="ow">not</span><span class="o">.</span><span class="n">ret</span><span class="p">)</span> <span class="n">then</span>
+     <span class="n">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(&quot;client(F): RPC CALL ERROR&quot;)&#39;</span><span class="p">)</span>
+     <span class="n">stop</span> <span class="mi">1</span>
+  <span class="n">end</span> <span class="k">if</span>
+<span class="n">end</span> <span class="n">function</span> <span class="n">model_function</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
-<span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-<span class="linenos">5</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">fortran</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.f90</span>
-<span class="linenos">7</span>  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-<span class="linenos">8</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
+
+<span class="nt">model</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">fortran</span>
+  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.f90</span>
+  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
 </pre></div>
-</div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
-<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">fortran</span>
-<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.f90</span>
-<span class="linenos"> 5</span>  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-<span class="linenos"> 6</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-<span class="linenos"> 7</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 8</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
-<span class="linenos"> 9</span>    <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">10</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
-<span class="linenos">11</span>      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
-<span class="linenos">12</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">13</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
-<span class="linenos">14</span>    <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">15</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
-<span class="linenos">16</span>      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</td></tr></table></div>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
+  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">fortran</span>
+  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.f90</span>
+  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+  <span class="nt">inputs</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
+    <span class="nt">default_file</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
+  <span class="nt">outputs</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
+    <span class="nt">default_file</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
+      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 </pre></div>
+</td></tr></table></div>
 </div>
-</section>
-<section id="matlab-version">
+<div class="section" id="matlab-version">
 <h2><a class="toc-backref" href="#id5">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">function</span><span class="w"> </span>out_buf<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">server</span><span class="p">(</span>in_buf<span class="p">)</span><span class="w"></span>
-<span class="linenos">2</span><span class="w">  </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;server(Matlab): %s\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">in_buf</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">3</span><span class="w">  </span><span class="n">out_buf</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">in_buf</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">4</span><span class="k">end</span><span class="w"></span>
+<div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span>out_buf <span class="p">=</span><span class="w"> </span><span class="nf">server</span><span class="p">(</span>in_buf<span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;server(Matlab): %s\n&#39;</span><span class="p">,</span> <span class="n">in_buf</span><span class="p">);</span>
+  <span class="n">out_buf</span> <span class="p">=</span> <span class="n">in_buf</span><span class="p">;</span>
+<span class="k">end</span>
 </pre></div>
-</div>
-<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">function</span><span class="w"> </span>out_buf<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">client</span><span class="p">(</span>in_buf<span class="p">)</span><span class="w"></span>
-<span class="linenos"> 2</span><span class="w">  </span><span class="c">% The global_scope keyword is required to ensure that the comm persists</span><span class="w"></span>
-<span class="linenos"> 3</span><span class="w">  </span><span class="c">% between function calls</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="n">rpc</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggRpcClient&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;server_client&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;global_scope&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nb">disp</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span><span class="s">&#39;client(Matlab): %s&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">in_buf</span><span class="p">));</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="p">[</span><span class="n">ret</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">rpc</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="n">in_buf</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">    </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;client(Matlab): RPC CALL ERROR&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="n">out_buf</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">result</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">11</span><span class="k">end</span><span class="w"></span>
+</td></tr></table></div>
+<div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span>out_buf <span class="p">=</span><span class="w"> </span><span class="nf">client</span><span class="p">(</span>in_buf<span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="c">% The global_scope keyword is required to ensure that the comm persists</span>
+  <span class="c">% between function calls</span>
+  <span class="n">rpc</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggRpcClient&#39;</span><span class="p">,</span> <span class="s">&#39;server_client&#39;</span><span class="p">,</span> <span class="s">&#39;global_scope&#39;</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
+  <span class="nb">disp</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;client(Matlab): %s&#39;</span><span class="p">,</span> <span class="n">in_buf</span><span class="p">));</span>
+  <span class="p">[</span><span class="n">ret</span><span class="p">,</span> <span class="n">result</span><span class="p">]</span> <span class="p">=</span> <span class="n">rpc</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="n">in_buf</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span>
+    <span class="n">error</span><span class="p">(</span><span class="s">&#39;client(Matlab): RPC CALL ERROR&#39;</span><span class="p">);</span>
+  <span class="k">end</span><span class="p">;</span>
+  <span class="n">out_buf</span> <span class="p">=</span> <span class="n">result</span><span class="p">;</span>
+<span class="k">end</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
-<span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-<span class="linenos">5</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.m</span>
-<span class="linenos">7</span>  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># matlab requires function to match file</span>
-<span class="linenos">8</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
+
+<span class="nt">model</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
+  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.m</span>
+  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># matlab requires function to match file</span>
+  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
 </pre></div>
-</div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
-<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
-<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.m</span>
-<span class="linenos"> 5</span>  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>  <span class="c1"># Matlab requires the same name</span>
-<span class="linenos"> 6</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-<span class="linenos"> 7</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 8</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
-<span class="linenos"> 9</span>    <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">10</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
-<span class="linenos">11</span>      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
-<span class="linenos">12</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">13</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
-<span class="linenos">14</span>    <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">15</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
-<span class="linenos">16</span>      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</td></tr></table></div>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
+  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
+  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.m</span>
+  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>  <span class="c1"># Matlab requires the same name</span>
+  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+  <span class="nt">inputs</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
+    <span class="nt">default_file</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
+  <span class="nt">outputs</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
+    <span class="nt">default_file</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
+      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 </pre></div>
+</td></tr></table></div>
 </div>
-</section>
-<section id="python-version">
+<div class="section" id="python-version">
 <h2><a class="toc-backref" href="#id6">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
-<span class="linenos">2</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;server(Python): </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
-<span class="linenos">3</span>    <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
-<span class="linenos">4</span>    <span class="k">return</span> <span class="n">out_buf</span>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;server(Python): </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
+    <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
+    <span class="k">return</span> <span class="n">out_buf</span>
 </pre></div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">yggdrasil.languages.Python.YggInterface</span> <span class="kn">import</span> <span class="n">YggRpcClient</span>
-<span class="linenos"> 2</span>
-<span class="linenos"> 3</span>
-<span class="linenos"> 4</span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
-<span class="linenos"> 5</span>    <span class="c1"># The global_scope keyword is required to ensure that the comm persists</span>
-<span class="linenos"> 6</span>    <span class="c1"># between function calls</span>
-<span class="linenos"> 7</span>    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcClient</span><span class="p">(</span><span class="s1">&#39;server_client&#39;</span><span class="p">,</span> <span class="n">global_scope</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="linenos"> 8</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;client(Python): </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
-<span class="linenos"> 9</span>    <span class="n">ret</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">in_buf</span><span class="p">)</span>
-<span class="linenos">10</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
-<span class="linenos">11</span>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;client(Python): RPC CALL ERROR&#39;</span><span class="p">)</span>
-<span class="linenos">12</span>    <span class="n">out_buf</span> <span class="o">=</span> <span class="n">result</span>
-<span class="linenos">13</span>    <span class="k">return</span> <span class="n">out_buf</span>
+</td></tr></table></div>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">yggdrasil.languages.Python.YggInterface</span> <span class="kn">import</span> <span class="n">YggRpcClient</span>
+
+
+<span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
+    <span class="c1"># The global_scope keyword is required to ensure that the comm persists</span>
+    <span class="c1"># between function calls</span>
+    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcClient</span><span class="p">(</span><span class="s1">&#39;server_client&#39;</span><span class="p">,</span> <span class="n">global_scope</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;client(Python): </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
+    <span class="n">ret</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">in_buf</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;client(Python): RPC CALL ERROR&#39;</span><span class="p">)</span>
+    <span class="n">out_buf</span> <span class="o">=</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">out_buf</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-<span class="linenos">3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
-<span class="linenos">5</span>  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-<span class="linenos">6</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
+  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
-</div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
-<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
-<span class="linenos"> 5</span>  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-<span class="linenos"> 6</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-<span class="linenos"> 7</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 8</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
-<span class="linenos"> 9</span>    <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">10</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
-<span class="linenos">11</span>      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
-<span class="linenos">12</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">13</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
-<span class="linenos">14</span>    <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">15</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
-<span class="linenos">16</span>      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</td></tr></table></div>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
+  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+  <span class="nt">inputs</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
+    <span class="nt">default_file</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
+  <span class="nt">outputs</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
+    <span class="nt">default_file</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
+      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 </pre></div>
+</td></tr></table></div>
 </div>
-</section>
-<section id="r-version">
+<div class="section" id="r-version">
 <h2><a class="toc-backref" href="#id7">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">model_function</span> <span class="o">&lt;-</span> <span class="n">function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">)</span> <span class="p">{</span>
-<span class="linenos">2</span>  <span class="n">fprintf</span><span class="p">(</span><span class="s1">&#39;server(R): </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">in_buf</span><span class="p">)</span>
-<span class="linenos">3</span>  <span class="n">out_buf</span> <span class="o">&lt;-</span> <span class="n">in_buf</span>
-<span class="linenos">4</span>  <span class="k">return</span><span class="p">(</span><span class="n">out_buf</span><span class="p">);</span>
-<span class="linenos">5</span><span class="p">}</span>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">model_function</span> <span class="o">&lt;-</span> <span class="n">function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">fprintf</span><span class="p">(</span><span class="s1">&#39;server(R): </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">in_buf</span><span class="p">)</span>
+  <span class="n">out_buf</span> <span class="o">&lt;-</span> <span class="n">in_buf</span>
+  <span class="k">return</span><span class="p">(</span><span class="n">out_buf</span><span class="p">);</span>
+<span class="p">}</span>
 </pre></div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>model_function &lt;- function(in_buf) {
-<span class="linenos"> 2</span>  # The global_scope keyword is required to ensure that the comm persists
-<span class="linenos"> 3</span>  # between function calls
-<span class="linenos"> 4</span>  rpc &lt;- YggInterface(&#39;YggRpcClient&#39;, &#39;server_client&#39;, global_scope=TRUE)
-<span class="linenos"> 5</span>  print(sprintf(&quot;client(R): %s&quot;, in_buf))
-<span class="linenos"> 6</span>  c(ret, result) %&lt;-% rpc$call(in_buf)
-<span class="linenos"> 7</span>  if (!ret) {
-<span class="linenos"> 8</span>    stop(&#39;client(R): RPC CALL ERROR&#39;)
-<span class="linenos"> 9</span>  }
-<span class="linenos">10</span>  out_buf &lt;- result[[1]]
-<span class="linenos">11</span>  return(out_buf)
-<span class="linenos">12</span>}
+</td></tr></table></div>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span></span>model_function &lt;- function(in_buf) {
+  # The global_scope keyword is required to ensure that the comm persists
+  # between function calls
+  rpc &lt;- YggInterface(&#39;YggRpcClient&#39;, &#39;server_client&#39;, global_scope=TRUE)
+  print(sprintf(&quot;client(R): %s&quot;, in_buf))
+  c(ret, result) %&lt;-% rpc$call(in_buf)
+  if (!ret) {
+    stop(&#39;client(R): RPC CALL ERROR&#39;)
+  }
+  out_buf &lt;- result[[1]]
+  return(out_buf)
+}
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
-<span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-<span class="linenos">5</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.R</span>
-<span class="linenos">7</span>  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-<span class="linenos">8</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
+
+<span class="nt">model</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
+  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.R</span>
+  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
 </pre></div>
-</div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
-<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
-<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.R</span>
-<span class="linenos"> 5</span>  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-<span class="linenos"> 6</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-<span class="linenos"> 7</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 8</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
-<span class="linenos"> 9</span>    <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">10</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
-<span class="linenos">11</span>      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
-<span class="linenos">12</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">13</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
-<span class="linenos">14</span>    <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">15</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
-<span class="linenos">16</span>      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</td></tr></table></div>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
+  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
+  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.R</span>
+  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+  <span class="nt">inputs</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
+    <span class="nt">default_file</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
+  <span class="nt">outputs</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
+    <span class="nt">default_file</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
+      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 </pre></div>
+</td></tr></table></div>
 </div>
-</section>
-</section>
+</div>
 
 
            </div>
+           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
-  </div>
+    <p>
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

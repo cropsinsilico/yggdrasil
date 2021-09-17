@@ -1,6 +1,6 @@
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/SaM/src/SaM.py
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.py
    :language: python
    :linenos:
 

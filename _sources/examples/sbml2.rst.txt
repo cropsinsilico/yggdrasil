@@ -3,6 +3,9 @@
 sbml2
 =====================
 
+A single SBML model runs with input from a files and output to a series of files. This example demonstrates how to control the SBML integration via model parameters in the YAML (e.g. tolerance, time steps, initial conditions).
+
+
 .. contents:: :local:
 
 SBML Version
@@ -10,14 +13,14 @@ SBML Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/sbml2/src/sbml2.xml
+.. literalinclude:: /../../yggdrasil/examples/sbml2/src/sbml2.xml
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/sbml2/sbml2.yml
+.. literalinclude:: /../../yggdrasil/examples/sbml2/sbml2.yml
    :language: yaml
    :linenos:
 

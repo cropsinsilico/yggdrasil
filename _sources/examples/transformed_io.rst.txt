@@ -3,6 +3,9 @@
 transformed_io
 =======================================
 
+Three models, A, B, & C, pass messages which are transformed based on YAML parameters. Model A receives input from a tab delimited table and sends output to both models B & C. The output to each model is transformed in different ways controlled by the `transform` comm model parameter. Models B & C both send output to tables.
+
+
 .. contents:: :local:
 
 C Version
@@ -10,22 +13,22 @@ C Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/src/transformed_io_modelA.c
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/src/transformed_io_modelA.c
    :language: c
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/src/transformed_io_modelB.c
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/src/transformed_io_modelB.c
    :language: c
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/src/transformed_io_modelC.c
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/src/transformed_io_modelC.c
    :language: c
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/transformed_io_c.yml
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/transformed_io_c.yml
    :language: yaml
    :linenos:
 
@@ -36,22 +39,22 @@ C++ Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/src/transformed_io_modelA.cpp
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/src/transformed_io_modelA.cpp
    :language: c++
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/src/transformed_io_modelB.cpp
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/src/transformed_io_modelB.cpp
    :language: c++
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/src/transformed_io_modelC.cpp
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/src/transformed_io_modelC.cpp
    :language: c++
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/transformed_io_cpp.yml
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/transformed_io_cpp.yml
    :language: yaml
    :linenos:
 
@@ -62,22 +65,22 @@ Matlab Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/src/transformed_io_modelA.m
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/src/transformed_io_modelA.m
    :language: matlab
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/src/transformed_io_modelB.m
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/src/transformed_io_modelB.m
    :language: matlab
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/src/transformed_io_modelC.m
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/src/transformed_io_modelC.m
    :language: matlab
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/transformed_io_matlab.yml
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/transformed_io_matlab.yml
    :language: yaml
    :linenos:
 
@@ -88,22 +91,22 @@ Python Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/src/transformed_io_modelA.py
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/src/transformed_io_modelA.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/src/transformed_io_modelB.py
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/src/transformed_io_modelB.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/src/transformed_io_modelC.py
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/src/transformed_io_modelC.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/transformed_io_python.yml
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/transformed_io_python.yml
    :language: yaml
    :linenos:
 
@@ -114,22 +117,22 @@ R Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/src/transformed_io_modelA.R
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/src/transformed_io_modelA.R
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/src/transformed_io_modelB.R
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/src/transformed_io_modelB.R
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/src/transformed_io_modelC.R
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/src/transformed_io_modelC.R
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transformed_io/transformed_io_r.yml
+.. literalinclude:: /../../yggdrasil/examples/transformed_io/transformed_io_r.yml
    :language: yaml
    :linenos:
 

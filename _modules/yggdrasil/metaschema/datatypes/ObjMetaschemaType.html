@@ -1,34 +1,72 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema.datatypes.ObjMetaschemaType &mdash; yggdrasil v1.8.0 documentation</title>
-      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  
+  <title>yggdrasil.metaschema.datatypes.ObjMetaschemaType &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
                 v1.8.0
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -36,8 +74,19 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
@@ -68,43 +117,86 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../glossary.html">Glossary</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../index.html">yggdrasil</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
+        
           <li><a href="../datatypes.html">yggdrasil.metaschema.datatypes</a> &raquo;</li>
+        
       <li>yggdrasil.metaschema.datatypes.ObjMetaschemaType</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <h1>Source code for yggdrasil.metaschema.datatypes.ObjMetaschemaType</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="kn">import</span> <span class="n">encode_json</span><span class="p">,</span> <span class="n">decode_json</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">_schema_dir</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="k">import</span> <span class="n">encode_json</span><span class="p">,</span> <span class="n">decode_json</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">_schema_dir</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">JSONObjectMetaschemaType</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.PlyMetaschemaType</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.PlyMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">trimesh</span><span class="p">,</span> <span class="n">PlyDict</span><span class="p">,</span>
     <span class="n">_index_type</span><span class="p">,</span> <span class="n">_color_type</span><span class="p">,</span> <span class="n">_coord_type</span><span class="p">,</span>
     <span class="n">_index_conv</span><span class="p">,</span> <span class="n">_color_conv</span><span class="p">,</span> <span class="n">_coord_conv</span><span class="p">,</span>
@@ -156,7 +248,7 @@
 <span class="n">_map_code2element</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_map_element2code</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
 
-<div class="viewcode-block" id="create_schema"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.create_schema">[docs]</a><span class="k">def</span> <span class="nf">create_schema</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="create_schema"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.create_schema">[docs]</a><span class="k">def</span> <span class="nf">create_schema</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Creates a file containing the Obj schema.</span>
 
 <span class="sd">    Args:</span>
@@ -307,7 +399,7 @@
         <span class="n">encode_json</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_schema"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.get_schema">[docs]</a><span class="k">def</span> <span class="nf">get_schema</span><span class="p">():</span>
+<div class="viewcode-block" id="get_schema"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.get_schema">[docs]</a><span class="k">def</span> <span class="nf">get_schema</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the Obj schema, initializing it if necessary.</span>
 
 <span class="sd">    Returns:</span>
@@ -325,10 +417,10 @@
     <span class="n">create_schema</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="ObjDict"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict">[docs]</a><span class="k">class</span> <span class="nc">ObjDict</span><span class="p">(</span><span class="n">PlyDict</span><span class="p">):</span>
+<div class="viewcode-block" id="ObjDict"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict">[docs]</a><span class="k">class</span> <span class="nc">ObjDict</span><span class="p">(</span><span class="n">PlyDict</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Enhanced dictionary class for storing Obj information.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ObjDict.from_array_dict"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict.from_array_dict">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ObjDict.from_array_dict"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict.from_array_dict">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_array_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">in_dict</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the object from a dictionary of arrays.&quot;&quot;&quot;</span>
         <span class="n">kws</span> <span class="o">=</span> <span class="p">{}</span>
@@ -467,7 +559,7 @@
                             <span class="s1">&#39;normal_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">old_norm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">kws</span><span class="p">)</span></div>
         
-<div class="viewcode-block" id="ObjDict.as_array_dict"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict.as_array_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_array_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ObjDict.as_array_dict"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict.as_array_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_array_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the object as a dictionary of arrays.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;material&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
@@ -570,7 +662,7 @@
                 <span class="n">out</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;surface_normals&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
     
-<div class="viewcode-block" id="ObjDict.from_trimesh"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict.from_trimesh">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ObjDict.from_trimesh"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict.from_trimesh">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_trimesh</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">in_mesh</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the object from a trimesh class.&quot;&quot;&quot;</span>
         <span class="n">kws</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">vertices</span><span class="o">=</span><span class="n">in_mesh</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span>
@@ -582,7 +674,7 @@
         <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">kws</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">],</span> <span class="n">weights</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]])</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_array_dict</span><span class="p">(</span><span class="n">kws</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ObjDict.as_trimesh"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict.as_trimesh">[docs]</a>    <span class="k">def</span> <span class="nf">as_trimesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="ObjDict.as_trimesh"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict.as_trimesh">[docs]</a>    <span class="k">def</span> <span class="nf">as_trimesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the object as a trimesh class.&quot;&quot;&quot;</span>
         <span class="n">kws0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_array_dict</span><span class="p">()</span>
         <span class="n">kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="n">kws0</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;vertices&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
@@ -623,7 +715,7 @@
                 <span class="n">mesh</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imesh</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">mesh</span>
 
-<div class="viewcode-block" id="ObjDict.from_shape"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict.from_shape">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ObjDict.from_shape"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict.from_shape">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_shape</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a ply dictionary from a PlantGL shape and descritizer.</span>
 
@@ -660,7 +752,7 @@
                                 <span class="n">iobj</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;normal_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">iobj</span></div>
 
-<div class="viewcode-block" id="ObjDict.to_geom_args"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict.to_geom_args">[docs]</a>    <span class="k">def</span> <span class="nf">to_geom_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
+<div class="viewcode-block" id="ObjDict.to_geom_args"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict.to_geom_args">[docs]</a>    <span class="k">def</span> <span class="nf">to_geom_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get arguments for creating a PlantGL geometry.</span>
 
 <span class="sd">        Args:</span>
@@ -731,7 +823,7 @@
                 <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;normalIndexList&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">array_class</span><span class="p">(</span><span class="n">obj_fnormals</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">smb_class</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span></div>
 
-<div class="viewcode-block" id="ObjDict.append"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solf</span><span class="p">):</span>
+<div class="viewcode-block" id="ObjDict.append"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solf</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append new ply information to this dictionary.</span>
 
 <span class="sd">        Args:</span>
@@ -793,7 +885,7 @@
             <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;material&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">material</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="ObjDict.apply_scalar_map"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict.apply_scalar_map">[docs]</a>    <span class="k">def</span> <span class="nf">apply_scalar_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="ObjDict.apply_scalar_map"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict.apply_scalar_map">[docs]</a>    <span class="k">def</span> <span class="nf">apply_scalar_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the color of faces in a 3D object based on a scalar map.</span>
 <span class="sd">        This creates a copy unless no_copy is True.</span>
 
@@ -832,7 +924,7 @@
 <span class="c1"># The base class could be anything since it is discarded during registration,</span>
 <span class="c1"># but is set to JSONObjectMetaschemaType here for transparancy since this is</span>
 <span class="c1"># what the base class is determined to be on loading the schema</span>
-<div class="viewcode-block" id="ObjMetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">ObjMetaschemaType</span><span class="p">(</span><span class="n">JSONObjectMetaschemaType</span><span class="p">):</span>
+<div class="viewcode-block" id="ObjMetaschemaType"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">ObjMetaschemaType</span><span class="p">(</span><span class="n">JSONObjectMetaschemaType</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Obj 3D structure map.&quot;&quot;&quot;</span>
 
     <span class="n">_empty_msg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="p">[]}</span>
@@ -915,7 +1007,7 @@
                 <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_decode_object_property</span><span class="p">([</span><span class="n">values</span><span class="p">],</span> <span class="p">[</span><span class="n">order</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
         <span class="k">return</span> <span class="n">out</span>
 
-<div class="viewcode-block" id="ObjMetaschemaType.encode_data"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjMetaschemaType.encode_data">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ObjMetaschemaType.encode_data"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjMetaschemaType.encode_data">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">encode_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="p">[],</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s data.</span>
 
@@ -954,7 +1046,7 @@
                 <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iline</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>  <span class="c1"># Ensure trailing spaces are removed</span>
         <span class="k">return</span> <span class="n">newline</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">header</span> <span class="o">+</span> <span class="n">body</span><span class="p">)</span> <span class="o">+</span> <span class="n">newline</span></div>
         
-<div class="viewcode-block" id="ObjMetaschemaType.encode_data_readable"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjMetaschemaType.encode_data_readable">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ObjMetaschemaType.encode_data_readable"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjMetaschemaType.encode_data_readable">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">encode_data_readable</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s data in a readable format.</span>
 
@@ -969,7 +1061,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encode_data</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">)</span></div>
     
-<div class="viewcode-block" id="ObjMetaschemaType.decode_data"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjMetaschemaType.decode_data">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ObjMetaschemaType.decode_data"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjMetaschemaType.decode_data">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">decode_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode an object.</span>
 
@@ -1010,7 +1102,7 @@
         <span class="c1"># out.update(**metadata)</span>
         <span class="k">return</span> <span class="n">ObjDict</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ObjMetaschemaType.coerce_type"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjMetaschemaType.coerce_type">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ObjMetaschemaType.coerce_type"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjMetaschemaType.coerce_type">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">coerce_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Coerce objects of specific types to match the data type.</span>
 
@@ -1032,7 +1124,7 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ObjMetaschemaType</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">coerce_type</span><span class="p">(</span>
             <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="n">typedef</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ObjMetaschemaType.updated_fixed_properties"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjMetaschemaType.updated_fixed_properties">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ObjMetaschemaType.updated_fixed_properties"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjMetaschemaType.updated_fixed_properties">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">updated_fixed_properties</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the fixed properties schema that includes information</span>
 <span class="sd">        from the object.</span>
@@ -1106,30 +1198,46 @@
 </pre></div>
 
            </div>
+           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
-  </div>
+    <p>
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

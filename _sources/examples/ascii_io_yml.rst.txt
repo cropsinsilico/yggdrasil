@@ -1,6 +1,6 @@
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/ascii_io/ascii_io_python.yml
+.. literalinclude:: /../../yggdrasil/examples/ascii_io/ascii_io_python.yml
    :language: yaml
    :linenos:
 

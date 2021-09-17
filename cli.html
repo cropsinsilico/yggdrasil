@@ -1,37 +1,74 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  <meta charset="utf-8" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Line Interface (CLI) &mdash; yggdrasil v1.8.0 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+  <title>Command Line Interface (CLI) &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    <script src="_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="High Performance Computing (HPC)" href="hpc.html" />
     <link rel="prev" title="Units" href="units.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="index.html" class="icon icon-home"> yggdrasil
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
                 v1.8.0
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -39,8 +76,19 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
@@ -127,58 +175,99 @@
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
       <li>Command Line Interface (CLI)</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
+          
             <a href="_sources/cli.rst.txt" rel="nofollow"> View page source</a>
+          
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
-  <section id="command-line-interface-cli">
+            
+  <div class="section" id="command-line-interface-cli">
 <span id="cli-rst"></span><h1>Command Line Interface (CLI)<a class="headerlink" href="#command-line-interface-cli" title="Permalink to this headline">¶</a></h1>
-<section id="yggdrasil-command">
+<div class="section" id="yggdrasil-command">
 <span id="cli-yggdrasil-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggdrasil</span></code> Command<a class="headerlink" href="#yggdrasil-command" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggdrasil</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">version</span><span class="p">]</span>
                  <span class="p">{</span><span class="n">run</span><span class="p">,</span><span class="n">info</span><span class="p">,</span><span class="n">validate</span><span class="p">,</span><span class="nb">compile</span><span class="p">,</span><span class="nb">compile</span><span class="o">-</span><span class="n">deps</span><span class="p">,</span><span class="n">clean</span><span class="p">,</span><span class="n">install</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">metaschema</span><span class="p">,</span><span class="n">schema</span><span class="p">,</span><span class="n">model</span><span class="o">-</span><span class="n">form</span><span class="o">-</span><span class="n">schema</span><span class="p">,</span><span class="n">dev</span><span class="o">-</span><span class="n">update</span><span class="p">,</span><span class="n">test</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span><span class="n">gha</span><span class="p">,</span><span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span><span class="p">}</span>
                  <span class="o">...</span>
 </pre></div>
 </div>
-<section id="Named Arguments">
+<div class="section" id="Named Arguments">
 <h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>--version</kbd></dt>
 <dd><p>show program’s version number and exit</p>
 </dd>
 </dl>
-</section>
-<section id="subcommands">
+</div>
+<div class="section" id="subcommands">
 <h3>subcommands<a class="headerlink" href="#subcommands" title="Permalink to this headline">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>subcommand</kbd></dt>
 <dd><p>Possible choices: run, info, validate, compile, compile-deps, clean, install, config, metaschema, schema, model-form-schema, dev-update, test, timing, gha, integration-service-manager</p>
 </dd>
 </dl>
-</section>
-<section id="Sub-commands:">
+</div>
+<div class="section" id="Sub-commands:">
 <h3>Sub-commands:<a class="headerlink" href="#Sub-commands:" title="Permalink to this headline">¶</a></h3>
-<section id="run">
+<div class="section" id="run">
 <h4>run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h4>
 <p>Run an integration.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">run</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">mpi</span> <span class="n">WITH_MPI</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">mpi</span><span class="o">-</span><span class="n">tag</span><span class="o">-</span><span class="n">start</span> <span class="n">MPI_TAG_START</span><span class="p">]</span>
@@ -191,15 +280,15 @@
               <span class="n">yamlfile</span> <span class="p">[</span><span class="n">yamlfile</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments">
+<div class="section" id="Positional Arguments">
 <h5>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>yamlfile</kbd></dt>
 <dd><p>One or more yaml specification files.</p>
 </dd>
 </dl>
-</section>
-<section id="Named Arguments_repeat1">
+</div>
+<div class="section" id="Named Arguments_repeat1">
 <h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat1" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--with-mpi, --mpi-nproc</kbd></dt>
@@ -257,16 +346,16 @@
 <p>Default: False</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="info">
+</div>
+</div>
+<div class="section" id="info">
 <h4>info<a class="headerlink" href="#info" title="Permalink to this headline">¶</a></h4>
 <p>Display information about the current yggdrasil installation.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">info</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">languages</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">comms</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span>
                <span class="p">{</span><span class="n">compiler</span><span class="p">,</span><span class="n">linker</span><span class="p">,</span><span class="n">archiver</span><span class="p">}</span> <span class="o">...</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat2">
+<div class="section" id="Named Arguments_repeat2">
 <h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat2" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--no-languages</kbd></dt>
@@ -282,8 +371,8 @@
 <p>Default: False</p>
 </dd>
 </dl>
-</section>
-<section id="tool">
+</div>
+<div class="section" id="tool">
 <h5>tool<a class="headerlink" href="#tool" title="Permalink to this headline">¶</a></h5>
 <p>Compilation tool types to get info about.</p>
 <dl class="option-list">
@@ -291,17 +380,17 @@
 <dd><p>Possible choices: compiler, linker, archiver</p>
 </dd>
 </dl>
-</section>
-<section id="Sub-commands:_repeat1">
+</div>
+<div class="section" id="Sub-commands:_repeat1">
 <h5>Sub-commands:<a class="headerlink" href="#Sub-commands:_repeat1" title="Permalink to this headline">¶</a></h5>
-<section id="compiler">
+<div class="section" id="compiler">
 <h6>compiler<a class="headerlink" href="#compiler" title="Permalink to this headline">¶</a></h6>
 <p>Get information about a compiler.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">info</span> <span class="n">compiler</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">flags</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fullpath</span><span class="p">]</span>
                         <span class="p">{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">}</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat1">
+<div class="section" id="Positional Arguments_repeat1">
 <h7>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat1" title="Permalink to this headline">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>language</kbd></dt>
@@ -309,8 +398,8 @@
 <p>Language to get tool information for.</p>
 </dd>
 </dl>
-</section>
-<section id="Named Arguments_repeat3">
+</div>
+<div class="section" id="Named Arguments_repeat3">
 <h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat3" title="Permalink to this headline">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>--toolname</kbd></dt>
@@ -325,9 +414,9 @@
 <p>Default: False</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="linker">
+</div>
+</div>
+<div class="section" id="linker">
 <h6>linker<a class="headerlink" href="#linker" title="Permalink to this headline">¶</a></h6>
 <p>Get information about a linker.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">info</span> <span class="n">linker</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">flags</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fullpath</span><span class="p">]</span>
@@ -335,7 +424,7 @@
                       <span class="p">{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">}</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat2">
+<div class="section" id="Positional Arguments_repeat2">
 <h7>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat2" title="Permalink to this headline">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>language</kbd></dt>
@@ -343,8 +432,8 @@
 <p>Language to get tool information for.</p>
 </dd>
 </dl>
-</section>
-<section id="Named Arguments_repeat4">
+</div>
+<div class="section" id="Named Arguments_repeat4">
 <h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat4" title="Permalink to this headline">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>--toolname</kbd></dt>
@@ -363,16 +452,16 @@
 <p>Default: False</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="archiver">
+</div>
+</div>
+<div class="section" id="archiver">
 <h6>archiver<a class="headerlink" href="#archiver" title="Permalink to this headline">¶</a></h6>
 <p>Get information about a archiver.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">info</span> <span class="n">archiver</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">flags</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fullpath</span><span class="p">]</span>
                         <span class="p">{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">}</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat3">
+<div class="section" id="Positional Arguments_repeat3">
 <h7>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat3" title="Permalink to this headline">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>language</kbd></dt>
@@ -380,8 +469,8 @@
 <p>Language to get tool information for.</p>
 </dd>
 </dl>
-</section>
-<section id="Named Arguments_repeat5">
+</div>
+<div class="section" id="Named Arguments_repeat5">
 <h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat5" title="Permalink to this headline">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>--toolname</kbd></dt>
@@ -396,26 +485,26 @@
 <p>Default: False</p>
 </dd>
 </dl>
-</section>
-</section>
-</section>
-</section>
-<section id="validate">
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="validate">
 <h4>validate<a class="headerlink" href="#validate" title="Permalink to this headline">¶</a></h4>
 <p>Validate a set of YAML specification files for an integration.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">validate</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">model</span><span class="o">-</span><span class="n">only</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">model</span><span class="o">-</span><span class="n">submission</span><span class="p">]</span>
                    <span class="n">yamlfile</span> <span class="p">[</span><span class="n">yamlfile</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat4">
+<div class="section" id="Positional Arguments_repeat4">
 <h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat4" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>yamlfile</kbd></dt>
 <dd><p>One or more YAML specification files.</p>
 </dd>
 </dl>
-</section>
-<section id="Named Arguments_repeat6">
+</div>
+<div class="section" id="Named Arguments_repeat6">
 <h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat6" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--model-only</kbd></dt>
@@ -427,9 +516,9 @@
 <p>Default: False</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="compile">
+</div>
+</div>
+<div class="section" id="compile">
 <h4>compile<a class="headerlink" href="#compile" title="Permalink to this headline">¶</a></h4>
 <p>Compile a program from source files for use in an yggdrasil integration.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="nb">compile</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">language</span> <span class="p">{</span><span class="kc">None</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">r</span><span class="p">}]</span>
@@ -438,15 +527,15 @@
                   <span class="n">source</span> <span class="p">[</span><span class="n">source</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat5">
+<div class="section" id="Positional Arguments_repeat5">
 <h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat5" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>source</kbd></dt>
 <dd><p>One or more source files or the directory containing an R package.</p>
 </dd>
 </dl>
-</section>
-<section id="Named Arguments_repeat7">
+</div>
+<div class="section" id="Named Arguments_repeat7">
 <h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat7" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--language</kbd></dt>
@@ -467,15 +556,15 @@
 <dd><p>Language that R package is written in (only used if the specified language is R).</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="compile-deps">
+</div>
+</div>
+<div class="section" id="compile-deps">
 <h4>compile-deps<a class="headerlink" href="#compile-deps" title="Permalink to this headline">¶</a></h4>
 <p>Compile yggdrasil dependency libraries. Existing libraries are first deleted.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="nb">compile</span><span class="o">-</span><span class="n">deps</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="n">language</span> <span class="p">[</span><span class="n">language</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat6">
+<div class="section" id="Positional Arguments_repeat6">
 <h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat6" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>language</kbd></dt>
@@ -483,23 +572,23 @@
 <p>Default: [‘all’]</p>
 </dd>
 </dl>
-</section>
-<section id="Named Arguments_repeat8">
+</div>
+<div class="section" id="Named Arguments_repeat8">
 <h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat8" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--toolname</kbd></dt>
 <dd><p>Name of compilation tool that should be used</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="clean">
+</div>
+</div>
+<div class="section" id="clean">
 <h4>clean<a class="headerlink" href="#clean" title="Permalink to this headline">¶</a></h4>
 <p>Remove dependency libraries compiled by yggdrasil.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">clean</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="n">language</span> <span class="p">[</span><span class="n">language</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat7">
+<div class="section" id="Positional Arguments_repeat7">
 <h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat7" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>language</kbd></dt>
@@ -507,16 +596,16 @@
 <p>Default: [‘all’]</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="install">
+</div>
+</div>
+<div class="section" id="install">
 <h4>install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h4>
 <p>Complete yggdrasil installation for one or more languages.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">install</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
 </pre></div>
 </div>
-</section>
-<section id="config">
+</div>
+<div class="section" id="config">
 <h4>config<a class="headerlink" href="#config" title="Permalink to this headline">¶</a></h4>
 <p>Update the user config file.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">config</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">languages</span> <span class="n">LANGUAGES_FLAG</span> <span class="p">[</span><span class="n">LANGUAGES_FLAG</span> <span class="o">...</span><span class="p">]]</span>
@@ -532,7 +621,7 @@
                  <span class="p">[</span><span class="n">languages</span> <span class="p">[</span><span class="n">languages</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat8">
+<div class="section" id="Positional Arguments_repeat8">
 <h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat8" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>languages</kbd></dt>
@@ -540,8 +629,8 @@
 <p>Default: []</p>
 </dd>
 </dl>
-</section>
-<section id="Named Arguments_repeat9">
+</div>
+<div class="section" id="Named Arguments_repeat9">
 <h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat9" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--languages</kbd></dt>
@@ -608,22 +697,22 @@
 <dd><p>Name or path to archiver that should be used to create static libraries for models written in fortran.</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="metaschema">
+</div>
+</div>
+<div class="section" id="metaschema">
 <h4>metaschema<a class="headerlink" href="#metaschema" title="Permalink to this headline">¶</a></h4>
 <p>Regenerate the yggdrasil metaschema.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">metaschema</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
 </pre></div>
 </div>
-</section>
-<section id="schema">
+</div>
+<div class="section" id="schema">
 <h4>schema<a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h4>
 <p>Regenerate the yggdrasil schema.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">schema</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">only</span><span class="o">-</span><span class="n">constants</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat10">
+<div class="section" id="Named Arguments_repeat10">
 <h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat10" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--only-constants</kbd></dt>
@@ -631,41 +720,40 @@
 <p>Default: False</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="model-form-schema">
+</div>
+</div>
+<div class="section" id="model-form-schema">
 <h4>model-form-schema<a class="headerlink" href="#model-form-schema" title="Permalink to this headline">¶</a></h4>
 <p>Save/print the JSON schema for generating the model specification form.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">model</span><span class="o">-</span><span class="n">form</span><span class="o">-</span><span class="n">schema</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">file</span> <span class="n">FILE</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat11">
+<div class="section" id="Named Arguments_repeat11">
 <h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat11" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--file</kbd></dt>
 <dd><p>Path to file where the schema should be saved.</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="dev-update">
+</div>
+</div>
+<div class="section" id="dev-update">
 <h4>dev-update<a class="headerlink" href="#dev-update" title="Permalink to this headline">¶</a></h4>
 <p>Perform cleanup and reinitialization following an update to the code during development.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">dev</span><span class="o">-</span><span class="n">update</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
 </pre></div>
 </div>
-</section>
-<section id="test">
+</div>
+<div class="section" id="test">
 <h4>test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h4>
 <p>Run yggdrasil tests.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">test</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">withcoverage</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">nocapture</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">stop</span><span class="p">]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">nologcapture</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">noflaky</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">ci</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">test</span><span class="o">-</span><span class="n">suite</span> <span class="p">{</span><span class="nb">all</span><span class="p">,</span><span class="n">top</span><span class="p">,</span><span class="n">examples</span><span class="p">,</span><span class="n">examples_part1</span><span class="p">,</span><span class="n">examples_part2</span><span class="p">,</span><span class="n">demos</span><span class="p">,</span><span class="n">types</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span><span class="n">connections</span><span class="p">,</span><span class="n">models</span><span class="p">,</span><span class="n">mpi</span><span class="p">}</span> <span class="p">[{</span><span class="nb">all</span><span class="p">,</span><span class="n">top</span><span class="p">,</span><span class="n">examples</span><span class="p">,</span><span class="n">examples_part1</span><span class="p">,</span><span class="n">examples_part2</span><span class="p">,</span><span class="n">demos</span><span class="p">,</span><span class="n">types</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span><span class="n">connections</span><span class="p">,</span><span class="n">models</span><span class="p">,</span><span class="n">mpi</span><span class="p">}</span> <span class="o">...</span><span class="p">]]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">test</span><span class="o">-</span><span class="n">suite</span> <span class="p">{</span><span class="nb">all</span><span class="p">,</span><span class="n">top</span><span class="p">,</span><span class="n">examples</span><span class="p">,</span><span class="n">examples_part1</span><span class="p">,</span><span class="n">examples_part2</span><span class="p">,</span><span class="n">demos</span><span class="p">,</span><span class="n">types</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span><span class="n">connections</span><span class="p">,</span><span class="n">models</span><span class="p">,</span><span class="n">mpi</span><span class="p">}]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">pytest</span><span class="o">-</span><span class="n">config</span> <span class="n">PYTEST_CONFIG</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cov</span><span class="o">-</span><span class="n">config</span> <span class="n">COV_CONFIG</span><span class="p">]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">ignore</span> <span class="n">IGNORE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">rootdir</span> <span class="n">ROOTDIR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">count</span> <span class="n">COUNT</span><span class="p">]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">additional</span><span class="o">-</span><span class="n">info</span> <span class="n">ADDITIONAL_INFO</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">mpi</span> <span class="n">WITH_MPI</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">write</span><span class="o">-</span><span class="n">script</span> <span class="n">WRITE_SCRIPT</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">separate</span><span class="o">-</span><span class="n">test</span> <span class="n">SEPARATE_TESTS</span> <span class="p">[</span><span class="n">SEPARATE_TESTS</span> <span class="o">...</span><span class="p">]]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">write</span><span class="o">-</span><span class="n">script</span> <span class="n">WRITE_SCRIPT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">separate</span><span class="o">-</span><span class="n">test</span> <span class="n">SEPARATE_TESTS</span><span class="p">]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">loglevel</span> <span class="n">LOGLEVEL</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">rmq</span><span class="o">-</span><span class="n">loglevel</span> <span class="n">RMQ_LOGLEVEL</span><span class="p">]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">client</span><span class="o">-</span><span class="n">loglevel</span> <span class="n">CLIENT_LOGLEVEL</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">validate</span><span class="o">-</span><span class="n">components</span><span class="p">]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">validate</span><span class="o">-</span><span class="n">messages</span> <span class="p">{</span><span class="kc">False</span><span class="p">,</span><span class="kc">True</span><span class="p">,</span><span class="n">First</span><span class="p">}]</span>
@@ -678,7 +766,7 @@
                <span class="p">[</span><span class="o">--</span><span class="n">default</span><span class="o">-</span><span class="n">comm</span> <span class="n">DEFAULT_COMM</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">production</span><span class="o">-</span><span class="n">run</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat12">
+<div class="section" id="Named Arguments_repeat12">
 <h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat12" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--withcoverage, --with-coverage</kbd></dt>
@@ -814,15 +902,15 @@
 <p>Default: False</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="timing">
+</div>
+</div>
+<div class="section" id="timing">
 <h4>timing<a class="headerlink" href="#timing" title="Permalink to this headline">¶</a></h4>
 <p>Create performance plots using timing results.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">timing</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">{</span><span class="n">commtype</span><span class="p">,</span><span class="n">language</span><span class="p">,</span><span class="n">os</span><span class="p">,</span><span class="n">python</span><span class="p">,</span><span class="n">lang2019</span><span class="p">}</span> <span class="o">...</span>
 </pre></div>
 </div>
-<section id="comparison">
+<div class="section" id="comparison">
 <h5>comparison<a class="headerlink" href="#comparison" title="Permalink to this headline">¶</a></h5>
 <p>Comparison plot that should be created.</p>
 <dl class="option-list">
@@ -830,53 +918,53 @@
 <dd><p>Possible choices: commtype, language, os, python, lang2019</p>
 </dd>
 </dl>
-</section>
-<section id="Sub-commands:_repeat2">
+</div>
+<div class="section" id="Sub-commands:_repeat2">
 <h5>Sub-commands:<a class="headerlink" href="#Sub-commands:_repeat2" title="Permalink to this headline">¶</a></h5>
-<section id="commtype">
+<div class="section" id="commtype">
 <h6>commtype<a class="headerlink" href="#commtype" title="Permalink to this headline">¶</a></h6>
 <p>Compare different communication avenues.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">timing</span> <span class="n">commtype</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
 </pre></div>
 </div>
-</section>
-<section id="language">
+</div>
+<div class="section" id="language">
 <h6>language<a class="headerlink" href="#language" title="Permalink to this headline">¶</a></h6>
 <p>Compare different programming languages.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">timing</span> <span class="n">language</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
 </pre></div>
 </div>
-</section>
-<section id="os">
+</div>
+<div class="section" id="os">
 <h6>os<a class="headerlink" href="#os" title="Permalink to this headline">¶</a></h6>
 <p>Compare different operating systems.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">timing</span> <span class="n">os</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
 </pre></div>
 </div>
-</section>
-<section id="python">
+</div>
+<div class="section" id="python">
 <h6>python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h6>
 <p>Compare different versions of Python.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">timing</span> <span class="n">python</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
 </pre></div>
 </div>
-</section>
-<section id="lang2019">
+</div>
+<div class="section" id="lang2019">
 <h6>lang2019<a class="headerlink" href="#lang2019" title="Permalink to this headline">¶</a></h6>
 <p>Create plots from Lang (2019) paper.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">timing</span> <span class="n">lang2019</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
 </pre></div>
 </div>
-</section>
-</section>
-</section>
-<section id="gha">
+</div>
+</div>
+</div>
+<div class="section" id="gha">
 <h4>gha<a class="headerlink" href="#gha" title="Permalink to this headline">¶</a></h4>
 <p>Generate a Github Actions (GHA) workflow yaml file from a version of the file that uses anchors (not supported by GHA as of 2021-01-14).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">gha</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">base</span> <span class="n">BASE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dest</span> <span class="n">DEST</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat13">
+<div class="section" id="Named Arguments_repeat13">
 <h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat13" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--base, --base-file</kbd></dt>
@@ -890,9 +978,9 @@
 <p>Default: False</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="integration-service-manager">
+</div>
+</div>
+<div class="section" id="integration-service-manager">
 <h4>integration-service-manager<a class="headerlink" href="#integration-service-manager" title="Permalink to this headline">¶</a></h4>
 <p>Start or manage a integration service manager.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">manager</span><span class="o">-</span><span class="n">name</span> <span class="n">MANAGER_NAME</span><span class="p">]</span>
@@ -903,7 +991,7 @@
                                       <span class="o">...</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat14">
+<div class="section" id="Named Arguments_repeat14">
 <h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat14" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--manager-name</kbd></dt>
@@ -923,8 +1011,8 @@
 <dd><p>Port that should be used to access the app. Defaults to 5000 for a flask service manager and 5672 for a RabbitMQ service manager if not set via the PORT environment variable.</p>
 </dd>
 </dl>
-</section>
-<section id="action">
+</div>
+<div class="section" id="action">
 <h5>action<a class="headerlink" href="#action" title="Permalink to this headline">¶</a></h5>
 <p>Management action to take.</p>
 <dl class="option-list">
@@ -932,10 +1020,10 @@
 <dd><p>Possible choices: start, stop, status, register, unregister</p>
 </dd>
 </dl>
-</section>
-<section id="Sub-commands:_repeat3">
+</div>
+<div class="section" id="Sub-commands:_repeat3">
 <h5>Sub-commands:<a class="headerlink" href="#Sub-commands:_repeat3" title="Permalink to this headline">¶</a></h5>
-<section id="start">
+<div class="section" id="start">
 <h6>start<a class="headerlink" href="#start" title="Permalink to this headline">¶</a></h6>
 <p>Start an integration service manager and/or integration service.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span> <span class="n">start</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">remote</span><span class="o">-</span><span class="n">url</span> <span class="n">REMOTE_URL</span><span class="p">]</span>
@@ -944,7 +1032,7 @@
                                             <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">coverage</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat15">
+<div class="section" id="Named Arguments_repeat15">
 <h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat15" title="Permalink to this headline">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>--remote-url</kbd></dt>
@@ -961,32 +1049,32 @@
 <p>Default: False</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="stop">
+</div>
+</div>
+<div class="section" id="stop">
 <h6>stop<a class="headerlink" href="#stop" title="Permalink to this headline">¶</a></h6>
 <p>Stop an integration service manager or an integration service.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span> <span class="n">stop</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
                                            <span class="p">[</span><span class="o">--</span><span class="n">integration</span><span class="o">-</span><span class="n">name</span> <span class="n">INTEGRATION_NAME</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat16">
+<div class="section" id="Named Arguments_repeat16">
 <h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat16" title="Permalink to this headline">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>--integration-name</kbd></dt>
 <dd><p>Name of integration to stop. If not provided, the service manager will be stopped as will all of the running services.</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="status">
+</div>
+</div>
+<div class="section" id="status">
 <h6>status<a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h6>
 <p>Get list of available services and the status of any running services.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span> <span class="n">status</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
 </pre></div>
 </div>
-</section>
-<section id="register">
+</div>
+<div class="section" id="register">
 <h6>register<a class="headerlink" href="#register" title="Permalink to this headline">¶</a></h6>
 <p>Register an integration with the service manager.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span> <span class="n">register</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
@@ -994,7 +1082,7 @@
                                                <span class="p">[</span><span class="n">integration</span><span class="o">-</span><span class="n">yamls</span> <span class="p">[</span><span class="n">integration</span><span class="o">-</span><span class="n">yamls</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat9">
+<div class="section" id="Positional Arguments_repeat9">
 <h7>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat9" title="Permalink to this headline">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>integration-name</kbd></dt>
@@ -1004,37 +1092,37 @@
 <dd><p>One or more YAML specification files defining the integration.</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="unregister">
+</div>
+</div>
+<div class="section" id="unregister">
 <h6>unregister<a class="headerlink" href="#unregister" title="Permalink to this headline">¶</a></h6>
 <p>Unregister an integration with the service manager.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span> <span class="n">unregister</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">integration</span><span class="o">-</span><span class="n">name</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat10">
+<div class="section" id="Positional Arguments_repeat10">
 <h7>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat10" title="Permalink to this headline">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>integration-name</kbd></dt>
 <dd><p>The name of the integration to remove from the registry or the path to a YAML file containing a list of one or more mappings between integration name and YAML specification files for integrations that should be unregistered.</p>
 </dd>
 </dl>
-</section>
-</section>
-</section>
-</section>
-</section>
-</section>
-<section id="yggcc-command">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="yggcc-command">
 <span id="cli-yggcc-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggcc</span></code> Command<a class="headerlink" href="#yggcc-command" title="Permalink to this headline">¶</a></h2>
 <p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">compile</span></code></p>
-</section>
-<section id="yggccflags-command">
+</div>
+<div class="section" id="yggccflags-command">
 <span id="cli-yggccflags-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggccflags</span></code> Command<a class="headerlink" href="#yggccflags-command" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggccflags</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments">
+<div class="section" id="Named Arguments">
 <h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>--cpp</kbd></dt>
@@ -1045,14 +1133,14 @@
 <dd><p>Name of the tool that associated flags be returned for.</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="yggcctool-command">
+</div>
+</div>
+<div class="section" id="yggcctool-command">
 <span id="cli-yggcctool-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggcctool</span></code> Command<a class="headerlink" href="#yggcctool-command" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggcctool</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fullpath</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments">
+<div class="section" id="Named Arguments">
 <h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>--cpp</kbd></dt>
@@ -1064,42 +1152,42 @@
 <p>Default: False</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="yggclean-command">
+</div>
+</div>
+<div class="section" id="yggclean-command">
 <span id="cli-yggclean-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggclean</span></code> Command<a class="headerlink" href="#yggclean-command" title="Permalink to this headline">¶</a></h2>
 <p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">clean</span></code></p>
-</section>
-<section id="yggcompile-command">
+</div>
+<div class="section" id="yggcompile-command">
 <span id="cli-yggcompile-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggcompile</span></code> Command<a class="headerlink" href="#yggcompile-command" title="Permalink to this headline">¶</a></h2>
 <p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">compile-deps</span></code></p>
-</section>
-<section id="yggconfig-command">
+</div>
+<div class="section" id="yggconfig-command">
 <span id="cli-yggconfig-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> Command<a class="headerlink" href="#yggconfig-command" title="Permalink to this headline">¶</a></h2>
 <p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">config</span></code></p>
-</section>
-<section id="yggdevup-command">
+</div>
+<div class="section" id="yggdevup-command">
 <span id="cli-yggdevup-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggdevup</span></code> Command<a class="headerlink" href="#yggdevup-command" title="Permalink to this headline">¶</a></h2>
 <p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">dev-update</span></code></p>
-</section>
-<section id="ygggha-command">
+</div>
+<div class="section" id="ygggha-command">
 <span id="cli-ygggha-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">ygggha</span></code> Command<a class="headerlink" href="#ygggha-command" title="Permalink to this headline">¶</a></h2>
 <p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">gha</span></code></p>
-</section>
-<section id="ygginfo-command">
+</div>
+<div class="section" id="ygginfo-command">
 <span id="cli-ygginfo-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">ygginfo</span></code> Command<a class="headerlink" href="#ygginfo-command" title="Permalink to this headline">¶</a></h2>
 <p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">info</span></code></p>
-</section>
-<section id="ygginstall-command">
+</div>
+<div class="section" id="ygginstall-command">
 <span id="cli-ygginstall-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">ygginstall</span></code> Command<a class="headerlink" href="#ygginstall-command" title="Permalink to this headline">¶</a></h2>
 <p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">install</span></code></p>
-</section>
-<section id="yggldflags-command">
+</div>
+<div class="section" id="yggldflags-command">
 <span id="cli-yggldflags-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggldflags</span></code> Command<a class="headerlink" href="#yggldflags-command" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggldflags</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments">
+<div class="section" id="Named Arguments">
 <h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>--cpp</kbd></dt>
@@ -1110,14 +1198,14 @@
 <dd><p>Name of the tool that associated flags be returned for.</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="yggldtool-command">
+</div>
+</div>
+<div class="section" id="yggldtool-command">
 <span id="cli-yggldtool-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggldtool</span></code> Command<a class="headerlink" href="#yggldtool-command" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggldtool</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fullpath</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments">
+<div class="section" id="Named Arguments">
 <h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>--cpp</kbd></dt>
@@ -1129,63 +1217,80 @@
 <p>Default: False</p>
 </dd>
 </dl>
-</section>
-</section>
-<section id="yggmetaschema-command">
+</div>
+</div>
+<div class="section" id="yggmetaschema-command">
 <span id="cli-yggmetaschema-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggmetaschema</span></code> Command<a class="headerlink" href="#yggmetaschema-command" title="Permalink to this headline">¶</a></h2>
 <p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">metaschema</span></code></p>
-</section>
-<section id="yggmodelform-command">
+</div>
+<div class="section" id="yggmodelform-command">
 <span id="cli-yggmodelform-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggmodelform</span></code> Command<a class="headerlink" href="#yggmodelform-command" title="Permalink to this headline">¶</a></h2>
 <p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">model-form-schema</span></code></p>
-</section>
-<section id="yggrun-command">
+</div>
+<div class="section" id="yggrun-command">
 <span id="cli-yggrun-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggrun</span></code> Command<a class="headerlink" href="#yggrun-command" title="Permalink to this headline">¶</a></h2>
 <p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">run</span></code></p>
-</section>
-<section id="yggschema-command">
+</div>
+<div class="section" id="yggschema-command">
 <span id="cli-yggschema-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggschema</span></code> Command<a class="headerlink" href="#yggschema-command" title="Permalink to this headline">¶</a></h2>
 <p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">schema</span></code></p>
-</section>
-<section id="yggtest-command">
+</div>
+<div class="section" id="yggtest-command">
 <span id="cli-yggtest-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggtest</span></code> Command<a class="headerlink" href="#yggtest-command" title="Permalink to this headline">¶</a></h2>
 <p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">test</span></code></p>
-</section>
-<section id="yggvalidate-command">
+</div>
+<div class="section" id="yggvalidate-command">
 <span id="cli-yggvalidate-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggvalidate</span></code> Command<a class="headerlink" href="#yggvalidate-command" title="Permalink to this headline">¶</a></h2>
 <p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">validate</span></code></p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
+           
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="units.html" class="btn btn-neutral float-left" title="Units" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="hpc.html" class="btn btn-neutral float-right" title="High Performance Computing (HPC)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="units.html" class="btn btn-neutral float-left" title="Units" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
-  </div>
+    <p>
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

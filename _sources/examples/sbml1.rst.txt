@@ -3,6 +3,9 @@
 sbml1
 =====================
 
+A single SBML model runs with input from a files and output to a file.
+
+
 .. contents:: :local:
 
 SBML Version
@@ -10,14 +13,14 @@ SBML Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/sbml1/src/sbml1.xml
+.. literalinclude:: /../../yggdrasil/examples/sbml1/src/sbml1.xml
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/sbml1/sbml1.yml
+.. literalinclude:: /../../yggdrasil/examples/sbml1/sbml1.yml
    :language: yaml
    :linenos:
 

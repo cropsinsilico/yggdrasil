@@ -1,0 +1,141 @@
+yggdrasil package
+=================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   yggdrasil.communication
+   yggdrasil.demos
+   yggdrasil.drivers
+   yggdrasil.examples
+   yggdrasil.interface
+   yggdrasil.languages
+   yggdrasil.metaschema
+   yggdrasil.serialize
+   yggdrasil.tests
+
+Submodules
+----------
+
+yggdrasil.command\_line module
+------------------------------
+
+.. automodule:: yggdrasil.command_line
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.components module
+---------------------------
+
+.. automodule:: yggdrasil.components
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.config module
+-----------------------
+
+.. automodule:: yggdrasil.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.constants module
+--------------------------
+
+.. automodule:: yggdrasil.constants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.doctools module
+-------------------------
+
+.. automodule:: yggdrasil.doctools
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.multitasking module
+-----------------------------
+
+.. automodule:: yggdrasil.multitasking
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.platform module
+-------------------------
+
+.. automodule:: yggdrasil.platform
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.runner module
+-----------------------
+
+.. automodule:: yggdrasil.runner
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.scanf module
+----------------------
+
+.. automodule:: yggdrasil.scanf
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.schema module
+-----------------------
+
+.. automodule:: yggdrasil.schema
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.timing module
+-----------------------
+
+.. automodule:: yggdrasil.timing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.tools module
+----------------------
+
+.. automodule:: yggdrasil.tools
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.units module
+----------------------
+
+.. automodule:: yggdrasil.units
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.yamlfile module
+-------------------------
+
+.. automodule:: yggdrasil.yamlfile
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil
+   :members:
+   :undoc-members:
+   :show-inheritance:

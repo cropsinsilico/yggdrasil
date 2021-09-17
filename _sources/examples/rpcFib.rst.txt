@@ -3,6 +3,9 @@
 rpcFib
 =======================
 
+Three models (two clients, one server) run in a client-server, remote procedure call (RPC) communication pattern. The client models (`rpcFibCli` and `rpcFibCliPar`) send requests and receive response to/from the server model `rpcFibSrv`. The `rpcFibCli` model sends & receives requests/responses via the deprecated `rpcCall` method (use `call` instead), while `rpcFibCliPar` uses the separate send/recv methods `rpcSend` and `rpcRecv` (use `send` & `recv` instead). The server model receives requests and send responses. The `rpcFibCli` model also reads text data from and input file and sends each request/response pair to an output file. This example demostrates the RPC pattern through the use of the `client_of` and `is_server` model parameters and the RPC interface classes/functions, including splitting calls into their send/recv components. The models also receive parameters via the command line as specified in the YAML `args` model parameter.
+
+
 .. contents:: :local:
 
 Mixed Version
@@ -10,30 +13,30 @@ Mixed Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCli.py
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCli.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCliPar.m
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCliPar.m
    :language: matlab
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibSrv.c
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibSrv.c
    :language: c
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCli_python.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibCli_python.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCliPar_matlab.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibCliPar_matlab.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibSrv_c.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibSrv_c.yml
    :language: yaml
    :linenos:
 
@@ -44,30 +47,30 @@ Mixed w/o Matlab Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCli.py
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCli.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCliPar.cpp
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCliPar.cpp
    :language: c++
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibSrv.c
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibSrv.c
    :language: c
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCli_python.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibCli_python.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCliPar_cpp.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibCliPar_cpp.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibSrv_c.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibSrv_c.yml
    :language: yaml
    :linenos:
 
@@ -78,30 +81,30 @@ C Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCli.c
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCli.c
    :language: c
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCliPar.c
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCliPar.c
    :language: c
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibSrv.c
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibSrv.c
    :language: c
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCli_c.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibCli_c.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCliPar_c.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibCliPar_c.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibSrv_c.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibSrv_c.yml
    :language: yaml
    :linenos:
 
@@ -112,30 +115,30 @@ C++ Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCli.cpp
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCli.cpp
    :language: c++
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCliPar.cpp
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCliPar.cpp
    :language: c++
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibSrv.cpp
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibSrv.cpp
    :language: c++
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCli_cpp.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibCli_cpp.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCliPar_cpp.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibCliPar_cpp.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibSrv_cpp.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibSrv_cpp.yml
    :language: yaml
    :linenos:
 
@@ -146,30 +149,30 @@ Fortran Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCli.f90
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCli.f90
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCliPar.f90
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCliPar.f90
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibSrv.f90
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibSrv.f90
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCli_fortran.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibCli_fortran.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCliPar_fortran.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibCliPar_fortran.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibSrv_fortran.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibSrv_fortran.yml
    :language: yaml
    :linenos:
 
@@ -180,30 +183,30 @@ Matlab Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCli.m
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCli.m
    :language: matlab
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCliPar.m
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCliPar.m
    :language: matlab
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibSrv.m
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibSrv.m
    :language: matlab
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCli_matlab.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibCli_matlab.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCliPar_matlab.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibCliPar_matlab.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibSrv_matlab.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibSrv_matlab.yml
    :language: yaml
    :linenos:
 
@@ -214,30 +217,30 @@ Python Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCli.py
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCli.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCliPar.py
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCliPar.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibSrv.py
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibSrv.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCli_python.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibCli_python.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCliPar_python.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibCliPar_python.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibSrv_python.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibSrv_python.yml
    :language: yaml
    :linenos:
 
@@ -248,30 +251,30 @@ R Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCli.R
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCli.R
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCliPar.R
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCliPar.R
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibSrv.R
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibSrv.R
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCli_r.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibCli_r.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCliPar_r.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibCliPar_r.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibSrv_r.yml
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/rpcFibSrv_r.yml
    :language: yaml
    :linenos:
 

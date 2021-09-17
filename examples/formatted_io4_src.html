@@ -1,35 +1,72 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  <meta charset="utf-8" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-    <script src="../_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
                 v1.8.0
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -37,8 +74,19 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
@@ -69,119 +117,230 @@
 <li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
       <li>&lt;no title&gt;</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
+          
             <a href="../_sources/examples/formatted_io4_src.rst.txt" rel="nofollow"> View page source</a>
+          
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <p>Model Code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># Import classes for input/output channels</span>
-<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
-<span class="linenos"> 3</span>    <span class="n">YggPandasInput</span><span class="p">,</span> <span class="n">YggPandasOutput</span><span class="p">)</span>
-<span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="c1"># Initialize input/output channels</span>
-<span class="linenos"> 6</span><span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggPandasInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
-<span class="linenos"> 7</span><span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggPandasOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
-<span class="linenos"> 8</span>
-<span class="linenos"> 9</span><span class="c1"># Loop until there is no longer input or the queues are closed</span>
-<span class="linenos">10</span><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-<span class="linenos">11</span>
-<span class="linenos">12</span>    <span class="c1"># Receive input from input channel</span>
-<span class="linenos">13</span>    <span class="c1"># If there is an error, the flag will be False</span>
-<span class="linenos">14</span>    <span class="n">flag</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="linenos">15</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-<span class="linenos">16</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.&quot;</span><span class="p">)</span>
-<span class="linenos">17</span>        <span class="k">break</span>
-<span class="linenos">18</span>
-<span class="linenos">19</span>    <span class="c1"># Print received message</span>
-<span class="linenos">20</span>    <span class="n">nrows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-<span class="linenos">21</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Model A: (</span><span class="si">%d</span><span class="s1"> rows)&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
-<span class="linenos">22</span>    <span class="nb">print</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
-<span class="linenos">23</span>
-<span class="linenos">24</span>    <span class="c1"># Send output to output channel</span>
-<span class="linenos">25</span>    <span class="c1"># If there is an error, the flag will be False</span>
-<span class="linenos">26</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
-<span class="linenos">27</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-<span class="linenos">28</span>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">YggPandasInput</span><span class="p">,</span> <span class="n">YggPandasOutput</span><span class="p">)</span>
+
+<span class="c1"># Initialize input/output channels</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggPandasInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggPandasOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+
+<span class="c1"># Loop until there is no longer input or the queues are closed</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+
+    <span class="c1"># Receive input from input channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+
+    <span class="c1"># Print received message</span>
+    <span class="n">nrows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model A: (</span><span class="si">%d</span><span class="s1"> rows)&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+    <span class="c1"># Send output to output channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># Import classes for input/output channels</span>
-<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
-<span class="linenos"> 3</span>    <span class="n">YggPandasInput</span><span class="p">,</span> <span class="n">YggPandasOutput</span><span class="p">)</span>
-<span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="c1"># Initialize input/output channels</span>
-<span class="linenos"> 6</span><span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggPandasInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
-<span class="linenos"> 7</span><span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggPandasOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
-<span class="linenos"> 8</span>
-<span class="linenos"> 9</span><span class="c1"># Loop until there is no longer input or the queues are closed</span>
-<span class="linenos">10</span><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-<span class="linenos">11</span>
-<span class="linenos">12</span>    <span class="c1"># Receive input from input channel</span>
-<span class="linenos">13</span>    <span class="c1"># If there is an error, the flag will be False</span>
-<span class="linenos">14</span>    <span class="n">flag</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="linenos">15</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-<span class="linenos">16</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.&quot;</span><span class="p">)</span>
-<span class="linenos">17</span>        <span class="k">break</span>
-<span class="linenos">18</span>
-<span class="linenos">19</span>    <span class="c1"># Print received message</span>
-<span class="linenos">20</span>    <span class="n">nrows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-<span class="linenos">21</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Model B: (</span><span class="si">%d</span><span class="s1"> rows)&#39;</span> <span class="o">%</span> <span class="n">nrows</span><span class="p">)</span>
-<span class="linenos">22</span>    <span class="nb">print</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
-<span class="linenos">23</span>
-<span class="linenos">24</span>    <span class="c1"># Send output to output channel</span>
-<span class="linenos">25</span>    <span class="c1"># If there is an error, the flag will be False</span>
-<span class="linenos">26</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
-<span class="linenos">27</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-<span class="linenos">28</span>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
+</td></tr></table></div>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">YggPandasInput</span><span class="p">,</span> <span class="n">YggPandasOutput</span><span class="p">)</span>
+
+<span class="c1"># Initialize input/output channels</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggPandasInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggPandasOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+
+<span class="c1"># Loop until there is no longer input or the queues are closed</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+
+    <span class="c1"># Receive input from input channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+
+    <span class="c1"># Print received message</span>
+    <span class="n">nrows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model B: (</span><span class="si">%d</span><span class="s1"> rows)&#39;</span> <span class="o">%</span> <span class="n">nrows</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+    <span class="c1"># Send output to output channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>(<a class="reference external" href="examples/formatted_io4.html">Example in other languages</a>)</p>
 
 
            </div>
+           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
-  </div>
+    <p>
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

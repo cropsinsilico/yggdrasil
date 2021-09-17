@@ -3,6 +3,9 @@
 formatted_io7
 =====================================
 
+Two models, A & B, that send/receive key/value maps. Model A receives input from a file and then sends it's output to model B. Model B receives input from model A and sends it's output to a file.
+
+
 .. contents:: :local:
 
 C Version
@@ -10,18 +13,18 @@ C Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/src/formatted_io7_modelA.c
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/src/formatted_io7_modelA.c
    :language: c
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/src/formatted_io7_modelB.c
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/src/formatted_io7_modelB.c
    :language: c
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/formatted_io7_c.yml
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/formatted_io7_c.yml
    :language: yaml
    :linenos:
 
@@ -32,18 +35,18 @@ C++ Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/src/formatted_io7_modelA.cpp
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/src/formatted_io7_modelA.cpp
    :language: c++
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/src/formatted_io7_modelB.cpp
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/src/formatted_io7_modelB.cpp
    :language: c++
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/formatted_io7_cpp.yml
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/formatted_io7_cpp.yml
    :language: yaml
    :linenos:
 
@@ -54,18 +57,18 @@ Fortran Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/src/formatted_io7_modelA.f90
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/src/formatted_io7_modelA.f90
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/src/formatted_io7_modelB.f90
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/src/formatted_io7_modelB.f90
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/formatted_io7_fortran.yml
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/formatted_io7_fortran.yml
    :language: yaml
    :linenos:
 
@@ -76,18 +79,18 @@ Matlab Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/src/formatted_io7_modelA.m
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/src/formatted_io7_modelA.m
    :language: matlab
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/src/formatted_io7_modelB.m
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/src/formatted_io7_modelB.m
    :language: matlab
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/formatted_io7_matlab.yml
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/formatted_io7_matlab.yml
    :language: yaml
    :linenos:
 
@@ -98,18 +101,18 @@ Python Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/src/formatted_io7_modelA.py
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/src/formatted_io7_modelA.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/src/formatted_io7_modelB.py
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/src/formatted_io7_modelB.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/formatted_io7_python.yml
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/formatted_io7_python.yml
    :language: yaml
    :linenos:
 
@@ -120,18 +123,18 @@ R Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/src/formatted_io7_modelA.R
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/src/formatted_io7_modelA.R
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/src/formatted_io7_modelB.R
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/src/formatted_io7_modelB.R
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/formatted_io7_r.yml
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/formatted_io7_r.yml
    :language: yaml
    :linenos:
 

@@ -3,6 +3,9 @@
 model_function2
 =========================================
 
+Two models, A & B, that send/receive scalars and arrays. Model A iterates over received array input from a table, calling the indicated model function for each array element, and then sends all of outputs from the iteration as an array to model B. Model B receives input arrays from model A and sends it's output to a file. Both models are functions that are automatically wrapped by yggdrasil with the appropriate interface calls. This example demonstrates the use of the `function` model YAML parameter and auto-wrapping as well as iteration over input/output arrays via the `iter_function_over` model YAML paramter.
+
+
 .. contents:: :local:
 
 C Version
@@ -10,18 +13,18 @@ C Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/src/model_function_modelA.c
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelA.c
    :language: c
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/src/model_function_modelB.c
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelB.c
    :language: c
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/model_function2_c.yml
+.. literalinclude:: /../../yggdrasil/examples/model_function2/model_function2_c.yml
    :language: yaml
    :linenos:
 
@@ -32,18 +35,18 @@ C++ Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/src/model_function_modelA.cpp
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelA.cpp
    :language: c++
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/src/model_function_modelB.cpp
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelB.cpp
    :language: c++
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/model_function2_cpp.yml
+.. literalinclude:: /../../yggdrasil/examples/model_function2/model_function2_cpp.yml
    :language: yaml
    :linenos:
 
@@ -54,18 +57,18 @@ Fortran Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/src/model_function_modelA.f90
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelA.f90
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/src/model_function_modelB.f90
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelB.f90
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/model_function2_fortran.yml
+.. literalinclude:: /../../yggdrasil/examples/model_function2/model_function2_fortran.yml
    :language: yaml
    :linenos:
 
@@ -76,18 +79,18 @@ Matlab Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/src/model_function_modelA.m
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelA.m
    :language: matlab
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/src/model_function_modelB.m
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelB.m
    :language: matlab
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/model_function2_matlab.yml
+.. literalinclude:: /../../yggdrasil/examples/model_function2/model_function2_matlab.yml
    :language: yaml
    :linenos:
 
@@ -98,18 +101,18 @@ Python Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/src/model_function_modelA.py
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelA.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/src/model_function_modelB.py
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelB.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/model_function2_python.yml
+.. literalinclude:: /../../yggdrasil/examples/model_function2/model_function2_python.yml
    :language: yaml
    :linenos:
 
@@ -120,18 +123,18 @@ R Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/src/model_function_modelA.R
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelA.R
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/src/model_function_modelB.R
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelB.R
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/model_function2/model_function2_r.yml
+.. literalinclude:: /../../yggdrasil/examples/model_function2/model_function2_r.yml
    :language: yaml
    :linenos:
 

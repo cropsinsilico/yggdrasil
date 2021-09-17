@@ -3,6 +3,9 @@
 transforms
 ===============================
 
+This example is used by yggdrasil to test the support transformations in each of the supported languages and should not be used outside of the tests.
+
+
 .. contents:: :local:
 
 R Version
@@ -10,18 +13,18 @@ R Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/src.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/src.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/dst.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/dst.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/transforms.yml
+.. literalinclude:: /../../yggdrasil/examples/transforms/transforms.yml
    :language: yaml
    :linenos:
 
@@ -32,18 +35,18 @@ C Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/src.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/src.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/dst.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/dst.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/transforms.yml
+.. literalinclude:: /../../yggdrasil/examples/transforms/transforms.yml
    :language: yaml
    :linenos:
 
@@ -54,18 +57,18 @@ C++ Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/src.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/src.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/dst.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/dst.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/transforms.yml
+.. literalinclude:: /../../yggdrasil/examples/transforms/transforms.yml
    :language: yaml
    :linenos:
 
@@ -76,18 +79,18 @@ Dummy Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/src.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/src.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/dst.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/dst.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/transforms.yml
+.. literalinclude:: /../../yggdrasil/examples/transforms/transforms.yml
    :language: yaml
    :linenos:
 
@@ -98,18 +101,18 @@ Fortran Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/src.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/src.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/dst.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/dst.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/transforms.yml
+.. literalinclude:: /../../yggdrasil/examples/transforms/transforms.yml
    :language: yaml
    :linenos:
 
@@ -120,18 +123,18 @@ Matlab Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/src.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/src.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/dst.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/dst.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/transforms.yml
+.. literalinclude:: /../../yggdrasil/examples/transforms/transforms.yml
    :language: yaml
    :linenos:
 
@@ -142,18 +145,18 @@ OpenSimRoot Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/src.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/src.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/dst.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/dst.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/transforms.yml
+.. literalinclude:: /../../yggdrasil/examples/transforms/transforms.yml
    :language: yaml
    :linenos:
 
@@ -164,18 +167,18 @@ Python Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/src.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/src.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/dst.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/dst.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/transforms.yml
+.. literalinclude:: /../../yggdrasil/examples/transforms/transforms.yml
    :language: yaml
    :linenos:
 
@@ -186,18 +189,18 @@ SBML Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/src.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/src.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/dst.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/dst.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/transforms.yml
+.. literalinclude:: /../../yggdrasil/examples/transforms/transforms.yml
    :language: yaml
    :linenos:
 
@@ -208,18 +211,18 @@ Timesync Version
 
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/src.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/src.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/src/dst.py
+.. literalinclude:: /../../yggdrasil/examples/transforms/src/dst.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/transforms/transforms.yml
+.. literalinclude:: /../../yggdrasil/examples/transforms/transforms.yml
    :language: yaml
    :linenos:
 
