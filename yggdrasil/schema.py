@@ -141,7 +141,9 @@ def convert_extended2base(s):
                 'function': 'string', 'class': 'string',
                 'instance': 'string', '1darray': 'array',
                 'ndarray': 'array', 'obj': 'object',
-                'ply': 'object'}
+                'ply': 'object',
+                'any': ["number", "string", "boolean", "object", "array",
+                        "null"]}
     if isinstance(s, (list, tuple)):
         s = [convert_extended2base(x) for x in s]
     elif isinstance(s, (dict, OrderedDict)):
