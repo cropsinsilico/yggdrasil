@@ -1119,11 +1119,18 @@ def validate_model_submission(fname):
     the yggdrasil model repository.
 
     Args:
-        fname (str): YAML file to validate.
+        fname (str): YAML file to validate or directory in which to check
+            each of the YAML files.
 
     """
     import glob
     from yggdrasil import yamlfile, runner
+    if os.path.isdir(fname):
+        files = sorted(glob.glob(os.path.join(fname, '*.yml'))
+                       + glob.glob(os.path.join(fname, '*.yaml')))
+        for x in files:
+            validate_model_submission(x)
+        return
     # 1-2. YAML syntax and schema
     yml = yamlfile.parse_yaml(fname, model_submission=True)
     # 3a. LICENSE

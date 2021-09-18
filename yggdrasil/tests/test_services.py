@@ -347,3 +347,19 @@ def test_validate_model_submission():
     finally:
         if os.path.isfile('cropsinsilico/example-fakemodel/fakemodel.yml'):
             git.rmtree("cropsinsilico")
+
+
+def test_validate_model_repo():
+    r"""Test validation of YAMLs in the model repository."""
+    import git
+    import tempfile
+    dest = os.path.join(tempfile.gettempdir(), "model_repo")
+    url = "https://github.com/cropsinsilico/yggdrasil_models"
+    for x in [url, url + "_test"]:
+        try:
+            repo = git.Repo.clone_from(x, dest)
+            validate_model_submission(dest)
+            repo.close()
+        finally:
+            if os.path.isdir(dest):
+                git.rmtree(dest)
