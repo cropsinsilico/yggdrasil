@@ -253,9 +253,7 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
         models = []
         for yml in yml_prep['models']:
             wd = yml.pop('working_dir', None)
-            x = s.validate_model_submission(yml, normalize=True,
-                                            no_defaults=True,
-                                            required_defaults=True)
+            x = s.validate_model_submission(yml)
             if wd:
                 x['working_dir'] = wd
             models.append(x)

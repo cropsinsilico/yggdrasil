@@ -898,7 +898,12 @@ class SchemaRegistry(object):
                 'comm': {
                     'transform': {
                         "type": "array",
-                        "items": {"$ref": "#/definitions/transform"}}}},
+                        "items": {"$ref": "#/definitions/transform"}},
+                    'default_file': {
+                        '$ref': '#/definitions/file'}},
+                'file': {
+                    'serializer': {
+                        '$ref': '#/definitions/serializer'}}},
             'required': {
                 'model': ['args', 'inputs', 'outputs', 'description',
                           'repository_url', 'repository_commit']},
@@ -906,7 +911,8 @@ class SchemaRegistry(object):
                 'comm': ['is_default', 'length_map', 'serializer',
                          'address', 'dont_copy', 'for_service',
                          'send_converter', 'recv_converter', 'client_id',
-                         'cookies', 'host', 'params', 'port'],
+                         'cookies', 'host', 'params', 'port', 'commtype'],
+                'ocomm': ['default_value'],
                 'file': ['is_default', 'length_map',
                          'wait_for_creation', 'working_dir',
                          'read_meth', 'in_temp',
@@ -924,7 +930,25 @@ class SchemaRegistry(object):
             'order': {
                 'model': ['name', 'repository_url', 'repository_commit',
                           'contact_email', 'language', 'description',
-                          'args', 'inputs', 'outputs']},
+                          'args', 'inputs', 'outputs'],
+                'comm': ['name', 'datatype']},
+            'update': {
+                'model': {
+                    'inputs': {
+                        'description': ('Zero or more channels carrying '
+                                        'input to the model'),
+                        'items': {'$ref': '#/definitions/icomm'}},
+                    'outputs': {
+                        'description': ('Zero or more channels carrying '
+                                        'output from the model'),
+                        'items': {'$ref': '#/definitions/ocomm'}},
+                    'repository_commit': {
+                        'description': ('Commit that should be checked out '
+                                        'from the model repository.')}},
+                'file': {
+                    'name': {
+                        'description': ('Path to a file in the model '
+                                        'repository')}}},
         }
         return prop
         
@@ -956,6 +980,8 @@ class SchemaRegistry(object):
             if types:
                 out['definitions']['schema']['properties'][k]['options'] = {
                     'dependencies': {'type': types}}
+        for k in ['comm', 'file', 'model']:
+            out['definitions'][k].pop('description', '')
         for k in out['definitions'].keys():
             if k in ['schema', 'simpleTypes']:
                 continue
@@ -966,54 +992,60 @@ class SchemaRegistry(object):
             for p, v in list(out['definitions'][k]['properties'].items()):
                 if v.get('description', '').startswith('[DEPRECATED]'):
                     out['definitions'][k]['properties'].pop(p)
-        for x in ['comm', 'file']:
-            for k in ['send_converter', 'recv_converter']:
-                out['definitions'][x]['properties'][k].pop('oneOf', None)
-                out['definitions'][x]['properties'][k].update(
-                    type='array', items={"$ref": "#/definitions/transform"})
-        for x in ['file']:
-            for k in ['serializer']:
-                out['definitions'][x]['properties'][k].pop('oneOf', None)
-                out['definitions'][x]['properties'][k].update(
-                    {"$ref": "#/definitions/serializer"})
+        # Process based on model_form_schema_props
         prop = self.model_form_schema_props
-        for k in ['inputs', 'outputs', 'repository_commit']:
-            out['definitions']['model']['properties'][k].pop('default', None)
-            desc = out['definitions']['model']['properties'][k]['description'].split(
-                '.')[0]
-            out['definitions']['model']['properties'][k]['description'] = desc
-        out['definitions']['model']['properties']['args']['minItems'] = 1
-        out['definitions']['model']['properties']['args']['items']['minLength'] = 1
-        for k, rlist in prop['remove'].items():
-            for p in rlist:
+
+        def adjust_definitions(k):
+            # Remove
+            for p in prop['remove'].get(k, []):
                 out['definitions'][k]['properties'].pop(p, None)
-        for k, rdict in prop['replace'].items():
-            for r in rdict.keys():
-                if 'description' in out['definitions'][k]['properties'][r]:
-                    rdict[r]['description'] = (
+                if p in out['definitions'][k].get('required', []):
+                    out['definitions'][k]['required'].remove(p)
+            # Replace
+            for r, v in prop['replace'].get(k, {}).items():
+                if 'description' in out['definitions'][k]['properties'].get(r, {}):
+                    v['description'] = (
                         out['definitions'][k]['properties'][r]['description'])
-            out['definitions'][k]['properties'].update(rdict)
-        for k, rlist in prop['required'].items():
+                out['definitions'][k]['properties'][r] = v
+            # Required
             out['definitions'][k].setdefault('required', [])
-            for p in rlist:
+            for p in prop['required'].get(k, []):
                 if p not in out['definitions'][k]['required']:
                     out['definitions'][k]['required'].append(p)
-        # for k, adict in prop['add'].items():
-        #     out['definitions'][k]['properties'].update(adict)
-        for k, rlist in prop['order'].items():
-            for i, p in enumerate(rlist):
+            # Update
+            for p, new in prop['update'].get(k, {}).items():
+                out['definitions'][k]['properties'][p].update(new)
+            # Add
+            # out['definitions'][k]['properties'].update(
+            #     prop['add'].get(k, {}))
+            # Order
+            for i, p in enumerate(prop['order'].get(k, [])):
                 out['definitions'][k]['properties'][p]['propertyOrder'] = i
-        out.update(out['definitions'].pop('model'))
-        out['definitions'].pop('connection')
+
+        # Update definitions
+        for k in ['model', 'comm', 'file']:
+            adjust_definitions(k)
+        for k in ['icomm', 'ocomm']:
+            out['definitions'][k] = copy.deepcopy(out['definitions']['comm'])
+            adjust_definitions(k)
+        out['definitions']['icomm']['oneOf'] = [
+            {'title': 'default file',
+             'required': ['default_file'],
+             'not': {'required': ['default_value']}},
+            {'title': 'default value',
+             'required': ['default_value'],
+             'not': {'required': ['default_file']}}]
+        # Adjust formating
         for x in [out] + list(out['definitions'].values()):
             for p, v in x.get('properties', {}).items():
                 if v.get("type", None) == "boolean":
                     v.setdefault("format", "checkbox")
+        # Isolate model
+        out.update(out['definitions'].pop('model'))
+        out['definitions'].pop('connection')
         out.update(
             title='Model YAML Schema',
             description='Schema for yggdrasil model YAML input files.')
-        out['definitions']['comm']['properties']['default_file'] = {
-            '$ref': '#/definitions/file'}
         out = convert_extended2base(out)
         return out
 
@@ -1100,12 +1132,12 @@ class SchemaRegistry(object):
 
         Args:
             obj (object): Object to validate.
-            **kwargs: Additional keyword arguments are passed to
-                yggdrasil.metaschema.validate_instance.
+            **kwargs: Additional keyword arguments are ignored.
 
         """
-        return metaschema.validate_instance(obj, self.model_form_schema,
-                                            **kwargs)
+        import jsonschema
+        jsonschema.validate(obj, self.model_form_schema)
+        return obj
 
     def validate_component(self, comp_name, obj, **kwargs):
         r"""Validate an object against a specific component.

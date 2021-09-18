@@ -181,8 +181,8 @@ definitions:
           type: array
       required:
       - datatype
-      - commtype
       - name
+      - commtype
       title: comm_base
       type: object
     - anyOf:
@@ -704,9 +704,9 @@ definitions:
             is used.
           type: string
       required:
-      - filetype
       - name
       - working_dir
+      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -1280,7 +1280,9 @@ definitions:
             that should be passed as input to the model program or language executable
             (e.g. source code or configuration file for a domain specific language).
           items:
+            minLength: 1
             type: string
+          minItems: 1
           type: array
         builddir:
           type: string
@@ -1806,10 +1808,10 @@ definitions:
             is used.
           type: string
       required:
-      - args
-      - language
       - name
       - working_dir
+      - args
+      - language
       title: model_base
       type: object
     - anyOf:

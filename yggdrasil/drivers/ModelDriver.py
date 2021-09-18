@@ -315,8 +315,8 @@ class ModelDriver(Driver):
                          'is written in. A list of available '
                          'languages can be found :ref:`here <'
                          'schema_table_model_subtype_rst>`.')},
-        'args': {'type': 'array',
-                 'items': {'type': 'string'}},
+        'args': {'type': 'array', 'minItems': 1,
+                 'items': {'type': 'string', 'minLength': 1}},
         'inputs': {'type': 'array', 'default': [],
                    'items': {'$ref': '#/definitions/comm'},
                    'description': (

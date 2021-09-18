@@ -80,7 +80,7 @@ class FileComm(CommBase.CommBase):
                                   'class': SerializeBase}],
                        'default': {'seritype': 'direct'}}}
     _schema_excluded_from_inherit = (
-        ['commtype', 'datatype', 'read_meth', 'serializer', 'default_value']
+        ['commtype', 'datatype', 'read_meth', 'serializer']
         + CommBase.CommBase._model_schema_prop)
     _schema_excluded_from_class_validation = ['serializer']
     _schema_base_class = None
