@@ -36,13 +36,15 @@ for cls in (BaseConstructor, Constructor, SafeConstructor):
                         no_duplicates_constructor)
 
 
-def clone_github_repo(fname):
+def clone_github_repo(fname, commit=None):
     r"""Clone a GitHub repository, returning the path to the local copy of the
     file pointed to by the URL if there is one.
 
     Args:
         fname (str): URL to a GitHub repository or a file in a GitHub
             repository that should be cloned.
+        commit (str, optional): Commit that should be checked out. Defaults
+            to None and the HEAD of the default branch is used.
 
 
     Returns:
@@ -79,6 +81,8 @@ def clone_github_repo(fname):
             reponame
         # clone the repo into the appropriate directory
         repo = git.Repo.clone_from(cloneurl, os.path.join(owner, reponame))
+        if commit is not None:
+            repo.git.checkout(commit)
         repo.close()
         # now that it is cloned, just pass the yaml file (and path) onwards
     return os.path.realpath(fname)
@@ -195,7 +199,9 @@ def prep_yaml(files):
             for x in yml[k]:
                 if isinstance(x, dict):
                     if (k == 'models') and ('repository_url' in x):
-                        repo_dir = clone_github_repo(x['repository_url'])
+                        repo_dir = clone_github_repo(
+                            x['repository_url'],
+                            commit=x.get('repository_commit', None))
                         x.setdefault('working_dir', repo_dir)
                     else:
                         x.setdefault('working_dir', yml['working_dir'])

@@ -181,8 +181,8 @@ definitions:
           type: array
       required:
       - datatype
-      - name
       - commtype
+      - name
       title: comm_base
       type: object
     - anyOf:
@@ -370,8 +370,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - inputs
       - outputs
+      - inputs
       title: connection_base
       type: object
     - anyOf:
@@ -1561,6 +1561,11 @@ definitions:
           items:
             type: string
           type: array
+        repository_commit:
+          description: Commit that should be checked out in the model repository specified
+            by repository_url. If not provided, the most recent commit on the default
+            branch will be used.
+          type: string
         repository_url:
           description: URL for the git repository containing the model source code.
             If provided, relative paths in the model YAML definition will be considered
@@ -1802,9 +1807,9 @@ definitions:
           type: string
       required:
       - args
+      - language
       - name
       - working_dir
-      - language
       title: model_base
       type: object
     - anyOf:

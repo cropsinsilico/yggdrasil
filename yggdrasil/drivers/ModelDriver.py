@@ -173,6 +173,9 @@ class ModelDriver(Driver):
             the model source code. If provided, relative paths in the model
             YAML definition will be considered relative to the repository root
             directory.
+        repository_commit (str, optional): Commit that should be checked out
+            in the model repository specified by repository_url. If not
+            provided, the most recent commit on the default branch will be used.
         description (str, optional): Description of the model. This parameter
             is only used in the model repository or when providing the model
             as a service.
@@ -287,6 +290,8 @@ class ModelDriver(Driver):
             source code. If provided, relative paths in the model YAML
             definition will be considered relative to the repository root
             directory.
+        repository_commit (str): Commit that should be checked out in the
+            model repository specified by repository_url.
         description (str): Description of the model. This parameter is only
             used in the model repository or when providing the model as a
             service.
@@ -393,6 +398,7 @@ class ModelDriver(Driver):
         'allow_threading': {'type': 'boolean'},
         'copies': {'type': 'integer', 'default': 1, 'minimum': 1},
         'repository_url': {'type': 'string'},
+        'repository_commit': {'type': 'string'},
         'description': {'type': 'string'},
         'contact_email': {'type': 'string'}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']

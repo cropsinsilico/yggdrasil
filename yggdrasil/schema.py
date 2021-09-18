@@ -901,7 +901,7 @@ class SchemaRegistry(object):
                         "items": {"$ref": "#/definitions/transform"}}}},
             'required': {
                 'model': ['args', 'inputs', 'outputs', 'description',
-                          'repository_url']},
+                          'repository_url', 'repository_commit']},
             'remove': {
                 'comm': ['is_default', 'length_map', 'serializer',
                          'address', 'dont_copy', 'for_service',
@@ -922,9 +922,9 @@ class SchemaRegistry(object):
                           'aggregation', 'interpolation', 'synonyms',
                           'driver']},
             'order': {
-                'model': ['name', 'repository_url', 'contact_email',
-                          'language', 'description', 'args', 'inputs',
-                          'outputs']},
+                'model': ['name', 'repository_url', 'repository_commit',
+                          'contact_email', 'language', 'description',
+                          'args', 'inputs', 'outputs']},
         }
         return prop
         
@@ -977,10 +977,10 @@ class SchemaRegistry(object):
                 out['definitions'][x]['properties'][k].update(
                     {"$ref": "#/definitions/serializer"})
         prop = self.model_form_schema_props
-        for k in ['inputs', 'outputs']:
+        for k in ['inputs', 'outputs', 'repository_commit']:
             out['definitions']['model']['properties'][k].pop('default', None)
             desc = out['definitions']['model']['properties'][k]['description'].split(
-                ' A full description')[0]
+                '.')[0]
             out['definitions']['model']['properties'][k]['description'] = desc
         out['definitions']['model']['properties']['args']['minItems'] = 1
         for k, rlist in prop['remove'].items():
