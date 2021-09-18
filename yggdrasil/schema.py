@@ -983,6 +983,7 @@ class SchemaRegistry(object):
                 '.')[0]
             out['definitions']['model']['properties'][k]['description'] = desc
         out['definitions']['model']['properties']['args']['minItems'] = 1
+        out['definitions']['model']['properties']['args']['items']['minLength'] = 1
         for k, rlist in prop['remove'].items():
             for p in rlist:
                 out['definitions'][k]['properties'].pop(p, None)
