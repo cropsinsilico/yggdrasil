@@ -344,7 +344,7 @@ def test_validate_model_submission():
     try:
         fname = os.path.join(os.path.dirname(__file__), 'yamls',
                              'FakePlant.yaml')
-        validate_model_submission(fname)
+        validate_model_submission([fname])
         os.remove(os.path.join('cropsinsilico', 'example-fakemodel',
                                'LICENSE'))
         assert_raises(RuntimeError, validate_model_submission, fname)

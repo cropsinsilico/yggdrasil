@@ -1152,7 +1152,11 @@ def validate_model_submission(fname):
 
     """
     from yggdrasil import yamlfile, runner
-    if os.path.isdir(fname):
+    if isinstance(fname, list):
+        for x in fname:
+            validate_model_submission(x)
+        return
+    elif os.path.isdir(fname):
         files = sorted(glob.glob(os.path.join(fname, '*.yml'))
                        + glob.glob(os.path.join(fname, '*.yaml')))
         for x in files:
