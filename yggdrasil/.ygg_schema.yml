@@ -180,8 +180,8 @@ definitions:
             type: string
           type: array
       required:
-      - datatype
       - name
+      - datatype
       - commtype
       title: comm_base
       type: object
@@ -705,8 +705,8 @@ definitions:
           type: string
       required:
       - name
-      - working_dir
       - filetype
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -1282,7 +1282,6 @@ definitions:
           items:
             minLength: 1
             type: string
-          minItems: 1
           type: array
         builddir:
           type: string
@@ -1809,8 +1808,8 @@ definitions:
           type: string
       required:
       - name
-      - working_dir
       - args
+      - working_dir
       - language
       title: model_base
       type: object

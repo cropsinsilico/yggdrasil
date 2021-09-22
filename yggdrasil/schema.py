@@ -944,7 +944,8 @@ class SchemaRegistry(object):
                         'items': {'$ref': '#/definitions/ocomm'}},
                     'repository_commit': {
                         'description': ('Commit that should be checked out '
-                                        'from the model repository.')}},
+                                        'from the model repository.')},
+                    'args': {'minItems': 1}},
                 'file': {
                     'name': {
                         'description': ('Path to a file in the model '
