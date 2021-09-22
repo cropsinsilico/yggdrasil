@@ -6,7 +6,6 @@
   language: python
   inputs:
   - name: photosynthesis_rate
-    commtype: default
     datatype:
       type: bytes
     default_file:
@@ -14,7 +13,6 @@
       filetype: table
   outputs:
   - name: growth_rate
-    commtype: default
     datatype:
       type: bytes
     default_file:

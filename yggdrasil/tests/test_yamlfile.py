@@ -656,6 +656,7 @@ class TestYamlModelSubmission(YamlTestBase):
                   '    repository_url: https://github.com/cropsinsilico/'
                   'example-fakemodel',
                   '    repository_commit: e4bc7932c3c0c68fb3852cfb864777ca64cba448',
+                  '    description: Example model submission',
                   '    language: python',
                   '    args:',
                   '      - ./src/fakemodel.py',
