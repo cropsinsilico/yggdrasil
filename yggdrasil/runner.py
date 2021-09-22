@@ -238,12 +238,12 @@ class YggRunner(YggClass):
         namespace (str, optional): Name that should be used to uniquely
             identify any RMQ exchange. Defaults to the value in the config
             file.
-        host (str, optional): Name of the host that the models will be launched
-            from. Defaults to None.
+        host (str, optional): Name of the host that the models will be
+            launched from. Defaults to None.
         rank (int, optional): Rank of this set of models if run in parallel.
             Defaults to 0.
-        ygg_debug_level (str, optional): Level for Ygg debug messages. Defaults
-            to environment variable 'YGG_DEBUG'.
+        ygg_debug_level (str, optional): Level for Ygg debug messages.
+            Defaults to environment variable 'YGG_DEBUG'.
         rmq_debug_level (str, optional): Level for RabbitMQ debug messages.
             Defaults to environment variable 'RMQ_DEBUG'.
         ygg_debug_prefix (str, optional): Prefix for Ygg debug messages.
@@ -257,10 +257,13 @@ class YggRunner(YggClass):
         partial_commtype (dict, optional): Communicator kwargs that should be
             be used for the connections to the unpaired channels when
             complete_partial is True. Defaults to None and will be ignored.
+        yaml_param (dict, optional): Parameters that should be used in
+            mustache formatting of YAML files. Defaults to None and is
+            ignored.
 
     Attributes:
-        namespace (str): Name that should be used to uniquely identify any RMQ
-            exchange.
+        namespace (str): Name that should be used to uniquely identify any
+            RMQ exchange.
         host (str): Name of the host that the models will be launched from.
         rank (int): Rank of this set of models if run in parallel.
         modeldrivers (dict): Model drivers associated with this run.
@@ -276,7 +279,7 @@ class YggRunner(YggClass):
                  ygg_debug_prefix=None, connection_task_method='thread',
                  as_service=False, complete_partial=False,
                  partial_commtype=None, production_run=False,
-                 mpi_tag_start=None):
+                 mpi_tag_start=None, yaml_param=None):
         self.mpi_comm = None
         name = 'runner'
         if MPI is not None:
@@ -317,7 +320,7 @@ class YggRunner(YggClass):
         else:
             self.drivers = yamlfile.parse_yaml(
                 modelYmls, complete_partial=complete_partial,
-                partial_commtype=partial_commtype)
+                partial_commtype=partial_commtype, yaml_param=yaml_param)
             self.connectiondrivers = self.drivers['connection']
             self.modeldrivers = self.drivers['model']
             for x in self.modeldrivers.values():

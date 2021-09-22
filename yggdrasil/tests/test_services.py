@@ -189,7 +189,7 @@ class TestServices(object):
             self.cli = None
 
     def call_integration_service(self, cli, yamls, test_yml, copy_yml=None,
-                                 name='test'):
+                                 name='test', yaml_param=None):
         r"""Call an integration that includes a service."""
         remote_yml = '_remote'.join(os.path.splitext(test_yml))
         yamls = copy.copy(yamls)
@@ -205,12 +205,17 @@ class TestServices(object):
                 remote_code = 'a'
             else:
                 remote_code = 'w'
+            lines = ['service:',
+                     f'    name: {name}',
+                     f'    yamls: [{test_yml}]',
+                     f'    type: {service_type}',
+                     f'    address: {address}']
+            if yaml_param:
+                lines.append('    yaml_param:')
+                for k, v in yaml_param.items():
+                    lines.append(f'        {k}: "{v}"')
             with open(remote_yml, remote_code) as fd:
-                fd.write('\n'.join(['service:',
-                                    f'    name: {name}',
-                                    f'    yamls: [{test_yml}]',
-                                    f'    type: {service_type}',
-                                    f'    address: {address}']))
+                fd.write('\n'.join(lines))
             r = runner.get_runner(yamls)
             r.run()
             assert(not r.error_flag)
@@ -301,8 +306,9 @@ class TestServices(object):
         if (((running_service.commtype != 'rest')
              or (running_service.service_type != 'flask'))):
             pytest.skip("redundent test")  # pragma: testing
-        os.environ.update(FIB_ITERATIONS='3',
+        yaml_param = dict(FIB_ITERATIONS='3',
                           FIB_SERVER_SLEEP_SECONDS='0.01')
+        os.environ.update(yaml_param)
         yamls = ex_yamls['rpcFib']['all_nomatlab']
         service = None
         for x in yamls:
@@ -310,7 +316,8 @@ class TestServices(object):
                 service = x
                 break
         self.call_integration_service(running_service, yamls, service,
-                                      name='rpcFibSrv')
+                                      name='rpcFibSrv',
+                                      yaml_param=yaml_param)
 
     def test_calling_service_as_function(self, running_service):
         r"""Test calling an integrations as a service in an integration."""

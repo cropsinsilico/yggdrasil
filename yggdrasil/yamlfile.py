@@ -92,7 +92,7 @@ def clone_github_repo(fname, commit=None, local_directory=None):
     return os.path.realpath(fname)
 
 
-def load_yaml(fname):
+def load_yaml(fname, yaml_param=None):
     r"""Parse a yaml file defining a run.
 
     Args:
@@ -104,6 +104,9 @@ def load_yaml(fname):
             YAML file (the server is assumed to be github.com if not given)
             (foo/bar/yam/interesting.yaml will be interpreted as
             http://github.com/foo/bar/yam/interesting.yml).
+        yaml_param (dict, optional): Parameters that should be used in
+            mustache formatting of YAML files. Defaults to None and is
+            ignored.
 
     Returns:
         dict: Contents of yaml file.
@@ -130,9 +133,11 @@ def load_yaml(fname):
         else:
             fname = os.path.join(os.getcwd(), 'stream')
     # Mustache replace vars
+    if yaml_param is None:
+        yaml_param = {}
     yamlparsed = fd.read()
     yamlparsed = chevron.render(
-        sio.StringIO(yamlparsed).getvalue(), dict(os.environ))
+        sio.StringIO(yamlparsed).getvalue(), dict(os.environ, **yaml_param))
     if fname.endswith('.json'):
         yamlparsed = json.loads(yamlparsed)
     else:
@@ -145,7 +150,7 @@ def load_yaml(fname):
     return yamlparsed
 
 
-def prep_yaml(files):
+def prep_yaml(files, yaml_param=None):
     r"""Prepare yaml to be parsed by jsonschema including covering backwards
     compatible options.
 
@@ -153,6 +158,9 @@ def prep_yaml(files):
         files (str, list): Either the path to a single yaml file or a list of
             yaml files. Entries can also be opened file descriptors for files
             containing YAML documents or pre-loaded YAML documents.
+        yaml_param (dict, optional): Parameters that should be used in
+            mustache formatting of YAML files. Defaults to None and is
+            ignored.
 
     Returns:
         dict: YAML ready to be parsed using schema.
@@ -162,7 +170,7 @@ def prep_yaml(files):
     # Load each file
     if not isinstance(files, list):
         files = [files]
-    yamls = [load_yaml(f) for f in files]
+    yamls = [load_yaml(f, yaml_param=yaml_param) for f in files]
     # Load files pointed to
     for y in yamls:
         if 'include' in y:
@@ -184,7 +192,7 @@ def prep_yaml(files):
                 y['models'].append(y.pop('model'))
         for x in services:
             request = {'action': 'start'}
-            for k in ['name', 'yamls']:
+            for k in ['name', 'yamls', 'yaml_param']:
                 if k in x:
                     request[k] = x.pop(k)
             if 'type' in x:
@@ -219,7 +227,7 @@ def prep_yaml(files):
 
 
 def parse_yaml(files, complete_partial=False, partial_commtype=None,
-               model_only=False, model_submission=False):
+               model_only=False, model_submission=False, yaml_param=None):
     r"""Parse list of yaml files.
 
     Args:
@@ -237,6 +245,9 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
         model_submission (bool, optional): If True, the YAML will be evaluated
             as a submission to the yggdrasil model repository and model_only
             will be set to True. Defaults to False.
+        yaml_param (dict, optional): Parameters that should be used in
+            mustache formatting of YAML files. Defaults to None and is
+            ignored.
 
     Raises:
         ValueError: If the yml dictionary is missing a required keyword or
@@ -250,7 +261,7 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
     """
     s = get_schema()
     # Parse files using schema
-    yml_prep = prep_yaml(files)
+    yml_prep = prep_yaml(files, yaml_param=yaml_param)
     # print('prepped')
     # pprint.pprint(yml_prep)
     if model_submission:
