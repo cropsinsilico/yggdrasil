@@ -832,14 +832,18 @@ class validate_yaml(SubCommand):
                    'ensuring that it is part of a complete integration.')}),
         (('--model-submission', ),
          {'action': 'store_true',
-          'help': ('Validate a YAML against the schema for submissions to '
-                   'the yggdrasil model repository.')})]
+          'help': ('Validate a YAML against the requirements for '
+                   'submissions to the yggdrasil model repository.')})]
 
     @classmethod
     def func(cls, args):
-        from yggdrasil import yamlfile
-        yamlfile.parse_yaml(args.yamlfile, model_only=args.model_only,
-                            model_submission=args.model_submission)
+        if args.model_submission:
+            from yggdrasil.services import validate_model_submission
+            validate_model_submission(args.yamlfile)
+        else:
+            from yggdrasil import yamlfile
+            yamlfile.parse_yaml(args.yamlfile, model_only=args.model_only,
+                                model_submission=args.model_submission)
         logger.info("Validation succesful.")
 
 
