@@ -72,11 +72,13 @@ def check_settings(service_type, partial_commtype=None):
 def running_service(service_type, partial_commtype=None, with_coverage=False):
     r"""Context manager to run and clean-up an integration service."""
     check_settings(service_type, partial_commtype)
+    model_repo = "https://github.com/cropsinsilico/yggdrasil_models_test/models"
     log_level = logging.ERROR
     args = [sys.executable, "-m", "yggdrasil", "integration-service-manager",
             f"--service-type={service_type}"]
     if partial_commtype is not None:
         args.append(f"--commtype={partial_commtype}")
+    args += ["start", f"--model-repository={model_repo}"]
     package_dir = None
     process_kws = {}
     if with_coverage:
@@ -97,7 +99,8 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
         lines[-1] += ')'
         lines += ['assert(not srv.is_running)',
                   f'srv.start_server(with_coverage={with_coverage},',
-                  f'                 log_level={log_level})']
+                  f'                 log_level={log_level},'
+                  f'                 model_repository=\'{model_repo}\')']
         with open(script_path, 'w') as fd:
             fd.write('\n'.join(lines))
         args = [sys.executable, script_path]
@@ -255,6 +258,7 @@ class TestServices(object):
         test_yml = ex_yamls['fakeplant']['python']
         assert_raises(KeyError, cli.registry.remove, 'test')
         assert_raises(ServerError, cli.send_request, 'test')
+        print(cli.send_request('FakePlant'))
         cli.registry.add('test', test_yml, namespace='remote')
         print(cli.send_request('test'))
         assert_raises(ValueError, cli.registry.add, 'test', [test_yml])
@@ -272,7 +276,7 @@ class TestServices(object):
             cli.registry.add(reg_coll)
             print(cli.send_request('photosynthesis', namespace='phot'))
             assert_raises(ValueError, cli.registry.add,
-                          'photosynthesis', [test_yml])
+                          'photosynthesis', [test_yml], invalid=1)
             cli.send_request('photosynthesis', action='stop')
             cli.registry.remove(reg_coll)
             assert_raises(KeyError, cli.registry.remove, 'photosynthesis')

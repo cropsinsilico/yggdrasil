@@ -36,7 +36,7 @@ for cls in (BaseConstructor, Constructor, SafeConstructor):
                         no_duplicates_constructor)
 
 
-def clone_github_repo(fname, commit=None):
+def clone_github_repo(fname, commit=None, local_directory=None):
     r"""Clone a GitHub repository, returning the path to the local copy of the
     file pointed to by the URL if there is one.
 
@@ -45,15 +45,18 @@ def clone_github_repo(fname, commit=None):
             repository that should be cloned.
         commit (str, optional): Commit that should be checked out. Defaults
             to None and the HEAD of the default branch is used.
-
+        local_directory (str, optional): Local directory that the file should
+            be cloned into. Defaults to None and the current working directory
+            will be used.
 
     Returns:
         str: Path to the local copy of the repository or file in the
             repository.
 
     """
-    
     from yggdrasil.services import _service_host_env
+    if local_directory is None:
+        local_directory = os.getcwd()
     # make sure we start with a full url
     if 'http' not in fname:
         url = 'http://github.com/' + fname
@@ -69,7 +72,7 @@ def clone_github_repo(fname, commit=None):
     reponame = splitpath[2]
     # the full path is the file name and location
     # turn the file path into an os based format
-    fname = os.path.join(*splitpath)
+    fname = os.path.join(local_directory, *splitpath)
     # check to see if the file already exists, and clone if it does not
     if not os.path.exists(fname):
         if os.environ.get(_service_host_env, False):
@@ -80,7 +83,8 @@ def clone_github_repo(fname, commit=None):
         cloneurl = parsed.scheme + '://' + parsed.netloc + '/' + owner + '/' +\
             reponame
         # clone the repo into the appropriate directory
-        repo = git.Repo.clone_from(cloneurl, os.path.join(owner, reponame))
+        repo = git.Repo.clone_from(cloneurl, os.path.join(local_directory,
+                                                          owner, reponame))
         if commit is not None:
             repo.git.checkout(commit)
         repo.close()

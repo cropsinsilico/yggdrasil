@@ -5,6 +5,7 @@ import uuid
 import json
 import traceback
 import yaml
+import glob
 import pprint
 import functools
 import threading
@@ -127,7 +128,7 @@ class ServiceBase(YggClass):
         logging.basicConfig(level=log_level)
 
     def start_server(self, remote_url=None, with_coverage=False,
-                     log_level=None):
+                     log_level=None, model_repository=None):
         r"""Start the server.
 
         Args:
@@ -140,12 +141,17 @@ class ServiceBase(YggClass):
                 with coverage. Defaults to False.
             log_level (int, optional): Level of log messages that should be
                 printed. Defaults to None and is ignored.
+            model_repository (str, optional): URL of directory in a Git
+                repository containing YAMLs that should be added to the model
+                registry. Defaults to None and is ignored.
 
         """
         if remote_url is None:
             remote_url = os.environ.get(_service_host_env, None)
         if remote_url is None:
             remote_url = self.address
+        if model_repository is not None:
+            self.registry.add_from_repository(model_repository)
         os.environ.setdefault(_service_host_env, remote_url)
         if log_level is not None:
             self.set_log_level(log_level)
@@ -1078,6 +1084,28 @@ class IntegrationServiceRegistry(object):
             registry.pop(k)
         self.save(registry)
 
+    def add_from_repository(self, model_repository, directory=None):
+        r"""Add integration services to the registry from a repository of
+        model YAMLs.
+
+        Args:
+            model_repository (str): URL of directory in a Git repository
+                containing YAMLs that should be added to the model registry.
+            directory (str, optional): Directory where services from the
+                model_repository should be cloned. Defaults to
+                '~/.yggdrasil_service'.
+
+        """
+        from yggdrasil.yamlfile import clone_github_repo
+        if directory is None:
+            directory = os.path.join('~', '.yggdrasil_services')
+        yaml_dir = clone_github_repo(model_repository,
+                                     local_directory=directory)
+        yaml_files = (glob.glob(os.path.join(yaml_dir, '*.yaml'))
+                      + glob.glob(os.path.join(yaml_dir, '*.yml')))
+        for x in yaml_files:
+            self.add(os.path.splitext(os.path.basename(x))[0], x)
+
     def add(self, name, yamls=None, **kwargs):
         r"""Add an integration service to the registry.
 
@@ -1102,7 +1130,7 @@ class IntegrationServiceRegistry(object):
             assert(yamls)
             collection = {name: dict(kwargs, name=name, yamls=yamls)}
         for k, v in collection.items():
-            if k in registry:
+            if (k in registry) and (registry[k] != v):
                 old = pprint.pformat(registry[k])
                 new = pprint.pformat(v)
                 raise ValueError(f"There is an registry integration "
@@ -1123,7 +1151,6 @@ def validate_model_submission(fname):
             each of the YAML files.
 
     """
-    import glob
     from yggdrasil import yamlfile, runner
     if os.path.isdir(fname):
         files = sorted(glob.glob(os.path.join(fname, '*.yml'))

@@ -328,7 +328,12 @@ class integration_service_manager(SubCommand):
                                    'registered integration.')}),
                         (('--with-coverage', ),
                          {'action': 'store_true',
-                          'help': ('Enable coverage cleanup for testing.')})]),
+                          'help': ('Enable coverage cleanup for testing.')}),
+                        (('--model-repository', ),
+                         {'type': str,
+                          'help': ('URL for a directory in a Git repository '
+                                   'containing models that should be loaded '
+                                   'into the service manager registry.')})]),
                 ArgumentParser(
                     name='stop',
                     help=('Stop an integration service manager or '
@@ -405,7 +410,9 @@ class integration_service_manager(SubCommand):
                 if not x.is_running:
                     x.start_server(
                         remote_url=getattr(args, 'remote_url', None),
-                        with_coverage=getattr(args, 'with_coverage', False))
+                        with_coverage=getattr(args, 'with_coverage', False),
+                        model_repository=getattr(args, 'model_repository',
+                                                 None))
             else:
                 x.send_request(integration_name,
                                yamls=integration_yamls,
