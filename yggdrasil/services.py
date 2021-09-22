@@ -1096,7 +1096,7 @@ class IntegrationServiceRegistry(object):
                 '~/.yggdrasil_service'.
 
         """
-        from yggdrasil.yamlfile import clone_github_repo
+        from yggdrasil.yamlfile import clone_github_repo, prep_yaml
         if directory is None:
             directory = os.path.join('~', '.yggdrasil_services')
         yaml_dir = clone_github_repo(model_repository,
@@ -1104,6 +1104,11 @@ class IntegrationServiceRegistry(object):
         yaml_files = (glob.glob(os.path.join(yaml_dir, '*.yaml'))
                       + glob.glob(os.path.join(yaml_dir, '*.yml')))
         for x in yaml_files:
+            # Calling prep_yaml allows the model repositories to be cloned
+            # in advance to circumvent th hold place on git cloning on the
+            # service manager (these models are assumed to be vetted so
+            # they do not pose a security risk).
+            prep_yaml(x)
             self.add(os.path.splitext(os.path.basename(x))[0], x)
 
     def add(self, name, yamls=None, **kwargs):

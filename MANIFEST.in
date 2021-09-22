@@ -20,6 +20,7 @@ recursive-include yggdrasil *.json
 recursive-include yggdrasil *.f90
 recursive-include yggdrasil *.xml
 recursive-include yggdrasil/examples *.py
+recursive-include yggdrasil/examples *.rst
 recursive-include yggdrasil/demos *.py
 recursive-include yggdrasil/tests/scripts *.py
 recursive-include yggdrasil/examples Makefile_linux

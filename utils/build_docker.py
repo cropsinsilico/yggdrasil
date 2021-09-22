@@ -7,7 +7,7 @@ _utils_dir = os.path.dirname(__file__)
 
 
 def build(dockerfile, tag, flags=[], repo='cropsinsilico/yggdrasil',
-          context=_utils_dir):
+          context=_utils_dir, disable_latest=False):
     r"""Build a docker image.
 
     Args:
@@ -20,11 +20,17 @@ def build(dockerfile, tag, flags=[], repo='cropsinsilico/yggdrasil',
         context (str, optional): Directory that should be provided as the
             context for the image. Defaults to the directory containing this
             script.
+        disable_latest (bool, optional): If True, the new image will not
+            be tagged 'latest' in addition to the provided tag value. Defaults
+            to False.
 
     """
     args = ['docker', 'build', '-t', f'{repo}:{tag}', '-f', dockerfile] + flags
     args.append(context)
     subprocess.call(args)
+    if not disable_latest:
+        args = ['docker', 'tag', f'{repo}:{tag}', f"{repo}:latest"]
+        subprocess.call(args)
 
 
 def push_image(tag, repo='cropsinsilico/yggdrasil'):
@@ -140,6 +146,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--push", action="store_true",
         help="After successfully building the image, push it to DockerHub.")
+    parser.add_argument(
+        "--disable-latest", action="store_true",
+        help=("Don't tag the new image as 'latest' in addition to the "
+              "version/commit specific tag."))
     subparsers = parser.add_subparsers(
         dest="type",
         help=("Type of docker image that should be built "
@@ -163,8 +173,11 @@ if __name__ == "__main__":
         params = params_executable(params)
     elif args.type == 'service':
         params = params_service(params)
+    params.setdefault('disable_latest', args.disable_latest)
     dockerfile = params.pop('dockerfile')
     tag = params.pop('tag')
     build(dockerfile, tag, **params)
     if args.push:
         push_image(tag, repo=params['repo'])
+        if not params['disable_latest']:
+            push_image('latest', repo=params['repo'])
