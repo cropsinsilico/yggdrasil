@@ -1,169 +1,322 @@
+import pytest
+from tests.metaschema.datatypes.test_MetaschemaType import (
+    TestMetaschemaType as base_class)
 import copy
 import numpy as np
 from yggdrasil import units, platform, constants
-from yggdrasil.metaschema.datatypes.tests import test_MetaschemaType as parent
 
 
-class TestScalarMetaschemaType(parent.TestMetaschemaType):
+class TestScalarMetaschemaType(base_class):
     r"""Test class for ScalarMetaschemaType class with float."""
-    _mod = 'ScalarMetaschemaType'
+    
+    _mod = 'yggdrasil.metaschema.datatypes.ScalarMetaschemaType'
     _cls = 'ScalarMetaschemaType'
-    _prec = 32
-    _type = 'float'
-    _shape = 1
-    _array_contents = None
 
-    @staticmethod
-    def after_class_creation(cls):
-        r"""Actions to be taken during class construction."""
-        parent.TestMetaschemaType.after_class_creation(cls)
-        if not cls._explicit:
-            cls._typedef['subtype'] = cls._type
-        if cls._type == 'bytes':
-            dtype = 'S%d' % (cls._prec // 8)
-        elif cls._type == 'unicode':
-            dtype = 'U%d' % (cls._prec // 32)
-        else:
-            dtype = '%s%d' % (cls._type, cls._prec)
-        if cls._array_contents is None:
-            cls._array = np.ones(cls._shape, dtype)
-        else:
-            cls._array = np.array(cls._array_contents, dtype)
-        if cls._type in ['bytes', 'unicode']:
-            dtype_invalid = 'float'
-        else:
-            dtype_invalid = 'S10'
-        cls._invalid_array = np.ones(cls._shape, dtype_invalid)
-        if 'Array' not in cls._cls:
-            cls._value = cls._array[0]
-            cls._invalid_decoded.append(cls._array)
-            cls._invalid_decoded.append(cls._invalid_array[0])
-        else:
-            cls._value = cls._array
-            if cls._array.ndim == 1:
-                cls._invalid_decoded.append(cls._array[0])
-                cls._invalid_decoded.append(np.ones((3, 4), dtype))
+    @pytest.fixture(scope="class", params=[False, True])
+    def explicit(self, request):
+        r"""bool: If True the type is explicit."""
+        return request.param
+
+    @pytest.fixture(scope="class")
+    def class_name(self, explicit, subtype):
+        r"""Name of class that will be tested."""
+        if not explicit:
+            return self._cls
+        return f"{subtype.title()}MetaschemaType"
+
+    @pytest.fixture(scope="class")
+    def precision(self, subtype, array_contents, explicit):
+        r"""int: Precision to test."""
+        if subtype == 'complex':
+            return 64
+        elif subtype in ['bytes', 'unicode']:
+            max_len = len(max(array_contents, key=len))
+            if subtype == 'unicode':
+                return max_len * 32
             else:
-                cls._invalid_decoded.append(cls._array[0][0])
-                cls._invalid_decoded.append(cls._array[0])
-            cls._invalid_decoded.append(cls._invalid_array)
-        cls._valid_encoded = [{'type': cls.get_import_cls().name,
-                               'precision': cls._prec,
-                               'units': '',
-                               'data': cls._value.tobytes()}]
-        if not cls._explicit:
-            cls._valid_encoded[0]['subtype'] = cls._type
-        cls._valid_decoded = [cls._value]
-        if cls._type == 'bytes':
-            new_dtype = 'S%d' % (cls._prec * 2 // 8)
-        elif cls._type == 'unicode':
-            new_dtype = 'U%d' % (cls._prec * 2 // 32)
+                return max_len * 8
+        elif explicit and (subtype == 'float'):
+            return 64
+        return 32
+
+    @pytest.fixture(scope="class", params=list(constants.VALID_TYPES.keys()))
+    def subtype(self, request):
+        r"""str: Scalar base type."""
+        return request.param
+
+    @pytest.fixture(scope="class")
+    def shape(self):
+        r"""int,tuple: Shape of scalar/array."""
+        return 1
+
+    @pytest.fixture(scope="class")
+    def value_units(self):
+        r"""str: Units that should be added to the type definition."""
+        return None
+
+    @pytest.fixture(scope="class")
+    def valid_units(self):
+        r"""list: Units that are compatible with the typedef units."""
+        return []
+
+    @pytest.fixture(scope="class")
+    def invalid_units(self):
+        r"""list: Units that are NOT compatible with the typedef units."""
+        return []
+
+    @pytest.fixture(scope="class")
+    def array_contents(self, subtype):
+        r"""Array contents."""
+        if subtype in ['bytes', 'unicode']:
+            return ['one', 'two', 'three']
+        return None
+    
+    @pytest.fixture(scope="class")
+    def typedef_base(self, explicit, subtype, value_units):
+        r"""dict: Base type definition."""
+        out = {}
+        if not explicit:
+            out['subtype'] = subtype
+        if value_units:
+            out['units'] = value_units
+        return out
+
+    @pytest.fixture(scope="class")
+    def dtype(self, subtype, precision):
+        r"""str: Numpy Data type."""
+        if subtype == 'bytes':
+            return 'S%d' % (precision // 8)
+        elif subtype == 'unicode':
+            return 'U%d' % (precision // 32)
         else:
-            new_dtype = '%s%d' % (cls._type, cls._prec * 2)
+            return '%s%d' % (subtype, precision)
+
+    @pytest.fixture(scope="class")
+    def dtype_invalid(self, subtype):
+        r"""str: Invalid numpy data type."""
+        if subtype in ['bytes', 'unicode']:
+            return 'float'
+        else:
+            return 'S10'
+
+    @pytest.fixture(scope="class")
+    def array(self, shape, dtype, array_contents):
+        r"""np.ndarray: Array for testing."""
+        if array_contents is None:
+            return np.ones(shape, dtype)
+        else:
+            return np.array(array_contents, dtype)
+
+    @pytest.fixture(scope="class")
+    def invalid_array(self, shape, dtype_invalid):
+        r"""np.ndarray: Invalid array."""
+        return np.ones(shape, dtype_invalid)
+
+    @pytest.fixture(scope="class")
+    def value(self, class_name, array, value_units):
+        r"""dict: Test value."""
+        if 'Array' not in class_name:
+            out = array[0]
+        else:
+            out = array
+        if value_units:
+            out = units.add_units(out, value_units)
+        return out
+
+    @pytest.fixture(scope="class")
+    def invalid_decoded(self, class_name, array, invalid_array, dtype):
+        r"""list: Objects that are invalid under this type."""
+        out = []
+        if 'Array' not in class_name:
+            out += [array, invalid_array[0]]
+        else:
+            if array.ndim == 1:
+                out += [array[0], np.ones((3, 4), dtype)]
+            else:
+                out += [array[0][0], array[0]]
+            out.append(invalid_array)
+        return out
+
+    @pytest.fixture(scope="class")
+    def valid_encoded(self, python_class, precision, value, explicit,
+                      subtype, valid_units, shape):
+        r"""list: Encoded objects that are valid under this type."""
+        out = [{'type': python_class.name,
+                'precision': precision,
+                'units': '',
+                'data': value.tobytes()}]
+        if not explicit:
+            out[0]['subtype'] = subtype
+        for x in valid_units:
+            out.append(dict(out[0], units=x))
+        if isinstance(shape, tuple):
+            out[0]['shape'] = shape
+        elif shape > 1:
+            out[0]['length'] = shape
+        return out
+
+    @pytest.fixture(scope="class")
+    def valid_decoded(self, value, valid_units):
+        r"""list: Objects that are valid under this type."""
+        out = [value]
+        for x in valid_units:
+            out.append(units.add_units(copy.deepcopy(out[0]), x))
+        return out
+    
+    @pytest.fixture(scope="class")
+    def precision_value(self, class_name, subtype, precision, array):
+        r"""np.ndarray: Value with specific precision."""
+        if subtype == 'bytes':
+            new_dtype = 'S%d' % (precision * 2 // 8)
+        elif subtype == 'unicode':
+            new_dtype = 'U%d' % (precision * 2 // 32)
+        else:
+            new_dtype = '%s%d' % (subtype, precision * 2)
         if platform._is_win and (new_dtype == 'float128'):  # pragma: windows
-            cls._prec_value = None
+            return None
         else:
-            prec_array = cls._array.astype(new_dtype)
-            if 'Array' not in cls._cls:
-                cls._prec_value = prec_array[0]
+            prec_array = array.astype(new_dtype)
+            if 'Array' not in class_name:
+                return prec_array[0]
             else:
-                cls._prec_value = prec_array
-        cls._compatible_objects = [
-            (cls._value, cls._value, None)]
-        if cls._prec_value is not None:
-            if not cls._explicit:
-                cls._compatible_objects.append(
-                    (cls._value, cls._prec_value, {'subtype': cls._type,
-                                                   'precision': cls._prec * 2}))
+                return prec_array
+
+    @pytest.fixture(scope="class")
+    def compatible_objects(self, subtype, precision, explicit, value,
+                           precision_value):
+        r"""list: Objects that are compatible with this type."""
+        out = [(value, value, None)]
+        if precision_value is not None:
+            if not explicit:
+                out.append(
+                    (value, precision_value, {'subtype': subtype,
+                                              'precision': precision * 2}))
             else:
-                cls._compatible_objects.append(
-                    (cls._value, cls._prec_value, {'precision': cls._prec * 2}))
-        if 'Array' not in cls._cls:
-            if cls._explicit:
-                if cls._type == 'bytes':
-                    cls._valid_normalize = [(1, b'1'),
-                                            (u'1', b'1')]
-                elif cls._type == 'unicode':
-                    cls._valid_normalize = [(1, u'1'),
-                                            (b'1', u'1')]
+                out.append(
+                    (value, precision_value, {'precision': precision * 2}))
+        return out
+            
+    @pytest.fixture(scope="class")
+    def valid_normalize(self, class_name, explicit, subtype, value):
+        r"""list: Pairs of pre-/post-normalized objects."""
+        if 'Array' not in class_name:
+            if explicit:
+                if subtype == 'bytes':
+                    return [(1, b'1'), (u'1', b'1')]
+                elif subtype == 'unicode':
+                    return [(1, u'1'), (b'1', u'1')]
                 else:
-                    cls._valid_normalize = [(str(cls._value), cls._value),
-                                            ('hello', 'hello')]
-        if cls._explicit and ('Array' not in cls._cls):
-            cls._invalid_encoded.append({'type': 'scalar',
-                                         'subtype': 'invalid'})
-        cls._invalid_validate.append(np.array([None, 1, list()],
-                                              dtype=object))
+                    return [(str(value), value), ('hello', 'hello')]
+        return []
 
-    def test_from_array(self):
+    @pytest.fixture(scope="class")
+    def invalid_encoded(self, class_name, explicit, invalid_units):
+        r"""list: Encoded objects that are invalid under this type."""
+        out = [{}]
+        if explicit and ('Array' not in class_name):
+            out.append({'type': 'scalar', 'subtype': 'invalid'})
+        for x in invalid_units:
+            out.append(dict(out[0], units=x))
+        return out
+            
+    @pytest.fixture(scope="class")
+    def invalid_validate(self):
+        r"""list: Objects that are invalid under this type."""
+        return [None, np.array([None, 1, list()], dtype=object)]
+
+    def test_from_array(self, value, typedef_base, array, instance,
+                        nested_approx):
         r"""Test getting object from array."""
-        test_val = self._value
+        test_val = value
         test_kws = {}
-        if 'units' in self._typedef:
-            test_val = units.add_units(test_val, self._typedef['units'])
-            test_kws['unit_str'] = self._typedef['units']
-        self.assert_equal(self.instance.from_array(self._array, **test_kws),
-                          test_val)
-
-
-# Dynamically create tests for dynamic and explicitly typed scalars
-for t in constants.VALID_TYPES.keys():
-    iattr_imp = {'_type': t}
-    if t == 'complex':
-        iattr_imp['_prec'] = 64
-    elif t in ('bytes', 'unicode'):
-        iattr_imp['_array_contents'] = ['one', 'two', 'three']
-        max_len = len(max(iattr_imp['_array_contents'], key=len))
-        if t == 'unicode':
-            iattr_imp['_prec'] = max_len * 32
-        else:
-            iattr_imp['_prec'] = max_len * 8
-    iattr_exp = copy.deepcopy(iattr_imp)
-    iattr_exp['_cls'] = '%sMetaschemaType' % t.title()
-    iattr_exp['_explicit'] = True
-    if t == 'float':
-        iattr_exp['_prec'] = 64
-    cls_imp = type('TestScalarMetaschemaType_%s' % t,
-                   (TestScalarMetaschemaType, ), iattr_imp)
-    cls_exp = type('Test%s' % iattr_exp['_cls'],
-                   (TestScalarMetaschemaType, ), iattr_exp)
-    globals()[cls_imp.__name__] = cls_imp
-    globals()[cls_exp.__name__] = cls_exp
-    del cls_imp, cls_exp
+        if 'units' in typedef_base:
+            test_val = units.add_units(test_val, typedef_base['units'])
+            test_kws['unit_str'] = typedef_base['units']
+        assert(instance.from_array(array, **test_kws) == nested_approx(test_val))
 
 
 class TestScalarMetaschemaType_prec(TestScalarMetaschemaType):
     r"""Test class for ScalarMetaschemaType class with precision."""
 
-    @staticmethod
-    def after_class_creation(cls):
-        r"""Actions to be taken during class construction."""
-        TestScalarMetaschemaType.after_class_creation(cls)
-        cls._typedef['precision'] = cls._prec
-        cls._valid_encoded.append(copy.deepcopy(cls._valid_encoded[0]))
-        for x in cls._invalid_encoded:
-            x['precision'] = cls._prec / 2  # compatible precision
-        # Version with incorrect precision
-        cls._invalid_encoded.append(copy.deepcopy(cls._valid_encoded[0]))
-        if cls._prec_value is not None:
-            cls._invalid_encoded[-1]['precision'] = cls._prec * 2
-            cls._invalid_decoded.append(cls._prec_value)
+    @pytest.fixture(scope="class")
+    def explicit(self):
+        r"""bool: If True the type is explicit."""
+        return False
+    
+    @pytest.fixture(scope="class")
+    def subtype(self):
+        r"""str: Scalar base type."""
+        return "float"
+    
+    @pytest.fixture(scope="class")
+    def typedef_base(self, explicit, subtype, precision):
+        r"""dict: Base type definition."""
+        return {'subtype': subtype,
+                'precision': precision}
+    
+    @pytest.fixture(scope="class")
+    def valid_encoded(self, python_class, precision, value, explicit,
+                      subtype):
+        r"""list: Encoded objects that are valid under this type."""
+        out = [{'type': python_class.name,
+                'precision': precision,
+                'units': '',
+                'data': value.tobytes(),
+                'subtype': subtype}]
+        # out.append(copy.deepcopy(out[0]))
+        return out
+    
+    @pytest.fixture(scope="class")
+    def invalid_encoded(self, precision, valid_encoded, precision_value):
+        r"""list: Encoded objects that are invalid under this type."""
+        out = [{'precision': precision / 2}]  # compatible precision
+        out.append(copy.deepcopy(valid_encoded[0]))
+        if precision_value is not None:
+            out[-1]['precision'] = precision * 2
+        return out
+    
+    @pytest.fixture(scope="class")
+    def invalid_decoded(self, class_name, array, invalid_array, dtype,
+                        precision_value):
+        r"""list: Objects that are invalid under this type."""
+        out = []
+        if 'Array' not in class_name:
+            out += [array, invalid_array[0]]
+        else:
+            if array.ndim == 1:
+                out += [array[0], np.ones((3, 4), dtype)]
+            else:
+                out += [array[0][0], array[0]]
+            out.append(invalid_array)
+        if precision_value is not None:
+            out.append(precision_value)
+        return out
 
 
 class TestScalarMetaschemaType_units(TestScalarMetaschemaType):
     r"""Test class for ScalarMetaschemaType class with units."""
 
-    @staticmethod
-    def after_class_creation(cls):
-        r"""Actions to be taken during class construction."""
-        TestScalarMetaschemaType.after_class_creation(cls)
-        cls._typedef['units'] = 'cm'
-        cls._valid_encoded.append(copy.deepcopy(cls._valid_encoded[0]))
-        cls._valid_encoded[-1]['units'] = 'cm'
-        cls._valid_encoded.append(copy.deepcopy(cls._valid_encoded[0]))
-        cls._valid_encoded[-1]['units'] = 'm'
-        cls._valid_decoded.append(copy.deepcopy(cls._valid_decoded[0]))
-        cls._valid_decoded[-1] = units.add_units(cls._valid_decoded[-1], 'm')
-        # Version with incorrect units
-        cls._invalid_encoded.append(copy.deepcopy(cls._valid_encoded[0]))
-        cls._invalid_encoded[-1]['units'] = 's'
+    @pytest.fixture(scope="class")
+    def explicit(self):
+        r"""bool: If True the type is explicit."""
+        return False
+    
+    @pytest.fixture(scope="class")
+    def subtype(self):
+        r"""str: Scalar base type."""
+        return "float"
+    
+    @pytest.fixture(scope="class")
+    def value_units(self, valid_units):
+        r"""str: Units that should be added to the type definition."""
+        return valid_units[0]
+    
+    @pytest.fixture(scope="class")
+    def valid_units(self):
+        r"""list: Units that are compatible with the typedef units."""
+        return ['cm', 'm']
+
+    @pytest.fixture(scope="class")
+    def invalid_units(self):
+        r"""list: Invalid units."""
+        return ['s']

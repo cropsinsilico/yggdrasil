@@ -1164,3 +1164,21 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
             'end;',
         ]
         return out
+
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for driver instance.
+                deps (list): Dependencies to install.
+
+        """
+        out = super(MatlabModelDriver, cls).get_testing_options(**kwargs)
+        out['args'] = ["test", 1]
+        return out

@@ -1,84 +1,94 @@
+import pytest
+from tests.drivers.test_BuildModelDriver import (
+    TestBuildModelDriver as base_class)
 import os
-from yggdrasil.tests import (
-    scripts, assert_raises, assert_equal, requires_language)
-import yggdrasil.drivers.tests.test_BuildModelDriver as parent
 from yggdrasil.drivers.MakeModelDriver import MakeModelDriver, MakeCompiler
 
 
-@requires_language('make', installed='any')
+@pytest.mark.related_language('make')
 def test_MakeCompiler():
     r"""Test MakeCompiler class."""
-    assert_equal(MakeCompiler.get_output_file(None, target='clean'), 'clean')
+    assert(MakeCompiler.get_output_file(None, target='clean') == 'clean')
 
 
-@requires_language('make', installed=False)
-def test_MakeModelDriver_no_C_library():  # pragma: windows
+@pytest.mark.absent_language('make')
+def test_MakeModelDriver_no_C_library(scripts):  # pragma: windows
     r"""Test MakeModelDriver error when C library not installed."""
-    assert_raises(RuntimeError, MakeModelDriver, 'test', scripts['make'])
+    with pytest.raises(RuntimeError):
+        MakeModelDriver('test', scripts['make'])
 
 
-@requires_language('make')
-def test_MakeModelDriver_error_notarget():
+@pytest.mark.language('make')
+def test_MakeModelDriver_error_notarget(scripts):
     r"""Test MakeModelDriver error for invalid target."""
     makedir, target = os.path.split(scripts['make'])
-    assert_raises(RuntimeError, MakeModelDriver, 'test', 'invalid',
-                  makedir=makedir)
+    with pytest.raises(RuntimeError):
+        MakeModelDriver('test', 'invalid', makedir=makedir)
 
 
-@requires_language('make')
-def test_MakeModelDriver_error_nofile():
+@pytest.mark.language('make')
+def test_MakeModelDriver_error_nofile(scripts):
     r"""Test MakeModelDriver error for missing Makefile."""
     makedir, target = os.path.split(scripts['make'])
-    assert_raises(RuntimeError, MakeModelDriver, 'test', 'invalid')
+    with pytest.raises(RuntimeError):
+        MakeModelDriver('test', 'invalid')
 
 
-class TestMakeModelParam(parent.TestBuildModelParam):
-    r"""Test parameters for MakeModelDriver."""
-
-    driver = 'MakeModelDriver'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestMakeModelParam, self).__init__(*args, **kwargs)
-        self.attr_list += ['target', 'makedir', 'makefile']
-        self.makedir, self.target = os.path.split(self.src[0])
-        self.makefile = os.path.join(self.makedir, 'Makefile')
-        self.args = [self.target]
-        self._inst_kwargs['makefile'] = self.makefile
-        if 'source_files' in self._inst_kwargs:
-            del self._inst_kwargs['source_files']
-        
-
-class TestMakeModelDriverNoInit(TestMakeModelParam,
-                                parent.TestBuildModelDriverNoInit):
-    r"""Test runner for MakeModelDriver without init."""
-    pass
-
-
-class TestMakeModelDriverNoStart(TestMakeModelParam,
-                                 parent.TestBuildModelDriverNoStart):
-    r"""Test runner for MakeModelDriver without start."""
-    
-    def __init__(self, *args, **kwargs):
-        super(TestMakeModelDriverNoStart, self).__init__(*args, **kwargs)
-        # Version specifying makedir via working_dir
-        self._inst_kwargs['yml']['working_dir'] = self.makedir
-        del self._inst_kwargs['makefile']
-
-    def test_compile_model(self):
-        r"""Test compile model with alternate set of input arguments."""
-        src = [self.target + '.c']
-        self.instance.compile_model(target=self.target)
-        self.instance.compile_model(source_files=src)
-        self.assert_raises(RuntimeError, self.instance.compile_model,
-                           source_files=src, target=self.target + 'invalid')
-        
-
-class TestMakeModelDriver(TestMakeModelParam, parent.TestBuildModelDriver):
+class TestMakeModelDriver(base_class):
     r"""Test runner for MakeModelDriver."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestMakeModelDriver, self).__init__(*args, **kwargs)
-        # Version specifying makedir in parts
-        makedir_parts = os.path.split(self.makedir)
-        self._inst_kwargs['working_dir'] = makedir_parts[0]
-        self._inst_kwargs['makedir'] = makedir_parts[1]
+    @pytest.fixture(scope="class")
+    def component_subtype(self):
+        r"""Subtype of component being tested."""
+        return 'make'
+
+    @pytest.fixture
+    def makefile(self, sourcedir):
+        r"""Makefile."""
+        return os.path.join(sourcedir, 'Makefile')
+
+    @pytest.fixture
+    def instance_kwargs(self, testing_options, timeout, working_dir,
+                        polling_interval, namespace, source, makefile):
+        r"""Keyword arguments for a new instance of the tested class."""
+        return dict(testing_options.get('kwargs', {}),
+                    yml={'working_dir': working_dir},
+                    timeout=timeout, sleeptime=polling_interval,
+                    namespace=namespace, makefile=makefile)
+
+
+class TestMakeModelDriver_wd(TestMakeModelDriver):
+    r"""Test runner for MakeModelDriver with working directory."""
+
+    @pytest.fixture
+    def instance_kwargs(self, testing_options, timeout, sourcedir,
+                        polling_interval, namespace, source):
+        r"""Keyword arguments for a new instance of the tested class."""
+        return dict(testing_options.get('kwargs', {}),
+                    yml={'working_dir': sourcedir},
+                    timeout=timeout, sleeptime=polling_interval,
+                    namespace=namespace)
+
+    def test_compile_model(self, target, instance):
+        r"""Test compile model with alternate set of input arguments."""
+        src = [target + '.c']
+        instance.compile_model(target=target)
+        instance.compile_model(source_files=src)
+        with pytest.raises(RuntimeError):
+            instance.compile_model(source_files=src,
+                                   target=target + 'invalid')
+        
+
+class TestMakeModelDriver_wd_rel(TestMakeModelDriver):
+    r"""Test runner for MakeModelDriver with makedir rel to working_dir."""
+
+    @pytest.fixture
+    def instance_kwargs(self, testing_options, timeout, working_dir,
+                        polling_interval, namespace, source, sourcedir):
+        r"""Keyword arguments for a new instance of the tested class."""
+        makedir_parts = os.path.split(sourcedir)
+        return dict(testing_options.get('kwargs', {}),
+                    yml={'working_dir': working_dir},
+                    timeout=timeout, sleeptime=polling_interval,
+                    namespace=namespace, working_dir=makedir_parts[0],
+                    makedir=makedir_parts[1])

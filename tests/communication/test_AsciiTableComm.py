@@ -1,12 +1,11 @@
+import pytest
 import os
 import numpy as np
-import unittest
-from yggdrasil import units
-from yggdrasil.tests import assert_equal
+from yggdrasil import units, tools
 from yggdrasil.communication import AsciiTableComm
-from yggdrasil.communication.tests import test_AsciiFileComm as parent
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
     data2dtype)
+from tests.communication.test_FileComm import TestFileComm as base_class
 
 
 def test_AsciiTableComm_nofmt():
@@ -26,48 +25,56 @@ def test_AsciiTableComm_nofmt():
         irow[0] = irow[0].encode("utf-8")
         idict = {'f%d' % i: irow[i] for i in range(len(irow))}
         # irow = tuple(irow)
-        assert_equal(x, idict)
+        assert(x == idict)
     flag, x = inst.recv()
     assert(not flag)
     inst.close()
     os.remove(test_file)
 
 
-class TestAsciiTableComm(parent.TestAsciiFileComm):
+class TestAsciiTableComm(base_class):
     r"""Test for AsciiTableComm communication class."""
 
-    comm = 'AsciiTableComm'
-    
-    @unittest.skipIf(True, 'Table comm')
-    def test_send_recv_comment(self):
-        r"""Disabled: Test send/recv with commented message."""
-        pass  # pragma: no cover
+    test_send_recv_comment = None
 
-    def map_sent2recv(self, obj):
-        r"""Convert a sent object into a received one."""
-        if not self.instance.is_eof(obj):
-            field_units = self.testing_options.get('field_units', None)
-            if field_units:
-                if isinstance(obj, dict):
-                    return {k: units.add_units(v, u, dtype=data2dtype(v))
-                            for (k, v), u in zip(obj.items(), field_units)}
-                elif isinstance(obj, (list, tuple)):
-                    return [units.add_units(x, u, dtype=data2dtype(x))
-                            for x, u in zip(obj, field_units)]
-        return obj
+    @pytest.fixture(scope="class", autouse=True, params=["table"])
+    def component_subtype(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
 
-    
+    @pytest.fixture(scope="class")
+    def map_sent2recv(self, testing_options):
+        r"""Factory for method to convert sent messages to received."""
+        def wrapped_map_sent2recv(obj):
+            if (not isinstance(obj, bytes)) or (obj != tools.YGG_MSG_EOF):
+                field_units = testing_options.get('field_units', None)
+                if field_units:
+                    if isinstance(obj, dict):
+                        return {k: units.add_units(v, u, dtype=data2dtype(v))
+                                for (k, v), u in zip(obj.items(), field_units)}
+                    elif isinstance(obj, (list, tuple)):
+                        return [units.add_units(x, u, dtype=data2dtype(x))
+                                for x, u in zip(obj, field_units)]
+            return obj
+        return wrapped_map_sent2recv
+
+
+@pytest.mark.usefixtures("unyts_equality_patch")
 class TestAsciiTableComm_AsArray(TestAsciiTableComm):
     r"""Test for AsciiTableComm communication class."""
 
-    testing_option_kws = {'array_columns': True}
+    @pytest.fixture(scope="class", autouse=True)
+    def options(self):
+        r"""Arguments that should be provided when getting testing options."""
+        return {'array_columns': True}
 
 
 class TestAsciiTableComm_single(TestAsciiTableComm):
     r"""Test for AsciiTableComm communication class with field names sent."""
 
-    def get_options(self):
-        r"""Get testing options."""
+    @pytest.fixture(scope="class")
+    def testing_options(self):
+        r"""Testing options."""
         nele = 5
         dtype = np.dtype(dict(formats=['float'], names=['f0']))
         arr1 = np.zeros((nele, ), dtype)
@@ -85,7 +92,9 @@ class TestAsciiTableComm_single(TestAsciiTableComm):
         out['msg_array'] = arr1
         return out
 
-    def test_send_dict_default(self):
+    def test_send_dict_default(self, send_comm, recv_comm, do_send_recv,
+                               testing_options):
         r"""Test automated conversion of dictionary to pandas data frame."""
-        self.do_send_recv(msg_send=self.testing_options['dict'],
-                          msg_recv=self.testing_options['msg'])
+        do_send_recv(send_comm, recv_comm,
+                     send_params={'message': testing_options['dict']},
+                     recv_params={'message': testing_options['msg']})

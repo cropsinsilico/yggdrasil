@@ -230,7 +230,7 @@ class MPIComm(CommBase.CommBase):
         """
         if rank is None:
             rank = self.next_rank()
-        if isinstance(rank, list):
+        if isinstance(rank, (list, tuple)):
             return {x: self.get_tag(x) for x in rank}
         if self.unused_tags.get(rank, []):
             return self.unused_tags[rank][0]

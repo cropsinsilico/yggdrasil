@@ -1,111 +1,105 @@
+import pytest
 import os
 import tempfile
-from yggdrasil.schema import get_schema
-import yggdrasil.drivers.tests.test_ConnectionDriver as parent
+from yggdrasil import constants
+from tests.drivers.test_ConnectionDriver import (
+    TestConnectionDriver as base_class)
 
 
-class TestFileInputParam(parent.TestConnectionParam):
-    r"""Test parameters for FileInputDriver.
-
-    Attributes (in addition to parent class's):
-        filepath (str): Full path to test file.
-
-    """
-
-    icomm_name = 'FileComm'
-    testing_option_kws = {}
-
-    def __init__(self, *args, **kwargs):
-        super(TestFileInputParam, self).__init__(*args, **kwargs)
-        self.driver = 'FileInputDriver'
-        self.filepath = os.path.join(tempfile.gettempdir(),
-                                     '%s_input%s' %
-                                     (self.name,
-                                      self.icomm_import_cls._default_extension))
-        self.args = self.filepath
-
-    @property
-    def send_comm_kwargs(self):
-        r"""dict: Keyword arguments for send comm."""
-        out = super(TestFileInputParam, self).send_comm_kwargs
-        out['append'] = True
-        return out
-
-    @property
-    def contents_to_write(self):
-        r"""str: Contents that should be written to the file."""
-        return self.testing_options['contents']
-
-    def setup(self):
-        r"""Create a driver instance and start the driver."""
-        with open(self.filepath, 'wb') as fd:
-            fd.write(self.contents_to_write)
-        super(TestFileInputParam, self).setup()
-
-    def teardown(self):
-        r"""Remove the instance, stoppping it."""
-        super(TestFileInputParam, self).teardown()
-        if os.path.isfile(self.filepath):  # pragma: debug
-            os.remove(self.filepath)
-
-    def remove_instance(self, inst):
-        r"""Remove an instance include the input file."""
-        filename = inst.icomm.address
-        super(TestFileInputParam, self).remove_instance(inst)
-        if os.path.isfile(filename):
-            os.remove(filename)
+_filetypes = sorted(
+    [x for x in constants.COMPONENT_REGISTRY['file']['subtypes'].keys()
+     if x not in ['pandas']])
 
 
-class TestFileInputDriverNoStart(TestFileInputParam,
-                                 parent.TestConnectionDriverNoStart):
-    r"""Test runner for FileInputDriver without start."""
-    pass
-
-
-class TestFileInputDriverNoInit(TestFileInputParam,
-                                parent.TestConnectionDriverNoInit):
-    r"""Test runner for FileInputDriver without init."""
-    pass
-
-
-class TestFileInputDriver(TestFileInputParam, parent.TestConnectionDriver):
-    r"""Test runner for FileInputDriver."""
+class TestFileInputDriver(base_class):
+    r"""Test class for FileInputDriver."""
 
     test_send_recv = None
     test_send_recv_nolimit = None
+    
+    @pytest.fixture(scope="class")
+    def component_subtype(self):
+        r"""Subtype of component being tested."""
+        return 'file_input'
 
-    def assert_before_stop(self):
+    @pytest.fixture(scope="class", params=_filetypes)
+    def icomm_name(self, request):
+        r"""str: Name of the input communicator being tested."""
+        return request.param
+
+    @pytest.fixture
+    def instance_args(self, name, filepath):
+        r"""Arguments for a new instance of the tested class."""
+        return (name, filepath)
+
+    @pytest.fixture
+    def send_comm_kwargs(self, instance, icomm_name):
+        r"""dict: Keyword arguments for send comm."""
+        out = instance.icomm.opp_comm_kwargs()
+        out['append'] = True
+        return out
+
+    @pytest.fixture
+    def filepath(self, name, icomm_python_class, contents_to_write):
+        r"""str: Path to the test file."""
+        out = os.path.join(
+            tempfile.gettempdir(),
+            f'{name}_input{icomm_python_class._default_extension}')
+        with open(out, 'wb') as fd:
+            fd.write(contents_to_write)
+        try:
+            yield out
+        finally:
+            if os.path.isfile(out):
+                os.remove(out)
+    
+    @pytest.fixture(scope="class")
+    def contents_to_write(self, testing_options):
+        r"""str: Contents that should be written to the file."""
+        return testing_options['contents']
+
+    @pytest.fixture
+    def assert_before_stop(self, instance, recv_message_list,
+                           recv_comm, testing_options, unyts_equality_patch,
+                           pandas_equality_patch):
         r"""Assertions to make before stopping the driver instance."""
-        super(TestFileInputDriver, self).assert_before_stop(check_open=False)
-        self.instance.sleep()
-        self.recv_message_list(self.recv_comm, self.testing_options['recv'])
-
-    def assert_after_terminate(self):
-        r"""Assertions to make after stopping the driver instance."""
-        super(TestFileInputDriver, self).assert_after_terminate()
-        assert(self.instance.is_comm_closed)
-        
+        def assert_before_stop_w():
+            instance.sleep()
+            recv_message_list(recv_comm, testing_options['recv'])
+        return assert_before_stop_w
+    
     # These are disabled to prevent writting extraneous data
+    @pytest.fixture(scope="class")
     def run_before_terminate(self):
         r"""Commands to run while the instance is running, before terminate."""
-        # Don't send any messages to the file
-        pass
+        def run_before_terminate_w():
+            pass
+        return run_before_terminate_w
 
 
-# Dynamically create tests based on registered file classes
-s = get_schema()
-file_types = list(s['file'].schema_subtypes.keys())
-for k in file_types:
-    attr_dict = {'icomm_name': k}
-    if k == 'PandasFileComm':
-        attr_dict['testing_option_kws'] = {'not_as_frames': True}
-    cls_exp = type('Test%sInputDriver' % k,
-                   (TestFileInputDriver, ), attr_dict)
-    globals()[cls_exp.__name__] = cls_exp
-    if k == 'AsciiTableComm':
-        attr_dict = dict(attr_dict, testing_option_kws={'array_columns': True})
-        cls_exp2 = type('Test%sArrayInputDriver' % k,
-                        (cls_exp, ), attr_dict)
-        globals()[cls_exp2.__name__] = cls_exp2
-        del cls_exp2
-    del cls_exp
+class TestPandasInputDriver(TestFileInputDriver):
+    r"""Test class for FileInputDriver reading from a pandas table."""
+    
+    @pytest.fixture(scope="class")
+    def icomm_name(self):
+        r"""str: Name of the input communicator being tested."""
+        return 'pandas'
+
+    @pytest.fixture(scope="class")
+    def options(self):
+        r"""Arguments that should be provided when getting testing options."""
+        return {'not_as_frames': True}
+
+
+class TestAsciiTableArrayInputDriver(TestFileInputDriver):
+    r"""Test class for FileInputDriver reading from a table as an array."""
+
+    @pytest.fixture(scope="class")
+    def icomm_name(self):
+        r"""str: Name of the input communicator being tested."""
+        return 'table'
+
+    @pytest.fixture(scope="class")
+    def options(self):
+        r"""Arguments that should be provided when getting testing options."""
+        return {'array_columns': True}

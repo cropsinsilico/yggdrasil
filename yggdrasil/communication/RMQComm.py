@@ -18,6 +18,7 @@ except ImportError:
 
 
 _rmq_param_sep = '_RMQPARAM_'
+_localhost = '127.0.0.1'
 
 
 def get_rmq_parameters(url=None, user=None, username=None,
@@ -38,8 +39,8 @@ def get_rmq_parameters(url=None, user=None, username=None,
             config option 'password' in section 'rmq' if it exists and
             'guest' if it does not.
         host (str, optional): RabbitMQ server host. Defaults to config option
-            'host' in section 'rmq' if it exists and 'localhost' if it
-            does not. If 'localhost', the output of socket.gethostname()
+            'host' in section 'rmq' if it exists and _localhost if it
+            does not. If _localhost, the output of socket.gethostname()
             is used.
         virtual_host (str, optional): RabbitMQ server virtual host. Defaults
             to config option 'vhost' in section 'rmq' if it exists and '/'
@@ -65,7 +66,7 @@ def get_rmq_parameters(url=None, user=None, username=None,
         if password is None:
             password = ygg_cfg.get('rmq', 'password', 'guest')
         if host is None:
-            host = ygg_cfg.get('rmq', 'host', 'localhost')
+            host = ygg_cfg.get('rmq', 'host', _localhost)
         if virtual_host is None:
             virtual_host = vhost or ygg_cfg.get('rmq', 'vhost', '/')
         if virtual_host == '/':
@@ -108,7 +109,7 @@ def check_rmq_server(url=None, **kwargs):
     else:
         username = kwargs.get('username', ygg_cfg.get('rmq', 'user', 'guest'))
         password = kwargs.get('password', ygg_cfg.get('rmq', 'password', 'guest'))
-        host = kwargs.get('host', ygg_cfg.get('rmq', 'host', 'localhost'))
+        host = kwargs.get('host', ygg_cfg.get('rmq', 'host', _localhost))
         port = kwargs.get('port', ygg_cfg.get('rmq', 'port', '5672'))
         vhost = kwargs.get('vhost', ygg_cfg.get('rmq', 'vhost', '/'))
         credentials = pika.PlainCredentials(username, password)
@@ -118,10 +119,14 @@ def check_rmq_server(url=None, **kwargs):
     # Try to establish connection
     logging.getLogger("pika").propagate = False
     try:
-        connection = pika.BlockingConnection(parameters)
+        from yggdrasil import tools
+        with tools.track_fds("pika test connection: "):
+            connection = pika.BlockingConnection(parameters)
         if not connection.is_open:  # pragma: debug
+            del connection
             raise BaseException("Connection was not opened.")
         connection.close()
+        del connection
     except BaseException as e:  # pragma: debug
         print("Error when attempting to connect to the RabbitMQ server: "
               + str(e))
@@ -133,8 +138,12 @@ def check_rmq_server(url=None, **kwargs):
 class RMQServer(CommBase.CommServer):
     r"""RMQ server object for cleaning up server connections."""
 
+    def __init__(self, *args, **kwargs):
+        self.comm_cls = kwargs.get('comm_cls', RMQComm)
+        super(RMQServer, self).__init__(*args, **kwargs)
+
     def terminate(self, *args, **kwargs):
-        RMQComm.unregister_comm(self.srv_address)
+        self.comm_cls.unregister_comm(self.srv_address)
         super(RMQServer, self).terminate(*args, **kwargs)
 
 
@@ -181,6 +190,7 @@ class RMQComm(CommBase.CommBase):
         self._opening = multitasking.ProcessEvent()
         self._closing = multitasking.ProcessEvent()
         self._server_class = RMQServer
+        self._server_kwargs = {'comm_cls': self.__class__}
         super(RMQComm, self)._init_before_open(**kwargs)
 
     @property
@@ -213,8 +223,8 @@ class RMQComm(CommBase.CommBase):
                 config option 'password' in section 'rmq' if it exists and
                 'guest' if it does not.
             host (str, optional): RabbitMQ server host. Defaults to config option
-                'host' in section 'rmq' if it exists and 'localhost' if it
-                does not. If 'localhost', the output of socket.gethostname()
+                'host' in section 'rmq' if it exists and _localhost if it
+                does not. If _localhost, the output of socket.gethostname()
                 is used.
             virtual_host (str, optional): RabbitMQ server virtual host. Defaults
                 to config option 'vhost' in section 'rmq' if it exists and '/'
@@ -334,13 +344,19 @@ class RMQComm(CommBase.CommBase):
                 self.debug('Closing the channel')
                 self.channel.close()
 
-    def close_connection(self):
+    def close_connection(self, *args, **kwargs):
         r"""Close the connection."""
         with self.rmq_lock:
             if self.connection is not None:
                 self.debug('Closing connection')
-                self.connection.close()
+                self.connection.close(*args, **kwargs)
 
+    def atexit(self):  # pragma: debug
+        r"""Close operations."""
+        if self.direction == 'send':
+            self.linger()
+        super(RMQComm, self).atexit()
+        
     @property
     def is_open(self):
         r"""bool: True if the connection and channel are open."""

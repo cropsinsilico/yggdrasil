@@ -1,6 +1,7 @@
+import pytest
+from tests.metaschema.properties.test_MetaschemaProperty import (
+    TestMetaschemaProperty as base_class)
 import weakref
-from yggdrasil.metaschema.properties.tests import (
-    test_MetaschemaProperty as parent)
 
 
 class Dummy(object):  # pragma: debug
@@ -60,23 +61,53 @@ class InvalidArgsClass:  # pragma: no cover
     pass
 
 
-class TestArgsMetaschemaProperty(parent.TestMetaschemaProperty):
+class TestArgsMetaschemaProperty(base_class):
     r"""Test class for ArgsMetaschemaProperty class."""
     
-    _mod = 'ArgsMetaschemaProperty'
+    _mod = 'yggdrasil.metaschema.properties.ArgsMetaschemaProperty'
     _cls = 'ArgsMetaschemaProperty'
+
+    @pytest.fixture(scope="class")
+    def valid_classes(self):
+        return [ValidArgsClass1, ValidArgsClass2,
+                ValidArgsClass3, ValidArgsClass4]
+
+    @pytest.fixture(scope="class")
+    def valid_instances(self, valid_classes):
+        return [cls(*(cls.test_args), **(cls.test_kwargs))
+                for cls in valid_classes]
     
-    def __init__(self, *args, **kwargs):
-        super(TestArgsMetaschemaProperty, self).__init__(*args, **kwargs)
-        self._valid = []
-        self._invalid = []
-        for cls in [ValidArgsClass1, ValidArgsClass2,
-                    ValidArgsClass3, ValidArgsClass4]:
-            cls_inst = cls(*(cls.test_args), **(cls.test_kwargs))
-            self._valid.append((cls_inst, cls.valid_args))
-            self._invalid.append((cls_inst, cls.invalid_args))
-        valid_type = ValidArgsClass1.valid_args
-        invalid_type = ValidArgsClass1.invalid_args
-        self._encode_errors = [int(1), InvalidArgsClass]
-        self._valid_compare = [(valid_type, valid_type)]
-        self._invalid_compare = [(valid_type, invalid_type)]
+    @pytest.fixture(scope="class")
+    def valid(self, valid_instances):
+        r"""Objects that are valid."""
+        return [(x, x.__class__.valid_args) for x in valid_instances]
+
+    @pytest.fixture(scope="class")
+    def invalid(self, valid_instances):
+        r"""Objects that are invalid."""
+        return [(x, x.__class__.invalid_args) for x in valid_instances]
+
+    @pytest.fixture(scope="class")
+    def valid_type(self, valid_classes):
+        r"""Valid type."""
+        return valid_classes[0].valid_args
+    
+    @pytest.fixture(scope="class")
+    def invalid_type(self, valid_classes):
+        r"""Invalid type."""
+        return valid_classes[0].invalid_args
+
+    @pytest.fixture(scope="class")
+    def encode_errors(self):
+        r"""Object that enduce errors during encoding."""
+        return [int(1), InvalidArgsClass]
+
+    @pytest.fixture(scope="class")
+    def valid_compare(self, valid_type):
+        r"""Objects that successfully compare."""
+        return [(valid_type, valid_type)]
+
+    @pytest.fixture(scope="class")
+    def invalid_compare(self, valid_type, invalid_type):
+        r"""Objects that do not successfully compare."""
+        return [(valid_type, invalid_type)]

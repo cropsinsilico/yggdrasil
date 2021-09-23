@@ -1,144 +1,114 @@
+import pytest
 import os
-from yggdrasil.schema import get_schema
-import yggdrasil.drivers.tests.test_ConnectionDriver as parent
+from yggdrasil import constants
+from tests.drivers.test_ConnectionDriver import (
+    TestConnectionDriver as base_class)
 
 
-class TestFileOutputParam(parent.TestConnectionParam):
-    r"""Test parameters for FileOutputDriver.
-
-    Attributes (in addition to parent class's):
-        filepath (str): Full path to test file.
-
-    """
-
-    ocomm_name = 'FileComm'
-    testing_option_kws = {}
-
-    def __init__(self, *args, **kwargs):
-        super(TestFileOutputParam, self).__init__(*args, **kwargs)
-        self.driver = 'FileOutputDriver'
-        self.filepath = os.path.abspath('%s_input%s' %
-                                        (self.name,
-                                         self.ocomm_import_cls._default_extension))
-        self.args = self.filepath
-        self.timeout = 5.0
-
-    @property
-    def recv_comm_kwargs(self):
-        r"""Keyword arguments for receive comm."""
-        return {'commtype': 'CommBase', 'direction': 'recv'}
-        
-    def teardown(self):
-        r"""Remove the instance, stoppping it."""
-        super(TestFileOutputParam, self).teardown()
-        if os.path.isfile(self.filepath):  # pragma: debug
-            os.remove(self.filepath)
-
-    def remove_instance(self, inst):
-        r"""Remove an instance include the input file."""
-        filename = inst.ocomm.address
-        super(TestFileOutputParam, self).remove_instance(inst)
-        if os.path.isfile(filename):
-            os.remove(filename)
+_filetypes = sorted(constants.COMPONENT_REGISTRY['file']['subtypes'].keys())
 
 
-class TestFileOutputDriverNoStart(TestFileOutputParam,
-                                  parent.TestConnectionDriverNoStart):
-    r"""Test runner for FileOutputDriver without start."""
-
-    def __init__(self, *args, **kwargs):
-        super(TestFileOutputDriverNoStart, self).__init__(*args, **kwargs)
-        self.args = os.path.basename(self.filepath)
-        
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for creating a class instance."""
-        out = super(TestFileOutputDriverNoStart, self).inst_kwargs
-        out['in_temp'] = True
-        return out
-
-
-class TestFileOutputDriverNoInit(TestFileOutputParam,
-                                 parent.TestConnectionDriverNoInit):
-    r"""Test runner for FileOutputDriver without init."""
-
-    def __init__(self, *args, **kwargs):
-        super(TestFileOutputDriverNoInit, self).__init__(*args, **kwargs)
-        self.args = os.path.basename(self.filepath)
-        
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for creating a class instance."""
-        out = super(TestFileOutputDriverNoInit, self).inst_kwargs
-        out['in_temp'] = True
-        return out
-
-    
-class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
-    r"""Test runner for FileOutputDriver."""
+class TestFileOutputDriver(base_class):
+    r"""Test class for FileOutputDriver."""
 
     test_send_recv = None
     test_send_recv_nolimit = None
+    test_send_recv_closed = None
+    
+    @pytest.fixture(scope="class")
+    def component_subtype(self):
+        r"""Subtype of component being tested."""
+        return 'file_output'
 
-    def send_file_contents(self):
-        r"""Send file contents to driver."""
-        for x in self.testing_options['send']:
-            flag = self.send_comm.send(x)
+    @pytest.fixture(scope="class", params=_filetypes)
+    def ocomm_name(self, request):
+        r"""str: Name of the input communicator being tested."""
+        return request.param
+
+    @pytest.fixture
+    def instance_args(self, name, filepath):
+        r"""Arguments for a new instance of the tested class."""
+        return (name, filepath)
+
+    @pytest.fixture(autouse=True)
+    def filepath(self, name, ocomm_python_class):
+        r"""str: Path to the test file."""
+        out = os.path.abspath(
+            f'{name}_input{ocomm_python_class._default_extension}')
+        try:
+            yield out
+        finally:
+            if os.path.isfile(out):
+                os.remove(out)
+
+    @pytest.fixture
+    def recv_comm(self):
+        r"""CommBase: communicator for receiving messages from the driver."""
+        pytest.skip("recv_comm disabled for output files")
+
+    @pytest.fixture
+    def before_instance_started(self, send_comm):
+        r"""Actions performed after teh instance is created, but before it
+        is started."""
+        def before_instance_started_w(x):
+            pass
+        return before_instance_started_w
+    
+    @pytest.fixture
+    def after_instance_started(self, send_comm, testing_options):
+        r"""Action taken after the instance is started, but before tests
+        begin."""
+        def after_instance_started_w(x):
+            for x in testing_options['send']:
+                flag = send_comm.send(x)
+                assert(flag)
+            flag = send_comm.send_eof()
             assert(flag)
-        flag = self.send_comm.send_eof()
-        assert(flag)
+        return after_instance_started_w
 
-    def setup(self):
-        r"""Create a driver instance and start the driver."""
-        super(TestFileOutputDriver, self).setup()
-        self.send_file_contents()
-        
-    def run_before_stop(self):
+    @pytest.fixture
+    def run_before_stop(self, instance):
         r"""Commands to run while the instance is running."""
-        self.instance.wait(1.0)
-
-    @property
-    def contents_to_read(self):
+        def run_before_stop_w():
+            instance.wait(1.0)
+        return run_before_stop_w
+    
+    @pytest.fixture
+    def contents_to_read(self, testing_options):
         r"""str: Contents that should be read to the file."""
-        return self.testing_options['contents']
+        return testing_options['contents']
 
-    def assert_before_stop(self):
-        r"""Assertions to make before stopping the driver instance."""
-        # super(TestFileOutputDriver, self).assert_before_stop()
-        # assert(self.instance.ocomm.is_closed)
-
-    def assert_after_stop(self):
+    @pytest.fixture
+    def assert_after_stop(self, assert_after_terminate, filepath,
+                          testing_options, contents_to_read):
         r"""Assertions to make after stopping the driver instance."""
-        super(TestFileOutputDriver, self).assert_after_stop()
-        assert(os.path.isfile(self.filepath))
-        if self.testing_options.get('exact_contents', True):
-            with open(self.filepath, 'rb') as fd:
-                data = fd.read()
-            self.assert_equal(data, self.contents_to_read)
-
-    def assert_after_terminate(self):
-        r"""Assertions to make after terminating the driver instance."""
-        super(TestFileOutputDriver, self).assert_after_terminate()
-        assert(self.instance.is_comm_closed)
-
+        def assert_after_stop_w():
+            assert_after_terminate()
+            assert(os.path.isfile(filepath))
+            if testing_options.get('exact_contents', True):
+                with open(filepath, 'rb') as fd:
+                    data = fd.read()
+                assert(data == contents_to_read)
+        return assert_after_stop_w
+    
     # These are disabled to prevent writting extraneous data
+    @pytest.fixture(scope="class")
     def run_before_terminate(self):
         r"""Commands to run while the instance is running, before terminate."""
-        # Don't send any messages to the file
-        pass
+        def run_before_terminate_w():
+            pass
+        return run_before_terminate_w
 
 
-# Dynamically create tests based on registered file classes
-s = get_schema()
-file_types = list(s['file'].schema_subtypes.keys())
-for k in file_types:
-    cls_exp = type('Test%sOutputDriver' % k,
-                   (TestFileOutputDriver, ), {'ocomm_name': k})
-    globals()[cls_exp.__name__] = cls_exp
-    if k == 'AsciiTableComm':
-        cls_exp2 = type('Test%sArrayOutputDriver' % k,
-                        (cls_exp, ),
-                        {'testing_option_kws': {'array_columns': True}})
-        globals()[cls_exp2.__name__] = cls_exp2
-        del cls_exp2
-    del cls_exp
+class TestAsciiTableArrayOutputDriver(TestFileOutputDriver):
+    r"""Test class for FileOutputDriver reading to a table as an array."""
+
+    @pytest.fixture(scope="class")
+    def ocomm_name(self):
+        r"""str: Name of the output communicator being tested."""
+        return 'table'
+
+    @pytest.fixture(scope="class")
+    def options(self):
+        r"""Arguments that should be provided when getting testing options."""
+        return {'array_columns': True}

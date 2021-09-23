@@ -1,141 +1,20 @@
 import os
-import sys
 import copy
 import pytest
-import subprocess
 import itertools
 import shutil
-import logging
-from contextlib import contextmanager
 from yggdrasil.services import (
-    IntegrationServiceManager, create_service_manager_class, ServerError,
-    validate_model_submission)
+    IntegrationServiceManager, ServerError, validate_model_submission)
 from yggdrasil.examples import yamls as ex_yamls
-from yggdrasil.tests import assert_raises, requires_language
-from yggdrasil import runner, import_as_function, platform
-from yggdrasil.tools import is_comm_installed
-
-
-def get_skips(service_type, partial_commtype=None, check_running=False):
-    r"""Create a list of conditions and skip messages."""
-    out = []
-    if partial_commtype is not None:
-        out.append(
-            (not is_comm_installed(partial_commtype, language='python'),
-             f"Communicator type '{partial_commtype}' not installed."))
-    cls = create_service_manager_class(service_type=service_type)
-    out.append(
-        (not cls.is_installed(),
-         f"Service type '{service_type}' not installed."))
-    assert(not check_running)
-    # if check_running and cls.is_installed():
-    #     cli = IntegrationServiceManager(service_type=service_type,
-    #                                     commtype=partial_commtype,
-    #                                     for_request=True)
-    #     out.append(
-    #         (not cli.is_running,
-    #          f"Service of type {service_type} not running."))
-    return out
-
-
-# def requires_service(service_type='flask', partial_commtype=None):
-#     r"""Decorator factory for marking tests that require that an yggdrasil
-#     service is running.
-
-#     Args:
-#         service_type (str, optional): Service type that is required.
-#             Defaults to 'flask'.
-
-#     Returns:
-#         function: Decorator for test.
-
-#     """
-
-#     def wrapper(function):
-#         for s in get_skips(service_type, partial_commtype=partial_commtype,
-#                            check_running=True):
-#             function = unittest.skipIf(*s)(function)
-#         return function
-    
-#     return wrapper
-
-
-def check_settings(service_type, partial_commtype=None):
-    r"""Check that the requested settings are available, skipping if not."""
-    skips = get_skips(service_type, partial_commtype=partial_commtype)
-    for s in skips:
-        if s[0]:
-            pytest.skip(s[1])
-
-
-@contextmanager
-def running_service(service_type, partial_commtype=None, with_coverage=False):
-    r"""Context manager to run and clean-up an integration service."""
-    check_settings(service_type, partial_commtype)
-    model_repo = "https://github.com/cropsinsilico/yggdrasil_models_test/models"
-    log_level = logging.ERROR
-    args = [sys.executable, "-m", "yggdrasil", "integration-service-manager",
-            f"--service-type={service_type}"]
-    if partial_commtype is not None:
-        args.append(f"--commtype={partial_commtype}")
-    args += ["start", f"--model-repository={model_repo}",
-             f"--log-level={log_level}"]
-    package_dir = None
-    process_kws = {}
-    if with_coverage:
-        from yggdrasil.command_line import package_dir
-        script_path = os.path.expanduser(os.path.join('~', 'run_server.py'))
-        process_kws['cwd'] = package_dir
-        if platform._is_win:  # pragma: windows
-            process_kws['creationflags'] = subprocess.CREATE_NEW_PROCESS_GROUP
-        lines = [
-            'from yggdrasil.services import IntegrationServiceManager',
-            'srv = IntegrationServiceManager(']
-        if service_type is not None:
-            lines[-1] += f'service_type=\'{service_type}\''
-            if partial_commtype is not None:
-                lines[-1] += ', '
-        if partial_commtype is not None:
-            lines[-1] += f'commtype=\'{partial_commtype}\''
-        lines[-1] += ')'
-        lines += ['assert(not srv.is_running)',
-                  f'srv.start_server(with_coverage={with_coverage},',
-                  f'                 log_level={log_level},'
-                  f'                 model_repository=\'{model_repo}\')']
-        with open(script_path, 'w') as fd:
-            fd.write('\n'.join(lines))
-        args = [sys.executable, script_path]
-    verify_flask = (service_type == 'flask')
-    if verify_flask:
-        # Flask is the default, verify that it is selected
-        service_type = None
-    cli = IntegrationServiceManager(service_type=service_type,
-                                    commtype=partial_commtype,
-                                    for_request=True)
-    if verify_flask:
-        assert(cli.service_type == 'flask')
-    assert(not cli.is_running)
-    p = subprocess.Popen(args, **process_kws)
-    try:
-        cli.wait_for_server()
-        yield cli
-        cli.stop_server()
-        assert(not cli.is_running)
-        p.wait(10)
-    finally:
-        if p.returncode is None:  # pragma: debug
-            p.terminate()
-        if with_coverage:
-            if os.path.isfile(script_path):
-                os.remove(script_path)
+from yggdrasil import runner, import_as_function
 
 
 def _make_ids(ids):
     return ','.join([str(x) for x in ids])
 
 
-@requires_language('c')
-@requires_language('c++')
+@pytest.mark.language('c')
+@pytest.mark.language('c++')
 def test_call_integration_remote():
     r"""Test with remote integration service."""
     name = 'photosynthesis'
@@ -175,16 +54,8 @@ class TestServices(object):
 
     @pytest.fixture(params=itertools.product(['flask', 'rmq'], [None, 'rmq']),
                     ids=_make_ids, scope="class", autouse=True)
-    def running_service(self, request):
-        manager = request.config.pluginmanager
-        plugin_class = manager.get_plugin('pytest_cov').CovPlugin
-        plugin = None
-        for x in manager.get_plugins():
-            if isinstance(x, plugin_class):
-                plugin = x
-                break
-        with running_service(request.param[0], request.param[1],
-                             with_coverage=(plugin is not None)) as cli:
+    def running_service(self, request, running_service):
+        with running_service(request.param[0], request.param[1]) as cli:
             self.cli = cli
             yield cli
             self.cli = None
@@ -231,15 +102,15 @@ class TestServices(object):
                     "fakemodel3.yml")
         assert(not os.path.isfile(
             "cropsinsilico/example-fakemodel/fakemodel3.yml"))
-        assert_raises(ServerError, cli.send_request, yamls=test_yml,
-                      action='start')
+        with pytest.raises(ServerError):
+            cli.send_request(yamls=test_yml, action='start')
 
     def test_integration_service(self, running_service):
         r"""Test starting/stopping an integration service via flask/rmq."""
         cli = running_service
         test_yml = ex_yamls['fakeplant']['python']
-        assert_raises(ServerError, cli.send_request,
-                      test_yml, action='invalid')
+        with pytest.raises(ServerError):
+            cli.send_request(test_yml, action='invalid')
         print(cli.send_request(test_yml))
         cli.printStatus()
         if cli.service_type == 'flask':
@@ -249,8 +120,8 @@ class TestServices(object):
         cli.send_request(test_yml, action='status')
         cli.send_request(action='status', client_id=None)
         cli.send_request(test_yml, yamls=test_yml, action='stop')
-        assert_raises(ServerError, cli.send_request,
-                      ['invalid'], action='stop')
+        with pytest.raises(ServerError):
+            cli.send_request(['invalid'], action='stop')
         cli.printStatus(return_str=True)
         cli.send_request([test_yml])
         cli.send_request([test_yml], action='stop')
@@ -262,16 +133,20 @@ class TestServices(object):
             pytest.skip("redundent test")
         cli = running_service
         test_yml = ex_yamls['fakeplant']['python']
-        assert_raises(KeyError, cli.registry.remove, 'test')
-        assert_raises(ServerError, cli.send_request, 'test')
+        with pytest.raises(KeyError):
+            cli.registry.remove('test')
+        with pytest.raises(ServerError):
+            cli.send_request('test')
         print(cli.send_request('FakePlant'))
         cli.registry.add('test', test_yml, namespace='remote')
         print(cli.send_request('test'))
-        assert_raises(ValueError, cli.registry.add, 'test', [test_yml])
+        with pytest.raises(ValueError):
+            cli.registry.add('test', [test_yml])
         cli.send_request('test', action='stop')
         # cli.stop_server()
         cli.registry.remove('test')
-        assert_raises(KeyError, cli.registry.remove, 'test')
+        with pytest.raises(KeyError):
+            cli.registry.remove('test')
         # Register from file
         reg_coll = os.path.join(os.path.dirname(test_yml),
                                 'registry_collection.yml')
@@ -281,16 +156,17 @@ class TestServices(object):
         try:
             cli.registry.add(reg_coll)
             print(cli.send_request('photosynthesis', namespace='phot'))
-            assert_raises(ValueError, cli.registry.add,
-                          'photosynthesis', [test_yml], invalid=1)
+            with pytest.raises(ValueError):
+                cli.registry.add('photosynthesis', [test_yml], invalid=1)
             cli.send_request('photosynthesis', action='stop')
             cli.registry.remove(reg_coll)
-            assert_raises(KeyError, cli.registry.remove, 'photosynthesis')
+            with pytest.raises(KeyError):
+                cli.registry.remove('photosynthesis')
         finally:
             os.remove(reg_coll)
 
-    @requires_language('c')
-    @requires_language('c++')
+    @pytest.mark.language('c')
+    @pytest.mark.language('c++')
     def test_calling_integration_service(self, running_service):
         r"""Test calling an integrations as a service in an integration."""
         self.call_integration_service(
@@ -299,8 +175,8 @@ class TestServices(object):
             ex_yamls['fakeplant']['python'],
             copy_yml=ex_yamls['fakeplant']['c'][0])
 
-    @requires_language('c')
-    @requires_language('c++')
+    @pytest.mark.language('c')
+    @pytest.mark.language('c++')
     def test_calling_server_as_service(self, running_service):
         r"""Test calling an integration service that is a server in an
         integration."""
@@ -355,7 +231,8 @@ def test_validate_model_submission():
         validate_model_submission([fname])
         os.remove(os.path.join('cropsinsilico', 'example-fakemodel',
                                'LICENSE'))
-        assert_raises(RuntimeError, validate_model_submission, fname)
+        with pytest.raises(RuntimeError):
+            validate_model_submission(fname)
     finally:
         if os.path.isfile('cropsinsilico/example-fakemodel/fakemodel.yml'):
             git.rmtree("cropsinsilico")

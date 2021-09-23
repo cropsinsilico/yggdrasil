@@ -1,15 +1,16 @@
+import pytest
 import os
-from yggdrasil.examples.tests import ExampleTstBase
+from tests.examples import TestExample as base_class
 
 
-class TestExampleRPC2(ExampleTstBase):
+class TestExampleRPC2(base_class):
     r"""Test the rpc_lesson2 example."""
     
-    example_name = 'rpc_lesson2'
+    examples = ['rpc_lesson2']
     niter1 = 3
     niter2 = 5
 
-    @property
+    @pytest.fixture
     def results(self):
         r"""Result that should be found in output files."""
         result = []
@@ -25,8 +26,8 @@ class TestExampleRPC2(ExampleTstBase):
             result.append(res)
         return result
 
-    @property
-    def output_files(self):
+    @pytest.fixture
+    def output_files(self, tempdir):
         r"""Output file."""
-        return [os.path.join(self.tempdir, 'client_output1.txt'),
-                os.path.join(self.tempdir, 'client_output2.txt')]
+        return [os.path.join(tempdir, 'client_output1.txt'),
+                os.path.join(tempdir, 'client_output2.txt')]

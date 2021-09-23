@@ -1,25 +1,27 @@
+import pytest
 import os
+from tests.examples import TestExample as base_class
 from pandas.testing import assert_frame_equal
 from yggdrasil.components import create_component
-from yggdrasil.examples.tests import ExampleTstBase
 
 
-class TestExampleConditionalIO(ExampleTstBase):
+class TestExampleConditionalIO(base_class):
     r"""Test the conditional_io example."""
 
-    example_name = 'conditional_io'
+    examples = ['conditional_io']
 
-    @property
-    def expected_output_files(self):
+    @pytest.fixture
+    def expected_output_files(self, yamldir):
         r"""list: Examples of expected output for the run."""
-        return [os.path.join(self.yamldir, 'Output', 'output.txt')]
+        return [os.path.join(yamldir, 'Output', 'output.txt')]
         
-    @property
-    def output_files(self):
+    @pytest.fixture
+    def output_files(self, yamldir):
         r"""list: Output files for the run."""
-        return [os.path.join(self.yamldir, 'output.txt')]
+        return [os.path.join(yamldir, 'output.txt')]
 
-    def read_file(self, fname):
+    @pytest.fixture(scope="class")
+    def read_file(self):
         r"""Read in contents from a file.
 
         Args:
@@ -29,29 +31,34 @@ class TestExampleConditionalIO(ExampleTstBase):
             object: File contents.
 
         """
-        x = create_component('file', 'table', name='test',
-                             address=fname, direction='recv',
-                             as_array=True, recv_converter='pandas')
-        msg = x.recv_array()[1]
-        if msg is not None:
-            msg = msg.sort_values(by=['InputMass']).reset_index(drop=True)
-        x.close()
-        return msg
+        def read_file_w(fname):
+            x = create_component('file', 'table', name='test',
+                                 address=fname, direction='recv',
+                                 as_array=True, recv_converter='pandas')
+            msg = x.recv_array()[1]
+            if msg is not None:
+                msg = msg.sort_values(by=['InputMass']).reset_index(
+                    drop=True)
+            x.close()
+            return msg
+        return read_file_w
 
-    def assert_equal_file_contents(self, a, b):
-        r"""Assert that the contents of two files are equivalent.
+    @pytest.fixture(scope="class")
+    def check_file_contents(self, read_file):
+        r"""Check that the contents of a file are correct.
 
         Args:
-            a (object): Contents of first file for comparison.
-            b (object): Contents of second file for comparison.
-
-        Raises:
-            AssertionError: If the contents are not equal.
+            fname (str): Full path to the file that should be checked.
+            result (str): Contents of the file.
 
         """
-        assert_frame_equal(a, b)
-
-    def check_file_size(self, fname, fsize):
+        def check_file_contents_w(fname, result):
+            ocont = read_file(fname)
+            assert_frame_equal(ocont, result)
+        return check_file_contents_w
+    
+    @pytest.fixture(scope="class")
+    def check_file_size(self):
         r"""Check that file is the correct size.
 
         Args:
@@ -59,4 +66,6 @@ class TestExampleConditionalIO(ExampleTstBase):
             fsize (int): Size that the file should be in bytes.
 
         """
-        pass
+        def check_file_size_w(*args, **kwargs):
+            pass
+        return check_file_size_w

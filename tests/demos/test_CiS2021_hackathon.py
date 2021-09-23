@@ -1,16 +1,19 @@
-import os
-from yggdrasil.demos.tests import DemoTstBase, _demo_dir
-import unittest
+import pytest
 try:
     import trimesh
 except ImportError:  # pragma: debug
     trimesh = None
+from tests.demos import DemoTstBase as base_class
 
 
-@unittest.skipIf(trimesh is None, "Trimesh is not installed")
-class TestCiS2021HackathonDemo(DemoTstBase):
+@pytest.mark.skipif(trimesh is None, reason="Trimesh is not installed")
+class TestCiS2021HackathonDemo(base_class):
 
-    demo_name = 'CiS2021-hackathon'
+    @pytest.fixture(scope="class")
+    def demo_name(self):
+        r"""str: Name of demo being tested."""
+        return 'CiS2021-hackathon'
+
     runs = {'light_v0': ('yamls/light_v0_python.yml', 'yamls/connections_v0.yml'),
             'shoot_v0': ('yamls/shoot_v0.yml', ),
             'shoot_v1': ('yamls/shoot_v1.yml', 'yamls/light_v0_python.yml',
@@ -23,9 +26,3 @@ class TestCiS2021HackathonDemo(DemoTstBase):
             'roots_v0': ('yamls/roots_v0.yml', ),
             'timesync': ('yamls/roots_v1.yml', 'yamls/shoot_v3.yml',
                          'yamls/timesync.yml', 'yamls/light_v1_python.yml')}
-
-    def __init__(self, *args, **kwargs):
-        super(TestCiS2021HackathonDemo, self).__init__(*args, **kwargs)
-        out_dir = os.path.join(_demo_dir, self.demo_name, 'output')
-        if not os.path.isdir(out_dir):
-            os.mkdir(out_dir)

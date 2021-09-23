@@ -1,36 +1,59 @@
+import pytest
+import copy
 import numpy as np
-from yggdrasil.metaschema.datatypes.tests import (
-    test_ScalarMetaschemaType as parent)
+from yggdrasil import units
+from tests.metaschema.datatypes.test_ScalarMetaschemaType import (
+    TestScalarMetaschemaType as base_class)
 
 
-class TestOneDArrayMetaschemaType(parent.TestScalarMetaschemaType):
+class TestOneDArrayMetaschemaType(base_class):
     r"""Test class for ArrayMetaschemaType class."""
-    _mod = 'ArrayMetaschemaType'
+    
+    _mod = 'yggdrasil.metaschema.datatypes.ArrayMetaschemaType'
     _cls = 'OneDArrayMetaschemaType'
-    _shape = 10
 
-    def __init__(self, *args, **kwargs):
-        super(TestOneDArrayMetaschemaType, self).__init__(*args, **kwargs)
-        self._valid_encoded[0]['length'] = len(self._array)
-        self._valid_decoded.append(np.array([], self._array.dtype))
+    @pytest.fixture(scope="class")
+    def explicit(self):
+        r"""bool: If True the type is explicit."""
+        return False
 
-    @classmethod
-    def assert_result_equal(cls, x, y):
-        r"""Assert that serialized/deserialized objects equal."""
-        np.testing.assert_array_equal(x, y)
-        
+    @pytest.fixture(scope="class")
+    def subtype(self):
+        r"""str: Scalar base type."""
+        return "float"
+    
+    @pytest.fixture(scope="class")
+    def shape(self):
+        r"""int,tuple: Shape of scalar/array."""
+        return 10
+    
+    @pytest.fixture(scope="class")
+    def valid_decoded(self, value, valid_units, dtype):
+        r"""list: Objects that are valid under this type."""
+        out = [value]
+        for x in valid_units:
+            out.append(units.add_units(copy.deepcopy(out[0]), x))
+        out.append(np.array([], dtype))
+        return out
 
-class TestNDArrayMetaschemaType(parent.TestScalarMetaschemaType):
+
+class TestNDArrayMetaschemaType(base_class):
     r"""Test class for ArrayMetaschemaType class with 2D array."""
-    _mod = 'ArrayMetaschemaType'
+
+    _mod = 'yggdrasil.metaschema.datatypes.ArrayMetaschemaType'
     _cls = 'NDArrayMetaschemaType'
-    _shape = (4, 5)
 
-    def __init__(self, *args, **kwargs):
-        super(TestNDArrayMetaschemaType, self).__init__(*args, **kwargs)
-        self._valid_encoded[0]['shape'] = list(self._array.shape)
+    @pytest.fixture(scope="class")
+    def explicit(self):
+        r"""bool: If True the type is explicit."""
+        return False
 
-    @classmethod
-    def assert_result_equal(cls, x, y):
-        r"""Assert that serialized/deserialized objects equal."""
-        np.testing.assert_array_equal(x, y)
+    @pytest.fixture(scope="class")
+    def subtype(self):
+        r"""str: Scalar base type."""
+        return "float"
+    
+    @pytest.fixture(scope="class")
+    def shape(self):
+        r"""int,tuple: Shape of scalar/array."""
+        return (4, 5)

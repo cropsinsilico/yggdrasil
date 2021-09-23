@@ -1,27 +1,47 @@
-from yggdrasil.tests import assert_raises
-from yggdrasil.metaschema.datatypes.tests import test_MetaschemaType as parent
+import pytest
+from tests.metaschema.datatypes.test_MetaschemaType import (
+    TestMetaschemaType as base_class)
 
 
-class TestAnyMetaschemaType(parent.TestMetaschemaType):
+class TestAnyMetaschemaType(base_class):
     r"""Test class for AnyMetaschemaType class."""
 
-    _mod = 'AnyMetaschemaType'
+    _mod = 'yggdrasil.metaschema.datatypes.AnyMetaschemaType'
     _cls = 'AnyMetaschemaType'
-    
-    @staticmethod
-    def after_class_creation(cls):
-        r"""Actions to be taken during class construction."""
-        parent.TestMetaschemaType.after_class_creation(cls)
-        cls._value = {'a': int(1), 'b': float(1)}
-        cls._valid_encoded = [dict(cls._typedef,
-                                   type=cls.get_import_cls().name,
-                                   temptype={'type': 'int'})]
-        cls._valid_decoded = [cls._value, object]
-        cls._invalid_validate = []
-        cls._invalid_encoded = [{}]
-        cls._invalid_decoded = []
-        cls._compatible_objects = [(cls._value, cls._value, None)]
 
-    def test_decode_data_errors(self):
+    @pytest.fixture(scope="class")
+    def value(self):
+        r"""dict: Test value."""
+        return {'a': int(1), 'b': float(1)}
+
+    @pytest.fixture(scope="class")
+    def valid_encoded(self, typedef_base, value, python_class):
+        r"""list: Encoded objects that are valid under this type."""
+        return [dict(typedef_base,
+                     type=python_class.name,
+                     temptype={'type': 'int'})]
+    
+    @pytest.fixture(scope="class")
+    def valid_decoded(self, value):
+        r"""list: Objects that are valid under this type."""
+        return [value, object]
+        
+    @pytest.fixture(scope="class")
+    def invalid_validate(self):
+        r"""list: Objects that are invalid under this type."""
+        return []
+    
+    @pytest.fixture(scope="class")
+    def invalid_encoded(self):
+        r"""list: Encoded objects that are invalid under this type."""
+        return []
+
+    @pytest.fixture(scope="class")
+    def compatible_objects(self, value):
+        r"""list: Objects that are compatible with this type."""
+        return [(value, value, None)]
+    
+    def test_decode_data_errors(self, python_class):
         r"""Test errors in decode_data."""
-        assert_raises(ValueError, self.import_cls.decode_data, 'hello', None)
+        with pytest.raises(ValueError):
+            python_class.decode_data('hello', None)

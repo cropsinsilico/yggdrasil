@@ -3849,3 +3849,31 @@ class CompiledModelDriver(ModelDriver):
         kwargs = cls.update_linker_kwargs(toolname=toolname, **kwargs)
         out = tool.call(obj, **kwargs)
         return out
+
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for driver instance.
+                deps (list): Dependencies to install.
+
+        """
+        out = super(CompiledModelDriver, cls).get_testing_options(**kwargs)
+        out.update(
+            args=['1'],
+        )
+        if cls.is_installed() and (not getattr(cls, 'is_build_tool', False)):
+            compiler = cls.get_tool('compiler')
+            linker = cls.get_tool('linker')
+            script_dir = os.path.join('tests', 'scripts')
+            include_flag = compiler.create_flag('include_dirs', script_dir)
+            library_flag = linker.create_flag('library_dirs', script_dir)
+            out['kwargs'].update(compiler_flags=include_flag,
+                                 linker_flags=library_flag)
+        return out

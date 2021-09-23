@@ -1,16 +1,16 @@
+import pytest
 import os
-from yggdrasil.tests import extra_example
-from yggdrasil.examples.tests import ExampleTstBase
+from tests.examples import TestExample as base_class
 
 
-@extra_example
-class TestExampleRPC1(ExampleTstBase):
+@pytest.mark.extra_example
+class TestExampleRPC1(base_class):
     r"""Test the rpc_lesson1 example."""
 
-    example_name = 'rpc_lesson1'
+    examples = ['rpc_lesson1']
     niter = 3
 
-    @property
+    @pytest.fixture
     def results(self):
         r"""Result that should be found in output files."""
         prev1 = 0
@@ -23,7 +23,7 @@ class TestExampleRPC1(ExampleTstBase):
             prev1 = next
         return [res]
 
-    @property
-    def output_files(self):
+    @pytest.fixture
+    def output_files(self, tempdir):
         r"""Output file."""
-        return [os.path.join(self.tempdir, 'client_output.txt')]
+        return [os.path.join(tempdir, 'client_output.txt')]

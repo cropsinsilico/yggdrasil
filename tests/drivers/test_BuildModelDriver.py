@@ -1,18 +1,21 @@
+import pytest
+from tests.drivers.test_CompiledModelDriver import (
+    TestCompiledModelDriver as base_class)
 import os
 import shutil
-import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
 
 
-class TestBuildModelParam(parent.TestCompiledModelParam):
+class TestBuildModelDriver(base_class):
     r"""Test parameters for BuildModelDriver."""
-    pass
-
-
-class TestBuildModelDriverNoInit(TestBuildModelParam,
-                                 parent.TestCompiledModelDriverNoInit):
-    """Test runner for BuildModelDriver without creating an instance."""
+    
+    @pytest.fixture(scope="class", params=[])
+    def component_subtype(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
 
     test_build = None
+    test_call_linker = None
+    test_parse_arguments = None
     test_get_tool = None
     test_get_dependency_info = None
     test_get_dependency_source = None
@@ -21,33 +24,38 @@ class TestBuildModelDriverNoInit(TestBuildModelParam,
     test_get_dependency_include_dirs = None
     test_get_dependency_order = None
     test_invalid_function_param = None
-
-
-class TestBuildModelDriverNoStart(TestBuildModelParam,
-                                  parent.TestCompiledModelDriverNoStart):
-    r"""Test runner for BuildModelDriver without start."""
-
     test_compilers = None
+    test_compile_model = None  # TODO: Verify
+    test_get_linker_flags = None  # TODO: Verify
+    
+    @pytest.fixture
+    def sourcedir(self, source):
+        r"""Directory that source code is in."""
+        return os.path.dirname(source[0])
 
-    def test_get_language_for_source(self):
+    @pytest.fixture
+    def target(self, source):
+        r"""Make target that should be used."""
+        return os.path.basename(source[0])
+    
+    @pytest.fixture
+    def instance_args(self, name, target):
+        r"""Arguments for a new instance of the tested class."""
+        return (name, target)
+
+    def test_get_language_for_source(self, python_class, source):
         r"""Test the get_language_for_source method."""
         buildfile = None
-        if self.import_cls.buildfile_base:
-            buildfile = os.path.join(os.path.dirname(self.src[0]),
-                                     self.import_cls.buildfile_base)
+        if python_class.buildfile_base:
+            buildfile = os.path.join(os.path.dirname(source[0]),
+                                     python_class.buildfile_base)
             buildfile_cache = '_copy'.join(os.path.splitext(buildfile))
-        self.import_cls.get_language_for_source(self.src)
-        self.import_cls.get_language_for_source(os.path.dirname(self.src[0]))
+        python_class.get_language_for_source(source)
+        python_class.get_language_for_source(os.path.dirname(source[0]))
         try:
             if buildfile:
                 shutil.move(buildfile, buildfile_cache)
-            self.import_cls.get_language_for_source(self.src[0])
+            python_class.get_language_for_source(source[0])
         finally:
             if buildfile:
                 shutil.move(buildfile_cache, buildfile)
-
-
-class TestBuildModelDriver(TestBuildModelParam,
-                           parent.TestCompiledModelDriver):
-    r"""Test runner for BuildModelDriver."""
-    pass

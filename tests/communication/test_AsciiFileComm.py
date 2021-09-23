@@ -1,19 +1,20 @@
-import copy
-from yggdrasil.communication.tests import test_FileComm as parent
+import pytest
+from tests.communication.test_FileComm import TestFileComm as base_class
 
 
-class TestAsciiFileComm(parent.TestFileComm):
+class TestAsciiFileComm(base_class):
     r"""Test for AsciiFileComm communication class."""
 
-    comm = 'AsciiFileComm'
-    attr_list = (copy.deepcopy(parent.TestFileComm.attr_list)
-                 + ['comment'])
+    @pytest.fixture(scope="class", autouse=True, params=["ascii"])
+    def component_subtype(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
 
-    def test_send_recv_comment(self):
+    def test_send_recv_comment(self, send_comm, recv_comm, testing_options):
         r"""Test send/recv with commented message."""
-        msg_send = self.send_instance.serializer.comment + self.test_msg
-        flag = self.send_instance.send(msg_send)
+        msg_send = send_comm.serializer.comment + testing_options['msg']
+        flag = send_comm.send(msg_send)
         assert(flag)
-        flag, msg_recv = self.recv_instance.recv()
+        flag, msg_recv = recv_comm.recv()
         assert(not flag)
-        self.assert_equal(msg_recv, self.recv_instance.eof_msg)
+        assert(msg_recv == recv_comm.eof_msg)

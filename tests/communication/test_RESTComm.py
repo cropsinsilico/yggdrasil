@@ -1,28 +1,21 @@
 import pytest
-import unittest
-from yggdrasil.communication import RESTComm
-from yggdrasil.communication.tests import test_CommBase
-from yggdrasil.tests.test_services import running_service
+from tests.communication import TestComm as base_class
 
 
-_rest_installed = RESTComm.RESTComm.is_installed(language='python')
-
-
-@unittest.skipIf(not _rest_installed, "REST library not installed")
-class TestRESTComm(test_CommBase.TestCommBase):
+class TestRESTComm(base_class):
     r"""Test for RESTComm communication class."""
 
-    comm = 'RESTComm'
+    @pytest.fixture(scope="class", autouse=True, params=["rest"])
+    def component_subtype(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
+
+    @pytest.fixture(scope="class", autouse=True, params=[False, True])
+    def use_async(self, request):
+        r"""Whether communicator should be asynchronous or not."""
+        return request.param
 
     @pytest.fixture(scope="class", autouse=True)
-    def running_service(self, request):
-        manager = request.config.pluginmanager
-        plugin_class = manager.get_plugin('pytest_cov').CovPlugin
-        plugin = None
-        for x in manager.get_plugins():
-            if isinstance(x, plugin_class):
-                plugin = x
-                break
-        with running_service('flask', partial_commtype='rest',
-                             with_coverage=(plugin is not None)) as cli:
+    def running_service(self, running_service):
+        with running_service('flask', partial_commtype='rest') as cli:
             yield cli

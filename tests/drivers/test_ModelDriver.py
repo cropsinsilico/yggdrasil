@@ -1,16 +1,14 @@
 import pytest
+from tests.drivers.test_Driver import TestDriver as base_class
 import os
 import copy
-import unittest
 import pprint
 import shutil
 import logging
-from yggdrasil import platform
-from yggdrasil.tests import assert_raises, scripts, check_enabled_languages
+from yggdrasil import platform, constants
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_product
 from yggdrasil.drivers.CompiledModelDriver import CompiledModelDriver
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
-import yggdrasil.drivers.tests.test_Driver as parent
 
 
 def test_remove_product():
@@ -19,223 +17,247 @@ def test_remove_product():
     with open(test_file, 'w') as fd:
         fd.write('print(\'hello\')')
     try:
-        assert_raises(RuntimeError, remove_product, test_file,
-                      check_for_source=True)
-        assert_raises(RuntimeError, remove_product, os.path.dirname(test_file),
-                      check_for_source=True)
+        with pytest.raises(RuntimeError):
+            remove_product(test_file, check_for_source=True)
+        with pytest.raises(RuntimeError):
+            remove_product(os.path.dirname(test_file), check_for_source=True)
     finally:
         os.remove(test_file)
 
 
 def test_ModelDriver_implementation():
     r"""Test that NotImplementedError raised for base class."""
-    assert_raises(NotImplementedError, ModelDriver.language_executable)
-    assert_raises(NotImplementedError, ModelDriver.executable_command, None)
-    assert_raises(NotImplementedError, ModelDriver.is_library_installed, None)
-    assert_raises(NotImplementedError, CompiledModelDriver.get_tool, 'compiler')
-    assert_raises(NotImplementedError, InterpretedModelDriver.get_interpreter)
+    with pytest.raises(NotImplementedError):
+        ModelDriver.language_executable()
+    with pytest.raises(NotImplementedError):
+        ModelDriver.executable_command(None)
+    with pytest.raises(NotImplementedError):
+        ModelDriver.is_library_installed(None)
+    with pytest.raises(NotImplementedError):
+        CompiledModelDriver.get_tool('compiler')
+    with pytest.raises(NotImplementedError):
+        InterpretedModelDriver.get_interpreter()
 
-    
-class TestModelParam(parent.TestParam):
+
+_models = sorted([x for x in (constants.LANGUAGES['interpreted']
+                              + constants.LANGUAGES['dsl'])
+                  if x not in ['matlab']] + ['executable'])
+
+
+@pytest.mark.suite("models")
+class TestModelDriver(base_class):
     r"""Test parameters for basic ModelDriver class."""
 
-    driver = 'ModelDriver'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestModelParam, self).__init__(*args, **kwargs)
-        self.attr_list += ['args', 'model_process', 'queue',
-                           'queue_thread',
-                           'is_server', 'client_of',
-                           'event_process_kill_called',
-                           'event_process_kill_complete',
-                           'with_strace', 'strace_flags',
-                           'with_valgrind', 'valgrind_flags',
-                           'model_index', 'model_file', 'model_args',
-                           'products', 'overwrite', 'numeric_logging_level']
-        self.src = None
-        if self.import_cls.language is not None:
-            self.src = scripts[self.import_cls.language.lower()]
-            if not isinstance(self.src, list):
-                self.src = [self.src]
-        if self.src is not None:
-            self.args = copy.deepcopy(self.src)
+    _component_type = 'model'
 
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for creating a class instance."""
-        out = super(TestModelParam, self).inst_kwargs
-        if self.src is not None:
-            wd = os.path.dirname(self.src[0])
-            if wd:
-                out.setdefault('working_dir', wd)
+    @pytest.fixture(scope="class", autouse=True, params=_models)
+    def component_subtype(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
+
+    @pytest.fixture(scope="class")
+    def required_languages(self, component_subtype):
+        r"""list: Languages required by the test."""
+        return [component_subtype]
+
+    @pytest.fixture(scope="class", autouse=True)
+    def check_enabled(self, required_languages, check_required_languages):
+        r"""Check if the language is enabled/disabled."""
+        check_required_languages(required_languages)
+
+    @pytest.fixture(scope="class")
+    def source(self, python_class, scripts):
+        r"""str: Source code to use for tests."""
+        # if python_class.language is not None:
+        out = scripts[python_class.language.lower()]
+        if not isinstance(out, list):
+            out = [out]
         return out
-        
-    def tests_on_not_installed(self):
-        r"""Tests for when the driver is not installed."""
-        if self.import_cls.is_installed():
-            raise unittest.SkipTest("'%s' installed."
-                                    % self.import_cls.language)
 
-    @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        cls._flag_tests_on_not_installed = False
-        super(TestModelParam, cls).setUpClass(*args, **kwargs)
+    @pytest.fixture(scope="class")
+    def working_dir(self, source):
+        r"""Working director."""
+        return os.path.dirname(source[0])
+    
+    @pytest.fixture
+    def instance_args(self, name, source, testing_options):
+        r"""Arguments for a new instance of the tested class."""
+        return tuple([name, source + testing_options.get('args', [])])
 
-    def setup(self, *args, **kwargs):
-        if self.import_cls.language is None:
-            raise unittest.SkipTest("Driver dosn't have language.")
-        if not self.import_cls.is_installed():
-            if not self.__class__._flag_tests_on_not_installed:
-                if not self.skip_init:
-                    self.assert_raises(RuntimeError,
-                                       super(TestModelParam, self).setup,
-                                       *args, **kwargs)
-                self.tests_on_not_installed()
-                self.__class__._flag_tests_on_not_installed = True
-            raise unittest.SkipTest("'%s' not installed."
-                                    % self.import_cls.language)
-        check_enabled_languages(self.import_cls.language)
-        super(TestModelParam, self).setup(*args, **kwargs)
+    @pytest.fixture(scope="class")
+    def python_class_installed(self, python_class):
+        r"""bool: True if the python class is installed."""
+        return python_class.is_installed()
 
-
-class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
-    r"""Test runner for ModelDriver class without creating an instance."""
-
-    def tests_on_not_installed(self):
-        r"""Tests for when the driver is not installed."""
-        super(TestModelDriverNoInit, self).tests_on_not_installed()
-        self.test_comm_installed()
-        self.test_write_if_block()
-        self.test_write_for_loop()
-        self.test_write_while_loop()
-        self.test_write_try_except()
-
-    def test_is_installed(self):
-        r"""Assert that the tested model driver is installed."""
-        assert(self.import_cls.is_installed())
-
-    def test_comm_installed(self):
-        r"""Tests for getting installed comm while skipping config."""
-        self.assert_equal(self.import_cls.is_comm_installed(),
-                          self.import_cls.is_comm_installed(skip_config=True))
-        self.assert_equal(self.import_cls.is_comm_installed(commtype='invalid',
-                                                            skip_config=True),
-                          False)
-        
-    def test_language_version(self):
-        r"""Test language version."""
-        assert(self.import_cls.language_version())
-
-    def run_model_instance(self, **kwargs):
+    @pytest.fixture
+    def run_model_instance_kwargs(self):
+        r"""dict: Additional keyword arguments that should be used in calls
+        to run_model_instance"""
+        return {}
+    
+    @pytest.fixture
+    def run_model_instance(self, python_class, is_installed,
+                           instance_args, instance_kwargs,
+                           testing_options, run_model_instance_kwargs):
         r"""Create a driver for a model and run it."""
-        inst_kwargs = copy.deepcopy(self.inst_kwargs)
-        inst_kwargs.update(kwargs)
-        logger = logging.getLogger("yggdrasil")
-        if logger.getEffectiveLevel() >= 20:
-            inst_kwargs.setdefault('logging_level', 'INFO')
-        drv = self.create_instance(kwargs=inst_kwargs)
-        getattr(drv, 'numeric_logging_level')
-        drv.start()
-        drv.wait(False)
-        assert(not drv.errors)
+        if testing_options.get('requires_partner', False):
+            pytest.skip(f"{python_class.language} requires partner model "
+                        f"to run.")
 
-    def test_run_model(self, **kwargs):
+        def run_model_instance_w(**kwargs):
+            inst_kwargs = copy.deepcopy(instance_kwargs)
+            inst_kwargs.update(kwargs)
+            inst_kwargs.update(run_model_instance_kwargs)
+            logger = logging.getLogger("yggdrasil")
+            if logger.getEffectiveLevel() >= 20:
+                inst_kwargs.setdefault('logging_level', 'INFO')
+            drv = python_class(*instance_args, **inst_kwargs)
+            getattr(drv, 'numeric_logging_level')
+            drv.start()
+            drv.wait(False)
+            assert(not drv.errors)
+            drv.cleanup()
+        return run_model_instance_w
+
+    @pytest.fixture(scope="class")
+    def run_generated_code(self, python_class, is_installed):
+        r"""Write and run generated code."""
+        # def run_generated_code_w(lines, **kwargs):
+        #     python_class.run_code(lines, **kwargs)
+        return python_class.run_code
+
+    @pytest.fixture(scope="class")
+    def code_types(self, python_class, testing_options):
+        if python_class.type_map is None:
+            out = []
+        else:
+            out = copy.deepcopy(list(python_class.type_map.items()))
+            if 'flag' not in python_class.type_map:
+                out.append(('flag', python_class.type_map['boolean']))
+        out += testing_options.get('code_types', [])
+        for k, v in testing_options.get('replacement_code_types', {}).items():
+            if k in out:
+                out[out.index(k)] = v
+        return out
+            
+    def test_executable_command(self, python_class):
+        r"""Test error raise for invalid exec_type."""
+        if python_class.executable_type != 'interpreter':
+            pytest.skip("Only valid for languages with an interpreter")
+        with pytest.raises(ValueError):
+            python_class.executable_command([], exec_type='invalid')
+
+    def test_is_installed(self, python_class, is_installed):
+        r"""Assert that the tested model driver is installed."""
+        assert(python_class.is_installed())
+
+    def test_comm_installed(self, python_class):
+        r"""Tests for getting installed comm while skipping config."""
+        assert(python_class.is_comm_installed()
+               == python_class.is_comm_installed(skip_config=True))
+        assert(python_class.is_comm_installed(commtype='invalid',
+                                              skip_config=True) is False)
+        
+    def test_language_version(self, python_class, is_installed):
+        r"""Test language version."""
+        assert(python_class.language_version())
+
+    def test_python2language(self, python_class, testing_options,
+                             nested_approx, pandas_equality_patch):
+        r"""Test python2language."""
+        for a, b in testing_options.get('python2language', []):
+            assert(python_class.python2language(a) == nested_approx(b))
+        
+    def test_is_library_installed(self, python_class, testing_options):
+        r"""Test is_library_installed for invalid library."""
+        for x in testing_options.get('valid_libraries', []):
+            assert(python_class.is_library_installed(x) is True)
+        for x in testing_options.get('invalid_libraries', []):
+            assert(python_class.is_library_installed(x) is False)
+        
+    def test_run_model(self, run_model_instance, testing_options):
         r"""Test running script used without debug."""
-        self.run_model_instance(**kwargs)
+        if testing_options.get('requires_partner', False):
+            pytest.skip("requires partner model to run")
+        run_model_instance()
 
-    # @unittest.skip("temp")
-    @unittest.skipIf(platform._is_mac, "Valgrind slow on Mac")
-    @unittest.skipIf(platform._is_win, "No valgrind on windows")
-    @unittest.skipIf(shutil.which('valgrind') is None,
-                     "Valgrind not installed.")
-    def test_valgrind(self):
+    @pytest.mark.skipif(platform._is_mac, reason="Valgrind slow on Mac")
+    @pytest.mark.skipif(platform._is_win, reason="No valgrind on windows")
+    @pytest.mark.skipif(shutil.which('valgrind') is None,
+                        reason="Valgrind not installed.")
+    def test_valgrind(self, working_dir, uuid, run_model_instance,
+                      testing_options):
         r"""Test running with valgrind."""
+        if testing_options.get('requires_partner', False):
+            pytest.skip("requires partner model to run")
         valgrind_log = os.path.join(
-            self.working_dir,
-            'valgrind_log_%s.log' % self.uuid.replace('-', '_'))
+            working_dir, f"valgrind_log_{uuid.replace('-', '_')}.log")
         try:
-            self.run_model_instance(with_valgrind=True, with_strace=False,
-                                    valgrind_flags=['--leak-check=full',
-                                                    '--log-file=%s' % valgrind_log])
+            run_model_instance(with_valgrind=True, with_strace=False,
+                               valgrind_flags=['--leak-check=full',
+                                               f'--log-file={valgrind_log}'])
         finally:
             if os.path.isfile(valgrind_log):
                 os.remove(valgrind_log)
-        
-    @unittest.skipIf(platform._is_win or platform._is_mac,
-                     "No strace on Windows or MacOS")
-    @unittest.skipIf(shutil.which('strace') is None,
-                     "strace not installed.")
-    def test_strace(self):
+    
+    @pytest.mark.skipif(platform._is_win or platform._is_mac,
+                        reason="No strace on Windows or MacOS")
+    @pytest.mark.skipif(shutil.which('strace') is None,
+                        reason="strace not installed.")
+    def test_strace(self, run_model_instance, testing_options):
         r"""Test running with strace."""
-        self.run_model_instance(with_valgrind=False, with_strace=True)
+        if testing_options.get('requires_partner', False):
+            pytest.skip("requires partner model to run")
+        run_model_instance(with_valgrind=False, with_strace=True)
         
     # Tests for code generation
-    def run_generated_code(self, lines, **kwargs):
-        r"""Write and run generated code."""
-        if not self.import_cls.is_installed():
-            return
-        # Write code to a file
-        self.import_cls.run_code(lines, **kwargs)
-
-    def get_test_types(self):
-        r"""Return the list of tuples mapping json type to expected native type."""
-        if self.import_cls.type_map is None:
-            return []
-        out = copy.deepcopy(list(self.import_cls.type_map.items()))
-        if 'flag' not in self.import_cls.type_map:
-            out.append(('flag', self.import_cls.type_map['boolean']))
-        return out
-
-    def test_invalid_function_param(self):
+    def test_invalid_function_param(self, python_class, instance_kwargs,
+                                    is_installed):
         r"""Test errors raise during class creation when parameters are invalid."""
-        kwargs = copy.deepcopy(self.inst_kwargs)
+        kwargs = copy.deepcopy(instance_kwargs)
         kwargs['name'] = 'test'
         kwargs['args'] = ['test']
         kwargs['function'] = 'invalid'
         kwargs['source_files'] = []
-        if self.import_cls.function_param is None:
-            self.assert_raises(ValueError, self.import_cls, **kwargs)
+        if python_class.function_param is None:
+            with pytest.raises(ValueError):
+                python_class(**kwargs)
         else:
             kwargs['args'] = ['invalid']
-            self.assert_raises(ValueError, self.import_cls, **kwargs)
+            with pytest.raises(ValueError):
+                python_class(**kwargs)
             kwargs['source_files'] = ['invalid']
-            self.assert_raises(ValueError, self.import_cls, **kwargs)
+            with pytest.raises(ValueError):
+                python_class(**kwargs)
                                
-    def test_get_native_type(self):
+    def test_get_native_type(self, python_class, code_types):
         r"""Test translation to native type."""
-        test_vals = self.get_test_types()
-        for a, b in test_vals:
-            self.assert_equal(
-                self.import_cls.get_native_type(datatype=a), b)
+        for a, b in code_types:
+            assert(python_class.get_native_type(datatype=a) == b)
             if not isinstance(a, dict):
-                self.assert_equal(
-                    self.import_cls.get_native_type(datatype={'type': a}), b)
+                assert(
+                    python_class.get_native_type(datatype={'type': a}) == b)
                 if a in ['float', 'int', 'uint']:
-                    self.assert_equal(self.import_cls.get_native_type(
-                        datatype={'type': 'scalar', 'subtype': a}), b)
+                    assert(python_class.get_native_type(
+                        datatype={'type': 'scalar', 'subtype': a}) == b)
                 
-    def test_write_declaration(self):
+    def test_write_declaration(self, python_class, code_types):
         r"""Test write_declaration for all supported native types."""
-        if (((self.import_cls.function_param is None)
-             or ('declare' not in self.import_cls.function_param))):
-            return
-        test_vals = self.get_test_types()
-        for a, b in test_vals:
-            self.import_cls.write_declaration({'name': 'test',
-                                               'datatype': a})
+        if (((python_class.function_param is None)
+             or ('declare' not in python_class.function_param))):
+            pytest.skip("No declaration token")
+        for a, b in code_types:
+            python_class.write_declaration({'name': 'test', 'datatype': a})
 
-    def test_write_model_wrapper(self):
+    def test_write_model_wrapper(self, python_class):
         r"""Test writing a model based on yaml parameters."""
-        if self.import_cls.function_param is None:
-            self.assert_raises(NotImplementedError,
-                               self.import_cls.write_model_wrapper,
-                               None, None)
-            self.assert_raises(NotImplementedError,
-                               self.import_cls.write_model_recv,
-                               None, None)
-            self.assert_raises(NotImplementedError,
-                               self.import_cls.write_model_send,
-                               None, None)
+        if python_class.function_param is None:
+            with pytest.raises(NotImplementedError):
+                python_class.write_model_wrapper(None, None)
+            with pytest.raises(NotImplementedError):
+                python_class.write_model_recv(None, None)
+            with pytest.raises(NotImplementedError):
+                python_class.write_model_send(None, None)
         else:
             inputs = [
                 {'name': 'a', 'datatype': 'bytes', 'outside_loop': True},
@@ -248,76 +270,65 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             for iovar in [inputs, outputs]:
                 for x in iovar:
                     x['name'] = 'test:' + x['name']
-            self.import_cls.write_model_wrapper('test', 'test',
-                                                inputs=inputs,
-                                                outputs=outputs)
-            self.assert_raises(NotImplementedError,
-                               self.import_cls.format_function_param,
-                               'invalid_key')
+            python_class.write_model_wrapper('test', 'test',
+                                             inputs=inputs,
+                                             outputs=outputs)
+            with pytest.raises(NotImplementedError):
+                python_class.format_function_param('invalid_key')
         
-    def test_write_executable(self):
+    def test_write_executable(self, python_class):
         r"""Test writing an executable."""
-        if self.import_cls.function_param is None:
-            self.assert_raises(NotImplementedError,
-                               self.import_cls.write_executable,
-                               None)
+        if python_class.function_param is None:
+            with pytest.raises(NotImplementedError):
+                python_class.write_executable(None)
         else:
-            lines1 = self.import_cls.write_executable('dummy',
-                                                      prefix='dummy',
-                                                      suffix='dummy')
-            lines2 = self.import_cls.write_executable(lines1)
-            self.assert_equal(lines1, lines2)
+            lines1 = python_class.write_executable('dummy',
+                                                   prefix='dummy',
+                                                   suffix='dummy')
+            lines2 = python_class.write_executable(lines1)
+            assert(lines1 == lines2)
             # Don't run this because it is invalid
 
-    def test_error_code(self):
+    def test_error_code(self, python_class, is_installed):
         r"""Test that error is raised when code generates one."""
-        if (((not self.import_cls.is_installed())
-             or (self.import_cls.function_param is None))):
+        if python_class.function_param is None:
+            pytest.skip("Language not tokenized")
             return
         error_msg = 'Test error'
-        lines = [self.import_cls.function_param['error'].format(error_msg=error_msg)]
-        assert_raises(RuntimeError, self.import_cls.run_code, lines)
+        lines = [python_class.function_param['error'].format(error_msg=error_msg)]
+        with pytest.raises(RuntimeError):
+            python_class.run_code(lines)
 
-    def test_write_function_def(self, inputs=None, outputs=None,
-                                outputs_in_inputs=None,
-                                declare_functions_as_var=None,
-                                guess_at_outputs_in_inputs=False, **kwargs):
-        r"""Test writing and running a function definition."""
-        if declare_functions_as_var is None:
-            declare_functions_as_var = False
-        if self.import_cls.function_param is None:
-            self.assert_raises(NotImplementedError,
-                               self.import_cls.write_function_def, None)
-        else:
-            if inputs is None:
-                inputs = [{'name': 'x', 'value': 1.0,
-                           'datatype': {'type': 'float',
-                                        'precision': 32,
-                                        'units': 'cm'}}]
-            if outputs is None:
-                outputs = [{'name': 'y',
-                            'datatype': {'type': 'float',
-                                         'precision': 32,
-                                         'units': 'cm'}}]
+    @pytest.fixture(scope="class")
+    def write_function_def(self, python_class, run_generated_code):
+        r"""Write & run a function definition."""
+        def write_function_def_w(inputs=None, outputs=None,
+                                 outputs_in_inputs=None,
+                                 declare_functions_as_var=None,
+                                 guess_at_outputs_in_inputs=False, **kwargs):
+            if declare_functions_as_var is None:
+                declare_functions_as_var = False
+            assert(inputs is not None)
+            assert(outputs is not None)
             if outputs_in_inputs is None:
-                outputs_in_inputs = self.import_cls.outputs_in_inputs
+                outputs_in_inputs = python_class.outputs_in_inputs
             flag_var = {'name': 'flag',
                         'datatype': 'flag',
-                        'value': self.import_cls.function_param['true']}
+                        'value': python_class.function_param['true']}
             function_contents = []
             if len(inputs) == len(outputs):
                 for i, o in zip(inputs, outputs):
-                    function_contents += self.import_cls.write_assign_to_output(
+                    function_contents += python_class.write_assign_to_output(
                         o['name'], i['name'],
                         outputs_in_inputs=outputs_in_inputs)
-                    function_contents += self.import_cls.write_print_output_var(
+                    function_contents += python_class.write_print_output_var(
                         o['name'], in_inputs=outputs_in_inputs)
-            output_var = self.import_cls.prepare_output_variables(
-                outputs, in_inputs=self.import_cls.outputs_in_inputs,
+            output_var = python_class.prepare_output_variables(
+                outputs, in_inputs=python_class.outputs_in_inputs,
                 in_definition=True)
-            if not self.import_cls.types_in_funcdef:
+            if not python_class.types_in_funcdef:
                 kwargs['outputs'] = outputs
-            definition = self.import_cls.write_function_def(
+            definition = python_class.write_function_def(
                 'test_function', inputs=inputs, output_var=output_var,
                 function_contents=function_contents,
                 flag_var=flag_var, outputs_in_inputs=outputs_in_inputs,
@@ -325,7 +336,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             # Add second definition to test ability to locate specific
             # function in the presence of others
             definition.append('')
-            definition += self.import_cls.write_function_def(
+            definition += python_class.write_function_def(
                 'test_function_decoy', inputs=inputs,
                 outputs=outputs, flag_var=flag_var,
                 function_contents=function_contents,
@@ -339,10 +350,10 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                 if guess_at_outputs_in_inputs:
                     kwargs.pop('expected_outputs')
                     kwargs.pop('outputs_in_inputs')
-                parsed = self.import_cls.parse_function_definition(
+                parsed = python_class.parse_function_definition(
                     None, 'test_function', **kwargs)
-                self.assert_equal(len(parsed.get('inputs', [])), len(inputs))
-                self.assert_equal(len(parsed.get('outputs', [])), len(outputs))
+                assert(len(parsed.get('inputs', [])) == len(inputs))
+                assert(len(parsed.get('outputs', [])) == len(outputs))
             except BaseException:  # pragma: debug
                 pprint.pprint(definition)
                 if parsed:
@@ -362,145 +373,128 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                     x0.update(xp)
             # Lines required to set up the function call
             lines = []
-            if 'declare' in self.import_cls.function_param:
+            if 'declare' in python_class.function_param:
                 for x in inputs + outputs:
-                    lines += self.import_cls.write_declaration(x)
+                    lines += python_class.write_declaration(x)
                 if outputs_in_inputs:
-                    lines += self.import_cls.write_declaration(flag_var)
+                    lines += python_class.write_declaration(flag_var)
                 if declare_functions_as_var:
                     if outputs_in_inputs:
-                        lines += self.import_cls.write_declaration(
+                        lines += python_class.write_declaration(
                             dict(flag_var, name='test_function'))
                     elif len(outputs) > 0:
-                        lines += self.import_cls.write_declaration(
+                        lines += python_class.write_declaration(
                             dict(outputs[0], name='test_function'))
             for x in inputs:
-                lines.append(self.import_cls.format_function_param(
+                lines.append(python_class.format_function_param(
                     'assign', **x))
             if outputs_in_inputs:
-                lines.append(self.import_cls.format_function_param(
+                lines.append(python_class.format_function_param(
                     'assign', **flag_var))
-            lines += self.import_cls.write_function_call(
+            lines += python_class.write_function_call(
                 'test_function', flag_var=flag_var,
                 inputs=inputs, outputs=outputs,
                 outputs_in_inputs=outputs_in_inputs)
-            self.run_generated_code(lines,
-                                    function_definitions=definition)
+            run_generated_code(lines,
+                               function_definitions=definition)
+        return write_function_def_w
+
+    def test_write_function_def(self, python_class, write_function_def,
+                                testing_options):
+        r"""Test writing and running a function definition."""
+        if python_class.function_param is None:
+            with pytest.raises(NotImplementedError):
+                python_class.write_function_def(None)
+        else:
+            for kws in testing_options.get('write_function_def_params', []):
+                write_function_def(**kws)
             
-    def test_write_if_block(self):
+    def test_write_if_block(self, python_class, run_generated_code):
         r"""Test writing an if block."""
-        if self.import_cls.function_param is None:
-            self.assert_raises(NotImplementedError, self.import_cls.write_if_block,
-                               None, None)
+        if python_class.function_param is None:
+            with pytest.raises(NotImplementedError):
+                python_class.write_if_block(None, None)
         else:
             lines = []
-            if 'declare' in self.import_cls.function_param:
-                lines += self.import_cls.write_declaration(
+            if 'declare' in python_class.function_param:
+                lines += python_class.write_declaration(
                     {'name': 'x', 'type': 'integer'})
-            cond = [self.import_cls.function_param['true'],
-                    self.import_cls.function_param['false']]
+            cond = [python_class.function_param['true'],
+                    python_class.function_param['false']]
             block_contents = [
-                self.import_cls.function_param['assign'].format(
+                python_class.function_param['assign'].format(
                     name='x', value='1'),
-                self.import_cls.function_param['assign'].format(
+                python_class.function_param['assign'].format(
                     name='x', value='2')]
-            else_contents = self.import_cls.function_param['assign'].format(
+            else_contents = python_class.function_param['assign'].format(
                 name='x', value='-1')
-            lines += self.import_cls.write_if_block(
+            lines += python_class.write_if_block(
                 cond, block_contents,
                 else_block_contents=else_contents)
-            self.run_generated_code(lines)
+            run_generated_code(lines)
 
-    def test_write_for_loop(self):
+    def test_write_for_loop(self, python_class, run_generated_code):
         r"""Test writing a for loop."""
-        if self.import_cls.function_param is None:
-            self.assert_raises(NotImplementedError, self.import_cls.write_for_loop,
-                               None, None, None, None)
+        if python_class.function_param is None:
+            with pytest.raises(NotImplementedError):
+                python_class.write_for_loop(None, None, None, None)
         else:
             lines = []
-            if 'declare' in self.import_cls.function_param:
-                lines += self.import_cls.write_declaration(
+            if 'declare' in python_class.function_param:
+                lines += python_class.write_declaration(
                     {'name': 'i', 'type': 'integer'})
-                lines += self.import_cls.write_declaration(
+                lines += python_class.write_declaration(
                     {'name': 'x', 'type': 'integer'})
-            loop_contents = self.import_cls.function_param['assign'].format(
+            loop_contents = python_class.function_param['assign'].format(
                 name='x', value='i')
-            lines += self.import_cls.write_for_loop('i', 1, 2, loop_contents)
-            self.run_generated_code(lines)
+            lines += python_class.write_for_loop('i', 1, 2, loop_contents)
+            run_generated_code(lines)
 
-    def test_write_while_loop(self):
+    def test_write_while_loop(self, python_class, run_generated_code):
         r"""Test writing a while loop."""
-        if self.import_cls.function_param is None:
-            self.assert_raises(NotImplementedError, self.import_cls.write_while_loop,
-                               None, None)
+        if python_class.function_param is None:
+            with pytest.raises(NotImplementedError):
+                python_class.write_while_loop(None, None)
         else:
             lines = []
-            cond = self.import_cls.function_param['true']
-            loop_contents = self.import_cls.function_param.get('break', 'break')
-            lines += self.import_cls.write_while_loop(cond, loop_contents)
-            self.run_generated_code(lines)
+            cond = python_class.function_param['true']
+            loop_contents = python_class.function_param.get('break', 'break')
+            lines += python_class.write_while_loop(cond, loop_contents)
+            run_generated_code(lines)
 
-    def test_write_try_except(self, **kwargs):
+    def test_write_try_except(self, python_class, run_generated_code,
+                              testing_options):
         r"""Test writing a try/except block."""
-        if self.import_cls.function_param is None:
-            self.assert_raises(NotImplementedError, self.import_cls.write_try_except,
-                               None, None)
+        if (((python_class.function_param is None)
+             or ('try_begin' not in python_class.function_param))):
+            with pytest.raises(NotImplementedError):
+                python_class.write_try_except(None, None)
         else:
             lines = []
-            try_contents = self.import_cls.function_param['error'].format(
+            try_contents = python_class.function_param['error'].format(
                 error_msg='Dummy error')
-            except_contents = self.import_cls.function_param['print'].format(
+            except_contents = python_class.function_param['print'].format(
                 message='Dummy message')
-            lines += self.import_cls.write_try_except(try_contents,
-                                                      except_contents, **kwargs)
-            self.run_generated_code(lines)
+            lines += python_class.write_try_except(
+                try_contents, except_contents,
+                **testing_options.get('write_try_except_kwargs', {}))
+            run_generated_code(lines)
 
-    def test_cleanup_dependencies(self):
+    def test_cleanup_dependencies(self, python_class):
         r"""Test cleanup_dependencies method."""
-        self.import_cls.cleanup_dependencies()
+        python_class.cleanup_dependencies()
 
-    def test_split_line(self, vals=None):
+    def test_split_line(self, python_class, testing_options):
         r"""Test split_line."""
-        if self.import_cls.function_param is None:
+        if python_class.function_param is None:
             return
-        if vals is None:
-            vals = [('abcdef', {'length': 3, 'force_split': True},
-                     ['abc', 'def']),
-                    ('    abc', {'length': 3, 'force_split': True},
-                     ['    abc'])]
-        for line, kwargs, splits in vals:
-            self.assert_equal(
-                self.import_cls.split_line(line, **kwargs), splits)
+        for line, kwargs, splits in testing_options.get('split_lines', []):
+            assert(python_class.split_line(line, **kwargs) == splits)
 
-    def test_install_model_dependencies(self, deps=None):
+    def test_install_model_dependencies(self, python_class, testing_options):
         r"""Test install_model_dependencies."""
-        if deps is None:
-            if self.import_cls.language == 'c':
-                deps = [
-                    "cmake",
-                    {"package_manager": "pip", "package": "pyyaml",
-                     "arguments": "-v"},
-                    {"package": "cmake", "arguments": "-v"}]
-                if platform._is_win:  # pragma: windows
-                    from yggdrasil import tools
-                    if not tools.get_conda_prefix():
-                        deps.append({"package_manager": "vcpkg",
-                                     "package": "czmq"})
-                else:
-                    deps.append('doxygen')
-            else:
-                deps = []
-        self.import_cls.install_model_dependencies(deps, always_yes=True)
+        deps = testing_options.get('deps', [])
+        python_class.install_model_dependencies(deps, always_yes=True)
         with pytest.raises(NotImplementedError):
-            self.import_cls.install_dependency(
+            python_class.install_dependency(
                 'invalid', package_manager='invalid')
-
-
-class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
-    r"""Test runner for basic ModelDriver class."""
-    pass
-
-
-class TestModelDriver(TestModelParam, parent.TestDriver):
-    r"""Test runner for basic ModelDriver class."""
-    pass

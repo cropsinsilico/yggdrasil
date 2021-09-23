@@ -32,13 +32,6 @@ def register_example(example_dir):
     # Check that the source directory and test exist
     example_base = os.path.basename(example_dir)
     srcdir = os.path.join(example_dir, 'src')
-    testfile = os.path.join(_example_dir, 'tests',
-                            'test_%s.py' % example_base)
-    if not os.path.isfile(testfile):  # pragma: no cover
-        # TODO: Automate test creation
-        if (((not tools.is_subprocess())
-             and (example_base not in ['sbml1', 'sbml2', 'sbml3']))):
-            logging.error("Missing test file: %s" % testfile)
     if not os.path.isdir(srcdir):  # pragma: no cover
         if not tools.is_subprocess():
             logging.error("Missing source directory: %s" % srcdir)

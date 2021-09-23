@@ -1,40 +1,58 @@
+import pytest
+from tests.metaschema.datatypes.test_MetaschemaType import (
+    TestMetaschemaType as base_class)
 from yggdrasil.metaschema import MetaschemaTypeError
-from yggdrasil.metaschema.datatypes.tests import test_MetaschemaType as parent
 from yggdrasil.metaschema.datatypes.MultiMetaschemaType import (
     create_multitype_class)
 
 
-class TestMultiMetaschemaType(parent.TestMetaschemaType):
+class TestMultiMetaschemaType(base_class):
     r"""Test class for MultiMetaschemaType class."""
 
-    _mod = 'MultiMetaschemaType'
+    _mod = 'yggdrasil.metaschema.datatypes.MultiMetaschemaType'
     _cls = 'MultiMetaschemaType'
-    _types = ['object', 'int']
+
+    @pytest.fixture(scope="class")
+    def types(self):
+        r"""list: Test types."""
+        return ['object', 'int']
     
-    @staticmethod
-    def after_class_creation(cls):
-        r"""Actions to be taken during class construction."""
-        parent.TestMetaschemaType.after_class_creation(cls)
-        cls._value = {'a': int(1), 'b': float(1)}
-        cls._valid_encoded = [dict(cls._typedef,
-                                   type=cls._types)]
-        cls._valid_decoded = [cls._value, int(1)]
-        cls._invalid_decoded = ['hello']
-        cls._compatible_objects = [(cls._value, cls._value, None)]
+    @pytest.fixture(scope="class", autouse=True)
+    def python_class(self, types):
+        r"""Python class that is being tested."""
+        return create_multitype_class(types)
 
-    @property
-    def import_cls(self):
-        r"""Import the tested class from its module"""
-        return create_multitype_class(self._types)
+    @pytest.fixture(scope="class")
+    def value(self):
+        r"""dict: Test value."""
+        return {'a': int(1), 'b': float(1)}
         
-    @property
-    def typedef(self):
-        r"""dict: Type definition."""
-        out = super(TestMultiMetaschemaType, self).typedef
-        out['type'] = self._types
-        return out
+    @pytest.fixture(scope="class")
+    def valid_encoded(self, typedef_base, types):
+        r"""list: Encoded objects that are valid under this type."""
+        return [dict(typedef_base, type=types)]
 
-    def test_type_mismatch_error(self):
+    @pytest.fixture(scope="class")
+    def valid_decoded(self, value):
+        r"""list: Objects that are valid under this type."""
+        return [value, int(1)]
+
+    @pytest.fixture(scope="class")
+    def invalid_decoded(self):
+        r"""list: Objects that are invalid under this type."""
+        return ['hello']
+
+    @pytest.fixture(scope="class")
+    def compatible_objects(self, value):
+        r"""list: Objects that are compatible with this type."""
+        return [(value, value, None)]
+
+    @pytest.fixture(scope="class")
+    def typedef(self, typedef_base, types):
+        r"""dict: Type definition"""
+        return dict(typedef_base, type=types)
+
+    def test_type_mismatch_error(self, python_class):
         r"""Test that error is raised when there is a type mismatch."""
-        self.assert_raises(MetaschemaTypeError, self.import_cls,
-                           type=['invalid'])
+        with pytest.raises(MetaschemaTypeError):
+            python_class(type=['invalid'])

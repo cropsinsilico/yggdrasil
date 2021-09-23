@@ -1,7 +1,7 @@
 
 # Copies of test input files
-yggdrasil/tests/scripts/gcc_model.out
-yggdrasil/tests/scripts/Makefile
+tests/scripts/gcc_model.out
+tests/scripts/Makefile
 
 # Jupyter notebook things
 .ipynb_checkpoints

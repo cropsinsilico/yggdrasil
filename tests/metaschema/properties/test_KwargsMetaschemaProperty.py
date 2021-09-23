@@ -1,27 +1,30 @@
-from yggdrasil.metaschema.properties.tests import (
-    test_MetaschemaProperty as parent)
-from yggdrasil.metaschema.properties.tests.test_ArgsMetaschemaProperty import (
-    ValidArgsClass1, ValidArgsClass2, ValidArgsClass3,
-    ValidArgsClass4, InvalidArgsClass)
+import pytest
+from tests.metaschema.properties.test_ArgsMetaschemaProperty import (
+    TestArgsMetaschemaProperty as base_class)
 
 
-class TestKwargsMetaschemaProperty(parent.TestMetaschemaProperty):
+class TestKwargsMetaschemaProperty(base_class):
     r"""Test class for KwargsMetaschemaProperty class."""
     
-    _mod = 'KwargsMetaschemaProperty'
+    _mod = 'yggdrasil.metaschema.properties.KwargsMetaschemaProperty'
     _cls = 'KwargsMetaschemaProperty'
     
-    def __init__(self, *args, **kwargs):
-        super(TestKwargsMetaschemaProperty, self).__init__(*args, **kwargs)
-        self._valid = []
-        self._invalid = []
-        for cls in [ValidArgsClass1, ValidArgsClass2,
-                    ValidArgsClass3, ValidArgsClass4]:
-            cls_inst = cls(*(cls.test_args), **(cls.test_kwargs))
-            self._valid.append((cls_inst, cls.valid_kwargs))
-            self._invalid.append((cls_inst, cls.invalid_kwargs))
-        valid_type = ValidArgsClass1.valid_kwargs
-        invalid_type = ValidArgsClass1.invalid_kwargs
-        self._encode_errors = [int(1), InvalidArgsClass]
-        self._valid_compare = [(valid_type, valid_type)]
-        self._invalid_compare = [(valid_type, invalid_type)]
+    @pytest.fixture(scope="class")
+    def valid(self, valid_instances):
+        r"""Objects that are valid."""
+        return [(x, x.__class__.valid_kwargs) for x in valid_instances]
+
+    @pytest.fixture(scope="class")
+    def invalid(self, valid_instances):
+        r"""Objects that are invalid."""
+        return [(x, x.__class__.invalid_kwargs) for x in valid_instances]
+
+    @pytest.fixture(scope="class")
+    def valid_type(self, valid_classes):
+        r"""Valid type."""
+        return valid_classes[0].valid_kwargs
+    
+    @pytest.fixture(scope="class")
+    def invalid_type(self, valid_classes):
+        r"""Invalid type."""
+        return valid_classes[0].invalid_kwargs

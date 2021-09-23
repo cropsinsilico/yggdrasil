@@ -1,66 +1,74 @@
+import pytest
 import os
 import six
-import unittest
-from yggdrasil import yamlfile, runner, tools
-from yggdrasil.components import ComponentMeta, import_component
-from yggdrasil.tests import YggTestBase, check_enabled_languages
+from yggdrasil import yamlfile, runner, demos
+from yggdrasil.components import import_component
+from tests import TestBase as base_class
 
 
-_demo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_demo_dir = os.path.dirname(os.path.abspath(demos.__file__))
 
 
-class DemoRun(object):
+class DemoMeta(type):
 
-    def __init__(self, name, yamls):
-        self.runner = None
-        self.name = name
-        self.yamls = yamls
-        self.languages = []
-        for x in yamlfile.parse_yaml(yamls)['model'].values():
-            drv = import_component('model', x['driver'],
-                                   without_schema=True)
-            if drv.language not in self.languages:
-                self.languages.append(drv.language)
-        super(DemoRun, self).__init__()
+    def __new__(meta, name, bases, class_dict):
+        
+        @pytest.fixture(scope="class",
+                        params=list(class_dict['runs'].keys()))
+        def run_name(self, request):
+            r"""str: Name of the run."""
+            return request.param
 
-    def run(self):
-        r"""Run the integration."""
-        if not tools.check_environ_bool('YGG_ENABLE_DEMO_TESTS'):
-            raise unittest.SkipTest("Demo tests not enabled.")
-        for x in self.languages:
-            check_enabled_languages(x)
-            if not tools.is_lang_installed(x):
-                raise unittest.SkipTest("%s not installed." % x)
-        self.runner = runner.get_runner(self.yamls, namespace=self.name,
-                                        production_run=True)
-        self.runner.run()
-        assert(not self.runner.error_flag)
-        self.runner = None
-
-    def add_test(self, dct):
-        def itest(solf):
-            self.run()
-        itest.__name__ = 'test_%s' % self.name
-        dct[itest.__name__] = itest
+        class_dict['run_name'] = run_name
+        return type.__new__(meta, name, bases, class_dict)
 
 
-class DemoMeta(ComponentMeta):
-
-    def __new__(cls, name, bases, dct):
-        runs = dct.get('runs', {})
-        for name, yamls in runs.items():
-            runs[name] = DemoRun(name, [os.path.join(_demo_dir,
-                                                     dct['demo_name'], iyml)
-                                        for iyml in yamls])
-            runs[name].add_test(dct)
-        dct['runs'] = runs
-        out = super(DemoMeta, cls).__new__(cls, name, bases, dct)
-        return out
-
-
+@pytest.mark.suite("demos", disabled=True)
 @six.add_metaclass(DemoMeta)
-class DemoTstBase(YggTestBase, tools.YggClass):
+class DemoTstBase(base_class):
     r"""Base class for running demos."""
 
-    demo_name = None
     runs = {}
+
+    @pytest.fixture(scope="class", params=[])
+    def demo_name(self, request):
+        r"""str: Name of demo being tested."""
+        return request.param
+
+    @pytest.fixture(scope="class")
+    def demo_directory(self, demo_name):
+        r"""str: Directory containing the demo."""
+        return os.path.join(_demo_dir, demo_name)
+
+    @pytest.fixture(scope="class", params=[])
+    def run_name(self, request):
+        r"""str: Name of the run."""
+        return request.param
+
+    @pytest.fixture(scope="class")
+    def yamls(self, run_name, demo_directory):
+        r"""tuple: YAMLs required for the run."""
+        return [os.path.join(demo_directory, x) for x in self.runs[run_name]]
+
+    def test_run(self, run_name, yamls, check_required_languages):
+        r"""Run the integration."""
+        languages = []
+        for x in yamlfile.parse_yaml(list(yamls))['model'].values():
+            drv = import_component('model', x['driver'],
+                                   without_schema=True)
+            if drv.language not in languages:
+                languages.append(drv.language)
+        check_required_languages(languages)
+        # Run
+        r = runner.get_runner(yamls, namespace=run_name,
+                              production_run=True)
+        r.run()
+        assert(not r.error_flag)
+        del r
+
+    @pytest.fixture(scope="class", autouse=True)
+    def create_output_directory(self, demo_directory):
+        r"""Create the output directory if it dosn't exist."""
+        out_dir = os.path.join(demo_directory, 'output')
+        if not os.path.isdir(out_dir):
+            os.mkdir(out_dir)

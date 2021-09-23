@@ -110,7 +110,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
             else:
                 self._backlog_thread = CommBase.CommTaskLoop(
                     self, target=self.run_backlog_recv,
-                    deamon=self.daemon, suffix='RecvBacklog')
+                    daemon=self.daemon, suffix='RecvBacklog')
         return self._backlog_thread
 
     @property
@@ -469,7 +469,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         """
         return self.send(self.eof_msg, *args, **kwargs)
 
-    def recv_message(self, *args, **kwargs):
+    def recv_message(self, timeout=None, **kwargs):
         r"""Receive a message.
 
         Args:
@@ -481,32 +481,6 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
             CommMessage: Received message.
 
         """
-        # This is required so that call to recv_message for work comms
-        # in CommBase.recv_message will retrieve messages from the backlog
-        kwargs['return_message_object'] = True
-        kwargs['dont_finalize'] = True
-        return self.recv(*args, **kwargs)
-        
-    def recv(self, timeout=None, return_message_object=False, dont_finalize=False,
-             **kwargs):
-        r"""Receive a message.
-
-        Args:
-            *args: All arguments are passed to comm _recv method.
-            return_message_object (bool, optional): If True, the full wrapped
-                CommMessage message object is returned instead of the tuple.
-                Defaults to False.
-            dont_finalize (bool, optional): If True, finalize_message will not
-                be called even if async_recv_method is 'recv_message'. Defaults
-                to False.
-            **kwargs: All keywords arguments are passed to comm _recv method.
-
-        Returns:
-            tuple (bool, obj): Success or failure of receive and received
-                message.
-
-        """
-        self.precheck('recv')
         # Sleep until there is a message
         if timeout is None:
             timeout = kwargs.get('timeout', self.recv_timeout)
@@ -535,18 +509,56 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         else:
             self.debug('Returning backlogged received message')
             out = self.pop_backlog()
-            if not dont_finalize:
-                if (out.flag == CommBase.FLAG_EOF) and self.close_on_eof_recv:
-                    self.close()
-                    out.flag = CommBase.FLAG_FAILURE
-                self._used = True
+        return out
+        
+    def finalize_message(self, msg, **kwargs):
+        r"""Perform actions to decipher a message.
+
+        Args:
+            msg (CommMessage): Initial message object to be finalized.
+            **kwargs: Keyword arguments are passed to the request comm's
+                finalize_message method.
+
+        Returns:
+            CommMessage: Deserialized and annotated message.
+
+        """
+        orig_flag = msg.flag
+        if (msg.flag == CommBase.FLAG_EOF) and self.close_on_eof_recv:
+            self.close()
+            msg.flag = CommBase.FLAG_FAILURE
+        if orig_flag not in [CommBase.FLAG_FAILURE, CommBase.FLAG_EMPTY]:
+            self._used = True
+        if self.async_recv_method != 'recv_message':
+            msg.finalized = False
+            kwargs['skip_processing'] = True
+        return self._wrapped.finalize_message(msg, **kwargs)
+        
+    def recv(self, timeout=None, return_message_object=False, dont_finalize=False,
+             **kwargs):
+        r"""Receive a message.
+
+        Args:
+            *args: All arguments are passed to comm _recv method.
+            return_message_object (bool, optional): If True, the full wrapped
+                CommMessage message object is returned instead of the tuple.
+                Defaults to False.
+            dont_finalize (bool, optional): If True, finalize_message will not
+                be called even if async_recv_method is 'recv_message'. Defaults
+                to False.
+            **kwargs: All keywords arguments are passed to comm _recv method.
+
+        Returns:
+            tuple (bool, obj): Success or failure of receive and received
+                message.
+
+        """
+        self.precheck('recv')
+        out = self.recv_message(timeout=timeout, **kwargs)
         if not dont_finalize:
             kws_finalize = {k: kwargs.pop(k) for k in self._finalize_message_kws
                             if k in kwargs}
-            if self.async_recv_method != 'recv_message':
-                out.finalized = False
-                kws_finalize['skip_processing'] = True
-            out = self._wrapped.finalize_message(out, **kws_finalize)
+            out = self.finalize_message(out, **kws_finalize)
         if not return_message_object:
             out = (bool(out.flag), out.args)
         return out
@@ -582,8 +594,3 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
     def recv_dict(self, *args, **kwargs):
         r"""Alias for recv_dict on wrapped comm."""
         return CommBase.CommBase.recv_dict(self, *args, **kwargs)
-    
-    def drain_server_signon_messages(self, **kwargs):
-        r"""Drain server signon messages. This should only be used
-        for testing purposes."""
-        pass

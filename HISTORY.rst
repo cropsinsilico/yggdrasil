@@ -2,6 +2,19 @@
 History
 =======
 
+1.8.2 (2021-XX-XX) Migrate tests out of package & into pytest fixtures
+------------------
+
+* Move tests out of package to take advantage of pytest conftest.py structure and reduce the size of the package
+* Refactor tests to use pytest fixtures instead of the unittest setup/teardown structure
+* Remove the yggtest CLI and migrate options into pytest CLI options
+* Update the GHA workflow to use the new pytest based CLI
+
+TODO
+~~~~
+
+* Debug GHA workflow
+
 1.8.1 (2021-10-15) Minor updates to support model submission form development
 ------------------
 

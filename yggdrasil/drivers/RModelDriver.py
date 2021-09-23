@@ -506,3 +506,35 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                   f'repos=\"http://cloud.r-project.org\")\'')])
         return super(RModelDriver, cls).install_dependency(
             package, package_manager=package_manager, **kwargs)
+
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for driver instance.
+                deps (list): Dependencies to install.
+
+        """
+        out = super(RModelDriver, cls).get_testing_options(**kwargs)
+        out['kwargs']['interpreter_flags'] = ['--vanilla']
+        out.update(
+            deps=['units', 'zeallot',
+                  {'package': 'units', 'arguments': '-v'}],
+            python2language=[
+                (np.string_('hello'), 'hello'),
+                ((np.string_('hello'), ), ('hello', )),
+                ([np.string_('hello')], ['hello']),
+                ({np.string_('hello'): np.string_('hello')},
+                 {'hello': 'hello'}),
+                (OrderedDict([(np.string_('hello'), np.string_('hello'))]),
+                 OrderedDict([('hello', 'hello')])),
+                (pd.DataFrame.from_dict({'a': np.zeros(5, dtype='int64')}),
+                 pd.DataFrame.from_dict({'a': np.zeros(5, dtype='int32')}))],
+            invalid_libraries=['invalid_unicorn'])
+        return out

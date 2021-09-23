@@ -1,20 +1,37 @@
+import pytest
+from tests.metaschema.properties.test_MetaschemaProperty import (
+    TestMetaschemaProperty as base_class)
 import numpy as np
-from yggdrasil.metaschema.properties.tests import (
-    test_MetaschemaProperty as parent)
 
 
-class TestTypeMetaschemaProperty(parent.TestMetaschemaProperty):
+class TestTypeMetaschemaProperty(base_class):
     r"""Test class for TypeMetaschemaProperty class."""
     
-    _mod = 'TypeMetaschemaProperty'
+    _mod = 'yggdrasil.metaschema.properties.TypeMetaschemaProperty'
     _cls = 'TypeMetaschemaProperty'
     
-    def __init__(self, *args, **kwargs):
-        super(TestTypeMetaschemaProperty, self).__init__(*args, **kwargs)
-        self._valid = [(np.int8(1), 'int'), (np.int8(1), 'scalar')]
-        self._invalid = [(np.int8(1), 'float'), (np.float32(1), 'int')]
-        self._encode_errors = [np]  # Can't encode modules
-        self._valid_compare = [('int', 'int'), ('int', 'scalar'),
-                               ('ply', 'object')]
-        self._invalid_compare = [('int', 'float'), ('array', 'object'),
-                                 ('ply', 'array'), ('1darray', 'scalar')]
+    @pytest.fixture(scope="class")
+    def valid(self):
+        r"""Objects that are valid."""
+        return [(np.int8(1), 'int'), (np.int8(1), 'scalar')]
+
+    @pytest.fixture(scope="class")
+    def invalid(self):
+        r"""Objects that are invalid."""
+        return [(np.int8(1), 'float'), (np.float32(1), 'int')]
+
+    @pytest.fixture(scope="class")
+    def encode_errors(self):
+        r"""Object that enduce errors during encoding."""
+        return [np]  # Can't encode modules
+
+    @pytest.fixture(scope="class")
+    def valid_compare(self):
+        r"""Objects that successfully compare."""
+        return [('int', 'int'), ('int', 'scalar'), ('ply', 'object')]
+
+    @pytest.fixture(scope="class")
+    def invalid_compare(self):
+        r"""Objects that do not successfully compare."""
+        return [('int', 'float'), ('array', 'object'),
+                ('ply', 'array'), ('1darray', 'scalar')]

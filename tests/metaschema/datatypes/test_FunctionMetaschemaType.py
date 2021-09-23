@@ -1,5 +1,6 @@
-from yggdrasil.tests import assert_raises
-from yggdrasil.metaschema.datatypes.tests import test_MetaschemaType as parent
+import pytest
+from tests.metaschema.datatypes.test_MetaschemaType import (
+    TestMetaschemaType as base_class)
 
 
 def valid_function():  # pragma: debug
@@ -7,27 +8,47 @@ def valid_function():  # pragma: debug
     pass
 
 
-class TestFunctionMetaschemaType(parent.TestMetaschemaType):
+class TestFunctionMetaschemaType(base_class):
     r"""Test class for FunctionMetaschemaType class with float."""
 
-    _mod = 'FunctionMetaschemaType'
+    _mod = 'yggdrasil.metaschema.datatypes.FunctionMetaschemaType'
     _cls = 'FunctionMetaschemaType'
 
-    @staticmethod
-    def after_class_creation(cls):
-        r"""Actions to be taken during class construction."""
-        parent.TestMetaschemaType.after_class_creation(cls)
-        value = valid_function
-        cls._valid_encoded = [dict(cls._typedef,
-                                   type=cls.get_import_cls().name)]
-        cls._valid_decoded = [value]
-        cls._invalid_encoded = [{}]
-        cls._invalid_decoded = [object]
-        cls._compatible_objects = [(value, value, None)]
-        cls._valid_normalize += [('%s:valid_function' % __name__, valid_function)]
+    @pytest.fixture(scope="class")
+    def value(self):
+        r"""function: Test function."""
+        return valid_function
+    
+    @pytest.fixture(scope="class")
+    def valid_encoded(self, python_class, typedef_base):
+        r"""list: Encoded objects that are valid under this type."""
+        return [dict(typedef_base,
+                     type=python_class.name)]
+    
+    @pytest.fixture(scope="class")
+    def valid_decoded(self, value):
+        r"""list: Objects that are valid under this type."""
+        return [value]
+    
+    @pytest.fixture(scope="class")
+    def invalid_decoded(self):
+        r"""list: Objects that are invalid under this type."""
+        return [object]
 
-    def test_decode_data_errors(self):
+    @pytest.fixture(scope="class")
+    def compatible_objects(self, value):
+        r"""list: Objects that are compatible with this type."""
+        return [(value, value, None)]
+
+    @pytest.fixture(scope="class")
+    def valid_normalize(self):
+        r"""list: Pairs of pre-/post-normalized objects."""
+        return [(None, None),
+                ('%s:valid_function' % __name__, valid_function)]
+
+    def test_decode_data_errors(self, python_class):
         r"""Test errors in decode_data."""
-        assert_raises(ValueError, self.import_cls.decode_data, 'hello', None)
-        assert_raises(AttributeError, self.import_cls.decode_data,
-                      'yggdrasil:invalid', None)
+        with pytest.raises(ValueError):
+            python_class.decode_data('hello', None)
+        with pytest.raises(AttributeError):
+            python_class.decode_data('yggdrasil:invalid', None)

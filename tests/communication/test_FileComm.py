@@ -1,9 +1,9 @@
+import pytest
 import os
-import copy
 import jsonschema
-from yggdrasil.tests import assert_equal
+from yggdrasil import schema
 from yggdrasil.communication import new_comm
-from yggdrasil.communication.tests import test_CommBase as parent
+from tests.communication import TestComm as base_class
 
 
 def test_wait_for_creation():
@@ -33,141 +33,208 @@ def test_wait_for_creation():
     assert(send_instance.sched_out)
     flag, msg_recv = recv_instance.recv()
     assert(flag)
-    assert_equal(msg_recv, msg_send)
+    assert(msg_recv == msg_send)
     send_instance.close()
     recv_instance.close()
     recv_instance.remove_file()
 
 
-class TestFileComm(parent.TestCommBase):
+_filetypes = sorted([x for x in schema.get_schema()['file'].subtypes
+                     if x not in ['ascii', 'table', 'pandas']])
+
+
+@pytest.mark.usefixtures("unyts_equality_patch")
+@pytest.mark.suite("files")
+class TestFileComm(base_class):
     r"""Test for FileComm communication class."""
 
-    comm = 'FileComm'
-    attr_list = (copy.deepcopy(parent.TestCommBase.attr_list)
-                 + ['fd', 'read_meth', 'append', 'in_temp',
-                    'is_series', 'wait_for_creation', 'serializer',
-                    'platform_newline'])
+    _component_type = 'file'
+
     test_send_recv_nolimit = None
     test_work_comm = None
     test_send_recv_raw = None
     
-    @property
-    def commtype(self):
-        r"""str: Subtype associated with comm class."""
-        return self.import_cls._filetype
+    @pytest.fixture(scope="class", autouse=True, params=_filetypes)
+    def component_subtype(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
+
+    @pytest.fixture(scope="class", autouse=True, params=[False])
+    def use_async(self, request):
+        r"""Whether communicator should be asynchronous or not."""
+        return request.param
     
-    def teardown(self):
-        r"""Remove the file."""
-        super(TestFileComm, self).teardown()
-        self.send_instance.remove_file()
+    def get_send_comm_kwargs(self, *args, **kwargs):
+        r"""Get keyword arguments for creating a send comm."""
+        kwargs['in_temp'] = True
+        return super(TestFileComm, self).get_send_comm_kwargs(
+            *args, **kwargs)
 
-    @property
-    def send_inst_kwargs(self):
-        r"""dict: Keyword arguments for send instance."""
-        out = super(TestFileComm, self).send_inst_kwargs
-        out['in_temp'] = True
-        return out
+    @pytest.fixture(scope="class")
+    def close_comm(self, close_comm):
+        r"""Remove a comm."""
+        def close_comm_w(comm, dont_remove_file=False):
+            close_comm(comm)
+            if (comm.direction == 'send') and (not dont_remove_file):
+                comm.remove_file()
+        return close_comm_w
 
-    def test_file_size(self):
+    @pytest.fixture
+    def global_send_comm(self, send_comm):
+        r"""Communicator for sending messages."""
+        return send_comm
+
+    @pytest.fixture
+    def global_recv_comm(self, recv_comm):
+        r"""Communicator for receiving messages."""
+        return recv_comm
+
+    @pytest.fixture(scope="class")
+    def maxMsgSize(self):
+        r"""int: Maximum message size."""
+        return 0
+
+    def test_file_size(self, global_recv_comm):
         r"""Test file_size method."""
-        self.recv_instance.file_size
+        global_recv_comm.file_size
 
-    def test_send_recv_filter_send_filter(self, **kwargs):
+    def test_send_recv_eof_no_close(self, send_comm, recv_comm, do_send_recv,
+                                    timeout):
+        r"""Test send/recv of EOF message with no close."""
+        recv_comm.close_on_eof_recv = False
+        do_send_recv(send_comm, recv_comm,
+                     send_params={'method': 'send_eof'},
+                     recv_params={'flag': True,
+                                  'skip_wait': True,
+                                  'kwargs': {'timeout': timeout}})
+
+    def test_send_recv_filter_eof(self, run_once, filtered_comms, send_comm,
+                                  recv_comm, do_send_recv, timeout):
+        r"""Test send/recv of EOF with filter."""
+        do_send_recv(send_comm, recv_comm,
+                     send_params={'method': 'send_eof'},
+                     recv_params={'flag': False,
+                                  'skip_wait': True,
+                                  'kwargs': {'timeout': timeout}})
+        assert(recv_comm.is_closed)
+
+    def test_send_recv_filter_send_filter(self, filtered_comms,
+                                          msg_filter_send, send_comm,
+                                          recv_comm, polling_interval,
+                                          do_send_recv):
         r"""Test send/recv with filter that blocks send."""
-        kwargs.setdefault('msg_recv', self.recv_instance.eof_msg)
-        super(TestFileComm, self).test_send_recv_filter_send_filter(**kwargs)
+        do_send_recv(send_comm, recv_comm, msg_filter_send,
+                     recv_params={'message': recv_comm.eof_msg,
+                                  'flag': False,
+                                  'skip_wait': True,
+                                  'kwargs': {'timeout': polling_interval}})
         
-    def test_send_recv_filter_recv_filter(self, **kwargs):
+    def test_send_recv_filter_recv_filter(self, filtered_comms,
+                                          msg_filter_recv, send_comm,
+                                          recv_comm, polling_interval,
+                                          do_send_recv):
         r"""Test send/recv with filter that blocks recv."""
-        kwargs.setdefault('msg_recv', self.recv_instance.eof_msg)
-        super(TestFileComm, self).test_send_recv_filter_recv_filter(**kwargs)
+        # Wait if not async?
+        do_send_recv(send_comm, recv_comm, msg_filter_recv,
+                     recv_params={'message': recv_comm.eof_msg,
+                                  'flag': False,
+                                  'skip_wait': True,
+                                  'kwargs': {'timeout': 10 * polling_interval}})
         
-    def test_invalid_read_meth(self):
+    def test_invalid_read_meth(self, name, commtype, use_async,
+                               testing_options):
         r"""Test raise of error on invalid read_meth."""
-        if self.comm == 'FileComm':
-            kwargs = self.send_inst_kwargs
-            kwargs['read_meth'] = 'invalid'
-            kwargs['skip_component_schema_normalization'] = False
-            self.assert_raises(jsonschema.ValidationError, new_comm, self.name,
-                               **kwargs)
+        if commtype != 'binary':
+            pytest.skip("Only run for commtype 'binary'")
+        kws = self.get_send_comm_kwargs(
+            commtype, use_async, testing_options, read_meth='invalid',
+            skip_component_schema_normalization=False)
+        with pytest.raises(jsonschema.ValidationError):
+            new_comm(name, **kws)
 
-    def test_append(self):
+    def test_append(self, uuid, commtype, use_async, testing_options,
+                    send_comm, recv_comm, recv_message_list, close_comm):
         r"""Test open of file comm with append."""
-        send_objects = self.testing_options['send']
-        recv_objects = self.testing_options['recv']
-        recv_objects_partial = self.testing_options['recv_partial']
+        send_objects = testing_options['send']
+        recv_objects = testing_options['recv']
+        recv_objects_partial = testing_options['recv_partial']
         # Write to file
-        flag = self.send_instance.send(send_objects[0])
+        flag = send_comm.send(send_objects[0])
         assert(flag)
-        # Create temp file for receving
-        recv_kwargs = copy.deepcopy(self.inst_kwargs)
-        recv_kwargs['append'] = True
-        new_inst_recv = new_comm('partial%s' % self.uuid, **recv_kwargs)
-        self.recv_message_list(new_inst_recv, recv_objects_partial[0],
-                               break_on_empty=True)
-        # Open file in append
-        send_kwargs = copy.deepcopy(self.send_inst_kwargs)
-        send_kwargs['append'] = True
-        new_inst_send = new_comm('append%s' % self.uuid, **send_kwargs)
-        for i in range(1, len(send_objects)):
-            flag = new_inst_send.send(send_objects[i])
-            assert(flag)
-            self.recv_message_list(new_inst_recv, recv_objects_partial[i],
-                                   break_on_empty=True)
-        self.remove_instance(new_inst_send)
-        self.remove_instance(new_inst_recv)
-        # Read entire contents
-        self.recv_message_list(self.recv_instance, recv_objects)
+        # Create temp file comms in append mode
+        recv_kwargs = self.get_recv_comm_kwargs(
+            commtype, send_comm, testing_options, append=True)
+        new_inst_recv = new_comm('partial%s' % uuid, **recv_kwargs)
+        send_kwargs = self.get_send_comm_kwargs(
+            commtype, use_async, testing_options, append=True)
+        new_inst_send = new_comm('append%s' % uuid, **send_kwargs)
+        try:
+            recv_message_list(new_inst_recv, recv_objects_partial[0],
+                              break_on_empty=True)
+            for i in range(1, len(send_objects)):
+                flag = new_inst_send.send(send_objects[i])
+                assert(flag)
+                recv_message_list(new_inst_recv, recv_objects_partial[i],
+                                  break_on_empty=True)
+            # Read entire contents
+            recv_message_list(recv_comm, recv_objects)
+        finally:
+            close_comm(new_inst_send, dont_remove_file=True)
+            close_comm(new_inst_recv, dont_remove_file=True)
         # Check file contents
-        if self.testing_options.get('exact_contents', True):
-            with open(self.send_instance.address, 'rb') as fd:
+        if testing_options.get('exact_contents', True):
+            with open(send_comm.address, 'rb') as fd:
                 contents = fd.read()
-            self.assert_equal(contents, self.testing_options['contents'])
+            assert(contents == testing_options['contents'])
 
-    def test_series(self):
+    def test_series(self, send_comm, recv_comm, do_send_recv):
         r"""Test sending/receiving to/from a series of files."""
         # Set up series
-        fname = '%d'.join(os.path.splitext(self.send_instance.address))
-        self.send_instance.close()
-        self.recv_instance.close()
-        self.send_instance.is_series = True
-        self.recv_instance.is_series = True
-        self.send_instance.address = fname
-        self.recv_instance.address = fname
-        self.send_instance.open()
-        self.recv_instance.open()
+        fname = '%d'.join(os.path.splitext(send_comm.address))
+        send_comm.close()
+        recv_comm.close()
+        send_comm.is_series = True
+        recv_comm.is_series = True
+        send_comm.address = fname
+        recv_comm.address = fname
+        send_comm.open()
+        recv_comm.open()
         # Send/receive multiple messages
         nmsg = 2
         for i in range(nmsg):
-            self.do_send_recv()
+            do_send_recv(send_comm, recv_comm)
         
-    def test_remaining_bytes(self):
+    def test_remaining_bytes(self, send_comm, recv_comm):
         r"""Test remaining_bytes."""
-        self.assert_equal(self.send_instance.remaining_bytes, 0)
-        self.recv_instance.close()
-        assert(self.recv_instance.is_closed)
-        self.assert_equal(self.recv_instance.remaining_bytes, 0)
+        assert(send_comm.remaining_bytes == 0)
+        recv_comm.close()
+        assert(recv_comm.is_closed)
+        assert(recv_comm.remaining_bytes == 0)
 
-    def test_recv_nomsg(self):
+    def test_recv_nomsg(self, recv_comm, polling_interval):
         r"""Test recieve when there is no waiting message."""
-        flag, msg_recv = self.recv_instance.recv(timeout=self.sleeptime)
+        flag, msg_recv = recv_comm.recv(timeout=polling_interval)
         assert(not flag)
-        self.assert_equal(msg_recv, self.recv_instance.eof_msg)
+        assert(msg_recv == recv_comm.eof_msg)
 
 
 class TestFileComm_readline(TestFileComm):
     r"""Test for FileComm communication class with read_meth = 'readline'."""
 
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for tested class."""
-        out = super(TestFileComm, self).inst_kwargs
-        out['read_meth'] = 'readline'
-        return out
+    @pytest.fixture(scope="class", autouse=True,
+                    params=['ascii'])
+    def component_subtype(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
 
-    @property
-    def testing_options(self):
-        r"""dict: Testing options."""
-        out = super(TestFileComm_readline, self).testing_options
-        out['recv'] = out['send']
-        return out
+    @pytest.fixture(scope="class", autouse=True,
+                    params=[{'read_meth': 'readline'}])
+    def options(self, request):
+        r"""Arguments that should be provided when getting testing options."""
+        return request.param
+    
+    def get_recv_comm_kwargs(self, *args, **kwargs):
+        r"""Get keyword arguments for creating a recv comm."""
+        kwargs['read_meth'] = 'readline'
+        return super(TestFileComm_readline, self).get_recv_comm_kwargs(
+            *args, **kwargs)

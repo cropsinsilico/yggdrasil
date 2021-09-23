@@ -40,7 +40,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.7]
         install-method: [pip]
-        test-flags1: [--long-running --test-suite=timing --test-suite=demos --test-suite=top, --test-suite=examples --separate-test='--test-suite=mpi --write-script=run_mpi.sh --with-mpi=3', --test-suite=types --skip-languages c c++, --test-suite=types --languages c cpp]
+        test-flags1: [--long-running --suite=timing --suite=demos --suite=top, --suite=examples --separate-test='--ci --cov-append --suite=mpi --write-script=run_mpi.sh --run-with-mpi=3', --suite=types --skip-languages c c++, --suite=types --languages c cpp]
         test-flags2: [""]
         install-c: [true]
         install-mpi: [true]
@@ -48,8 +48,8 @@ jobs:
           - os: windows-latest
             python-version: 3.7
             install-method: pip
-            test-flags1: --long-running --languages cpp
-            test-flags2: --long-running --skip-languages c++
+            test-flags1: --long-running
+            test-flags2: ""
             install-c: false
             install-mpi: false
       fail-fast: false
@@ -239,68 +239,68 @@ jobs:
     #   if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
     #   id: mpi_macos
     #   run: |
-    #     yggtest --ci --test-suite=mpi --write-script=run_mpi.sh
+    #     pytest --ci --suite=mpi --write-script=run_mpi.sh
     #     ./run_mpi.sh
     # - name: Run MPI tests (ubuntu)
     #   if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
     #   id: mpi_ubuntu
     #   run: |
-    #     yggtest --ci --with-mpi=3 --test-suite=mpi --write-script=run_mpi.sh
-    #     # yggtest --ci --with-mpi=3 yggdrasil/communication/tests/test_MPIComm.py --write-script=run_mpi.sh --nocapture --debug
+    #     pytest --ci --run-with-mpi=3 --suite=mpi --write-script=run_mpi.sh
+    #     # pytest --ci --run-with-mpi=3 tests/communication/test_MPIComm.py --write-script=run_mpi.sh --nocapture --ygg-debug
     #     ./run_mpi.sh
     # - name: Run MPI tests (windows)
     #   if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
     #   id: mpi_windows
-    #   run: yggtest --ci --test-suite=mpi
+    #   run: pytest --ci --suite=mpi
     #   continue-on-error: true
     # - name: Re-run MPI test failures (windows)
     #   if: ${{ steps.mpi_windows.outcome == 'failure' }}
-    #   run: yggtest --ci --test-suite=mpi --debug --nocapture
+    #   run: pytest --ci --suite=mpi --ygg-debug --nocapture
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
       shell: cmd /C CALL {0}
       run: |
         cmake -h
-        yggtest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
+        pytest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
       if: ${{ matrix.os == 'windows-latest' || !contains(matrix.test-flags1, '--write-script') }}
       id: test1
-      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none --debug
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none --ygg-debug
     - name: Run generated test script (1st)
-      if: ${{ matrix.os != 'windows-latest' && contains(matrix.test-flags1, '--write-script') }}
+      if: ${{ contains(matrix.test-flags1, '--write-script') }}
       id: test1_script
       run: |
-        yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+        pytest --ci --cov-append ${{ matrix.test-flags1 }}
         ./run_mpi.sh
       continue-on-error: true
     - name: Re-run test script failures (1st)
       if: ${{ steps.test1_script.outcome == 'failure' }}
       run: |
-        yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none --debug
+        pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none --ygg-debug
         ./run_mpi.sh
     - name: Run tests (2nd)
-      if: ${{ matrix.test-flags2 != '' && (matrix.os == 'windows-latest' || !contains(matrix.test-flags2, '--write-script')) }}
+      if: ${{ matrix.test-flags2 != '' && !contains(matrix.test-flags2, '--write-script') }}
       id: test2
-      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
       continue-on-error: true
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none --debug
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none --ygg-debug
     - name: Run generated test script (2nd)
-      if: ${{ matrix.test-flags2 != '' && (matrix.os != 'windows-latest' && contains(matrix.test-flags2, '--write-script')) }}
+      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--write-script') }}
       id: test2_script
       run: |
-        yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+        pytest --ci --cov-append ${{ matrix.test-flags2 }}
         ./run_mpi.sh
       continue-on-error: true
     - name: Re-run test script failures (2nd)
       if: ${{ steps.test2_script.outcome == 'failure' }}
       run: |
-        yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none --debug
+        pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none --ygg-debug
         ./run_mpi.sh
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
@@ -350,7 +350,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.7]
         install-method: [conda]
-        test-flags1: [--long-running --separate-test='--test-suite=mpi --write-script=run_mpi.sh']
+        test-flags1: [--long-running --separate-test='--ci --cov-append --suite=mpi --write-script=run_mpi.sh']
         test-flags2: [--with-examples examples/tests/test_backwards.py]
         install-c: [true]
         install-mpi: [true]

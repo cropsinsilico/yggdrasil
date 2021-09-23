@@ -1,11 +1,16 @@
-from yggdrasil.serialize.tests import test_SerializeBase as parent
+import pytest
+from tests.serialize import TestSerializeBase as base_class
 
 
-class TestMatSerialize(parent.TestSerializeBase):
+class TestMatSerialize(base_class):
     r"""Test class for TestMatSerialize class."""
 
-    _cls = 'MatSerialize'
+    @pytest.fixture(scope="class", autouse=True, params=['mat'])
+    def component_subtype(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
 
-    def test_serialize_errors(self):
+    def test_serialize_errors(self, instance):
         r"""Test serialize errors."""
-        self.assert_raises(TypeError, self.instance.serialize, ['blah', 'blah'])
+        with pytest.raises(TypeError):
+            instance.serialize(['blah', 'blah'])

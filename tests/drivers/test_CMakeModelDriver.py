@@ -1,38 +1,37 @@
+import pytest
+from tests.drivers.test_BuildModelDriver import (
+    TestBuildModelDriver as base_class)
 import os
 import re
 import pprint
 import tempfile
-import unittest
 from yggdrasil import platform
-from yggdrasil.tests import (
-    scripts, assert_raises, assert_equal, requires_language)
-import yggdrasil.drivers.tests.test_BuildModelDriver as parent
 from yggdrasil.drivers.CMakeModelDriver import (
     CMakeModelDriver, CMakeConfigure, CMakeBuilder)
 from yggdrasil.drivers.CModelDriver import GCCCompiler
 from yggdrasil.drivers.CPPModelDriver import CPPModelDriver
 
 
-@requires_language('cmake', installed='any')
-def test_CMakeConfigure():
+@pytest.mark.related_language('cmake')
+def test_CMakeConfigure(scripts):
     r"""Test CMakeConfigure."""
     src = scripts['c'][0]
     sourcedir = os.path.dirname(src)
     builddir = sourcedir
     # Test get_output_file
     out = CMakeConfigure.get_output_file(src, dont_build=True)
-    assert_equal(out, builddir)
+    assert(out == builddir)
     out = CMakeConfigure.get_output_file(src, dont_build=True,
                                          builddir='.', working_dir=sourcedir)
-    assert_equal(out, builddir)
+    assert(out == builddir)
     # Test get_flags
     out_A = CMakeConfigure.get_flags(dont_link=True)
     out_B = CMakeConfigure.get_flags(dont_link=True, outfile='.')
-    assert_equal(out_A, out_B)
+    assert(out_A == out_B)
 
 
-@requires_language('cmake', installed='any')
-def test_CMakeBuilder():
+@pytest.mark.related_language('cmake')
+def test_CMakeBuilder(scripts):
     r"""Test CMakeBuilder."""
     src = scripts['c'][0]
     target = os.path.splitext(os.path.basename(src))[0]
@@ -42,18 +41,19 @@ def test_CMakeBuilder():
     if platform._is_win:  # pragma: windows
         out += '.exe'
     # Test get_output_file
-    assert_equal(CMakeBuilder.get_output_file(obj), out)
-    assert_equal(CMakeBuilder.get_output_file(obj, target='clean'), 'clean')
-    assert_equal(CMakeBuilder.get_output_file(builddir, target=target), out)
-    assert_raises(RuntimeError, CMakeBuilder.get_output_file, builddir)
+    assert(CMakeBuilder.get_output_file(obj) == out)
+    assert(CMakeBuilder.get_output_file(obj, target='clean') == 'clean')
+    assert(CMakeBuilder.get_output_file(builddir, target=target) == out)
+    with pytest.raises(RuntimeError):
+        CMakeBuilder.get_output_file(builddir)
     # Test get_flags
     out_A = CMakeBuilder.get_flags(target=target, working_dir=builddir)
     out_B = CMakeBuilder.get_flags(target=target,
                                    outfile=os.path.join('.', os.path.basename(out)))
-    assert_equal(out_A, out_B)
+    assert(out_A == out_B)
 
 
-@requires_language('cmake')
+@pytest.mark.language('cmake')
 def test_create_include():
     r"""Test create_include."""
     target = 'target'
@@ -103,125 +103,134 @@ def test_create_include():
                 raise
     for fname in [fname_dll, fname_lib]:
         os.remove(fname)
-    assert_raises(ValueError, CMakeConfigure.create_include,
-                  None, target, compiler_flags=['invalid'], **kws)
-    assert_raises(ValueError, CMakeConfigure.create_include,
-                  None, target, linker_flags=['-invalid'], **kws)
-    assert_raises(ValueError, CMakeConfigure.create_include,
-                  None, target, linker_flags=['/invalid'], **kws)
+    with pytest.raises(ValueError):
+        CMakeConfigure.create_include(
+            None, target, compiler_flags=['invalid'], **kws)
+    with pytest.raises(ValueError):
+        CMakeConfigure.create_include(
+            None, target, linker_flags=['-invalid'], **kws)
+    with pytest.raises(ValueError):
+        CMakeConfigure.create_include(
+            None, target, linker_flags=['/invalid'], **kws)
 
 
-@requires_language('cmake', installed=False)
-def test_CMakeModelDriver_no_C_library():  # pragma: windows
+@pytest.mark.absent_language('cmake')
+def test_CMakeModelDriver_no_C_library(scripts):  # pragma: windows
     r"""Test CMakeModelDriver error when C library not installed."""
-    assert_raises(RuntimeError, CMakeModelDriver, 'test', scripts['cmake'])
+    with pytest.raises(RuntimeError):
+        CMakeModelDriver('test', scripts['cmake'])
 
 
-@requires_language('cmake')
-def test_CMakeModelDriver_error_cmake():
+@pytest.mark.language('cmake')
+def test_CMakeModelDriver_error_cmake(scripts):
     r"""Test CMakeModelDriver error for invalid cmake args."""
     makedir, target = os.path.split(scripts['cmake'])
-    assert_raises(RuntimeError, CMakeModelDriver, 'test', target,
-                  sourcedir=makedir, compiler_flags='-P',
-                  target_language='c')
+    with pytest.raises(RuntimeError):
+        CMakeModelDriver('test', target,
+                         sourcedir=makedir, compiler_flags='-P',
+                         target_language='c')
 
 
-@requires_language('cmake')
-def test_CMakeModelDriver_error_notarget():
+@pytest.mark.language('cmake')
+def test_CMakeModelDriver_error_notarget(scripts):
     r"""Test CMakeModelDriver error for invalid target."""
     makedir, target = os.path.split(scripts['cmake'])
-    assert_raises(RuntimeError, CMakeModelDriver, 'test', 'invalid',
-                  sourcedir=makedir, target_language='c')
+    with pytest.raises(RuntimeError):
+        CMakeModelDriver('test', 'invalid',
+                         sourcedir=makedir, target_language='c')
 
 
-@requires_language('cmake')
+@pytest.mark.language('cmake')
 def test_CMakeModelDriver_error_nofile():
     r"""Test CMakeModelDriver error for missing CMakeLists.txt."""
-    assert_raises(RuntimeError, CMakeModelDriver, 'test', 'invalid',
-                  target_language='c')
+    with pytest.raises(RuntimeError):
+        CMakeModelDriver('test', 'invalid',
+                         target_language='c')
 
 
-class TestCMakeModelParam(parent.TestBuildModelParam):
-    r"""Test parameters for CMakeModelDriver."""
+class TestCMakeModelDriver(base_class):
+    r"""Test runner for CMakeModelDriver."""
 
-    driver = 'CMakeModelDriver'
+    @pytest.fixture(scope="class")
+    def component_subtype(self):
+        r"""Subtype of component being tested."""
+        return 'cmake'
+
+    @pytest.fixture
+    def builddir(self, sourcedir):
+        r"""Directory that build will occur in."""
+        return os.path.join(sourcedir, 'build')
     
-    def __init__(self, *args, **kwargs):
-        super(TestCMakeModelParam, self).__init__(*args, **kwargs)
-        self.attr_list += ['target', 'sourcedir', 'builddir']
-        self.sourcedir, self.target = os.path.split(scripts['cmake'])
-        self.builddir = os.path.join(self.sourcedir, 'build')
-        self.args = [self.target]
-        self._inst_kwargs['yml']['working_dir'] = self.sourcedir
-        self._inst_kwargs.update(env_compiler='CXX',
-                                 env_compiler_flags='CXXFLAGS')
-        
+    @pytest.fixture
+    def instance_kwargs(self, testing_options, timeout, sourcedir,
+                        polling_interval, namespace, source):
+        r"""Keyword arguments for a new instance of the tested class."""
+        return dict(testing_options.get('kwargs', {}),
+                    yml={'working_dir': sourcedir},
+                    timeout=timeout, sleeptime=polling_interval,
+                    namespace=namespace, env_compiler='CXX',
+                    env_compiler_flags='CXXFLAGS')
 
-class TestCMakeModelDriverNoInit(TestCMakeModelParam,
-                                 parent.TestBuildModelDriverNoInit):
-    r"""Test runner for CMakeModelDriver without init."""
-
-    @unittest.skipIf(not platform._is_win, "Windows only.")
-    @unittest.skipIf(not GCCCompiler.is_installed(),
-                     "GNU compiler not installed.")
-    def test_run_model_gcc(self):
+    @pytest.mark.skipif(not platform._is_win, reason="Windows only.")
+    @pytest.mark.skipif(not GCCCompiler.is_installed(),
+                        reason="GNU compiler not installed.")
+    def test_run_model_gcc(self, run_model_instance):
         r"""Test compiling/running test model with gcc."""
-        self.run_model_instance(target_compiler='gcc')
-    
-    
-class TestCMakeModelDriverNoStart(TestCMakeModelParam,
-                                  parent.TestBuildModelDriverNoStart):
-    r"""Test runner for CMakeModelDriver without start."""
-    
-    def __init__(self, *args, **kwargs):
-        super(TestCMakeModelDriverNoStart, self).__init__(*args, **kwargs)
-        # Version specifying sourcedir via working_dir
-        self._inst_kwargs['yml']['working_dir'] = self.sourcedir
-        # Relative paths
-        self._inst_kwargs.update(sourcedir='.',
-                                 builddir='build',
-                                 compiler_flags=['-Wdev'],
-                                 skip_compiler=True)
+        run_model_instance(target_compiler='gcc')
 
-    def test_call_compiler(self):
+    def test_sbdir(self, instance, sourcedir, builddir):
+        r"""Test that source/build directories set correctly."""
+        assert(instance.sourcedir == sourcedir)
+        assert(instance.builddir == builddir)
+
+    def test_write_wrappers(self, instance):
+        r"""Test write_wrappers method with verbosity and existing
+        include file."""
+        try:
+            instance.overwrite = False
+            instance.write_wrappers(verbose=False)
+            instance.write_wrappers(verbose=True)
+            instance.overwrite = True
+            instance.write_wrappers(verbose=True)
+        finally:
+            instance.overwrite = True
+
+
+class TestCMakeModelDriver_wd(TestCMakeModelDriver):
+    r"""Test runner for CMakeModelDriver with working directory."""
+    
+    @pytest.fixture
+    def instance_kwargs(self, testing_options, timeout, sourcedir,
+                        polling_interval, namespace, source):
+        r"""Keyword arguments for a new instance of the tested class."""
+        return dict(testing_options.get('kwargs', {}),
+                    yml={'working_dir': sourcedir},
+                    timeout=timeout, sleeptime=polling_interval,
+                    namespace=namespace, env_compiler='CXX',
+                    env_compiler_flags='CXXFLAGS',
+                    sourcedir='.', builddir='build',
+                    compiler_flags=['-Wdev'], skip_compiler=True)
+    
+    # Disable instance args?
+
+    def test_call_compiler(self, python_class, instance):
         r"""Test call_compiler without full path."""
-        # self.instance.cleanup()
+        # instance.cleanup()
         CPPModelDriver.compile_dependencies()
-        self.import_cls.call_compiler(self.instance.source_files,
-                                      builddir='build',
-                                      working_dir=self.instance.working_dir,
-                                      dont_build=True)
-        out = self.instance.model_file
+        python_class.call_compiler(instance.source_files,
+                                   builddir='build',
+                                   working_dir=instance.working_dir,
+                                   dont_build=True)
+        out = instance.model_file
         if platform._is_win:
             out = os.path.join(os.path.dirname(out),
                                'Debug',
                                os.path.basename(out))
         compiler = CPPModelDriver.get_tool('compiler')
-        self.import_cls.call_compiler(self.instance.source_files,
-                                      out=out,
-                                      builddir='build',
-                                      working_dir=self.instance.working_dir,
-                                      overwrite=True,
-                                      target_compiler=compiler.toolname,
-                                      target_linker=compiler.linker().toolname)
-        
-
-class TestCMakeModelDriver(TestCMakeModelParam, parent.TestBuildModelDriver):
-    r"""Test runner for CMakeModelDriver."""
-
-    def test_sbdir(self):
-        r"""Test that source/build directories set correctly."""
-        assert_equal(self.instance.sourcedir, self.sourcedir)
-        assert_equal(self.instance.builddir, self.builddir)
-
-    def test_write_wrappers(self):
-        r"""Test write_wrappers method with verbosity and existing
-        include file."""
-        try:
-            self.instance.overwrite = False
-            self.instance.write_wrappers(verbose=False)
-            self.instance.write_wrappers(verbose=True)
-            self.instance.overwrite = True
-            self.instance.write_wrappers(verbose=True)
-        finally:
-            self.instance.overwrite = True
+        python_class.call_compiler(instance.source_files,
+                                   out=out,
+                                   builddir='build',
+                                   working_dir=instance.working_dir,
+                                   overwrite=True,
+                                   target_compiler=compiler.toolname,
+                                   target_linker=compiler.linker().toolname)

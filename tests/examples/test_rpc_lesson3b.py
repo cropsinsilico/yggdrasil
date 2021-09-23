@@ -1,20 +1,7 @@
-import os
-from yggdrasil.examples.tests import ExampleTstBase
+from tests.examples import TestExample as base_class
 
 
-class TestExampleRPC3b(ExampleTstBase):
-    r"""Test the rpc_lesson3 example."""
+class TestExampleRPC3b(base_class):
+    r"""Test the rpc_lesson3b example."""
     
-    example_name = 'rpc_lesson3b'
-    # iter_over = ['language', 'mpi']
-    # iter_list_mpi = ['', 'mpi']
-
-    @property
-    def input_files(self):
-        r"""Input file."""
-        return [os.path.join(self.yamldir, 'Input', 'input.txt')]
-    
-    @property
-    def output_files(self):
-        r"""Output file."""
-        return [os.path.join(self.tempdir, 'client_output.txt')]
+    examples = ['rpc_lesson3b']

@@ -1,43 +1,73 @@
+import pytest
+from tests.metaschema.datatypes.test_JSONObjectMetaschemaType import (
+    TestJSONObjectMetaschemaType as base_class)
 import copy
-from yggdrasil.metaschema.datatypes import compare_schema
-from yggdrasil.metaschema.datatypes.tests import (
-    test_JSONObjectMetaschemaType as parent)
+# from yggdrasil.metaschema.datatypes import compare_schema
 
 
-class TestSchemaMetaschemaType(parent.TestJSONObjectMetaschemaType):
+class TestSchemaMetaschemaType(base_class):
     r"""Test class for SchemaMetaschemaType class."""
 
-    _mod = 'SchemaMetaschemaType'
+    _mod = 'yggdrasil.metaschema.datatypes.SchemaMetaschemaType'
     _cls = 'SchemaMetaschemaType'
 
-    @staticmethod
-    def after_class_creation(cls):
-        r"""Actions to be taken during class construction."""
-        parent.TestJSONObjectMetaschemaType.after_class_creation(cls)
-        cls._value = copy.deepcopy(cls._fulldef)
-        cls._value['type'] = 'object'
-        cls._fulldef = {'type': 'schema'}
-        cls._typedef = {'type': 'schema'}
-        cls._valid_encoded = [cls._fulldef]
-        cls._valid_decoded = [cls._value]
-        cls._invalid_validate = [None]
-        cls._invalid_decoded = [{}]
-        cls._invalid_encoded = [{}]
-        cls._compatible_objects = [(cls._value, cls._value, None)]
-        cls._valid_normalize += [('float', {'type': 'float',
-                                            'precision': 64}),
-                                 ({'units': 'g'}, {'units': 'g',
-                                                   'type': 'scalar',
-                                                   'subtype': 'float',
-                                                   'precision': 64}),
-                                 ({'title': 'a'}, {'title': 'a'}),
-                                 ({'title': 'a', 'units': 'g'},
-                                  {'title': 'a', 'units': 'g',
-                                   'type': 'scalar', 'subtype': 'float',
-                                   'precision': 64}),
-                                 ({}, {})]
+    @pytest.fixture(scope="class")
+    def value(self, fulldef):
+        r"""dict: Test value."""
+        return dict(copy.deepcopy(fulldef), type='object')
+    
+    @pytest.fixture(scope="class")
+    def fulldef(self):
+        r"""dict: Full type definitions."""
+        return {'type': 'schema'}
 
-    @classmethod
-    def assert_result_equal(cls, x, y):
-        r"""Assert that serialized/deserialized objects equal."""
-        compare_schema(x, y)
+    @pytest.fixture(scope="class")
+    def typedef_base(self):
+        r"""dict: Base type definition."""
+        return {'type': 'schema'}
+    
+    @pytest.fixture(scope="class")
+    def valid_encoded(self, fulldef):
+        r"""list: Encoded objects that are valid under this type."""
+        return [fulldef]
+    
+    @pytest.fixture(scope="class")
+    def valid_decoded(self, value):
+        r"""list: Objects that are valid under this type."""
+        return [value]
+    
+    @pytest.fixture(scope="class")
+    def invalid_encoded(self):
+        r"""list: Encoded objects that are invalid under this type."""
+        return [{}]
+
+    @pytest.fixture(scope="class")
+    def invalid_decoded(self):
+        r"""list: Objects that are invalid under this type."""
+        return [{}]
+        
+    @pytest.fixture(scope="class")
+    def compatible_objects(self, value):
+        r"""list: Objects that are compatible with this type."""
+        return [(value, value, None)]
+
+    @pytest.fixture(scope="class")
+    def valid_normalize(self):
+        r"""list: Pairs of pre-/post-normalized objects."""
+        return [('float', {'type': 'float',
+                           'precision': 64}),
+                ({'units': 'g'}, {'units': 'g',
+                                  'type': 'scalar',
+                                  'subtype': 'float',
+                                  'precision': 64}),
+                ({'title': 'a'}, {'title': 'a'}),
+                ({'title': 'a', 'units': 'g'},
+                 {'title': 'a', 'units': 'g',
+                  'type': 'scalar', 'subtype': 'float',
+                  'precision': 64}),
+                ({}, {})]
+
+    # @classmethod
+    # def assert_result_equal(cls, x, y):
+    #     r"""Assert that serialized/deserialized objects equal."""
+    #     compare_schema(x, y)

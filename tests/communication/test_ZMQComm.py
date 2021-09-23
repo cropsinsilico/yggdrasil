@@ -1,243 +1,197 @@
-import unittest
-import copy
+import pytest
 from yggdrasil import platform
-from yggdrasil.tests import assert_raises, assert_equal
-from yggdrasil.communication import new_comm
-from yggdrasil.communication.tests import test_CommBase
-from yggdrasil.communication import ZMQComm, IPCComm
+from tests.communication import TestComm as base_class
 
 
-_zmq_installed = ZMQComm.ZMQComm.is_installed(language='python')
-_ipc_installed = IPCComm.IPCComm.is_installed(language='python')
+class TestZMQComm(base_class):
+    r"""Test for ZMQComm with non-default protocols and socket types."""
 
+    test_send_recv_nolimit = None
+    test_eof_no_close = None
 
-@unittest.skipIf(not _zmq_installed, "ZMQ library not installed")
-def test_get_socket_type_mate():
-    r"""Test socket type matching."""
-    for s, r in ZMQComm._socket_type_pairs:
-        assert_equal(ZMQComm.get_socket_type_mate(s), r)
-        assert_equal(ZMQComm.get_socket_type_mate(r), s)
-    assert_raises(ValueError, ZMQComm.get_socket_type_mate, 'INVALID')
+    @pytest.fixture(scope="class", autouse=True, params=["zmq"])
+    def component_subtype(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
 
+    @pytest.fixture(scope="class", autouse=True, params=[False])
+    def use_async(self, request):
+        r"""Whether communicator should be asynchronous or not."""
+        return request.param
 
-@unittest.skipIf(not _zmq_installed, "ZMQ library not installed")
-def test_format_address():
-    r"""Test format/parse of address."""
-    protocol = 'tcp'
-    host = '127.0.0.1'
-    port = 5555
-    address = ZMQComm.format_address(protocol, host, port)
-    result = ZMQComm.parse_address(address)
-    assert_equal(result['protocol'], protocol)
-    assert_equal(result['host'], host)
-    assert_equal(result['port'], port)
-    assert_raises(ValueError, ZMQComm.parse_address, 'INVALID')
-    assert_raises(ValueError, ZMQComm.parse_address, 'INVALID://')
+    @pytest.fixture(scope="class", autouse=True,
+                    params=["inproc", "tcp", "ipc"])
+    # Unsupported ['udp', 'pgm', 'epgm']
+    def protocol(self, request):
+        r"""Protocol that should be used."""
+        return request.param
 
+    @pytest.fixture(scope="class", autouse=True,
+                    params=['PAIR', 'PUSH', 'PUB', 'ROUTER'])
+    def socket_type(self, request, protocol):
+        r"""Socket type that should be used."""
+        if (((((protocol, request.param) == ('tcp', 'PAIR'))
+              or ((protocol != 'tcp') and (request.param != 'PAIR')))
+             and ((protocol, request.param) != ('inproc', 'PUSH')))):
+            pytest.skip("Redundent combination.")
+        return request.param
 
-@unittest.skipIf(not _zmq_installed, "ZMQ library not installed")
-def test_invalid_protocol():
-    r"""Test raise of an error in the event of an invalid protocol."""
-    assert_raises(ValueError, new_comm, 'test_invalid_protocol',
-                  commtype='zmq', protocol='invalid')
+    @pytest.fixture(scope="class", autouse=True)
+    def check_protocol(self, protocol):
+        r"""Check that the protocol is installed."""
+        if protocol == "ipc":
+            from yggdrasil.communication import IPCComm
+            if not IPCComm.IPCComm.is_installed(language='python'):
+                pytest.skip("IPC not installed.")
 
+    @pytest.fixture(scope="class")
+    def sleep_after_connect(self, socket_type):
+        r"""Indicates if sleep should occur after comm creation."""
+        return (socket_type == 'ROUTER')
 
-@unittest.skipIf(not _zmq_installed, "ZMQ library not installed")
-@unittest.skipIf(platform._is_mac, "Testing on MacOS")
-@unittest.skipIf(platform._is_win, "Testing on Windows")
-def test_error_on_send_open_twice():
-    r"""Test creation of the same send socket twice for an error."""
-    import zmq
-    for s, r in ZMQComm._socket_type_pairs:
-        # Send comm
-        name1 = 'test_%s' % s
-        comm1 = new_comm(name1 + '_1', commtype='zmq', socket_type=s,
-                         dont_open=True, socket_action='bind')
-        assert_raises(zmq.ZMQError, ZMQComm.ZMQComm,
-                      name1 + '_2', socket_type=s,
-                      address=comm1.opp_address, socket_action='bind')
-        comm1.close()
-
-        
-@unittest.skipIf(not _zmq_installed, "ZMQ library not installed")
-class TestZMQComm(test_CommBase.TestCommBase):
-    r"""Test for ZMQComm communication class."""
-
-    comm = 'ZMQComm'
-    attr_list = (copy.deepcopy(test_CommBase.TestCommBase.attr_list)
-                 + ['context', 'socket', 'socket_type_name',
-                    'socket_type', 'protocol', 'host', 'port'])
-    protocol = None
-    socket_type = None
-
-    @property
-    def description_prefix(self):
-        r"""String prefix to prepend docstr test message with."""
-        return '%s(%s, %s)' % (self.comm, self.protocol, self.socket_type)
-
-    @property
-    def send_inst_kwargs(self):
-        r"""Keyword arguments for send instance."""
-        out = super(TestZMQComm, self).send_inst_kwargs
-        out['protocol'] = self.protocol
-        out['socket_type'] = self.socket_type
+    @pytest.fixture(scope="class")
+    def testing_options(self, python_class, options, protocol, socket_type):
+        r"""Testing options."""
+        out = python_class.get_testing_options(**options)
+        out['kwargs'].update(protocol=protocol, socket_type=socket_type)
         return out
 
-    def test_send_recv_nolimit(self):
-        r"""Send/recv of large message."""
-        if self.__class__ != TestZMQComm:
-            raise unittest.SkipTest('Only test once')
-        super(TestZMQComm, self).test_send_recv_nolimit()
+    def test_router_recv(self, socket_type, send_comm, recv_comm,
+                         testing_options, do_send_recv):
+        r"""Test router receipt of message from the dealer with an
+        identity."""
+        if socket_type != 'ROUTER':
+            pytest.skip("Only valid for ROUTER socket_type")
+        temp = send_comm
+        send_comm = recv_comm
+        recv_comm = temp
+        send_comm.direction = 'send'
+        recv_comm.direction = 'recv'
+        do_send_recv(send_comm, recv_comm,
+                     send_params={'kwargs': {
+                         'identity': recv_comm.dealer_identity}})
+        send_comm.direction = 'recv'
+        recv_comm.direction = 'send'
 
-    def test_eof_no_close(self):
-        r"""Test send/recv of EOF message with no close."""
-        if self.__class__ != TestZMQComm:
-            raise unittest.SkipTest('Only test once')
-        super(TestZMQComm, self).test_eof_no_close()
-        
-    
-# Tests for server/client
-class TestZMQComm_client(TestZMQComm):
+    def test_get_socket_type_mate(self, run_once, python_module):
+        r"""Test socket type matching."""
+        for s, r in python_module._socket_type_pairs:
+            assert(python_module.get_socket_type_mate(s) == r)
+            assert(python_module.get_socket_type_mate(r) == s)
+        with pytest.raises(ValueError):
+            python_module.get_socket_type_mate('INVALID')
+
+    def test_format_address(self, run_once, python_module):
+        r"""Test format/parse of address."""
+        protocol = 'tcp'
+        host = '127.0.0.1'
+        port = 5555
+        address = python_module.format_address(protocol, host, port)
+        result = python_module.parse_address(address)
+        assert(result['protocol'] == protocol)
+        assert(result['host'] == host)
+        assert(result['port'] == port)
+        with pytest.raises(ValueError):
+            python_module.parse_address('INVALID')
+        with pytest.raises(ValueError):
+            python_module.parse_address('INVALID://')
+
+    def test_invalid_protocol(self, run_once, commtype):
+        r"""Test raise of an error in the event of an invalid protocol."""
+        from yggdrasil.communication import new_comm
+        with pytest.raises(ValueError):
+            new_comm('test_invalid_protocol', commtype=commtype,
+                     protocol='invalid')
+
+    @pytest.mark.skipif(platform._is_mac, reason="Testing on MacOS")
+    @pytest.mark.skipif(platform._is_win, reason="Testing on Windows")
+    def test_error_on_send_open_twice(self, run_once, python_module,
+                                      python_class):
+        r"""Test creation of the same send socket twice for an error."""
+        from yggdrasil.communication import new_comm
+        import zmq
+        for s, r in python_module._socket_type_pairs:
+            # Send comm
+            name1 = 'test_%s' % s
+            comm1 = new_comm(name1 + '_1', commtype='zmq', socket_type=s,
+                             dont_open=True, socket_action='bind')
+            with pytest.raises(zmq.ZMQError):
+                python_class(name1 + '_2', socket_type=s,
+                             address=comm1.opp_address, socket_action='bind')
+            comm1.close()
+
+
+class TestZMQCommClient(TestZMQComm):
     r"""Test for ZMQComm communication class for client/server."""
 
     test_drain_messages = None
 
-    @property
-    def send_inst_kwargs(self):
-        r"""Keyword arguments for send instance."""
-        out = super(TestZMQComm_client, self).send_inst_kwargs
-        out['is_client'] = True
+    @pytest.fixture(scope="class", autouse=True, params=['tcp', 'ipc'])
+    def protocol(self, request):
+        r"""Protocol that should be used."""
+        return request.param
+
+    @pytest.fixture(scope="class", autouse=True, params=['PAIR'])
+    def socket_type(self, request, protocol):
+        r"""Socket type that should be used."""
+        return request.param
+
+    @pytest.fixture(scope="class")
+    def testing_options(self, python_class, options, protocol, socket_type):
+        r"""Testing options."""
+        out = python_class.get_testing_options(**options)
+        out['kwargs'].update(protocol=protocol, socket_type=socket_type,
+                             is_client=True)
         return out
-
-    
-# Tests for all the supported protocols
-class TestZMQCommINPROC(TestZMQComm):
-    r"""Test for ZMQComm communication class with INPROC socket."""
-
-    protocol = 'inproc'
-
-    
-class TestZMQCommTCP(TestZMQComm):
-    r"""Test for ZMQComm communication class with TCP socket."""
-
-    protocol = 'tcp'
-
-    
-@unittest.skipIf(not _ipc_installed, "IPC library not installed")
-class TestZMQCommIPC(TestZMQComm):
-    r"""Test for ZMQComm communication class with IPC socket."""
-
-    protocol = 'ipc'
-
-
-class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
-    r"""Test for ZMQComm communication class with IPC socket."""
-    pass
-    
-
-# Unsupported
-# class TestZMQCommUDP(TestZMQComm):
-#     r"""Test for ZMQComm communication class with UDP socket."""
-
-#     protocol = 'udp'
-
-
-# class TestZMQCommPGM(TestZMQComm):
-#     r"""Test for ZMQComm communication class with PGM socket."""
-
-#     protocol = 'pgm'
-
-    
-# class TestZMQCommEPGM(TestZMQComm):
-#     r"""Test for ZMQComm communication class with EPGM socket."""
-
-#     protocol = 'epgm'
-
-
-# Tests for all the socket types
-class TestZMQCommPAIR(TestZMQComm):
-    r"""Test for ZMQComm communication class with PAIR/PAIR socket."""
-
-    socket_type = 'PAIR'
-
-    
-class TestZMQCommPUSH(TestZMQComm):
-    r"""Test for ZMQComm communication class with PUSH/PULL socket."""
-
-    socket_type = 'PUSH'
-
-    
-class TestZMQCommPUSH_INPROC(TestZMQCommINPROC):
-    r"""Test for ZMQComm communication class with INPROC PUSH/PULL socket."""
-
-    socket_type = 'PUSH'
-
-    
-class TestZMQCommPUB(TestZMQComm):
-    r"""Test for ZMQComm communication class with PUB/SUB socket."""
-
-    socket_type = 'PUB'
 
 
 class TestZMQCommREQ(TestZMQComm):
     r"""Test for ZMQComm communication class with REP/REQ socket."""
 
-    socket_type = 'REQ'
+    @pytest.fixture(scope="class", autouse=True, params=['tcp'])
+    def protocol(self, request):
+        r"""Protocol that should be used."""
+        return request.param
 
-    def test_send_recv_condition(self):
-        r"""Test send/recv with conditional."""
-        pass
+    @pytest.fixture(scope="class", autouse=True, params=['REQ'])
+    def socket_type(self, request, protocol):
+        r"""Socket type that should be used."""
+        return request.param
 
-    def test_send_recv_filter_eof(self, **kwargs):
+    test_send_recv_condition = None
+
+    def test_send_recv_filter_eof(self, filtered_comms, do_send_recv,
+                                  send_comm, recv_comm, polling_interval):
         r"""Test send/recv of EOF with filter."""
-        self.setup_filters()
-        self.assert_raises(RuntimeError, self.do_send_recv,
-                           send_meth='send_eof')
+        with pytest.raises(RuntimeError):
+            do_send_recv(send_comm, recv_comm,
+                         send_params={'method': 'send_eof'},
+                         recv_params={'skip_wait': True,
+                                      'timeout': polling_interval,
+                                      'flag': False})
 
-    def test_send_recv_filter_pass(self, **kwargs):
+    def test_send_recv_filter_pass(self, filtered_comms, do_send_recv,
+                                   send_comm, recv_comm, msg_filter_pass):
         r"""Test send/recv with filter that passes both messages."""
-        self.setup_filters()
-        kwargs.setdefault('msg_send', self.msg_filter_pass)
-        kwargs.setdefault('msg_recv', self.msg_filter_pass)
-        self.assert_raises(RuntimeError, self.do_send_recv, **kwargs)
+        with pytest.raises(RuntimeError):
+            do_send_recv(send_comm, recv_comm, msg_filter_pass)
         
-    def test_send_recv_filter_send_filter(self, **kwargs):
+    def test_send_recv_filter_send_filter(self, filtered_comms, do_send_recv,
+                                          send_comm, recv_comm,
+                                          msg_filter_send, polling_interval):
         r"""Test send/recv with filter that blocks send."""
-        self.setup_filters()
-        kwargs.setdefault('msg_send', self.msg_filter_send)
-        kwargs.setdefault('msg_recv', self.recv_instance.empty_obj_recv)
-        kwargs.setdefault('recv_timeout', self.sleeptime)
-        kwargs.setdefault('no_recv', True)
-        self.assert_raises(RuntimeError, self.do_send_recv, **kwargs)
+        with pytest.raises(RuntimeError):
+            do_send_recv(send_comm, recv_comm, msg_filter_send,
+                         recv_params={'message': recv_comm.empty_obj_recv,
+                                      'timeout': polling_interval,
+                                      'skip_wait': True})
         
-    def test_send_recv_filter_recv_filter(self, **kwargs):
+    def test_send_recv_filter_recv_filter(self, filtered_comms, do_send_recv,
+                                          send_comm, recv_comm,
+                                          msg_filter_recv, polling_interval):
         r"""Test send/recv with filter that blocks recv."""
-        self.setup_filters()
-        kwargs.setdefault('msg_send', self.msg_filter_recv)
-        kwargs.setdefault('msg_recv', self.recv_instance.empty_obj_recv)
-        kwargs.setdefault('recv_timeout', 10 * self.sleeptime)
-        self.assert_raises(RuntimeError, self.do_send_recv, **kwargs)
-    
-
-class TestZMQCommROUTER(TestZMQComm):
-    r"""Test for ZMQComm communication class with DEALER/ROUTER socket."""
-
-    socket_type = 'ROUTER'
-
-    def setup(self, *args, **kwargs):
-        r"""Initialize comm object pair with sleep after setup to ensure
-        dealer has connected."""
-        kwargs['sleep_after_connect'] = True
-        super(TestZMQCommROUTER, self).setup(*args, **kwargs)
-
-    def test_router_recv(self):
-        r"""Test router receipt of message from the dealer with an identity."""
-        self.do_send_recv(reverse_comms=True, send_kwargs=dict(
-            identity=self.recv_instance.dealer_identity))
-
-
-# @unittest.skipIf(_zmq_installed, "ZMQ library installed")
-# def test_not_running():
-#     r"""Test raise of an error if a ZMQ library is not installed."""
-#     comm_kwargs = dict(commtype='zmq', direction='send', reverse_names=True)
-#     assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)
+        with pytest.raises(RuntimeError):
+            do_send_recv(send_comm, recv_comm, msg_filter_recv,
+                         recv_params={'message': recv_comm.empty_obj_recv,
+                                      'timeout': 10 * polling_interval,
+                                      'skip_wait': True})

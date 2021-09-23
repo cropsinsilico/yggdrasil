@@ -256,3 +256,22 @@ class PythonModelDriver(InterpretedModelDriver):
             self.validation_command = (
                 f"{self.get_interpreter()} {self.validation_command}")
         return super(PythonModelDriver, self).run_validation()
+
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for driver instance.
+                deps (list): Dependencies to install.
+
+        """
+        out = super(PythonModelDriver, cls).get_testing_options(**kwargs)
+        out['deps'] = [{'package': 'numpy', 'arguments': '-v'},
+                       'requests', 'pyyaml']
+        return out

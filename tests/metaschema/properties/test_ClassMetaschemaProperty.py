@@ -1,21 +1,34 @@
-from yggdrasil.metaschema.properties.tests import (
-    test_MetaschemaProperty as parent)
+import pytest
+from tests.metaschema.properties.test_MetaschemaProperty import (
+    TestMetaschemaProperty as base_class)
 
 
-class TestClassMetaschemaProperty(parent.TestMetaschemaProperty):
+class TestClassMetaschemaProperty(base_class):
     r"""Test class for ClassMetaschemaProperty class."""
     
-    _mod = 'ClassMetaschemaProperty'
+    _mod = 'yggdrasil.metaschema.properties.ClassMetaschemaProperty'
     _cls = 'ClassMetaschemaProperty'
     
-    def __init__(self, *args, **kwargs):
-        super(TestClassMetaschemaProperty, self).__init__(*args, **kwargs)
-        self._valid = [(int(1), int), (dict(), dict)]
-        self._invalid = [(int(1), dict), (dict(), int)]
-        self._encode_errors = []
-        self._valid_compare = [(int, int), (int, (int, float)),
-                               ([int, float], int),
-                               ([int, float], (dict, float))]
-        self._invalid_compare = [(int, float), (int, (dict, float)),
-                                 ((int, dict), float),
-                                 ((int, float), (dict, list))]
+    @pytest.fixture(scope="class")
+    def valid(self):
+        r"""Objects that are valid."""
+        return [(int(1), int), (dict(), dict)]
+
+    @pytest.fixture(scope="class")
+    def invalid(self):
+        r"""Objects that are invalid."""
+        return [(int(1), dict), (dict(), int)]
+
+    @pytest.fixture(scope="class")
+    def valid_compare(self):
+        r"""Objects that successfully compare."""
+        return [(int, int), (int, (int, float)),
+                ([int, float], int),
+                ([int, float], (dict, float))]
+
+    @pytest.fixture(scope="class")
+    def invalid_compare(self):
+        r"""Objects that do not successfully compare."""
+        return [(int, float), (int, (dict, float)),
+                ((int, dict), float),
+                ((int, float), (dict, list))]

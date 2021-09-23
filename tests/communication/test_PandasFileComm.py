@@ -1,25 +1,44 @@
+import pytest
 import numpy as np
 import pandas
-from yggdrasil.communication.tests import test_AsciiTableComm as parent
+from tests.communication.test_AsciiTableComm import (
+    TestAsciiTableComm as base_class)
 
 
-class TestPandasFileComm(parent.TestAsciiTableComm):
+@pytest.mark.usefixtures("pandas_equality_patch")
+class TestPandasFileComm(base_class):
     r"""Test for PandasFileComm communication class."""
 
-    comm = 'PandasFileComm'
+    @pytest.fixture(scope="class", autouse=True, params=["pandas"])
+    def component_subtype(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
 
+    @pytest.fixture(scope="class", autouse=True,
+                    params=[{}, {'no_names': True}])
+    def options(self, request):
+        r"""Arguments that should be provided when getting testing options."""
+        return request.param
 
-class TestPandasFileComm_nonames(TestPandasFileComm):
-    r"""Test for PandasFileComm communication class without field names sent."""
-
-    testing_option_kws = {'no_names': True}
+    @pytest.fixture(scope="class")
+    def map_sent2recv(self, testing_options):
+        r"""Factory for method to convert sent messages to received."""
+        def wrapped_map_sent2recv(obj):
+            return obj
+        return wrapped_map_sent2recv
 
 
 class TestPandasFileComm_single(TestPandasFileComm):
     r"""Test for PandasFileComm communication class with field names sent."""
 
-    def get_options(self):
-        r"""Get testing options."""
+    @pytest.fixture(scope="class", autouse=True, params=[{}])
+    def options(self, request):
+        r"""Arguments that should be provided when getting testing options."""
+        return request.param
+    
+    @pytest.fixture(scope="class")
+    def testing_options(self):
+        r"""Testing options."""
         nele = 5
         dtype = np.dtype(dict(formats=['float'], names=['f0']))
         arr1 = np.zeros((nele, ), dtype)
@@ -38,7 +57,9 @@ class TestPandasFileComm_single(TestPandasFileComm):
         out['msg_array'] = arr1
         return out
 
-    def test_send_dict_default(self):
+    def test_send_dict_default(self, send_comm, recv_comm, testing_options,
+                               do_send_recv):
         r"""Test automated conversion of dictionary to pandas data frame."""
-        self.do_send_recv(msg_send=self.testing_options['dict'],
-                          msg_recv=self.testing_options['msg'])
+        do_send_recv(send_comm, recv_comm,
+                     send_params={'message': testing_options['dict']},
+                     recv_params={'message': testing_options['msg']})

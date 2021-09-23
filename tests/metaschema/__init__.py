@@ -1,11 +1,11 @@
+import pytest
 import os
 import pprint
 import numpy as np
 import shutil
 import tempfile
 import warnings
-from yggdrasil import metaschema
-from yggdrasil.tests import assert_raises, assert_equal
+from yggdrasil import metaschema, constants
 
 
 def test_func():  # pragma: debug
@@ -81,7 +81,8 @@ _normalize_objects = [
 def test_create_metaschema():
     r"""Test errors in create_metaschema."""
     assert(metaschema.get_metaschema())
-    assert_raises(RuntimeError, metaschema.create_metaschema, overwrite=False)
+    with pytest.raises(RuntimeError):
+        metaschema.create_metaschema(overwrite=False)
 
 
 def test_get_metaschema():
@@ -103,7 +104,7 @@ def test_get_metaschema():
                                new_id, old_id))
         else:
             try:
-                assert_equal(new_metaschema, old_metaschema)
+                assert(new_metaschema == old_metaschema)
             except AssertionError:  # pragma: debug
                 print("Old:\n%s" % pprint.pformat(old_metaschema))
                 print("New:\n%s" % pprint.pformat(new_metaschema))
@@ -131,7 +132,23 @@ def test_normalize_instance():
         z = metaschema.normalize_instance(x, schema, test_attr=1,
                                           show_errors=(x != y))
         try:
-            assert_equal(z, y)
+            assert(z == y)
         except BaseException:  # pragma: debug
             print(schema, x, y, z)
             raise
+
+
+def test_data2dtype_errors():
+    r"""Check that error is raised for list, dict, & tuple objects."""
+    with pytest.raises(metaschema.MetaschemaTypeError):
+        metaschema.data2dtype([])
+
+
+def test_definition2dtype_errors():
+    r"""Check that error raised if type not specified."""
+    with pytest.raises(KeyError):
+        metaschema.definition2dtype({})
+    with pytest.raises(RuntimeError):
+        metaschema.definition2dtype({'type': 'float'})
+    assert(metaschema.definition2dtype({'type': 'bytes'})
+           == np.dtype((constants.VALID_TYPES['bytes'])))

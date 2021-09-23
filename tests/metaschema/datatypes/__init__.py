@@ -1,8 +1,8 @@
-from yggdrasil.tests import assert_raises, assert_equal
+import pytest
 from yggdrasil.metaschema import datatypes, MetaschemaTypeError
-from yggdrasil.metaschema.tests import _valid_objects
 from yggdrasil.metaschema.datatypes.ScalarMetaschemaType import (
     ScalarMetaschemaType)
+from tests.metaschema import _valid_objects
 
 
 def test_registry_operations():
@@ -16,20 +16,24 @@ def test_get_type_class():
     r"""Test get_type_class."""
     for v in _valid_objects.keys():
         datatypes.get_type_class(v)
-    assert_raises(ValueError, datatypes.get_type_class, 'invalid')
+    with pytest.raises(ValueError):
+        datatypes.get_type_class('invalid')
 
 
 def test_register_type_errors():
     r"""Test errors in register_type for duplicate."""
-    assert_raises(ValueError, datatypes.register_type, ScalarMetaschemaType)
+    with pytest.raises(ValueError):
+        datatypes.register_type(ScalarMetaschemaType)
     type_args = ('FakeType', (ScalarMetaschemaType, ),
                  {'name': 'new', 'properties': ['invalid']})
-    assert_raises(ValueError, type, *type_args)
+    with pytest.raises(ValueError):
+        type(*type_args)
     
 
 def test_add_type_from_schema_errors():
     r"""Test errors in add_type_from_schema."""
-    assert_raises(ValueError, datatypes.add_type_from_schema, 'invalid_file')
+    with pytest.raises(ValueError):
+        datatypes.add_type_from_schema('invalid_file')
 
 
 def test_get_type_from_def():
@@ -38,36 +42,38 @@ def test_get_type_from_def():
     datatypes.get_type_from_def({'type': 'float'})
     datatypes.get_type_from_def({'a': 'float', 'b': 'int'})
     datatypes.get_type_from_def(['float', 'int'])
-    assert_raises(TypeError, datatypes.get_type_from_def, None)
+    with pytest.raises(TypeError):
+        datatypes.get_type_from_def(None)
 
 
 def test_guess_type_from_msg():
     r"""Test guess_type_from_msg."""
-    assert_raises(ValueError, datatypes.guess_type_from_msg,
-                  b'fake message')
+    with pytest.raises(ValueError):
+        datatypes.guess_type_from_msg(b'fake message')
 
 
 def test_guess_type_from_obj():
     r"""Test guess_type_from_obj."""
     invalid_objects = [object()]  # , object()]
     for t, x in _valid_objects.items():
-        assert_equal(datatypes.guess_type_from_obj(x).name, t)
+        assert(datatypes.guess_type_from_obj(x).name == t)
     for x in invalid_objects:
-        assert_raises(MetaschemaTypeError,
-                      datatypes.guess_type_from_obj, x)
+        with pytest.raises(MetaschemaTypeError):
+            datatypes.guess_type_from_obj(x)
 
 
-def test_encode_decode():
+def test_encode_decode(nested_approx):
     r"""Test encode/decode for valid objects."""
     for x in _valid_objects.values():
         y = datatypes.encode(x)
         z = datatypes.decode(y)
-        assert_equal(z, x)
+        assert(z == nested_approx(x))
         t = datatypes.encode_type(x)
         d = datatypes.encode_data(x)
         w = datatypes.decode_data(d, t)
-        assert_equal(w, x)
-    assert_raises(ValueError, datatypes.decode_data, b'', None)
+        assert(w == nested_approx(x))
+    with pytest.raises(ValueError):
+        datatypes.decode_data(b'', None)
 
 
 def test_encode_decode_readable():

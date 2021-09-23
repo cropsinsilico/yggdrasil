@@ -1,120 +1,108 @@
-import unittest
+import pytest
 import uuid
-import copy
 from yggdrasil.communication import new_comm
-from yggdrasil.communication.tests import test_CommBase
+from tests.communication import TestComm as base_class
 
 
-class TestServerComm(test_CommBase.TestCommBase):
+class TestServerComm(base_class):
     r"""Tests for ServerComm communication class."""
 
-    comm = 'ServerComm'
-    attr_list = (copy.deepcopy(test_CommBase.TestCommBase.attr_list)
-                 + ['response_kwargs', 'icomm', 'ocomm'])
+    test_error_send = None
+    test_error_recv = None
+    test_invalid_direction = None
+    test_work_comm = None
+    test_send_recv_raw = None
 
-    @property
-    def send_inst_kwargs(self):
-        r"""dict: Keyword arguments for send instance."""
-        return {'commtype': 'client', 'direct_connection': True}
-    
-    @unittest.skipIf(True, 'Server')
-    def test_error_send(self):
-        r"""Disabled: Test error on send."""
-        pass  # pragma: no cover
-        
-    @unittest.skipIf(True, 'Server')
-    def test_error_recv(self):
-        r"""Disabled: Test error on recv."""
-        pass  # pragma: no cover
-        
-    @unittest.skipIf(True, 'Server')
-    def test_invalid_direction(self):
-        r"""Disabled: Test of error on incorrect direction."""
-        pass  # pragma: no cover
-    
-    @unittest.skipIf(True, 'Server')
-    def test_work_comm(self):
-        r"""Disabled: Test creating/removing a work comm."""
-        pass  # pragma: no cover
+    @pytest.fixture(scope="class", autouse=True, params=['server'])
+    def component_subtype(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
 
-    def test_newcomm_server(self):
+    @pytest.fixture(scope="class", autouse=True)
+    def python_class(self):
+        r"""Python class that is being tested."""
+        from yggdrasil.communication.ServerComm import ServerComm
+        return ServerComm
+
+    def get_send_comm_kwargs(self, commtype, send_comm,
+                             testing_options, **kwargs):
+        r"""Get keyword arguments for creating a send comm."""
+        kwargs.update(direct_connection=True)
+        out = super(TestServerComm, self).get_send_comm_kwargs(
+            'client', send_comm, testing_options, **kwargs)
+        return out
+
+    def test_newcomm_server(self, commtype, close_comm):
         r"""Test creation of server using newcomm."""
         inst = new_comm('testserver_%s' % str(uuid.uuid4()),
-                        commtype=self.commtype)
-        self.remove_instance(inst)
+                        commtype=commtype)
+        close_comm(inst)
         
-    def test_eof_no_close(self):
-        r"""Test send/recv of EOF message with no close."""
-        # Forwards
-        self.recv_instance.icomm.close_on_eof_recv = False
-        self.do_send_recv(send_meth='send_eof', close_on_recv_eof=False)
-
-    def test_call(self):
+    def test_call(self, send_comm, recv_comm, testing_options, timeout,
+                  wait_on_function):
         r"""Test RPC call."""
-        self.send_instance.sched_task(0.0, self.send_instance.rpcCall,
-                                      args=[self.test_msg], store_output=True)
-        flag, msg_recv = self.recv_instance.rpcRecv(timeout=self.timeout)
+        send_comm.sched_task(0.0, send_comm.rpcCall,
+                             args=[testing_options['msg']],
+                             store_output=True)
+        flag, msg_recv = recv_comm.rpcRecv(timeout=timeout)
         assert(flag)
-        self.assert_equal(msg_recv, self.test_msg)
-        flag = self.recv_instance.rpcSend(msg_recv)
+        assert(msg_recv == testing_options['msg'])
+        flag = recv_comm.rpcSend(msg_recv)
         assert(flag)
-        T = self.recv_instance.start_timeout()
-        while (not T.is_out) and (self.send_instance.sched_out is None):  # pragma: debug
-            self.recv_instance.sleep()
-        self.recv_instance.stop_timeout()
-        flag, msg_recv = self.send_instance.sched_out
+        wait_on_function(lambda: (send_comm.sched_out is not None))
+        flag, msg_recv = send_comm.sched_out
         assert(flag)
-        self.assert_equal(msg_recv, self.test_msg)
+        assert(msg_recv == testing_options['msg'])
 
-    def test_call_alias(self):
+    def test_call_alias(self, send_comm, recv_comm, testing_options,
+                        timeout, polling_interval, wait_on_function):
         r"""Test RPC call aliases."""
-        # self.send_instance.sched_task(0.0, self.send_instance.rpcSend,
-        #                               args=[self.test_msg], store_output=True)
-        self.recv_instance.sched_task(self.sleeptime, self.recv_instance.rpcRecv,
-                                      kwargs=dict(timeout=self.timeout),
-                                      store_output=True)
-        flag = self.send_instance.rpcSend(self.test_msg)
+        # send_comm.sched_task(0.0, send_comm.rpcSend,
+        #                      args=[testing_options['msg']],
+        #                      store_output=True)
+        recv_comm.sched_task(polling_interval, recv_comm.rpcRecv,
+                             kwargs=dict(timeout=timeout),
+                             store_output=True)
+        flag = send_comm.rpcSend(testing_options['msg'])
         assert(flag)
-        T = self.recv_instance.start_timeout()
-        while (not T.is_out) and (self.recv_instance.sched_out is None):  # pragma: debug
-            self.recv_instance.sleep()
-        self.recv_instance.stop_timeout()
-        flag, msg_recv = self.recv_instance.sched_out
-        # flag, msg_recv = self.recv_instance.rpcRecv(timeout=self.timeout)
+        wait_on_function(lambda: (recv_comm.sched_out is not None))
+        flag, msg_recv = recv_comm.sched_out
+        # flag, msg_recv = recv_comm.rpcRecv(timeout=timeout)
         assert(flag)
-        self.assert_equal(msg_recv, self.test_msg)
-        flag = self.recv_instance.rpcSend(msg_recv)
+        assert(msg_recv == testing_options['msg'])
+        flag = recv_comm.rpcSend(msg_recv)
         assert(flag)
-        flag, msg_recv = self.send_instance.rpcRecv(timeout=self.timeout)
+        flag, msg_recv = send_comm.rpcRecv(timeout=timeout)
         assert(flag)
-        self.assert_equal(msg_recv, self.test_msg)
+        assert(msg_recv == testing_options['msg'])
 
-    def test_call_nolimit(self):
+    def test_call_nolimit(self, send_comm, recv_comm, msg_long, timeout,
+                          wait_on_function):
         r"""Test RPC nolimit call."""
-        self.send_instance.sched_task(0.0, self.send_instance.call_nolimit,
-                                      args=[self.msg_long], store_output=True)
-        msg = self.recv_instance.recv_nolimit(timeout=self.timeout,
-                                              return_message_object=True)
+        send_comm.sched_task(0.0, send_comm.call_nolimit,
+                             args=[msg_long], store_output=True)
+        msg = recv_comm.recv_nolimit(timeout=timeout,
+                                     return_message_object=True)
         flag = bool(msg.flag)
         msg_recv = msg.args
         header = msg.header
         assert(flag)
-        self.assert_equal(msg_recv, self.msg_long)
+        assert(msg_recv == msg_long)
         assert(isinstance(header, dict))
-        flag = self.recv_instance.send_nolimit(msg_recv)
+        flag = recv_comm.send_nolimit(msg_recv)
         assert(flag)
-        T = self.recv_instance.start_timeout()
-        while (not T.is_out) and (self.send_instance.sched_out is None):  # pragma: debug
-            self.recv_instance.sleep()
-        self.recv_instance.stop_timeout()
-        flag, msg_recv = self.send_instance.sched_out
+        T = recv_comm.start_timeout()
+        while (not T.is_out) and (send_comm.sched_out is None):  # pragma: debug
+            recv_comm.sleep()
+        recv_comm.stop_timeout()
+        flag, msg_recv = send_comm.sched_out
         assert(flag)
-        self.assert_equal(msg_recv, self.msg_long)
+        assert(msg_recv == msg_long)
 
-    def test_close_in_thread(self):
+    def test_close_in_thread(self, send_comm, recv_comm):
         r"""Test close of comm in thread."""
-        self.send_instance.close_in_thread()
-        self.recv_instance.close_in_thread()
+        send_comm.close_in_thread()
+        recv_comm.close_in_thread()
 
     def add_filter(self, comm, filter=None, **kwargs):
         r"""Add a filter to a comm.
@@ -133,20 +121,17 @@ class TestServerComm(test_CommBase.TestCommBase):
                                                       **kwargs)
         
     # # This dosn't work for comms that are uni-directional
-    # def test_purge_recv(self):
+    # def test_purge_recv(self, send_comm, recv_comm, testing_options,
+    #                     wait_on_function):
     #     r"""Test purging messages from the client comm."""
     #     # Purge send while open
-    #     if self.comm != 'CommBase':
-    #         flag = self.send_instance.send(self.test_msg)
-    #         assert(flag)
-    #         T = self.recv_instance.start_timeout()
-    #         while (not T.is_out) and (self.recv_instance.n_msg == 0):  # pragma: debug
-    #             self.recv_instance.sleep()
-    #         self.recv_instance.stop_timeout()
-    #         self.assert_equal(self.recv_instance.n_msg, 1)
-    #     self.send_instance.purge()
-    #     self.assert_equal(self.send_instance.n_msg, 0)
-    #     self.assert_equal(self.recv_instance.n_msg, 0)
+    #     flag = send_comm.send(testing_options['msg'])
+    #     assert(flag)
+    #     wait_on_function(lambda: (recv_comm.n_msg != 0))
+    #     assert(recv_comm.n_msg == 1)
+    #     send_comm.purge()
+    #     assert(send_comm.n_msg == 0)
+    #     assert(recv_comm.n_msg == 0)
     #     # Purge send while closed
-    #     self.send_instance.close()
-    #     self.send_instance.purge()
+    #     send_comm.close()
+    #     send_comm.purge()

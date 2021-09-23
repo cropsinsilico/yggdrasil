@@ -107,9 +107,17 @@ class InstanceMetaschemaType(MetaschemaType):
             object: Python object of the specified type.
 
         """
-        typedef = cls.normalize_definition(typedef)
         args = JSONArrayMetaschemaType.generate_data(
             {'type': 'array', 'items': typedef.get('args', [])})
         kwargs = JSONObjectMetaschemaType.generate_data(
             {'type': 'object', 'properties': typedef.get('kwargs', {})})
         return typedef['class'](*args, **kwargs)
+
+    @classmethod
+    def get_test_data(cls, typedef=None):
+        r"""object: Test data."""
+        if typedef is None:
+            from yggdrasil.metaschema.datatypes.ClassMetaschemaType import (
+                ExampleClass)
+            typedef = {'type': 'instance', 'class': ExampleClass}
+        return super(InstanceMetaschemaType, cls).get_test_data(typedef)

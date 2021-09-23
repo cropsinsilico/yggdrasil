@@ -120,3 +120,32 @@ class JSONObjectMetaschemaType(ContainerMetaschemaType):
             container_type = OrderedDict
         return super(JSONObjectMetaschemaType, cls)._encode_data_alias(
             obj, typedef, func_encode, container_type=container_type)
+
+    @classmethod
+    def get_test_data(cls, typedef=None):
+        r"""object: Test data."""
+        if (typedef is None) and (cls.name == 'object'):
+            typedef = {
+                'type': 'object',
+                'properties': {
+                    'a': {'type': 'float',
+                          'precision': 32,
+                          'units': ''},
+                    'b': {'type': 'bytes',
+                          'precision': 40,
+                          'units': ''},
+                    'c': {'type': 'unicode',
+                          'precision': 40,
+                          'units': ''},
+                    'd': {'type': 'object',
+                          'properties': {'nested': {'type': 'int',
+                                                    'precision': 64,
+                                                    'units': ''}}},
+                    'e': {'type': 'array',
+                          'items': [{'type': 'complex',
+                                     'precision': 128,
+                                     'units': ''},
+                                    {'type': 'uint',
+                                     'precision': 8,
+                                     'units': ''}]}}}
+        return super(JSONObjectMetaschemaType, cls).get_test_data(typedef)

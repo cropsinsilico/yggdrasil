@@ -1,35 +1,40 @@
-import unittest
-import copy
+import pytest
 import flaky
-from yggdrasil.tests import assert_raises, timeout
+from tests.communication import TestComm as base_class
 from yggdrasil.communication import new_comm
 from yggdrasil.communication.RMQComm import RMQComm
-from yggdrasil.communication.tests import test_RMQComm as parent
+from tests import timeout_decorator
 
 
-_rmq_installed = RMQComm.is_installed(language='python')
-
-
-@unittest.skipIf(not _rmq_installed, "RMQ Server not running")
 @flaky.flaky
-@timeout(timeout=60)
-class TestRMQAsyncComm(parent.TestRMQComm):
+@timeout_decorator(timeout=60)
+class TestRMQAsyncComm(base_class):
     r"""Test for RMQAsyncComm communication class."""
 
-    comm = 'RMQAsyncComm'
-    attr_list = (copy.deepcopy(parent.TestRMQComm.attr_list)
-                 + ['times_connected', 'rmq_thread', 'rmq_lock'])
+    @pytest.fixture(scope="class", autouse=True, params=["rmq_async"])
+    def component_subtype(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
 
-    def test_reconnect_recv(self):
+    @pytest.fixture(autouse=True)
+    def ensure_comm(self, send_comm, recv_comm):
+        pass
+
+    def test_reconnect_recv(self, send_comm, recv_comm, do_send_recv):
         r"""Test reconnect after unexpected disconnect of recv comm."""
-        self.do_send_recv(print_status=True)
-        self.recv_instance.connection.close(reply_code=100,
-                                            reply_text="Test shutdown")
-        self.recv_instance._reconnecting.started.wait(5)
-        self.recv_instance._reconnecting.stopped.wait(5)
-        assert(self.recv_instance.times_connected > 1)
-        assert(self.recv_instance._reconnecting.has_stopped())
-        self.do_send_recv(print_status=True)
+        send_comm.printStatus()
+        recv_comm.printStatus()
+        do_send_recv(send_comm, recv_comm)
+        recv_comm.connection.close(reply_code=100,
+                                   reply_text="Test shutdown")
+        recv_comm._reconnecting.started.wait(5)
+        recv_comm._reconnecting.stopped.wait(5)
+        assert(recv_comm.times_connected > 1)
+        assert(recv_comm._reconnecting.has_stopped())
+        recv_comm._opening.stopped.wait(5)
+        do_send_recv(send_comm, recv_comm)
+        send_comm.printStatus()
+        recv_comm.printStatus()
 
 
 class TestRMQAsyncCommNamedQueue(TestRMQAsyncComm):
@@ -60,28 +65,35 @@ class TestRMQAsyncCommNamedQueue(TestRMQAsyncComm):
     test_send_recv_raw = None
     test_work_comm = None
 
-    @property
-    def send_inst_kwargs(self):
-        r"""dict: Keyword arguments for send instance."""
-        out = super(TestRMQAsyncCommNamedQueue, self).send_inst_kwargs
-        out['queue'] = 'test_queue'
+    @pytest.fixture(scope="class")
+    def testing_options(self, python_class, options):
+        r"""Testing options."""
+        out = python_class.get_testing_options(**options)
+        out['kwargs'].update(queue='test_queue')
         return out
     
-    def test_reconnect_send(self):
+    def test_reconnect_send(self, send_comm, recv_comm, do_send_recv):
         r"""Test reconnect after unexpected disconnect of send comm."""
-        self.send_instance.start_run_thread()
-        self.do_send_recv(print_status=True)
-        self.send_instance.connection.close(reply_code=100,
-                                            reply_text="Test shutdown")
-        self.send_instance._reconnecting.started.wait(5)
-        self.send_instance._reconnecting.stopped.wait(10)
-        assert(self.send_instance.times_connected > 1)
-        assert(self.send_instance._reconnecting.has_stopped())
-        self.do_send_recv(print_status=True)
-        
+        send_comm.start_run_thread()
+        send_comm.printStatus()
+        recv_comm.printStatus()
+        do_send_recv(send_comm, recv_comm)
+        send_comm.connection.close(reply_code=100,
+                                   reply_text="Test shutdown")
+        send_comm._reconnecting.started.wait(5)
+        send_comm._reconnecting.stopped.wait(10)
+        assert(send_comm.times_connected > 1)
+        assert(send_comm._reconnecting.has_stopped())
+        do_send_recv(send_comm, recv_comm)
+        send_comm.printStatus()
+        recv_comm.printStatus()
 
-@unittest.skipIf(_rmq_installed, "RMQ Server running")
+
+@pytest.mark.skipif(RMQComm.is_installed(language='python'),
+                    reason="RMQ Server running")
 def test_not_running():
     r"""Test raise of an error if a RMQ server is not running."""
-    comm_kwargs = dict(commtype='rmq_async', direction='send', reverse_names=True)
-    assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)
+    comm_kwargs = dict(commtype='rmq_async', direction='send',
+                       reverse_names=True)
+    with pytest.raises(RuntimeError):
+        new_comm('test', **comm_kwargs)

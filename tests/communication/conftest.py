@@ -21,17 +21,23 @@ if _on_mpi:
             _mpi_error_exchange.reset(global_tag=_global_tag)
         return _mpi_error_exchange
 
-    def adv_global_mpi_tag(value=1):
-        global _mpi_error_exchange
-        assert(_mpi_error_exchange is not None)
-        out = _mpi_error_exchange.global_tag
-        _mpi_error_exchange.global_tag += value
-        return out
+    @pytest.fixture(scope="session")
+    def adv_global_mpi_tag():
+        def adv_global_mpi_tag_w(value=1):
+            global _mpi_error_exchange
+            assert(_mpi_error_exchange is not None)
+            out = _mpi_error_exchange.global_tag
+            _mpi_error_exchange.global_tag += value
+            return out
+        return adv_global_mpi_tag_w
 
-    def sync_mpi_exchange(*args, **kwargs):
-        global _mpi_error_exchange
-        assert(_mpi_error_exchange is not None)
-        return _mpi_error_exchange.sync(*args, **kwargs)
+    @pytest.fixture(scope="session")
+    def sync_mpi_exchange():
+        def sync_mpi_exchange_w(*args, **kwargs):
+            global _mpi_error_exchange
+            assert(_mpi_error_exchange is not None)
+            return _mpi_error_exchange.sync(*args, **kwargs)
+        return sync_mpi_exchange_w
 
     # Method of raising errors when other process fails
     # https://docs.pytest.org/en/latest/example/simple.html#
@@ -53,7 +59,8 @@ if _on_mpi:
         mpi_exchange.sync()
         yield
         failure = (request.node.rep_setup.failed
-                   or request.node.rep_call.failed)
+                   or getattr(getattr(request.node, 'rep_call', None),
+                              'failed', False))
         mpi_exchange.finalize(failure)
 
     # Monkey patch pytest-cov plugin with MPI Barriers to prevent multiple
@@ -94,3 +101,11 @@ if _on_mpi:
                 return True
 
             plugin._is_worker = new_is_worker
+
+
+else:
+    @pytest.fixture(scope="session")
+    def adv_global_mpi_tag():
+        def adv_global_mpi_tag_w(value=1):
+            return value
+        return adv_global_mpi_tag_w

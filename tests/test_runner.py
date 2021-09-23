@@ -1,11 +1,8 @@
 import pytest
 import os
-import unittest
 import signal
 import uuid
 from yggdrasil import runner, tools, platform, import_as_function
-from yggdrasil.tests import assert_raises, requires_language
-# from yggdrasil.tests import yamls as sc_yamls
 from yggdrasil.examples import yamls as ex_yamls
 
 
@@ -43,7 +40,8 @@ def test_run_process_connections():
 
 
 # Spawning fake Ctrl-C works locally for windows, but causes hang on appveyor
-@unittest.skipIf(platform._is_win, "Signal processing not sorted on windows")
+@pytest.mark.skipif(platform._is_win,
+                    reason="Signal processing not sorted on windows")
 def test_Arunner_interrupt():
     r"""Start a runner then stop it with a keyboard interrupt."""
     cr = runner.get_runner([ex_yamls['hello']['python']])
@@ -73,8 +71,8 @@ def test_runner_terminate():
 
 def test_runner_error():
     r"""Test error on missing yaml."""
-    assert_raises(IOError, runner.YggRunner,
-                  ['fake_yaml.yml'], 'test_ygg_run')
+    with pytest.raises(IOError):
+        runner.YggRunner(['fake_yaml.yml'], 'test_ygg_run')
 
 
 def test_import_as_function():
@@ -118,7 +116,7 @@ def test_import_as_function_server():
     fmodel.stop()
 
 
-@requires_language('c')
+@pytest.mark.language('c')
 def test_import_as_function_C():
     r"""Test import_as_function for C."""
     contents = r"""models:

@@ -1,176 +1,148 @@
+import pytest
+from tests import TestComponentBase as base_class
 import os
-import uuid
-from yggdrasil.tests import YggTestClassInfo
 
 
-class TestParam(YggTestClassInfo):
-    r"""Test parameters for basic Driver test class.
+class TestDriver(base_class):
+    r"""Test parameters for basic Driver test class."""
 
-    Attributes:
-        driver (str): Name of driver class.
-        args (object): Driver arguments.
-        namespace (str): PSI namespace to run drivers in.
-
-    """
-
-    driver = 'Driver'
-    args = None
-
-    def __init__(self, *args, **kwargs):
-        super(TestParam, self).__init__(*args, **kwargs)
-        self.namespace = 'TESTING_%s' % self.uuid
-        self.attr_list += ['name', 'sleeptime', 'longsleep', 'timeout',
-                           'yml', 'env', 'namespace', 'rank', 'working_dir',
-                           'lock']
-        self._inst_kwargs = {'yml': {'working_dir': self.working_dir},
-                             'timeout': self.timeout,
-                             'sleeptime': self.sleeptime,
-                             # 'working_dir': self.working_dir,
-                             'namespace': self.namespace}
-        self.debug_flag = False
-
-    def get_fresh_name(self):
-        r"""Get a fresh name for a new instance that won't overlap with the base."""
-        return 'Test%s_%s' % (self.cls, str(uuid.uuid4()))
-    
-    @property
+    @pytest.fixture(scope="class")
     def working_dir(self):
-        r"""str: Working directory."""
+        r"""Working director."""
         return os.path.dirname(__file__)
 
-    @property
-    def skip_start(self):
-        r"""bool: True if driver shouldn't be started. False otherwise."""
-        return ('NoStart' in str(self.__class__))
+    @pytest.fixture
+    def namespace(self, uuid):
+        r"""Unique name for the test communicators."""
+        return f"TESTING_{uuid}"
 
-    @property
-    def skip_init(self):
-        r"""bool: True fi driver shouldn't be initialized during startup.
-        False otherwise."""
-        return ('NoInit' in str(self.__class__))
-
-    @property
-    def cls(self):
-        r"""str: Driver class."""
-        return self.driver
-
-    @property
-    def mod(self):
-        r"""str: Absolute path to module containing driver."""
-        return 'yggdrasil.drivers.%s' % self.cls
-
-    @property
-    def inst_args(self):
-        r"""tuple: Driver arguments."""
-        out = [self.name]
-        if self.args is not None:
-            out.append(self.args)
-        return out
-
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for creating a class instance."""
-        out = super(TestParam, self).inst_kwargs
-        out['timeout'] = self.timeout
-        out['sleeptime'] = self.sleeptime
-        return out
-
-    def setup(self, *args, **kwargs):
-        r"""Create a driver instance and start the driver."""
-        super(TestParam, self).setup(*args, **kwargs)
-        if not (self.skip_init or self.skip_start):
-            self.instance.start()
-
-    @property
-    def name(self):
+    @pytest.fixture
+    def name(self, class_name, uuid):
         r"""str: Name of the test driver."""
-        return 'Test%s_%s' % (self.cls, self.uuid)
+        return f'Test{class_name}_{uuid}'
 
-    def create_instance(self, *args, **kwargs):
-        r"""Create a new instance object."""
+    @pytest.fixture
+    def instance_args(self, name):
+        r"""Arguments for a new instance of the tested class."""
+        return tuple([name])
+
+    @pytest.fixture
+    def instance_kwargs(self, testing_options, timeout, working_dir,
+                        polling_interval, namespace):
+        r"""Keyword arguments for a new instance of the tested class."""
+        return dict(testing_options.get('kwargs', {}),
+                    yml={'working_dir': working_dir},
+                    timeout=timeout, sleeptime=polling_interval,
+                    namespace=namespace)
+
+    @pytest.fixture
+    def instance(self, python_class, instance_args, instance_kwargs,
+                 verify_count_threads, verify_count_comms, verify_count_fds,
+                 working_dir, is_installed):
+        r"""New instance of the python class for testing."""
         curpath = os.getcwd()
+        os.chdir(working_dir)
+        out = python_class(*instance_args, **instance_kwargs)
         try:
-            os.chdir(self.working_dir)
-            inst = super(TestParam, self).create_instance(*args, **kwargs)
+            yield out
         finally:
+            if not out.was_started:
+                out.cleanup()
+            out.disconnect()
+            del out
             os.chdir(curpath)
-        return inst
 
-    def remove_instance(self, inst):
-        r"""Remove an instance."""
-        if not inst.was_terminated:
-            inst.terminate()
-        if inst.is_alive():  # pragma: debug
-            inst.join()
-        inst.cleanup()
-        assert(not inst.is_alive())
-        super(TestParam, self).remove_instance(inst)
+    @pytest.fixture(scope="class")
+    def before_instance_started(self):
+        r"""Actions performed after teh instance is created, but before it
+        is started."""
+        def before_instance_started_w(x):
+            pass
+        return before_instance_started_w
 
-
-class TestDriverNoInit(TestParam):
-    r"""Test runner for driver without initializing the driver."""
-    pass
-
+    @pytest.fixture(scope="class")
+    def after_instance_started(self):
+        r"""Action taken after the instance is started, but before tests
+        begin."""
+        def after_instance_started_w(x):
+            pass
+        return after_instance_started_w
         
-class TestDriverNoStart(TestParam):
-    r"""Test runner for basic Driver class without starting driver."""
+    @pytest.fixture
+    def started_instance(self, instance, before_instance_started,
+                         after_instance_started):
+        r"""Started version of the instance."""
+        before_instance_started(instance)
+        instance.start()
+        try:
+            after_instance_started(instance)
+            yield instance
+        finally:
+            if not instance.was_terminated:
+                instance.terminate()
+            if instance.is_alive():
+                instance.join()
+            instance.cleanup()
+            assert(not instance.is_alive())
 
-    def setup(self, *args, **kwargs):
-        r"""Create a driver instance without starting the driver."""
-        super(TestDriverNoStart, self).setup(*args, **kwargs)
-        assert(not self.instance.is_alive())
-
-    def test_attributes(self):
-        r"""Assert that the driver has all of the required attributes."""
-        for a in self.attr_list:
-            if not hasattr(self.instance, a):  # pragma: debug
-                raise AttributeError("Driver does not have attribute %s" % a)
-
-
-class TestDriver(TestParam):
-    r"""Test runner for basic Driver class."""
-
+    @pytest.fixture(scope="class")
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
-        pass
+        def assert_before_stop_w():
+            pass
+        return assert_before_stop_w
 
+    @pytest.fixture(scope="class")
     def run_before_terminate(self):
         r"""Commands to run while the instance is running, before terminate."""
-        pass
+        def run_before_terminate_w():
+            pass
+        return run_before_terminate_w
 
+    @pytest.fixture(scope="class")
     def run_before_stop(self):
         r"""Commands to run while the instance is running."""
-        pass
+        def run_before_stop_w():
+            pass
+        return run_before_stop_w
 
-    def assert_after_terminate(self):
+    @pytest.fixture
+    def assert_after_terminate(self, started_instance):
         r"""Assertions to make after terminating the driver instance."""
-        assert(not self.instance.is_alive())
+        def assert_after_terminate_w():
+            assert(not started_instance.is_alive())
+        return assert_after_terminate_w
 
-    def assert_after_stop(self):
+    @pytest.fixture
+    def assert_after_stop(self, assert_after_terminate):
         r"""Assertions to make after stopping the driver instance."""
-        self.assert_after_terminate()
+        def assert_after_stop_w():
+            assert_after_terminate()
+        return assert_after_stop_w
 
-    def test_init_del(self):
+    def test_init_del(self, started_instance):
         r"""Test driver creation and deletion."""
-        self.instance.printStatus()
-        self.instance.printStatus(return_str=True)
+        started_instance.printStatus()
+        started_instance.printStatus(return_str=True)
 
-    def test_run_stop(self):
+    def test_run_stop(self, started_instance, assert_before_stop,
+                      run_before_stop, assert_after_stop, polling_interval):
         r"""Start the thread, then stop it."""
-        self.assert_before_stop()
-        self.run_before_stop()
-        self.instance.wait(self.sleeptime)
-        self.instance.stop()
-        self.instance.stop()
-        self.assert_after_stop()
+        assert_before_stop()
+        run_before_stop()
+        started_instance.wait(polling_interval)
+        started_instance.stop()
+        started_instance.stop()
+        assert_after_stop()
 
-    def test_run_terminate(self):
+    def test_run_terminate(self, started_instance, assert_before_stop,
+                           run_before_terminate, assert_after_terminate):
         r"""Start the thread, then terminate it."""
-        self.assert_before_stop()
-        self.run_before_terminate()
-        self.instance.terminate()
+        assert_before_stop()
+        run_before_terminate()
+        started_instance.terminate()
         # Second time to ensure it is escaped
-        self.instance.terminate()
-        if self.instance.is_alive():  # pragma: debug
-            self.instance.join()
-        self.assert_after_terminate()
+        started_instance.terminate()
+        if started_instance.is_alive():  # pragma: debug
+            started_instance.join()
+        assert_after_terminate()

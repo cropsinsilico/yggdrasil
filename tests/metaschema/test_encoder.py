@@ -1,7 +1,7 @@
+import pytest
 import io as sio
 from collections import OrderedDict
 from yggdrasil.metaschema import encoder
-from yggdrasil.tests import assert_raises
 
 
 class TestClass(object):  # pragma: no cover
@@ -11,7 +11,8 @@ class TestClass(object):  # pragma: no cover
 def test_JSONEncoder():
     r"""Test JSONEncoder error."""
     x = TestClass()
-    assert_raises(TypeError, encoder.encode_json, x)
+    with pytest.raises(TypeError):
+        encoder.encode_json(x)
 
 
 def test_encode_yaml():

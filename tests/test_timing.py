@@ -1,21 +1,15 @@
+import pytest
 import os
 import sys
 import copy
-import unittest
 import flaky
 from yggdrasil import tools, timing, platform
-from yggdrasil.tests import YggTestClass, assert_raises, long_running
+from tests import TestClassBase as base_class
 
 
-_test_size = 1
-_test_count = 1
-_test_nrep = 1
 _test_lang = 'c'
-# On windows, it's possible to not have a C/C++ communication library installed
 if 'c' not in timing.get_lang_list():  # pragma: windows
     _test_lang = 'python'  # pragma: testing
-# _test_run = timing.TimedRun(_test_lang, _test_lang)
-# _test_run.time_run(_test_count, _test_size, nrep=_test_nrep)
 _this_platform = (platform._platform,
                   '%d.%d' % sys.version_info[:2],
                   tools.get_default_comm())
@@ -48,197 +42,239 @@ def test_platform_error():
                          'Windows': 'MacOS'}
     test_platform = test_platform_map[platform._platform]
     x = timing.TimedRun(_test_lang, _test_lang, platform=test_platform)
-    assert_raises(RuntimeError, x.can_run, raise_error=True)
+    with pytest.raises(RuntimeError):
+        x.can_run(raise_error=True)
 
 
-class TimedRunTestBase(YggTestClass):
+@pytest.mark.suite("timing", disabled=True)
+class TimedRunTestBase(base_class):
     r"""Base test class for the TimedRun class."""
 
     _mod = 'yggdrasil.timing'
     _cls = 'TimedRun'
-    test_name = 'timed_pipe'
-    _filename = None
-    platform = None
-    python_ver = None
-    comm_type = None
-    dont_use_pyperf = False
-    language = _test_lang
-    count = 1
-    size = 1
-    nrep = 1
-    max_errors = 5
 
-    @property
-    def inst_args(self):
-        r"""list: Arguments for creating a class instance."""
-        return [self.language, self.language]
+    @pytest.fixture
+    def count(self, instance):
+        r"""int: Number of messages to use for tests."""
+        return 1
 
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for creating a class instance."""
-        return {'test_name': self.test_name, 'filename': self._filename,
-                'platform': self.platform, 'python_ver': self.python_ver,
-                'comm_type': self.comm_type, 'dont_use_pyperf': self.dont_use_pyperf,
-                'max_errors': self.max_errors}
+    @pytest.fixture
+    def size(self, instance):
+        r"""int: Size of messages to use for tests."""
+        return 1
 
-    @property
-    def time_run_args(self):
+    @pytest.fixture
+    def nrep(self):
+        r"""int: Number of times to repeat."""
+        return 1
+
+    @pytest.fixture
+    def language(self):
+        r"""str: Language to test."""
+        return _test_lang
+
+    @pytest.fixture(scope="class", autouse=True, params=[False])
+    def dont_use_pyperf(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
+    
+    @pytest.fixture
+    def instance_args(self, language):
+        r"""Arguments for a new instance of the tested class."""
+        return (language, language)
+
+    @pytest.fixture
+    def instance_kwargs(self, dont_use_pyperf):
+        r"""Keyword arguments for a new instance of the tested class."""
+        return {'test_name': 'timed_pipe',
+                'filename': None,
+                'platform': None,
+                'python_ver': None,
+                'comm_type': None,
+                'dont_use_pyperf': dont_use_pyperf,
+                'max_errors': 5}
+
+    @pytest.fixture
+    def time_run_args(self, count, size):
         r"""tuple: Arguments for time_run."""
-        return (self.count, self.size)
+        return (count, size)
 
-    @property
-    def time_run_kwargs(self):
+    @pytest.fixture
+    def time_run_kwargs(self, nrep):
         r"""dict: Keyword arguments for time_run."""
-        return {'nrep': self.nrep}
+        return {'nrep': nrep}
 
-    @property
-    def entry_name(self):
+    @pytest.fixture
+    def entry_name(self, instance, time_run_args):
         r"""str: Name of the entry for the provided time_run_args."""
-        return self.instance.entry_name(*self.time_run_args)
+        return instance.entry_name(*time_run_args)
 
-    @property
-    def filename(self):
+    @pytest.fixture
+    def filename(self, instance):
         r"""str: Name of the file where data is stored."""
-        return self.instance.filename
+        return instance.filename
 
-    def check_filename(self):
+    @pytest.fixture
+    def check_filename(self, filename):
         r"""Raise a unittest.SkipTest error if the filename dosn't exist."""
-        if not os.path.isfile(self.filename):  # pragma: debug
-            raise unittest.SkipTest("Performance stats file dosn't exist: %s"
-                                    % self.filename)
+        if not os.path.isfile(filename):  # pragma: debug
+            pytest.skip(f"Performance stats file dosn't exist: {filename}")
 
-    def get_raw_data(self):
+    @pytest.fixture
+    def get_raw_data(self, filename):
         r"""Get the raw contents of the data file."""
-        out = ''
-        if os.path.isfile(self.filename):
-            with open(self.filename, 'r') as fd:
-                out = fd.read()
-        return out
+        def get_raw_data_w():
+            out = ''
+            if os.path.isfile(filename):
+                with open(filename, 'r') as fd:
+                    out = fd.read()
+            return out
+        return get_raw_data_w
 
-    def time_run(self):
+    @pytest.fixture
+    def time_run(self, instance, time_run_args, time_run_kwargs):
         r"""Perform a timed run."""
-        self.instance.time_run(*self.time_run_args, **self.time_run_kwargs)
+        def time_run_w(inst=instance):
+            inst.time_run(*time_run_args, **time_run_kwargs)
+        return time_run_w
 
 
-@unittest.skipIf(not tools.check_environ_bool("YGG_TEST_PRODUCTION_RUNS"),
-                 'YGG_TEST_PRODUCTION_RUNS not set')
-@long_running
+@pytest.mark.production_run
 class TestTimedRun(TimedRunTestBase):
     r"""Test class for the TimedRun class using existing data."""
 
-    platform = _base_environment['platform']
-    python_ver = _base_environment['python_ver']
-    comm_type = _base_environment['comm_type']
-    language = 'python'
+    @pytest.fixture
+    def instance_kwargs(self, dont_use_pyperf):
+        r"""Keyword arguments for a new instance of the tested class."""
+        return {'test_name': 'timed_pipe',
+                'filename': None,
+                'platform': _base_environment['platform'],
+                'python_ver': _base_environment['python_ver'],
+                'comm_type': _base_environment['comm_type'],
+                'dont_use_pyperf': dont_use_pyperf,
+                'max_errors': 5}
 
-    @property
-    def count(self):
+    @pytest.fixture
+    def count(self, instance):
         r"""int: Number of messages to use for tests."""
-        return self.instance.base_msg_count
+        return instance.base_msg_count
 
-    @property
-    def size(self):
+    @pytest.fixture
+    def size(self, instance):
         r"""int: Size of messages to use for tests."""
-        return self.instance.base_msg_size
+        return instance.base_msg_size
 
-    def test_json(self):
+    @pytest.fixture
+    def language(self):
+        r"""str: Language to test."""
+        return 'python'
+    
+    def test_json(self, check_filename, get_raw_data, instance):
         r"""Test loading/saving pyperf data as json."""
-        self.check_filename()
-        old_text = self.get_raw_data()
-        x = self.instance.load(as_json=True)
-        self.instance.save(x, overwrite=True)
-        new_text = self.get_raw_data()
-        self.assert_equal(new_text, old_text)
+        old_text = get_raw_data()
+        x = instance.load(as_json=True)
+        instance.save(x, overwrite=True)
+        new_text = get_raw_data()
+        assert(new_text == old_text)
 
-    def test_save(self):
+    def test_save(self, check_filename, get_raw_data, instance):
         r"""Test save with/without overwrite."""
-        self.check_filename()
-        old_text = self.get_raw_data()
-        assert_raises(RuntimeError, self.instance.save, self.instance.data)
-        self.instance.save(self.instance.data, overwrite=True)
-        new_text = self.get_raw_data()
-        self.assert_equal(new_text, old_text)
+        old_text = get_raw_data()
+        with pytest.raises(RuntimeError):
+            instance.save(instance.data)
+        instance.save(instance.data, overwrite=True)
+        new_text = get_raw_data()
+        assert(new_text == old_text)
 
-    def test_scaling_count(self):
+    def test_scaling_count(self, check_filename, instance, count, size,
+                           nrep):
         r"""Test running scaling with number of messages."""
-        self.check_filename()
-        kwargs = dict(min_count=self.count, max_count=self.count,
-                      nsamples=1, nrep=self.nrep)
-        self.instance.scaling_count(self.size, scaling='log', **kwargs)
-        self.instance.scaling_count(self.size, scaling='linear',
-                                    per_message=True, **kwargs)
-        assert_raises(ValueError, self.instance.scaling_count, self.size,
-                      scaling='invalid')
+        kwargs = dict(min_count=count, max_count=count,
+                      nsamples=1, nrep=nrep)
+        instance.scaling_count(size, scaling='log', **kwargs)
+        instance.scaling_count(size, scaling='linear',
+                               per_message=True, **kwargs)
+        with pytest.raises(ValueError):
+            instance.scaling_count(size, scaling='invalid')
 
-    def test_scaling_size(self):
+    def test_scaling_size(self, check_filename, instance, count, size,
+                          nrep):
         r"""Test running scaling with size of messages."""
-        self.check_filename()
-        kwargs = dict(min_size=self.size, max_size=self.size,
-                      nsamples=1, nrep=self.nrep)
-        self.instance.scaling_size(self.count, scaling='log', **kwargs)
-        self.instance.scaling_size(self.count, scaling='linear',
-                                   per_message=True, **kwargs)
-        assert_raises(ValueError, self.instance.scaling_size, self.count,
-                      scaling='invalid')
+        kwargs = dict(min_size=size, max_size=size,
+                      nsamples=1, nrep=nrep)
+        instance.scaling_size(count, scaling='log', **kwargs)
+        instance.scaling_size(count, scaling='linear',
+                              per_message=True, **kwargs)
+        with pytest.raises(ValueError):
+            instance.scaling_size(count, scaling='invalid')
 
-    def test_plot_scaling_joint(self):
+    @pytest.fixture
+    def close_figures(self):
+        r"""Close figures after the test."""
+        yield
+        import matplotlib.pyplot as plt  # noqa: E402
+        plt.clf()
+        plt.cla()
+        plt.close('all')
+
+    def test_plot_scaling_joint(self, check_filename, instance, count, size,
+                                close_figures, disable_verify_count_fds):
         r"""Test plot_scaling_joint."""
-        self.check_filename()
-        kwargs = dict(msg_size0=self.size, msg_count0=self.count,
-                      msg_size=[self.size], msg_count=[self.count],
+        kwargs = dict(msg_size0=size, msg_count0=count,
+                      msg_size=[size], msg_count=[count],
                       per_message=True, time_method='bestof')
-        self.instance.plot_scaling_joint(**kwargs)
+        instance.plot_scaling_joint(**kwargs)
 
-    def test_plot_scaling(self):
+    def test_plot_scaling(self, check_filename, instance, count, size, nrep,
+                          close_figures, disable_verify_count_fds):
         r"""Test plot_scaling corner cases not covered by test_plot_scaling_joint."""
-        self.check_filename()
-        self.instance.plot_scaling(self.size, [self.count], per_message=True,
-                                   time_method='average', yscale='linear')
-        self.instance.plot_scaling([self.size], self.count, per_message=False,
-                                   time_method='average', yscale='log')
+        instance.plot_scaling(size, [count], per_message=True,
+                              time_method='average', yscale='linear')
+        instance.plot_scaling([size], count, per_message=False,
+                              time_method='average', yscale='log')
 
         if False:
             # Test with msg_count on x linear/linear axs
-            args = (self.size, [self.count])
-            kwargs = {'axs': None, 'nrep': self.nrep,
+            args = (size, [count])
+            kwargs = {'axs': None, 'nrep': nrep,
                       'time_method': 'average', 'per_message': True}
-            kwargs['axs'] = self.instance.plot_scaling(*args, **kwargs)
+            kwargs['axs'] = instance.plot_scaling(*args, **kwargs)
             kwargs['time_method'] = 'bestof'
-            kwargs['axs'] = self.instance.plot_scaling(*args, **kwargs)
+            kwargs['axs'] = instance.plot_scaling(*args, **kwargs)
             # Test with msg_size on x log/log axes
-            args = ([self.size], self.count)
-            kwargs = {'axs': None, 'nrep': self.nrep, 'time_method': 'average',
+            args = ([size], count)
+            kwargs = {'axs': None, 'nrep': nrep,
+                      'time_method': 'average',
                       'xscale': 'log', 'yscale': 'log'}
-            kwargs['axs'] = self.instance.plot_scaling(*args, **kwargs)
+            kwargs['axs'] = instance.plot_scaling(*args, **kwargs)
             kwargs['time_method'] = 'bestof'
-            kwargs['axs'] = self.instance.plot_scaling(*args, **kwargs)
+            kwargs['axs'] = instance.plot_scaling(*args, **kwargs)
         # Errors
-        assert_raises(RuntimeError, self.instance.plot_scaling,
-                      [self.size], [self.count])
-        assert_raises(RuntimeError, self.instance.plot_scaling,
-                      self.size, self.count)
-        assert_raises(ValueError, self.instance.plot_scaling,
-                      [self.size], self.count, nrep=self.nrep,
-                      time_method='invalid')
+        with pytest.raises(RuntimeError):
+            instance.plot_scaling([size], [count])
+        with pytest.raises(RuntimeError):
+            instance.plot_scaling(size, count)
+        with pytest.raises(ValueError):
+            instance.plot_scaling([size], count, nrep=nrep,
+                                  time_method='invalid')
 
-    def test_pyperfjson_to_pandas(self):
+    def test_pyperfjson_to_pandas(self, check_filename, filename):
         r"""Test pyperfjson_to_pandas."""
-        self.check_filename()
-        timing.pyperfjson_to_pandas(self.filename)
+        timing.pyperfjson_to_pandas(filename)
 
-    def test_fits(self):
+    def test_fits(self, check_filename, instance):
         r"""Test fits to scaling on one platform."""
-        self.check_filename()
-        self.instance.time_per_byte
-        self.instance.time_per_message
-        self.instance.startup_time
+        instance.time_per_byte
+        instance.time_per_message
+        instance.startup_time
 
-    def test_plot_scalings(self):
+    def test_plot_scalings(self, check_filename, instance_kwargs,
+                           count, size, language, close_figures,
+                           disable_verify_count_fds):
         r"""Test plot_scalings corner cases on test platform."""
-        self.check_filename()
-        kwargs = copy.deepcopy(self.inst_kwargs)
-        kwargs.update(msg_size=[self.size], msg_size0=self.size,
-                      msg_count=[self.count], msg_count0=self.count,
+        kwargs = copy.deepcopy(instance_kwargs)
+        kwargs.update(msg_size=[size], msg_size0=size,
+                      msg_count=[count], msg_count0=count,
                       cleanup_plot=True)
         for c in ['comm_type', 'language', 'platform', 'python_ver']:
             ikws = copy.deepcopy(kwargs)
@@ -247,19 +283,20 @@ class TestTimedRun(TimedRunTestBase):
                 del ikws[c]
             if c == 'language':
                 ikws['per_message'] = True
-                ikws['compare_values'] = [self.language]
+                ikws['compare_values'] = [language]
             timing.plot_scalings(**ikws)
         # Errors
-        assert_raises(ValueError, timing.plot_scalings, compare='invalid')
-        assert_raises(RuntimeError, timing.plot_scalings, compare='comm_type',
-                      comm_type='zmq')
+        with pytest.raises(ValueError):
+            timing.plot_scalings(compare='invalid')
+        with pytest.raises(RuntimeError):
+            timing.plot_scalings(compare='comm_type', comm_type='zmq')
 
-    def test_production_runs(self):
+    def test_production_runs(self, check_filename, instance_kwargs,
+                             close_figures):
         r"""Test production tests (those used in paper)."""
-        self.check_filename()
         # Limit language list for tests
         for c in ['comm_type', 'language', 'platform', 'python_ver']:
-            kwargs = copy.deepcopy(self.inst_kwargs)
+            kwargs = copy.deepcopy(instance_kwargs)
             kwargs.update(compare=c, cleanup_plot=True, use_paper_values=True)
             if c in kwargs:
                 del kwargs[c]
@@ -270,74 +307,58 @@ class TestTimedRun(TimedRunTestBase):
                 timing.plot_scalings(**kwargs)
 
 
-@long_running
 class TestTimedRunTemp(TimedRunTestBase):
     r"""Test class for the TimedRun class using temporary data."""
 
-    _filename = 'test_run123.json'
+    @pytest.fixture
+    def instance_kwargs(self, dont_use_pyperf):
+        r"""Keyword arguments for a new instance of the tested class."""
+        if dont_use_pyperf:
+            # This forces use of standard name with .dat extension
+            filename = None
+        else:
+            filename = 'test_run123.json'
+        return {'test_name': 'timed_pipe',
+                'filename': filename,
+                'platform': None,
+                'python_ver': None,
+                'comm_type': None,
+                'dont_use_pyperf': dont_use_pyperf,
+                'max_errors': 5}
 
-    @property
-    def description_prefix(self):
-        r"""String prefix to prepend docstr test message with."""
-        out = super(TestTimedRunTemp, self).description_prefix
-        out += ' Temporary'
-        return out
+    @pytest.fixture(scope="class", autouse=True, params=[False, True])
+    def dont_use_pyperf(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
 
-    def cleanup_files(self):
+    @pytest.fixture(autouse=True)
+    def cleanup_files(self, instance):
         r"""Remove the temporary file if it exists."""
-        if os.path.isfile(self.instance.filename):
-            os.remove(self.instance.filename)
-        if os.path.isfile(self.instance.pyperfscript):  # pragma: debug
-            os.remove(self.instance.pyperfscript)
+        yield
+        if os.path.isfile(instance.filename):
+            os.remove(instance.filename)
+        if os.path.isfile(instance.pyperfscript):  # pragma: debug
+            os.remove(instance.pyperfscript)
 
-    def setup(self, *args, **kwargs):
-        r"""Cleanup the file if it exists and then reload."""
-        super(TestTimedRunTemp, self).setup(*args, **kwargs)
-        self.cleanup_files()
-        self.instance.reload()
-
-    def teardown(self, *args, **kwargs):
-        r"""Cleanup temporary files before destroying instance."""
-        self.cleanup_files()
-        super(TestTimedRunTemp, self).teardown(*args, **kwargs)
-
-    @property
-    def time_run_kwargs(self):
+    @pytest.fixture
+    def time_run_kwargs(self, nrep):
         r"""dict: Keyword arguments for time_run."""
-        out = super(TestTimedRunTemp, self).time_run_kwargs
-        out['overwrite'] = True
-        return out
+        return {'nrep': nrep, 'overwrite': True}
 
     @flaky.flaky
-    def test_pyperf_func(self):
+    def test_pyperf_func(self, dont_use_pyperf, instance, count, size):
         r"""Test pyperf_func."""
-        timing.pyperf_func(1, self.instance, self.count, self.size, 0)
+        if dont_use_pyperf:
+            pytest.skip("Don't use pyperf")
+        timing.pyperf_func(1, instance, count, size, 0)
 
     @flaky.flaky
-    def test_run_overwrite(self):
+    def test_run_overwrite(self, time_run, python_class,
+                           instance_args, instance_kwargs, entry_name):
         r"""Test performing a run twice, the second time with ovewrite."""
-        self.time_run()
+        time_run()
         # Reload instance to test load for existing file
-        self.clear_instance()
-        self.time_run()
-        self.instance.remove_entry(self.entry_name)
-        assert(not self.instance.has_entry(self.entry_name))
-
-
-@long_running
-class TestTimedRunTempNoPyperf(TestTimedRunTemp):
-    r"""Test class for the TimedRun class using temporary data without pyperf."""
-
-    _filename = None  # This forces use of standard name with .dat extension
-    dont_use_pyperf = True
-
-    @property
-    def description_prefix(self):
-        r"""String prefix to prepend docstr test message with."""
-        out = super(TestTimedRunTempNoPyperf, self).description_prefix
-        out += ' (w/o pyperf)'
-        return out
-
-    def test_pyperf_func(self):
-        r"""Disabled: Test pyperf_func."""
-        pass
+        instance = python_class(*instance_args, **instance_kwargs)
+        time_run(instance)
+        instance.remove_entry(entry_name)
+        assert(not instance.has_entry(entry_name))

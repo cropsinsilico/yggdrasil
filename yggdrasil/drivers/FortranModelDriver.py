@@ -1197,3 +1197,116 @@ class FortranModelDriver(CompiledModelDriver):
         if (extra is not None) and cls.allows_realloc(extra):
             kwargs['variable'] = "%s%%x" % extra['name']
         return cls.format_function_param('index', ignore_method=True, **kwargs)
+
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for driver instance.
+                deps (list): Dependencies to install.
+
+        """
+        out = super(FortranModelDriver, cls).get_testing_options(**kwargs)
+        # Test types
+        out['replacement_code_types'] = {}
+        for k, v in cls.type_map.items():
+            knew = k
+            vnew = v
+            if v == '*':
+                knew = {'type': k, 'subtype': 'float',
+                        'precision': 32}
+                vnew = 'real(kind = 4)'
+                if k == '1darray':
+                    knew['length'] = 3
+                    vnew += ', dimension(3)'
+                elif k == 'ndarray':
+                    knew['shape'] = (3, 4)
+                    vnew += ', dimension(3,4)'
+            elif 'X' in v:
+                if vnew.startswith('complex'):
+                    knew = {'type': knew, 'precision': 128}
+                elif 'ISO_10646' in vnew:
+                    knew = {'type': knew, 'precision': 4 * 64}
+                else:
+                    knew = {'type': knew, 'precision': 64}
+                vnew = vnew.replace('X', '8')
+            if vnew.startswith('ygg'):
+                vnew = 'type(%s)' % vnew
+            if (knew != k) or (vnew != v):
+                out['replacement_code_types'][(k, v)] = (knew, vnew)
+        # Code composition parameters
+        out.setdefault('write_function_def_params', [])
+        out['write_function_def_params'] += [
+            # Single output
+            {'inputs': [{'name': 'x', 'value': 1.0,
+                         'datatype': {'type': 'float',
+                                      'precision': 32,
+                                      'units': 'cm'}}],
+             'outputs': [{'name': 'y',
+                          'datatype': {'type': 'float',
+                                       'precision': 32,
+                                       'units': 'cm'}}],
+             'outputs_in_inputs': False,
+             'dont_add_lengths': True},
+            # No output
+            {'inputs': [{'name': 'x', 'value': 1.0,
+                         'datatype': {'type': 'float',
+                                      'precision': 32,
+                                      'units': 'cm'}}],
+             'outputs': [],
+             'outputs_in_inputs': False},
+            # No length variable
+            {'inputs': [{'name': 'x', 'value': '"hello"',
+                         'length_var': 'length_x',
+                         'datatype': {'type': 'string',
+                                      'precision': 20,
+                                      'units': ''}},
+                        {'name': 'length_x', 'value': 5,
+                         'datatype': {'type': 'uint',
+                                      'precision': 64},
+                         'is_length_var': True}],
+             'outputs': [{'name': 'y',
+                          'length_var': 'length_y',
+                          'datatype': {'type': 'string',
+                                       'precision': 20,
+                                       'units': ''}},
+                         {'name': 'length_y',
+                          'datatype': {'type': 'uint',
+                                       'precision': 64},
+                          'is_length_var': True}],
+             'dont_add_lengths': True},
+            # Returns output instead of parameter
+            {'inputs': [{'name': 'x', 'value': 1.0,
+                         'datatype': {'type': 'float',
+                                      'precision': 32,
+                                      'units': 'cm'}}],
+             'outputs': [{'name': 'y',
+                          'datatype': {'type': 'float',
+                                       'precision': 32,
+                                       'units': 'cm'}}],
+             'outputs_in_inputs': False,
+             'guess_at_outputs_in_inputs': True},
+            # Guess at outputs in inputs
+            {'inputs': [{'name': 'x', 'value': 1.0,
+                         'datatype': {'type': 'float',
+                                      'precision': 32,
+                                      'units': 'cm'}}],
+             'outputs': [{'name': 'y',
+                          'datatype': {'type': 'float',
+                                       'precision': 32,
+                                       'units': 'cm'}}],
+             'guess_at_outputs_in_inputs': True},
+        ]
+        for x in out['write_function_def_params']:
+            x['declare_functions_as_var'] = True
+        out['split_lines'] = [('abcdef', {'length': 3, 'force_split': True},
+                               ['ab&', '     &cdef']),
+                              ('    abc', {'length': 3, 'force_split': True},
+                               ['    abc'])]
+        return out

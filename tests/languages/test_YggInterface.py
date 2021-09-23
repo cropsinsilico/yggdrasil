@@ -1,13 +1,15 @@
+import pytest
 import os
 import numpy as np
 import flaky
+import copy
 from yggdrasil.communication import get_comm
 from yggdrasil.interface import YggInterface
 from yggdrasil import constants
 from yggdrasil.tools import get_YGG_MSG_MAX, is_lang_installed
 from yggdrasil.components import import_component
 from yggdrasil.drivers import ConnectionDriver
-from yggdrasil.tests import YggTestClassInfo, assert_equal, assert_raises
+from tests import TestClassBase as base_class
 
 
 YGG_MSG_MAX = get_YGG_MSG_MAX()
@@ -38,23 +40,25 @@ class ModelEnv(object):
 
 def test_maxMsgSize():
     r"""Test max message size."""
-    assert_equal(YggInterface.maxMsgSize(), YGG_MSG_MAX)
+    assert(YggInterface.maxMsgSize() == YGG_MSG_MAX)
 
 
 def test_eof_msg():
     r"""Test eof message signal."""
-    assert_equal(YggInterface.eof_msg(), constants.YGG_MSG_EOF)
+    assert(YggInterface.eof_msg() == constants.YGG_MSG_EOF)
 
 
 def test_bufMsgSize():
     r"""Test buf message size."""
-    assert_equal(YggInterface.bufMsgSize(), constants.YGG_MSG_BUF)
+    assert(YggInterface.bufMsgSize() == constants.YGG_MSG_BUF)
 
 
 def test_init():
     r"""Test error on init."""
-    assert_raises(Exception, YggInterface.YggInput, 'error')
-    assert_raises(Exception, YggInterface.YggOutput, 'error')
+    with pytest.raises(Exception):
+        YggInterface.YggInput('error')
+    with pytest.raises(Exception):
+        YggInterface.YggOutput('error')
 
 
 def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), np.int32(2)],
@@ -99,8 +103,8 @@ def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), np.int32(2)]
             o.send_eof()
             o.close(linger=True)
             # Input
-            assert_equal(i.recv(), (True, converter(msg)))
-            assert_equal(i.recv(), (False, converter(constants.YGG_MSG_EOF)))
+            assert(i.recv() == (True, converter(msg)))
+            assert(i.recv() == (False, converter(constants.YGG_MSG_EOF)))
     finally:
         iodrv.terminate()
 
@@ -121,530 +125,388 @@ def test_YggInit_backwards():
 
 def test_YggInit_variables():
     r"""Test Matlab interface for variables."""
-    assert_equal(YggInterface.YggInit('YGG_MSG_MAX'), YGG_MSG_MAX)
-    assert_equal(YggInterface.YggInit('YGG_MSG_EOF'), constants.YGG_MSG_EOF)
-    assert_equal(YggInterface.YggInit('YGG_MSG_EOF'),
-                 YggInterface.YggInit('CIS_MSG_EOF'))
-    assert_equal(YggInterface.YggInit('YGG_MSG_EOF'),
-                 YggInterface.YggInit('PSI_MSG_EOF'))
+    assert(YggInterface.YggInit('YGG_MSG_MAX') == YGG_MSG_MAX)
+    assert(YggInterface.YggInit('YGG_MSG_EOF') == constants.YGG_MSG_EOF)
+    assert(YggInterface.YggInit('YGG_MSG_EOF')
+           == YggInterface.YggInit('CIS_MSG_EOF'))
+    assert(YggInterface.YggInit('YGG_MSG_EOF')
+           == YggInterface.YggInit('PSI_MSG_EOF'))
 
 
-class TestBase(YggTestClassInfo):
-    r"""Test class for interface classes."""
+class TestYggClass(base_class):
+    r"""Test basic input/output to/from python/matlab."""
 
     _mod = 'yggdrasil.interface.YggInterface'
+    fmt_str = '%5s\t%d\t%f\n'
+    fmt_str_matlab = '%5s\\t%d\\t%f\\n'
     
-    def __init__(self, *args, **kwargs):
-        super(TestBase, self).__init__(*args, **kwargs)
-        self.name = 'test' + self.uuid.split('-')[0]
-        self.model1 = 'model1'
-        self.model2 = 'model2'
-        self.language = None
-        self.iodriver = None
-        self.test_comm = None
-        self.is_file = False
-        self.filecomm = None
-        self.filename = os.path.join(os.getcwd(), 'temp_ascii.txt')
-        self.testing_option_kws = {}
-        self.direction = None
-        self.test_comm_kwargs = {}
-        # self._driver_kwargs = {}
-        self._inst_args = [self.name]
-        self.fmt_str = '%5s\t%d\t%f\n'
-        self.fmt_str_matlab = '%5s\\t%d\\t%f\\n'
+    @pytest.fixture(scope="class", autouse=True,
+                    params=['YggInput', 'YggOutput',
+                            'YggAsciiFileInput', 'YggAsciiFileOutput',
+                            'YggAsciiTableInput', 'YggAsciiTableOutput',
+                            'YggAsciiArrayInput', 'YggAsciiArrayOutput',
+                            'YggPickleInput', 'YggPickleOutput',
+                            'YggPandasInput', 'YggPandasOutput',
+                            'YggPlyInput', 'YggPlyOutput',
+                            'YggObjInput', 'YggObjOutput'])
+    def class_name(self, request):
+        r"""Name of class that will be tested."""
+        return request.param
 
-    @property
-    def iodriver_class(self):
+    @pytest.fixture(scope="class", autouse=True, params=[None, 'matlab'])
+    def language(self, request, filecomm, direction):
+        r"""str: Language being tested."""
+        if ((request.param and filecomm
+             and not ((filecomm == 'AsciiTableComm')
+                      and (direction == 'output')))):
+            pytest.skip("Redundent testing files for python and matlab.")
+        return request.param
+
+    @pytest.fixture(scope="class")
+    def direction(self, class_name):
+        r"""str: Direction of comm being tested."""
+        if 'Input' in class_name:
+            return 'input'
+        else:
+            return 'output'
+        
+    @pytest.fixture(scope="class")
+    def filecomm(self, class_name):
+        r"""str: File communicator to test."""
+        if class_name in ['YggAsciiFileInput', 'YggAsciiFileOutput']:
+            return 'AsciiFileComm'
+        elif class_name in ['YggAsciiTableInput', 'YggAsciiTableOutput',
+                            'YggAsciiArrayInput', 'YggAsciiArrayOutput']:
+            return 'AsciiTableComm'
+        elif class_name in ['YggPickleInput', 'YggPickleOutput']:
+            return 'PickleFileComm'
+        elif class_name in ['YggPandasInput', 'YggPandasOutput']:
+            return 'PandasFileComm'
+        elif class_name in ['YggPlyInput', 'YggPlyOutput']:
+            return 'PlyFileComm'
+        elif class_name in ['YggObjInput', 'YggObjOutput']:
+            return 'ObjFileComm'
+        return None
+
+    @pytest.fixture
+    def instance_args(self, name, class_name, format_str):
+        r"""Arguments for a new instance of the tested class."""
+        if class_name in ['YggAsciiTableOutput', 'YggAsciiArrayOutput']:
+            return (name, format_str)
+        return (name, )
+
+    @pytest.fixture
+    def instance_kwargs(self, testing_options, class_name, format_str):
+        r"""Keyword arguments for a new instance of the tested class."""
+        if class_name in ['YggInput', 'YggOutput']:
+            return {'format_str': format_str}
+        elif class_name == 'YggAsciiTableOutput':
+            return {}
+        return dict(testing_options.get('kwargs', {}))
+
+    @pytest.fixture(scope="class")
+    def format_str(self, language):
+        if language == 'matlab':
+            return self.fmt_str_matlab
+        else:
+            return self.fmt_str
+    
+    @pytest.fixture
+    def name(self, uuid):
+        return f"test{uuid.split('-')[0]}"
+
+    @pytest.fixture
+    def test_comm_kwargs(self):
+        r"""dict: Keyword arguments for the test communicator."""
+        return {}
+
+    @pytest.fixture(scope="class")
+    def filename(self):
+        return os.path.join(os.getcwd(), 'temp_ascii.txt')
+
+    @pytest.fixture(scope="class")
+    def model1(self):
+        r"""str: Name of one test model."""
+        return 'model1'
+
+    @pytest.fixture(scope="class")
+    def model2(self):
+        r"""str: Name of other test model."""
+        return 'model2'
+
+    @pytest.fixture(scope="class")
+    def comm_class(self, filecomm):
+        r"""Communicator class being tested."""
+        if filecomm is None:
+            return import_component('comm', 'default')
+        else:
+            return import_component('file', filecomm)
+
+    @pytest.fixture(scope="class")
+    def iodriver_class(self, direction, filecomm):
         r"""class: Input/output driver class."""
-        if self.is_file:
-            return import_component('connection',
-                                    'file_' + self.direction)
+        if filecomm:
+            return import_component('connection', 'file_' + direction)
         return ConnectionDriver.ConnectionDriver
         
-    @property
-    def iodriver_args(self):
+    @pytest.fixture
+    def iodriver_args(self, testing_options, name, model1, model2,
+                      filecomm, filename, direction):
         r"""list: Connection driver arguments."""
-        args = [self.name]
-        kwargs = {'inputs': [{'partner_model': self.model1}],
-                  'outputs': [{'partner_model': self.model2}]}
-        if self.is_file:
-            args += [self.filename]
-            if (self.direction == 'output'):
-                filecomm_kwargs = self.testing_options['kwargs']
-                filecomm_kwargs['filetype'] = self.filecomm
-                return ([self.name, self.filename],
+        args = [name]
+        kwargs = {'inputs': [{'partner_model': model1}],
+                  'outputs': [{'partner_model': model2}]}
+        if filecomm:
+            args += [filename]
+            if (direction == 'output'):
+                filecomm_kwargs = copy.deepcopy(testing_options['kwargs'])
+                filecomm_kwargs['filetype'] = filecomm
+                return ([name, filename],
                         {'inputs': kwargs['inputs'],
                          'outputs': [filecomm_kwargs]})
-            elif (self.direction == 'input'):
-                filecomm_kwargs = self.testing_options['kwargs']
-                filecomm_kwargs['filetype'] = self.filecomm
-                return ([self.name, self.filename],
+            elif (direction == 'input'):
+                filecomm_kwargs = copy.deepcopy(testing_options['kwargs'])
+                filecomm_kwargs['filetype'] = filecomm
+                return ([name, filename],
                         {'inputs': [filecomm_kwargs],
                          'outputs': kwargs['outputs']})
         return (args, kwargs)
 
-    def get_options(self):
-        r"""Get testing options."""
-        out = {}
-        if self.is_file:
-            assert(self.filecomm is not None)
-            out = import_component('file', self.filecomm).get_testing_options(
-                **self.testing_option_kws)
-        else:
-            out = import_component('comm', 'default').get_testing_options(
-                **self.testing_option_kws)
-        return out
+    @pytest.fixture(scope="class", autouse=True)
+    def options(self, class_name):
+        r"""Arguments that should be provided when getting testing options."""
+        if class_name in ['YggInput', 'YggOutput']:
+            return {'table_example': True}
+        elif class_name in ['YggAsciiArrayInput', 'YggAsciiArrayOutput']:
+            return {'array_columns': True}
+        # elif class_name in ['YggPandasInput', 'YggPandasOutput']:
+        #     return {'as_frames': True}
+        return {}
 
-    @property
-    def messages(self):
-        r"""list: Messages that should be sent/received."""
-        if getattr(self, '_messages', None) is not None:
-            return self._messages
-        return self.testing_options['send']
+    @pytest.fixture(scope="class")
+    def testing_options(self, comm_class, options):
+        r"""Testing options."""
+        return comm_class.get_testing_options(**options)
 
-    def setup(self):
-        r"""Start driver and instance."""
-        if self.direction is None:  # pragma: debug
-            return
-        nprev_comm = self.comm_count
-        nprev_thread = self.thread_count
-        nprev_fd = self.fd_count
-        # File
-        if self.is_file and (self.direction == 'input'):
-            with open(self.filename, 'wb') as fd:
-                fd.write(self.testing_options['contents'])
-            assert(os.path.isfile(self.filename))
-        # Drivers
-        args, kwargs = self.iodriver_args
-        self.iodriver = self.iodriver_class(*args, **kwargs)
-        self.iodriver.start()
-        self.iodriver.wait_for_loop()
-        # Test comm
-        if not self.is_file:
-            if self.direction == 'input':
-                kws = self.iodriver.icomm.opp_comm_kwargs()
-                kws.update(self.test_comm_kwargs)
-                self.test_comm = get_comm('in', **kws)
-            elif self.direction == 'output':
-                kws = self.iodriver.ocomm.opp_comm_kwargs()
-                kws.update(self.test_comm_kwargs)
-                self.test_comm = get_comm('out', **kws)
-        # Test class
-        super(TestBase, self).setup(nprev_comm=nprev_comm,
-                                    nprev_thread=nprev_thread,
-                                    nprev_fd=nprev_fd)
+    @pytest.fixture(autouse=True)
+    def input_file(self, filename, testing_options, direction, filecomm):
+        r"""Create an input file."""
+        if filecomm and (direction == 'input'):
+            with open(filename, 'wb') as fd:
+                fd.write(testing_options['contents'])
+            assert(os.path.isfile(filename))
+        try:
+            yield
+        finally:
+            if filecomm and os.path.isfile(filename):
+                os.remove(filename)
 
-    def teardown(self):
-        r"""Stop the driver."""
-        if self.iodriver is not None:
-            self.iodriver.terminate()
-            self.iodriver.cleanup()
-        if self.test_comm is not None:
-            self.test_comm.close()
-        if self.is_file and os.path.isfile(self.filename):
-            os.remove(self.filename)
-        if self.direction is None:  # pragma: debug
-            return
-        super(TestBase, self).teardown()
-        self.cleanup_comms()
+    @pytest.fixture(autouse=True)
+    def iodriver(self, input_file, iodriver_class, iodriver_args,
+                 verify_count_threads, verify_count_comms,
+                 verify_count_fds):
+        iodriver = iodriver_class(*iodriver_args[0], **iodriver_args[1])
+        iodriver.start()
+        iodriver.wait_for_loop()
+        try:
+            yield iodriver
+        finally:
+            iodriver.terminate()
+            iodriver.cleanup()
+            iodriver.disconnect()
+            del iodriver
 
-    @property
-    def model_env(self):
+    @pytest.fixture(autouse=True)
+    def test_comm(self, iodriver, direction, filecomm, test_comm_kwargs,
+                  close_comm):
+        r"""Communicator for testing."""
+        test_comm = None
+        if not filecomm:
+            if direction == 'input':
+                kws = iodriver.icomm.opp_comm_kwargs()
+                kws.update(test_comm_kwargs)
+                test_comm = get_comm('in', **kws)
+            elif direction == 'output':
+                kws = iodriver.ocomm.opp_comm_kwargs()
+                kws.update(test_comm_kwargs)
+                test_comm = get_comm('out', **kws)
+        try:
+            yield test_comm
+        finally:
+            if test_comm is not None:
+                close_comm(test_comm)
+
+    @pytest.fixture
+    def model_env(self, direction, iodriver, model1, model2):
         r"""Environment variables that should be set for interface."""
         out = {}
-        if self.direction == 'input':
-            out.update(self.iodriver.ocomm.opp_comms,
-                       YGG_MODEL_NAME=self.model2)
-        elif self.direction == 'output':
-            out.update(self.iodriver.icomm.opp_comms,
-                       YGG_MODEL_NAME=self.model1)
+        if direction == 'input':
+            out.update(iodriver.ocomm.opp_comms,
+                       YGG_MODEL_NAME=model2)
+        elif direction == 'output':
+            out.update(iodriver.icomm.opp_comms,
+                       YGG_MODEL_NAME=model1)
         return out
 
-    def create_instance(self):
-        r"""Create a new instance of the class."""
-        with ModelEnv(language=self.language, **self.model_env):
-            out = super(TestBase, self).create_instance()
-        return out
-        
-    def remove_instance(self, inst):
-        r"""Remove an instance."""
-        inst.is_interface = False
-        inst.close()
-        assert(inst.is_closed)
-        super(TestBase, self).remove_instance(inst)
-            
-    
-class TestYggInput(TestBase):
-    r"""Test basic input to python."""
+    @pytest.fixture
+    def instance(self, python_class, instance_args, instance_kwargs,
+                 language, model_env, close_comm):
+        r"""New instance of the python class for testing."""
+        with ModelEnv(language=language, **model_env):
+            out = python_class(*instance_args, **instance_kwargs)
+            yield out
+            out.is_interface = False
+            close_comm(out)
 
-    _cls = 'YggInput'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggInput, self).__init__(*args, **kwargs)
-        self.direction = 'input'
-        if self.__class__ == TestYggInput:
-            self.testing_option_kws = {'table_example': True}
-            self._inst_kwargs = {'format_str': self.fmt_str}
+    @pytest.fixture(autouse=True)
+    def pandas_equality_patch(self, monkeypatch, pandas_equality):
+        r"""Patch pandas DataFrame so that equals is used instead of '=='"""
+        with monkeypatch.context() as m:
+            import pandas
+            m.setattr(pandas.DataFrame, '__eq__', pandas_equality)
+            yield
 
-    def test_msg(self):
+    def test_msg(self, filecomm, testing_options, instance, timeout,
+                 test_comm, iodriver, wait_on_function,
+                 filename, direction, nested_approx, unyts_equality_patch):
         r"""Test sending/receiving message."""
-        if self.is_file:
-            for msg in self.testing_options['recv']:
-                msg_flag, msg_recv = self.instance.recv(self.timeout)
-                assert(msg_flag)
-                self.assert_equal(msg_recv, msg)
-            msg_flag, msg_recv = self.instance.recv(self.timeout)
-            assert(not msg_flag)
+        if direction == 'input':
+            if filecomm:
+                for msg_recv in testing_options['recv']:
+                    msg_flag, msg_recv0 = instance.recv(timeout)
+                    assert(msg_flag)
+                    assert(msg_recv0 == nested_approx(msg_recv))
+                msg_flag, msg_recv0 = instance.recv(timeout)
+                assert(not msg_flag)
+            else:
+                for msg_send, msg_recv in zip(testing_options['send'],
+                                              testing_options['recv']):
+                    msg_flag = test_comm.send(msg_send)
+                    assert(msg_flag)
+                    msg_flag, msg_recv0 = instance.recv(timeout)
+                    assert(msg_flag)
+                    assert(msg_recv0 == nested_approx(msg_recv))
         else:
-            for msg in self.messages:
-                msg_flag = self.test_comm.send(msg)
-                assert(msg_flag)
-                msg_flag, msg_recv = self.instance.recv(self.timeout)
-                assert(msg_flag)
-                self.assert_equal(msg_recv, msg)
-            
-
-class TestYggInputMatlab(TestYggInput):
-    r"""Test basic input to python as passed from matlab."""
-    def __init__(self, *args, **kwargs):
-        super(TestYggInputMatlab, self).__init__(*args, **kwargs)
-        self.language = 'matlab'
-        self.testing_option_kws = {'table_example': True}
-        self._inst_kwargs = {'format_str': self.fmt_str_matlab}
-
-
-class TestYggOutput(TestBase):
-    r"""Test basic output to python."""
-
-    _cls = 'YggOutput'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggOutput, self).__init__(*args, **kwargs)
-        self.direction = 'output'
-        if self.__class__ == TestYggOutput:
-            self.testing_option_kws = {'table_example': True}
-            self._inst_kwargs = {'format_str': self.fmt_str}
-
-    def test_msg(self):
-        r"""Test sending/receiving message."""
-        if self.is_file:
-            for msg in self.testing_options['send']:
-                msg_flag = self.instance.send(msg)
-                assert(msg_flag)
-            self.instance.send_eof()
-            # Read temp file
-            Tout = self.instance.start_timeout()
-            while self.iodriver.ocomm.is_open and not Tout.is_out:
-                self.instance.sleep()
-            self.instance.stop_timeout()
-            assert(os.path.isfile(self.filename))
-            if self.testing_options.get('exact_contents', True):
-                with open(self.filename, 'rb') as fd:
-                    res = fd.read()
-                    self.assert_equal(res, self.testing_options['contents'])
-        else:
-            for msg in self.messages:
-                msg_flag = self.instance.send(msg)
-                assert(msg_flag)
-                msg_flag, msg_recv = self.test_comm.recv(self.timeout)
-                assert(msg_flag)
-                self.assert_equal(msg_recv, msg)
-        
-
-class TestYggOutputMatlab(TestYggOutput):
-    r"""Test basic output to python as passed from matlab."""
-    def __init__(self, *args, **kwargs):
-        super(TestYggOutputMatlab, self).__init__(*args, **kwargs)
-        self.language = 'matlab'
-        self.testing_option_kws = {'table_example': True}
-        self._inst_kwargs = {'format_str': self.fmt_str_matlab}
+            if filecomm:
+                for msg in testing_options['send']:
+                    msg_flag = instance.send(msg)
+                    assert(msg_flag)
+                instance.send_eof()
+                # Read temp file
+                wait_on_function(lambda: not iodriver.ocomm.is_open)
+                assert(os.path.isfile(filename))
+                if testing_options.get('exact_contents', True):
+                    with open(filename, 'rb') as fd:
+                        res = fd.read()
+                        assert(res == testing_options['contents'])
+            else:
+                for msg_send, msg_recv in zip(testing_options['send'],
+                                              testing_options['recv']):
+                    msg_flag = instance.send(msg_send)
+                    assert(msg_flag)
+                    msg_flag, msg_recv0 = test_comm.recv(timeout)
+                    assert(msg_flag)
+                    assert(msg_recv0 == nested_approx(msg_recv))
 
 
 @flaky.flaky
-class TestYggRpcClient(TestYggOutput):
+class TestYggRpcClient(TestYggClass):
     r"""Test client-side RPC communication with Python."""
 
-    _cls = 'YggRpcClient'
+    @pytest.fixture(scope="class", autouse=True,
+                    params=['YggRpcClient', 'YggRpcServer'])
+    def class_name(self, request):
+        r"""Name of class that will be tested."""
+        return request.param
+
+    @pytest.fixture(scope="class")
+    def direction(self, class_name):
+        r"""str: Direction of comm being tested."""
+        if class_name == 'YggRpcClient':
+            return 'output'
+        else:
+            return 'input'
     
-    def __init__(self, *args, **kwargs):
-        super(TestYggRpcClient, self).__init__(*args, **kwargs)
-        self._inst_args = [self.name + '_' + self.model1,
-                           self.fmt_str, self.fmt_str]
-        self.test_comm_kwargs = {'commtype': 'server',
-                                 'response_kwargs': {'format_str': self.fmt_str}}
-        self._messages = [(b'one', np.int32(1), 1.0)]
+    @pytest.fixture
+    def instance_args(self, format_str, class_name, name, model1):
+        r"""Arguments for a new instance of the tested class."""
+        if class_name == 'YggRpcClient':
+            return (f"{name}_{model1}", format_str, format_str)
+        else:
+            return (name, format_str, format_str)
+
+    @pytest.fixture
+    def test_comm_kwargs(self, class_name, format_str):
+        r"""dict: Keyword arguments for the test communicator."""
+        if class_name == 'YggRpcClient':
+            return {'commtype': 'server',
+                    'response_kwargs': {'format_str': format_str}}
+        else:
+            return {'commtype': 'client',
+                    'response_kwargs': {'format_str': format_str}}
+    
+    @pytest.fixture(scope="class")
+    def testing_options(self, comm_class, options):
+        r"""Testing options."""
+        out = comm_class.get_testing_options(**options)
+        out.update(send=[[b'one', np.int32(1), 1.0]],
+                   recv=[[b'one', np.int32(1), 1.0]])
+        return out
+    
+    @pytest.fixture(autouse=True)
+    def drain_signon(self, class_name, instance, test_comm):
+        r"""Drain server signon messages."""
+        if class_name == 'YggRpcClient':
+            test_comm.drain_server_signon_messages()
+        else:
+            instance.drain_server_signon_messages()
         
-    def setup(self):
-        r"""Start driver and instance."""
-        super(TestYggRpcClient, self).setup()
-        self.test_comm.drain_server_signon_messages()
-        
-    @property
+    @pytest.fixture(scope="class")
     def iodriver_class(self):
         r"""class: Input/output driver class."""
         return import_component('connection', 'rpc_request')
 
-    @property
-    def iodriver_args(self):
+    @pytest.fixture
+    def iodriver_args(self, testing_options, name, model1, model2,
+                      filecomm, filename):
         r"""list: Connection driver arguments."""
-        args, kwargs = super(TestYggRpcClient, self).iodriver_args
-        kwargs['inputs'] = [
-            {'name': '%s:%s_%s' % (
-                self.model1, self.name, self.model1),
-             'partner_model': self.model1}]
-        return (args, kwargs)
-        
-    def test_msg(self):
-        r"""Test sending/receiving message."""
-        super(TestYggRpcClient, self).test_msg()
-        for msg in self.messages:
-            msg_flag = self.test_comm.send(msg)
-            assert(msg_flag)
-            msg_flag, msg_recv = self.instance.recv(self.timeout)
-            assert(msg_flag)
-            self.assert_equal(msg_recv, msg)
-        
-
-@flaky.flaky
-class TestYggRpcClientMatlab(TestYggRpcClient):
-    r"""Test client-side RPC communication with Python as passed through Matlab."""
-    def __init__(self, *args, **kwargs):
-        super(TestYggRpcClientMatlab, self).__init__(*args, **kwargs)
-        self.language = 'matlab'
-        self._inst_args = [self.name + '_' + self.model1,
-                           self.fmt_str_matlab, self.fmt_str_matlab]
-
-
-@flaky.flaky
-class TestYggRpcServer(TestYggInput):
-    r"""Test server-side RPC communication with Python."""
-
-    _cls = 'YggRpcServer'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggRpcServer, self).__init__(*args, **kwargs)
-        self._inst_args = [self.name, self.fmt_str, self.fmt_str]
-        self.test_comm_kwargs = {'commtype': 'client',
-                                 'response_kwargs': {'format_str': self.fmt_str}}
-        self._messages = [(b'one', np.int32(1), 1.0)]
-        
-    def setup(self):
-        r"""Start driver and instance."""
-        super(TestYggRpcServer, self).setup()
-        self.instance.drain_server_signon_messages()
-        
-    @property
-    def iodriver_class(self):
-        r"""class: Output driver class."""
-        return import_component('connection', 'rpc_request')
-
-    @property
-    def iodriver_args(self):
-        r"""list: Connection driver arguments."""
-        args, kwargs = super(TestYggRpcServer, self).iodriver_args
-        kwargs['inputs'] = [
-            {'name': '%s:%s_%s' % (
-                self.model1, self.name, self.model1),
-             'partner_model': self.model1}]
+        args = [name]
+        kwargs = {'inputs': [{'partner_model': model1,
+                              'name': f"{model1}:{name}_{model1}"}],
+                  'outputs': [{'partner_model': model2}]}
         return (args, kwargs)
 
-    @property
-    def model_env(self):
+    @pytest.fixture
+    def model_env(self, direction, iodriver, model1, model2):
         r"""Environment variables that should be set for interface."""
-        out = super(TestYggRpcServer, self).model_env
-        out['YGG_NCLIENTS'] = '1'
+        out = {}
+        if direction == 'input':  # YggRpcServer
+            out.update(iodriver.ocomm.opp_comms,
+                       YGG_MODEL_NAME=model2,
+                       YGG_NCLIENTS='1')
+        elif direction == 'output':
+            out.update(iodriver.icomm.opp_comms,
+                       YGG_MODEL_NAME=model1)
         return out
-        
-    def test_msg(self):
+
+    def test_msg(self, filecomm, testing_options, instance, timeout,
+                 test_comm, iodriver, wait_on_function,
+                 filename, direction, nested_approx, unyts_equality_patch):
         r"""Test sending/receiving message."""
-        super(TestYggRpcServer, self).test_msg()
-        for msg in self.messages:
-            msg_flag = self.instance.send(msg)
+        super(TestYggRpcClient, self).test_msg(
+            filecomm, testing_options, instance, timeout,
+            test_comm, iodriver, wait_on_function, filename, direction,
+            nested_approx, unyts_equality_patch)
+        if direction == 'output':
+            send_comm = test_comm
+            recv_comm = instance
+        else:
+            send_comm = instance
+            recv_comm = test_comm
+        for msg_send, msg_recv in zip(testing_options['send'],
+                                      testing_options['recv']):
+            msg_flag = send_comm.send(msg_send)
             assert(msg_flag)
-            msg_flag, msg_recv = self.test_comm.recv(self.timeout)
+            msg_flag, msg_recv0 = recv_comm.recv(timeout)
             assert(msg_flag)
-            self.assert_equal(msg_recv, msg)
-        
-        
-@flaky.flaky
-class TestYggRpcServerMatlab(TestYggRpcServer):
-    r"""Test server-side RPC communication with Python as passed through Matlab."""
-    def __init__(self, *args, **kwargs):
-        super(TestYggRpcServerMatlab, self).__init__(*args, **kwargs)
-        self.language = 'matlab'
-        self._inst_args = [self.name, self.fmt_str_matlab, self.fmt_str_matlab]
-
-
-# AsciiFile
-class TestYggAsciiFileInput(TestYggInput):
-    r"""Test input from an unformatted text file."""
-
-    _cls = 'YggAsciiFileInput'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggAsciiFileInput, self).__init__(*args, **kwargs)
-        self.is_file = True
-        self.filecomm = 'AsciiFileComm'
-
-
-class TestYggAsciiFileOutput(TestYggOutput):
-    r"""Test output to an unformatted text file."""
-
-    _cls = 'YggAsciiFileOutput'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggAsciiFileOutput, self).__init__(*args, **kwargs)
-        self.is_file = True
-        self.filecomm = 'AsciiFileComm'
-
-
-# AsciiTable
-class TestYggAsciiTableInput(TestYggAsciiFileInput):
-    r"""Test input from an ascii table."""
-
-    _cls = 'YggAsciiTableInput'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggAsciiTableInput, self).__init__(*args, **kwargs)
-        self.is_file = True
-        self.filecomm = 'AsciiTableComm'
-
-        
-class TestYggAsciiTableOutput(TestYggAsciiFileOutput):
-    r"""Test output from an ascii table."""
-
-    _cls = 'YggAsciiTableOutput'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggAsciiTableOutput, self).__init__(*args, **kwargs)
-        self.is_file = True
-        self.filecomm = 'AsciiTableComm'
-        self._inst_args = [self.name, self.fmt_str]
-        self._inst_kwargs = {}
-
-
-class TestYggAsciiTableOutputMatlab(TestYggAsciiTableOutput):
-    r"""Test output from an ascii table as passed through Matlab."""
-    def __init__(self, *args, **kwargs):
-        super(TestYggAsciiTableOutputMatlab, self).__init__(*args, **kwargs)
-        self.language = 'matlab'
-        self._inst_args = [self.name, self.fmt_str_matlab]
-        
-
-# AsciiTable Array
-class TestYggAsciiArrayInput(TestYggAsciiTableInput):
-    r"""Test input from an ASCII table."""
-
-    _cls = 'YggAsciiArrayInput'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggAsciiArrayInput, self).__init__(*args, **kwargs)
-        self.is_file = True
-        self.filecomm = 'AsciiTableComm'
-        self.testing_option_kws = {'array_columns': True}
-
-
-class TestYggAsciiArrayOutput(TestYggAsciiTableOutput):
-    r"""Test input from an ASCII table."""
-
-    _cls = 'YggAsciiArrayOutput'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggAsciiArrayOutput, self).__init__(*args, **kwargs)
-        self.is_file = True
-        self.filecomm = 'AsciiTableComm'
-        self.testing_option_kws = {'array_columns': True}
-        
-
-# Pickle
-class TestYggPickleInput(TestYggInput):
-    r"""Test input from a pickle file."""
-
-    _cls = 'YggPickleInput'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggPickleInput, self).__init__(*args, **kwargs)
-        self.is_file = True
-        self.filecomm = 'PickleFileComm'
-
-
-class TestYggPickleOutput(TestYggOutput):
-    r"""Test output from a pickle."""
-
-    _cls = 'YggPickleOutput'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggPickleOutput, self).__init__(*args, **kwargs)
-        self.is_file = True
-        self.filecomm = 'PickleFileComm'
-
-        
-# Pandas
-class TestYggPandasInput(TestYggInput):
-    r"""Test input from a pandas file."""
-
-    _cls = 'YggPandasInput'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggPandasInput, self).__init__(*args, **kwargs)
-        self.is_file = True
-        self.filecomm = 'PandasFileComm'
-        # self.testing_option_kws = {'as_frames': True}
-
-
-class TestYggPandasOutput(TestYggOutput):
-    r"""Test output from a pandas."""
-
-    _cls = 'YggPandasOutput'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggPandasOutput, self).__init__(*args, **kwargs)
-        self.is_file = True
-        self.filecomm = 'PandasFileComm'
-        # self.testing_option_kws = {'as_frames': True}
-
-
-# Ply
-class TestYggPlyInput(TestYggInput):
-    r"""Test input from a ply file."""
-
-    _cls = 'YggPlyInput'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggPlyInput, self).__init__(*args, **kwargs)
-        self.is_file = True
-        self.filecomm = 'PlyFileComm'
-
-
-class TestYggPlyOutput(TestYggOutput):
-    r"""Test output from a ply."""
-
-    _cls = 'YggPlyOutput'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggPlyOutput, self).__init__(*args, **kwargs)
-        self.is_file = True
-        self.filecomm = 'PlyFileComm'
-
-
-# Obj
-class TestYggObjInput(TestYggInput):
-    r"""Test input from a obj file."""
-
-    _cls = 'YggObjInput'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggObjInput, self).__init__(*args, **kwargs)
-        self.is_file = True
-        self.filecomm = 'ObjFileComm'
-
-
-class TestYggObjOutput(TestYggOutput):
-    r"""Test output from a obj."""
-
-    _cls = 'YggObjOutput'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestYggObjOutput, self).__init__(*args, **kwargs)
-        self.is_file = True
-        self.filecomm = 'ObjFileComm'
+            assert(msg_recv0 == nested_approx(msg_recv))

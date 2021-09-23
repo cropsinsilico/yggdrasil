@@ -1,81 +1,67 @@
+import pytest
 import os
 import numpy as np
 from yggdrasil import serialize
-from yggdrasil.tests import extra_example
-from yggdrasil.examples.tests import ExampleTstBase
+from tests.examples import TestExample as base_class
 
 
-@extra_example
-class TestExampleAsciiIO(ExampleTstBase):
+@pytest.mark.extra_example
+class TestExampleAsciiIO(base_class):
     r"""Test the AsciiIO example."""
 
-    example_name = 'ascii_io'
+    examples = ['ascii_io']
 
-    @property
-    def input_file(self):
+    @pytest.fixture
+    def input_file(self, yamldir):
         r"""str: Input file."""
-        return os.path.join(self.yamldir, 'Input', 'input_file.txt')
+        return os.path.join(yamldir, 'Input', 'input_file.txt')
 
-    @property
-    def input_table(self):
+    @pytest.fixture
+    def input_table(self, yamldir):
         r"""str: Input table file."""
-        return os.path.join(self.yamldir, 'Input', 'input_table.txt')
+        return os.path.join(yamldir, 'Input', 'input_table.txt')
         
-    @property
-    def input_array(self):
+    @pytest.fixture
+    def input_array(self, yamldir):
         r"""str: Input array file."""
-        return os.path.join(self.yamldir, 'Input', 'input_array.txt')
+        return os.path.join(yamldir, 'Input', 'input_array.txt')
 
-    # @property
-    # def input_files(self):
+    # @pytest.fixture
+    # def input_files(self, input_file, input_table, input_array):
     #     r"""list Input files for the run."""
-    #     return [self.input_file, self.input_table, self.input_array]
+    #     return [input_file, input_table, input_array]
         
-    @property
-    def output_file(self):
+    @pytest.fixture
+    def output_file(self, tempdir):
         r"""str: Output file for the run."""
-        for o, yml in self.runner.connectiondrivers.items():
-            if yml['outputs'][0].get('filetype', None) == 'ascii':
-                return os.path.join(self.tempdir,
-                                    yml['outputs'][0]['address'])
-        raise Exception('Could not locate output file in yaml.')  # pragma: debug
+        return os.path.join(tempdir, 'output_file.txt')
 
-    @property
-    def output_table(self):
+    @pytest.fixture
+    def output_table(self, tempdir):
         r"""str: Output table for the run."""
-        for o, yml in self.runner.connectiondrivers.items():
-            if (((yml['outputs'][0].get('filetype', None) == 'table')
-                 and (not yml['outputs'][0].get('as_array', False)))):
-                return os.path.join(self.tempdir,
-                                    yml['outputs'][0]['address'])
-        raise Exception('Could not locate output table in yaml.')  # pragma: debug
+        return os.path.join(tempdir, 'output_table.txt')
 
-    @property
-    def output_array(self):
+    @pytest.fixture
+    def output_array(self, tempdir):
         r"""str: Output array for the run."""
-        for o, yml in self.runner.connectiondrivers.items():
-            if (((yml['outputs'][0].get('filetype', None) == 'table')
-                 and (yml['outputs'][0].get('as_array', False)))):
-                return os.path.join(self.tempdir,
-                                    yml['outputs'][0]['address'])
-        raise Exception('Could not locate output array in yaml.')  # pragma: debug
+        return os.path.join(tempdir, 'output_array.txt')
 
-    @property
-    def output_files(self):
+    @pytest.fixture
+    def output_files(self, output_file, output_table, output_array):
         r"""list: Output files for the run."""
-        return [self.output_file, self.output_table, self.output_array]
+        return [output_file, output_table, output_array]
 
-    @property
-    def results(self):
+    @pytest.fixture
+    def results(self, input_file, input_table, input_array):
         r"""list: Results that should be found in the output files."""
-        assert(os.path.isfile(self.input_file))
-        assert(os.path.isfile(self.input_table))
-        assert(os.path.isfile(self.output_array))
-        with open(self.input_file, 'r') as fd:
+        assert(os.path.isfile(input_file))
+        assert(os.path.isfile(input_table))
+        assert(os.path.isfile(input_array))
+        with open(input_file, 'r') as fd:
             icont = fd.read()
-        with open(self.input_table, 'rb') as fd:
+        with open(input_table, 'rb') as fd:
             iATT = serialize.table_to_array(fd.read(), comment='#')
-        with open(self.input_array, 'rb') as fd:
+        with open(input_array, 'rb') as fd:
             iATA = serialize.table_to_array(fd.read(), comment='#')
         return [icont,
                 (self.check_table, iATT),

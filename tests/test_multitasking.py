@@ -1,7 +1,7 @@
+import pytest
 import pickle
 from yggdrasil import multitasking, tools
-from yggdrasil.tests import assert_raises
-from yggdrasil.tests.test_tools import YggTestClass
+from tests import TestClassBase as base_class
 
 
 class TstClass(object):
@@ -24,8 +24,8 @@ def test_LockedAttr():
     z = LockedTstClass()
     z.x
     z.disconnect()
-    assert_raises(multitasking.AliasDisconnectError,
-                  getattr, z, 'x')
+    with pytest.raises(multitasking.AliasDisconnectError):
+        z.x
 
 
 def test_WaitableFunction():
@@ -34,8 +34,8 @@ def test_WaitableFunction():
         return False
     x = multitasking.WaitableFunction(always_false, polling_interval=0.0)
     assert(not x.wait(timeout=0.0, on_timeout=True))
-    assert_raises(multitasking.TimeoutError, x.wait,
-                  timeout=0.0, on_timeout="Error message")
+    with pytest.raises(multitasking.TimeoutError):
+        x.wait(timeout=0.0, on_timeout="Error message")
 
 
 def test_TaskThread():
@@ -58,42 +58,46 @@ def test_TaskProcess():
     assert(not q.is_alive())
 
 
-class TestContextThread(YggTestClass):
+class TestContextThread(base_class):
     r"""Test for thread based Context."""
 
     _cls = 'Context'
     _mod = 'yggdrasil.multitasking'
     _task_method = 'thread'
 
-    def __init__(self, *args, **kwargs):
-        super(TestContextThread, self).__init__(*args, **kwargs)
-        self._inst_kwargs = {'task_method': self._task_method}
+    @pytest.fixture(scope="class", autouse=True)
+    def reset_test(self, module_name, class_name, task_method):
+        self.__class__._first_test = True
 
-    def test_RLock(self):
+    @pytest.fixture(scope="class", autouse=True, params=['thread', 'process'])
+    def task_method(self, request):
+        r"""Method that should be used for the generatd task."""
+        return request.param
+    
+    @pytest.fixture(scope="class")
+    def instance_kwargs(self, task_method):
+        r"""Keyword arguments for a new instance of the tested class."""
+        return dict(task_method=task_method)
+        
+    def test_RLock(self, instance):
         r"""Test creation of RLock from context."""
-        x = self.instance.RLock()
+        x = instance.RLock()
         x.disconnect()
 
-    def test_Event(self):
+    def test_Event(self, instance):
         r"""Test creation of Event from context."""
-        x = self.instance.Event()
+        x = instance.Event()
         x.disconnect()
 
-    def test_Task(self):
+    def test_Task(self, instance):
         r"""Test creation of Task from context."""
-        x = self.instance.Task()
+        x = instance.Task()
         x.disconnect()
 
-    def test_Queue(self):
+    def test_Queue(self, instance):
         r"""Test creation of Queue from context."""
-        x = self.instance.Queue()
+        x = instance.Queue()
         x.disconnect()
-
-
-class TestContextProcess(YggTestClass):
-    r"""Test for process based Context."""
-
-    _task_method = 'process'
 
 
 class TstContextObject(object):
@@ -101,36 +105,42 @@ class TstContextObject(object):
     _cls = None
     _mod = 'yggdrasil.multitasking'
 
-    def check_decoded(self, decoded):
+    @pytest.fixture
+    def check_decoded(self):
         r"""Check that object was decoded correctly."""
-        pass
+        def check_decoded_w(decoded):
+            pass
+        return check_decoded_w
 
-    def test_pickle(self):
+    def test_pickle(self, instance, check_decoded):
         r"""Test pickling and unpickling the object."""
-        encoded = pickle.dumps(self.instance)
+        encoded = pickle.dumps(instance)
         decoded = pickle.loads(encoded)
-        self.check_decoded(decoded)
+        check_decoded(decoded)
 
 
-class TestRLock(TstContextObject, YggTestClass):
+class TestRLock(TstContextObject, base_class):
 
     _cls = 'RLock'
 
 
-class TestEvent(TstContextObject, YggTestClass):
+class TestEvent(TstContextObject, base_class):
 
     _cls = 'Event'
 
-    def check_decoded(self, decoded):
+    @pytest.fixture
+    def check_decoded(self, instance):
         r"""Check that object was decoded correctly."""
-        self.assert_equal(decoded.is_set(), self.instance.is_set())
+        def check_decoded_w(decoded):
+            assert(decoded.is_set() == instance.is_set())
+        return check_decoded_w
 
-    def test_pickle(self):
+    def test_pickle(self, instance, check_decoded):
         r"""Test pickling and unpickling the object."""
-        self.instance.set()
-        super(TestEvent, self).test_pickle()
+        instance.set()
+        super(TestEvent, self).test_pickle(instance, check_decoded)
 
-    def test_callback(self):
+    def test_callback(self, instance):
         r"""Test callabacks."""
         def set_callback():
             self.state = 'set'
@@ -138,11 +148,11 @@ class TestEvent(TstContextObject, YggTestClass):
         def clear_callback():
             self.state = 'clear'
 
-        self.instance.add_callback(set_callback, trigger='set')
-        self.instance.add_callback(clear_callback, trigger='clear')
-        self.instance.set()
+        instance.add_callback(set_callback, trigger='set')
+        instance.add_callback(clear_callback, trigger='clear')
+        instance.set()
         assert(self.state == 'set')
-        self.instance.clear()
+        instance.clear()
         assert(self.state == 'clear')
 
 
@@ -150,96 +160,126 @@ class TestValueEvent(TestEvent):
 
     _cls = 'ValueEvent'
 
-    def test_value(self):
+    def test_value(self, instance):
         r"""Test setting/clearning event value."""
-        self.assert_equal(self.instance.get(), None)
-        self.instance.set('test')
-        self.assert_equal(self.instance.get(), 'test')
-        self.instance.clear()
-        self.assert_equal(self.instance.get(), None)
+        assert(instance.get() is None)
+        instance.set('test')
+        assert(instance.get() == 'test')
+        instance.clear()
+        assert(instance.get() is None)
 
 
-class TestTask(TstContextObject, YggTestClass):
+class TestTask(TstContextObject, base_class):
 
     _cls = 'Task'
 
-    def check_decoded(self, decoded):
+    @pytest.fixture
+    def check_decoded(self, instance):
         r"""Check that object was decoded correctly."""
-        self.assert_equal(decoded.name, self.instance.name)
-        self.assert_equal(decoded.daemon, self.instance.daemon)
+        def check_decoded_w(decoded):
+            assert(decoded.name == instance.name)
+            assert(decoded.daemon == instance.daemon)
+        return check_decoded_w
 
 
-class TestQueue(TstContextObject, YggTestClass):
+class TestQueue(TstContextObject, base_class):
 
     _cls = 'Queue'
 
-    def test_join(self):
+    def test_join(self, instance):
         r"""Test join."""
-        self.instance.join()
+        instance.join()
 
 
-class TestYggTask(YggTestClass):
+class TestYggTask(base_class):
     r"""Test basic behavior of YggTask class."""
 
     _cls = 'YggTask'
     _mod = 'yggdrasil.multitasking'
 
-    def __init__(self, *args, **kwargs):
-        super(TestYggTask, self).__init__(*args, **kwargs)
-        self.namespace = 'TESTING_%s' % self.uuid
-        self.attr_list += ['name', 'sleeptime', 'longsleep', 'timeout']
-        self._inst_kwargs = {'timeout': self.timeout,
-                             'sleeptime': self.sleeptime,
-                             'target': self.target}
-        self.debug_flag = False
+    @pytest.fixture(scope="class", autouse=True)
+    def reset_test(self, module_name, class_name, task_method):
+        self.__class__._first_test = True
 
+    @pytest.fixture(scope="class", autouse=True, params=['thread', 'process'])
+    def task_method(self, request):
+        r"""Method that should be used for the generatd task."""
+        return request.param
+
+    @pytest.fixture(scope="class", autouse=True)
+    def context(self, task_method):
+        if task_method == 'process':
+            return multitasking.mp_ctx_spawn
+    
+    @pytest.fixture(scope="class")
+    def instance_kwargs(self, timeout, polling_interval, task_method,
+                        context):
+        r"""Keyword arguments for a new instance of the tested class."""
+        return dict(timeout=timeout, sleeptime=polling_interval,
+                    target=self.target, task_method=task_method,
+                    context=context)
+
+    @pytest.fixture
+    def namespace(self, uuid):
+        r"""Test namespace."""
+        return f'TESTING_{uuid}'
+
+    @pytest.fixture
+    def instance(self, python_class, instance_args, instance_kwargs):
+        r"""New instance of the python class for testing."""
+        out = python_class(*instance_args, **instance_kwargs)
+        yield out
+        # Must disconnect as calling 'del' dosn't trigger garbage collection
+        # until after tests due to presence of a ref in pytest fixtures
+        out.disconnect()
+        
     @staticmethod
     def target():  # pragma: no cover
         tools.sleep(10.0)
 
-    def test_id(self):
+    def test_id(self, instance):
         r"""Test process ID and ident."""
-        self.instance.pid
-        self.instance.ident
+        instance.pid
+        instance.ident
 
-    def test_daemon(self):
+    def test_daemon(self, instance):
         r"""Test process/thread daemon property."""
-        self.instance.daemon
+        instance.daemon
 
-    def test_exitcode(self):
+    def test_exitcode(self, instance):
         r"""Test process exitcode."""
-        self.instance.exitcode
+        instance.exitcode
 
-    def test_get_main_proc(self):
+    def test_get_main_proc(self, instance):
         r"""Test get_main_proc."""
-        self.instance.get_main_proc()
+        instance.get_main_proc()
 
-    def test_kill(self):
+    def test_kill(self, instance, task_method):
         r"""Test kill."""
-        if self._inst_kwargs.get('task_method', None) == 'process':
-            self.instance.start()
-        self.instance.kill()
-        self.instance.exitcode
+        if task_method == 'process':
+            instance.start()
+        instance.kill()
+        instance.exitcode
 
-    def test_flag_manipulation(self):
+    def test_flag_manipulation(self, instance):
         r"""Test flag manipulation."""
-        self.instance.set_flag_attr('error_flag')
-        assert(self.instance.check_flag_attr('error_flag'))
-        self.instance.clear_flag_attr('error_flag')
-        assert(not self.instance.check_flag_attr('error_flag'))
+        instance.set_flag_attr('error_flag')
+        assert(instance.check_flag_attr('error_flag'))
+        instance.clear_flag_attr('error_flag')
+        assert(not instance.check_flag_attr('error_flag'))
 
 
-class TestYggProcess(TestYggTask):
-    r"""Test basic behavior of YggTask for spawned process."""
-
-    def __init__(self, *args, **kwargs):
-        super(TestYggProcess, self).__init__(*args, **kwargs)
-        self._inst_kwargs['task_method'] = 'process'
-
-
-class TestYggProcessFork(TestYggProcess):
+class TestYggProcessFork(TestYggTask):
     r"""Test basic behavior of YggTask for forked process."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestYggProcessFork, self).__init__(*args, **kwargs)
-        self._inst_kwargs['context'] = multitasking.mp_ctx
+    @pytest.fixture(scope="class", autouse=True, params=['process'])
+    def task_method(self, request):
+        r"""Method that should be used for the generatd task."""
+        return request.param
+    
+    @pytest.fixture(scope="class")
+    def instance_kwargs(self, timeout, polling_interval, task_method):
+        r"""Keyword arguments for a new instance of the tested class."""
+        return dict(timeout=timeout, sleeptime=polling_interval,
+                    target=self.target, task_method=task_method,
+                    context=multitasking.mp_ctx)

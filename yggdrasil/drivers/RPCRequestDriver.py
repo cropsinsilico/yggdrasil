@@ -240,3 +240,10 @@ class RPCRequestDriver(ConnectionDriver):
             #         remove_idx.append(i)
             # for i in remove_idx[::-1]:
             #     self.response_drivers.pop(i)
+
+    def disconnect(self):
+        if hasattr(self, 'response_drivers'):
+            for x in self.response_drivers.values():
+                x.disconnect()
+        if RPCRequestDriver is not None:
+            super(RPCRequestDriver, self).disconnect()

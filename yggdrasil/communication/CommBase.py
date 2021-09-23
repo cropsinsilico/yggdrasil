@@ -836,6 +836,9 @@ class CommBase(tools.YggClass):
                'contents': out_seri['contents'],
                'objects': out_seri['objects']}
         out['recv'] = copy.deepcopy(out['send'])
+        for i in range(len(out['recv'])):
+            if isinstance(out['recv'][i], tuple):
+                out['recv'][i] = list(out['recv'][i])
         out['dict'] = seri_cls.object2dict(out['msg'], **out['kwargs'])
         if not out_seri.get('exact_contents', True):
             out['exact_contents'] = False
@@ -1217,7 +1220,7 @@ class CommBase(tools.YggClass):
             self.drain_messages(variable='n_msg_send')
             self.wait_for_confirm(timeout=self._timeout_drain,
                                   active_confirm=active_confirm)
-        self.debug("Finished (timeout_drain = %s)", str(self._timeout_drain))
+        self.debug("Finished (timeout_drain = {str(self._timeout_drain)})")
 
     def language_atexit(self):  # pragma: debug
         r"""Close operations specific to the language."""
@@ -1226,14 +1229,13 @@ class CommBase(tools.YggClass):
 
     def atexit(self):  # pragma: debug
         r"""Close operations."""
-        self.debug('atexit begins (n_msg=%d)', self.n_msg)
+        self.debug(f'atexit begins (n_msg={self.n_msg})')
         self.language_atexit()
         self.debug('atexit after language_atexit, but before close')
         self.close()
         self.debug(
-            'atexit finished: closed=%s, n_msg=%d, close_alive=%s',
-            self.is_closed, self.n_msg,
-            self._closing_thread.is_alive())
+            f'atexit finished: closed={self.is_closed}, n_msg={self.n_msg}, '
+            f'close_alive={self._closing_thread.is_alive()}')
 
     @property
     def is_open(self):
@@ -1515,8 +1517,13 @@ class CommBase(tools.YggClass):
 
         """
         try:
-            from yggdrasil.tests import assert_equal
-            assert_equal(msg, emsg)
+            import pandas
+            if isinstance(msg, np.ndarray):
+                np.testing.assert_array_equal(msg, emsg)
+            elif isinstance(msg, pandas.DataFrame):
+                pandas.testing.assert_frame_equal(msg, emsg)
+            else:
+                assert(msg == emsg)
         except AssertionError:
             return False
         return True

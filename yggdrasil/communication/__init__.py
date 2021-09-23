@@ -162,9 +162,6 @@ def new_comm(name, commtype=None, use_async=False, **kwargs):
             commtype = 'fork'
     if (commtype is None) and kwargs.get('filetype', None):
         commtype = kwargs.pop('filetype')
-    if commtype in ['ErrorComm', 'error']:
-        kwargs['commtype'] = commtype
-        commtype = kwargs['base_commtype']
     comm_cls = import_comm(commtype)
     if kwargs.get('is_interface', False):
         use_async = False

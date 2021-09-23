@@ -1,45 +1,48 @@
-from yggdrasil.serialize.tests import test_AsciiTableSerialize as parent
+import pytest
+from tests.serialize.test_AsciiTableSerialize import (
+    TestAsciiTableSerialize as base_class)
 
 
-class TestPandasSerialize(parent.TestAsciiTableSerialize):
+@pytest.mark.usefixtures("pandas_equality_patch")
+class TestPandasSerialize(base_class):
     r"""Test class for TestPandasSerialize class."""
 
-    _cls = 'PandasSerialize'
+    @pytest.fixture(scope="class", autouse=True, params=['pandas'])
+    def component_subtype(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
 
-    def test_apply_field_names_errors(self):
+    @pytest.fixture(scope="class", autouse=True,
+                    params=[{}, {'no_header': True},
+                            {'table_string_type': 'bytes'}])
+    def options(self, request):
+        r"""Arguments that should be provided when getting testing options."""
+        return request.param
+
+    def test_apply_field_names_errors(self, instance, testing_options):
         r"""Test errors raised by apply_field_names."""
-        self.assert_raises(RuntimeError, self.instance.apply_field_names,
-                           self.testing_options['objects'][0],
-                           field_names=['x', 'y'])
-        names = self.testing_options['objects'][0].columns.tolist()
+        with pytest.raises(RuntimeError):
+            instance.apply_field_names(testing_options['objects'][0],
+                                       field_names=['x', 'y'])
+        names = testing_options['objects'][0].columns.tolist()
         names[0] = 'invalid'
-        self.assert_raises(RuntimeError, self.instance.apply_field_names,
-                           self.testing_options['objects'][0],
-                           field_names=names)
+        with pytest.raises(RuntimeError):
+            instance.apply_field_names(testing_options['objects'][0],
+                                       field_names=names)
 
-    def test_func_serialize_errors(self):
+    def test_func_serialize_errors(self, instance):
         r"""Test errors raised by func_serialize."""
-        self.assert_raises(TypeError, self.instance.func_serialize, None)
+        with pytest.raises(TypeError):
+            instance.func_serialize(None)
 
-    def test_deserialize_no_header(self):
+    def test_deserialize_no_header(self, instance, testing_options,
+                                   python_class, map_sent2recv, options):
         r"""Test deserialization of frame output without a header."""
-        if self.testing_option_kws.get('no_header', False):
+        if options.get('no_header', False):
             return
-        kws = self.instance.get_testing_options(no_header=True)
+        kws = instance.get_testing_options(no_header=True)
         kws['kwargs'].pop('no_header', None)
-        no_head_inst = self.import_cls(**kws['kwargs'])
+        no_head_inst = python_class(**kws['kwargs'])
         x = no_head_inst.serialize(kws['objects'][0])
-        y = self.instance.deserialize(x)[0]
-        self.assert_result_equal(y, self.testing_options['objects'][0])
-
-
-class TestPandasSerializeNoHeader(TestPandasSerialize):
-    r"""Test class for PandasSerialize class when no header specified."""
-
-    testing_option_kws = {'no_header': True}
-
-    
-class TestPandasSerializeBytes(TestPandasSerialize):
-    r"""Test class for PandasSerialize class when strings are bytes."""
-
-    testing_option_kws = {'table_string_type': 'bytes'}
+        y = instance.deserialize(x)[0]
+        assert(y == map_sent2recv(testing_options['objects'][0]))

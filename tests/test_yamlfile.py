@@ -1,3 +1,4 @@
+import pytest
 import tempfile
 import os
 import yaml
@@ -5,8 +6,8 @@ import flaky
 import io as sio
 from jsonschema.exceptions import ValidationError
 from yggdrasil import yamlfile
-from yggdrasil.tests import YggTestClass, assert_raises, assert_equal
 from yaml.constructor import ConstructorError
+from tests import TestBase as base_class
 _yaml_env = 'TEST_YAML_FILE'
 
 
@@ -28,17 +29,17 @@ def test_load_yaml():
     try:
         # Dictionary
         out = yamlfile.load_yaml(dict_write)
-        assert_equal(out, dict_read)
+        assert(out == dict_read)
         # File name
         out = yamlfile.load_yaml(fname)
-        assert_equal(out, dict_read)
+        assert(out == dict_read)
         # Open file object
         with open(fname, 'r') as fd:
             out = yamlfile.load_yaml(fd)
-            assert_equal(out, dict_read)
+            assert(out == dict_read)
         # Open stream
         out = yamlfile.load_yaml(sio.StringIO(contents))
-        assert_equal(out, dict_read)
+        assert(out == dict_read)
     finally:
         # Remove file
         if os.path.isfile(fname):
@@ -47,15 +48,16 @@ def test_load_yaml():
 
 def test_load_yaml_error():
     r"""Test error on loading invalid file."""
-    assert_raises(IOError, yamlfile.load_yaml, 'invalid')
+    with pytest.raises(IOError):
+        yamlfile.load_yaml('invalid')
 
 
 def test_parse_component_error():
     r"""Test errors in parse_component."""
-    assert_raises(yamlfile.YAMLSpecificationError, yamlfile.parse_component,
-                  1, 'invalid', 'invalid')
-    assert_raises(yamlfile.YAMLSpecificationError, yamlfile.parse_component,
-                  {}, 'invalid', 'invalid')
+    with pytest.raises(yamlfile.YAMLSpecificationError):
+        yamlfile.parse_component(1, 'invalid', 'invalid')
+    with pytest.raises(yamlfile.YAMLSpecificationError):
+        yamlfile.parse_component({}, 'invalid', 'invalid')
 
 
 @flaky.flaky(max_runs=3)
@@ -63,107 +65,121 @@ def test_load_yaml_git():
     r"""Test loading a yaml from a remote git repository."""
     import git
     yml = "https://github.com/cropsinsilico/example-fakemodel/fakemodel.yml"
-    assert_raises(Exception, yamlfile.load_yaml, yml)
+    with pytest.raises(Exception):
+        yamlfile.load_yaml(yml)
     assert('model' in yamlfile.load_yaml('git:' + yml))
     yml = "cropsinsilico/example-fakemodel/fakemodel.yml"
     assert('model' in yamlfile.load_yaml('git:' + yml))
     git.rmtree("cropsinsilico")
     
 
-class YamlTestBase(YggTestClass):
+class YamlTestBase(base_class):
     r"""Test base for yamlfile."""
+    
     _contents = tuple()
     _include = tuple()
     _use_json = False
     _parse_kwargs = dict()
 
-    def __init__(self, *args, **kwargs):
-        super(YamlTestBase, self).__init__(*args, **kwargs)
-        self.files = []
-        self.include_files = []
-        for i in range(self.nfiles):
-            self.files.append(self.get_fname(i))
-        for i in range(len(self.include)):
-            self.include_files.append(self.get_fname(i, '_incl'))
-
-    @property
-    def nfiles(self):
-        r"""int: Number of files."""
-        return len(self.contents)
-
-    @property
+    @pytest.fixture(scope="class")
     def contents(self):
         r"""tuple: Contents of files."""
         return self._contents
 
-    @property
+    @pytest.fixture(scope="class")
+    def nfiles(self, contents):
+        r"""int: Number of files created for the test."""
+        return len(contents)
+
+    @pytest.fixture(scope="class")
+    def use_json(self):
+        r"""bool: Whether or not to use JSON for the test."""
+        return self._use_json
+
+    @pytest.fixture(scope="class")
+    def parse_kwargs(self):
+        r"""dict: Keyword arguments for the parse call."""
+        return self._parse_kwargs
+
+    @pytest.fixture(scope="class")
     def include(self):
         r"""tuple: Contents of included files."""
         return self._include
 
-    @property
+    @pytest.fixture(scope="class")
     def yaml_env(self):
         r"""str: Environment variable where file path is stored."""
         return _yaml_env
 
-    def setup(self):
+    @pytest.fixture
+    def files(self, nfiles, get_fname):
+        r"""list: Name of test files."""
+        return [get_fname(i) for i in range(nfiles)]
+
+    @pytest.fixture
+    def include_files(self, include, get_fname):
+        r"""list: Names of test include files."""
+        return [get_fname(i, '_incl') for i in range(len(include))]
+
+    @pytest.fixture(autouse=True)
+    def create_files(self, files, contents, yaml_env,
+                     include_files, include, nfiles):
         r"""Write contents to temp file."""
-        super(YamlTestBase, self).setup()
-        if self.nfiles > 0:
-            os.environ[self.yaml_env] = self.files[0]
-        for fname, content in zip(self.files, self.contents):
+        if nfiles > 0:
+            os.environ[yaml_env] = files[0]
+        for fname, content in zip(files, contents):
             with open(fname, 'w') as f:
                 f.write('\n'.join(content))
-        for i, (fname, content) in enumerate(zip(self.include_files,
-                                                 self.include)):
-            os.environ['%s%d' % (self.yaml_env, i)] = os.path.join(
+        for i, (fname, content) in enumerate(zip(include_files,
+                                                 include)):
+            os.environ['%s%d' % (yaml_env, i)] = os.path.join(
                 '.', os.path.basename(fname))
             with open(fname, 'w') as f:
                 f.write('\n'.join(content))
-
-    def teardown(self):
-        r"""Remove the temporary file if it exists."""
-        for fname in self.files:
+        yield
+        for fname in files + include_files:
             if os.path.isfile(fname):
                 os.remove(fname)
-        super(YamlTestBase, self).teardown()
 
-    def get_fname(self, idx=0, suffix=''):
+    @pytest.fixture
+    def get_fname(self, uuid, use_json):
         r"""Path to temporary file."""
-        if self._use_json:
-            ext = '.json'
-        else:
-            ext = '.yml'
-        return os.path.join(tempfile.gettempdir(),
-                            '%s_%s_%d%s%s' % (
-                                tempfile.gettempprefix(), self.uuid,
-                                idx, suffix, ext))
+        def wrapped_get_fname(idx=0, suffix=''):
+            if use_json:
+                ext = '.json'
+            else:
+                ext = '.yml'
+            return os.path.join(tempfile.gettempdir(),
+                                '%s_%s_%d%s%s' % (
+                                    tempfile.gettempprefix(), uuid,
+                                    idx, suffix, ext))
+        return wrapped_get_fname
 
-    def create_instance(self):
-        r"""Disabled: Create a new instance of the class."""
-        return None
-
-    def test_parse_yaml(self, **kwargs):
+    def test_parse_yaml(self, parse_kwargs, nfiles, files):
         r"""Test successfully reading & parsing yaml."""
-        kwargs.update(self._parse_kwargs)
-        if self.nfiles == 0:
+        if nfiles == 0:
             pass
-        elif self.nfiles == 1:
-            yamlfile.parse_yaml(self.files[0], **kwargs)
+        elif nfiles == 1:
+            yamlfile.parse_yaml(files[0], **parse_kwargs)
         else:
-            yamlfile.parse_yaml(self.files, **kwargs)
+            yamlfile.parse_yaml(files, **parse_kwargs)
 
 
 class YamlTestBaseError(YamlTestBase):
     r"""Test error for yamlfile."""
+    
     _error = None
 
-    def test_parse_yaml(self, **kwargs):
+    @pytest.fixture(scope="class")
+    def error(self):
+        return self._error
+
+    def test_parse_yaml(self, parse_kwargs, error, nfiles, files):
         r"""Test error reading & parsing yaml."""
-        kwargs.update(self._parse_kwargs)
-        if (self._error is None) or (self.nfiles == 0):
+        if (error is None) or (nfiles == 0):
             return
-        assert_raises(self._error, yamlfile.parse_yaml, self.files, **kwargs)
+        with pytest.raises(error):
+            yamlfile.parse_yaml(files, parse_kwargs)
 
 
 class TestJSONModelOnly(YamlTestBase):
@@ -677,11 +693,12 @@ class TestYamlModelSubmission(YamlTestBase):
                   '          type: bytes',
                   ],)
 
-    def teardown(self):
-        r"""Remove the temporary file if it exists."""
+    @pytest.fixture(autouse=True)
+    def cleanup_git_repo(self):
+        r"""Remove the git repository."""
+        yield
         import git
         git.rmtree("cropsinsilico")
-        super(TestYamlModelSubmission, self).teardown()
 
 
 class TestYamlServerNoClient(YamlTestBaseError):

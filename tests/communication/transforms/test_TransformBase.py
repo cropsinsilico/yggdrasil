@@ -1,104 +1,94 @@
-import pprint
+import pytest
+from tests import TestComponentBase as base_class
 import collections
 import numpy as np
 import copy
-from yggdrasil.tests import YggTestClass
+from yggdrasil import constants
 from yggdrasil.communication import new_comm
 
 
-class TestTransformBase(YggTestClass):
+_transforms = sorted(constants.COMPONENT_REGISTRY['transform']['subtypes'].keys())
+
+
+@pytest.mark.usefixtures("pandas_equality_patch")
+class TestTransformBase(base_class):
     r"""Test for TransformBase communication flass."""
 
-    transform = 'TransformBase'
-    skip_comm_check = True
+    _component_type = 'transform'
     
-    @property
-    def cls(self):
-        r"""str: Communication class."""
-        return self.transform
+    @pytest.fixture(scope="class", autouse=True, params=_transforms)
+    def component_subtype(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
 
-    @property
-    def mod(self):
-        r"""str: Absolute module import."""
-        return 'yggdrasil.communication.transforms.%s' % self.cls
-
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for tested class."""
+    @pytest.fixture
+    def testing_options(self, python_class, options):
+        r"""Testing options."""
+        if 'explicit_testing_options' in options:
+            return copy.deepcopy(options['explicit_testing_options'])
+        return python_class.get_testing_options(**options)
+    
+    @pytest.fixture
+    def instance_kwargs(self, testing_options):
+        r"""Keyword arguments for a new instance of the tested class."""
         out = {}
-        opt = self.get_options()
-        if opt:
-            out = opt[0].get('kwargs', {})
+        if testing_options:
+            out = dict(testing_options[0].get('kwargs', {}))
         return out
 
-    def assert_equal_msg(self, a, b, **kwargs):
-        r"""Assert that two message are the same.
+    @pytest.fixture(scope="class")
+    def assert_iterator_equality(self, nested_approx):
+        r"""Check for equality between iterators."""
+        from collections.abc import Iterator
 
-        Args:
-            a (object): Message for comarison.
-            b (object): Expected message.
-            original (object, None): Original message.
-
-        """
-        try:
-            if ((isinstance(a, collections.abc.Iterator)
-                 and isinstance(b, collections.abc.Iterator))):
-                self.assert_equal(list(copy.deepcopy(a)), list(copy.deepcopy(b)))
+        def iterator_equality_w(a, b):
+            if isinstance(a, Iterator) and isinstance(b, Iterator):
+                assert(list(copy.deepcopy(a))
+                       == nested_approx(list(copy.deepcopy(b))))
             else:
-                self.assert_equal(a, b)
-        except BaseException:  # pragma: debug
-            labels = ['expected', 'out']
-            values = [b, a]
-            if 'original' in kwargs:
-                labels.insert(0, 'in')
-                values.insert(0, kwargs['original'])
-            for t, x in zip(labels, values):
-                print('%s:' % t)
-                if isinstance(x, collections.abc.Iterator):
-                    print('iter(%s)' % pprint.pformat(list(x)))
-                else:
-                    pprint.pprint(x)
-            raise
+                assert(a == nested_approx(b))
+        return iterator_equality_w
 
-    def test_transform(self):
+    def test_transform(self, python_class, testing_options,
+                       assert_iterator_equality):
         r"""Test transform."""
-        for x in self.get_options():
-            inst = self.import_cls(**x.get('kwargs', {}))
+        for x in testing_options:
+            inst = python_class(**x.get('kwargs', {}))
             for msg_in, msg_exp in x.get('in/out', []):
-                if isinstance(msg_in, collections.abc.Iterator):
-                    msg_in0 = copy.deepcopy(msg_in)
-                else:
-                    msg_in0 = msg_in
+                # if isinstance(msg_in, collections.abc.Iterator):
+                #     msg_in0 = copy.deepcopy(msg_in)
+                # else:
+                #     msg_in0 = msg_in
                 if isinstance(msg_exp, type(BaseException)):
-                    self.assert_raises(msg_exp, inst, msg_in)
+                    with pytest.raises(msg_exp):
+                        inst(msg_in)
                 else:
                     msg_out = inst(msg_in)
-                    self.assert_equal_msg(msg_out, msg_exp, original=msg_in0)
+                    assert_iterator_equality(msg_out, msg_exp)
 
-    def test_transform_type(self):
+    def test_transform_type(self, python_class, testing_options):
         r"""Test transform_type."""
-        for x in self.get_options():
-            inst = self.import_cls(**x.get('kwargs', {}))
+        for x in testing_options:
+            inst = python_class(**x.get('kwargs', {}))
             for typ_in, typ_exp in x.get('in/out_t', []):
                 if isinstance(typ_exp, type(BaseException)):
-                    self.assert_raises(typ_exp, inst.validate_datatype,
-                                       typ_in)
+                    with pytest.raises(typ_exp):
+                        inst.validate_datatype(typ_in)
                 else:
                     inst.validate_datatype(typ_in)
                     typ_out = inst.transform_datatype(typ_in)
-                    self.assert_equal_msg(typ_out, typ_exp, original=typ_in)
+                    assert(typ_out == typ_exp)
 
-    def test_transform_empty(self):
+    def test_transform_empty(self, instance):
         r"""Test transform of empty bytes message."""
-        self.assert_equal(self.instance(b'', no_init=True), b'')
+        assert(instance(b'', no_init=True) == b'')
 
-    def test_send_comm(self):
+    def test_send_comm(self, class_name, python_class, testing_options,
+                       timeout, nested_approx):
         r"""Test transform within send comm."""
-        if self.transform in ['pandas', 'PandasTransform',
-                              'array', 'ArrayTransform']:
-            # These transformation are negated on send
-            return
-        for x in self.get_options():
+        if class_name in ['PandasTransform', 'ArrayTransform']:
+            pytest.skip("Transformation negated on send")
+        for x in testing_options:
             if (((not x.get('in/out', False))
                  or isinstance(x['in/out'][0][1],
                                type(BaseException)))):  # pragma: debug
@@ -106,7 +96,7 @@ class TestTransformBase(YggTestClass):
             msg_in, msg_out = x['in/out'][0]
             send_comm = new_comm('test_send', reverse_names=True,
                                  direction='send', use_async=False,
-                                 transform=[self.import_cls(**x.get('kwargs', {}))])
+                                 transform=[python_class(**x.get('kwargs', {}))])
             recv_comm = new_comm('test_recv', **send_comm.opp_comm_kwargs())
             if isinstance(msg_in, collections.abc.Iterator):
                 msg_out_list = list(msg_out)
@@ -115,38 +105,41 @@ class TestTransformBase(YggTestClass):
                 msg_out_list = [msg_out]
             try:
                 for imsg_out in msg_out_list:
-                    flag = send_comm.send(msg_in, timeout=self.timeout)
+                    flag = send_comm.send(msg_in, timeout=timeout)
                     assert(flag)
-                    if self.transform in ['iterate', 'IterateTransform']:
+                    if class_name in ['IterateTransform']:
                         for iimsg_out in imsg_out:
-                            flag, msg_recv = recv_comm.recv(timeout=self.timeout)
+                            flag, msg_recv = recv_comm.recv(timeout=timeout)
                             assert(flag)
-                            self.assert_equal_msg(msg_recv, iimsg_out,
-                                                  original=msg_in)
+                            assert(msg_recv == nested_approx(iimsg_out))
                         msg_recv = imsg_out
-                    elif ((self.transform in ['filter', 'FilterTransform'])
+                    elif ((class_name in ['FilterTransform'])
                           and isinstance(imsg_out, collections.abc.Iterator)):
                         assert(recv_comm.n_msg_recv == 0)
                         flag, msg_recv = recv_comm.recv(timeout=0.0)
                         assert(flag)
-                        self.assert_equal_msg(msg_recv, b'', original=msg_in)
+                        assert(msg_recv == b'')
                         msg_recv = imsg_out
-                    elif ((self.transform in ['map', 'MapFieldsTransform',
-                                              'select_fields', 'SelectFieldsTransform'])
+                    elif ((class_name in ['MapFieldsTransform',
+                                          'SelectFieldsTransform'])
                           and isinstance(imsg_out, np.ndarray)):
-                        flag, msg_recv = recv_comm.recv_array(timeout=self.timeout)
+                        flag, msg_recv = recv_comm.recv_array(timeout=timeout)
                     else:
-                        flag, msg_recv = recv_comm.recv(timeout=self.timeout)
+                        flag, msg_recv = recv_comm.recv(timeout=timeout)
                     assert(flag)
-                    self.assert_equal_msg(msg_recv, imsg_out,
-                                          original=msg_in)
+                    assert(msg_recv == nested_approx(imsg_out))
             finally:
-                send_comm.close()
-                recv_comm.close()
+                send_comm.close(linger=True)
+                recv_comm.close(linger=True)
+                send_comm.disconnect()
+                recv_comm.disconnect()
+                del send_comm
+                del recv_comm
 
-    def test_recv_comm(self):
+    def test_recv_comm(self, class_name, python_class, testing_options,
+                       timeout, assert_iterator_equality):
         r"""Test transform within recv comm."""
-        for x in self.get_options():
+        for x in testing_options:
             if (((not x.get('in/out', False))
                  or isinstance(x['in/out'][0][1],
                                type(BaseException)))):  # pragma: debug
@@ -155,7 +148,7 @@ class TestTransformBase(YggTestClass):
             send_comm = new_comm('test_send', reverse_names=True,
                                  direction='send', use_async=False)
             recv_comm = new_comm('test_recv',
-                                 transform=[self.import_cls(**x.get('kwargs', {}))],
+                                 transform=[python_class(**x.get('kwargs', {}))],
                                  **send_comm.opp_comm_kwargs())
             if isinstance(msg_in, collections.abc.Iterator):
                 msg_out_list = list(msg_out)
@@ -163,17 +156,21 @@ class TestTransformBase(YggTestClass):
             else:
                 msg_out_list = [msg_out]
             try:
-                flag = send_comm.send(msg_in, timeout=self.timeout)
+                flag = send_comm.send(msg_in, timeout=timeout)
                 assert(flag)
                 for imsg_out in msg_out_list:
-                    if (((self.transform in ['map', 'MapFieldsTransform',
-                                             'select_fields', 'SelectFieldsTransform'])
+                    if (((class_name in ['MapFieldsTransform',
+                                         'SelectFieldsTransform'])
                          and isinstance(imsg_out, np.ndarray))):
-                        flag, msg_recv = recv_comm.recv_array(timeout=self.timeout)
+                        flag, msg_recv = recv_comm.recv_array(timeout=timeout)
                     else:
-                        flag, msg_recv = recv_comm.recv(timeout=self.timeout)
+                        flag, msg_recv = recv_comm.recv(timeout=timeout)
                     assert(flag)
-                    self.assert_equal_msg(msg_recv, imsg_out, original=msg_in)
+                    assert_iterator_equality(msg_recv, imsg_out)
             finally:
-                send_comm.close()
-                recv_comm.close()
+                send_comm.close(linger=True)
+                recv_comm.close(linger=True)
+                send_comm.disconnect()
+                recv_comm.disconnect()
+                del send_comm
+                del recv_comm

@@ -234,3 +234,32 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         else:
             out = super(JSONArrayMetaschemaType, cls)._generate_data(typedef)
         return out
+
+    @classmethod
+    def get_test_data(cls, typedef=None):
+        r"""object: Test data."""
+        if typedef is None:
+            typedef = {
+                'type': 'array',
+                'items': [
+                    {'type': 'float',
+                     'precision': 32,
+                     'units': ''},
+                    {'type': 'bytes',
+                     'precision': 40,
+                     'units': ''},
+                    {'type': 'unicode',
+                     'precision': 40,
+                     'units': ''},
+                    {'type': 'object',
+                     'properties': {'nested': {'type': 'int',
+                                               'precision': 64,
+                                               'units': ''}}},
+                    {'type': 'array',
+                     'items': [{'type': 'complex',
+                                'precision': 128,
+                                'units': ''},
+                               {'type': 'uint',
+                                'precision': 8,
+                                'units': ''}]}]}
+        return super(JSONArrayMetaschemaType, cls).get_test_data(typedef)

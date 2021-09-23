@@ -1,38 +1,37 @@
-from yggdrasil.tests import YggTestClass
+import pytest
+from tests import TestComponentBase as base_class
+from yggdrasil import constants
 
 
-class TestFilterBase(YggTestClass):
+_filters = sorted(constants.COMPONENT_REGISTRY['filter']['subtypes'].keys())
+
+
+class TestFilterBase(base_class):
     r"""Test for FilterBase communication flass."""
 
-    filter = 'FilterBase'
-    skip_comm_check = True
-    
-    @property
-    def cls(self):
-        r"""str: Communication class."""
-        return self.filter
+    _component_type = 'filter'
 
-    @property
-    def mod(self):
-        r"""str: Absolute module import."""
-        return 'yggdrasil.communication.filters.%s' % self.cls
+    @pytest.fixture(scope="class", autouse=True, params=_filters)
+    def component_subtype(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
 
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for tested class."""
+    @pytest.fixture
+    def instance_kwargs(self, testing_options):
+        r"""Keyword arguments for a new instance of the tested class."""
         out = {}
-        opt = self.get_options()
-        if opt:
-            out = opt[0].get('kwargs', {})
+        if testing_options:
+            out = dict(testing_options[0].get('kwargs', {}))
         return out
 
-    def test_filter(self):
+    def test_filter(self, python_class, testing_options):
         r"""Test filter."""
-        for x in self.get_options():
-            inst = self.import_cls(**x.get('kwargs', {}))
+        for x in testing_options:
+            inst = python_class(**x.get('kwargs', {}))
             for msg in x.get('pass', []):
-                self.assert_equal(inst(msg), True)
+                assert(inst(msg) is True)
             for msg in x.get('fail', []):
-                self.assert_equal(inst(msg), False)
+                assert(inst(msg) is False)
             for msg, err in x.get('error', []):
-                self.assert_raises(err, inst, msg)
+                with pytest.raises(err):
+                    inst(msg)

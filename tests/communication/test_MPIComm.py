@@ -1,172 +1,233 @@
+import copy
 import pytest
-import unittest
-from yggdrasil.tests import assert_equal
-from yggdrasil.communication import CommBase, MPIComm
-from yggdrasil.communication.tests import test_CommBase
+from yggdrasil.communication import CommBase, new_comm, get_comm
+from tests.communication import TestComm as base_class
+import utils
 
 
-_mpi_installed = MPIComm.MPIComm.is_installed(language='python')
-
-
-@unittest.skipIf(not _mpi_installed, "MPI library not installed")
 @pytest.mark.mpi(min_size=2)
-class TestMPIComm(test_CommBase.TestCommBase):
+class TestMPIComm(base_class):
     r"""Test class for MPIComm."""
     # Rank 0 sends, rank 1+ receives
 
-    comm = 'MPIComm'
-    root_direction = 'send'
     test_error_send = None
     test_error_recv = None
     test_invalid_direction = None
     test_work_comm = None
 
-    def __init__(self, *args, **kwargs):
+    @pytest.fixture(scope="class")
+    def component_subtype(self):
+        r"""Subtype of component being tested."""
+        return "mpi"
+
+    @pytest.fixture(scope="class")
+    def mpi_comm(self):
+        r"""MPI communicator."""
         try:
             from mpi4py import MPI
-            self.mpi_comm = MPI.COMM_WORLD
-            self.mpi_rank = self.mpi_comm.Get_rank()
-            self.mpi_size = self.mpi_comm.Get_size()
+            return MPI.COMM_WORLD
         except ImportError:  # pragma: debug
-            self.mpi_comm = None
-            self.mpi_rank = 0
-            self.mpi_size = 1
-        self._rank_kws = {}
-        super(TestMPIComm, self).__init__(*args, **kwargs)
+            pytest.skip("tests not run with MPI")
 
-    @property
-    def rank_direction(self):
+    @pytest.fixture(scope="class")
+    def mpi_rank(self, mpi_comm):
+        r"""int: MPI rank"""
+        return mpi_comm.Get_rank()
+
+    @pytest.fixture(scope="class")
+    def mpi_size(self, mpi_comm):
+        r"""int: MPI size"""
+        return mpi_comm.Get_size()
+
+    @pytest.fixture(scope="class")
+    def root_direction(self):
+        r"""str: Direction of communicator on the root process."""
+        return 'send'
+
+    @pytest.fixture(scope="class")
+    def rank_direction(self, mpi_rank, root_direction):
         r"""str: MPI rank of the direction this processes is handling
         messages."""
-        if self.mpi_rank == 0:
-            return self.root_direction
-        elif self.root_direction == 'recv':
+        if mpi_rank == 0:
+            return root_direction
+        elif root_direction == 'recv':
             return 'send'
         else:
             return 'recv'
 
-    @property
-    def root_inst_kwargs(self):
-        r"""dict: Keyword arguments for the tested class on the rank == 0
-        process."""
-        out = self.send_inst_kwargs
-        out['direction'] = self.root_direction
-        return out
+    @pytest.fixture
+    def get_next_tag(self, adv_global_mpi_tag, initial_tag):
+        def wrapped_get_next_tag():
+            return adv_global_mpi_tag()
+        return wrapped_get_next_tag
 
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for tested class."""
-        tag = self.get_next_tag()
-        if self.mpi_rank == 0:
-            out = self.root_inst_kwargs
-            out['tag_start'] = tag
-            out['partner_mpi_ranks'] = list(range(1, self.mpi_size))
-        else:
-            out = self._rank_kws
-            out['tag_start'] = tag
-            out['commtype'] = self.commtype
-        return out
-    
-    @property
-    def recv_instance(self):
-        r"""Alias for instance."""
-        if self.rank_direction == 'recv':
-            return self.instance
+    @pytest.fixture(scope="class")
+    def sync(self, sync_mpi_exchange):
+        def wrapped_sync(local_comm, **kwargs):
+            return sync_mpi_exchange(local_comm.tag, **kwargs)
+        return wrapped_sync
 
-    @property
-    def send_instance(self):
-        r"""Alias for instance."""
-        if self.rank_direction == 'send':
-            return self.instance
-        
-    def setup(self, *args, **kwargs):
-        r"""Initialize comm object pair."""
-        assert(self.is_installed)
-        sleep_after_connect = kwargs.pop('sleep_after_connect', False)
-        kwargs.setdefault('nprev_comm', self.comm_count)
-        kwargs.setdefault('nprev_fd', self.fd_count)
-        init_tag = self.get_next_tag()
-        if self.mpi_rank > 0:
-            self._rank_kws = self.mpi_comm.recv(source=0, tag=init_tag)
-        super(test_CommBase.TestCommBase, self).setup(*args, **kwargs)
-        if self.mpi_rank == 0:
-            rank_kws = self.instance.opp_comm_kwargs()
-            for i in self.instance.ranks:
-                self.mpi_comm.send(rank_kws, dest=i, tag=init_tag)
-        if sleep_after_connect:  # pragma: testing
-            self.instance.sleep()
-        assert(self.instance.is_open)
-        if self.instance.direction == 'recv':
-            self.instance.drain_server_signon_messages()
-        self.sync()
-
-    def get_next_tag(self):
-        from yggdrasil.communication.tests.conftest import adv_global_mpi_tag
+    @pytest.fixture
+    def initial_tag(self, adv_global_mpi_tag, mpi_rank):
         return adv_global_mpi_tag()
 
-    def sync(self, **kwargs):
-        from yggdrasil.communication.tests.conftest import sync_mpi_exchange
-        return sync_mpi_exchange(self.instance.tag, **kwargs)
+    @pytest.fixture
+    def root_kwargs(self, commtype, use_async, testing_options,
+                    root_direction, get_next_tag, mpi_rank, mpi_size):
+        r"""dict: Keyword arguments for the communicator on the rank == 0
+        process."""
+        if mpi_rank == 0:
+            out = dict(commtype=commtype, reverse_names=True,
+                       direction=root_direction, use_async=use_async)
+            out.update(testing_options['kwargs'],
+                       tag_start=get_next_tag(),
+                       partner_mpi_ranks=list(range(1, mpi_size)))
+        else:
+            out = {}
+        return out
 
-    def teardown(self, *args, **kwargs):
-        r"""Destroy comm object pair."""
+    @pytest.fixture
+    def rank_kwargs(self, mpi_comm, mpi_rank, initial_tag,
+                    get_next_tag, commtype):
+        r"""dict: Keyword arguments for the communicator on the rank > 0
+        process(es)."""
+        if mpi_rank > 0:
+            out = mpi_comm.recv(source=0, tag=initial_tag)
+            out.update(tag_start=get_next_tag(),
+                       commtype=commtype)
+        else:
+            out = {}
+        return out
+
+    # Disable global comms for MPI
+    @pytest.fixture
+    def global_send_comm(self, send_comm):
+        r"""Communicator for sending messages."""
+        yield send_comm
+
+    @pytest.fixture
+    def global_recv_comm(self, recv_comm):
+        r"""Communicator for receiving messages."""
+        yield recv_comm
+
+    @pytest.fixture
+    def global_comm(self, global_recv_comm, global_send_comm):
+        r"""Global communicator."""
+        if global_recv_comm is None:
+            return global_send_comm
+        return global_recv_comm
+    
+    @pytest.fixture(scope="class")
+    def sleep_after_connect(self):
+        r"""Indicates if sleep should occur after comm creation."""
+        return False
+    
+    @pytest.fixture(scope="class")
+    def alt_sleep_after_connect(self):
+        r"""Indicates if sleep should occur after comm creation."""
+        return False
+
+    # TODO: Adjust nprev_comm & nprev_fd?
+    
+    @pytest.fixture
+    def root_comm(self, name, mpi_comm, mpi_rank, root_kwargs,
+                  initial_tag, close_comm):
+        r"""MPI communicator for rank == 0 process."""
+        if mpi_rank == 0:
+            x = new_comm(name, **root_kwargs)
+            rank_kws = x.opp_comm_kwargs()
+            for i in x.ranks:
+                mpi_comm.send(rank_kws, dest=i, tag=initial_tag)
+            yield x
+            close_comm(x)
+        else:
+            yield None
+        
+    @pytest.fixture
+    def rank_comm(self, name, mpi_rank, rank_kwargs, close_comm):
+        r"""MPI communicator for rank > 0 processes."""
+        if mpi_rank > 0:
+            x = get_comm(name, **rank_kwargs)
+            yield x
+            close_comm(x)
+        else:
+            yield None
+
+    @pytest.fixture
+    def local_comm(self, mpi_rank, root_comm, rank_comm, sync,
+                   alt_sleep_after_connect, use_async):
+        r"""Communicator for the current MPI process."""
+        if mpi_rank == 0:
+            x = root_comm
+        else:
+            x = rank_comm
+        if alt_sleep_after_connect:  # pragma: testing
+            x.sleep()
+        assert(x.is_open)
+        if x.direction == 'recv':
+            x.drain_server_signon_messages()
+        sync(x)
+        yield x
         # Even up send/recv calls since the same comm will be used for
         # subsequent tests
-        if self.use_async and (self.instance.direction == 'recv'):
+        if use_async and (x.direction == 'recv'):
             # Don't keep receiving or there will never be a balence
             # between receive requests and sent messages
-            self.instance._close_backlog(wait=True)
-        all_tag = self.sync(get_tags=True)
-        if self.instance.direction == 'send':
-            for _ in range(max(all_tag) - all_tag[self.mpi_rank]):
-                self.instance.tags[self.instance.ranks[0]] += 1
-            if self.use_async:
-                self.instance.wait_for_confirm(timeout=60.0)
-        self.sync(check_equal=True)
-        super(test_CommBase.TestCommBase, self).teardown(*args, **kwargs)
+            x._close_backlog(wait=True)
+        all_tag = sync(x, get_tags=True)
+        if x.direction == 'send':
+            for _ in range(max(all_tag) - all_tag[mpi_rank]):
+                x.tags[x.ranks[0]] += 1
+            if use_async:
+                x.wait_for_confirm(timeout=60.0)
+        sync(x, check_equal=True)
+    
+    @pytest.fixture
+    def recv_comm(self, rank_direction, local_comm):
+        r"""Receiving communicator."""
+        if rank_direction == 'recv':
+            return local_comm
 
-    def test_send_recv_after_close(self):
-        r"""Test that opening twice dosn't cause errors and that send/recv after
-        close returns false."""
-        self.instance.open()
-        self.instance.close()
-        assert(self.instance.is_closed)
-        if self.instance.direction == 'send':
-            flag = self.instance.send(self.test_msg)
-        elif self.instance.direction == 'recv':
-            flag, msg_recv = self.instance.recv()
+    @pytest.fixture
+    def send_comm(self, rank_direction, local_comm):
+        r"""Sending communicator."""
+        if rank_direction == 'send':
+            return local_comm
+
+    def test_send_recv_after_close(self, local_comm, testing_options):
+        r"""Test that opening twice dosn't cause errors and that send/recv
+        after close returns false."""
+        local_comm.open()
+        local_comm.close()
+        assert(local_comm.is_closed)
+        if local_comm.direction == 'send':
+            flag = local_comm.send(testing_options['msg'])
+        elif local_comm.direction == 'recv':
+            flag, msg_recv = local_comm.recv()
         assert(not flag)
 
-    def test_send_after_close(self):
+    def test_send_after_close(self, use_async, local_comm, testing_options,
+                              sync):
         r"""Sending a message after the receive comm has closed."""
-        if self.instance.direction == 'recv':
-            self.instance.close()
-            for i in self.instance.tags.keys():
-                self.instance.tags[i] += 1
-        self.sync()
-        if self.instance.direction == 'send':
-            flag = self.instance.send(self.test_msg)
+        if use_async:
+            pytest.skip("skip for async")
+        if local_comm.direction == 'recv':
+            local_comm.close()
+            for i in local_comm.tags.keys():
+                local_comm.tags[i] += 1
+        sync(local_comm)
+        if local_comm.direction == 'send':
+            flag = local_comm.send(testing_options['msg'])
             assert(flag)
 
-    def test_attributes(self):
-        r"""Assert that the instance has all of the required attributes."""
-        for a in self.attr_list:
-            if not hasattr(self.instance, a):  # pragma: debug
-                raise AttributeError("%s comm does not have attribute %s"
-                                     % (self.instance.direction, a))
-            getattr(self.instance, a)
-        self.instance.debug('maxMsgSize: %d, %d', self.maxMsgSize,
-                            self.instance.maxMsgSize)
-        self.instance.opp_comm_kwargs()
-        assert(not self.import_cls.is_installed(language='invalid'))
-
-    # def test_work_comm(self):
+    # def test_work_comm(self, local_comm, testing_options, uuid, timeout):
     #     r"""Test creating/removing a work comm."""
-    #     wc_send = self.instance.create_work_comm()
-    #     self.assert_raises(KeyError, self.instance.add_work_comm, wc_send)
+    #     wc_send = local_comm.create_work_comm()
+    #     with pytest.raises(KeyError):
+    #         local_comm.add_work_comm(wc_send)
     #     # Create recv instance in way that tests new_comm
-    #     header_recv = dict(id=self.uuid + '1', address=wc_send.address)
-    #     recv_kwargs = self.instance.get_work_comm_kwargs
+    #     header_recv = dict(id=uuid + '1', address=wc_send.address)
+    #     recv_kwargs = local_comm.get_work_comm_kwargs
     #     recv_kwargs.pop('async_recv_kwargs', None)
     #     recv_kwargs['work_comm_name'] = 'test_worker_%s' % header_recv['id']
     #     recv_kwargs['commtype'] = wc_send._commtype
@@ -174,197 +235,161 @@ class TestMPIComm(test_CommBase.TestCommBase):
     #         os.environ[recv_kwargs['work_comm_name']] = wc_send.opp_address
     #     else:
     #         recv_kwargs['address'] = wc_send.opp_address
-    #     wc_recv = self.instance.create_work_comm(**recv_kwargs)
-    #     # wc_recv = self.instance.get_work_comm(header_recv)
-    #     flag = wc_send.send(self.test_msg)
+    #     wc_recv = local_comm.create_work_comm(**recv_kwargs)
+    #     # wc_recv = local_comm.get_work_comm(header_recv)
+    #     flag = wc_send.send(testing_options['msg'])
     #     assert(flag)
-    #     flag, msg_recv = wc_recv.recv(self.timeout)
+    #     flag, msg_recv = wc_recv.recv(timeout)
     #     assert(flag)
-    #     self.assert_equal(msg_recv, self.test_msg)
+    #     assert(msg_recv == testing_options['msg'])
     #     # Assert errors on second attempt
-    #     # self.assert_raises(RuntimeError, wc_send.send, self.test_msg)
-    #     self.assert_raises(RuntimeError, wc_recv.recv)
-    #     self.instance.remove_work_comm(wc_send.uuid)
-    #     self.instance.remove_work_comm(wc_recv.uuid)
-    #     self.instance.remove_work_comm(wc_recv.uuid)
+    #     # with pytest.raises(RuntimeError):
+    #     #     wc_send.send(testing_options['msg'])
+    #     with pytest.raises(RuntimeError):
+    #         wc_recv.recv()
+    #     local_comm.remove_work_comm(wc_send.uuid)
+    #     local_comm.remove_work_comm(wc_recv.uuid)
+    #     local_comm.remove_work_comm(wc_recv.uuid)
     #     # Create work comm that should be cleaned up on teardown
-    #     self.instance.create_work_comm()
+    #     local_comm.create_work_comm()
 
-    def assert_msg_equal(self, x, y):
-        r"""Assert that two messages are equivalent."""
-        if not self.instance.is_eof(y):
-            y = self.map_sent2recv(y)
-        self.assert_equal(x, y)
+    @pytest.fixture(scope="class")
+    def do_send_recv(self, wait_on_function, testing_options, map_sent2recv,
+                     n_msg_expected, sync, timeout, nested_approx):
+        r"""Factory for method to perform send/recv checks for comms."""
 
-    def do_send_recv(self, send_meth='send', recv_meth='recv',
-                     msg_send=None, msg_recv=None,
-                     n_msg_send_meth='n_msg_send', n_msg_recv_meth='n_msg_recv',
-                     reverse_comms=False, send_kwargs=None, recv_kwargs=None,
-                     n_send=1, n_recv=1, print_status=False,
-                     close_on_send_eof=None, close_on_recv_eof=None,
-                     no_recv=False, recv_timeout=None,
-                     n_send_init=0, n_recv_init=0):
-        r"""Generic send/recv of a message."""
-        assert(not reverse_comms)
-        is_eof_send = (('eof' in send_meth) or self.instance.is_eof(msg_send))
-        if msg_send is None:
-            if is_eof_send:
-                msg_send = self.instance.eof_msg
+        def do_send(send_comm, send_params):
+            assert(send_comm.n_msg_send == send_params.get('n_init', 0))
+            send_params.setdefault('count', 1)
+            if 'eof' not in send_params.get('method', 'send'):
+                send_params['count'] *= len(send_comm.ranks)
+            sync(send_comm)
+            utils.logger.debug(f"sending {send_params.get('count', 1)} "
+                               f"copies of {send_params['message']!s:.100}")
+            for _ in range(send_params.get('count', 1)):
+                flag = getattr(send_comm, send_params.get('method', 'send'))(
+                    *send_params['args'], **send_params.get('kwargs', {}))
+                assert(flag == send_params.get('flag', True))
+            if not send_params.get('skip_wait', False):
+                wait_on_function(
+                    lambda: send_comm.is_closed or (send_comm.n_msg_send == 0))
+            send_comm.printStatus(level='debug')
+            if 'eof' not in send_params.get('method', 'send'):
+                send_comm.wait_for_confirm(timeout=timeout)
+                assert(send_comm.is_confirmed)
+                send_comm.confirm(noblock=True)
+            assert(send_comm.n_msg_send == 0)
+            sync(send_comm)
+            
+        def do_recv(recv_comm, recv_params):
+            if (((not recv_comm.is_eof(recv_params['message']))
+                 and (recv_params['message'] != b''))):
+                recv_params['count'] *= len(recv_comm.ranks)
+            assert(recv_comm.n_msg_recv == recv_params.get('n_init', 0))
+            sync(recv_comm)
+            utils.logger.debug(f"expecting {recv_params.get('count', 1)} "
+                               f"copies of {recv_params['message']!s:.100}")
+            for _ in range(recv_params.get('count', 1)):
+                if not recv_params.get('skip_wait', False):
+                    wait_on_function(
+                        lambda: (recv_comm.is_closed
+                                 or (recv_comm.n_msg_recv > 0)))
+                flag, msg = getattr(
+                    recv_comm, recv_params.get('method', 'recv'))(
+                        **recv_params.get('kwargs', {'timeout': 0}))
+                assert(flag == recv_params.get('flag', True))
+                assert(msg == nested_approx(recv_params['message']))
+            recv_comm.printStatus()
+            if not recv_comm.is_eof(recv_params['message']):
+                recv_comm.wait_for_confirm(timeout=timeout)
+                assert(recv_comm.is_confirmed)
+                recv_comm.confirm(noblock=True)
+            assert(recv_comm.n_msg_recv == 0)
+            sync(recv_comm)
+
+        def wrapped(send_comm, recv_comm, message=None,
+                    send_params=None, recv_params=None):
+            if send_comm is None:
+                local_comm = recv_comm
             else:
-                msg_send = self.test_msg
-        if msg_recv is None:
-            msg_recv = msg_send
-        if self.instance.direction == 'send':
-            self.do_send(send_meth=send_meth, msg_send=msg_send,
-                         n_msg_send_meth=n_msg_send_meth,
-                         send_kwargs=send_kwargs, n_send=n_send,
-                         print_status=print_status,
-                         close_on_send_eof=close_on_send_eof,
-                         n_send_init=n_send_init,
-                         is_eof_send=is_eof_send)
-        else:
-            self.do_recv(recv_meth=recv_meth, msg_recv=msg_recv,
-                         n_msg_recv_meth=n_msg_recv_meth,
-                         recv_kwargs=recv_kwargs, n_recv=n_recv,
-                         print_status=print_status,
-                         close_on_recv_eof=close_on_recv_eof,
-                         no_recv=no_recv, recv_timeout=recv_timeout,
-                         n_recv_init=n_recv_init,
-                         is_eof_send=is_eof_send)
-        
-    def do_send(self, send_meth='send', msg_send=None,
-                n_msg_send_meth='n_msg_send',
-                send_kwargs=None, n_send=1, print_status=False,
-                close_on_send_eof=None, n_send_init=0, is_eof_send=False):
-        r"""Generic send of a message."""
-        tkey = '.do_send'
-        if send_kwargs is None:
-            send_kwargs = dict()
-        if is_eof_send:
-            send_args = tuple()
-        else:
-            n_send *= len(self.send_instance.ranks)
-            send_args = (msg_send,)
-        self.assert_equal(getattr(self.send_instance, n_msg_send_meth), n_send_init)
-        self.sync()
-        send_instance = self.send_instance
-        if close_on_send_eof is None:
-            close_on_send_eof = send_instance.close_on_eof_send
-        send_instance.close_on_eof_send = close_on_send_eof
-        fsend_meth = getattr(send_instance, send_meth)
-        for i in range(n_send):
-            flag = fsend_meth(*send_args, **send_kwargs)
-            assert(flag)
-        # Wait for send to close
-        if is_eof_send and close_on_send_eof:  # pragma: testing
-            T = send_instance.start_timeout(self.timeout, key_suffix=tkey)
-            while (not T.is_out) and (not send_instance.is_closed):  # pragma: debug
-                send_instance.sleep()
-            send_instance.stop_timeout(key_suffix=tkey)
-            assert(send_instance.is_closed)
-        # Make sure no messages outgoing
-        T = send_instance.start_timeout(self.timeout, key_suffix=tkey)
-        while ((not T.is_out) and (getattr(send_instance,
-                                           n_msg_send_meth) != 0)):  # pragma: debug
-            send_instance.sleep()
-        send_instance.stop_timeout(key_suffix=tkey)
-        # Print status of comms
-        if print_status:
-            send_instance.printStatus()
-        # Confirm recept of messages
-        if not is_eof_send:
-            send_instance.wait_for_confirm(timeout=self.timeout)
-            assert(send_instance.is_confirmed)
-            send_instance.confirm(noblock=True)
-        self.assert_equal(getattr(send_instance, n_msg_send_meth), 0)
-        self.sync()
-
-    def do_recv(self, recv_meth='recv', msg_recv=None,
-                n_msg_recv_meth='n_msg_recv',
-                recv_kwargs=None, n_recv=1, print_status=False,
-                close_on_recv_eof=None, no_recv=False, recv_timeout=None,
-                n_recv_init=0, is_eof_send=False):
-        r"""Generic recv of a message."""
-        tkey = '.do_send_recv'
-        is_eof_recv = (is_eof_send or self.recv_instance.is_eof(msg_recv))
-        if recv_timeout is None:
-            recv_timeout = self.timeout
-        if recv_kwargs is None:
-            recv_kwargs = dict()
-        if (not is_eof_recv) and (msg_recv != b''):
-            n_recv *= len(self.recv_instance.ranks)
-        self.assert_equal(getattr(self.recv_instance, n_msg_recv_meth), n_recv_init)
-        self.sync()
-        recv_instance = self.recv_instance
-        if close_on_recv_eof is None:
-            close_on_recv_eof = recv_instance.close_on_eof_recv
-        recv_instance.close_on_eof_recv = close_on_recv_eof
-        frecv_meth = getattr(recv_instance, recv_meth)
-        # Wait for messages to be received
-        for i in range(n_recv):
-            if not (is_eof_recv or no_recv):
-                T = recv_instance.start_timeout(recv_timeout, key_suffix=tkey)
-                while ((not T.is_out) and (not recv_instance.is_closed)
-                       and (getattr(recv_instance,
-                                    n_msg_recv_meth) == 0)):  # pragma: debug
-                    recv_instance.sleep()
-                recv_instance.stop_timeout(key_suffix=tkey)
-                assert(getattr(recv_instance, n_msg_recv_meth) >= 1)
-                # IPC nolimit sends multiple messages
-                # self.assert_equal(recv_instance.n_msg_recv, 1)
-            flag, msg_recv0 = frecv_meth(timeout=recv_timeout, **recv_kwargs)
-            if is_eof_recv and close_on_recv_eof:
-                assert(not flag)
-                assert(recv_instance.is_closed)
+                local_comm = send_comm
+            if send_params is None:
+                send_params = {}
+            if recv_params is None:
+                recv_params = {}
+            local_comm.printStatus(level='debug')
+            if send_params.get('method', 'send') == 'send_eof':
+                message = local_comm.eof_msg
+                send_params['args'] = tuple([])
             else:
-                assert(flag)
-            self.assert_msg_equal(msg_recv0, msg_recv)
-        # Print status of comms
-        if print_status:
-            recv_instance.printStatus()
-        # Confirm recept of messages
-        if not is_eof_send:
-            recv_instance.wait_for_confirm(timeout=self.timeout)
-            assert(recv_instance.is_confirmed)
-            recv_instance.confirm(noblock=True)
-        self.assert_equal(getattr(recv_instance, n_msg_recv_meth), 0)
-        self.sync()
+                if message is None:
+                    message = testing_options['msg']
+                send_params['args'] = (copy.deepcopy(message),)
+            send_params['message'] = message
+            if (((not recv_params.get('skip_wait', False))
+                 and ('eof' not in send_params.get('method', 'send')))):
+                recv_params.setdefault('count', n_msg_expected)
+            if 'message' not in recv_params:
+                if 'eof' in send_params.get('method', 'send'):
+                    recv_params['message'] = message
+                else:
+                    recv_params['message'] = map_sent2recv(message)
+            if local_comm.direction == "send":
+                do_send(local_comm, send_params)
+            else:
+                do_recv(local_comm, recv_params)
+        return wrapped
 
-    def test_cleanup_comms(self):
+    def test_cleanup_comms(self, local_comm):
         r"""Test cleanup_comms for comm class."""
-        self.instance.cleanup_comms()
-        assert(len(self.instance.comm_registry()) == 0)
+        local_comm.cleanup_comms()
+        assert(len(local_comm.comm_registry()) == 0)
 
-    def test_drain_messages(self):
+    def test_drain_messages(self, local_comm, timeout):
         r"""Test waiting for messages to drain."""
-        self.instance.drain_messages(timeout=self.timeout)
-        self.assert_equal(
-            getattr(self.instance,
-                    'n_msg_%s_drain' % self.instance.direction), 0)
-        self.assert_raises(ValueError, self.instance.drain_messages,
-                           variable='n_msg_invalid')
+        local_comm.drain_messages(timeout=timeout)
+        assert(getattr(local_comm,
+                       'n_msg_%s_drain' % local_comm.direction) == 0)
+        with pytest.raises(ValueError):
+            local_comm.drain_messages(variable='n_msg_invalid')
 
-    def test_recv_nomsg(self):
+    def test_recv_nomsg(self, local_comm, polling_interval):
         r"""Test recieve when there is no waiting message."""
-        if self.instance.direction == 'recv':
-            flag, msg_recv = self.recv_instance.recv(timeout=self.sleeptime)
+        if local_comm.direction == 'recv':
+            flag, msg_recv = local_comm.recv(timeout=polling_interval)
             assert(flag)
             assert(not msg_recv)
         else:
-            self.send_instance.sleep()
+            local_comm.sleep()
 
-    def setup_filters(self):
-        r"""Add filters to send/recv instances for testing filters."""
-        if self.instance.direction == 'send':
-            self.add_filter(self.send_instance,
-                            self.get_filter_statement(self.msg_filter_send,
-                                                      'send'))
+    @pytest.fixture
+    def filtered_comms(self, local_comm, msg_filter_send, msg_filter_recv):
+        r"""Add filters to the send and receive communicators."""
+        from yggdrasil.communication.filters.StatementFilter import (
+            StatementFilter)
+        from yggdrasil.communication.filters.FunctionFilter import (
+            FunctionFilter)
+        if local_comm.direction == 'send':
+            # Statement filter on send comm
+            if isinstance(msg_filter_send, (str, bytes)):
+                statement = '%x% != ' + repr(msg_filter_send)
+            else:
+                statement = 'repr(%x%) != r"""' + repr(msg_filter_send) + '"""'
+            local_comm.filter = StatementFilter(statement=statement)
         else:
-            self.add_filter(self.recv_instance,
-                            self.get_filter_function(self.msg_filter_recv,
-                                                     'recv'))
+            # Function filter on recv comm
 
-    def test_send_recv_raw(self):
+            def fcond(x):
+                try:
+                    assert(x == msg_filter_recv)
+                    return False
+                except BaseException:
+                    return True
+            local_comm.filter = FunctionFilter(function=fcond)
+        yield
+        local_comm.filter = None
+
+    def test_send_recv_raw(self, local_comm, testing_options):
         r"""Test send/recv of a small message."""
         def dummy(msg):
             print(msg)
@@ -373,71 +398,58 @@ class TestMPIComm(test_CommBase.TestCommBase):
             msg.length = 0
             return msg
 
-        if self.instance.direction == 'send':
-            for _ in range(len(self.send_instance.ranks)):
-                assert(self.send_instance.send(self.test_msg))
+        if local_comm.direction == 'send':
+            for _ in range(len(local_comm.ranks)):
+                assert(local_comm.send(testing_options['msg']))
         else:
-            for _ in range(len(self.recv_instance.ranks)):
-                msg = self.recv_instance.recv(
+            for _ in range(len(local_comm.ranks)):
+                msg = local_comm.recv(
                     timeout=60.0, skip_deserialization=True,
                     return_message_object=True,
                     after_finalize_message=[dummy])
                 assert(msg.finalized)
-                assert_equal(self.recv_instance.finalize_message(msg), msg)
+                assert(local_comm.finalize_message(msg) == msg)
                 msg.finalized = False
-                assert(self.recv_instance.is_empty_recv(msg.args))
-                msg = self.recv_instance.finalize_message(msg)
-                assert_equal(msg.flag, CommBase.FLAG_EMPTY)
+                assert(local_comm.is_empty_recv(msg.args))
+                msg = local_comm.finalize_message(msg)
+                assert(msg.flag == CommBase.FLAG_EMPTY)
 
-    def test_purge(self, nrecv=1, nrecv_init=0, nsend_init=0):
+    def test_purge(self, use_async, local_comm, testing_options,
+                   wait_on_function, n_msg_expected, sync):
         r"""Test purging messages from the comm."""
-        if self.instance.direction == 'send':
-            self.assert_equal(self.send_instance.n_msg, nsend_init)
-            if self.send_instance.is_async:
-                self.assert_equal(self.send_instance.n_msg_direct, 0)
-            self.sync()
-            for _ in range(len(self.send_instance.ranks)):
-                flag = self.send_instance.send(self.test_msg)
+        assert(local_comm.n_msg == 0)
+        if local_comm.direction == 'send':
+            if local_comm.is_async:
+                assert(local_comm.n_msg_direct == 0)
+            sync(local_comm)
+            for _ in range(len(local_comm.ranks)):
+                flag = local_comm.send(testing_options['msg'])
             assert(flag)
-            # self.send_instance.purge()
-            # self.assert_equal(self.send_instance.n_msg, 0)
-            T = self.send_instance.start_timeout()
-            while ((not T.is_out) and (self.send_instance.n_msg
-                                       > 0)):  # pragma: debug
-                self.send_instance.sleep()
-            if self.use_async:
-                self.send_instance._wrapped.wait_for_confirm()
-            # self.sync()
+            # local_comm.purge()
+            # assert(local_comm.n_msg == 0)
+            wait_on_function(lambda: local_comm.n_msg == 0)
+            if use_async:
+                local_comm._wrapped.wait_for_confirm()
+            # sync(local_comm)
         else:
-            self.assert_equal(self.recv_instance.n_msg, nrecv_init)
-            if self.recv_instance.is_async:
-                self.assert_equal(self.recv_instance.n_msg_direct, 0)
-            self.sync()
-            T = self.recv_instance.start_timeout()
-            while ((not T.is_out) and (self.recv_instance.n_msg
-                                       != nrecv)):  # pragma: debug
-                self.recv_instance.sleep()
-            self.recv_instance.stop_timeout()
-            self.assert_greater(self.recv_instance.n_msg, 0)
-            self.recv_instance.purge()
-            self.assert_equal(self.recv_instance.n_msg, 0)
+            if local_comm.is_async:
+                assert(local_comm.n_msg_direct == 0)
+            sync(local_comm)
+            wait_on_function(lambda: local_comm.n_msg == n_msg_expected)
+            assert(local_comm.n_msg > 0)
+            local_comm.purge()
+            assert(local_comm.n_msg == 0)
             # Purge recv while closed
-            self.recv_instance.close()
-            self.recv_instance.purge()
-            # self.sync()
+            local_comm.close()
+            local_comm.purge()
+            # sync(local_comm)
 
 
-@pytest.mark.mpi(min_size=2)
-class TestMPICommAsync(TestMPIComm):
-    r"""Test class for asynchronous MPIComm."""
-
-    use_async = True
-    test_send_after_close = None
-
-
-@unittest.skipIf(not _mpi_installed, "MPI library not installed")
 @pytest.mark.mpi(min_size=3)
 class TestMPICommMultipleRecv(TestMPIComm):
     r"""Test class for MPIComm with comm receiving from multiple processes."""
 
-    root_direction = 'recv'
+    @pytest.fixture(scope="class")
+    def root_direction(self):
+        r"""str: Direction of communicator on the root process."""
+        return 'recv'

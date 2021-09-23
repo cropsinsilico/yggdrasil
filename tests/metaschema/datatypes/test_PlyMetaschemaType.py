@@ -1,68 +1,25 @@
+import pytest
+from tests.metaschema.datatypes.test_JSONObjectMetaschemaType import (
+    TestJSONObjectMetaschemaType as base_class)
+from tests import TestClassBase as base_class_dict
 import os
 import copy
 import shutil
 import tempfile
 import numpy as np
-import unittest
-from yggdrasil.metaschema.datatypes.tests import (
-    test_JSONObjectMetaschemaType as parent)
 from yggdrasil.metaschema.datatypes import PlyMetaschemaType
-from yggdrasil.tests import YggTestClassInfo, assert_raises, assert_equal
-from yggdrasil.drivers.LPyModelDriver import LPyModelDriver
-
-
-vcoords = np.array([[0, 0, 0, 0, 1, 1, 1, 1],
-                    [0, 0, 1, 1, 0, 0, 1, 1],
-                    [0, 1, 1, 0, 0, 1, 1, 0]], 'float32').T
-vcolors = np.array([[255, 255, 255, 255, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 255, 255, 255, 255]], 'uint8').T
-eindexs = np.array([[0, 1, 2, 3, 2],
-                    [1, 2, 3, 0, 0]], 'int32')
-ecolors = np.array([[255, 255, 255, 255, 0],
-                    [255, 255, 255, 255, 0],
-                    [255, 255, 255, 255, 0]], 'uint8')
-_test_value = {'material': 'fake_material', 'vertices': [], 'edges': [],
-               'faces': [{'vertex_index': [0, 1, 2]},
-                         {'vertex_index': [0, 2, 3]},
-                         {'vertex_index': [7, 6, 5, 4]},
-                         {'vertex_index': [0, 4, 5, 1]},
-                         {'vertex_index': [1, 5, 6, 2]},
-                         {'vertex_index': [2, 6, 7, 3]},
-                         {'vertex_index': [3, 7, 4, 0]}]}
-for i in range(len(vcoords)):
-    ivert = {}
-    for j, k in enumerate('xyz'):
-        ivert[k] = vcoords[i, j]
-    for j, k in enumerate(['red', 'green', 'blue']):
-        ivert[k] = vcolors[i, j]
-    _test_value['vertices'].append(ivert)
-for i in range(len(eindexs)):
-    iedge = {}
-    for j, k in enumerate(['vertex1', 'vertex2']):
-        iedge[k] = eindexs[i, j]
-    for j, k in enumerate(['red', 'green', 'blue']):
-        iedge[k] = ecolors[i, j]
-    _test_value['edges'].append(iedge)
-for f in _test_value['faces']:
-    f['vertex_index'] = [np.int32(x) for x in f['vertex_index']]
-_test_value_simple = {'vertices': copy.deepcopy(_test_value['vertices']),
-                      'faces': [{'vertex_index': [0, 1, 2]},
-                                {'vertex_index': [0, 2, 3]}]}
-_test_value_int64 = copy.deepcopy(_test_value)
-for f in _test_value_int64['faces']:
-    f['vertex_index'] = [np.int64(x) for x in f['vertex_index']]
 
 
 def test_create_schema():
     r"""Test create_schema."""
-    assert_raises(RuntimeError, PlyMetaschemaType.create_schema, overwrite=False)
+    with pytest.raises(RuntimeError):
+        PlyMetaschemaType.create_schema(overwrite=False)
     temp = os.path.join(tempfile.gettempdir(), 'temp_schema')
     old_schema = PlyMetaschemaType.get_schema()
     try:
         shutil.move(PlyMetaschemaType._schema_file, temp)
         new_schema = PlyMetaschemaType.get_schema()
-        assert_equal(old_schema, new_schema)
+        assert(old_schema == new_schema)
     except BaseException:  # pragma: debug
         shutil.move(temp, PlyMetaschemaType._schema_file)
         raise
@@ -71,17 +28,20 @@ def test_create_schema():
 
 def test_translate_ply2fmt_errors():
     r"""Test errors in translate_ply2fmt."""
-    assert_raises(ValueError, PlyMetaschemaType.translate_ply2fmt, 'invalid')
+    with pytest.raises(ValueError):
+        PlyMetaschemaType.translate_ply2fmt('invalid')
 
 
 def test_translate_ply2py_errors():
     r"""Test errors in translate_ply2py."""
-    assert_raises(ValueError, PlyMetaschemaType.translate_ply2py, 'invalid')
+    with pytest.raises(ValueError):
+        PlyMetaschemaType.translate_ply2py('invalid')
 
 
 def test_translate_py2ply_errors():
     r"""Test errors in translate_py2ply."""
-    assert_raises(ValueError, PlyMetaschemaType.translate_py2ply, 'float128')
+    with pytest.raises(ValueError):
+        PlyMetaschemaType.translate_py2ply('float128')
 
 
 def test_singular2plural():
@@ -89,67 +49,95 @@ def test_singular2plural():
     pairs = [('face', 'faces'), ('vertex', 'vertices'),
              ('vertex_index', 'vertex_indices')]
     for s, p in pairs:
-        assert_equal(PlyMetaschemaType.singular2plural(s), p)
-        assert_equal(PlyMetaschemaType.plural2singular(p), s)
-    assert_raises(ValueError, PlyMetaschemaType.plural2singular, 'invalid')
+        assert(PlyMetaschemaType.singular2plural(s) == p)
+        assert(PlyMetaschemaType.plural2singular(p) == s)
+    with pytest.raises(ValueError):
+        PlyMetaschemaType.plural2singular('invalid')
 
 
-class TestPlyDict(YggTestClassInfo):
+class TestPlyDict(base_class_dict):
     r"""Test for PlyDict class."""
     
-    _mod = 'PlyMetaschemaType'
+    _mod = 'yggdrasil.metaschema.datatypes.PlyMetaschemaType'
     _cls = 'PlyDict'
-    _simple_test = _test_value_simple
 
-    @property
-    def mod(self):
-        r"""str: Absolute name of module containing class to be tested."""
-        return 'yggdrasil.metaschema.datatypes.%s' % self._mod
+    @pytest.fixture(scope="class")
+    def simple_test(self, ply_test_value_simple):
+        r"""dict: Simple test structure."""
+        return ply_test_value_simple
 
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for creating a class instance."""
-        return _test_value
+    @pytest.fixture
+    def instance_kwargs(self, ply_test_value):
+        r"""Keyword arguments for a new instance of the tested class."""
+        return ply_test_value
 
-    @classmethod
-    def remove_hd_faces(cls, obj):
+    @pytest.fixture
+    def objects_array_dict(self, instance):
+        r"""Objects for testing transformation to/from dict of arrays."""
+        orig = copy.deepcopy(instance)
+        for f in orig['faces']:
+            for k in ['red', 'green', 'blue']:
+                f[k] = int(255)
+        orig_no_color = copy.deepcopy(instance)
+        for v in orig_no_color['vertices']:
+            for k in ['red', 'green', 'blue']:
+                v.pop(k, None)
+        for e in orig_no_color['edges']:
+            for k in ['red', 'green', 'blue']:
+                e.pop(k, None)
+        return [orig, orig_no_color]
+
+    @pytest.fixture
+    def objects_trimesh(self, instance):
+        r"""Objects for testing transformation to/from trimesh class."""
+        if not PlyMetaschemaType.trimesh:
+            pytest.skip("trimesh not available")
+        orig = copy.deepcopy(instance)
+        for k in ['material', 'edges']:
+            orig.pop(k, None)
+        return [orig]
+
+    @pytest.fixture(scope="class")
+    def remove_hd_faces(self):
         r"""Remove higher dimension faces (>3 verts)."""
-        for f in obj.get('faces', []):
-            f['vertex_index'] = f['vertex_index'][:3]
-        return obj
+        def remove_hd_faces_w(obj):
+            for f in obj.get('faces', []):
+                f['vertex_index'] = f['vertex_index'][:3]
+            return obj
+        return remove_hd_faces_w
 
-    def test_count_elements(self):
+    def test_count_elements(self, instance):
         r"""Test count_elements."""
-        self.assert_raises(ValueError, self.instance.count_elements, 'invalid')
-        x = self.instance.count_elements('vertices')
-        y = self.instance.count_elements('vertex')
-        self.assert_equal(x, y)
+        with pytest.raises(ValueError):
+            instance.count_elements('invalid')
+        x = instance.count_elements('vertices')
+        y = instance.count_elements('vertex')
+        assert(x == y)
 
-    def test_mesh(self):
+    def test_mesh(self, instance):
         r"""Test mesh."""
-        self.instance.mesh
+        instance.mesh
 
-    def test_merge(self):
+    def test_merge(self, instance):
         r"""Test merging two ply objects."""
-        ply1 = copy.deepcopy(self.instance)
-        ply2 = ply1.merge(self.instance)
-        ply1.merge([self.instance], no_copy=True)
-        self.assert_equal(ply1, ply2)
+        ply1 = copy.deepcopy(instance)
+        ply2 = ply1.merge(instance)
+        ply1.merge([instance], no_copy=True)
+        assert(ply1 == ply2)
 
-    def test_append(self):
+    def test_append(self, python_class, instance):
         r"""Test appending ply objects."""
-        basic = self.import_cls(vertices=self.instance['vertices'],
-                                faces=[])
-        basic.append(self.instance)
+        basic = python_class(vertices=instance['vertices'], faces=[])
+        basic.append(instance)
 
-    def test_apply_scalar_map(self, _as_obj=False):
+    def test_apply_scalar_map(self, class_name, instance):
         r"""Test applying a scalar colormap."""
-        o = copy.deepcopy(self.instance)
+        o = copy.deepcopy(instance)
         scalar_arr = np.arange(o.count_elements('faces')).astype('float')
-        self.assert_raises(NotImplementedError, o.apply_scalar_map,
-                           scalar_arr, scale_by_area=True)
+        with pytest.raises(NotImplementedError):
+            o.apply_scalar_map(scalar_arr, scale_by_area=True)
         new_faces = []
-        if _as_obj:
+        if 'Obj' in class_name:
             for f in o['faces']:
                 if len(f) == 3:
                     new_faces.append(f)
@@ -163,114 +151,138 @@ class TestPlyDict(YggTestClassInfo):
             o1 = o.apply_scalar_map(scalar_arr, scaling=scale, scale_by_area=True)
             o2.apply_scalar_map(scalar_arr, scaling=scale, scale_by_area=True,
                                 no_copy=True)
-            self.assert_equal(o1, o2)
+            assert(o1 == o2)
 
-    @unittest.skipIf(not LPyModelDriver.is_installed(), "LPy library not installed.")
-    def test_to_from_scene(self, _as_obj=False, data=None):  # pragma: lpy
+    @pytest.fixture
+    def to_from_scene(self, python_class, instance):
+        r"""Perform convertions to/from PlantGL scene."""
+        from yggdrasil.drivers.LPyModelDriver import LPyModelDriver
+        if not LPyModelDriver.is_installed():
+            pytest.skip("LPy library not installed.")
+            
+        def to_from_scene_w(data):  # pragma: lpy
+            o1 = instance
+            cls = o1.__class__
+            s = o1.to_scene(name='test')
+            o2 = cls.from_scene(s)
+            # Direct equivalence won't happen unless test is just for simple
+            # mesh as faces with more than 3 vertices will be triangulated.
+            cls = python_class
+            o1 = cls(data)
+            s = o1.to_scene(name='test')
+            o2 = cls.from_scene(s)
+            # import pprint
+            # print('o2')
+            # pprint.pprint(o2)
+            # print('o1')
+            # pprint.pprint(o1)
+            assert(o2 == o1)
+        return to_from_scene_w
+
+    def test_to_from_scene(self, to_from_scene, simple_test):  # pragma: lpy
         r"""Test conversion to/from PlantGL scene."""
-        if data is None:
-            data = self._simple_test
-        o1 = self.instance
-        cls = o1.__class__
-        s = o1.to_scene(name='test')
-        o2 = cls.from_scene(s)
-        # Direct equivalence won't happen unless test is just for simple mesh
-        # as faces with more than 3 vertices will be triangulated.
-        cls = self.import_cls
-        o1 = cls(data)
-        s = o1.to_scene(name='test')
-        o2 = cls.from_scene(s)
-        # import pprint
-        # print('o2')
-        # pprint.pprint(o2)
-        # print('o1')
-        # pprint.pprint(o1)
-        self.assert_equal(o2, o1)
+        to_from_scene(simple_test)
 
-    def test_to_from_dict(self):
+    def test_to_from_dict(self, python_class, instance):
         r"""Test transformation to/from dict."""
-        x = self.instance.as_dict()
-        y = self.import_cls.from_dict(x)
-        self.assert_equal(y, self.instance)
+        x = instance.as_dict()
+        y = python_class.from_dict(x)
+        assert(y == instance)
 
-    def test_to_from_array_dict(self, test_objs=None):
+    def test_to_from_array_dict(self, python_class, objects_array_dict):
         r"""Test transformation to/from dict of arrays."""
-        if test_objs is None:
-            orig = copy.deepcopy(self.instance)
-            for f in orig['faces']:
-                for k in ['red', 'green', 'blue']:
-                    f[k] = int(255)
-            orig_no_color = copy.deepcopy(self.instance)
-            for v in orig_no_color['vertices']:
-                for k in ['red', 'green', 'blue']:
-                    v.pop(k, None)
-            for e in orig_no_color['edges']:
-                for k in ['red', 'green', 'blue']:
-                    e.pop(k, None)
-            test_objs = [orig, orig_no_color]
-        for y0 in test_objs:
+        for y0 in objects_array_dict:
             x = y0.as_array_dict()
-            y = self.import_cls.from_array_dict(x)
-            self.assert_equal(y, y0)
+            y = python_class.from_array_dict(x)
+            assert(y == y0)
 
-    def test_to_from_trimesh(self, test_objs=None):
+    def test_to_from_trimesh(self, python_class, objects_trimesh,
+                             remove_hd_faces):
         r"""Test transformation to/from trimesh class."""
-        if PlyMetaschemaType.trimesh:
-            if test_objs is None:
-                orig = copy.deepcopy(self.instance)
-                for k in ['material', 'edges']:
-                    orig.pop(k, None)
-                test_objs = [orig]
-            for y0 in test_objs:
-                y0 = self.remove_hd_faces(y0)
-                x = y0.as_trimesh()
-                y = self.import_cls.from_trimesh(x)
-                self.assert_equal(y, y0)
+        for y0 in objects_trimesh:
+            y0 = remove_hd_faces(y0)
+            x = y0.as_trimesh()
+            y = python_class.from_trimesh(x)
+            assert(y == y0)
 
-    def test_properties(self):
+    def test_properties(self, instance):
         r"""Test explicit exposure of specific element counts as properties
         against counts based on singular elements."""
-        self.instance.bounds
-        self.assert_equal(self.instance.nvert, self.instance.count_elements('vertex'))
-        self.assert_equal(self.instance.nface, self.instance.count_elements('face'))
+        instance.bounds
+        assert(instance.nvert == instance.count_elements('vertex'))
+        assert(instance.nface == instance.count_elements('face'))
 
 
-class TestPlyMetaschemaType(parent.TestJSONObjectMetaschemaType):
+class TestPlyMetaschemaType(base_class):
     r"""Test class for PlyMetaschemaType class."""
 
-    _mod = 'PlyMetaschemaType'
+    _mod = 'yggdrasil.metaschema.datatypes.PlyMetaschemaType'
     _cls = 'PlyMetaschemaType'
 
-    @staticmethod
-    def after_class_creation(cls):
-        r"""Actions to be taken during class construction."""
-        parent.TestJSONObjectMetaschemaType.after_class_creation(cls)
-        cls._value = _test_value
-        cls._fulldef = {'type': cls.get_import_cls().name}
-        cls._typedef = {'type': cls._fulldef['type']}
-        cls._valid_encoded = [cls._fulldef]
-        cls._valid_decoded = [cls._value,
-                              PlyMetaschemaType.PlyDict(**_test_value),
-                              {'vertices': [], 'faces': [],
-                               'alt_verts': copy.deepcopy(_test_value['vertices'])},
-                              _test_value_int64]
-        if PlyMetaschemaType.trimesh:
-            cls._valid_decoded.append(
-                PlyMetaschemaType.PlyDict(**_test_value).as_trimesh())
-        cls._invalid_encoded = [{}]
-        cls._invalid_decoded = [{'vertices': [{k: 0.0 for k in 'xyz'}],
-                                 'faces': [{'vertex_index': [0, 1, 2]}]}]
-        cls._compatible_objects = [(cls._value, cls._value, None)]
-        cls._encode_data_kwargs = {'comments': ['Test comment']}
+    @pytest.fixture(scope="class")
+    def value(self, ply_test_value):
+        r"""list: Test value."""
+        return ply_test_value
 
-    @classmethod
-    def assert_result_equal(cls, x, y):
-        r"""Assert that serialized/deserialized objects equal."""
-        if PlyMetaschemaType.trimesh:
-            if isinstance(y, PlyMetaschemaType.trimesh.base.Trimesh):
-                y = PlyMetaschemaType.PlyDict.from_trimesh(y)
-        super(TestPlyMetaschemaType, cls).assert_result_equal(x, y)
+    @pytest.fixture(scope="class")
+    def fulldef(self, python_class):
+        r"""dict: Full type definitions."""
+        return {'type': python_class.name}
+    
+    @pytest.fixture(scope="class")
+    def typedef_base(self, python_class):
+        r"""dict: Base type definition."""
+        return {'type': python_class.name}
+
+    @pytest.fixture(scope="class")
+    def valid_encoded(self, fulldef):
+        r"""list: Encoded objects that are valid under this type."""
+        return [fulldef]
         
-    def test_decode_data_errors(self):
+    @pytest.fixture(scope="class")
+    def valid_decoded(self, value, ply_test_value, ply_test_value_int64):
+        r"""list: Objects that are valid under this type."""
+        out = [value,
+               PlyMetaschemaType.PlyDict(**ply_test_value),
+               {'vertices': [], 'faces': [],
+                'alt_verts': copy.deepcopy(ply_test_value['vertices'])},
+               ply_test_value_int64]
+        if PlyMetaschemaType.trimesh:
+            out.append(PlyMetaschemaType.PlyDict(**ply_test_value).as_trimesh())
+        return out
+            
+    @pytest.fixture(scope="class")
+    def invalid_encoded(self):
+        r"""list: Encoded objects that are invalid under this type."""
+        return [{}]
+
+    @pytest.fixture(scope="class")
+    def invalid_decoded(self):
+        r"""list: Objects that are invalid under this type."""
+        return [{'vertices': [{k: 0.0 for k in 'xyz'}],
+                 'faces': [{'vertex_index': [0, 1, 2]}]}]
+
+    @pytest.fixture(scope="class")
+    def compatible_objects(self, value):
+        r"""list: Objects that are compatible with this type."""
+        return [(value, value, None)]
+
+    @pytest.fixture(scope="class")
+    def encode_data_kwargs(self):
+        r"""dict: Keyword arguments for encoding data of this type."""
+        return {'comments': ['Test comment']}
+
+    @pytest.fixture
+    def nested_result(self, nested_approx):
+        r"""Prepare value for comparison."""
+        def nested_result_w(x):
+            if PlyMetaschemaType.trimesh:
+                if isinstance(x, PlyMetaschemaType.trimesh.base.Trimesh):
+                    x = PlyMetaschemaType.PlyDict.from_trimesh(x)
+            return nested_approx(x)
+        return nested_result_w
+    
+    def test_decode_data_errors(self, python_class):
         r"""Test errors in decode_data."""
-        self.assert_raises(ValueError, self.import_cls.decode_data, 'hello', None)
+        with pytest.raises(ValueError):
+            python_class.decode_data('hello', None)

@@ -1,5 +1,6 @@
+import pytest
 import numpy as np
-from yggdrasil.tests import YggTestBase
+from tests import TestBase as base_class
 from yggdrasil import units, tools
 
 
@@ -9,48 +10,51 @@ class DummyUnits(int):
     units = 'cm'
 
 
-class TestUnits(YggTestBase):
+class TestUnits(base_class):
     r"""Tests for using pint for units."""
 
-    def setup(self, *args, **kwargs):
-        r"""Setup, create variables for testing."""
-        self._vars_nounits = [1.0, np.zeros(5), int(1)]
-        self._vars_units = [units.add_units(v, 'cm') for v in self._vars_nounits]
-        self._vars_nounits.append(DummyUnits(1))
-        super(TestUnits, self).setup(*args, **kwargs)
+    @pytest.fixture(scope="class")
+    def vars_nounits(self):
+        return [1.0, np.zeros(5), int(1), DummyUnits(1)]
 
-    def test_has_units(self):
+    @pytest.fixture(scope="class")
+    def vars_units(self, vars_nounits):
+        return [units.add_units(v, 'cm') for v in vars_nounits
+                if not isinstance(v, DummyUnits)]
+
+    def test_has_units(self, vars_nounits, vars_units):
         r"""Test has_units."""
-        for v in self._vars_nounits:  # + ['string']:
+        for v in vars_nounits:
             assert(not units.has_units(v))
-        for v in self._vars_units:
+        for v in vars_units:
             assert(units.has_units(v))
 
     def test_invalid_unit(self):
         r"""Test error when an invalid unit is added."""
-        self.assert_raises(ValueError, units.add_units, 1.0, 'invalid')
+        with pytest.raises(ValueError):
+            units.add_units(1.0, 'invalid')
 
-    def test_get_data(self):
+    def test_get_data(self, vars_units, vars_nounits, nested_approx):
         r"""Test get_data."""
-        for v in self._vars_nounits:
-            self.assert_equal(units.get_data(v), v)
-        for vno, v in zip(self._vars_nounits, self._vars_units):
-            self.assert_equal(units.get_data(v), np.array(vno))
+        for v in vars_nounits:
+            assert(units.get_data(v) == nested_approx(v))
+        for vno, v in zip(vars_nounits, vars_units):
+            assert(units.get_data(v) == nested_approx(vno))
 
-    def test_get_units(self):
+    def test_get_units(self, vars_units, vars_nounits):
         r"""Test get_units."""
-        for v in self._vars_nounits:
-            self.assert_equal(units.get_units(v), '')
-        for v in self._vars_units:
-            self.assert_equal(units.get_units(v), str(units.as_unit('cm').units))
+        for v in vars_nounits:
+            assert(units.get_units(v) == '')
+        for v in vars_units:
+            assert(units.get_units(v) == str(units.as_unit('cm').units))
 
-    def test_add_units(self):
+    def test_add_units(self, vars_nounits):
         r"""Test add_units."""
-        for v in self._vars_nounits:
+        for v in vars_nounits:
             x = units.add_units(v, 'cm')
             assert(units.has_units(x))
-        self.assert_equal(units.add_units(1.0, ''), 1.0)
-        self.assert_equal(units.add_units(1.0, 'n/a'), 1.0)
+        assert(units.add_units(1.0, '') == 1.0)
+        assert(units.add_units(1.0, 'n/a') == 1.0)
 
     def test_is_null_unit(self):
         r"""Test is_null_unit."""
@@ -61,7 +65,8 @@ class TestUnits(YggTestBase):
     def test_as_unit(self):
         r"""Test as_unit."""
         units.as_unit('cm')
-        self.assert_raises(ValueError, units.as_unit, 'invalid')
+        with pytest.raises(ValueError):
+            units.as_unit('invalid')
 
     def test_is_unit(self):
         r"""Test is_unit."""
@@ -74,12 +79,13 @@ class TestUnits(YggTestBase):
         assert(units.is_unit('mmol'))
         assert(not units.is_unit('invalid'))
 
-    def test_convert_to(self):
+    def test_convert_to(self, vars_units):
         r"""Test convert_to."""
         units.convert_to(1, 'm')
-        for v in self._vars_units:
+        for v in vars_units:
             units.convert_to(v, 'm')
-            self.assert_raises(ValueError, units.convert_to, v, 's')
+            with pytest.raises(ValueError):
+                units.convert_to(v, 's')
         x = units.add_units(int(1), 'umol')
         units.convert_to(x, 'mol')
 
@@ -104,6 +110,6 @@ class TestUnits(YggTestBase):
                  ('', ''),
                  ('cm**(-2)', '(cm**-2)')]
         for x, y in pairs:
-            self.assert_equal(units.convert_R_unit_string(x), y)
-            self.assert_equal(units.convert_R_unit_string(y), y)
+            assert(units.convert_R_unit_string(x) == y)
+            assert(units.convert_R_unit_string(y) == y)
             units.add_units(1.0, x)

@@ -52,6 +52,7 @@ class RemoteTaskLoop(multitasking.YggTaskLoop):
             task_context=connection.process_instance.context)
         super(RemoteTaskLoop, self).__init__(target=self.target, **kwargs)
         # Overwrite break flag with process safe Event
+        self.break_flag.disconnect()
         self.break_flag = multitasking.Event(
             task_method='process',
             task_context=connection.process_instance.context)
@@ -212,7 +213,8 @@ class ConnectionDriver(Driver):
         'onexit': {'type': 'string'}}
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     _disconnect_attr = Driver._disconnect_attr + [
-        '_comm_closed', '_skip_after_loop', 'shared', 'task_thread']
+        '_comm_closed', '_skip_after_loop', 'shared', 'task_thread',
+        'icomm', 'ocomm']
 
     def __init__(self, name, translator=None, single_use=False, onexit=None,
                  models=None, **kwargs):
@@ -326,6 +328,7 @@ class ConnectionDriver(Driver):
             self._init_single_comm('output', self.outputs)
         except BaseException:
             self.icomm.close()
+            self.icomm.disconnect()
             raise
         # Apply keywords dependent on comms
         if self.icomm.any_files:
@@ -496,11 +499,13 @@ class ConnectionDriver(Driver):
             try:
                 if getattr(self, 'icomm', None) is not None:
                     self.icomm.close()
+                    self.icomm.disconnect()
             except BaseException as e:
                 ie = e
             try:
                 if getattr(self, 'ocomm', None) is not None:
                     self.ocomm.close()
+                    self.ocomm.disconnect()
             except BaseException as e:
                 oe = e
             if ie:

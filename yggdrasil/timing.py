@@ -10,6 +10,7 @@ import subprocess
 import warnings
 import tempfile
 import itertools
+import contextlib
 import numpy as np
 import pandas as pd
 import logging
@@ -17,7 +18,7 @@ import pickle
 from yggdrasil.components import import_component
 from yggdrasil import tools, runner, examples, platform, config
 from yggdrasil import platform as ygg_platform
-from yggdrasil.tests import YggTestBase
+from yggdrasil.multitasking import wait_on_function
 from yggdrasil.drivers import MatlabModelDriver
 import matplotlib as mpl
 if os.environ.get('DISPLAY', '') == '':  # pragma: debug
@@ -154,25 +155,27 @@ def pyperf_func(loops, timer, nmsg, msg_size, max_errors):
     ttot = 0
     range_it = range(loops)
     for i in range_it:
-        run_uuid = timer.before_run(nmsg, msg_size)
-        flag = False
-        nerrors = 0
-        while not flag:
-            try:
-                t0 = pyperf.perf_counter()
-                timer.run(run_uuid, timer=pyperf.perf_counter)
-                t1 = pyperf.perf_counter()
-                tdif = t1 - t0
-                timer.after_run(run_uuid, tdif)
-                ttot += tdif
-                flag = True
-            except AssertionError as e:  # pragma: debug
-                nerrors += 1
-                if nerrors >= max_errors:
-                    raise
-                else:
-                    warnings.warn("Error %d/%d. Trying again. (error = '%s')"
-                                  % (nerrors, max_errors, e), RuntimeWarning)
+        with change_default_comm(timer.comm_type):
+            run_uuid = timer.before_run(nmsg, msg_size)
+            flag = False
+            nerrors = 0
+            while not flag:
+                try:
+                    t0 = pyperf.perf_counter()
+                    timer.run(run_uuid, timer=pyperf.perf_counter)
+                    t1 = pyperf.perf_counter()
+                    tdif = t1 - t0
+                    timer.after_run(run_uuid, tdif)
+                    ttot += tdif
+                    flag = True
+                except AssertionError as e:  # pragma: debug
+                    nerrors += 1
+                    if nerrors >= max_errors:
+                        raise
+                    else:
+                        warnings.warn(
+                            f"Error {nerrors}/{max_errors}. Trying again. "
+                            f"(error = '{e}')", RuntimeWarning)
     return ttot
 
 
@@ -194,7 +197,36 @@ def get_source(lang, direction, test_name='timed_pipe'):
     return out
 
 
-class TimedRun(YggTestBase, tools.YggClass):
+@contextlib.contextmanager
+def change_default_comm(default_comm):
+    from yggdrasil.communication.DefaultComm import DefaultComm
+    old_default_comm = os.environ.get('YGG_DEFAULT_COMM', None)
+    if default_comm is None:
+        os.environ.pop('YGG_DEFAULT_COMM', None)
+    else:
+        os.environ['YGG_DEFAULT_COMM'] = default_comm
+    DefaultComm._reset_alias()
+    yield
+    del os.environ['YGG_DEFAULT_COMM']
+    if old_default_comm is not None:
+        os.environ['YGG_DEFAULT_COMM'] = old_default_comm
+    DefaultComm._reset_alias()
+
+
+@contextlib.contextmanager
+def debug_log():  # pragma: debug
+    r"""Set the log level to debug."""
+    from yggdrasil.config import ygg_cfg, cfg_logging
+    loglevel = ygg_cfg.get('debug', 'ygg')
+    ygg_cfg.set('debug', 'ygg', 'DEBUG')
+    cfg_logging()
+    yield
+    if loglevel is not None:
+        ygg_cfg.set('debug', 'ygg', loglevel)
+        cfg_logging()
+
+
+class TimedRun(tools.YggClass):
     r"""Class to time sending messages from one language to another.
 
     Args:
@@ -266,8 +298,7 @@ class TimedRun(YggTestBase, tools.YggClass):
         self._lang_list = get_lang_list()
         self._comm_list = get_comm_list()
         name = '%s_%s_%s' % (test_name, lang_src, lang_dst)
-        tools.YggClass.__init__(self, name)
-        super(TimedRun, self).__init__(skip_unittest=True, **kwargs)
+        super(TimedRun, self).__init__(name, **kwargs)
         self.lang_src = lang_src
         self.lang_dst = lang_dst
         self._data = None
@@ -430,11 +461,23 @@ class TimedRun(YggTestBase, tools.YggClass):
         Args:
             fout (str): The file that should be checked.
             nmsg (int): The number of messages that will be sent.
-            msg_sizze (int): The size of the the messages that will be sent.
+            msg_size (int): The size of the the messages that will be sent.
 
         """
         fres = self.output_content(nmsg, msg_size)
-        self.check_file(fout, fres)
+        wait_on_function(lambda: os.path.isfile(fout), timeout=self.timeout,
+                         on_timeout=f"File '{fout}' does not exist")
+
+        def on_timeout():  # pragma: debug
+            if (fres is not None) and (len(fres) < 200):
+                print(f"Expected:\n{fres}\n"
+                      f"Actual:\n{open(fout, 'r').read()}")
+            raise AssertionError(f"File size ({os.stat(fout).st_size}), "
+                                 f"dosn't match expected size ({len(fres)}).")
+        wait_on_function(lambda: os.stat(fout).st_size == len(fres),
+                         timeout=self.timeout, on_timeout=on_timeout)
+        ocont = open(fout, 'r').read()
+        assert(ocont == fres)
 
     def cleanup_output(self, fout):
         r"""Cleanup the output file.
@@ -540,8 +583,6 @@ class TimedRun(YggTestBase, tools.YggClass):
                'PIPE_MSG_SIZE': str(msg_size),
                'PIPE_OUT_FILE': self.foutput[run_uuid]}
         os.environ.update(env)
-        # self.debug_log()
-        self.set_default_comm(self.comm_type)
         self.cleanup_output(self.foutput[run_uuid])
         self.info("Starting %s...", self.entry_name(nmsg, msg_size))
         return run_uuid
@@ -560,8 +601,6 @@ class TimedRun(YggTestBase, tools.YggClass):
         self.info("Finished %s: %f s", self.entry_name(nmsg, msg_size), result)
         self.check_output(fout, nmsg, msg_size)
         self.cleanup_output(fout)
-        self.reset_log()
-        self.reset_default_comm()
         assert(self.matlab_running == MatlabModelDriver.is_matlab_running())
         del self.entries[run_uuid], self.fyaml[run_uuid], self.foutput[run_uuid]
 
@@ -586,6 +625,7 @@ class TimedRun(YggTestBase, tools.YggClass):
                               namespace=self.name + run_uuid)
         times = r.run(timer=timer, t0=t0)
         assert(not r.error_flag)
+        del r
         return times
 
     def time_run(self, nmsg, msg_size, nrep=10, overwrite=False):
@@ -681,12 +721,13 @@ class TimedRun(YggTestBase, tools.YggClass):
         old_reps = self.get_entry(entry_name)
         new_reps = []
         for i in range(nrep):
-            run_uuid = self.before_run(nmsg, msg_size)
-            t0 = time.time()
-            self.run(run_uuid, timer=time.time)
-            t1 = time.time()
-            new_reps.append(t1 - t0)
-            self.after_run(run_uuid, new_reps[-1])
+            with change_default_comm(self.comm_type):
+                run_uuid = self.before_run(nmsg, msg_size)
+                t0 = time.time()
+                self.run(run_uuid, timer=time.time)
+                t1 = time.time()
+                new_reps.append(t1 - t0)
+                self.after_run(run_uuid, new_reps[-1])
         if self.data is None:
             self._data = dict()
         self._data[entry_name] = tuple(list(old_reps) + list(new_reps))

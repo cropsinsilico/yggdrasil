@@ -1,152 +1,98 @@
 import pytest
-import unittest
-from yggdrasil.schema import get_schema
-from yggdrasil.tests import assert_raises, assert_equal
-import yggdrasil.drivers.tests.test_ConnectionDriver as parent
-from yggdrasil.drivers.tests.test_ConnectionDriver import (
-    _default_comm, _zmq_installed, _ipc_installed, _rmq_installed,
-    _mpi_installed, _rest_installed)
+from yggdrasil import constants
+from tests.drivers.test_ConnectionDriver import (
+    TestConnectionDriver as base_class)
 
 
-class TestRPCRequestParam(parent.TestConnectionParam):
-    r"""Test parameters for RPCRequestDriver class."""
+_comm_types = sorted(
+    [x for x in constants.COMPONENT_REGISTRY['comm']['subtypes'].keys()
+     if x not in ['value', 'buffer', 'mpi']])
 
-    def __init__(self, *args, **kwargs):
-        super(TestRPCRequestParam, self).__init__(*args, **kwargs)
-        self.driver = 'RPCRequestDriver'
-        self.args = None
-        self.attr_list += ['response_drivers', 'clients']
-        # Increased to allow forwarding between IPC comms on MacOS
-        self.timeout = 5.0
-        self.route_timeout = 2 * self.timeout
-        # if tools.get_default_comm() == "IPCComm":
-        #     self.route_timeout = 120.0
-        # self.debug_flag = True
-        # self.sleeptime = 0.5
-        # self.timeout = 10.0
-            
-    @property
-    def send_comm_kwargs(self):
+
+class TestRPCRequestDriver(base_class):
+    r"""Test class for RPCRequestDriver class."""
+
+    @pytest.fixture(scope="class")
+    def component_subtype(self):
+        r"""Subtype of component being tested."""
+        return 'rpc_request'
+
+    @pytest.fixture(scope="class", params=_comm_types)
+    def ocomm_name(self, request):
+        r"""str: Name of the output communicator being tested."""
+        return request.param
+
+    @pytest.fixture(scope="class")
+    def icomm_name(self, ocomm_name):
+        r"""str: Name of the input communicator being tested."""
+        return ocomm_name
+    
+    # @pytest.fixture(scope="class")
+    # def timeout(self):
+    #     r"""int: Time that should be waiting in seconds."""
+    #     return 5.0
+
+    @pytest.fixture(scope="class")
+    def route_timeout(self, timeout):
+        r"""int: Time to wait for messages to be routed."""
+        return 2 * timeout
+    
+    @pytest.fixture
+    def send_comm_kwargs(self, instance, icomm_name):
         r"""dict: Keyword arguments for send comm."""
-        out = self.instance.icomm.opp_comm_kwargs()
+        out = instance.icomm.opp_comm_kwargs()
         out['request_commtype'] = out['commtype']
         out['commtype'] = 'client'
         return out
 
-    @property
-    def recv_comm_kwargs(self):
+    @pytest.fixture
+    def recv_comm_kwargs(self, instance):
         r"""dict: Keyword arguments for recv comm."""
-        out = self.instance.ocomm.opp_comm_kwargs()
+        out = instance.ocomm.opp_comm_kwargs()
         out['request_commtype'] = out['commtype']
         out['commtype'] = 'server'
         return out
-
     
-class TestRPCRequestDriverNoStart(TestRPCRequestParam,
-                                  parent.TestConnectionDriverNoStart):
-    r"""Test class for RPCRequestDriver class without start."""
-    
-    def test_error_attributes(self):
+    def test_error_attributes(self, instance):
         r"""Test error raised when trying to access attributes set on recv."""
         err_attr = ['request_id', 'response_address']
         for k in err_attr:
-            assert_raises(AttributeError, getattr, self.instance, k)
+            with pytest.raises(AttributeError):
+                getattr(instance, k)
 
+    @pytest.fixture
+    def do_send_recv(self, started_instance, send_comm, recv_comm,
+                     route_timeout, wait_on_function, nested_approx):
+        r"""Perform a send/recv cycle."""
+        def do_send_recv_w(msg_send):
+            try:
+                wait_on_function(lambda: started_instance.is_valid)
+                # Send a message to local output
+                flag = send_comm.send(msg_send)
+                assert(flag)
+                # Receive on server side, then send back
+                flag, srv_msg = recv_comm.recv(timeout=route_timeout)
+                assert(flag)
+                assert(srv_msg == nested_approx(msg_send))
+                started_instance.printStatus()
+                started_instance.printStatus(return_str=True)
+                flag = recv_comm.send(srv_msg)
+                assert(flag)
+                # Receive response on client side
+                flag, cli_msg = send_comm.recv(timeout=route_timeout)
+                assert(flag)
+                assert(cli_msg == nested_approx(msg_send))
+            except BaseException:  # pragma: debug
+                send_comm.printStatus()
+                started_instance.printStatus(verbose=True)
+                recv_comm.printStatus()
+                raise
+        return do_send_recv_w
 
-class TestRPCRequestDriverNoInit(TestRPCRequestParam,
-                                 parent.TestConnectionDriverNoInit):
-    r"""Test class for RPCRequestDriver class without init."""
-    pass
-            
-
-class TestRPCRequestDriver(TestRPCRequestParam,
-                           parent.TestConnectionDriver):
-    r"""Test class for RPCRequestDriver class."""
-
-    def test_send_recv(self, msg_send=None):
+    def test_send_recv(self, do_send_recv, test_msg):
         r"""Test routing of a short message between client and server."""
-        try:
-            if msg_send is None:
-                msg_send = self.test_msg
-            T = self.instance.start_timeout()
-            while ((not T.is_out) and (not self.instance.is_valid)):
-                self.instance.sleep()  # pragma: debug
-            self.instance.stop_timeout()
-            # Send a message to local output
-            flag = self.send_comm.send(msg_send)
-            assert(flag)
-            # Receive on server side, then send back
-            flag, srv_msg = self.recv_comm.recv(timeout=self.route_timeout)
-            assert(flag)
-            assert_equal(srv_msg, msg_send)
-            self.instance.printStatus()
-            self.instance.printStatus(return_str=True)
-            flag = self.recv_comm.send(srv_msg)
-            assert(flag)
-            # Receive response on client side
-            flag, cli_msg = self.send_comm.recv(timeout=self.route_timeout)
-            assert(flag)
-            assert_equal(cli_msg, msg_send)
-        except BaseException:  # pragma: debug
-            self.send_comm.printStatus()
-            self.instance.printStatus(verbose=True)
-            self.recv_comm.printStatus()
-            raise
+        do_send_recv(test_msg)
 
-    def test_send_recv_nolimit(self):
+    def test_send_recv_nolimit(self, do_send_recv, msg_long):
         r"""Test routing of a large message between client and server."""
-        self.test_send_recv(msg_send=self.msg_long)
-
-
-# Dynamically create tests based on registered comm classes
-s = get_schema()
-comm_types = list(s['comm'].schema_subtypes.keys())
-for k in comm_types:
-    if k in [_default_comm, 'ValueComm', 'value',
-             'BufferComm', 'buffer']:  # pragma: debug
-        continue
-    base_class = TestRPCRequestDriver
-    if k in ['RESTComm', 'rest']:
-        from yggdrasil.tests.test_services import running_service
-        
-        class BaseRESTClass(TestRPCRequestDriver):
-            @pytest.fixture(scope="class", autouse=True)
-            def running_service(self):
-                with running_service('flask') as cli:
-                    yield cli
-        base_class = BaseRESTClass
-    tcls = type('Test%sRPCRequestDriver' % k,
-                (base_class, ), {'ocomm_name': k,
-                                 'icomm_name': k,
-                                 'driver': 'RPCRequestDriver',
-                                 'args': 'test'})
-    # Flags
-    flag_func = None
-    if k in ['RMQComm', 'RMQAsyncComm', 'rmq', 'rmq_async']:
-        flag_func = unittest.skipIf(not _rmq_installed,
-                                    "RMQ Server not running")
-    elif k in ['ZMQComm', 'zmq']:
-        flag_func = unittest.skipIf(not _zmq_installed,
-                                    "ZMQ library not installed")
-    elif k in ['IPCComm', 'ipc']:
-        flag_func = unittest.skipIf(not _ipc_installed,
-                                    "IPC library not installed")
-    elif k in ['MPIComm', 'mpi']:
-        flag_func = [unittest.skipIf(True,
-                                     "No MPI RPCRequestDriver test"),
-                     unittest.skipIf(not _mpi_installed,
-                                     "MPI library not installed"),
-                     pytest.mark.mpi(min_size=2)]
-    elif k in ['RESTComm', 'rest']:
-        flag_func = unittest.skipIf(not _rest_installed,
-                                    "REST library not installed")
-    if flag_func is not None:
-        if not isinstance(flag_func, list):
-            flag_func = [flag_func]
-        for x in flag_func:
-            tcls = x(tcls)
-    # Add class to globals
-    globals()[tcls.__name__] = tcls
-    del tcls, base_class
-    if k in ['RESTComm', 'rest']:
-        del BaseRESTClass
+        do_send_recv(msg_long)

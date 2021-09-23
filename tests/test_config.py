@@ -1,7 +1,6 @@
+import pytest
 import os
-import json
 import shutil
-from yggdrasil.tests import assert_equal, assert_raises
 from yggdrasil import config, tools, platform
 
 
@@ -10,13 +9,14 @@ def test_YggConfigParser():
     x = config.YggConfigParser()
     x.add_section('test_section')
     x.set('test_section', 'test_option', 'test_value')
-    assert_raises(RuntimeError, x.update_file)
-    assert_equal(x.file_to_update, None)
-    assert_equal(x.get('test_section', 'test_option'), 'test_value')
-    assert_equal(x.get('test_section', 'fake_option'), None)
-    assert_equal(x.get('test_section', 'fake_option', 5), 5)
-    assert_equal(x.get('fake_section', 'fake_option'), None)
-    assert_equal(x.get('fake_section', 'fake_option', 5), 5)
+    with pytest.raises(RuntimeError):
+        x.update_file()
+    assert(x.file_to_update is None)
+    assert(x.get('test_section', 'test_option') == 'test_value')
+    assert(x.get('test_section', 'fake_option') is None)
+    assert(x.get('test_section', 'fake_option', 5) == 5)
+    assert(x.get('fake_section', 'fake_option') is None)
+    assert(x.get('fake_section', 'fake_option', 5) == 5)
 
 
 def test_update_language_config():
@@ -70,46 +70,36 @@ def test_parser_config():
     r"""Test parser_config."""
     config.get_config_parser(description="test", skip_sections=['testing'])
     parser = config.get_config_parser(description="test")
-    assert_raises(ValueError, config.resolve_config_parser,
-                  parser.parse_args(['--production-run', '--debug']))
-    args1 = config.resolve_config_parser(
-        parser.parse_args(['--languages', 'c', 'cpp', '--production-run']))
+    with pytest.raises(ValueError):
+        config.resolve_config_parser(
+            parser.parse_args(['--production-run', '--debug']))
     args2 = config.resolve_config_parser(
-        parser.parse_args(['--skip-languages', 'R', '--debug']))
+        parser.parse_args(['--debug']))
     args3 = config.resolve_config_parser(
         parser.parse_args(['--validate-messages=True']))
-    assert_equal(args3.validate_messages, True)
+    assert(args3.validate_messages is True)
     old_var = {k: os.environ.get(k, None) for k in
-               ['YGG_TEST_LANGUAGE', 'YGG_TEST_SKIP_LANGUAGE',
-                'YGG_VALIDATE_COMPONENTS', 'YGG_VALIDATE_MESSAGES',
+               ['YGG_VALIDATE_COMPONENTS', 'YGG_VALIDATE_MESSAGES',
                 'YGG_DEBUG', 'YGG_CLIENT_DEBUG']}
-    args1.validate_messages = 'False'
     args2.validate_messages = 'True'
-    with config.parser_config(args1):
-        assert_equal(json.loads(os.environ.get('YGG_TEST_LANGUAGE', '')),
-                     ['c', 'c++'])
-        assert_equal(os.environ.get('YGG_VALIDATE_COMPONENTS', ''), 'false')
-        assert_equal(os.environ.get('YGG_VALIDATE_MESSAGES', ''), 'false')
     for k, v in old_var.items():
-        assert_equal(os.environ.get(k, None), v)
+        assert(os.environ.get(k, None) == v)
     with config.parser_config(args2):
-        assert_equal(json.loads(os.environ.get('YGG_TEST_SKIP_LANGUAGE', '')),
-                     ['R'])
-        assert_equal(os.environ.get('YGG_DEBUG', ''), 'DEBUG')
-        assert_equal(os.environ.get('YGG_CLIENT_DEBUG', ''), 'DEBUG')
-        assert_equal(os.environ.get('YGG_VALIDATE_COMPONENTS', ''), 'true')
-        assert_equal(os.environ.get('YGG_VALIDATE_MESSAGES', ''), 'true')
+        assert(os.environ.get('YGG_DEBUG', '') == 'DEBUG')
+        assert(os.environ.get('YGG_CLIENT_DEBUG', '') == 'DEBUG')
+        assert(os.environ.get('YGG_VALIDATE_COMPONENTS', '') == 'true')
+        assert(os.environ.get('YGG_VALIDATE_MESSAGES', '') == 'true')
     for k, v in old_var.items():
-        assert_equal(os.environ.get(k, None), v)
-    assert_raises(ValueError, config.acquire_env,
-                  dict(production_run=True, debug=True))
+        assert(os.environ.get(k, None) == v)
+    with pytest.raises(ValueError):
+        config.acquire_env(dict(production_run=True, debug=True))
     with config.temp_config(production_run=True):
-        assert_equal(os.environ.get('YGG_VALIDATE_COMPONENTS', ''), 'false')
-        assert_equal(os.environ.get('YGG_VALIDATE_MESSAGES', ''), 'false')
+        assert(os.environ.get('YGG_VALIDATE_COMPONENTS', '') == 'false')
+        assert(os.environ.get('YGG_VALIDATE_MESSAGES', '') == 'false')
     with config.temp_config(debug=True):
-        assert_equal(os.environ.get('YGG_DEBUG', ''), 'DEBUG')
-        assert_equal(os.environ.get('YGG_CLIENT_DEBUG', ''), 'DEBUG')
-        assert_equal(os.environ.get('YGG_VALIDATE_COMPONENTS', ''), 'true')
-        assert_equal(os.environ.get('YGG_VALIDATE_MESSAGES', ''), 'true')
+        assert(os.environ.get('YGG_DEBUG', '') == 'DEBUG')
+        assert(os.environ.get('YGG_CLIENT_DEBUG', '') == 'DEBUG')
+        assert(os.environ.get('YGG_VALIDATE_COMPONENTS', '') == 'true')
+        assert(os.environ.get('YGG_VALIDATE_MESSAGES', '') == 'true')
     with config.temp_config(validate_messages='True'):
-        assert_equal(os.environ.get('YGG_VALIDATE_MESSAGES', ''), 'true')
+        assert(os.environ.get('YGG_VALIDATE_MESSAGES', '') == 'true')

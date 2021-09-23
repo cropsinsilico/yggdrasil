@@ -1,5 +1,4 @@
 from yggdrasil import scanf
-from yggdrasil.tests import assert_equal
 
 
 def test_scanf():
@@ -28,4 +27,4 @@ def test_scanf():
                 new_tup.append(v)
         val_str = fmt % tuple(new_tup)
         res = scanf.scanf(fmt, val_str)
-        assert_equal(res, val_tup)
+        assert(res == val_tup)

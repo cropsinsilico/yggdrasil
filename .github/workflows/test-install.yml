@@ -48,11 +48,11 @@ jobs:
         install-method:
         - pip
         test-flags1:
-        - --long-running --test-suite=timing --test-suite=demos --test-suite=top
-        - --test-suite=examples --separate-test='--test-suite=mpi --write-script=run_mpi.sh
-          --with-mpi=3'
-        - --test-suite=types --skip-languages c c++
-        - --test-suite=types --languages c cpp
+        - --long-running --suite=timing --suite=demos --suite=top
+        - --suite=examples --separate-test='--ci --cov-append --suite=mpi --write-script=run_mpi.sh
+          --run-with-mpi=3'
+        - --suite=types --skip-languages c c++
+        - --suite=types --languages c cpp
         test-flags2:
         - ''
         install-c:
@@ -63,8 +63,8 @@ jobs:
         - os: windows-latest
           python-version: 3.7
           install-method: pip
-          test-flags1: --long-running --languages cpp
-          test-flags2: --long-running --skip-languages c++
+          test-flags1: --long-running
+          test-flags2: ''
           install-c: false
           install-mpi: false
       fail-fast: false
@@ -243,24 +243,23 @@ jobs:
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        yggtest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
+        pytest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
       if: ${{ matrix.os == 'windows-latest' || !contains(matrix.test-flags1, '--write-script')
         }}
       id: test1
-      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
     - name: Run generated test script (1st)
-      if: ${{ matrix.os != 'windows-latest' && contains(matrix.test-flags1, '--write-script')
-        }}
+      if: ${{ contains(matrix.test-flags1, '--write-script') }}
       id: test1_script
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }}
 
         ./run_mpi.sh
 
@@ -268,27 +267,27 @@ jobs:
       continue-on-error: true
     - name: Re-run test script failures (1st)
       if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
 
         ./run_mpi.sh
 
         '
     - name: Run tests (2nd)
-      if: ${{ matrix.test-flags2 != '' && (matrix.os == 'windows-latest' || !contains(matrix.test-flags2,
-        '--write-script')) }}
+      if: ${{ matrix.test-flags2 != '' && !contains(matrix.test-flags2, '--write-script')
+        }}
       id: test2
-      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
       continue-on-error: true
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
     - name: Run generated test script (2nd)
-      if: ${{ matrix.test-flags2 != '' && (matrix.os != 'windows-latest' && contains(matrix.test-flags2,
-        '--write-script')) }}
+      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--write-script')
+        }}
       id: test2_script
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }}
 
         ./run_mpi.sh
 
@@ -296,8 +295,8 @@ jobs:
       continue-on-error: true
     - name: Re-run test script failures (2nd)
       if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
 
         ./run_mpi.sh
 
@@ -355,7 +354,7 @@ jobs:
         install-method:
         - conda
         test-flags1:
-        - --long-running --separate-test='--test-suite=mpi --write-script=run_mpi.sh'
+        - --long-running --separate-test='--ci --cov-append --suite=mpi --write-script=run_mpi.sh'
         test-flags2:
         - --with-examples examples/tests/test_backwards.py
         install-c:
@@ -570,24 +569,23 @@ jobs:
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        yggtest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
+        pytest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
       if: ${{ matrix.os == 'windows-latest' || !contains(matrix.test-flags1, '--write-script')
         }}
       id: test1
-      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
     - name: Run generated test script (1st)
-      if: ${{ matrix.os != 'windows-latest' && contains(matrix.test-flags1, '--write-script')
-        }}
+      if: ${{ contains(matrix.test-flags1, '--write-script') }}
       id: test1_script
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }}
 
         ./run_mpi.sh
 
@@ -595,27 +593,27 @@ jobs:
       continue-on-error: true
     - name: Re-run test script failures (1st)
       if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
 
         ./run_mpi.sh
 
         '
     - name: Run tests (2nd)
-      if: ${{ matrix.test-flags2 != '' && (matrix.os == 'windows-latest' || !contains(matrix.test-flags2,
-        '--write-script')) }}
+      if: ${{ matrix.test-flags2 != '' && !contains(matrix.test-flags2, '--write-script')
+        }}
       id: test2
-      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
       continue-on-error: true
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
     - name: Run generated test script (2nd)
-      if: ${{ matrix.test-flags2 != '' && (matrix.os != 'windows-latest' && contains(matrix.test-flags2,
-        '--write-script')) }}
+      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--write-script')
+        }}
       id: test2_script
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }}
 
         ./run_mpi.sh
 
@@ -623,8 +621,8 @@ jobs:
       continue-on-error: true
     - name: Re-run test script failures (2nd)
       if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
 
         ./run_mpi.sh
 
@@ -873,24 +871,23 @@ jobs:
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        yggtest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
+        pytest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
       if: ${{ matrix.os == 'windows-latest' || !contains(matrix.test-flags1, '--write-script')
         }}
       id: test1
-      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
     - name: Run generated test script (1st)
-      if: ${{ matrix.os != 'windows-latest' && contains(matrix.test-flags1, '--write-script')
-        }}
+      if: ${{ contains(matrix.test-flags1, '--write-script') }}
       id: test1_script
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }}
 
         ./run_mpi.sh
 
@@ -898,27 +895,27 @@ jobs:
       continue-on-error: true
     - name: Re-run test script failures (1st)
       if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
 
         ./run_mpi.sh
 
         '
     - name: Run tests (2nd)
-      if: ${{ matrix.test-flags2 != '' && (matrix.os == 'windows-latest' || !contains(matrix.test-flags2,
-        '--write-script')) }}
+      if: ${{ matrix.test-flags2 != '' && !contains(matrix.test-flags2, '--write-script')
+        }}
       id: test2
-      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
       continue-on-error: true
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
     - name: Run generated test script (2nd)
-      if: ${{ matrix.test-flags2 != '' && (matrix.os != 'windows-latest' && contains(matrix.test-flags2,
-        '--write-script')) }}
+      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--write-script')
+        }}
       id: test2_script
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }}
 
         ./run_mpi.sh
 
@@ -926,8 +923,8 @@ jobs:
       continue-on-error: true
     - name: Re-run test script failures (2nd)
       if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
 
         ./run_mpi.sh
 
@@ -1178,24 +1175,23 @@ jobs:
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        yggtest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
+        pytest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
       if: ${{ matrix.os == 'windows-latest' || !contains(matrix.test-flags1, '--write-script')
         }}
       id: test1
-      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
     - name: Run generated test script (1st)
-      if: ${{ matrix.os != 'windows-latest' && contains(matrix.test-flags1, '--write-script')
-        }}
+      if: ${{ contains(matrix.test-flags1, '--write-script') }}
       id: test1_script
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }}
 
         ./run_mpi.sh
 
@@ -1203,27 +1199,27 @@ jobs:
       continue-on-error: true
     - name: Re-run test script failures (1st)
       if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
 
         ./run_mpi.sh
 
         '
     - name: Run tests (2nd)
-      if: ${{ matrix.test-flags2 != '' && (matrix.os == 'windows-latest' || !contains(matrix.test-flags2,
-        '--write-script')) }}
+      if: ${{ matrix.test-flags2 != '' && !contains(matrix.test-flags2, '--write-script')
+        }}
       id: test2
-      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
       continue-on-error: true
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
     - name: Run generated test script (2nd)
-      if: ${{ matrix.test-flags2 != '' && (matrix.os != 'windows-latest' && contains(matrix.test-flags2,
-        '--write-script')) }}
+      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--write-script')
+        }}
       id: test2_script
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }}
 
         ./run_mpi.sh
 
@@ -1231,8 +1227,8 @@ jobs:
       continue-on-error: true
     - name: Re-run test script failures (2nd)
       if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
 
         ./run_mpi.sh
 
@@ -1482,24 +1478,23 @@ jobs:
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        yggtest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
+        pytest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
       if: ${{ matrix.os == 'windows-latest' || !contains(matrix.test-flags1, '--write-script')
         }}
       id: test1
-      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
     - name: Run generated test script (1st)
-      if: ${{ matrix.os != 'windows-latest' && contains(matrix.test-flags1, '--write-script')
-        }}
+      if: ${{ contains(matrix.test-flags1, '--write-script') }}
       id: test1_script
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }}
 
         ./run_mpi.sh
 
@@ -1507,27 +1502,27 @@ jobs:
       continue-on-error: true
     - name: Re-run test script failures (1st)
       if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
 
         ./run_mpi.sh
 
         '
     - name: Run tests (2nd)
-      if: ${{ matrix.test-flags2 != '' && (matrix.os == 'windows-latest' || !contains(matrix.test-flags2,
-        '--write-script')) }}
+      if: ${{ matrix.test-flags2 != '' && !contains(matrix.test-flags2, '--write-script')
+        }}
       id: test2
-      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
       continue-on-error: true
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
     - name: Run generated test script (2nd)
-      if: ${{ matrix.test-flags2 != '' && (matrix.os != 'windows-latest' && contains(matrix.test-flags2,
-        '--write-script')) }}
+      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--write-script')
+        }}
       id: test2_script
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }}
 
         ./run_mpi.sh
 
@@ -1535,8 +1530,8 @@ jobs:
       continue-on-error: true
     - name: Re-run test script failures (2nd)
       if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --debug
+      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+        --ygg-debug
 
         ./run_mpi.sh
 

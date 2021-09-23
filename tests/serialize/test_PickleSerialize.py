@@ -1,11 +1,15 @@
-from yggdrasil.serialize.tests import test_SerializeBase as parent
+import pytest
+from tests.serialize import TestSerializeBase as base_class
 
 
-class TestPickleSerialize(parent.TestSerializeBase):
+class TestPickleSerialize(base_class):
     r"""Test class for TestPickleSerialize class."""
 
-    _cls = 'PickleSerialize'
+    @pytest.fixture(scope="class", autouse=True, params=['pickle'])
+    def component_subtype(self, request):
+        r"""Subtype of component being tested."""
+        return request.param
 
-    def test_get_first_frame(self):
+    def test_get_first_frame(self, python_class):
         r"""Test get_first_frame for empty message."""
-        self.assert_equal(self.import_cls.get_first_frame(b'not a pickle'), b'')
+        assert(python_class.get_first_frame(b'not a pickle') == b'')

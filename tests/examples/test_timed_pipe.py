@@ -1,30 +1,33 @@
+import pytest
 import os
-from yggdrasil.examples.tests import ExampleTstBase
+from tests.examples import TestExample as base_class
+from yggdrasil.tools import get_supported_comm
 
 
-class TestTimedPipeBase(ExampleTstBase):
+_commtypes = sorted([x for x in get_supported_comm(dont_include_value=True)
+                     if x not in ['value', 'buffer', 'rmq_async']])
+
+
+@pytest.mark.parametrize("commtype", _commtypes, indirect=True)
+class TestTimedPipeBase(base_class):
     r"""Base class for testing TimedPipe example with various comm types."""
 
-    example_name = 'timed_pipe'
-    env = {'PIPE_MSG_COUNT': '10',
-           'PIPE_MSG_SIZE': '1024'}
-    iter_over = ['language', 'comm']
+    examples = ['timed_pipe']
 
-    @property
-    def description_prefix(self):
-        r"""Prefix message with test name."""
-        out = super(TestTimedPipeBase, self).description_prefix
-        out += '(%s)' % self.comm
-        return out
-    
-    @property
-    def results(self):
+    @pytest.fixture(scope="class")
+    def env(self):
+        r"""dict: Environment variables set for the test."""
+        return {'PIPE_MSG_COUNT': '10',
+                'PIPE_MSG_SIZE': '1024'}
+        
+    @pytest.fixture
+    def results(self, env):
         r"""Result that should be found in output files."""
-        siz = int(self.env['PIPE_MSG_COUNT']) * int(self.env['PIPE_MSG_SIZE'])
+        siz = int(env['PIPE_MSG_COUNT']) * int(env['PIPE_MSG_SIZE'])
         res = '0' * siz
         return [res]
 
-    @property
-    def output_files(self):
+    @pytest.fixture
+    def output_files(self, tempdir):
         r"""Output file."""
-        return [os.path.join(self.tempdir, 'output_timed_pipe.txt')]
+        return [os.path.join(tempdir, 'output_timed_pipe.txt')]

@@ -511,3 +511,34 @@ class CPPModelDriver(CModelDriver):
         else:
             out = super(CPPModelDriver, cls).get_json_type(native_type)
         return out
+
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for driver instance.
+                deps (list): Dependencies to install.
+
+        """
+        from yggdrasil import tools
+        out = super(CPPModelDriver, cls).get_testing_options(**kwargs)
+        out['deps'] = ["cmake",
+                       {"package_manager": "pip", "package": "pyyaml",
+                        "arguments": "-v"},
+                       {"package": "cmake", "arguments": "-v"}]
+        if platform._is_win:  # pragma: windows
+            if not tools.get_conda_prefix():
+                out['deps'].append({"package_manager": "vcpkg",
+                                    "package": "czmq"})
+            else:
+                out['deps'].append('doxygen')
+        out['write_try_except_kwargs'] = {'error_type': '...'}
+        out['kwargs'].setdefault('compiler_flags', [])
+        out['kwargs']['compiler_flags'].append('-std=c++11')
+        return out

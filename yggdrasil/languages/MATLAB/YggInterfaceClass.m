@@ -1,4 +1,4 @@
-classdef YggInterfaceClass
+classdef YggInterfaceClass < handle
   properties
     pyobj
   end
@@ -9,7 +9,7 @@ classdef YggInterfaceClass
       end
     end
     function delete(obj)
-      obj.pyobj.language_atexit();
+      obj.pyobj.atexit();
     end
     function ml_res = eval_pyobj(obj, cmd, nargs, args)
       py_cmd = sprintf('obj.pyobj.%s(', cmd);

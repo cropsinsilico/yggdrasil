@@ -1,7 +1,8 @@
+import pytest
 import os
 import tempfile
 from yggdrasil import tools, platform
-from yggdrasil.tests import YggTestClass, assert_equal, assert_warns
+from tests import TestClassBase as base_class
 
 
 class DummyTarget(object):
@@ -85,7 +86,7 @@ def test_bytes2str():
             ([b'a', b'b'], ['a', 'b']),
             ([b'a', [b'b', b'c']], ['a', ['b', 'c']])]
     for x, exp in vals:
-        assert_equal(tools.bytes2str(x, recurse=True), exp)
+        assert(tools.bytes2str(x, recurse=True) == exp)
 
 
 def test_str2bytes():
@@ -97,7 +98,7 @@ def test_str2bytes():
             (['a', 'b'], [b'a', b'b']),
             (['a', ['b', 'c']], [b'a', [b'b', b'c']])]
     for x, exp in vals:
-        assert_equal(tools.str2bytes(x, recurse=True), exp)
+        assert(tools.str2bytes(x, recurse=True) == exp)
 
 
 def test_timer_context():
@@ -190,13 +191,13 @@ def test_locate_file():
     sdir, spat, sans = make_temp_single()
     sout = tools.locate_file(spat, verification_func=os.path.isfile)
     assert(isinstance(sout, (bytes, str)))
-    assert_equal(sout, sans[0])
+    assert(sout == sans[0])
     # Multiple files
     mdir, mpat, mans = make_temp_multiple()
-    with assert_warns(RuntimeWarning):
+    with pytest.warns(RuntimeWarning):
         mout = tools.locate_file([mpat])
         assert(isinstance(mout, (bytes, str)))
-        assert_equal(mout, mans[0])
+        assert(mout == mans[0])
     
 
 def test_find_all():
@@ -207,12 +208,12 @@ def test_find_all():
     sdir, spat, sans = make_temp_single()
     sout = tools.find_all(spat, sdir)
     assert(isinstance(sout, list))
-    assert_equal(sout, sans)
+    assert(sout == sans)
     # Multiple files
     mdir, mpat, mans = make_temp_multiple()
     mout = tools.find_all(mpat, mdir)
     assert(isinstance(mout, list))
-    assert_equal(mout, mans)
+    assert(mout == mans)
 
 
 def test_locate_path():
@@ -223,7 +224,7 @@ def test_locate_path():
     fpath = tools.locate_path(fname, basedir=basedir)
     assert(fpath)
     assert(__file__ in fpath)
-    # assert_equal(__file__, fpath)
+    # assert(__file__ == fpath)
     # Search for invalid file
     fname = 'invalid_file.ext'
     fpath = tools.locate_path(fname, basedir=basedir)
@@ -241,7 +242,7 @@ def test_popen_nobuffer():
     p = tools.popen_nobuffer(args)
     out, err = p.communicate()
     res = tools.bytes2str(out).splitlines()[0]
-    assert_equal(res, ans)
+    assert(res == ans)
     # Test w/ shell
     if platform._is_win:  # pragma: windows
         args = 'cd'
@@ -250,87 +251,86 @@ def test_popen_nobuffer():
     p = tools.popen_nobuffer(args, shell=True)
     out, err = p.communicate()
     res = tools.bytes2str(out).splitlines()[0]
-    assert_equal(res, ans)
+    assert(res == ans)
 
 
 def test_eval_kwarg():
     r"""Ensure strings & objects properly evaluated."""
     vals = [None, True, False, ['one', 'two'], 'one']
     for v in vals:
-        assert_equal(tools.eval_kwarg(v), v)
-        assert_equal(tools.eval_kwarg(str(v)), v)
-    assert_equal(tools.eval_kwarg("'one'"), 'one')
-    assert_equal(tools.eval_kwarg('"one"'), 'one')
+        assert(tools.eval_kwarg(v) == v)
+        assert(tools.eval_kwarg(str(v)) == v)
+    assert(tools.eval_kwarg("'one'") == 'one')
+    assert(tools.eval_kwarg('"one"') == 'one')
 
 
-class TestYggClass(YggTestClass):
+class TestYggClass(base_class):
     r"""Test basic behavior of YggTestClass."""
 
     _cls = 'YggClass'
     _mod = 'yggdrasil.tools'
 
-    def __init__(self, *args, **kwargs):
-        super(TestYggClass, self).__init__(*args, **kwargs)
-        self.namespace = 'TESTING_%s' % self.uuid
-        self.attr_list += ['name', 'sleeptime', 'longsleep', 'timeout']
-        self._inst_kwargs = {'timeout': self.timeout,
-                             'sleeptime': self.sleeptime}
-        self.debug_flag = False
+    @pytest.fixture
+    def namespace(self, uuid):
+        return f'TESTING_{uuid}'
 
-    def test_attributes(self):
-        r"""Assert that the driver has all of the required attributes."""
-        for a in self.attr_list:
-            if not hasattr(self.instance, a):  # pragma: debug
-                raise AttributeError("Driver does not have attribute %s" % a)
-
-    def test_prints(self):
+    @pytest.fixture
+    def instance_kwargs(self, timeout, polling_interval):
+        r"""Keyword arguments for a new instance of the tested class."""
+        return {'timeout': timeout,
+                'sleeptime': polling_interval}
+        
+    def test_prints(self, instance):
         r"""Test logging at various levels."""
-        self.instance.display(1)
-        self.instance.info(1)
-        self.instance.debug(1)
-        self.instance.verbose_debug(1)
-        self.instance.critical(1)
-        self.instance.warning(1)
-        self.instance.warn(1)
-        self.instance.error(1)
-        self.instance.exception(1)
+        instance.display(1)
+        instance.info(1)
+        instance.debug(1)
+        instance.verbose_debug(1)
+        instance.critical(1)
+        instance.warning(1)
+        instance.warn(1)
+        instance.error(1)
+        instance.exception(1)
         try:
             raise Exception("Test exception")
         except Exception:
-            self.instance.exception(1)
-        self.instance.printStatus()
-        self.instance.printStatus(return_str=True)
-        self.instance.special_debug(1)
-        self.instance.suppress_special_debug = True
-        self.instance.special_debug(1)
-        self.instance.suppress_special_debug = False
-        self.instance.interface_info(1)
-        self.instance.language_info([])(1)
-        self.instance.language_info('python')(1)
+            instance.exception(1)
+        instance.printStatus()
+        instance.printStatus(return_str=True)
+        instance.special_debug(1)
+        instance.suppress_special_debug = True
+        instance.special_debug(1)
+        instance.suppress_special_debug = False
+        instance.interface_info(1)
+        instance.language_info([])(1)
+        instance.language_info('python')(1)
 
-    def test_wait_on_function(self):
+    def test_wait_on_function(self, instance):
         r"""Test functionality of async wait on function."""
         def func():
             return False
-        self.instance.wait_on_function(func, timeout=0.0,
-                                       polling_interval=0.0,
-                                       quiet=True)
+        instance.wait_on_function(func, timeout=0.0,
+                                  polling_interval=0.0,
+                                  quiet=True)
 
-    def test_timeout(self):
+    def test_timeout(self, instance):
         r"""Test functionality of timeout."""
         # Test w/o timeout
-        self.instance.start_timeout(10, key='fake_key')
-        assert(not self.instance.check_timeout(key='fake_key'))
+        instance.start_timeout(10, key='fake_key')
+        assert(not instance.check_timeout(key='fake_key'))
         # Test errors
-        self.assert_raises(KeyError, self.instance.start_timeout,
-                           0.1, key='fake_key')
-        self.instance.stop_timeout(key='fake_key')
-        self.assert_raises(KeyError, self.instance.check_timeout)
-        self.assert_raises(KeyError, self.instance.check_timeout, key='fake_key')
-        self.assert_raises(KeyError, self.instance.stop_timeout, key='fake_key')
+        with pytest.raises(KeyError):
+            instance.start_timeout(0.1, key='fake_key')
+        instance.stop_timeout(key='fake_key')
+        with pytest.raises(KeyError):
+            instance.check_timeout()
+        with pytest.raises(KeyError):
+            instance.check_timeout(key='fake_key')
+        with pytest.raises(KeyError):
+            instance.stop_timeout(key='fake_key')
         # Test w/ timeout
-        T = self.instance.start_timeout(0.001)  # self.instance.sleeptime)
+        T = instance.start_timeout(0.001)  # instance.sleeptime)
         while not T.is_out:
-            self.instance.sleep()
-        assert(self.instance.check_timeout())
-        self.instance.stop_timeout(quiet=True)
+            instance.sleep()
+        assert(instance.check_timeout())
+        instance.stop_timeout(quiet=True)

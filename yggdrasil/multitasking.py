@@ -210,7 +210,7 @@ class AliasObject(object):
 
     """
 
-    __slots__ = ['_base']
+    __slots__ = ['_base', '__weakref__']
     _base_class_name = None
     _base_class = None
     _base_attr = []
@@ -242,7 +242,8 @@ class AliasObject(object):
             out.update(
                 dict((slot, getattr(self, slot))
                      for slot in base.__slots__
-                     if (hasattr(self, slot) and (slot != '_base_class')
+                     if (hasattr(self, slot)
+                         and (slot not in ['_base_class', '__weakref__'])
                          and (slot not in out))))
             for x in base.__bases__:
                 if x != object:
@@ -270,7 +271,9 @@ class AliasObject(object):
         r"""Disconnect from the aliased object by replacing it with
         a dummy object."""
         if self._base is not None:
-            self._base = self.dummy_copy
+            dummy = self.dummy_copy
+            del self._base
+            self._base = dummy
 
     def __del__(self):
         self.disconnect()
@@ -396,6 +399,10 @@ class ContextObject(MultiObject):
         task_method = task_context.task_method
         self._context = weakref.ref(task_context)
         self._base_class = self.get_base_class(task_context)
+        if ((self._base_class
+             and isinstance(self._base_class, type)
+             and issubclass(self._base_class, (LockedObject, ContextObject)))):
+            kwargs['task_context'] = task_context
         super(ContextObject, self).__init__(
             *args, task_method=task_method, **kwargs)
 
@@ -614,6 +621,14 @@ class Event(ContextObject):
         getattr(self, f'_{trigger}_callbacks').append(
             (callback, args, kwargs))
 
+    def disconnect(self):
+        r"""Disconnect from the aliased object by replacing it with
+        a dummy object."""
+        if Event is not None:
+            super(Event, self).disconnect()
+            self._set = self._base.set
+            self._clear = self._base.clear
+
 
 class ValueEvent(Event):
     r"""Class for handling storing a value that also triggers an event."""
@@ -760,6 +775,13 @@ class Task(ContextObject):
         elif hasattr(self._base, 'terminate'):
             return self._base.terminate(*args, **kwargs)
 
+    def disconnect(self):
+        r"""Disconnect from the aliased object by replacing it with
+        a dummy object."""
+        self._target = None
+        if Task is not None:
+            super(Task, self).disconnect()
+
 
 class TaskLoop(Task):
     r"""Class for looping over a task."""
@@ -806,6 +828,14 @@ class TaskLoop(Task):
     def _finalize(self):
         r"""Finalize a run."""
         self.break_loop()
+
+    def disconnect(self):
+        r"""Disconnect from the aliased object by replacing it with
+        a dummy object."""
+        self.break_flag.disconnect()
+        self._loop_target = None
+        if TaskLoop is not None:
+            super(TaskLoop, self).disconnect()
 
 
 class DummyQueue(DummyContextObject):  # pragma: no cover
@@ -941,13 +971,16 @@ class Dict(ContextObject):
         r"""Disconnect from the aliased object by replacing it with
         a dummy object."""
         try:
-            final_value = self._base.copy()
+            final_value = {k: v for k, v in self._base.items()}
         except BaseException:  # pragma: debug
             final_value = {}
-        if isinstance(self._base, LockedDict):
+        if LockedDict and isinstance(self._base, LockedDict):
             self._base.disconnect()
         if getattr(self._base, '_manager', None) is not None:
             self._base._manager.shutdown()
+            self._base._manager.join()
+            del self._base._manager
+            self._base._manager = None
         if hasattr(self._base, '_close'):
             self._base._close()
         if Dict is not None:
@@ -1027,7 +1060,7 @@ class WaitableFunction(object):
 
     __slots__ = ["function", "polling_interval"]
 
-    def __init__(self, function, polling_interval=0.1):
+    def __init__(self, function, polling_interval=0.01):
         self.function = function
         self.polling_interval = polling_interval
 
@@ -1327,7 +1360,8 @@ class YggTask(YggClass):
 
     _disconnect_attr = (YggClass._disconnect_attr
                         + ['context', 'lock', 'process_instance',
-                           'error_flag', 'start_flag', 'terminate_flag'])
+                           'error_flag', 'start_flag', 'terminate_flag',
+                           'pipe'])
     
     def __init__(self, name=None, target=None, args=(), kwargs=None,
                  daemon=False, group=None, task_method='thread',
@@ -1625,7 +1659,7 @@ class YggTaskLoop(YggTask):
     r"""Class to run a loop inside a thread/process."""
 
     _disconnect_attr = (YggTask._disconnect_attr
-                        + ['break_flag', 'loop_flag'])
+                        + ['break_flag', 'loop_flag', 'unpause_flag'])
 
     def __init__(self, *args, **kwargs):
         super(YggTaskLoop, self).__init__(*args, **kwargs)
