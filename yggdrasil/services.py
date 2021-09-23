@@ -18,6 +18,7 @@ from yggdrasil.config import ygg_cfg
 
 
 _service_host_env = 'YGGDRASIL_SERVICE_HOST_URL'
+_service_repo_dir = 'YGGDRASIL_SERVICE_REPO_DIR'
 _default_service_type = ygg_cfg.get('services', 'default_type', 'flask')
 _default_commtype = ygg_cfg.get('services', 'default_comm', None)
 _default_address = ygg_cfg.get('services', 'address', None)
@@ -151,7 +152,8 @@ class ServiceBase(YggClass):
         if remote_url is None:
             remote_url = self.address
         if model_repository is not None:
-            self.registry.add_from_repository(model_repository)
+            repo_dir = self.registry.add_from_repository(model_repository)
+            os.environ.setdefault(_service_repo_dir, repo_dir)
         os.environ.setdefault(_service_host_env, remote_url)
         if log_level is not None:
             self.set_log_level(log_level)
@@ -1095,10 +1097,14 @@ class IntegrationServiceRegistry(object):
                 model_repository should be cloned. Defaults to
                 '~/.yggdrasil_service'.
 
+        Returns:
+            str: The directory where the repositories were cloned.
+
         """
         from yggdrasil.yamlfile import clone_github_repo, prep_yaml
         if directory is None:
-            directory = os.path.join('~', '.yggdrasil_services')
+            directory = os.path.expanduser(
+                os.path.join('~', '.yggdrasil_services'))
         yaml_dir = clone_github_repo(model_repository,
                                      local_directory=directory)
         yaml_files = (glob.glob(os.path.join(yaml_dir, '*.yaml'))
@@ -1108,8 +1114,9 @@ class IntegrationServiceRegistry(object):
             # in advance to circumvent th hold place on git cloning on the
             # service manager (these models are assumed to be vetted so
             # they do not pose a security risk).
-            prep_yaml(x)
+            prep_yaml(x, directory_for_clones=directory)
             self.add(os.path.splitext(os.path.basename(x))[0], x)
+        return directory
 
     def add(self, name, yamls=None, **kwargs):
         r"""Add an integration service to the registry.

@@ -54,9 +54,9 @@ def clone_github_repo(fname, commit=None, local_directory=None):
             repository.
 
     """
-    from yggdrasil.services import _service_host_env
+    from yggdrasil.services import _service_host_env, _service_repo_dir
     if local_directory is None:
-        local_directory = os.getcwd()
+        local_directory = os.environ.get(_service_repo_dir, os.getcwd())
     # make sure we start with a full url
     if 'http' not in fname:
         url = 'http://github.com/' + fname
@@ -92,7 +92,7 @@ def clone_github_repo(fname, commit=None, local_directory=None):
     return os.path.realpath(fname)
 
 
-def load_yaml(fname, yaml_param=None):
+def load_yaml(fname, yaml_param=None, directory_for_clones=None):
     r"""Parse a yaml file defining a run.
 
     Args:
@@ -107,6 +107,9 @@ def load_yaml(fname, yaml_param=None):
         yaml_param (dict, optional): Parameters that should be used in
             mustache formatting of YAML files. Defaults to None and is
             ignored.
+        directory_for_clones (str, optional): Directory that git repositories
+            should be cloned into. Defaults to None and the current working
+            directory will be used.
 
     Returns:
         dict: Contents of yaml file.
@@ -120,7 +123,8 @@ def load_yaml(fname, yaml_param=None):
     elif isinstance(fname, str):
         # pull foreign file
         if fname.startswith('git:'):
-            fname = clone_github_repo(fname[4:])
+            fname = clone_github_repo(fname[4:],
+                                      local_directory=directory_for_clones)
         fname = os.path.realpath(fname)
         if not os.path.isfile(fname):
             raise IOError("Unable locate yaml file %s" % fname)
@@ -150,7 +154,7 @@ def load_yaml(fname, yaml_param=None):
     return yamlparsed
 
 
-def prep_yaml(files, yaml_param=None):
+def prep_yaml(files, yaml_param=None, directory_for_clones=None):
     r"""Prepare yaml to be parsed by jsonschema including covering backwards
     compatible options.
 
@@ -161,6 +165,9 @@ def prep_yaml(files, yaml_param=None):
         yaml_param (dict, optional): Parameters that should be used in
             mustache formatting of YAML files. Defaults to None and is
             ignored.
+        directory_for_clones (str, optional): Directory that git repositories
+            should be cloned into. Defaults to None and the current working
+            directory will be used.
 
     Returns:
         dict: YAML ready to be parsed using schema.
@@ -170,7 +177,9 @@ def prep_yaml(files, yaml_param=None):
     # Load each file
     if not isinstance(files, list):
         files = [files]
-    yamls = [load_yaml(f, yaml_param=yaml_param) for f in files]
+    yamls = [load_yaml(f, yaml_param=yaml_param,
+                       directory_for_clones=directory_for_clones)
+             for f in files]
     # Load files pointed to
     for y in yamls:
         if 'include' in y:
@@ -213,7 +222,8 @@ def prep_yaml(files, yaml_param=None):
                     if (k == 'models') and ('repository_url' in x):
                         repo_dir = clone_github_repo(
                             x['repository_url'],
-                            commit=x.get('repository_commit', None))
+                            commit=x.get('repository_commit', None),
+                            local_directory=directory_for_clones)
                         x.setdefault('working_dir', repo_dir)
                     else:
                         x.setdefault('working_dir', yml['working_dir'])
@@ -227,7 +237,8 @@ def prep_yaml(files, yaml_param=None):
 
 
 def parse_yaml(files, complete_partial=False, partial_commtype=None,
-               model_only=False, model_submission=False, yaml_param=None):
+               model_only=False, model_submission=False, yaml_param=None,
+               directory_for_clones=None):
     r"""Parse list of yaml files.
 
     Args:
@@ -248,6 +259,9 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
         yaml_param (dict, optional): Parameters that should be used in
             mustache formatting of YAML files. Defaults to None and is
             ignored.
+        directory_for_clones (str, optional): Directory that git repositories
+            should be cloned into. Defaults to None and the current working
+            directory will be used.
 
     Raises:
         ValueError: If the yml dictionary is missing a required keyword or
@@ -261,7 +275,8 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
     """
     s = get_schema()
     # Parse files using schema
-    yml_prep = prep_yaml(files, yaml_param=yaml_param)
+    yml_prep = prep_yaml(files, yaml_param=yaml_param,
+                         directory_for_clones=directory_for_clones)
     # print('prepped')
     # pprint.pprint(yml_prep)
     if model_submission:

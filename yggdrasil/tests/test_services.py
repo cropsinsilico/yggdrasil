@@ -227,9 +227,9 @@ class TestServices(object):
         r"""Test that sending a request for a git YAML fails."""
         cli = running_service
         test_yml = ("git:https://github.com/cropsinsilico/example-fakemodel/"
-                    "fakemodel.yml")
+                    "fakemodel3.yml")
         assert(not os.path.isfile(
-            "cropsinsilico/example-fakemodel/fakemodel.yml"))
+            "cropsinsilico/example-fakemodel/fakemodel3.yml"))
         assert_raises(ServerError, cli.send_request, yamls=test_yml,
                       action='start')
 
