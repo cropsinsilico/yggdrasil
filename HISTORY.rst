@@ -2,11 +2,13 @@
 History
 =======
 
-1.8.1 (2021-09-XX) Minor updates to support model submission form development
+1.8.1 (2021-09-25) Minor updates to support model submission form development
 ------------------
 
 * Added --model_repository option to the integration-service-manager CLI
 * Preload models from the model repository into the service manager registry
+* Added validation_command option to model schema that can be used to validate a run on completion via the 'validate' runner option
+* Added dependencies and additional_dependencies options to model schema that can be used to specify packages that should be installed for a model
 
 1.8.0 (2021-09-15) Support for REST API based communicators, running integrations as services, and connecting to remote integration services
 ------------------

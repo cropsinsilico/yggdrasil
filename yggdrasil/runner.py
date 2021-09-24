@@ -260,6 +260,9 @@ class YggRunner(YggClass):
         yaml_param (dict, optional): Parameters that should be used in
             mustache formatting of YAML files. Defaults to None and is
             ignored.
+        validate (bool, optional): If True, the validation scripts for each
+            modle (if present), will be run after the integration finishes
+            running. Defaults to False.
 
     Attributes:
         namespace (str): Name that should be used to uniquely identify any
@@ -279,7 +282,7 @@ class YggRunner(YggClass):
                  ygg_debug_prefix=None, connection_task_method='thread',
                  as_service=False, complete_partial=False,
                  partial_commtype=None, production_run=False,
-                 mpi_tag_start=None, yaml_param=None):
+                 mpi_tag_start=None, yaml_param=None, validate=False):
         self.mpi_comm = None
         name = 'runner'
         if MPI is not None:
@@ -309,6 +312,7 @@ class YggRunner(YggClass):
         self.error_flag = False
         self.complete_partial = complete_partial
         self.partial_commtype = partial_commtype
+        self.validate = validate
         self.debug("Running in %s with path %s namespace %s rank %d",
                    os.getcwd(), sys.path, namespace, rank)
         # Update environment based on config
@@ -439,6 +443,9 @@ class YggRunner(YggClass):
                 tprev = t
             self.info(40 * '=')
             self.info('%20s\t%f', "Total", tprev - t0)
+        if self.validate:
+            for v in self.modeldrivers.values():
+                v.run_validation()
         return times
 
     @property

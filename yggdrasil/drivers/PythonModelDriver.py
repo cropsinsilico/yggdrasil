@@ -225,3 +225,34 @@ class PythonModelDriver(InterpretedModelDriver):
                  'units.get_units({name}[0]))').format(
                      name=var['name'])]
         return out
+
+    @classmethod
+    def install_dependency(cls, package, package_manager=None, **kwargs):
+        r"""Install a dependency.
+
+        Args:
+            package (str): Name of the package that should be installed. If
+                the package manager supports it, this can include version
+                requirements.
+            package_manager (str, optional): Package manager that should be
+                used to install the package.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class.
+
+        """
+        if package_manager in [None, 'pip']:
+            if isinstance(package, str):
+                package = package.split()
+            kwargs.setdefault(
+                'command',
+                [cls.get_interpreter(), '-m', 'pip', 'install'] + package)
+        return super(PythonModelDriver, cls).install_dependency(
+            package, package_manager=package_manager, **kwargs)
+        
+    def run_validation(self):
+        r"""Run the validation script for the model."""
+        if ((self.validation_script
+             and (self.validation_script.split()[0].endswith('.py')))):
+            self.validation_script = (
+                f"{self.get_interpreter()} {self.validation_script}")
+        return super(PythonModelDriver, self).run_validation()

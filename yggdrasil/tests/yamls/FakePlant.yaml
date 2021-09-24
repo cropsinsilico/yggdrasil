@@ -19,5 +19,10 @@
       name: ./Output/output.txt
       filetype: table
   repository_url: https://github.com/cropsinsilico/example-fakemodel
-  repository_commit: e4bc7932c3c0c68fb3852cfb864777ca64cba448
+  repository_commit: bb39d0db7e4883dbef2c1cb90bc563fc9d757a19
   description: Example model submission
+  validation_command: validate.py
+  dependencies:
+  - numpy
+  additional_dependencies:
+    c++: [doxygen]

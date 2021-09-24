@@ -182,6 +182,19 @@ class ModelDriver(Driver):
         contact_email (str, optional): Email address that should be used to
             contact the maintainer of the model. This parameter is only used
             in the model repository.
+        validation_command (str, optional): Path to a validation command that
+            can be used to verify that the model ran as expected. A non-zero
+            return code is taken to indicate failure.
+        dependencies (list, optional): A list of packages required by the
+            model that are written in the same language as the model. If the
+            package requires dependencies outside the language of the model.
+            use the additional_dependencies parameter to provide them. If you
+            need a version of the package from a specific package manager,
+            a mapping with 'package' and 'package_manager' fields can be
+            provided instead of just the name of the package.
+        additional_dependencies (dict, optional): A mapping between languages
+            and lists of packages in those languages that are required by the
+            model.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Class Attributes:
@@ -298,6 +311,19 @@ class ModelDriver(Driver):
         contact_email (str): Email address that should be used to contact the
             maintainer of the model. This parameter is only used in the model
             repository.
+        validation_command (str): Path to a validation command that can be
+            used to verify that the model ran as expected. A non-zero return
+            code is taken to indicate failure.
+        dependencies (list): A list of packages required by the model that are
+            written in the same language as the model. If the package requires
+            dependencies outside the language of the model, use the
+            additional_dependencies parameter to provide them. If you need a
+            version of the package from a specific package manager, a mapping
+            
+            with 'package' and 'package_manager' fields can be provided
+            instead of just the name of the package.
+        additional_dependencies (dict): A mapping between languages and lists
+            of packages in those languages that are required by the model.
 
     Raises:
         RuntimeError: If both with_strace and with_valgrind are True.
@@ -400,7 +426,32 @@ class ModelDriver(Driver):
         'repository_url': {'type': 'string'},
         'repository_commit': {'type': 'string'},
         'description': {'type': 'string'},
-        'contact_email': {'type': 'string'}}
+        'contact_email': {'type': 'string'},
+        'validation_command': {'type': 'string'},
+        'dependencies': {
+            'type': 'array',
+            'items': {'oneOf': [
+                {'type': 'string'},
+                {'type': 'object',
+                 'required': ['package'],
+                 'properties': {
+                     'package': {'type': 'string'},
+                     'package_manager': {'type': 'string'},
+                     'arguments': {'type': 'string'}},
+                 'additionalProperties': False}]}},
+        'additional_dependencies': {
+            'type': 'object',
+            'additionalProperties': {
+                'type': 'array',
+                'items': {'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'object',
+                     'required': ['package'],
+                     'properties': {
+                         'package': {'type': 'string'},
+                         'package_manager': {'type': 'string'},
+                         'arguments': {'type': 'string'}},
+                     'additionalProperties': False}]}}}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     
@@ -525,6 +576,13 @@ class ModelDriver(Driver):
         if self.function:
             self.wrapper_products.append(args[0])
         self.wrapper_products += self.write_wrappers()
+        # Install dependencies
+        if self.dependencies:
+            self.install_model_dependencies(self.dependencies)
+        if self.additional_dependencies:
+            for language, v in self.additional_dependencies.items():
+                drv = import_component('model', language)
+                drv.install_model_dependencies(v)
 
     @staticmethod
     def before_registration(cls):
@@ -776,6 +834,92 @@ class ModelDriver(Driver):
 
         """
         return []
+
+    @classmethod
+    def install_model_dependencies(cls, dependencies, always_yes=False):
+        r"""Install any dependencies required by the model.
+
+        Args:
+            dependencies (list): Dependencies that should be installed.
+            always_yes (bool, optional): If True, the package manager will
+                not ask users for input during installation. Defaults to
+                False.
+
+        """
+        packages = {}
+        for x in dependencies:
+            if isinstance(x, str):
+                x = {'package': x}
+            if x.get('arguments', None):
+                cls.install_dependency(always_yes=always_yes, **x)
+            else:
+                packages.setdefault(x.get('package_manager', None), [])
+                packages[x.get('package_manager', None)].append(
+                    x['package'])
+        for k, v in packages.items():
+            cls.install_dependency(v, package_manager=k,
+                                   always_yes=always_yes)
+
+    @classmethod
+    def install_dependency(cls, package, package_manager=None,
+                           arguments=None, command=None, always_yes=False):
+        r"""Install a dependency.
+
+        Args:
+            package (str): Name of the package that should be installed. If
+                the package manager supports it, this can include version
+                requirements.
+            package_manager (str, optional): Package manager that should be
+                used to install the package.
+            arguments (str, optional): Additional arguments that should be
+                passed to the package manager.
+            command (list, optional): Command that should be used to
+                install the package.
+            always_yes (bool, optional): If True, the package manager will
+                not ask users for input during installation. Defaults to
+                False.
+
+        """
+        if isinstance(package, str):
+            package = package.split()
+        if package_manager is None:
+            if tools.get_conda_prefix():
+                package_manager = 'conda'
+            elif platform._is_mac:
+                package_manager = 'brew'
+            elif platform._is_linux:
+                package_manager = 'apt'
+            elif platform._is_win:
+                package_manager = 'choco'
+        yes_cmd = []
+        if command:
+            cmd = copy.copy(command)
+        elif package_manager == 'conda':
+            cmd = ['conda', 'install'] + package
+            yes_cmd = ['-y']
+        elif package_manager == 'brew':
+            cmd = ['brew', 'install'] + package
+        elif package_manager == 'apt':
+            cmd = ['apt-get', 'install'] + package
+            yes_cmd = ['-y']
+        elif package_manager == 'choco':
+            cmd = ['choco', 'install'] + package
+        elif package_manager == 'vcpkg':
+            cmd = ['vcpkg.exe', 'install'] + package
+        else:
+            package_managers = {'pip': 'python',
+                                'cran': 'r'}
+            if package_manager in package_managers:
+                drv = import_component(
+                    'model', package_managers[package_manager])
+                return drv.install_dependency(package_manager, package)
+            raise NotImplementedError(f"Unsupported package manager: "
+                                      f"{package_manager}")
+        if arguments:
+            cmd += arguments.split()
+        if always_yes:
+            cmd += yes_cmd
+        subprocess.check_call(cmd)
         
     def model_command(self):
         r"""Return the command that should be used to run the model.
@@ -883,6 +1027,12 @@ class ModelDriver(Driver):
         except (subprocess.CalledProcessError, OSError) as e:  # pragma: debug
             raise RuntimeError("Could not call command '%s': %s"
                                % (' '.join(cmd), e))
+
+    def run_validation(self):
+        r"""Run the validation script for the model."""
+        if not self.validation_command:
+            return
+        subprocess.check_call(self.validation_command.split())
         
     def run_model(self, return_process=True, **kwargs):
         r"""Run the model. Unless overridden, the model will be run using

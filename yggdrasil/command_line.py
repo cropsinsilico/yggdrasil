@@ -225,7 +225,11 @@ class yggrun(SubCommand):
           'help': 'Number of MPI processes to run on.'}),
         (('--mpi-tag-start', ),
          {'type': int, 'default': 0,
-          'help': 'Tag that MPI communications should start at.'})]
+          'help': 'Tag that MPI communications should start at.'}),
+        (('--validate', ),
+         {'action': 'store_true',
+          'help': ('Validate the run via model validation commands on '
+                   'completion.')})]
 
     @classmethod
     def add_arguments(cls, parser, **kwargs):
@@ -252,7 +256,8 @@ class yggrun(SubCommand):
         with config.parser_config(args):
             runner.run(args.yamlfile, ygg_debug_prefix=prog,
                        production_run=args.production_run,
-                       mpi_tag_start=args.mpi_tag_start)
+                       mpi_tag_start=args.mpi_tag_start,
+                       validate=args.validate)
 
 
 class integration_service_manager(SubCommand):

@@ -180,9 +180,9 @@ definitions:
             type: string
           type: array
       required:
-      - name
       - datatype
       - commtype
+      - name
       title: comm_base
       type: object
     - anyOf:
@@ -704,9 +704,9 @@ definitions:
             is used.
           type: string
       required:
+      - working_dir
       - name
       - filetype
-      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -1253,6 +1253,26 @@ definitions:
         - args
       description: Base schema for all subtypes of model components.
       properties:
+        additional_dependencies:
+          additionalProperties:
+            items:
+              oneOf:
+              - type: string
+              - additionalProperties: false
+                properties:
+                  arguments:
+                    type: string
+                  package:
+                    type: string
+                  package_manager:
+                    type: string
+                required:
+                - package
+                type: object
+            type: array
+          description: A mapping between languages and lists of packages in those
+            languages that are required by the model.
+          type: object
         additional_variables:
           additionalProperties:
             items:
@@ -1337,6 +1357,28 @@ definitions:
             use any of the files located there since OSR always assumes the included
             file paths are relative. Defaults to False.
           type: boolean
+        dependencies:
+          description: A list of packages required by the model that are written in
+            the same language as the model. If the package requires dependencies outside
+            the language of the model. use the additional_dependencies parameter to
+            provide them. If you need a version of the package from a specific package
+            manager, a mapping with 'package' and 'package_manager' fields can be
+            provided instead of just the name of the package.
+          items:
+            oneOf:
+            - type: string
+            - additionalProperties: false
+              properties:
+                arguments:
+                  type: string
+                package:
+                  type: string
+                package_manager:
+                  type: string
+              required:
+              - package
+              type: object
+          type: array
         description:
           description: Description of the model. This parameter is only used in the
             model repository or when providing the model as a service.
@@ -1793,6 +1835,11 @@ definitions:
           items:
             type: string
           type: array
+        validation_command:
+          description: Path to a validation command that can be used to verify that
+            the model ran as expected. A non-zero return code is taken to indicate
+            failure.
+          type: string
         with_strace:
           default: false
           description: If True, the command is run with strace (on Linux) or dtrace
@@ -1807,10 +1854,10 @@ definitions:
             is used.
           type: string
       required:
-      - name
-      - args
-      - working_dir
       - language
+      - working_dir
+      - args
+      - name
       title: model_base
       type: object
     - anyOf:

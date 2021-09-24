@@ -470,7 +470,15 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         for line, kwargs, splits in vals:
             self.assert_equal(
                 self.import_cls.split_line(line, **kwargs), splits)
-    
+
+    def test_install_model_dependencies(self, deps=None):
+        r"""Test install_model_dependencies."""
+        if (deps is None) and (self.import_cls.language == 'c'):
+            deps = ['doxygen', 'cmake']
+        else:
+            deps = []
+        self.import_cls.install_model_dependencies(deps, always_yes=True)
+
 
 class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
     r"""Test runner for basic ModelDriver class."""

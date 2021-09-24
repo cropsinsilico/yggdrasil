@@ -42,6 +42,13 @@ class TestRModelDriverNoInit(TestRModelParam,
         for a, b in test_vars:
             self.assert_equal(self.import_cls.python2language(a), b)
 
+    def test_install_model_dependencies(self, deps=None):
+        r"""Test install_model_dependencies."""
+        if deps is None:
+            deps = ['units', 'zeallot']
+        super(TestRModelDriverNoInit, self).test_install_model_dependencies(
+            deps=deps)
+
 
 class TestRModelDriverNoStart(TestRModelParam,
                               parent.TestInterpretedModelDriverNoStart):

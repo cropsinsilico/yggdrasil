@@ -1185,5 +1185,5 @@ def validate_model_submission(fname):
             break
     else:
         raise RuntimeError("Model repository does not contain a LICENSE file.")
-    # 4. Run
-    runner.run(fname)
+    # 4. Run & validate
+    runner.run(fname, validate=True)
