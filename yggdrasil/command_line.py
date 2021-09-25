@@ -338,7 +338,12 @@ class integration_service_manager(SubCommand):
                          {'type': str,
                           'help': ('URL for a directory in a Git repository '
                                    'containing models that should be loaded '
-                                   'into the service manager registry.')})]),
+                                   'into the service manager registry.')}),
+                        (('--log-level', ),
+                         {'type': int,
+                          'help': ('Level of logging that should be '
+                                   'performed for the service manager '
+                                   'application.')})]),
                 ArgumentParser(
                     name='stop',
                     help=('Stop an integration service manager or '
@@ -417,7 +422,8 @@ class integration_service_manager(SubCommand):
                         remote_url=getattr(args, 'remote_url', None),
                         with_coverage=getattr(args, 'with_coverage', False),
                         model_repository=getattr(args, 'model_repository',
-                                                 None))
+                                                 None),
+                        log_level=getattr(args, 'log_level', None))
             else:
                 x.send_request(integration_name,
                                yamls=integration_yamls,

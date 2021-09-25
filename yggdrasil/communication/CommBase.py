@@ -848,7 +848,11 @@ class CommBase(tools.YggClass):
         else:
             seri_cls = import_component('serializer', serializer)
         out_seri = seri_cls.get_testing_options(**kwargs)
-        out = {'kwargs': out_seri['kwargs'],
+        out = {'attributes': ['name', 'address', 'direction',
+                              'serializer', 'recv_timeout',
+                              'close_on_eof_recv', 'opp_address',
+                              'opp_comms', 'maxMsgSize'],
+               'kwargs': out_seri['kwargs'],
                'send': copy.deepcopy(out_seri['objects']),
                'msg': out_seri['objects'][0],
                'contents': out_seri['contents'],
@@ -876,11 +880,11 @@ class CommBase(tools.YggClass):
         Args:
             nindent (int, optional): Number of tabs that should be used to
                 indent each line. Defaults to 0.
-            extra_lines_before (list, optional): Additional lines that should be
-                added to the beginning of the default print message. Defaults to
-                empty list if not provided.
-            extra_lines_after (list, optional): Additional lines that should be
-                added to the end of the default print message. Defaults to
+            extra_lines_before (list, optional): Additional lines that should
+                be added to the beginning of the default print message.
+                Defaults to empty list if not provided.
+            extra_lines_after (list, optional): Additional lines that should
+                be added to the end of the default print message. Defaults to
                 empty list if not provided.
                 
         Returns:
@@ -1532,10 +1536,9 @@ class CommBase(tools.YggClass):
             bool: True if the object is empty, False otherwise.
 
         """
-        from yggdrasil.tests import assert_equal
         try:
-            assert_equal(msg, emsg, dont_print_diff=True)
-        except AssertionError:
+            assert(msg == emsg)
+        except BaseException:
             return False
         return True
 

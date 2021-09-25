@@ -474,7 +474,10 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
     def test_install_model_dependencies(self, deps=None):
         r"""Test install_model_dependencies."""
         if (deps is None) and (self.import_cls.language == 'c'):
-            deps = ['doxygen', 'cmake']
+            if platform._is_win:  # pragma: windows
+                deps = ['cmake']
+            else:
+                deps = ['doxygen', 'cmake']
         else:
             deps = []
         self.import_cls.install_model_dependencies(deps, always_yes=True)

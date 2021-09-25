@@ -251,8 +251,8 @@ class PythonModelDriver(InterpretedModelDriver):
         
     def run_validation(self):
         r"""Run the validation script for the model."""
-        if ((self.validation_script
-             and (self.validation_script.split()[0].endswith('.py')))):
-            self.validation_script = (
-                f"{self.get_interpreter()} {self.validation_script}")
+        if ((self.validation_command
+             and (self.validation_command.split()[0].endswith('.py')))):
+            self.validation_command = (
+                f"{self.get_interpreter()} {self.validation_command}")
         return super(PythonModelDriver, self).run_validation()

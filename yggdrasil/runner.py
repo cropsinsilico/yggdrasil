@@ -4,7 +4,6 @@ import os
 import time
 import copy
 import signal
-import traceback
 import atexit
 from pprint import pformat
 from itertools import chain
@@ -445,7 +444,7 @@ class YggRunner(YggClass):
             self.info('%20s\t%f', "Total", tprev - t0)
         if self.validate:
             for v in self.modeldrivers.values():
-                v.run_validation()
+                v['instance'].run_validation()
         return times
 
     @property
@@ -1039,10 +1038,5 @@ def get_runner(models, **kwargs):
 
 def run(*args, **kwargs):
     yggRunner = get_runner(*args, **kwargs)
-    try:
-        yggRunner.run()
-        yggRunner.debug("runner returns, exiting")
-    except Exception as ex:  # pragma: debug
-        yggRunner.pprint("yggrun exception: %s" % type(ex))
-        print(traceback.format_exc())
-    print('')
+    yggRunner.run()
+    yggRunner.debug("runner returns, exiting")

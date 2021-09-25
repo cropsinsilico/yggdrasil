@@ -892,15 +892,26 @@ class ModelDriver(Driver):
             elif platform._is_win:
                 package_manager = 'choco'
         yes_cmd = []
+        cmd_kwargs = {}
         if command:
             cmd = copy.copy(command)
         elif package_manager == 'conda':
             cmd = ['conda', 'install'] + package
+            if platform._is_win:  # pragma: windows
+                # Conda commands must be run on the shell on windows as it
+                # is implemented as a batch script
+                cmd.insert(0, 'call')
+                cmd_kwargs['shell'] = True
             yes_cmd = ['-y']
         elif package_manager == 'brew':
             cmd = ['brew', 'install'] + package
         elif package_manager == 'apt':
             cmd = ['apt-get', 'install'] + package
+            if bool(os.environ.get('GITHUB_ACTIONS', False)):
+                # Only enable sudo for testing, otherwise allow the user to
+                # decide if they want to run yggdrasil with sudo, or just
+                # install the dependencies themselves
+                cmd.insert(0, 'sudo')
             yes_cmd = ['-y']
         elif package_manager == 'choco':
             cmd = ['choco', 'install'] + package
@@ -919,7 +930,9 @@ class ModelDriver(Driver):
             cmd += arguments.split()
         if always_yes:
             cmd += yes_cmd
-        subprocess.check_call(cmd)
+        if cmd_kwargs.get('shell', False):
+            cmd = ' '.join(cmd)
+        subprocess.check_call(cmd, **cmd_kwargs)
         
     def model_command(self):
         r"""Return the command that should be used to run the model.
@@ -1032,7 +1045,8 @@ class ModelDriver(Driver):
         r"""Run the validation script for the model."""
         if not self.validation_command:
             return
-        subprocess.check_call(self.validation_command.split())
+        subprocess.check_call(self.validation_command.split(),
+                              cwd=self.working_dir)
         
     def run_model(self, return_process=True, **kwargs):
         r"""Run the model. Unless overridden, the model will be run using

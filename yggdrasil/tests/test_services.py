@@ -78,7 +78,8 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
             f"--service-type={service_type}"]
     if partial_commtype is not None:
         args.append(f"--commtype={partial_commtype}")
-    args += ["start", f"--model-repository={model_repo}"]
+    args += ["start", f"--model-repository={model_repo}",
+             f"--log-level={log_level}"]
     package_dir = None
     process_kws = {}
     if with_coverage:
