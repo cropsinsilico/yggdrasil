@@ -1537,8 +1537,9 @@ class CommBase(tools.YggClass):
 
         """
         try:
-            assert(msg == emsg)
-        except BaseException:
+            from yggdrasil.tests import assert_equal
+            assert_equal(msg, emsg)
+        except AssertionError:
             return False
         return True
 
