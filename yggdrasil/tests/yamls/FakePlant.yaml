@@ -25,4 +25,4 @@
   dependencies:
   - numpy
   additional_dependencies:
-    c++: [doxygen]
+    c++: [cmake]
