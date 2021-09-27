@@ -380,7 +380,10 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
             self.runner = runner.get_runner(self.yaml, namespace=self.namespace,
                                             production_run=True,
                                             mpi_tag_start=mpi_tag_start)
-            self.runner.run()
+            try:
+                self.runner.run()
+            except runner.IntegrationError:
+                pass
             self.runner.printStatus()
             self.runner.printStatus(return_str=True)
             if self.mpi_rank != 0:

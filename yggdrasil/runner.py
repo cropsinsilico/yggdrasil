@@ -23,6 +23,11 @@ COLOR_TRACE = '\033[30;43;22m'
 COLOR_NORMAL = '\033[0m'
 
 
+class IntegrationError(BaseException):
+    r"""Error raised when there is an error in an integration."""
+    pass
+
+
 class YggFunction(YggClass):
     r"""This class wraps function-like behavior around a model.
 
@@ -442,6 +447,8 @@ class YggRunner(YggClass):
                 tprev = t
             self.info(40 * '=')
             self.info('%20s\t%f', "Total", tprev - t0)
+        if self.error_flag:
+            raise IntegrationError("Error running the integration.")
         if self.validate:
             for v in self.modeldrivers.values():
                 v['instance'].run_validation()
