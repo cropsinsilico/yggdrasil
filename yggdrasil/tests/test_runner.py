@@ -1,3 +1,4 @@
+import pytest
 import os
 import unittest
 import signal
@@ -22,8 +23,9 @@ def test_get_run():
     namespace = "test_run_%s" % str(uuid.uuid4)
     runner.run([ex_yamls['hello']['python']],
                namespace=namespace)
-    runner.run([ex_yamls['model_error']['python']],
-               namespace=namespace)
+    with pytest.raises(runner.IntegrationError):
+        runner.run([ex_yamls['model_error']['python']],
+                   namespace=namespace)
 
 
 def test_run_process_connections():
