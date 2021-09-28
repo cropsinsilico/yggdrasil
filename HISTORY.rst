@@ -2,7 +2,7 @@
 History
 =======
 
-1.8.1 (2021-09-27) Minor updates to support model submission form development
+1.8.1 (2021-09-28) Minor updates to support model submission form development
 ------------------
 
 * Added --model_repository option to the integration-service-manager CLI
