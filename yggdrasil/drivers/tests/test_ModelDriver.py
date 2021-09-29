@@ -481,7 +481,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                     {"package_manager": "pip", "package": "pyyaml",
                      "arguments": "-v"},
                     {"package": "cmake", "arguments": "-v"}]
-                if not platform._is_win:  # pragma: windows
+                if platform._is_win:  # pragma: windows
                     from yggdrasil import tools
                     if not tools.get_conda_prefix():
                         deps.append({"package_manager": "vcpkg",
