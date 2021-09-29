@@ -44,7 +44,7 @@ jobs:
         - macos-latest
         - windows-latest
         python-version:
-        - 3.6
+        - 3.7
         install-method:
         - pip
         test-flags1:
@@ -61,7 +61,7 @@ jobs:
         - true
         include:
         - os: windows-latest
-          python-version: 3.6
+          python-version: 3.7
           install-method: pip
           test-flags1: --long-running --languages cpp
           test-flags2: --long-running --skip-languages c++
@@ -351,7 +351,7 @@ jobs:
         - macos-latest
         - windows-latest
         python-version:
-        - 3.6
+        - 3.7
         install-method:
         - conda
         test-flags1:
@@ -364,7 +364,7 @@ jobs:
         - true
         include:
         - os: ubuntu-latest
-          python-version: 3.7
+          python-version: 3.6
           install-method: conda
           test-flags1: --long-running
           test-flags2: ''
@@ -679,7 +679,7 @@ jobs:
         os:
         - ubuntu-latest
         python-version:
-        - 3.6
+        - 3.7
         install-method:
         - pip
         test-flags1:
@@ -981,7 +981,7 @@ jobs:
         os:
         - ubuntu-latest
         python-version:
-        - 3.6
+        - 3.7
         install-method:
         - conda
         test-flags1:
@@ -1295,7 +1295,7 @@ jobs:
         - macos-latest
         - windows-latest
         python-version:
-        - 3.6
+        - 3.7
         install-method:
         - pip
         test-flags1:
