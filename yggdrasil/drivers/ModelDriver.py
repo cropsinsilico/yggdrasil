@@ -861,7 +861,7 @@ class ModelDriver(Driver):
                                    always_yes=always_yes)
 
     @classmethod
-    def install_dependency(cls, package, package_manager=None,
+    def install_dependency(cls, package=None, package_manager=None,
                            arguments=None, command=None, always_yes=False):
         r"""Install a dependency.
 
@@ -880,6 +880,7 @@ class ModelDriver(Driver):
                 False.
 
         """
+        assert(package)
         if isinstance(package, str):
             package = package.split()
         if package_manager is None:
@@ -916,14 +917,17 @@ class ModelDriver(Driver):
         elif package_manager == 'choco':
             cmd = ['choco', 'install'] + package
         elif package_manager == 'vcpkg':
-            cmd = ['vcpkg.exe', 'install'] + package
+            cmd = ['vcpkg.exe', 'install'] + package + ['--triplet',
+                                                        'x64-windows']
         else:
             package_managers = {'pip': 'python',
                                 'cran': 'r'}
             if package_manager in package_managers:
                 drv = import_component(
                     'model', package_managers[package_manager])
-                return drv.install_dependency(package_manager, package)
+                return drv.install_dependency(
+                    package=package, package_manager=package_manager,
+                    arguments=arguments, always_yes=always_yes)
             raise NotImplementedError(f"Unsupported package manager: "
                                       f"{package_manager}")
         if arguments:

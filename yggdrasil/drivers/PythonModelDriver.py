@@ -227,7 +227,7 @@ class PythonModelDriver(InterpretedModelDriver):
         return out
 
     @classmethod
-    def install_dependency(cls, package, package_manager=None, **kwargs):
+    def install_dependency(cls, package=None, package_manager=None, **kwargs):
         r"""Install a dependency.
 
         Args:
