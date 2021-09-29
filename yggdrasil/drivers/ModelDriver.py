@@ -917,8 +917,8 @@ class ModelDriver(Driver):
         elif package_manager == 'choco':
             cmd = ['choco', 'install'] + package
         elif package_manager == 'vcpkg':
-            cmd = ['vcpkg.exe', 'install'] + package + ['--triplet',
-                                                        'x64-windows']
+            cmd = ['vcpkg.exe', 'install', '--triplet', 'x64-windows']
+            cmd += package
         else:
             package_managers = {'pip': 'python',
                                 'cran': 'r'}

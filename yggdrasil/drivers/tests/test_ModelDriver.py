@@ -485,7 +485,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                     from yggdrasil import tools
                     if not tools.get_conda_prefix():
                         deps.append({"package_manager": "vcpkg",
-                                     "package": "zmq"})
+                                     "package": "czmq"})
                 else:
                     deps.append('doxygen')
             else:
