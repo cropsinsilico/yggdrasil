@@ -45,7 +45,8 @@ class TestRModelDriverNoInit(TestRModelParam,
     def test_install_model_dependencies(self, deps=None):
         r"""Test install_model_dependencies."""
         if deps is None:
-            deps = ['units', 'zeallot']
+            deps = ['units', 'zeallot',
+                    {'package': 'units', 'arguments': '-v'}]
         super(TestRModelDriverNoInit, self).test_install_model_dependencies(
             deps=deps)
 
