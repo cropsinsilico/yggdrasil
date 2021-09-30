@@ -25,6 +25,7 @@ def register_metaschema_property(prop_class):
     from yggdrasil.metaschema import _metaschema, _base_validator
     global _metaschema_properties
     prop_name = prop_class.name
+    print(f"Registering {prop_name} {prop_class}")
     if _metaschema_properties.has_entry(prop_name):
         raise ValueError("Property '%s' already registered." % prop_name)
     if prop_name in _base_validator.VALIDATORS:
