@@ -86,6 +86,9 @@ def register_type(type_class):
     for p in type_class.properties:
         prop_class = get_metaschema_property(p)
         if prop_class.name != p:
+            from yggdrasil.metaschema.properties import get_registered_properties
+            x = get_registered_properties()
+            print(prop_class.name, x.keys())
             raise ValueError("Type '%s' has unregistered property '%s'."
                              % (type_name, p))
     # Update property class with this type's info
