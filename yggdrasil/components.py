@@ -49,6 +49,7 @@ class ClassRegistry(OrderedDict):
         # self._schema_directory = os.path.join(self._directory, 'schemas')
         self._import_function = import_function
         self._imported = False
+        print('ClassRegistry', self._module, self._directory)
         super(ClassRegistry, self).__init__(*args, **kwargs)
 
     def import_classes(self):
@@ -56,6 +57,8 @@ class ClassRegistry(OrderedDict):
         if self._imported:
             return
         self._imported = True
+        print('ClassRegistry import_classes', self._module,
+              glob.glob(os.path.join(self._directory, '*.py')))
         for x in glob.glob(os.path.join(self._directory, '*.py')):
             mod = os.path.basename(x)[:-3]
             if not mod.startswith('__'):
