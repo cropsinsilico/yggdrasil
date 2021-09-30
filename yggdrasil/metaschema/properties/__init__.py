@@ -42,7 +42,6 @@ def register_metaschema_property(prop_class):
     if _metaschema is not None:
         if prop_name not in _metaschema['properties']:
             raise ValueError("Property '%s' not in pre-loaded metaschema." % prop_name)
-    print(f"Registered {prop_name} {prop_class}")
     _metaschema_properties[prop_name] = prop_class
     return prop_class
 
@@ -65,7 +64,6 @@ def get_registered_properties():
         dict: Registered property/class pairs.
 
     """
-    global _metaschema_properties
     return _metaschema_properties
 
 
@@ -82,7 +80,6 @@ def get_metaschema_property(property_name, skip_generic=False):
 
     """
     from yggdrasil.metaschema.properties import MetaschemaProperty
-    global _metaschema_properties
     out = _metaschema_properties.get(property_name, None)
     if (out is None) and (not skip_generic):
         out = MetaschemaProperty.MetaschemaProperty
