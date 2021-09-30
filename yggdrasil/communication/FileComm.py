@@ -4,6 +4,7 @@ import tempfile
 from yggdrasil import platform, tools
 from yggdrasil.serialize.SerializeBase import SerializeBase
 from yggdrasil.communication import CommBase
+from yggdrasil.components import import_component
 
 
 class FileComm(CommBase.CommBase):
@@ -139,8 +140,10 @@ class FileComm(CommBase.CommBase):
         # Add serializer properties to schema
         if cls._filetype != 'binary':
             assert('serializer' not in cls._schema_properties)
+            serializer_class = import_component('serializer',
+                                                cls._default_serializer)
             cls._schema_properties.update(
-                cls._default_serializer_class._schema_properties)
+                serializer_class._schema_properties)
             del cls._schema_properties['seritype']
         cls._commtype = cls._filetype
 
@@ -182,7 +185,8 @@ class FileComm(CommBase.CommBase):
                 out['contents'] += comment
                 out['recv_partial'].append([])
         else:
-            seri_cls = cls._default_serializer_class
+            seri_cls = import_component('serializer',
+                                        cls._default_serializer)
             if seri_cls.concats_as_str:
                 out['recv_partial'] = [[x] for x in out['recv']]
                 out['recv'] = seri_cls.concatenate(out['recv'], **out['kwargs'])
