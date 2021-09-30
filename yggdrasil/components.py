@@ -56,6 +56,7 @@ class ClassRegistry(OrderedDict):
         r"""Import all classes in the same directory."""
         if self._imported:
             return
+        self._imported = True
         print('ClassRegistry import_classes', self._module,
               sorted(glob.glob(os.path.join(self._directory, '*.py'))))
         for x in sorted(glob.glob(os.path.join(self._directory, '*.py'))):
@@ -63,7 +64,6 @@ class ClassRegistry(OrderedDict):
             if not mod.startswith('__'):
                 print('ClassRegistry importing', mod)
                 importlib.import_module(self._module + '.%s' % mod)
-        self._imported = True
         if self._import_function is not None:
             self._import_function()
 
