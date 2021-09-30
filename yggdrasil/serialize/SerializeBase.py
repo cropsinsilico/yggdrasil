@@ -7,11 +7,7 @@ from yggdrasil import tools, units, serialize
 from yggdrasil.metaschema.datatypes import (
     guess_type_from_obj, get_type_from_def, get_type_class, compare_schema,
     type2numpy)
-from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
-    _flexible_types)
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
-from yggdrasil.metaschema.datatypes.ArrayMetaschemaType import (
-    OneDArrayMetaschemaType)
 
 
 class SerializeBase(tools.YggClass):
@@ -570,6 +566,10 @@ class SerializeBase(tools.YggClass):
                 continue
             # Key specific changes to type
             if k == 'format_str':
+                from yggdrasil.metaschema.datatypes.ArrayMetaschemaType import (
+                    OneDArrayMetaschemaType)
+                from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
+                    _flexible_types)
                 v = tools.bytes2str(v)
                 fmts = serialize.extract_formats(v)
                 if 'type' in typedef:

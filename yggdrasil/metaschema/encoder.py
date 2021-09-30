@@ -36,7 +36,7 @@ def string2import(s):
 
     """
     pkg_mod = s.split(u':')
-    if len(pkg_mod) == 2:
+    if (len(pkg_mod) == 2) and (not s.startswith('http')) and (' ' not in s):
         try:
             mod = importlib.import_module(pkg_mod[0])
             s = getattr(mod, pkg_mod[1])
