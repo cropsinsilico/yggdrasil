@@ -57,8 +57,8 @@ class ClassRegistry(OrderedDict):
         if self._imported:
             return
         print('ClassRegistry import_classes', self._module,
-              glob.glob(os.path.join(self._directory, '*.py')))
-        for x in glob.glob(os.path.join(self._directory, '*.py')):
+              sorted(glob.glob(os.path.join(self._directory, '*.py'))))
+        for x in sorted(glob.glob(os.path.join(self._directory, '*.py'))):
             mod = os.path.basename(x)[:-3]
             if not mod.startswith('__'):
                 print('ClassRegistry importing', mod)
