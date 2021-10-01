@@ -904,7 +904,8 @@ class CompilationToolBase(object):
         if platform._is_mac:
             base_paths.append('/Library/Developer/CommandLineTools/usr')
             # REMOVE THIS!
-            paths.append('/')
+            paths.append('/usr')
+            paths.append('/Library')
         if libtype == 'include':
             suffix = 'include'
         else:
