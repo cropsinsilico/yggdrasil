@@ -576,7 +576,6 @@ class CommBase(tools.YggClass):
         'for_service': {'type': 'boolean', 'default': False}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
-    _default_serializer_class = None
     _schema_excluded_from_class_validation = ['datatype']
     is_file = False
     _maxMsgSize = 0
@@ -751,12 +750,8 @@ class CommBase(tools.YggClass):
         if self.serializer is None:
             # Get serializer class
             if seri_cls is None:
-                if (((seri_kws['seritype'] == self._default_serializer)
-                     and (self._default_serializer_class is not None))):
-                    seri_cls = self._default_serializer_class
-                else:
-                    seri_cls = import_component('serializer',
-                                                subtype=seri_kws['seritype'])
+                seri_cls = import_component('serializer',
+                                            subtype=seri_kws['seritype'])
             # Recover keyword arguments for serializer passed to comm class
             for k in seri_cls.seri_kws():
                 if k in kwargs:
@@ -811,15 +806,6 @@ class CommBase(tools.YggClass):
                               subtype=filter_schema.identify_subtype(self.filter))
             self.filter = create_component('filter', **filter_kws)
 
-    @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration."""
-        tools.YggClass.before_registration(cls)
-        cls._default_serializer_class = import_component('serializer',
-                                                         cls._default_serializer,
-                                                         without_schema=True)
-
     @classmethod
     def get_testing_options(cls, serializer=None, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
@@ -842,11 +828,7 @@ class CommBase(tools.YggClass):
         """
         if serializer is None:
             serializer = cls._default_serializer
-        if (((serializer == cls._default_serializer)
-             and (cls._default_serializer_class is not None))):
-            seri_cls = cls._default_serializer_class
-        else:
-            seri_cls = import_component('serializer', serializer)
+        seri_cls = import_component('serializer', serializer)
         out_seri = seri_cls.get_testing_options(**kwargs)
         out = {'attributes': ['name', 'address', 'direction',
                               'serializer', 'recv_timeout',
