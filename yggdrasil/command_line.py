@@ -1291,7 +1291,8 @@ class regen_schema(SubCommand):
                 os.remove(schema._schema_fname)
             schema.clear_schema()
             schema.init_schema()
-        schema.update_constants()
+        else:
+            schema.update_constants()
 
 
 class yggmodelform(SubCommand):

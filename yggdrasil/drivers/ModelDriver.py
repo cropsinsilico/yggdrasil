@@ -12,7 +12,7 @@ import asyncio
 from collections import OrderedDict
 from pprint import pformat
 from yggdrasil import platform, tools, languages, multitasking
-from yggdrasil.components import import_component, import_all_components
+from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.metaschema.datatypes import is_default_typedef
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
@@ -45,7 +45,7 @@ def remove_product(product, check_for_source=False, **kwargs):
         RuntimeError: If the product cannot be removed.
 
     """
-    import_all_components('model')
+    tools.import_all_modules('yggdrasil.drivers')
     source_keys = list(_map_language_ext.keys())
     if '.exe' in source_keys:  # pragma: windows
         source_keys.remove('.exe')

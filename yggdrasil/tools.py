@@ -6,6 +6,7 @@ import pprint
 import os
 import re
 import sys
+import glob
 import sysconfig
 try:
     from distutils import sysconfig as distutils_sysconfig
@@ -1251,6 +1252,53 @@ def print_encoded(msg, *args, **kwargs):
             print(msg, *args, **kwargs)
         except UnicodeEncodeError:  # pragma: debug
             print(str2bytes(msg), *args, **kwargs)
+
+
+def import_all_modules(base=None, exclude=None, do_first=None):
+    r"""Import all yggdrasil modules.
+
+    Args:
+        base (str, optional): Base module to start from. Defaults to
+            'yggdrasil'.
+        exclude (list, optional): Modules that should not be imported.
+            Defaults to empty list.
+        do_first (list, optional): Modules that should be import first.
+            Defaults to empty list.
+
+    """
+    if base is None:
+        base = 'yggdrasil'
+    if exclude is None:
+        exclude = []
+    if do_first is None:
+        do_first = []
+    assert(base.startswith('yggdrasil'))
+    for x in do_first:
+        import_all_modules(x, exclude=exclude)
+    exclude = exclude + do_first
+    directory = os.path.dirname(__file__)
+    parts = base.split('.')[1:]
+    if parts:
+        directory = os.path.join(directory, *parts)
+    if not os.path.isfile(os.path.join(directory, '__init__.py')):
+        return
+    if (base in exclude) or base.endswith('tests'):
+        return
+    importlib.import_module(base)
+    for x in sorted(glob.glob(os.path.join(directory, '*.py'))):
+        x_base = os.path.basename(x)
+        if x_base.startswith('__') and x_base.endswith('__.py'):
+            continue
+        x_mod = f"{base}.{os.path.splitext(os.path.basename(x))[0]}"
+        if x_mod in exclude:
+            continue
+        importlib.import_module(x_mod)
+    for x in sorted(glob.glob(os.path.join(directory, '*', ''))):
+        if x.startswith('__') and x.endswith('__'):
+            continue
+        next_module = os.path.basename(os.path.dirname(x))
+        import_all_modules(f"{base}.{next_module}",
+                           exclude=exclude + do_first)
 
 
 class TimeOut(object):
