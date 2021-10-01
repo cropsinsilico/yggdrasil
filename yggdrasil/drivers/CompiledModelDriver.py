@@ -902,10 +902,11 @@ class CompilationToolBase(object):
         else:
             base_paths = ['/usr', os.path.join('/usr', 'local')]
         if platform._is_mac:
-            base_paths.append('/Library/Developer/CommandLineTools/usr')
-            # REMOVE THIS!
-            paths.append('/usr')
-            paths.append('/Library')
+            base_paths += [
+                '/Library/Developer/CommandLineTools/usr',
+                # XCode >= 12
+                '/Applications/Xcode.app/Contents/Developer/'
+                'Toolchains/XcodeDefault.xctoolchain/usr']
         if libtype == 'include':
             suffix = 'include'
         else:
