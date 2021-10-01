@@ -1006,10 +1006,9 @@ class SchemaRegistry(object):
     @property
     def model_form_schema(self):
         r"""dict: Schema for generating a model YAML form."""
-        from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
-            _valid_types)
+        from yggdrasil import constants
         out = self.get_schema(for_form=True)
-        scalar_types = list(_valid_types.keys())
+        scalar_types = list(constants.VALID_TYPES.keys())
         meta = copy.deepcopy(metaschema._metaschema)
         meta_prop = {
             'subtype': ['1darray', 'ndarray'],
