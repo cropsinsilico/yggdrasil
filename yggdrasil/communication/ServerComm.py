@@ -1,6 +1,7 @@
 import os
 import uuid
 from collections import OrderedDict
+from yggdrasil import constants
 from yggdrasil.communication import CommBase, get_comm, import_comm
 
 
@@ -362,7 +363,7 @@ class ServerComm(CommBase.CommBase):
         """
         def check_for_client_info(msg):
             if msg.flag == CommBase.FLAG_SUCCESS:
-                if isinstance(msg.args, bytes) and (msg.args == CommBase.YGG_CLIENT_EOF):
+                if isinstance(msg.args, bytes) and (msg.args == constants.YGG_CLIENT_EOF):
                     self.debug("Client signed off: %s", msg.header['model'])
                     self.closed_clients.append(msg.header['model'])
                     msg.flag = CommBase.FLAG_SKIP

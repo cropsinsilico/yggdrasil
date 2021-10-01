@@ -1,11 +1,11 @@
 import os
-from yggdrasil import tools
+from yggdrasil import tools, constants
 from yggdrasil.communication.DefaultComm import DefaultComm
 
 
 YGG_MSG_MAX = tools.get_YGG_MSG_MAX()
-YGG_MSG_EOF = tools.YGG_MSG_EOF
-YGG_MSG_BUF = tools.YGG_MSG_BUF
+YGG_MSG_EOF = constants.YGG_MSG_EOF
+YGG_MSG_BUF = constants.YGG_MSG_BUF
 YGG_SERVER_INPUT = os.environ.get('YGG_SERVER_INPUT', False)
 YGG_SERVER_OUTPUT = os.environ.get('YGG_SERVER_OUTPUT', False)
 YGG_MODEL_NAME = os.environ.get('YGG_MODEL_NAME', False)

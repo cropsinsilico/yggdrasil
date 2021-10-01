@@ -1,4 +1,4 @@
-from yggdrasil.metaschema.datatypes import MetaschemaTypeError
+from yggdrasil.metaschema import MetaschemaTypeError
 from yggdrasil.metaschema.datatypes.tests import test_MetaschemaType as parent
 from yggdrasil.metaschema.datatypes.MultiMetaschemaType import (
     create_multitype_class)

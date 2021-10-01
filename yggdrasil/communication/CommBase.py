@@ -7,13 +7,13 @@ import types
 import time
 import collections
 import numpy as np
-from yggdrasil import tools, multitasking
-from yggdrasil.tools import YGG_MSG_EOF
+from yggdrasil import tools, multitasking, constants
 from yggdrasil.communication import (
     new_comm, get_comm, determine_suffix, TemporaryCommunicationError,
     import_comm, check_env_for_address)
-from yggdrasil.components import import_component, create_component
-from yggdrasil.metaschema.datatypes import MetaschemaTypeError, type2numpy
+from yggdrasil.components import (
+    import_component, create_component, ComponentError)
+from yggdrasil.metaschema import MetaschemaTypeError, type2numpy
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 from yggdrasil.serialize import consolidate_array
@@ -31,10 +31,6 @@ FLAG_SKIP = 3
 FLAG_EOF = 4
 FLAG_INCOMPLETE = 5
 FLAG_EMPTY = 6
-
-
-YGG_CLIENT_INI = b'YGG_BEGIN_CLIENT'
-YGG_CLIENT_EOF = b'YGG_END_CLIENT'
 
 
 class NeverMatch(Exception):
@@ -959,7 +955,7 @@ class CommBase(tools.YggClass):
                 try:
                     drv = import_component('model', language)
                     out = drv.is_comm_installed(commtype=cls._commtype)
-                except ValueError:
+                except ComponentError:
                     out = False
         return out
 
@@ -1364,7 +1360,7 @@ class CommBase(tools.YggClass):
     @property
     def eof_msg(self):
         r"""str: Message indicating EOF."""
-        return YGG_MSG_EOF
+        return constants.YGG_MSG_EOF
 
     def is_eof(self, msg):
         r"""Determine if a message is an EOF.
@@ -2011,7 +2007,7 @@ class CommBase(tools.YggClass):
         # Make duplicates
         once_per_partner = ((msg.flag == FLAG_EOF)
                             or (isinstance(msg.args, bytes)
-                                and (msg.args == YGG_CLIENT_EOF)))
+                                and (msg.args == constants.YGG_CLIENT_EOF)))
         if once_per_partner and (self.partner_copies > 1):
             self.debug("Sending %s to %d model(s)", msg.args,
                        self.partner_copies)

@@ -1,4 +1,82 @@
 """Constants used by yggdrasil."""
+import numpy as np
+from collections import OrderedDict
+# No other yggdrasil modules should be import here
+# TODO: Move platform constants into this module?
+from yggdrasil import platform
+
+
+# Type related constants
+NUMPY_NUMERIC_TYPES = [
+    'int',
+    'uint',
+    'float',
+    'complex',
+]
+NUMPY_STRING_TYPES = [
+    'bytes',
+    'unicode',
+    'str',
+]
+NUMPY_TYPES = NUMPY_NUMERIC_TYPES + NUMPY_STRING_TYPES
+FLEXIBLE_TYPES = [
+    'string',
+    'bytes',
+    'unicode',
+]
+PYTHON_SCALARS = OrderedDict([
+    ('float', [float]),
+    ('int', [int, np.signedinteger]),
+    ('uint', [np.unsignedinteger]),
+    ('complex', [complex]),
+    ('bytes', [bytes]),
+    ('unicode', [str]),
+])
+VALID_TYPES = OrderedDict([(k, k) for k in NUMPY_NUMERIC_TYPES])
+VALID_TYPES.update([
+    ('bytes', 'bytes'),
+    ('unicode', 'str'),
+])
+NUMPY_PRECISIONS = {
+    'float': [16, 32, 64],
+    'int': [8, 16, 32, 64],
+    'uint': [8, 16, 32, 64],
+    'complex': [64, 128],
+}
+if not platform._is_win:
+    # Not available on windows
+    NUMPY_PRECISIONS['float'].append(128)
+    NUMPY_PRECISIONS['complex'].append(256)
+for T, T_NP in VALID_TYPES.items():
+    PYTHON_SCALARS[T].append(np.dtype(T_NP).type)
+    if T in NUMPY_PRECISIONS:
+        PYTHON_SCALARS[T] += [np.dtype(T_NP + str(P)).type
+                              for P in NUMPY_PRECISIONS[T]]
+ALL_PYTHON_SCALARS = []
+for k, v in PYTHON_SCALARS.items():
+    PYTHON_SCALARS[k] = tuple(set(v))
+    ALL_PYTHON_SCALARS += list(v)
+ALL_PYTHON_SCALARS = tuple(ALL_PYTHON_SCALARS)
+ALL_PYTHON_ARRAYS = (np.ndarray,)
+
+
+# Serialization constants
+FMT_CHAR = b'%'
+YGG_MSG_HEAD = b'YGG_MSG_HEAD'
+DEFAULT_COMMENT = b'# '
+DEFAULT_DELIMITER = b'\t'
+DEFAULT_NEWLINE = b'\n'
+FMT_CHAR_STR = FMT_CHAR.decode("utf-8")
+DEFAULT_COMMENT_STR = DEFAULT_COMMENT.decode("utf-8")
+DEFAULT_DELIMITER_STR = DEFAULT_DELIMITER.decode("utf-8")
+DEFAULT_NEWLINE_STR = DEFAULT_NEWLINE.decode("utf-8")
+
+
+# Communication constants
+YGG_MSG_EOF = b'EOF!!!'
+YGG_MSG_BUF = 1024 * 2
+YGG_CLIENT_INI = b'YGG_BEGIN_CLIENT'
+YGG_CLIENT_EOF = b'YGG_END_CLIENT'
 
 
 # ======================================================

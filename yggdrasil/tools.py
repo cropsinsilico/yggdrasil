@@ -28,8 +28,6 @@ from yggdrasil.components import import_component, ComponentBase
 
 
 logger = logging.getLogger(__name__)
-YGG_MSG_EOF = b'EOF!!!'
-YGG_MSG_BUF = 1024 * 2
 
 
 _stack_in_log = False

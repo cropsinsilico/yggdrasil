@@ -1,9 +1,7 @@
 import copy
 import numpy as np
-from yggdrasil import units, platform
+from yggdrasil import units, platform, constants
 from yggdrasil.metaschema.datatypes.tests import test_MetaschemaType as parent
-from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
-    _valid_types)
 
 
 class TestScalarMetaschemaType(parent.TestMetaschemaType):
@@ -109,7 +107,7 @@ class TestScalarMetaschemaType(parent.TestMetaschemaType):
 
 
 # Dynamically create tests for dynamic and explicitly typed scalars
-for t in _valid_types.keys():
+for t in constants.VALID_TYPES.keys():
     iattr_imp = {'_type': t}
     if t == 'complex':
         iattr_imp['_prec'] = 64

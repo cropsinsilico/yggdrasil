@@ -11,12 +11,10 @@ import tempfile
 import asyncio
 from collections import OrderedDict
 from pprint import pformat
-from yggdrasil import platform, tools, languages, multitasking
+from yggdrasil import platform, tools, languages, multitasking, constants
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.metaschema.datatypes import is_default_typedef
-from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
-    _valid_types)
 from queue import Empty
 logger = logging.getLogger(__name__)
 
@@ -2812,11 +2810,11 @@ class ModelDriver(Driver):
                          'precision': 64, 'length': len(datatype['shape'])}},
                     definitions=definitions,
                     requires_freeing=requires_freeing)
-        elif datatype['type'] in ['ply', 'obj', '1darray',
-                                  'scalar', 'boolean', 'null',
-                                  'number', 'integer', 'string',
-                                  'class', 'function', 'instance',
-                                  'schema', 'any'] + list(_valid_types.keys()):
+        elif datatype['type'] in (['ply', 'obj', '1darray', 'scalar',
+                                   'boolean', 'null', 'number', 'integer',
+                                   'string', 'class', 'function', 'instance',
+                                   'schema', 'any']
+                                  + list(constants.VALID_TYPES.keys())):
             pass
         else:  # pragma: debug
             raise ValueError(("Cannot create %s version of type "
@@ -2938,7 +2936,7 @@ class ModelDriver(Driver):
                 keys['ndim'] = 0
                 keys['shape'] = cls.function_param['null']
             keys['units'] = datatype.get('units', '')
-        elif (typename == 'scalar') or (typename in _valid_types):
+        elif (typename == 'scalar') or (typename in constants.VALID_TYPES):
             keys['subtype'] = datatype.get('subtype', datatype['type'])
             keys['units'] = datatype.get('units', '')
             if keys['subtype'] in ['bytes', 'string', 'unicode']:

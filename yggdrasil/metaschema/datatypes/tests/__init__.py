@@ -1,5 +1,5 @@
 from yggdrasil.tests import assert_raises, assert_equal
-from yggdrasil.metaschema import datatypes
+from yggdrasil.metaschema import datatypes, MetaschemaTypeError
 from yggdrasil.metaschema.tests import _valid_objects
 from yggdrasil.metaschema.datatypes.ScalarMetaschemaType import (
     ScalarMetaschemaType)
@@ -53,7 +53,7 @@ def test_guess_type_from_obj():
     for t, x in _valid_objects.items():
         assert_equal(datatypes.guess_type_from_obj(x).name, t)
     for x in invalid_objects:
-        assert_raises(datatypes.MetaschemaTypeError,
+        assert_raises(MetaschemaTypeError,
                       datatypes.guess_type_from_obj, x)
 
 

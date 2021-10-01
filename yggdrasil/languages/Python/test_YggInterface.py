@@ -3,8 +3,8 @@ import numpy as np
 import flaky
 from yggdrasil.communication import get_comm
 from yggdrasil.interface import YggInterface
-from yggdrasil.tools import (
-    YGG_MSG_EOF, get_YGG_MSG_MAX, YGG_MSG_BUF, is_lang_installed)
+from yggdrasil import constants
+from yggdrasil.tools import get_YGG_MSG_MAX, is_lang_installed
 from yggdrasil.components import import_component
 from yggdrasil.drivers import ConnectionDriver
 from yggdrasil.tests import YggTestClassInfo, assert_equal, assert_raises
@@ -43,12 +43,12 @@ def test_maxMsgSize():
 
 def test_eof_msg():
     r"""Test eof message signal."""
-    assert_equal(YggInterface.eof_msg(), YGG_MSG_EOF)
+    assert_equal(YggInterface.eof_msg(), constants.YGG_MSG_EOF)
 
 
 def test_bufMsgSize():
     r"""Test buf message size."""
-    assert_equal(YggInterface.bufMsgSize(), YGG_MSG_BUF)
+    assert_equal(YggInterface.bufMsgSize(), constants.YGG_MSG_BUF)
 
 
 def test_init():
@@ -100,7 +100,7 @@ def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), np.int32(2)]
             o.close(linger=True)
             # Input
             assert_equal(i.recv(), (True, converter(msg)))
-            assert_equal(i.recv(), (False, converter(YGG_MSG_EOF)))
+            assert_equal(i.recv(), (False, converter(constants.YGG_MSG_EOF)))
     finally:
         iodrv.terminate()
 
@@ -122,7 +122,7 @@ def test_YggInit_backwards():
 def test_YggInit_variables():
     r"""Test Matlab interface for variables."""
     assert_equal(YggInterface.YggInit('YGG_MSG_MAX'), YGG_MSG_MAX)
-    assert_equal(YggInterface.YggInit('YGG_MSG_EOF'), YGG_MSG_EOF)
+    assert_equal(YggInterface.YggInit('YGG_MSG_EOF'), constants.YGG_MSG_EOF)
     assert_equal(YggInterface.YggInit('YGG_MSG_EOF'),
                  YggInterface.YggInit('CIS_MSG_EOF'))
     assert_equal(YggInterface.YggInit('YGG_MSG_EOF'),

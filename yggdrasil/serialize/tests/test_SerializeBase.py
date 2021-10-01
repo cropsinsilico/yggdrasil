@@ -1,6 +1,6 @@
 import copy
 from yggdrasil.tests import YggTestClassInfo, assert_equal
-from yggdrasil import tools
+from yggdrasil import constants
 from yggdrasil.components import import_component
 from yggdrasil.serialize import SerializeBase
 
@@ -39,7 +39,7 @@ class TestSerializeBase(YggTestClassInfo):
     def empty_head(self, msg):
         r"""dict: Empty header for message only contains the size."""
         out = dict(size=len(msg), incomplete=False)
-        if msg == tools.YGG_MSG_EOF:  # pragma: debug
+        if msg == constants.YGG_MSG_EOF:  # pragma: debug
             out['eof'] = True
         return out
 
@@ -143,7 +143,7 @@ class TestSerializeBase(YggTestClassInfo):
         r"""Test serialize/deserialize EOF."""
         if (self._cls == 'SerializeBase'):
             return
-        iobj = tools.YGG_MSG_EOF
+        iobj = constants.YGG_MSG_EOF
         msg = self.instance.serialize(iobj)
         iout, ihead = self.instance.deserialize(msg)
         self.assert_equal(iout, iobj)
@@ -153,7 +153,7 @@ class TestSerializeBase(YggTestClassInfo):
         r"""Test serialize/deserialize EOF with header."""
         if (self._cls == 'SerializeBase'):
             return
-        iobj = tools.YGG_MSG_EOF
+        iobj = constants.YGG_MSG_EOF
         msg = self.instance.serialize(iobj, header_kwargs=self._header_info)
         iout, ihead = self.instance.deserialize(msg)
         self.assert_equal(iout, iobj)

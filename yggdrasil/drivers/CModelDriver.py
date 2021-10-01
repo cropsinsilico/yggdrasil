@@ -7,12 +7,10 @@ import subprocess
 import numpy as np
 import sysconfig
 from collections import OrderedDict
-from yggdrasil import platform, tools
+from yggdrasil import platform, tools, constants
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase,
     get_compilation_tool)
-from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
-    _valid_types)
 from yggdrasil.languages import get_language_dir
 from yggdrasil.config import ygg_cfg
 from numpy import distutils as numpy_distutils
@@ -1052,7 +1050,7 @@ class CModelDriver(CompiledModelDriver):
                 x['datatype']['shape'] = [
                     int(float(s.strip('[]')))
                     for s in x.pop('shape').split('][')]
-                assert(x['datatype']['subtype'] in _valid_types)
+                assert(x['datatype']['subtype'] in constants.VALID_TYPES)
                 if len(x['datatype']['shape']) == 1:
                     x['datatype']['length'] = x['datatype'].pop(
                         'shape')[0]
@@ -1353,7 +1351,7 @@ class CModelDriver(CompiledModelDriver):
             if nptr > 0:
                 out['subtype'] = out['type']
                 out['type'] = '1darray'
-        if out['type'] in _valid_types:
+        if out['type'] in constants.VALID_TYPES:
             out['subtype'] = out['type']
             out['type'] = 'scalar'
         return out

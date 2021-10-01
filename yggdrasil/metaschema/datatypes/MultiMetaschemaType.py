@@ -1,7 +1,7 @@
 import copy
 from collections import OrderedDict
-from yggdrasil.metaschema.datatypes import (
-    get_type_class, MetaschemaTypeError)
+from yggdrasil.metaschema import MetaschemaTypeError
+from yggdrasil.metaschema.datatypes import get_type_class
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.properties.TypeMetaschemaProperty import (
     TypeMetaschemaProperty)

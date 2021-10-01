@@ -1,5 +1,5 @@
 import numpy as np
-from yggdrasil import serialize, platform
+from yggdrasil import serialize, platform, constants
 from yggdrasil.tests import assert_raises, assert_equal
 
 
@@ -107,10 +107,10 @@ def test_cformat2nptype():
         if isinstance(a, str):
             a = [a]
         for _ia in a:
-            if _ia.startswith(serialize._fmt_char_str):
+            if _ia.startswith(constants.FMT_CHAR_STR):
                 ia = _ia.encode("utf-8")
             else:
-                ia = serialize._fmt_char + _ia.encode("utf-8")
+                ia = constants.FMT_CHAR + _ia.encode("utf-8")
             assert_equal(serialize.cformat2nptype(ia), np.dtype(b))  # .str)
             # assert_equal(serialize.cformat2nptype(ia), np.dtype(b).str)
     assert_raises(TypeError, serialize.cformat2nptype, 0)
