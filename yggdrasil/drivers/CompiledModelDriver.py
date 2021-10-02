@@ -907,6 +907,8 @@ class CompilationToolBase(object):
                 # XCode >= 12
                 '/Applications/Xcode.app/Contents/Developer/'
                 'Toolchains/XcodeDefault.xctoolchain/usr']
+            # Check homebrew llvm
+            paths.append('/usr/local/Cellar/llvm/')
         if libtype == 'include':
             suffix = 'include'
         else:
