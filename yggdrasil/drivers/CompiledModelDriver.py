@@ -902,13 +902,23 @@ class CompilationToolBase(object):
         else:
             base_paths = ['/usr', os.path.join('/usr', 'local')]
         if platform._is_mac:
+            macos_sdkroot = cfg.get('c', 'macos_sdkroot', None)
             base_paths += [
                 '/Library/Developer/CommandLineTools/usr',
                 # XCode >= 12
                 '/Applications/Xcode.app/Contents/Developer/'
                 'Toolchains/XcodeDefault.xctoolchain/usr']
+            if macos_sdkroot is not None:
+                base_paths.append(os.path.join(macos_sdkroot, 'usr'))
+                if 'Platforms' in macos_sdkroot:
+                    base_paths.append(
+                        os.path.join(
+                            macos_sdkroot.split('/Platforms')[0],
+                            'Toolchains/XcodeDefault.xctoolchain/usr'))
+            # /Applications/Xcode_12.5.1.app/Contents/Developer/Platforms/
+            # MacOSX.platform/Developer/SDKs/MacOSX.sdk
             # Check homebrew llvm
-            paths.append('/usr/local/Cellar/llvm/')
+            # paths.append('/usr/local/Cellar/llvm/')
         if libtype == 'include':
             suffix = 'include'
         else:
