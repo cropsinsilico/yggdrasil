@@ -1,6 +1,6 @@
 chevron
 flask
-jsonschema>=3
+jsonschema==3.2.0
 matplotlib
 numpy>=1.13.0
 pandas

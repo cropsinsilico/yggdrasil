@@ -60,7 +60,7 @@ requirements:
     - git
     - GitPython <=3.1.20  # [py==36]
     - GitPython  # [py>36]
-    - jsonschema
+    - jsonschema==3.2.0
     - matplotlib-base
     - numpy >=1.13.0
     - pandas
