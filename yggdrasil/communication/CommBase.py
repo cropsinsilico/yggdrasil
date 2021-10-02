@@ -774,7 +774,7 @@ class CommBase(tools.YggClass):
                 if isinstance(iv, str):
                     try:
                         iv = create_component('transform', subtype=iv)
-                    except ValueError:
+                    except ComponentError:
                         iv = None
                 elif isinstance(iv, dict):
                     from yggdrasil.schema import get_schema
