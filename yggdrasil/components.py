@@ -168,9 +168,9 @@ def import_component(comptype, subtype=None, **kwargs):
         class: Component class.
 
     Raises:
-        ValueError: If comptype is not a registered component type.
-        ValueError: If subtype is not a registered subtype or the name of a
-            registered subtype class for the specified comptype.
+        ComponentError: If comptype is not a registered component type.
+        ComponentError: If subtype is not a registered subtype or the name of
+            a registered subtype class for the specified comptype.
             
 
     """
@@ -229,13 +229,13 @@ def create_component(comptype, subtype=None, **kwargs):
             options.
     
     Raises:
-        ValueError: If comptype is not a registered component type.
+        ComponentError: If comptype is not a registered component type.
 
     """
     from yggdrasil.schema import get_schema
     s = get_schema().get(comptype, None)
     if s is None:  # pragma: debug
-        raise ValueError("Unrecognized component type: %s" % comptype)
+        raise ComponentError("Unrecognized component type: %s" % comptype)
     if s.subtype_key in kwargs:
         subtype = kwargs[s.subtype_key]
     if subtype is None:

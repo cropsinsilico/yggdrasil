@@ -459,8 +459,7 @@ class ComponentSchema(object):
             else:
                 from yggdrasil.components import import_component
                 comp_cls = import_component(
-                    self.schema_type, subtype=subtype,
-                    without_schema=True)
+                    self.schema_type, subtype=subtype)
             out = {'oneOf': [out, {'type': 'instance',
                                    'class': comp_cls}]}
         return out
