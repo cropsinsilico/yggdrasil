@@ -44,7 +44,7 @@ while (ret) {
   if (ret) {
     # If the receive was succesful, send the values to output.
     # Formatting is taken care of on the output driver side.
-    fprintf("Table: %s, %d, %3.1f, %s", line[[1]], line[[2]], line[[3]], line[[4]])
+    fprintf("Table: %s, %d, %3.1f, %s", line[[1]], as.integer(line[[2]]), line[[3]], line[[4]])
     ret <- out_table$send(line[[1]], line[[2]], line[[3]], line[[4]])
     if (!ret) {
       stop("ascii_io(R): ERROR SENDING ROW")
