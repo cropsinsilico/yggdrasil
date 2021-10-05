@@ -915,16 +915,18 @@ class CompilationToolBase(object):
                         os.path.join(
                             macos_sdkroot.split('/Platforms', 1)[0],
                             'Toolchains/XcodeDefault.xctoolchain/usr'))
-            # /Applications/Xcode_12.5.1.app/Contents/Developer/Platforms/
-            # MacOSX.platform/Developer/SDKs/MacOSX.sdk
-            # Check homebrew llvm
-            # paths.append('/usr/local/Cellar/llvm/')
         if libtype == 'include':
             suffix = 'include'
         else:
             suffix = 'lib'
         for base in base_paths:
             paths.append(os.path.join(base, suffix))
+        if platform._is_mac:
+            # Check homebrew llvm
+            # paths.append('/usr/local/Cellar/llvm/')
+            paths += [
+                "/Library", "/Applications",
+                "/usr/local/Cellar/llvm/"]
         out = []
         for x in paths:
             if x and (x not in out) and os.path.isdir(x):
