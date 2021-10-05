@@ -54,9 +54,9 @@ for T, T_NP in VALID_TYPES.items():
                               for P in NUMPY_PRECISIONS[T]]
 ALL_PYTHON_SCALARS = []
 for k, v in PYTHON_SCALARS.items():
-    PYTHON_SCALARS[k] = tuple(set(v))
+    PYTHON_SCALARS[k] = tuple(v)
     ALL_PYTHON_SCALARS += list(v)
-ALL_PYTHON_SCALARS = tuple(ALL_PYTHON_SCALARS)
+ALL_PYTHON_SCALARS = tuple(set(ALL_PYTHON_SCALARS))
 ALL_PYTHON_ARRAYS = (np.ndarray,)
 
 

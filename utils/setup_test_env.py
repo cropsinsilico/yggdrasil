@@ -329,7 +329,7 @@ def create_env(method, python, name=None, packages=None, init=_on_ci):
 
     """
     cmds = ["echo Creating test environment using %s..." % method]
-    major, minor = [int(x) for x in python.split('.')]
+    major, minor = [int(x) for x in python.split('.')][:2]
     if name is None:
         name = '%s%s' % (method, python.replace('.', ''))
     if packages is None:

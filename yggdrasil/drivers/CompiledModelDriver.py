@@ -913,7 +913,7 @@ class CompilationToolBase(object):
                 if 'Platforms' in macos_sdkroot:
                     base_paths.append(
                         os.path.join(
-                            macos_sdkroot.split('/Platforms')[0],
+                            macos_sdkroot.split('/Platforms', 1)[0],
                             'Toolchains/XcodeDefault.xctoolchain/usr'))
             # /Applications/Xcode_12.5.1.app/Contents/Developer/Platforms/
             # MacOSX.platform/Developer/SDKs/MacOSX.sdk
