@@ -927,7 +927,8 @@ class CompilationToolBase(object):
             for x in glob.glob(os.path.join(
                     macos_sdkroot.split('/Platforms', 1)[0], 'Platforms',
                     '*', '')):
-                paths.append(x)
+                if 'AppleTV' not in x:
+                    paths.append(x)
             paths += [
                 "/usr/local/Cellar/llvm/"]
         out = []
