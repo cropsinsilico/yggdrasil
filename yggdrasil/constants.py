@@ -26,8 +26,8 @@ FLEXIBLE_TYPES = [
 ]
 PYTHON_SCALARS = OrderedDict([
     ('float', [float]),
-    ('int', [int, np.signedinteger]),
-    ('uint', [np.unsignedinteger]),
+    ('int', [int]),
+    ('uint', []),
     ('complex', [complex]),
     ('bytes', [bytes]),
     ('unicode', [str]),
@@ -52,6 +52,8 @@ for T, T_NP in VALID_TYPES.items():
     if T in NUMPY_PRECISIONS:
         PYTHON_SCALARS[T] += [np.dtype(T_NP + str(P)).type
                               for P in NUMPY_PRECISIONS[T]]
+PYTHON_SCALARS['int'].append(np.signedinteger)
+PYTHON_SCALARS['uint'].append(np.unsignedinteger)
 ALL_PYTHON_SCALARS = []
 for k, v in PYTHON_SCALARS.items():
     PYTHON_SCALARS[k] = tuple(v)
