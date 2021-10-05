@@ -924,8 +924,11 @@ class CompilationToolBase(object):
         if platform._is_mac:
             # Check homebrew llvm
             # paths.append('/usr/local/Cellar/llvm/')
+            for x in glob.glob(os.path.join(
+                    macos_sdkroot.split('/Platforms', 1)[0], 'Platforms',
+                    '*', '')):
+                paths.append(x)
             paths += [
-                "/Library", "/Applications",
                 "/usr/local/Cellar/llvm/"]
         out = []
         for x in paths:
