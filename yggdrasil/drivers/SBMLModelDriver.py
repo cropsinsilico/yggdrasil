@@ -107,7 +107,7 @@ class SBMLModelDriver(DSLModelDriver):  # pragma: sbml
             integrator=integrator, integrator_settings=integrator_settings,
         )
         if not selections:
-            selections = list(model.keys())
+            selections = [k for k in model.keys() if not k.startswith('init(')]
         if 'time' not in selections:
             selections = ['time'] + selections
         for k, v in output_map.items():
@@ -194,4 +194,8 @@ class SBMLModelDriver(DSLModelDriver):  # pragma: sbml
                              steps=int(steps))
         # Unsupported?
         # variableStep=variable_step)
+        try:
+            out = {k: out[k] for k in out.colnames}
+        except IndexError:
+            out = {k: out[:, i] for i, k in enumerate(out.colnames)}
         return end_time, out
