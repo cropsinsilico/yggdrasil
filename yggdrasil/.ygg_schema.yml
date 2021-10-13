@@ -180,9 +180,9 @@ definitions:
             type: string
           type: array
       required:
-      - name
-      - datatype
       - commtype
+      - datatype
+      - name
       title: comm_base
       type: object
     - anyOf:
@@ -704,9 +704,9 @@ definitions:
             is used.
           type: string
       required:
+      - filetype
       - name
       - working_dir
-      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -1856,8 +1856,8 @@ definitions:
             is used.
           type: string
       required:
-      - language
       - args
+      - language
       - name
       - working_dir
       title: model_base

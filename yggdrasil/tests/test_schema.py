@@ -1,6 +1,7 @@
 import os
 import pprint
 import tempfile
+import subprocess
 from jsonschema import ValidationError
 from yggdrasil import schema, components
 from yggdrasil.tests import assert_raises, assert_equal
@@ -102,12 +103,33 @@ def test_default_schema():
 
 
 def test_create_schema():
-    r"""Test creating new schema."""
+    r"""Test re-creating the schema."""
+    f_schema = schema._schema_fname
+    f_consts = os.path.join(os.path.dirname(schema.__file__), 'constants.py')
+    old_schema = open(f_schema, 'r').read()
+    old_consts = open(f_consts, 'r').read()
+    try:
+        os.remove(f_schema)
+        open(f_consts, 'w').write(
+            old_consts.split(schema._constants_separator)[0]
+            + schema._constants_separator)
+        subprocess.check_call(['yggschema'])
+        new_schema = open(f_schema, 'r').read()
+        new_consts = open(f_consts, 'r').read()
+        assert(new_consts == old_consts)
+        assert(new_schema == old_schema)
+    finally:
+        open(f_schema, 'w').write(old_schema)
+        open(f_consts, 'w').write(old_consts)
+
+
+def test_save_load_schema():
+    r"""Test saving & loading schema."""
     fname = 'test_schema.yml'
     if os.path.isfile(fname):  # pragma: debug
         os.remove(fname)
     # Test saving/loading schema
-    s0 = schema.create_schema()
+    s0 = schema.load_schema()
     s0.save(fname)
     assert(s0 is not None)
     assert(os.path.isfile(fname))

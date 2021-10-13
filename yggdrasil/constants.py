@@ -259,7 +259,7 @@ LANGUAGES_WITH_ALIASES = {
     'compiled': [
         'c', 'c++', 'cpp', 'cxx', 'fortran'],
     'interpreted': [
-        'R', 'r', 'matlab', 'python'],
+        'R', 'matlab', 'python', 'r'],
     'build': [
         'cmake', 'make'],
     'dsl': [

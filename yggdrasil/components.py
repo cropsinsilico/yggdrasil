@@ -88,11 +88,15 @@ def registering(recurse=False):
     if not recurse:
         assert(not registration_in_progress())
     try:
+        previous = os.environ.get('YGGDRASIL_REGISTRATION_IN_PROGRESS', None)
         os.environ['YGGDRASIL_REGISTRATION_IN_PROGRESS'] = '1'
         yield
     finally:
-        if 'YGGDRASIL_REGISTRATION_IN_PROGRESS' in os.environ:
-            del os.environ['YGGDRASIL_REGISTRATION_IN_PROGRESS']
+        if previous is None:
+            if 'YGGDRASIL_REGISTRATION_IN_PROGRESS' in os.environ:
+                del os.environ['YGGDRASIL_REGISTRATION_IN_PROGRESS']
+        else:
+            os.environ['YGGDRASIL_REGISTRATION_IN_PROGRESS'] = previous
 
 
 def init_registry(recurse=False):
@@ -597,13 +601,6 @@ class ComponentBase(ComponentBaseUnregistered):
             #                    "with the value %s.")
             #                   % (k, v, getattr(self, k)))
         self.extra_kwargs = kwargs
-
-    @staticmethod
-    def before_schema(cls):
-        r"""Operations that should be performed before the schema is generated.
-        These actions will only be performed if a new schema is being generated.
-        """
-        pass
 
     @staticmethod
     def before_registration(cls):
