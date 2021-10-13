@@ -140,6 +140,7 @@ def test_save_load_schema():
     # Test getting schema
     s2 = schema.load_schema(fname)
     assert(os.path.isfile(fname))
+    assert(s2.schema == s0.schema)
     assert(s2 == s0)
     os.remove(fname)
 
