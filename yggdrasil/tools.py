@@ -1292,7 +1292,7 @@ def import_all_modules(base=None, exclude=None, do_first=None):
             continue
         importlib.import_module(x_mod)
     for x in sorted(glob.glob(os.path.join(directory, '*', ''))):
-        if x.startswith('__') and x.endswith('__'):
+        if x.startswith('__') and x.endswith('__'):  # pragma: debug
             continue
         next_module = os.path.basename(os.path.dirname(x))
         import_all_modules(f"{base}.{next_module}",

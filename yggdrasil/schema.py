@@ -639,27 +639,21 @@ class ComponentSchema(object):
     def base_subtype_class(self):
         r"""ComponentClass: Base class for the subtype."""
         if not getattr(self, '_base_subtype_class', None):
-            if getattr(self, '_base_subtype_class_name', None):
-                self._base_subtype_class = getattr(
-                    importlib.import_module(
-                        f"{self.module}.{self._base_subtype_class_name}"),
-                    self._base_subtype_class_name)
-            else:
-                default_class = list(self.schema_subtypes.keys())[0]
-                cls = getattr(
-                    importlib.import_module(f"{self.module}.{default_class}"),
-                    default_class)
-                base_class = cls
-                for i, x in enumerate(cls.__mro__):
-                    if x._schema_type != cls._schema_type:
-                        break
-                    base_class = x
-                else:  # pragma: debug
-                    raise RuntimeError(
-                        f"Could not determine a base class for "
-                        f"{self.schema_type} (using class {cls})")
-                self._base_subtype_class = base_class
-                self._base_subtype_class_name = base_class.__name__
+            default_class = list(self.schema_subtypes.keys())[0]
+            cls = getattr(
+                importlib.import_module(f"{self.module}.{default_class}"),
+                default_class)
+            base_class = cls
+            for i, x in enumerate(cls.__mro__):
+                if x._schema_type != cls._schema_type:
+                    break
+                base_class = x
+            else:  # pragma: debug
+                raise RuntimeError(
+                    f"Could not determine a base class for "
+                    f"{self.schema_type} (using class {cls})")
+            self._base_subtype_class = base_class
+            self._base_subtype_class_name = base_class.__name__
         return self._base_subtype_class
 
     @property
@@ -701,10 +695,7 @@ class ComponentSchema(object):
             subtype_list = [subtype_list]
         subtype_list += getattr(comp_cls, '_%s_aliases' % self.subtype_key, [])
         self.schema_subtypes[name] = subtype_list
-        if self.module is None:
-            self.module = subtype_module
-        else:
-            assert(subtype_module == self.module)
+        assert(subtype_module == self.module)
         # Create new schema for subtype
         new_schema = {'title': fullname,
                       'description': ('Schema for %s component %s subtype.'
