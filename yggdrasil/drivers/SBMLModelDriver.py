@@ -194,8 +194,8 @@ class SBMLModelDriver(DSLModelDriver):  # pragma: sbml
                              steps=int(steps))
         # Unsupported?
         # variableStep=variable_step)
-        try:
-            out = {k: out[k] for k in out.colnames}
-        except IndexError:
-            out = {k: out[:, i] for i, k in enumerate(out.colnames)}
+        # try:
+        #     out = {k: out[k] for k in out.colnames}
+        # except IndexError:
+        #     out = {k: out[:, i] for i, k in enumerate(out.colnames)}
         return end_time, out

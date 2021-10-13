@@ -143,17 +143,7 @@ class CCompilerBase(CompilerBase):
             list: List of paths that the tools will search.
 
         """
-        cfg = kwargs.get('cfg', ygg_cfg)
-        libtype = kwargs.get('libtype', None)
-        out = super(CompilerBase, cls).get_search_path(*args, **kwargs)
-        macos_sdkroot = cfg.get('c', 'macos_sdkroot', _osx_sysroot)
-        if platform._is_mac and (macos_sdkroot is not None):
-            base_path = os.path.join(macos_sdkroot, 'usr')
-            assert(libtype == 'include')
-            new = os.path.join(base_path, 'include')
-            if new not in out:
-                out.append(new)
-        return out
+        return super(CompilerBase, cls).get_search_path(*args, **kwargs)
 
 
 class GCCCompiler(CCompilerBase):
