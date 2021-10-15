@@ -496,7 +496,7 @@ class ComponentSchema(object):
         else:
             out['allOf'] = [self.get_subtype_schema('base', relaxed=relaxed),
                             {'anyOf': [self.get_subtype_schema(x, unique=True)
-                                       for x in self._storage.keys()]}]
+                                       for x in sorted(self._storage.keys())]}]
         if allow_instance:
             out['oneOf'] = [{'allOf': out.pop('allOf')},
                             {'type': 'instance',
@@ -519,7 +519,7 @@ class ComponentSchema(object):
                'title': self.schema_type,
                'allOf': [self.get_subtype_schema('base', unique=True),
                          {'anyOf': [self.get_subtype_schema(x)
-                                    for x in self._storage.keys()]}]}
+                                    for x in sorted(self._storage.keys())]}]}
         return out
 
     @classmethod
