@@ -43,6 +43,9 @@ class TestValueComm(parent.TestCommBase):
         n_recv = self.testing_options['kwargs']['count']
         msg_recv = self.test_msg
         if self.use_async:
+            from yggdrasil.multitasking import wait_on_function
+            wait_on_function(lambda: self.recv_instance.n_msg_recv > 0,
+                             timeout=self.timeout)
             assert(self.recv_instance.n_msg_recv > 0)
         else:
             self.assert_equal(self.recv_instance.n_msg_recv, n_recv)
