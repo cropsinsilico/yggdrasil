@@ -256,17 +256,6 @@ definitions:
         title: yggdrasil.communication.RESTComm.RESTComm
         type: object
       - additionalProperties: true
-        description: Schema for comm component ['rmq'] subtype.
-        properties:
-          commtype:
-            default: default
-            description: RabbitMQ connection.
-            enum:
-            - rmq
-            type: string
-        title: yggdrasil.communication.RMQComm.RMQComm
-        type: object
-      - additionalProperties: true
         description: Schema for comm component ['rmq_async'] subtype.
         properties:
           commtype:
@@ -276,6 +265,17 @@ definitions:
             - rmq_async
             type: string
         title: yggdrasil.communication.RMQAsyncComm.RMQAsyncComm
+        type: object
+      - additionalProperties: true
+        description: Schema for comm component ['rmq'] subtype.
+        properties:
+          commtype:
+            default: default
+            description: RabbitMQ connection.
+            enum:
+            - rmq
+            type: string
+        title: yggdrasil.communication.RMQComm.RMQComm
         type: object
       - additionalProperties: true
         description: Schema for comm component ['value'] subtype.
@@ -387,16 +387,6 @@ definitions:
         title: yggdrasil.drivers.ConnectionDriver.ConnectionDriver
         type: object
       - additionalProperties: true
-        description: Schema for connection component ['input'] subtype.
-        properties:
-          connection_type:
-            description: Connection between one or more comms/files and a model.
-            enum:
-            - input
-            type: string
-        title: yggdrasil.drivers.InputDriver.InputDriver
-        type: object
-      - additionalProperties: true
         description: Schema for connection component ['file_input'] subtype.
         properties:
           connection_type:
@@ -405,16 +395,6 @@ definitions:
             - file_input
             type: string
         title: yggdrasil.drivers.FileInputDriver.FileInputDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for connection component ['output'] subtype.
-        properties:
-          connection_type:
-            description: Connection between a model and one or more comms/files.
-            enum:
-            - output
-            type: string
-        title: yggdrasil.drivers.OutputDriver.OutputDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['file_output'] subtype.
@@ -427,15 +407,24 @@ definitions:
         title: yggdrasil.drivers.FileOutputDriver.FileOutputDriver
         type: object
       - additionalProperties: true
-        description: Schema for connection component ['rpc_response'] subtype.
+        description: Schema for connection component ['input'] subtype.
         properties:
           connection_type:
-            description: Connection between one or more comms/files and one or more
-              comms/files.
+            description: Connection between one or more comms/files and a model.
             enum:
-            - rpc_response
+            - input
             type: string
-        title: yggdrasil.drivers.RPCResponseDriver.RPCResponseDriver
+        title: yggdrasil.drivers.InputDriver.InputDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['output'] subtype.
+        properties:
+          connection_type:
+            description: Connection between a model and one or more comms/files.
+            enum:
+            - output
+            type: string
+        title: yggdrasil.drivers.OutputDriver.OutputDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['rpc_request'] subtype.
@@ -447,6 +436,17 @@ definitions:
             - rpc_request
             type: string
         title: yggdrasil.drivers.RPCRequestDriver.RPCRequestDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['rpc_response'] subtype.
+        properties:
+          connection_type:
+            description: Connection between one or more comms/files and one or more
+              comms/files.
+            enum:
+            - rpc_response
+            type: string
+        title: yggdrasil.drivers.RPCResponseDriver.RPCResponseDriver
         type: object
     description: Schema for connection components.
     title: connection
@@ -711,37 +711,6 @@ definitions:
       type: object
     - anyOf:
       - additionalProperties: true
-        description: Schema for file component ['binary'] subtype.
-        properties:
-          filetype:
-            default: binary
-            description: The entire file is read/written all at once as bytes.
-            enum:
-            - binary
-            type: string
-          read_meth:
-            default: read
-            description: Method that should be used to read data from the file. Defaults
-              to 'read'. Ignored if direction is 'send'.
-            enum:
-            - read
-            - readline
-            type: string
-          serializer:
-            default:
-              seritype: direct
-            description: Class with serialize and deserialize methods that should
-              be used to process sent and received messages. Defaults to None and
-              is constructed using provided 'serializer_kwargs'.
-            oneOf:
-            - $ref: '#/definitions/serializer'
-            - class: yggdrasil.serialize.SerializeBase:SerializeBase
-              type: instance
-        required:
-        - serializer
-        title: yggdrasil.communication.FileComm.FileComm
-        type: object
-      - additionalProperties: true
         description: Schema for file component ['ascii'] subtype.
         properties:
           comment:
@@ -839,6 +808,37 @@ definitions:
               table. Defaults to False.
             type: boolean
         title: yggdrasil.communication.AsciiTableComm.AsciiTableComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['binary'] subtype.
+        properties:
+          filetype:
+            default: binary
+            description: The entire file is read/written all at once as bytes.
+            enum:
+            - binary
+            type: string
+          read_meth:
+            default: read
+            description: Method that should be used to read data from the file. Defaults
+              to 'read'. Ignored if direction is 'send'.
+            enum:
+            - read
+            - readline
+            type: string
+          serializer:
+            default:
+              seritype: direct
+            description: Class with serialize and deserialize methods that should
+              be used to process sent and received messages. Defaults to None and
+              is constructed using provided 'serializer_kwargs'.
+            oneOf:
+            - $ref: '#/definitions/serializer'
+            - class: yggdrasil.serialize.SerializeBase:SerializeBase
+              type: instance
+        required:
+        - serializer
+        title: yggdrasil.communication.FileComm.FileComm
         type: object
       - additionalProperties: true
         description: Schema for file component ['json'] subtype.
@@ -954,34 +954,6 @@ definitions:
         title: yggdrasil.communication.NetCDFFileComm.NetCDFFileComm
         type: object
       - additionalProperties: true
-        description: Schema for file component ['ply'] subtype.
-        properties:
-          comment:
-            default: '# '
-            description: One or more characters indicating a comment. Defaults to
-              '# '.
-            type: string
-          datatype:
-            description: JSON schema defining the type of object that the serializer
-              will be used to serialize/deserialize. Defaults to default_datatype.
-            type: schema
-          filetype:
-            default: binary
-            description: The file is in the `Ply <http://paulbourke.net/dataformats/ply/>`_
-              data format for 3D structures.
-            enum:
-            - ply
-            type: string
-          newline:
-            default: '
-
-              '
-            description: One or more characters indicating a newline. Defaults to
-              '\n'.
-            type: string
-        title: yggdrasil.communication.PlyFileComm.PlyFileComm
-        type: object
-      - additionalProperties: true
         description: Schema for file component ['obj'] subtype.
         properties:
           comment:
@@ -1082,6 +1054,34 @@ definitions:
               '\n'.
             type: string
         title: yggdrasil.communication.PickleFileComm.PickleFileComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['ply'] subtype.
+        properties:
+          comment:
+            default: '# '
+            description: One or more characters indicating a comment. Defaults to
+              '# '.
+            type: string
+          datatype:
+            description: JSON schema defining the type of object that the serializer
+              will be used to serialize/deserialize. Defaults to default_datatype.
+            type: schema
+          filetype:
+            default: binary
+            description: The file is in the `Ply <http://paulbourke.net/dataformats/ply/>`_
+              data format for 3D structures.
+            enum:
+            - ply
+            type: string
+          newline:
+            default: '
+
+              '
+            description: One or more characters indicating a newline. Defaults to
+              '\n'.
+            type: string
+        title: yggdrasil.communication.PlyFileComm.PlyFileComm
         type: object
       - additionalProperties: true
         description: Schema for file component ['wofost'] subtype.
@@ -1864,55 +1864,6 @@ definitions:
       type: object
     - anyOf:
       - additionalProperties: true
-        description: Schema for model component ['c'] subtype.
-        properties:
-          compiler:
-            description: Command or path to executable that should be used to compile
-              the model. If not provided, the compiler will be determined based on
-              configuration options for the language (if present) and the registered
-              compilers that are available on the current operating system.
-            type: string
-          compiler_flags:
-            default: []
-            description: Flags that should be passed to the compiler during compilation.
-              If nto provided, the compiler flags will be determined based on configuration
-              options for the language (if present), the compiler defaults, and the
-              default_compiler_flags class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is written in C.
-            enum:
-            - c
-            type: string
-          linker:
-            description: Command or path to executable that should be used to link
-              the model. If not provided, the linker will be determined based on configuration
-              options for the language (if present) and the registered linkers that
-              are available on the current operating system
-            type: string
-          linker_flags:
-            default: []
-            description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
-              options for the language (if present), the linker defaults, and the
-              default_linker_flags class attribute.
-            items:
-              type: string
-            type: array
-          source_files:
-            default: []
-            description: Source files that should be compiled into an executable.
-              Defaults to an empty list and the driver will search for a source file
-              based on the model executable (the first model argument).
-            items:
-              type: string
-            type: array
-        title: yggdrasil.drivers.CModelDriver.CModelDriver
-        type: object
-      - additionalProperties: true
         description: Schema for model component ['cmake'] subtype.
         properties:
           builddir:
@@ -2025,6 +1976,55 @@ definitions:
               type: string
             type: array
         title: yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['c'] subtype.
+        properties:
+          compiler:
+            description: Command or path to executable that should be used to compile
+              the model. If not provided, the compiler will be determined based on
+              configuration options for the language (if present) and the registered
+              compilers that are available on the current operating system.
+            type: string
+          compiler_flags:
+            default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in C.
+            enum:
+            - c
+            type: string
+          linker:
+            description: Command or path to executable that should be used to link
+              the model. If not provided, the linker will be determined based on configuration
+              options for the language (if present) and the registered linkers that
+              are available on the current operating system
+            type: string
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items:
+              type: string
+            type: array
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items:
+              type: string
+            type: array
+        title: yggdrasil.drivers.CModelDriver.CModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['c++', 'cpp', 'cxx'] subtype.
@@ -2176,38 +2176,6 @@ definitions:
             - f2008
             type: string
         title: yggdrasil.drivers.FortranModelDriver.FortranModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['python'] subtype.
-        properties:
-          interpreter:
-            description: Name or path of interpreter executable that should be used
-              to run the model. If not provided, the interpreter will be determined
-              based on configuration options for the language (if present) and the
-              default_interpreter class attribute.
-            type: string
-          interpreter_flags:
-            default: []
-            description: Flags that should be passed to the interpreter when running
-              the model. If not provided, the flags are determined based on configuration
-              options for the language (if present) and the default_interpreter_flags
-              class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is written in Python.
-            enum:
-            - python
-            type: string
-          skip_interpreter:
-            default: false
-            description: If True, no interpreter will be added to the arguments. This
-              should only be used for subclasses that will not be invoking the model
-              via the command line. Defaults to False.
-            type: boolean
-        title: yggdrasil.drivers.PythonModelDriver.PythonModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['lpy'] subtype.
@@ -2443,6 +2411,38 @@ definitions:
               table of values will be extrapolated.
             type: object
         title: yggdrasil.drivers.OSRModelDriver.OSRModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['python'] subtype.
+        properties:
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in Python.
+            enum:
+            - python
+            type: string
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+        title: yggdrasil.drivers.PythonModelDriver.PythonModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['R', 'r'] subtype.
@@ -2803,19 +2803,6 @@ definitions:
         title: yggdrasil.serialize.AsciiMapSerialize.AsciiMapSerialize
         type: object
       - additionalProperties: true
-        description: Schema for serializer component ['default'] subtype.
-        properties:
-          seritype:
-            default: default
-            description: Default serializer that uses |yggdrasil|'s extended JSON
-              serialization based on a provided type definition (See discussion :ref:`here
-              <serialization_rst>`).
-            enum:
-            - default
-            type: string
-        title: yggdrasil.serialize.DefaultSerialize.DefaultSerialize
-        type: object
-      - additionalProperties: true
         description: Schema for serializer component ['table'] subtype.
         properties:
           as_array:
@@ -2859,6 +2846,19 @@ definitions:
               table. Defaults to False.
             type: boolean
         title: yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize
+        type: object
+      - additionalProperties: true
+        description: Schema for serializer component ['default'] subtype.
+        properties:
+          seritype:
+            default: default
+            description: Default serializer that uses |yggdrasil|'s extended JSON
+              serialization based on a provided type definition (See discussion :ref:`here
+              <serialization_rst>`).
+            enum:
+            - default
+            type: string
+        title: yggdrasil.serialize.DefaultSerialize.DefaultSerialize
         type: object
       - additionalProperties: true
         description: Schema for serializer component ['direct'] subtype.
@@ -2934,17 +2934,6 @@ definitions:
         title: yggdrasil.serialize.MatSerialize.MatSerialize
         type: object
       - additionalProperties: true
-        description: Schema for serializer component ['ply'] subtype.
-        properties:
-          seritype:
-            default: default
-            description: Serialize 3D structures using Ply format.
-            enum:
-            - ply
-            type: string
-        title: yggdrasil.serialize.PlySerialize.PlySerialize
-        type: object
-      - additionalProperties: true
         description: Schema for serializer component ['obj'] subtype.
         properties:
           seritype:
@@ -3014,6 +3003,17 @@ definitions:
             - pickle
             type: string
         title: yggdrasil.serialize.PickleSerialize.PickleSerialize
+        type: object
+      - additionalProperties: true
+        description: Schema for serializer component ['ply'] subtype.
+        properties:
+          seritype:
+            default: default
+            description: Serialize 3D structures using Ply format.
+            enum:
+            - ply
+            type: string
+        title: yggdrasil.serialize.PlySerialize.PlySerialize
         type: object
       - additionalProperties: true
         description: Schema for serializer component ['wofost'] subtype.
@@ -3147,18 +3147,6 @@ definitions:
         title: yggdrasil.communication.transforms.ArrayTransform.ArrayTransform
         type: object
       - additionalProperties: true
-        description: Schema for transform component ['pandas'] subtype.
-        properties:
-          field_names:
-            items:
-              type: string
-            type: array
-          transformtype:
-            enum:
-            - pandas
-        title: yggdrasil.communication.transforms.PandasTransform.PandasTransform
-        type: object
-      - additionalProperties: true
         description: Schema for transform component ['direct'] subtype.
         properties:
           transformtype:
@@ -3218,6 +3206,18 @@ definitions:
         required:
         - map
         title: yggdrasil.communication.transforms.MapFieldsTransform.MapFieldsTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['pandas'] subtype.
+        properties:
+          field_names:
+            items:
+              type: string
+            type: array
+          transformtype:
+            enum:
+            - pandas
+        title: yggdrasil.communication.transforms.PandasTransform.PandasTransform
         type: object
       - additionalProperties: true
         description: Schema for transform component ['select_fields'] subtype.
