@@ -2,7 +2,7 @@ import os
 import glob
 import jsonschema
 import copy
-import numpy as np
+from yggdrasil import constants
 from yggdrasil.components import ClassRegistry
 from yggdrasil.metaschema.encoder import decode_json
 from yggdrasil.metaschema.properties import get_metaschema_property
@@ -11,7 +11,6 @@ from yggdrasil.metaschema.properties import get_metaschema_property
 _schema_dir = os.path.join(os.path.dirname(__file__), 'schemas')
 # _base_validator = jsonschema.validators.validator_for({"$schema": ""})
 _base_validator = jsonschema.validators._LATEST_VERSION
-YGG_MSG_HEAD = b'YGG_MSG_HEAD'
 _property_attributes = ['properties', 'definition_properties',
                         'metadata_properties', 'extract_properties']
 
@@ -38,11 +37,6 @@ def import_schema_types():
                             + "following new schemas found in schema files: %s"
                             % new_names)
     
-
-class MetaschemaTypeError(TypeError):
-    r"""Error that should be raised when a class encounters a type it cannot handle."""
-    pass
-
 
 _default_typedef = {'type': 'bytes'}
 _type_registry = ClassRegistry(import_function=import_schema_types)
@@ -302,8 +296,8 @@ def guess_type_from_msg(msg):
 
     """
     try:
-        if YGG_MSG_HEAD in msg:
-            _, metadata, data = msg.split(YGG_MSG_HEAD, 2)
+        if constants.YGG_MSG_HEAD in msg:
+            _, metadata, data = msg.split(constants.YGG_MSG_HEAD, 2)
             metadata = decode_json(metadata)
             cls = _type_registry[metadata['datatype']['type']]
         else:
@@ -456,7 +450,7 @@ def decode(msg):
 
     """
     cls = guess_type_from_msg(msg)
-    metadata = decode_json(msg.split(YGG_MSG_HEAD, 2)[1])
+    metadata = decode_json(msg.split(constants.YGG_MSG_HEAD, 2)[1])
     typedef = cls.extract_typedef(metadata.get('datatype', {}))
     cls_inst = cls(**typedef)
     obj = cls_inst.deserialize(msg)[0]
@@ -581,37 +575,3 @@ def generate_data(typedef):
     """
     type_cls = get_type_class(typedef['type'])
     return type_cls.generate_data(typedef)
-
-
-def type2numpy(typedef):
-    r"""Convert a type definition into a numpy dtype.
-
-    Args:
-        typedef (dict): Type definition.
-
-    Returns:
-        np.dtype: Numpy data type.
-
-    """
-    from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
-        definition2dtype)
-    out = None
-    if ((isinstance(typedef, dict) and ('type' in typedef)
-         and (typedef['type'] == 'array') and ('items' in typedef))):
-        if isinstance(typedef['items'], dict):
-            as_array = (typedef['items']['type'] in ['1darray', 'ndarray'])
-            if as_array:
-                out = definition2dtype(typedef['items'])
-        elif isinstance(typedef['items'], (list, tuple)):
-            as_array = True
-            dtype_list = []
-            field_names = []
-            for i, x in enumerate(typedef['items']):
-                if x['type'] not in ['1darray', 'ndarray']:
-                    as_array = False
-                    break
-                dtype_list.append(definition2dtype(x))
-                field_names.append(x.get('title', 'f%d' % i))
-            if as_array:
-                out = np.dtype(dict(names=field_names, formats=dtype_list))
-    return out

@@ -1,5 +1,4 @@
 import numbers
-from jsonschema.compat import str_types, int_types
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
@@ -74,7 +73,7 @@ class JSONIntegerMetaschemaType(JSONMetaschemaTypeBase):
 
     name = 'integer'
     description = 'JSON integer type.'
-    python_types = int_types
+    python_types = (int,)
     # TODO: Find a better way to signify this for creating the table
     cross_language_support = False
     example_data = int(1)
@@ -147,7 +146,7 @@ class JSONStringMetaschemaType(JSONMetaschemaTypeBase):
 
     name = 'string'
     description = 'JSON string type.'
-    python_types = str_types
+    python_types = (str,)
     example_data = 'hello'
 
     @classmethod

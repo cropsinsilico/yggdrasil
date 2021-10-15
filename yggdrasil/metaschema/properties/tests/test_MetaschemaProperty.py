@@ -1,6 +1,6 @@
 from yggdrasil.tests import YggTestClassInfo, assert_equal
-from yggdrasil.metaschema import get_validator, get_metaschema
-from yggdrasil.metaschema.datatypes import MetaschemaTypeError
+from yggdrasil.metaschema import (
+    get_validator, get_metaschema, MetaschemaTypeError)
 from yggdrasil.metaschema.properties.MetaschemaProperty import (
     create_property)
 

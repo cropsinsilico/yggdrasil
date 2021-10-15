@@ -3,10 +3,10 @@ import copy
 import pprint
 import numpy as np
 import warnings
-from yggdrasil import tools, units, serialize
+from yggdrasil import tools, units, serialize, constants
 from yggdrasil.metaschema.datatypes import (
-    guess_type_from_obj, get_type_from_def, get_type_class, compare_schema,
-    type2numpy)
+    guess_type_from_obj, get_type_from_def, get_type_class, compare_schema)
+from yggdrasil.metaschema import type2numpy
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
@@ -55,9 +55,9 @@ class SerializeBase(tools.YggClass):
                      'default': 'default',
                      'description': ('Serializer type.')},
         'newline': {'type': 'string',
-                    'default': serialize._default_newline_str},
+                    'default': constants.DEFAULT_NEWLINE_STR},
         'comment': {'type': 'string',
-                    'default': serialize._default_comment_str},
+                    'default': constants.DEFAULT_COMMENT_STR},
         'datatype': {'type': 'schema'}}
     _oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
     _attr_conv = ['newline', 'comment']
@@ -568,8 +568,6 @@ class SerializeBase(tools.YggClass):
             if k == 'format_str':
                 from yggdrasil.metaschema.datatypes.ArrayMetaschemaType import (
                     OneDArrayMetaschemaType)
-                from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
-                    _flexible_types)
                 v = tools.bytes2str(v)
                 fmts = serialize.extract_formats(v)
                 if 'type' in typedef:
@@ -593,7 +591,7 @@ class SerializeBase(tools.YggClass):
                         itype['type'] = '1darray'
                     else:
                         itype['type'] = itype.pop('subtype')
-                        if (((itype['type'] in _flexible_types)
+                        if (((itype['type'] in constants.FLEXIBLE_TYPES)
                              and ('precision' in itype))):
                             del itype['precision']
                     typedef['items'].append(itype)
@@ -689,7 +687,7 @@ class SerializeBase(tools.YggClass):
         """
         if header_kwargs is None:
             header_kwargs = {}
-        if isinstance(args, bytes) and (args == tools.YGG_MSG_EOF):
+        if isinstance(args, bytes) and (args == constants.YGG_MSG_EOF):
             header_kwargs['raw'] = True
         self.initialize_from_message(args, **header_kwargs)
         metadata = {'no_metadata': no_metadata,

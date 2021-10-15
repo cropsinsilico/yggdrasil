@@ -1,5 +1,6 @@
+from yggdrasil.metaschema import MetaschemaTypeError
 from yggdrasil.metaschema.datatypes import (
-    get_registered_types, get_type_class, MetaschemaTypeError)
+    get_registered_types, get_type_class)
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 

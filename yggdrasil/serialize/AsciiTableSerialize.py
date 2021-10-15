@@ -1,8 +1,6 @@
-from yggdrasil import units, serialize, tools
-from yggdrasil.serialize import _default_delimiter_str
+from yggdrasil import units, serialize, tools, constants
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
-from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
-    definition2dtype, data2dtype)
+from yggdrasil.metaschema import definition2dtype, data2dtype
 
 
 class AsciiTableSerialize(DefaultSerialize):
@@ -50,7 +48,8 @@ class AsciiTableSerialize(DefaultSerialize):
         'field_names': {'type': 'array', 'items': {'type': 'string'}},
         'field_units': {'type': 'array', 'items': {'type': 'string'}},
         'as_array': {'type': 'boolean', 'default': False},
-        'delimiter': {'type': 'string', 'default': _default_delimiter_str},
+        'delimiter': {'type': 'string',
+                      'default': constants.DEFAULT_DELIMITER_STR},
         'use_astropy': {'type': 'boolean', 'default': False}}
     _attr_conv = DefaultSerialize._attr_conv + ['format_str', 'delimiter']
     has_header = True

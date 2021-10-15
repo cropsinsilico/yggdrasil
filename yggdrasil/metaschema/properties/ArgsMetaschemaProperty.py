@@ -1,5 +1,5 @@
 import weakref
-from yggdrasil.metaschema.datatypes import MetaschemaTypeError
+from yggdrasil.metaschema import MetaschemaTypeError
 from yggdrasil.metaschema.properties.MetaschemaProperty import (
     MetaschemaProperty)
 from yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties import (

@@ -1,4 +1,4 @@
-from yggdrasil.metaschema.datatypes import MetaschemaTypeError
+from yggdrasil.metaschema import MetaschemaTypeError
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
     JSONArrayMetaschemaType)

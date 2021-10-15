@@ -1,24 +1,24 @@
 import numpy as np
-from yggdrasil import units
+from yggdrasil import units, constants
 from yggdrasil.tests import assert_raises, assert_equal
-from yggdrasil.metaschema.properties import ScalarMetaschemaProperties
 from yggdrasil.metaschema.properties.tests import (
     test_MetaschemaProperty as parent)
-from yggdrasil.metaschema.datatypes import MetaschemaTypeError
+from yggdrasil.metaschema import (data2dtype, definition2dtype,
+                                  MetaschemaTypeError)
 
 
 def test_data2dtype_errors():
     r"""Check that error is raised for list, dict, & tuple objects."""
-    assert_raises(MetaschemaTypeError, ScalarMetaschemaProperties.data2dtype, [])
+    assert_raises(MetaschemaTypeError, data2dtype, [])
 
 
 def test_definition2dtype_errors():
     r"""Check that error raised if type not specified."""
-    assert_raises(KeyError, ScalarMetaschemaProperties.definition2dtype, {})
-    assert_raises(RuntimeError, ScalarMetaschemaProperties.definition2dtype,
+    assert_raises(KeyError, definition2dtype, {})
+    assert_raises(RuntimeError, definition2dtype,
                   {'type': 'float'})
-    assert_equal(ScalarMetaschemaProperties.definition2dtype({'type': 'bytes'}),
-                 np.dtype((ScalarMetaschemaProperties._valid_types['bytes'])))
+    assert_equal(definition2dtype({'type': 'bytes'}),
+                 np.dtype((constants.VALID_TYPES['bytes'])))
 
 
 class TestSubtypeMetaschemaProperty(parent.TestMetaschemaProperty):

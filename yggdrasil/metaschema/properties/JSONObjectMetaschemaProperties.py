@@ -1,4 +1,3 @@
-from jsonschema.compat import iteritems
 from yggdrasil.metaschema import normalizer as normalizer_mod
 from yggdrasil.metaschema.datatypes import encode_type, compare_schema
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
@@ -34,7 +33,7 @@ class PropertiesMetaschemaProperty(MetaschemaProperty):
         r"""Normalization method for 'properties' container property."""
         if not isinstance(instance, dict):
             return instance
-        for property, subschema in iteritems(value):
+        for property, subschema in value.items():
             if property not in instance:
                 instance[property] = normalizer_mod.UndefinedProperty()
         return instance

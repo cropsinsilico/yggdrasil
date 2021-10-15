@@ -13,7 +13,7 @@ def test_get_runner():
     r"""Use get_runner to start a run."""
     namespace = "test_get_runner_%s" % str(uuid.uuid4)
     cr = runner.get_runner([ex_yamls['hello']['python']],
-                           namespace=namespace)
+                           namespace=namespace, validate=True)
     cr.run()
     cr.sleep()
 

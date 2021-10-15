@@ -93,9 +93,9 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
         super(TestFileOutputDriver, self).setup()
         self.send_file_contents()
         
-    # def run_before_stop(self):
-    #     r"""Commands to run while the instance is running."""
-    #     self.send_file_contents()
+    def run_before_stop(self):
+        r"""Commands to run while the instance is running."""
+        self.instance.wait(1.0)
 
     @property
     def contents_to_read(self):

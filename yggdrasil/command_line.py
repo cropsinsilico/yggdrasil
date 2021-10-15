@@ -7,7 +7,9 @@ import subprocess
 import argparse
 import pprint
 import shutil
-from yggdrasil.constants import LANGUAGES, LANGUAGES_WITH_ALIASES
+from yggdrasil import constants
+LANGUAGES = getattr(constants, 'LANGUAGES', {})
+LANGUAGES_WITH_ALIASES = getattr(constants, 'LANGUAGES_WITH_ALIASES', {})
 
 
 logger = logging.getLogger(__name__)
@@ -139,7 +141,7 @@ class SubCommand(metaclass=SubCommandMeta):
                 if isinstance(v_flag, list):
                     v.extend(v_flag)
                 if (len(v) == 0) or ('all' in v):
-                    setattr(args, k, LANGUAGES['all'])
+                    setattr(args, k, LANGUAGES.get('all', []))
                     args.all_languages = True
         return args
 
@@ -468,7 +470,7 @@ class ygginfo(SubCommand):
             description='Compilation tool types to get info about.',
             arguments=[
                 (('language', ),
-                 {'choices': LANGUAGES_WITH_ALIASES['compiled'],
+                 {'choices': LANGUAGES_WITH_ALIASES.get('compiled', []),
                   'type': str.lower,
                   'help': 'Language to get tool information for.'}),
                 (('--toolname', ),
@@ -878,7 +880,8 @@ class yggcc(SubCommand):
                    "R package.")}),
         (('--language', ),
          {'default': None,
-          'choices': [None] + LANGUAGES_WITH_ALIASES['compiled'] + ['R', 'r'],
+          'choices': ([None] + LANGUAGES_WITH_ALIASES.get('compiled', [])
+                      + ['R', 'r']),
           'help': ("Language of the source code. If not provided, "
                    "the language will be determined from the "
                    "source extension.")}),
@@ -921,8 +924,8 @@ class yggcompile(SubCommand):
     arguments = [
         (('language', ),
          {'nargs': '*', 'default': ['all'],
-          # 'choices': (['all'] + LANGUAGES_WITH_ALIASES['compiled']
-          #             + LANGUAGES_WITH_ALIASES['compiled_dsl']),
+          # 'choices': (['all'] + LANGUAGES_WITH_ALIASES.get('compiled', [])
+          #             + LANGUAGES_WITH_ALIASES.get('compiled_dsl', [])),
           'help': ("One or more languages to compile dependencies "
                    "for.")}),
         (('--toolname', ),
@@ -957,7 +960,7 @@ class yggclean(SubCommand):
     arguments = [
         (('language', ),
          {'nargs': '*', 'default': ['all'],
-          # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
+          # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
           'help': ("One or more languages to clean up dependencies "
                    "for.")})]
 
@@ -1098,12 +1101,12 @@ class update_config(SubCommand):
     arguments = (
         [(('languages', ),
           {'nargs': '*',
-           # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
+           # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
            'default': [],
            'help': 'One or more languages that should be configured.'}),
          (('--languages', ),
           {'nargs': '+', 'dest': 'languages_flag',
-           # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
+           # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
            'default': [],
            'help': 'One or more languages that should be configured.'}),
          (('--show-file', ),
@@ -1117,11 +1120,11 @@ class update_config(SubCommand):
            'help': 'Overwrite the existing file.'}),
          (('--disable-languages', ),
           {'nargs': '+', 'default': [],
-           'choices': LANGUAGES_WITH_ALIASES['all'],
+           'choices': LANGUAGES_WITH_ALIASES.get('all', []),
            'help': 'One or more languages that should be disabled.'}),
          (('--enable-languages', ),
           {'nargs': '+', 'default': [],
-           'choices': LANGUAGES_WITH_ALIASES['all'],
+           'choices': LANGUAGES_WITH_ALIASES.get('all', []),
            'help': 'One or more languages that should be enabled.'}),
          (('--quiet', '-q'),
           {'action': 'store_true',
@@ -1142,15 +1145,15 @@ class update_config(SubCommand):
         + [(('--%s-compiler' % k, ),
             {'help': ('Name or path to compiler that should be used to compile '
                       'models written in %s.' % k)})
-           for k in LANGUAGES['compiled']]
+           for k in LANGUAGES.get('compiled', [])]
         + [(('--%s-linker' % k, ),
             {'help': ('Name or path to linker that should be used to link '
                       'models written in %s.' % k)})
-           for k in LANGUAGES['compiled']]
+           for k in LANGUAGES.get('compiled', [])]
         + [(('--%s-archiver' % k, ),
             {'help': ('Name or path to archiver that should be used to create '
                       'static libraries for models written in %s.' % k)})
-           for k in LANGUAGES['compiled']]
+           for k in LANGUAGES.get('compiled', [])]
     )
     # TODO: Move these into the language directories?
     language_arguments = {
@@ -1211,7 +1214,7 @@ class update_config(SubCommand):
         if preargs.languages_flag:
             prelang += preargs.languages_flag
         if (len(prelang) == 0) or ('all' in prelang):
-            prelang = LANGUAGES['all']
+            prelang = LANGUAGES.get('all', [])
         # TODO: The languages could be subparsers
         for k, v in cls.language_arguments.items():
             if k in prelang:
@@ -1243,7 +1246,7 @@ class update_config(SubCommand):
                     lang_kwargs.setdefault(k, {})
                     lang_kwargs[k][name] = getattr(args, name)
         for x in ['compiler', 'linker', 'archiver']:
-            for k in LANGUAGES['compiled']:
+            for k in LANGUAGES.get('compiled', []):
                 if getattr(args, '%s_%s' % (k, x), None):
                     lang_kwargs.setdefault(k, {})
                     lang_kwargs[k][x] = getattr(args, '%s_%s' % (k, x))
@@ -1291,7 +1294,8 @@ class regen_schema(SubCommand):
                 os.remove(schema._schema_fname)
             schema.clear_schema()
             schema.init_schema()
-        schema.update_constants()
+        else:
+            schema.update_constants()
 
 
 class yggmodelform(SubCommand):

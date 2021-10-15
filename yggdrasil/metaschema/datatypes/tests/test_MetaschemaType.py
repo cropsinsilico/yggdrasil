@@ -3,7 +3,8 @@ import numpy as np
 import copy
 import pprint
 import jsonschema
-from yggdrasil.metaschema.datatypes import MetaschemaTypeError, YGG_MSG_HEAD
+from yggdrasil import constants
+from yggdrasil.metaschema import MetaschemaTypeError
 from yggdrasil.tests import YggTestClassInfo, assert_equal
 
 
@@ -301,7 +302,8 @@ class TestMetaschemaType(YggTestClassInfo):
         self.assert_result_equal(out[0], self.instance._empty_msg)
         self.assert_equal(out[1], dict(size=0, incomplete=False))
         # Empty metadata and message
-        out = self.instance.deserialize((2 * YGG_MSG_HEAD) + self._empty_msg)
+        out = self.instance.deserialize((2 * constants.YGG_MSG_HEAD)
+                                        + self._empty_msg)
         self.assert_result_equal(out[0], self.instance._empty_msg)
         self.assert_equal(out[1], dict(size=0, incomplete=False))
 

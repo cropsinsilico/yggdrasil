@@ -3,7 +3,8 @@ import copy
 import numpy as np
 from yggdrasil import tools, units
 from yggdrasil.tests import assert_equal
-from yggdrasil.components import import_component, create_component
+from yggdrasil.components import (
+    ComponentError, import_component, create_component)
 from yggdrasil.languages import get_language_ext
 from yggdrasil.examples import _example_dir
 from yggdrasil.examples.tests import ExampleTstBase
@@ -78,7 +79,7 @@ class TestExampleTransforms(ExampleTstBase):
         """
         try:
             t = create_component('transform', subtype=transform)
-        except ValueError:
+        except ComponentError:
             def t(x):
                 return x
         x_sent = t(cls.get_test_data(transform))

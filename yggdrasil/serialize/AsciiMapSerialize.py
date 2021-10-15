@@ -1,6 +1,5 @@
 import json
-from yggdrasil import tools
-from yggdrasil.serialize import _default_delimiter_str
+from yggdrasil import tools, constants
 from yggdrasil.serialize.SerializeBase import SerializeBase
 from yggdrasil.metaschema.encoder import JSONReadableEncoder
 
@@ -21,7 +20,7 @@ class AsciiMapSerialize(SerializeBase):
                                    'values.')
     _schema_properties = {
         'delimiter': {'type': 'string',
-                      'default': _default_delimiter_str}}
+                      'default': constants.DEFAULT_DELIMITER_STR}}
     _attr_conv = SerializeBase._attr_conv  # + ['delimiter']
     default_datatype = {'type': 'object'}
     concats_as_str = False
