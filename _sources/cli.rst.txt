@@ -9,7 +9,7 @@ Command Line Interface (CLI)
 *********************
 
 .. argparse::
-   :filename: /Users/langmm/yggdrasil/docs/source/cli.py
+   :filename: /home/runner/work/yggdrasil/yggdrasil/docs/source/cli.py
    :func: yggdrasil
    :prog: yggdrasil
 
@@ -28,7 +28,7 @@ Alias for ``yggdrasil compile``
 **********************
 
 .. argparse::
-   :filename: /Users/langmm/yggdrasil/docs/source/cli.py
+   :filename: /home/runner/work/yggdrasil/yggdrasil/docs/source/cli.py
    :func: yggccflags
    :prog: yggccflags
 
@@ -39,7 +39,7 @@ Alias for ``yggdrasil compile``
 *********************
 
 .. argparse::
-   :filename: /Users/langmm/yggdrasil/docs/source/cli.py
+   :filename: /home/runner/work/yggdrasil/yggdrasil/docs/source/cli.py
    :func: yggcctool
    :prog: yggcctool
 
@@ -106,7 +106,7 @@ Alias for ``yggdrasil install``
 **********************
 
 .. argparse::
-   :filename: /Users/langmm/yggdrasil/docs/source/cli.py
+   :filename: /home/runner/work/yggdrasil/yggdrasil/docs/source/cli.py
    :func: yggldflags
    :prog: yggldflags
 
@@ -117,7 +117,7 @@ Alias for ``yggdrasil install``
 *********************
 
 .. argparse::
-   :filename: /Users/langmm/yggdrasil/docs/source/cli.py
+   :filename: /home/runner/work/yggdrasil/yggdrasil/docs/source/cli.py
    :func: yggldtool
    :prog: yggldtool
 

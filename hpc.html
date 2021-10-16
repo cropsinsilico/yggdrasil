@@ -1,74 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>High Performance Computing (HPC) &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>High Performance Computing (HPC) &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Running Integrations as Services" href="remote.html" />
     <link rel="prev" title="Command Line Interface (CLI)" href="cli.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -76,19 +39,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
@@ -126,79 +78,38 @@
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>High Performance Computing (HPC)</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/hpc.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="high-performance-computing-hpc">
+             
+  <section id="high-performance-computing-hpc">
 <span id="hpc-rst"></span><h1>High Performance Computing (HPC)<a class="headerlink" href="#high-performance-computing-hpc" title="Permalink to this headline">¶</a></h1>
 <p>As of version 1.7, yggdrasil includes support for running integrations (networks of models) on High Performance Computing (HPC) clusters via MPI (either <a class="reference external" href="https://www.open-mpi.org/">OpenMPI</a> or <a class="reference external" href="https://www.mpich.org/">MPICH</a>) and <a class="reference external" href="https://mpi4py.readthedocs.io/en/stable/">mpi4py</a>. yggdrasil will distribute models in an integration evenly amongst the available processes and coordinate message passing between them.</p>
 <p>You can run a yggdrasil integration using MPI, by passing the usual <code class="docutils literal notranslate"><span class="pre">yggrun</span></code> command to <code class="docutils literal notranslate"><span class="pre">mpiexec/mpirun/srun</span></code> e.g.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mpiexec -n 2 yggrun model1.yml model2.yml
 </pre></div>
 </div>
-<div class="section" id="setup">
+<section id="setup">
 <h2>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h2>
 <p>To run an integration using yggdrasil, you must be able to install yggdrasil on the cluster. The existing packages and permissions of the cluster will determine how yggdrasil should be installed.</p>
 <ul>
@@ -219,8 +130,8 @@ $ bash miniconda.sh -b -p $HOME/miniconda export PATH=&quot;$HOME/miniconda/bin:
 </div>
 </li>
 </ul>
-</div>
-<div class="section" id="writing-the-job-script">
+</section>
+<section id="writing-the-job-script">
 <h2>Writing the Job Script<a class="headerlink" href="#writing-the-job-script" title="Permalink to this headline">¶</a></h2>
 <p>Many of the specifics of how you would set up your job script will depend on the scheduler used by the cluster you are targeting (e.g. SLURM, Torque), but there are some general tips:</p>
 <ul class="simple">
@@ -228,7 +139,7 @@ $ bash miniconda.sh -b -p $HOME/miniconda export PATH=&quot;$HOME/miniconda/bin:
 <li><p>Activate/load packages you will need that are provided by the cluster package manager (e.g. conda, Python, MPI).</p></li>
 <li><p>If you used conda to install yggdrasil, activate the environment that yggdrasil was installed in before calling <code class="docutils literal notranslate"><span class="pre">mpiexec/mpirun/srun</span></code>.</p></li>
 </ul>
-<div class="section" id="example-slurm-job-script">
+<section id="example-slurm-job-script">
 <h3>Example SLURM Job Script<a class="headerlink" href="#example-slurm-job-script" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-slurm notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="kp">#SBATCH --partition=general</span>
@@ -244,56 +155,39 @@ conda activate env_name
 mpiexec -np <span class="nv">$SLURM_NTASKS</span> yggrun model1.yml model2.yml &gt; output.txt
 </pre></div>
 </div>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="remote.html" class="btn btn-neutral float-right" title="Running Integrations as Services" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="cli.html" class="btn btn-neutral float-left" title="Command Line Interface (CLI)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="remote.html" class="btn btn-neutral float-right" title="Running Integrations as Services" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

@@ -1,74 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Server/Client I/O &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Server/Client I/O &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Autowrapping Model Functions" href="autowrap.html" />
     <link rel="prev" title="Formatted I/O" href="formatted_io.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -76,19 +39,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
@@ -126,72 +78,31 @@
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Server/Client I/O</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/server_client_io.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="server-client-i-o">
+             
+  <section id="server-client-i-o">
 <span id="server-client-io-rst"></span><h1>Server/Client I/O<a class="headerlink" href="#server-client-i-o" title="Permalink to this headline">¶</a></h1>
 <p>Often you will want to call one model from another like a functions. This
 would required sending the input variable(s) to the model being called and
@@ -199,7 +110,7 @@ then sending the output variables(s) back to the calling model. We refer to
 this as a Remote Procedure Call (RPC). The model being called can be considered
 a server providing its calculations as a service to the client (the calling model).
 The yggdrasil provides options for treating models as server and clients.</p>
-<div class="section" id="one-server-one-client">
+<section id="one-server-one-client">
 <h2>One Server, One Client<a class="headerlink" href="#one-server-one-client" title="Permalink to this headline">¶</a></h2>
 <p>In the example below, the “server” model computes the nth number in the
 Fibonacci sequence and the “client” model calls the server to get a certain
@@ -207,230 +118,121 @@ portion of the Fibonacci sequences and then writes it to a log. The server
 will continue processing requests until all clients connected to it have
 disconnected.</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggRpcServer</span>
-
-
-<span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        n (int): Index of the Fibonacci number in the Fibonacci sequence that</span>
-<span class="sd">            should be returned.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        int: The nth Fibonacci number.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">pprev</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">prev</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">fib_no</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">while</span> <span class="n">fib_no</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">prev</span> <span class="o">+</span> <span class="n">pprev</span>
-        <span class="n">pprev</span> <span class="o">=</span> <span class="n">prev</span>
-        <span class="n">prev</span> <span class="o">=</span> <span class="n">result</span>
-        <span class="n">fib_no</span> <span class="o">=</span> <span class="n">fib_no</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">result</span>
-
-
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
-
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
-
-    <span class="c1"># Get parameters</span>
-    <span class="n">inp</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">)</span>
-    <span class="n">retval</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">inp</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server(P): ERROR receiving parameters&#39;</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server(P): Parameters = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">params</span><span class="p">)</span>
-
-    <span class="c1"># Create server-side rpc conneciton using model name</span>
-    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="c1"># Continue receiving requests until the connection is closed when all</span>
-    <span class="c1"># clients have disconnected.</span>
-    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server(P): receiving...&#39;</span><span class="p">)</span>
-        <span class="n">retval</span><span class="p">,</span> <span class="n">rpc_in</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server(P): end of input&#39;</span><span class="p">)</span>
-            <span class="k">break</span>
-
-        <span class="c1"># Compute fibonacci number</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">rpc_in</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server(P): Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server(P): Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
-
-        <span class="c1"># Send response back</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server(P): ERROR sending&#39;</span><span class="p">)</span>
-
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
-
-    
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">main</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggRpcServer</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<span class="linenos"> 6</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span><span class="sd">    Args:</span>
+<span class="linenos"> 9</span><span class="sd">        n (int): Index of the Fibonacci number in the Fibonacci sequence that</span>
+<span class="linenos">10</span><span class="sd">            should be returned.</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span><span class="sd">    Returns:</span>
+<span class="linenos">13</span><span class="sd">        int: The nth Fibonacci number.</span>
+<span class="linenos">14</span>
+<span class="linenos">15</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">16</span>    <span class="n">pprev</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="linenos">17</span>    <span class="n">prev</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="linenos">18</span>    <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="linenos">19</span>    <span class="n">fib_no</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="linenos">20</span>    <span class="k">while</span> <span class="n">fib_no</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+<span class="linenos">21</span>        <span class="n">result</span> <span class="o">=</span> <span class="n">prev</span> <span class="o">+</span> <span class="n">pprev</span>
+<span class="linenos">22</span>        <span class="n">pprev</span> <span class="o">=</span> <span class="n">prev</span>
+<span class="linenos">23</span>        <span class="n">prev</span> <span class="o">=</span> <span class="n">result</span>
+<span class="linenos">24</span>        <span class="n">fib_no</span> <span class="o">=</span> <span class="n">fib_no</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="linenos">25</span>    <span class="k">return</span> <span class="n">result</span>
+<span class="linenos">26</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="linenos">29</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
+<span class="linenos">32</span>
+<span class="linenos">33</span>    <span class="c1"># Get parameters</span>
+<span class="linenos">34</span>    <span class="n">inp</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">)</span>
+<span class="linenos">35</span>    <span class="n">retval</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">inp</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="linenos">36</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
+<span class="linenos">37</span>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server(P): ERROR receiving parameters&#39;</span><span class="p">)</span>
+<span class="linenos">38</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server(P): Parameters = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">params</span><span class="p">)</span>
+<span class="linenos">39</span>
+<span class="linenos">40</span>    <span class="c1"># Create server-side rpc conneciton using model name</span>
+<span class="linenos">41</span>    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">42</span>
+<span class="linenos">43</span>    <span class="c1"># Continue receiving requests until the connection is closed when all</span>
+<span class="linenos">44</span>    <span class="c1"># clients have disconnected.</span>
+<span class="linenos">45</span>    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+<span class="linenos">46</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server(P): receiving...&#39;</span><span class="p">)</span>
+<span class="linenos">47</span>        <span class="n">retval</span><span class="p">,</span> <span class="n">rpc_in</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="linenos">48</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
+<span class="linenos">49</span>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server(P): end of input&#39;</span><span class="p">)</span>
+<span class="linenos">50</span>            <span class="k">break</span>
+<span class="linenos">51</span>
+<span class="linenos">52</span>        <span class="c1"># Compute fibonacci number</span>
+<span class="linenos">53</span>        <span class="n">n</span> <span class="o">=</span> <span class="n">rpc_in</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="linenos">54</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server(P): Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+<span class="linenos">55</span>        <span class="n">result</span> <span class="o">=</span> <span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="linenos">56</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server(P): Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+<span class="linenos">57</span>
+<span class="linenos">58</span>        <span class="c1"># Send response back</span>
+<span class="linenos">59</span>        <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+<span class="linenos">60</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+<span class="linenos">61</span>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server(P): ERROR sending&#39;</span><span class="p">)</span>
+<span class="linenos">62</span>
+<span class="linenos">63</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
+<span class="linenos">64</span>
+<span class="linenos">65</span>    
+<span class="linenos">66</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="linenos">67</span>    <span class="n">main</span><span class="p">()</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">YggRpcClient</span><span class="p">,</span> <span class="n">YggOutput</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute client communication with server that computes</span>
-<span class="sd">    numbers in the Fibonacci sequence.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        iterations (int): The number of Fibonacci numbers to log.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python client: iterations = </span><span class="si">%d</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">iterations</span><span class="p">)</span>
-
-    <span class="c1"># Set up connections matching yaml</span>
-    <span class="c1"># RPC client-side connection will be $(server_name)_$(client_name)</span>
-    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcClient</span><span class="p">(</span><span class="s2">&quot;server_client&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">log</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s2">&quot;output_log&quot;</span><span class="p">,</span> <span class="s1">&#39;fib(</span><span class="si">%-2d</span><span class="s1">) = </span><span class="si">%-2d</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-
-    <span class="c1"># Iterate over Fibonacci sequence</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-        
-        <span class="c1"># Call the server and receive response</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client(Python): Calling fib(</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
-        <span class="n">ret</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;client(Python): RPC CALL ERROR&#39;</span><span class="p">)</span>
-        <span class="n">fib</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client(Python): Response fib(</span><span class="si">%d</span><span class="s1">) = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">))</span>
-
-        <span class="c1"># Log result by sending it to the log connection</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">fib</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;client(Python): SEND ERROR&#39;</span><span class="p">)</span>
-
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python client&#39;</span><span class="p">)</span>
-
-    
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="c1"># Take number of iterations from the first argument</span>
-    <span class="n">main</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="linenos"> 2</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="linenos"> 4</span>    <span class="n">YggRpcClient</span><span class="p">,</span> <span class="n">YggOutput</span><span class="p">)</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
+<span class="linenos"> 8</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute client communication with server that computes</span>
+<span class="linenos"> 9</span><span class="sd">    numbers in the Fibonacci sequence.</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span><span class="sd">    Args:</span>
+<span class="linenos">12</span><span class="sd">        iterations (int): The number of Fibonacci numbers to log.</span>
+<span class="linenos">13</span>
+<span class="linenos">14</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python client: iterations = </span><span class="si">%d</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">iterations</span><span class="p">)</span>
+<span class="linenos">17</span>
+<span class="linenos">18</span>    <span class="c1"># Set up connections matching yaml</span>
+<span class="linenos">19</span>    <span class="c1"># RPC client-side connection will be $(server_name)_$(client_name)</span>
+<span class="linenos">20</span>    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcClient</span><span class="p">(</span><span class="s2">&quot;server_client&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">21</span>    <span class="n">log</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s2">&quot;output_log&quot;</span><span class="p">,</span> <span class="s1">&#39;fib(</span><span class="si">%-2d</span><span class="s1">) = </span><span class="si">%-2d</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos">22</span>
+<span class="linenos">23</span>    <span class="c1"># Iterate over Fibonacci sequence</span>
+<span class="linenos">24</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+<span class="linenos">25</span>        
+<span class="linenos">26</span>        <span class="c1"># Call the server and receive response</span>
+<span class="linenos">27</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;client(Python): Calling fib(</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+<span class="linenos">28</span>        <span class="n">ret</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="linenos">29</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+<span class="linenos">30</span>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;client(Python): RPC CALL ERROR&#39;</span><span class="p">)</span>
+<span class="linenos">31</span>        <span class="n">fib</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="linenos">32</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;client(Python): Response fib(</span><span class="si">%d</span><span class="s1">) = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">))</span>
+<span class="linenos">33</span>
+<span class="linenos">34</span>        <span class="c1"># Log result by sending it to the log connection</span>
+<span class="linenos">35</span>        <span class="n">ret</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">fib</span><span class="p">)</span>
+<span class="linenos">36</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+<span class="linenos">37</span>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;client(Python): SEND ERROR&#39;</span><span class="p">)</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python client&#39;</span><span class="p">)</span>
+<span class="linenos">40</span>
+<span class="linenos">41</span>    
+<span class="linenos">42</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="linenos">43</span>    <span class="c1"># Take number of iterations from the first argument</span>
+<span class="linenos">44</span>    <span class="n">main</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/rpc_lesson1.html">Example in other languages</a>)</p>
 <p>The interface server-side API call (YggRpcServer for Python),
 requires 3 input variables: the name of the server channel (this will be
@@ -448,70 +250,45 @@ as a server and requires a set of RPC channels. In the client model YAML,
 the key/value pair <code class="docutils literal notranslate"><span class="pre">client_of:</span> <span class="pre">&lt;server_model_name&gt;</span></code> is required to indicate
 that the model will act as a client of the <code class="docutils literal notranslate"><span class="pre">&lt;server_model_name&gt;</span></code> model.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
-
-<span class="nt">model</span><span class="p">:</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
-  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
-  <span class="nt">inputs</span><span class="p">:</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">params</span>
-    <span class="nt">default_file</span><span class="p">:</span>
-      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/server_params.txt</span>
-      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="linenos"> 5</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 6</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
+<span class="linenos"> 7</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
+<span class="linenos"> 8</span>  <span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 9</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">params</span>
+<span class="linenos">10</span>    <span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">11</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/server_params.txt</span>
+<span class="linenos">12</span>      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
-
-<span class="nt">model</span><span class="p">:</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
-  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-  <span class="nt">args</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3</span>  <span class="c1"># Pass the number of iterations that should be performed</span>
-  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
-  <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log</span>
-  <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client_output.txt</span>
-  <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+</div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
+<span class="linenos"> 5</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 6</span>  <span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3</span>  <span class="c1"># Pass the number of iterations that should be performed</span>
+<span class="linenos"> 9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+<span class="linenos">10</span>  <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">13</span>  <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log</span>
+<span class="linenos">14</span>  <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client_output.txt</span>
+<span class="linenos">15</span>  <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/rpc_lesson1.html">Example in other languages</a>)</p>
 <p>In addition to the RPC API call, the example server also has an input <code class="docutils literal notranslate"><span class="pre">params</span></code>.
 Models acting as servers can have as many inputs/outputs as desired in addition to
 the RPC connections. While the example input is not used to modify the output
 in this example, such a comm could be used to initialize a model with
 parameters and/or initial conditions.</p>
-</div>
-<div class="section" id="using-existing-inputs-outputs">
+</section>
+<section id="using-existing-inputs-outputs">
 <h2>Using Existing Inputs/Outputs<a class="headerlink" href="#using-existing-inputs-outputs" title="Permalink to this headline">¶</a></h2>
 <p>Models that have already been integrated via yggdrasil can also be turned
 into servers without modifying the code. Instead of passing a boolean to
@@ -524,8 +301,8 @@ interface comm.</p>
 <p class="admonition-title">Todo</p>
 <p>Example source code and YAML of server replacing an existing input/output</p>
 </div>
-</div>
-<div class="section" id="one-server-two-clients">
+</section>
+<section id="one-server-two-clients">
 <h2>One Server, Two Clients<a class="headerlink" href="#one-server-two-clients" title="Permalink to this headline">¶</a></h2>
 <p>There is no limit on the number of clients that can connect to a single
 server. In the example below, the server is the same as above. The client
@@ -533,421 +310,234 @@ code is also essentially the same except that it has been modified to take
 a <code class="docutils literal notranslate"><span class="pre">client_index</span></code> variable that provides information to differentiates
 between two clients using the same source code.</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggRpcServer</span>
-
-
-<span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        n (int): Index of the Fibonacci number in the Fibonacci sequence that</span>
-<span class="sd">            should be returned.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        int: The nth Fibonacci number.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">pprev</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">prev</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">fib_no</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">while</span> <span class="n">fib_no</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">prev</span> <span class="o">+</span> <span class="n">pprev</span>
-        <span class="n">pprev</span> <span class="o">=</span> <span class="n">prev</span>
-        <span class="n">prev</span> <span class="o">=</span> <span class="n">result</span>
-        <span class="n">fib_no</span> <span class="o">=</span> <span class="n">fib_no</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">result</span>
-
-
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
-
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
-
-    <span class="c1"># Get parameters</span>
-    <span class="n">inp</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">)</span>
-    <span class="n">retval</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">inp</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server: ERROR receiving parameters&#39;</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Parameters = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">params</span><span class="p">)</span>
-
-    <span class="c1"># Create server-side rpc conneciton using model name</span>
-    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="c1"># Continue receiving requests until the connection is closed when all</span>
-    <span class="c1"># clients have disconnected.</span>
-    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
-        <span class="n">retval</span><span class="p">,</span> <span class="n">rpc_in</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
-            <span class="k">break</span>
-
-        <span class="c1"># Compute fibonacci number</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">rpc_in</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
-
-        <span class="c1"># Send response back</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
-
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
-
-    
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">main</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggRpcServer</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<span class="linenos"> 6</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span><span class="sd">    Args:</span>
+<span class="linenos"> 9</span><span class="sd">        n (int): Index of the Fibonacci number in the Fibonacci sequence that</span>
+<span class="linenos">10</span><span class="sd">            should be returned.</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span><span class="sd">    Returns:</span>
+<span class="linenos">13</span><span class="sd">        int: The nth Fibonacci number.</span>
+<span class="linenos">14</span>
+<span class="linenos">15</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">16</span>    <span class="n">pprev</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="linenos">17</span>    <span class="n">prev</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="linenos">18</span>    <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="linenos">19</span>    <span class="n">fib_no</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="linenos">20</span>    <span class="k">while</span> <span class="n">fib_no</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+<span class="linenos">21</span>        <span class="n">result</span> <span class="o">=</span> <span class="n">prev</span> <span class="o">+</span> <span class="n">pprev</span>
+<span class="linenos">22</span>        <span class="n">pprev</span> <span class="o">=</span> <span class="n">prev</span>
+<span class="linenos">23</span>        <span class="n">prev</span> <span class="o">=</span> <span class="n">result</span>
+<span class="linenos">24</span>        <span class="n">fib_no</span> <span class="o">=</span> <span class="n">fib_no</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="linenos">25</span>    <span class="k">return</span> <span class="n">result</span>
+<span class="linenos">26</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="linenos">29</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
+<span class="linenos">32</span>
+<span class="linenos">33</span>    <span class="c1"># Get parameters</span>
+<span class="linenos">34</span>    <span class="n">inp</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">)</span>
+<span class="linenos">35</span>    <span class="n">retval</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">inp</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="linenos">36</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
+<span class="linenos">37</span>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server: ERROR receiving parameters&#39;</span><span class="p">)</span>
+<span class="linenos">38</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Parameters = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">params</span><span class="p">)</span>
+<span class="linenos">39</span>
+<span class="linenos">40</span>    <span class="c1"># Create server-side rpc conneciton using model name</span>
+<span class="linenos">41</span>    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">42</span>
+<span class="linenos">43</span>    <span class="c1"># Continue receiving requests until the connection is closed when all</span>
+<span class="linenos">44</span>    <span class="c1"># clients have disconnected.</span>
+<span class="linenos">45</span>    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+<span class="linenos">46</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
+<span class="linenos">47</span>        <span class="n">retval</span><span class="p">,</span> <span class="n">rpc_in</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="linenos">48</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
+<span class="linenos">49</span>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
+<span class="linenos">50</span>            <span class="k">break</span>
+<span class="linenos">51</span>
+<span class="linenos">52</span>        <span class="c1"># Compute fibonacci number</span>
+<span class="linenos">53</span>        <span class="n">n</span> <span class="o">=</span> <span class="n">rpc_in</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="linenos">54</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+<span class="linenos">55</span>        <span class="n">result</span> <span class="o">=</span> <span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="linenos">56</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+<span class="linenos">57</span>
+<span class="linenos">58</span>        <span class="c1"># Send response back</span>
+<span class="linenos">59</span>        <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+<span class="linenos">60</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+<span class="linenos">61</span>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
+<span class="linenos">62</span>
+<span class="linenos">63</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
+<span class="linenos">64</span>
+<span class="linenos">65</span>    
+<span class="linenos">66</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="linenos">67</span>    <span class="n">main</span><span class="p">()</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">YggRpcClient</span><span class="p">,</span> <span class="n">YggOutput</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">client_index</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute client communication with server that computes</span>
-<span class="sd">    numbers in the Fibonacci sequence.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        iterations (int): The number of Fibonacci numbers to log.</span>
-<span class="sd">        client_index (int): Index of the client in total list of clients.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python client</span><span class="si">%d</span><span class="s1">: iterations = </span><span class="si">%d</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">client_index</span><span class="p">,</span>
-                                                            <span class="n">iterations</span><span class="p">))</span>
-
-    <span class="c1"># Set up connections matching yaml</span>
-    <span class="c1"># RPC client-side connection will be $(server_name)_$(client_name)</span>
-    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcClient</span><span class="p">(</span><span class="s2">&quot;server_client</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">log</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s2">&quot;output_log</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">,</span> <span class="s1">&#39;fib(</span><span class="si">%-2d</span><span class="s1">) = </span><span class="si">%-2d</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-
-    <span class="c1"># Iterate over Fibonacci sequence</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-        
-        <span class="c1"># Call the server and receive response</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): Calling fib(</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">client_index</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
-        <span class="n">ret</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): RPC CALL ERROR&#39;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">)</span>
-        <span class="n">fib</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): Response fib(</span><span class="si">%d</span><span class="s1">) = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">client_index</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">))</span>
-
-        <span class="c1"># Log result by sending it to the log connection</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">fib</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): SEND ERROR&#39;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">)</span>
-
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python client</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">)</span>
-
-    
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="c1"># Take number of iterations from the first argument and the</span>
-    <span class="c1"># client index from the second</span>
-    <span class="n">main</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="linenos"> 2</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="linenos"> 4</span>    <span class="n">YggRpcClient</span><span class="p">,</span> <span class="n">YggOutput</span><span class="p">)</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">client_index</span><span class="p">):</span>
+<span class="linenos"> 8</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute client communication with server that computes</span>
+<span class="linenos"> 9</span><span class="sd">    numbers in the Fibonacci sequence.</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span><span class="sd">    Args:</span>
+<span class="linenos">12</span><span class="sd">        iterations (int): The number of Fibonacci numbers to log.</span>
+<span class="linenos">13</span><span class="sd">        client_index (int): Index of the client in total list of clients.</span>
+<span class="linenos">14</span>
+<span class="linenos">15</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python client</span><span class="si">%d</span><span class="s1">: iterations = </span><span class="si">%d</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">client_index</span><span class="p">,</span>
+<span class="linenos">18</span>                                                            <span class="n">iterations</span><span class="p">))</span>
+<span class="linenos">19</span>
+<span class="linenos">20</span>    <span class="c1"># Set up connections matching yaml</span>
+<span class="linenos">21</span>    <span class="c1"># RPC client-side connection will be $(server_name)_$(client_name)</span>
+<span class="linenos">22</span>    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcClient</span><span class="p">(</span><span class="s2">&quot;server_client</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">23</span>    <span class="n">log</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s2">&quot;output_log</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">,</span> <span class="s1">&#39;fib(</span><span class="si">%-2d</span><span class="s1">) = </span><span class="si">%-2d</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos">24</span>
+<span class="linenos">25</span>    <span class="c1"># Iterate over Fibonacci sequence</span>
+<span class="linenos">26</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+<span class="linenos">27</span>        
+<span class="linenos">28</span>        <span class="c1"># Call the server and receive response</span>
+<span class="linenos">29</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): Calling fib(</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">client_index</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+<span class="linenos">30</span>        <span class="n">ret</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="linenos">31</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+<span class="linenos">32</span>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): RPC CALL ERROR&#39;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">)</span>
+<span class="linenos">33</span>        <span class="n">fib</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="linenos">34</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): Response fib(</span><span class="si">%d</span><span class="s1">) = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">client_index</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">))</span>
+<span class="linenos">35</span>
+<span class="linenos">36</span>        <span class="c1"># Log result by sending it to the log connection</span>
+<span class="linenos">37</span>        <span class="n">ret</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">fib</span><span class="p">)</span>
+<span class="linenos">38</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+<span class="linenos">39</span>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): SEND ERROR&#39;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">)</span>
+<span class="linenos">40</span>
+<span class="linenos">41</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python client</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">)</span>
+<span class="linenos">42</span>
+<span class="linenos">43</span>    
+<span class="linenos">44</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="linenos">45</span>    <span class="c1"># Take number of iterations from the first argument and the</span>
+<span class="linenos">46</span>    <span class="c1"># client index from the second</span>
+<span class="linenos">47</span>    <span class="n">main</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/rpc_lesson2.html">Example in other languages</a>)</p>
 <p>The server YAML is the same as above. The client YAML now has entries for
 two models which are both clients of the server model and call the same
 source code.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
-
-<span class="nt">model</span><span class="p">:</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
-  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
-  <span class="nt">inputs</span><span class="p">:</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">params</span>
-    <span class="nt">default_file</span><span class="p">:</span>
-      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/server_params.txt</span>
-      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="linenos"> 5</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 6</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
+<span class="linenos"> 7</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
+<span class="linenos"> 8</span>  <span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 9</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">params</span>
+<span class="linenos">10</span>    <span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">11</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/server_params.txt</span>
+<span class="linenos">12</span>      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
-
-<span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client1</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-    <span class="nt">args</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3</span>  <span class="c1"># Pass the number of iterations that should be performed</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">1</span>  <span class="c1"># Pass index of the client</span>
-    <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log1</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client2</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-    <span class="nt">args</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">5</span>  <span class="c1"># Pass the number of iterations that should be performed</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">2</span>  <span class="c1"># Pass index of the client</span>
-    <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log2</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log1</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client_output1.txt</span>
-    <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log2</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client_output2.txt</span>
-    <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+</div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 4</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client1</span>
+<span class="linenos"> 5</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 6</span>    <span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+<span class="linenos"> 8</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3</span>  <span class="c1"># Pass the number of iterations that should be performed</span>
+<span class="linenos"> 9</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">1</span>  <span class="c1"># Pass index of the client</span>
+<span class="linenos">10</span>    <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+<span class="linenos">11</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log1</span>
+<span class="linenos">12</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client2</span>
+<span class="linenos">13</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos">14</span>    <span class="nt">args</span><span class="p">:</span>
+<span class="linenos">15</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+<span class="linenos">16</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">5</span>  <span class="c1"># Pass the number of iterations that should be performed</span>
+<span class="linenos">17</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">2</span>  <span class="c1"># Pass index of the client</span>
+<span class="linenos">18</span>    <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+<span class="linenos">19</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log2</span>
+<span class="linenos">20</span>
+<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">22</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log1</span>
+<span class="linenos">23</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client_output1.txt</span>
+<span class="linenos">24</span>    <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">25</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log2</span>
+<span class="linenos">26</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client_output2.txt</span>
+<span class="linenos">27</span>    <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/rpc_lesson2.html">Example in other languages</a>)</p>
 <p>During runtime, request messages from both clients will be routed to the
 server model which will process the requests in the order they are received.</p>
-</div>
-<div class="section" id="two-servers-two-clients">
+</section>
+<section id="two-servers-two-clients">
 <h2>Two Servers, Two Clients<a class="headerlink" href="#two-servers-two-clients" title="Permalink to this headline">¶</a></h2>
 <p>There is also no limit on the number of copies of a server model that can be
 used to responsd to RPC requests from the clients. In the example below, the
 server and clients are the same as above, but 2 copies of the server model
 are run as specified by the model <code class="docutils literal notranslate"><span class="pre">copies</span></code> parameter in the server YAML.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
-
-<span class="nt">model</span><span class="p">:</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
-  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
-  <span class="nt">copies</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
-  <span class="nt">inputs</span><span class="p">:</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">params</span>
-    <span class="nt">default_file</span><span class="p">:</span>
-      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/server_params.txt</span>
-      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="linenos"> 5</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 6</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
+<span class="linenos"> 7</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
+<span class="linenos"> 8</span>  <span class="nt">copies</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="linenos"> 9</span>  <span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos">10</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">params</span>
+<span class="linenos">11</span>    <span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">12</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/server_params.txt</span>
+<span class="linenos">13</span>      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
-
-<span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client1</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-    <span class="nt">args</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3</span>  <span class="c1"># Pass the number of iterations that should be performed</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">1</span>  <span class="c1"># Pass index of the client</span>
-    <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log1</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client2</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-    <span class="nt">args</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">5</span>  <span class="c1"># Pass the number of iterations that should be performed</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">2</span>  <span class="c1"># Pass index of the client</span>
-    <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log2</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log1</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client_output1.txt</span>
-    <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log2</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client_output2.txt</span>
-    <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+</div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 4</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client1</span>
+<span class="linenos"> 5</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 6</span>    <span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+<span class="linenos"> 8</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3</span>  <span class="c1"># Pass the number of iterations that should be performed</span>
+<span class="linenos"> 9</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">1</span>  <span class="c1"># Pass index of the client</span>
+<span class="linenos">10</span>    <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+<span class="linenos">11</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log1</span>
+<span class="linenos">12</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client2</span>
+<span class="linenos">13</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos">14</span>    <span class="nt">args</span><span class="p">:</span>
+<span class="linenos">15</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+<span class="linenos">16</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">5</span>  <span class="c1"># Pass the number of iterations that should be performed</span>
+<span class="linenos">17</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">2</span>  <span class="c1"># Pass index of the client</span>
+<span class="linenos">18</span>    <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+<span class="linenos">19</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log2</span>
+<span class="linenos">20</span>
+<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">22</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log1</span>
+<span class="linenos">23</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client_output1.txt</span>
+<span class="linenos">24</span>    <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">25</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log2</span>
+<span class="linenos">26</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client_output2.txt</span>
+<span class="linenos">27</span>    <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/rpc_lesson2b.html">Example in other languages</a>)</p>
 <p>This allow client requests to be returned twice as fast, but precludes any
 use of an internal state by the server model as there is no way for a client
 to be sure that the same server model is responding to its requests and only
 its requests.</p>
-</div>
-<div class="section" id="wrapped-function-server">
+</section>
+<section id="wrapped-function-server">
 <h2>Wrapped Function Server<a class="headerlink" href="#wrapped-function-server" title="Permalink to this headline">¶</a></h2>
 <p>Models that are created by letting yggdrasil automatically
 <a class="reference internal" href="autowrap.html#autowrap-rst"><span class="std std-ref">wrap a function</span></a> can also act as servers and/or clients.
@@ -964,92 +554,57 @@ done by framing RPC client interface initialization calls with the
 <code class="docutils literal notranslate"><span class="pre">WITH_GLOBAL_SCOPE</span></code> macro (see the language specific versions of this
 example for specifics).</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;server(Python): </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
-    <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
-    <span class="k">return</span> <span class="n">out_buf</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;server(Python): </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
+<span class="linenos">3</span>    <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
+<span class="linenos">4</span>    <span class="k">return</span> <span class="n">out_buf</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">yggdrasil.languages.Python.YggInterface</span> <span class="kn">import</span> <span class="n">YggRpcClient</span>
-
-
-<span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
-    <span class="c1"># The global_scope keyword is required to ensure that the comm persists</span>
-    <span class="c1"># between function calls</span>
-    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcClient</span><span class="p">(</span><span class="s1">&#39;server_client&#39;</span><span class="p">,</span> <span class="n">global_scope</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;client(Python): </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
-    <span class="n">ret</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">in_buf</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;client(Python): RPC CALL ERROR&#39;</span><span class="p">)</span>
-    <span class="n">out_buf</span> <span class="o">=</span> <span class="n">result</span>
-    <span class="k">return</span> <span class="n">out_buf</span>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">yggdrasil.languages.Python.YggInterface</span> <span class="kn">import</span> <span class="n">YggRpcClient</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
+<span class="linenos"> 5</span>    <span class="c1"># The global_scope keyword is required to ensure that the comm persists</span>
+<span class="linenos"> 6</span>    <span class="c1"># between function calls</span>
+<span class="linenos"> 7</span>    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcClient</span><span class="p">(</span><span class="s1">&#39;server_client&#39;</span><span class="p">,</span> <span class="n">global_scope</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos"> 8</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;client(Python): </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
+<span class="linenos"> 9</span>    <span class="n">ret</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">in_buf</span><span class="p">)</span>
+<span class="linenos">10</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+<span class="linenos">11</span>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;client(Python): RPC CALL ERROR&#39;</span><span class="p">)</span>
+<span class="linenos">12</span>    <span class="n">out_buf</span> <span class="o">=</span> <span class="n">result</span>
+<span class="linenos">13</span>    <span class="k">return</span> <span class="n">out_buf</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/rpc_lesson3.html">Example in other languages</a>)</p>
 <p>The RPC connection between the server and the client is controlled by the
 same <code class="docutils literal notranslate"><span class="pre">is_server</span></code> and <code class="docutils literal notranslate"><span class="pre">client_of</span></code> YAML parameters as before.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
-  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos">2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="linenos">3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos">4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
+<span class="linenos">5</span>  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+<span class="linenos">6</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
-  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
-  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-  <span class="nt">inputs</span><span class="p">:</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
-    <span class="nt">default_file</span><span class="p">:</span>
-      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
-      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
-  <span class="nt">outputs</span><span class="p">:</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
-    <span class="nt">default_file</span><span class="p">:</span>
-      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
-      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
+<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+<span class="linenos"> 5</span>  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+<span class="linenos"> 6</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="linenos"> 7</span>  <span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 8</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
+<span class="linenos"> 9</span>    <span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">10</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+<span class="linenos">11</span>      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
+<span class="linenos">12</span>  <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">13</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
+<span class="linenos">14</span>    <span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">15</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
+<span class="linenos">16</span>      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/rpc_lesson3.html">Example in other languages</a>)</p>
 <p>By default, all inputs to a wrapped server function will be used in
 the RPC call. However if only some of the inputs should be passed in by the
@@ -1057,55 +612,38 @@ RPC calls, they can be specified explicitly by providing the <code class="docuti
 parameter with a map that contains <code class="docutils literal notranslate"><span class="pre">input</span></code> and <code class="docutils literal notranslate"><span class="pre">output</span></code> parameters that
 map to the names of function input/output variables (as in the case of
 using existing input/output channels above).</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="autowrap.html" class="btn btn-neutral float-right" title="Autowrapping Model Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="formatted_io.html" class="btn btn-neutral float-left" title="Formatted I/O" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="autowrap.html" class="btn btn-neutral float-right" title="Autowrapping Model Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

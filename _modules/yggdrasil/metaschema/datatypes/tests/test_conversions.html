@@ -1,72 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.metaschema.datatypes.tests.test_conversions &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.metaschema.datatypes.tests.test_conversions &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
         <script src="../../../../../_static/jquery.js"></script>
         <script src="../../../../../_static/underscore.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
-
-    
+    <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../../../../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -74,19 +36,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../install.html">Installation</a></li>
@@ -117,80 +68,36 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../../../../index.html">Module code</a> &raquo;</li>
-        
-          <li><a href="../../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
           <li><a href="../../../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
-        
           <li><a href="../../datatypes.html">yggdrasil.metaschema.datatypes</a> &raquo;</li>
-        
           <li><a href="../tests.html">yggdrasil.metaschema.datatypes.tests</a> &raquo;</li>
-        
       <li>yggdrasil.metaschema.datatypes.tests.test_conversions</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for yggdrasil.metaschema.datatypes.tests.test_conversions</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">assert_raises</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">conversions</span>
+<span></span><span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">assert_raises</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">conversions</span>
 
 
 <div class="viewcode-block" id="test_register_conversion_errors"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_conversions.test_register_conversion_errors">[docs]</a><span class="k">def</span> <span class="nf">test_register_conversion_errors</span><span class="p">():</span>
@@ -201,9 +108,9 @@
 
 <div class="viewcode-block" id="test_ply2obj"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_conversions.test_ply2obj">[docs]</a><span class="k">def</span> <span class="nf">test_ply2obj</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion between ply and obj objects.&quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="p">(</span>
         <span class="n">ObjMetaschemaType</span><span class="p">,</span> <span class="n">PlyMetaschemaType</span><span class="p">)</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.tests</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.tests</span> <span class="kn">import</span> <span class="p">(</span>
         <span class="n">test_ObjMetaschemaType</span><span class="p">,</span> <span class="n">test_PlyMetaschemaType</span><span class="p">)</span>
     <span class="n">obj_class</span> <span class="o">=</span> <span class="n">ObjMetaschemaType</span><span class="o">.</span><span class="n">ObjMetaschemaType</span>
     <span class="n">ply_class</span> <span class="o">=</span> <span class="n">PlyMetaschemaType</span><span class="o">.</span><span class="n">PlyMetaschemaType</span>
@@ -222,46 +129,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

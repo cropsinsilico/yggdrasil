@@ -4,7 +4,6 @@
     "type": "object",
     "definitions": {
         "comm": {
-            "description": "Base schema for all subtypes of comm components.",
             "additionalProperties": false,
             "dependencies": {
                 "driver": [
@@ -12,31 +11,23 @@
                 ]
             },
             "properties": {
-                "commtype": {
-                    "default": "default",
-                    "description": "Communication mechanism that should be used.",
-                    "enum": [
-                        "buffer",
-                        "default",
-                        "ipc",
-                        "mpi",
-                        "rest",
-                        "rmq",
-                        "rmq_async",
-                        "value",
-                        "zmq"
-                    ],
-                    "type": "string"
-                },
                 "datatype": {
                     "$ref": "#/definitions/schema"
                 },
                 "default_file": {
-                    "$ref": "#/definitions/file"
+                    "$ref": "#/definitions/file",
+                    "description": "Comm information for a file that input should be drawn from (for input comms) or that output should be sent to (for output comms) in the event that a yaml does not pair the comm with another model comm or a file."
                 },
                 "default_value": {
                     "description": "Value that should be returned in the event that a yaml does not pair the comm with another model comm or a file.",
-                    "type": "any"
+                    "type": [
+                        "number",
+                        "string",
+                        "boolean",
+                        "object",
+                        "array",
+                        "null"
+                    ]
                 },
                 "filter": {
                     "$ref": "#/definitions/filter",
@@ -48,7 +39,8 @@
                 },
                 "name": {
                     "description": "Name used for component in log messages.",
-                    "type": "string"
+                    "type": "string",
+                    "propertyOrder": 0
                 },
                 "outside_loop": {
                     "default": false,
@@ -84,13 +76,11 @@
             },
             "required": [
                 "datatype",
-                "name",
-                "commtype"
+                "name"
             ],
             "type": "object"
         },
         "file": {
-            "description": "Base schema for all subtypes of file components.",
             "additionalProperties": false,
             "dependencies": {
                 "driver": [
@@ -139,7 +129,7 @@
                     "format": "checkbox"
                 },
                 "name": {
-                    "description": "Name used for component in log messages.",
+                    "description": "Path to a file in the model repository",
                     "type": "string"
                 },
                 "transform": {
@@ -180,18 +170,41 @@
                     "options": {
                         "dependencies": {
                             "filetype": [
-                                "map",
-                                "ply",
-                                "netcdf",
-                                "wofost",
-                                "table",
-                                "mat",
                                 "ascii",
-                                "pandas",
-                                "obj",
-                                "yaml",
+                                "map",
+                                "table",
                                 "json",
-                                "pickle"
+                                "mat",
+                                "netcdf",
+                                "obj",
+                                "pandas",
+                                "pickle",
+                                "ply",
+                                "wofost",
+                                "yaml"
+                            ]
+                        }
+                    }
+                },
+                "newline": {
+                    "default": "\n",
+                    "description": "One or more characters indicating a newline. Defaults to '\\n'.",
+                    "type": "string",
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
+                                "ascii",
+                                "map",
+                                "table",
+                                "json",
+                                "mat",
+                                "netcdf",
+                                "obj",
+                                "pandas",
+                                "pickle",
+                                "ply",
+                                "wofost",
+                                "yaml"
                             ]
                         }
                     }
@@ -204,35 +217,55 @@
                         "dependencies": {
                             "filetype": [
                                 "map",
-                                "wofost",
                                 "table",
-                                "pandas"
+                                "pandas",
+                                "wofost"
                             ]
                         }
                     }
                 },
-                "newline": {
-                    "default": "\n",
-                    "description": "One or more characters indicating a newline. Defaults to '\\n'.",
-                    "type": "string",
+                "use_astropy": {
+                    "default": false,
+                    "description": "If True, the astropy package will be used to serialize/deserialize table. Defaults to False.",
+                    "type": "boolean",
                     "options": {
                         "dependencies": {
                             "filetype": [
-                                "map",
-                                "ply",
-                                "netcdf",
-                                "wofost",
                                 "table",
-                                "mat",
-                                "ascii",
-                                "pandas",
-                                "obj",
-                                "yaml",
+                                "pandas"
+                            ]
+                        }
+                    },
+                    "format": "checkbox"
+                },
+                "indent": {
+                    "default": "\t",
+                    "description": "String or number of spaces that should be used to indent each level within the seiralized structure. Defaults to '\\t'.",
+                    "type": [
+                        "string",
+                        "integer"
+                    ],
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
                                 "json",
-                                "pickle"
+                                "yaml"
                             ]
                         }
                     }
+                },
+                "sort_keys": {
+                    "default": true,
+                    "description": "If True, the serialization of dictionaries will be in key sorted order. Defaults to True.",
+                    "type": "boolean",
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
+                                "json"
+                            ]
+                        }
+                    },
+                    "format": "checkbox"
                 },
                 "read_attributes": {
                     "default": false,
@@ -276,20 +309,6 @@
                             ]
                         }
                     }
-                },
-                "use_astropy": {
-                    "default": false,
-                    "description": "If True, the astropy package will be used to serialize/deserialize table. Defaults to False.",
-                    "type": "boolean",
-                    "options": {
-                        "dependencies": {
-                            "filetype": [
-                                "table",
-                                "pandas"
-                            ]
-                        }
-                    },
-                    "format": "checkbox"
                 },
                 "no_header": {
                     "default": false,
@@ -342,34 +361,8 @@
                         }
                     }
                 },
-                "indent": {
-                    "default": "\t",
-                    "description": "String or number of spaces that should be used to indent each level within the seiralized structure. Defaults to '\\t'.",
-                    "type": [
-                        "string",
-                        "integer"
-                    ],
-                    "options": {
-                        "dependencies": {
-                            "filetype": [
-                                "yaml",
-                                "json"
-                            ]
-                        }
-                    }
-                },
-                "sort_keys": {
-                    "default": true,
-                    "description": "If True, the serialization of dictionaries will be in key sorted order. Defaults to True.",
-                    "type": "boolean",
-                    "options": {
-                        "dependencies": {
-                            "filetype": [
-                                "json"
-                            ]
-                        }
-                    },
-                    "format": "checkbox"
+                "serializer": {
+                    "$ref": "#/definitions/serializer"
                 }
             },
             "required": [
@@ -398,17 +391,6 @@
                     "description": "Dictionary of initial state variables that should be set when the filter is created.",
                     "type": "object"
                 },
-                "statement": {
-                    "description": "Python statement in terms of the message as represented by the string \"%x%\" that should evaluate to a boolean, True if the message should pass through the filter, False if it should not. The statement should only use a limited set of builtins and the math library (See yggdrasil.tools.safe_eval). If more complex relationships are required, use the FunctionFilter class.",
-                    "type": "string",
-                    "options": {
-                        "dependencies": {
-                            "filtertype": [
-                                "statement"
-                            ]
-                        }
-                    }
-                },
                 "function": {
                     "description": "The handle for a callable Python object (e.g. function) that should be used to determine if a message should be filtered or a string of the form \"<function file>:<function name>\" identifying a function where \"<function file>\" is the module or Python file containing the function and \"<function name>\" is the name of the function. The function should take the message as input and return a boolean, True if the message should pass through the filter, False if it should not.",
                     "type": "string",
@@ -416,6 +398,17 @@
                         "dependencies": {
                             "filtertype": [
                                 "function"
+                            ]
+                        }
+                    }
+                },
+                "statement": {
+                    "description": "Python statement in terms of the message as represented by the string \"%x%\" that should evaluate to a boolean, True if the message should pass through the filter, False if it should not. The statement should only use a limited set of builtins and the math library (See yggdrasil.tools.safe_eval). If more complex relationships are required, use the FunctionFilter class.",
+                    "type": "string",
+                    "options": {
+                        "dependencies": {
+                            "filtertype": [
+                                "statement"
                             ]
                         }
                     }
@@ -465,6 +458,21 @@
                     ],
                     "type": "string"
                 },
+                "delimiter": {
+                    "default": "\t",
+                    "description": "Delimiter that should be used to separate name/value pairs in the map. Defaults to \\t.",
+                    "type": "string",
+                    "options": {
+                        "dependencies": {
+                            "seritype": [
+                                "map",
+                                "table",
+                                "pandas",
+                                "wofost"
+                            ]
+                        }
+                    }
+                },
                 "as_array": {
                     "default": false,
                     "description": "If True, each of the arguments being serialized/deserialized will be arrays that are converted to/from bytes in column major ('F') order. Otherwise, each argument should be a scalar. Defaults to False.",
@@ -477,21 +485,6 @@
                         }
                     },
                     "format": "checkbox"
-                },
-                "delimiter": {
-                    "default": "\t",
-                    "description": "Character(s) that should be used to separate columns. Defaults to '\\t'.",
-                    "type": "string",
-                    "options": {
-                        "dependencies": {
-                            "seritype": [
-                                "table",
-                                "pandas",
-                                "map",
-                                "wofost"
-                            ]
-                        }
-                    }
                 },
                 "field_names": {
                     "description": "The names of fields in the format string. If not provided, names are set based on the order of the fields in the format string.",
@@ -549,32 +542,6 @@
                     },
                     "format": "checkbox"
                 },
-                "no_header": {
-                    "default": false,
-                    "description": "If True, headers will not be read or serialized from/to tables. Defaults to False.",
-                    "type": "boolean",
-                    "options": {
-                        "dependencies": {
-                            "seritype": [
-                                "pandas"
-                            ]
-                        }
-                    },
-                    "format": "checkbox"
-                },
-                "str_as_bytes": {
-                    "default": false,
-                    "description": "If True, strings in columns are read as bytes. Defaults to False.",
-                    "type": "boolean",
-                    "options": {
-                        "dependencies": {
-                            "seritype": [
-                                "pandas"
-                            ]
-                        }
-                    },
-                    "format": "checkbox"
-                },
                 "encoded_datatype": {
                     "$ref": "#/definitions/schema"
                 },
@@ -624,6 +591,32 @@
                         "dependencies": {
                             "seritype": [
                                 "json"
+                            ]
+                        }
+                    },
+                    "format": "checkbox"
+                },
+                "no_header": {
+                    "default": false,
+                    "description": "If True, headers will not be read or serialized from/to tables. Defaults to False.",
+                    "type": "boolean",
+                    "options": {
+                        "dependencies": {
+                            "seritype": [
+                                "pandas"
+                            ]
+                        }
+                    },
+                    "format": "checkbox"
+                },
+                "str_as_bytes": {
+                    "default": false,
+                    "description": "If True, strings in columns are read as bytes. Defaults to False.",
+                    "type": "boolean",
+                    "options": {
+                        "dependencies": {
+                            "seritype": [
+                                "pandas"
                             ]
                         }
                     },
@@ -700,6 +693,41 @@
                         }
                     }
                 },
+                "filter": {
+                    "$ref": "#/definitions/filter",
+                    "options": {
+                        "dependencies": {
+                            "transformtype": [
+                                "filter"
+                            ]
+                        }
+                    }
+                },
+                "function": {
+                    "description": "The handle for a callable Python object (e.g. function) that should be used to transform messages or a string of the form \"<function file>:<function name>\" identifying a function where \"<function file>\" is the module or Python file containing the function and \"<function name>\" is the name of the function. The function should take the message as input and return the transformed message.",
+                    "type": "string",
+                    "options": {
+                        "dependencies": {
+                            "transformtype": [
+                                "function"
+                            ]
+                        }
+                    }
+                },
+                "map": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "A mapping from original field name to new field names.",
+                    "type": "object",
+                    "options": {
+                        "dependencies": {
+                            "transformtype": [
+                                "map_fields"
+                            ]
+                        }
+                    }
+                },
                 "original_order": {
                     "description": "The original order of fields that should be used for selecting from lists/tuples.",
                     "items": {
@@ -740,17 +768,6 @@
                     },
                     "format": "checkbox"
                 },
-                "function": {
-                    "description": "The handle for a callable Python object (e.g. function) that should be used to transform messages or a string of the form \"<function file>:<function name>\" identifying a function where \"<function file>\" is the module or Python file containing the function and \"<function name>\" is the name of the function. The function should take the message as input and return the transformed message.",
-                    "type": "string",
-                    "options": {
-                        "dependencies": {
-                            "transformtype": [
-                                "function"
-                            ]
-                        }
-                    }
-                },
                 "statement": {
                     "description": "Python statement in terms of the message as represented by the string \"%x%\" that should evaluate to the transformed message. The statement should only use a limited set of builtins and the math library (See yggdrasil.tools.safe_eval). If more complex relationships are required, use the FunctionTransform class.",
                     "type": "string",
@@ -758,30 +775,6 @@
                         "dependencies": {
                             "transformtype": [
                                 "statement"
-                            ]
-                        }
-                    }
-                },
-                "map": {
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "description": "A mapping from original field name to new field names.",
-                    "type": "object",
-                    "options": {
-                        "dependencies": {
-                            "transformtype": [
-                                "map_fields"
-                            ]
-                        }
-                    }
-                },
-                "filter": {
-                    "$ref": "#/definitions/filter",
-                    "options": {
-                        "dependencies": {
-                            "transformtype": [
-                                "filter"
                             ]
                         }
                     }
@@ -911,19 +904,219 @@
                     }
                 }
             }
+        },
+        "icomm": {
+            "additionalProperties": false,
+            "dependencies": {
+                "driver": [
+                    "args"
+                ]
+            },
+            "properties": {
+                "datatype": {
+                    "$ref": "#/definitions/schema"
+                },
+                "default_file": {
+                    "$ref": "#/definitions/file",
+                    "description": "Comm information for a file that input should be drawn from (for input comms) or that output should be sent to (for output comms) in the event that a yaml does not pair the comm with another model comm or a file."
+                },
+                "default_value": {
+                    "description": "Value that should be returned in the event that a yaml does not pair the comm with another model comm or a file.",
+                    "type": [
+                        "number",
+                        "string",
+                        "boolean",
+                        "object",
+                        "array",
+                        "null"
+                    ]
+                },
+                "filter": {
+                    "$ref": "#/definitions/filter",
+                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
+                },
+                "format_str": {
+                    "description": "String that should be used to format/parse messages. Default to None.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "type": "string",
+                    "propertyOrder": 0
+                },
+                "outside_loop": {
+                    "default": false,
+                    "description": "If True, and the comm is an input/outputs to/from a model being wrapped. The receive/send calls for this comm will be outside the loop for the model. Defaults to False.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "transform": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/transform"
+                    },
+                    "description": "One or more transformations that will be applied to messages that are sent/received. Ignored if not provided."
+                },
+                "vars": {
+                    "description": "Names of variables to be sent/received by this comm. Defaults to [].",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "count": {
+                    "default": 1,
+                    "type": "integer",
+                    "options": {
+                        "dependencies": {
+                            "commtype": [
+                                "value"
+                            ]
+                        }
+                    }
+                }
+            },
+            "required": [
+                "datatype",
+                "name"
+            ],
+            "type": "object",
+            "oneOf": [
+                {
+                    "title": "default file",
+                    "required": [
+                        "default_file"
+                    ],
+                    "not": {
+                        "required": [
+                            "default_value"
+                        ]
+                    }
+                },
+                {
+                    "title": "default value",
+                    "required": [
+                        "default_value"
+                    ],
+                    "not": {
+                        "required": [
+                            "default_file"
+                        ]
+                    }
+                }
+            ]
+        },
+        "ocomm": {
+            "additionalProperties": false,
+            "dependencies": {
+                "driver": [
+                    "args"
+                ]
+            },
+            "properties": {
+                "datatype": {
+                    "$ref": "#/definitions/schema"
+                },
+                "default_file": {
+                    "$ref": "#/definitions/file",
+                    "description": "Comm information for a file that input should be drawn from (for input comms) or that output should be sent to (for output comms) in the event that a yaml does not pair the comm with another model comm or a file."
+                },
+                "filter": {
+                    "$ref": "#/definitions/filter",
+                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
+                },
+                "format_str": {
+                    "description": "String that should be used to format/parse messages. Default to None.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "type": "string",
+                    "propertyOrder": 0
+                },
+                "outside_loop": {
+                    "default": false,
+                    "description": "If True, and the comm is an input/outputs to/from a model being wrapped. The receive/send calls for this comm will be outside the loop for the model. Defaults to False.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "transform": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/transform"
+                    },
+                    "description": "One or more transformations that will be applied to messages that are sent/received. Ignored if not provided."
+                },
+                "vars": {
+                    "description": "Names of variables to be sent/received by this comm. Defaults to [].",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "count": {
+                    "default": 1,
+                    "type": "integer",
+                    "options": {
+                        "dependencies": {
+                            "commtype": [
+                                "value"
+                            ]
+                        }
+                    }
+                }
+            },
+            "required": [
+                "datatype",
+                "name"
+            ],
+            "type": "object"
         }
     },
     "required": [
         "args",
-        "name",
         "language",
+        "name",
         "inputs",
         "outputs",
         "description",
-        "repository_url"
+        "repository_url",
+        "repository_commit"
     ],
     "additionalProperties": false,
     "properties": {
+        "additional_dependencies": {
+            "additionalProperties": {
+                "items": {
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {
+                                "arguments": {
+                                    "type": "string"
+                                },
+                                "package": {
+                                    "type": "string"
+                                },
+                                "package_manager": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "package"
+                            ],
+                            "type": "object"
+                        }
+                    ]
+                },
+                "type": "array"
+            },
+            "description": "A mapping between languages and lists of packages in those languages that are required by the model.",
+            "type": "object"
+        },
         "allow_threading": {
             "description": "If True, comm connections will be set up so that the model-side comms can be used by more than one thread. Defaults to False.",
             "type": "boolean",
@@ -932,21 +1125,51 @@
         "args": {
             "description": "The path to the file containing the model program that will be run by the driver for the model's language and/or a list of arguments that should be passed as input to the model program or language executable (e.g. source code or configuration file for a domain specific language).",
             "items": {
+                "minLength": 1,
                 "type": "string"
             },
             "type": "array",
             "minItems": 1,
-            "propertyOrder": 5
+            "propertyOrder": 6
         },
         "contact_email": {
             "description": "Email address that should be used to contact the maintainer of the model. This parameter is only used in the model repository.",
             "type": "string",
-            "propertyOrder": 2
+            "propertyOrder": 3
+        },
+        "dependencies": {
+            "description": "A list of packages required by the model that are written in the same language as the model. If the package requires dependencies outside the language of the model. use the additional_dependencies parameter to provide them. If you need a version of the package from a specific package manager, a mapping with 'package' and 'package_manager' fields can be provided instead of just the name of the package.",
+            "items": {
+                "oneOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "additionalProperties": false,
+                        "properties": {
+                            "arguments": {
+                                "type": "string"
+                            },
+                            "package": {
+                                "type": "string"
+                            },
+                            "package_manager": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "package"
+                        ],
+                        "type": "object"
+                    }
+                ]
+            },
+            "type": "array"
         },
         "description": {
             "description": "Description of the model. This parameter is only used in the model repository or when providing the model as a service.",
             "type": "string",
-            "propertyOrder": 4
+            "propertyOrder": 5
         },
         "env": {
             "additional_properties": {
@@ -961,12 +1184,13 @@
             "type": "string"
         },
         "inputs": {
-            "description": "Zero or more channels carrying input to the model.",
+            "default": [],
+            "description": "Zero or more channels carrying input to the model",
             "items": {
-                "$ref": "#/definitions/comm"
+                "$ref": "#/definitions/icomm"
             },
             "type": "array",
-            "propertyOrder": 6
+            "propertyOrder": 7
         },
         "iter_function_over": {
             "default": [],
@@ -1000,7 +1224,7 @@
                 "timesync"
             ],
             "type": "string",
-            "propertyOrder": 3
+            "propertyOrder": 4
         },
         "logging_level": {
             "default": "",
@@ -1013,17 +1237,23 @@
             "propertyOrder": 0
         },
         "outputs": {
-            "description": "Zero or more channels carrying output from the model.",
+            "default": [],
+            "description": "Zero or more channels carrying output from the model",
             "items": {
-                "$ref": "#/definitions/comm"
+                "$ref": "#/definitions/ocomm"
             },
             "type": "array",
-            "propertyOrder": 7
+            "propertyOrder": 8
         },
         "outputs_in_inputs": {
             "description": "If True, outputs from wrapped model functions are passed by pointer as inputs for modification and the return value will be a flag. If False, outputs are limited to return values. Defaults to the value of the class attribute outputs_in_inputs.",
             "type": "boolean",
             "format": "checkbox"
+        },
+        "repository_commit": {
+            "description": "Commit that should be checked out from the model repository.",
+            "type": "string",
+            "propertyOrder": 2
         },
         "repository_url": {
             "description": "URL for the git repository containing the model source code. If provided, relative paths in the model YAML definition will be considered relative to the repository root directory.",
@@ -1041,13 +1271,18 @@
             },
             "type": "array"
         },
+        "validation_command": {
+            "description": "Path to a validation command that can be used to verify that the model ran as expected. A non-zero return code is taken to indicate failure.",
+            "type": "string"
+        },
         "builddir": {
+            "description": "Directory where the build should be saved. Defaults to <sourcedir>/build. It can be relative to working_dir or absolute.",
             "type": "string",
             "options": {
                 "dependencies": {
                     "language": [
-                        "make",
-                        "cmake"
+                        "cmake",
+                        "make"
                     ]
                 }
             }
@@ -1057,8 +1292,8 @@
             "options": {
                 "dependencies": {
                     "language": [
-                        "make",
-                        "cmake"
+                        "cmake",
+                        "make"
                     ]
                 }
             }
@@ -1069,13 +1304,13 @@
             "options": {
                 "dependencies": {
                     "language": [
-                        "make",
+                        "cmake",
                         "c",
                         "c++",
                         "cpp",
                         "cxx",
-                        "cmake",
-                        "fortran"
+                        "fortran",
+                        "make"
                     ]
                 }
             }
@@ -1090,13 +1325,25 @@
             "options": {
                 "dependencies": {
                     "language": [
-                        "make",
+                        "cmake",
                         "c",
                         "c++",
                         "cpp",
                         "cxx",
-                        "cmake",
-                        "fortran"
+                        "fortran",
+                        "make"
+                    ]
+                }
+            }
+        },
+        "configuration": {
+            "default": "Release",
+            "description": "Build type/configuration that should be built. Defaults to 'Release'.",
+            "type": "string",
+            "options": {
+                "dependencies": {
+                    "language": [
+                        "cmake"
                     ]
                 }
             }
@@ -1107,8 +1354,8 @@
             "options": {
                 "dependencies": {
                     "language": [
-                        "make",
-                        "cmake"
+                        "cmake",
+                        "make"
                     ]
                 }
             }
@@ -1119,8 +1366,8 @@
             "options": {
                 "dependencies": {
                     "language": [
-                        "make",
-                        "cmake"
+                        "cmake",
+                        "make"
                     ]
                 }
             }
@@ -1131,8 +1378,8 @@
             "options": {
                 "dependencies": {
                     "language": [
-                        "make",
-                        "cmake"
+                        "cmake",
+                        "make"
                     ]
                 }
             }
@@ -1143,8 +1390,8 @@
             "options": {
                 "dependencies": {
                     "language": [
-                        "make",
-                        "cmake"
+                        "cmake",
+                        "make"
                     ]
                 }
             }
@@ -1155,13 +1402,13 @@
             "options": {
                 "dependencies": {
                     "language": [
-                        "make",
+                        "cmake",
                         "c",
                         "c++",
                         "cpp",
                         "cxx",
-                        "cmake",
-                        "fortran"
+                        "fortran",
+                        "make"
                     ]
                 }
             }
@@ -1176,12 +1423,178 @@
             "options": {
                 "dependencies": {
                     "language": [
-                        "make",
+                        "cmake",
                         "c",
                         "c++",
                         "cpp",
                         "cxx",
+                        "fortran",
+                        "make"
+                    ]
+                }
+            }
+        },
+        "source_files": {
+            "default": [],
+            "description": "Source files that should be compiled into an executable. Defaults to an empty list and the driver will search for a source file based on the model executable (the first model argument).",
+            "items": {
+                "type": "string"
+            },
+            "type": "array",
+            "options": {
+                "dependencies": {
+                    "language": [
                         "cmake",
+                        "c",
+                        "c++",
+                        "cpp",
+                        "cxx",
+                        "fortran",
+                        "make"
+                    ]
+                }
+            }
+        },
+        "sourcedir": {
+            "description": "Source directory to call cmake on. If not provided it is set to working_dir. This should be the directory containing the CMakeLists.txt file. It can be relative to working_dir or absolute.",
+            "type": "string",
+            "options": {
+                "dependencies": {
+                    "language": [
+                        "cmake"
+                    ]
+                }
+            }
+        },
+        "target": {
+            "description": "Make target that should be built to create the model executable. Defaults to None.",
+            "type": "string",
+            "options": {
+                "dependencies": {
+                    "language": [
+                        "cmake",
+                        "make"
+                    ]
+                }
+            }
+        },
+        "target_compiler": {
+            "description": "Compilation tool that should be used to compile the target language. Defaults to None and will be set based on the selected language driver.",
+            "type": "string",
+            "options": {
+                "dependencies": {
+                    "language": [
+                        "cmake",
+                        "make"
+                    ]
+                }
+            }
+        },
+        "target_compiler_flags": {
+            "description": "Compilation flags that should be passed to the target language compiler. Defaults to [].",
+            "items": {
+                "type": "string"
+            },
+            "type": "array",
+            "options": {
+                "dependencies": {
+                    "language": [
+                        "cmake",
+                        "make"
+                    ]
+                }
+            }
+        },
+        "target_language": {
+            "description": "Language that the target is written in. Defaults to None and will be set based on the source files provided.",
+            "type": "string",
+            "options": {
+                "dependencies": {
+                    "language": [
+                        "cmake",
+                        "make"
+                    ]
+                }
+            }
+        },
+        "target_linker": {
+            "description": "Compilation tool that should be used to link the target language. Defaults to None and will be set based on the selected language driver.",
+            "type": "string",
+            "options": {
+                "dependencies": {
+                    "language": [
+                        "cmake",
+                        "make"
+                    ]
+                }
+            }
+        },
+        "target_linker_flags": {
+            "description": "Linking flags that should be passed to the target language linker. Defaults to [].",
+            "items": {
+                "type": "string"
+            },
+            "type": "array",
+            "options": {
+                "dependencies": {
+                    "language": [
+                        "cmake",
+                        "make"
+                    ]
+                }
+            }
+        },
+        "interpreter": {
+            "description": "Name or path of interpreter executable that should be used to run the model. If not provided, the interpreter will be determined based on configuration options for the language (if present) and the default_interpreter class attribute.",
+            "type": "string",
+            "options": {
+                "dependencies": {
+                    "language": [
+                        "dummy",
+                        "lpy",
+                        "matlab",
+                        "python",
+                        "R",
+                        "r",
+                        "sbml",
+                        "timesync"
+                    ]
+                }
+            }
+        },
+        "interpreter_flags": {
+            "default": [],
+            "description": "Flags that should be passed to the interpreter when running the model. If not provided, the flags are determined based on configuration options for the language (if present) and the default_interpreter_flags class attribute.",
+            "items": {
+                "type": "string"
+            },
+            "type": "array",
+            "options": {
+                "dependencies": {
+                    "language": [
+                        "dummy",
+                        "lpy",
+                        "matlab",
+                        "python",
+                        "R",
+                        "r",
+                        "sbml",
+                        "timesync"
+                    ]
+                }
+            }
+        },
+        "standard": {
+            "default": "f2003",
+            "description": "Fortran standard that should be used. Defaults to 'f2003'.",
+            "enum": [
+                "f2003",
+                "f2008"
+            ],
+            "type": "string",
+            "options": {
+                "dependencies": {
+                    "language": [
                         "fortran"
                     ]
                 }
@@ -1210,144 +1623,18 @@
                 }
             }
         },
-        "source_files": {
-            "default": [],
-            "description": "Source files that should be compiled into an executable. Defaults to an empty list and the driver will search for a source file based on the model executable (the first model argument).",
-            "items": {
-                "type": "string"
+        "use_symunit": {
+            "default": false,
+            "description": "If True, input/output variables with units will be represented in Matlab using symunit. Defaults to False.",
+            "type": "boolean",
+            "options": {
+                "dependencies": {
+                    "language": [
+                        "matlab"
+                    ]
+                }
             },
-            "type": "array",
-            "options": {
-                "dependencies": {
-                    "language": [
-                        "make",
-                        "c",
-                        "c++",
-                        "cpp",
-                        "cxx",
-                        "cmake",
-                        "fortran"
-                    ]
-                }
-            }
-        },
-        "target": {
-            "description": "Make target that should be built to create the model executable. Defaults to None.",
-            "type": "string",
-            "options": {
-                "dependencies": {
-                    "language": [
-                        "make",
-                        "cmake"
-                    ]
-                }
-            }
-        },
-        "target_compiler": {
-            "description": "Compilation tool that should be used to compile the target language. Defaults to None and will be set based on the selected language driver.",
-            "type": "string",
-            "options": {
-                "dependencies": {
-                    "language": [
-                        "make",
-                        "cmake"
-                    ]
-                }
-            }
-        },
-        "target_compiler_flags": {
-            "description": "Compilation flags that should be passed to the target language compiler. Defaults to [].",
-            "items": {
-                "type": "string"
-            },
-            "type": "array",
-            "options": {
-                "dependencies": {
-                    "language": [
-                        "make",
-                        "cmake"
-                    ]
-                }
-            }
-        },
-        "target_language": {
-            "description": "Language that the target is written in. Defaults to None and will be set based on the source files provided.",
-            "type": "string",
-            "options": {
-                "dependencies": {
-                    "language": [
-                        "make",
-                        "cmake"
-                    ]
-                }
-            }
-        },
-        "target_linker": {
-            "description": "Compilation tool that should be used to link the target language. Defaults to None and will be set based on the selected language driver.",
-            "type": "string",
-            "options": {
-                "dependencies": {
-                    "language": [
-                        "make",
-                        "cmake"
-                    ]
-                }
-            }
-        },
-        "target_linker_flags": {
-            "description": "Linking flags that should be passed to the target language linker. Defaults to [].",
-            "items": {
-                "type": "string"
-            },
-            "type": "array",
-            "options": {
-                "dependencies": {
-                    "language": [
-                        "make",
-                        "cmake"
-                    ]
-                }
-            }
-        },
-        "interpreter": {
-            "description": "Name or path of interpreter executable that should be used to run the model. If not provided, the interpreter will be determined based on configuration options for the language (if present) and the default_interpreter class attribute.",
-            "type": "string",
-            "options": {
-                "dependencies": {
-                    "language": [
-                        "python",
-                        "lpy",
-                        "matlab",
-                        "R",
-                        "r",
-                        "timesync",
-                        "sbml",
-                        "dummy"
-                    ]
-                }
-            }
-        },
-        "interpreter_flags": {
-            "default": [],
-            "description": "Flags that should be passed to the interpreter when running the model. If not provided, the flags are determined based on configuration options for the language (if present) and the default_interpreter_flags class attribute.",
-            "items": {
-                "type": "string"
-            },
-            "type": "array",
-            "options": {
-                "dependencies": {
-                    "language": [
-                        "python",
-                        "lpy",
-                        "matlab",
-                        "R",
-                        "r",
-                        "timesync",
-                        "sbml",
-                        "dummy"
-                    ]
-                }
-            }
+            "format": "checkbox"
         },
         "copy_xml_to_osr": {
             "default": false,
@@ -1408,19 +1695,6 @@
                     ]
                 }
             }
-        },
-        "use_symunit": {
-            "default": false,
-            "description": "If True, input/output variables with units will be represented in Matlab using symunit. Defaults to False.",
-            "type": "boolean",
-            "options": {
-                "dependencies": {
-                    "language": [
-                        "matlab"
-                    ]
-                }
-            },
-            "format": "checkbox"
         },
         "integrator": {
             "default": "cvode",
@@ -1526,45 +1800,6 @@
                 "dependencies": {
                     "language": [
                         "sbml"
-                    ]
-                }
-            }
-        },
-        "configuration": {
-            "default": "Release",
-            "description": "Build type/configuration that should be built. Defaults to 'Release'.",
-            "type": "string",
-            "options": {
-                "dependencies": {
-                    "language": [
-                        "cmake"
-                    ]
-                }
-            }
-        },
-        "sourcedir": {
-            "description": "Source directory to call cmake on. If not provided it is set to working_dir. This should be the directory containing the CMakeLists.txt file. It can be relative to working_dir or absolute.",
-            "type": "string",
-            "options": {
-                "dependencies": {
-                    "language": [
-                        "cmake"
-                    ]
-                }
-            }
-        },
-        "standard": {
-            "default": "f2003",
-            "description": "Fortran standard that should be used. Defaults to 'f2003'.",
-            "enum": [
-                "f2003",
-                "f2008"
-            ],
-            "type": "string",
-            "options": {
-                "dependencies": {
-                    "language": [
-                        "fortran"
                     ]
                 }
             }

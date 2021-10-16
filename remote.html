@@ -1,74 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Running Integrations as Services &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Running Integrations as Services &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Docker Containers" href="docker.html" />
     <link rel="prev" title="High Performance Computing (HPC)" href="hpc.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -76,19 +39,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
@@ -133,77 +85,36 @@
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Running Integrations as Services</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/remote.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="running-integrations-as-services">
+             
+  <section id="running-integrations-as-services">
 <span id="remote-rst"></span><h1>Running Integrations as Services<a class="headerlink" href="#running-integrations-as-services" title="Permalink to this headline">¶</a></h1>
 <p>In release 1.7.1, the ability to run models as services that can be accessed by integrations running on remote machines was added to yggdrasil. This feature allows models (or sets of models) to be exposed for external use without the need to have the model source code or install it on your local machine. It is intended to make it easier for scientists to share models and foster collaboration. Future releases will include tools for exploring remote models &amp; integrations via visualizations.</p>
-<div class="section" id="setting-up-an-integration-as-a-service">
+<section id="setting-up-an-integration-as-a-service">
 <h2>Setting Up an Integration as a Service<a class="headerlink" href="#setting-up-an-integration-as-a-service" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="host-requirements">
+<section id="host-requirements">
 <h3>Host Requirements<a class="headerlink" href="#host-requirements" title="Permalink to this headline">¶</a></h3>
 <ul>
 <li><p>yggdrasil must be installed</p></li>
@@ -221,8 +132,8 @@
 <p class="admonition-title">Note</p>
 <p>For convenience, there are Docker images available that launch the service manager as a web application using <a class="reference external" href="https://gunicorn.org/">gunicorn</a>. See the documentation <a class="reference internal" href="docker.html#service-docker-rst"><span class="std std-ref">here</span></a> for additional details about the Docker images and how to use them.</p>
 </div>
-</div>
-<div class="section" id="registering-integrations">
+</section>
+<section id="registering-integrations">
 <h3>Registering Integrations<a class="headerlink" href="#registering-integrations" title="Permalink to this headline">¶</a></h3>
 <p>In order for an integration to be run on the host machine, it must first be registered via yggdrasil’s <code class="docutils literal notranslate"><span class="pre">integration-service-manager</span></code> CLI. Usage is:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggdrasil integration-service-manager register &lt;integration-name&gt; &lt;integration-yamls ...&gt;
@@ -238,8 +149,8 @@
 <p class="admonition-title">Note</p>
 <p>For security, YAML files located in remote Git repositories will not be allowed as part of integrations that the service manager runs.</p>
 </div>
-</div>
-<div class="section" id="registering-multiple-integrations-at-once">
+</section>
+<section id="registering-multiple-integrations-at-once">
 <h3>Registering Multiple Integrations at Once<a class="headerlink" href="#registering-multiple-integrations-at-once" title="Permalink to this headline">¶</a></h3>
 <p>To save time, yggdrasil also allows you to register multiple integrations at once from a YAML file containing a set of mappings between integration names and the YAML specification files defining them. The example services file below defines two integrations, each specified by one YAML file.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">photosynthesis</span><span class="p">:</span>
@@ -253,11 +164,11 @@
 </pre></div>
 </div>
 <p>where <code class="docutils literal notranslate"><span class="pre">SERVICES_FILE</span></code> is the full path to the file.</p>
-</div>
-</div>
-<div class="section" id="connecting-an-integration-to-a-remote-service">
+</section>
+</section>
+<section id="connecting-an-integration-to-a-remote-service">
 <h2>Connecting an Integration to a Remote Service<a class="headerlink" href="#connecting-an-integration-to-a-remote-service" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="client-requirements">
+<section id="client-requirements">
 <h3>Client Requirements<a class="headerlink" href="#client-requirements" title="Permalink to this headline">¶</a></h3>
 <ul>
 <li><p>yggdrasil must be installed</p></li>
@@ -268,8 +179,8 @@
 <p>The <code class="docutils literal notranslate"><span class="pre">ADDRESS</span></code> field is required and must be the URL for the service manager (i.e. the value set in <code class="docutils literal notranslate"><span class="pre">YGGDRASIL_SERVICE_HOST_URL</span></code> or via <code class="docutils literal notranslate"><span class="pre">--remote-url</span></code> in the command to start the service manager).</p>
 </li>
 </ul>
-</div>
-<div class="section" id="service-yaml-entry">
+</section>
+<section id="service-yaml-entry">
 <h3>Service YAML Entry<a class="headerlink" href="#service-yaml-entry" title="Permalink to this headline">¶</a></h3>
 <p>Integrations can connect to remote integration services by including <code class="docutils literal notranslate"><span class="pre">service</span></code> entries in the YAML integration specification files. For example, the entry below requests the <code class="docutils literal notranslate"><span class="pre">photosynthesis</span></code> integration service from the yggdrasil flask service manager located at <a class="reference external" href="http://remote_service_manager_url/">http://remote_service_manager_url/</a>.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">service</span><span class="p">:</span>
@@ -292,60 +203,43 @@
     <span class="nt">address</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">http://another_remote_service_manager_url/</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="performance">
+</section>
+</section>
+<section id="performance">
 <h2>Performance<a class="headerlink" href="#performance" title="Permalink to this headline">¶</a></h2>
 <p>It is important to keep in mind that connecting to remote integrations over an internet connection introduces a great deal of overhead and a certain degree of fragility into integrations that is not present when all models are running locally. Such connections between models make integrations dependent on the speed and reliability of the internet connection both at the host and client. If performant and stable communication times are import for your use case, we advise looking for a way to run the integrations locally.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="docker.html" class="btn btn-neutral float-right" title="Docker Containers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="hpc.html" class="btn btn-neutral float-left" title="High Performance Computing (HPC)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="docker.html" class="btn btn-neutral float-right" title="Docker Containers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

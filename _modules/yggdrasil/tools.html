@@ -1,72 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.tools &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.tools &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -74,19 +36,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
@@ -117,83 +68,43 @@
 <li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-          <li><a href="../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
       <li>yggdrasil.tools</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for yggdrasil.tools</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;This modules offers various tools.&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
 <span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">sysconfig</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">distutils</span> <span class="k">import</span> <span class="n">sysconfig</span> <span class="k">as</span> <span class="n">distutils_sysconfig</span>
+    <span class="kn">from</span> <span class="nn">distutils</span> <span class="kn">import</span> <span class="n">sysconfig</span> <span class="k">as</span> <span class="n">distutils_sysconfig</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
     <span class="n">distutils_sysconfig</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -207,13 +118,11 @@
 <span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">difflib</span>
 <span class="kn">import</span> <span class="nn">contextlib</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">constants</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span><span class="p">,</span> <span class="n">ComponentBase</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span><span class="p">,</span> <span class="n">ComponentBase</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="n">YGG_MSG_EOF</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;EOF!!!&#39;</span>
-<span class="n">YGG_MSG_BUF</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">2</span>
 
 
 <span class="n">_stack_in_log</span> <span class="o">=</span> <span class="kc">False</span>
@@ -375,15 +284,15 @@
         <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;python&#39;</span>
         <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">fname</span><span class="p">),</span> <span class="n">fname</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">pygments</span> <span class="k">import</span> <span class="n">highlight</span>
-        <span class="kn">from</span> <span class="nn">pygments.lexers</span> <span class="k">import</span> <span class="n">PythonLexer</span>
-        <span class="kn">from</span> <span class="nn">pygments.lexers.data</span> <span class="k">import</span> <span class="n">YamlLexer</span>
-        <span class="kn">from</span> <span class="nn">pygments.lexers.c_cpp</span> <span class="k">import</span> <span class="n">CLexer</span><span class="p">,</span> <span class="n">CppLexer</span>
-        <span class="kn">from</span> <span class="nn">pygments.lexers.r</span> <span class="k">import</span> <span class="n">SLexer</span>
-        <span class="kn">from</span> <span class="nn">pygments.lexers.fortran</span> <span class="k">import</span> <span class="n">FortranLexer</span>
-        <span class="kn">from</span> <span class="nn">pygments.lexers.matlab</span> <span class="k">import</span> <span class="n">MatlabLexer</span>
-        <span class="kn">from</span> <span class="nn">pygments.lexers.html</span> <span class="k">import</span> <span class="n">XmlLexer</span>
-        <span class="kn">from</span> <span class="nn">pygments.formatters</span> <span class="k">import</span> <span class="n">Terminal256Formatter</span>
+        <span class="kn">from</span> <span class="nn">pygments</span> <span class="kn">import</span> <span class="n">highlight</span>
+        <span class="kn">from</span> <span class="nn">pygments.lexers</span> <span class="kn">import</span> <span class="n">PythonLexer</span>
+        <span class="kn">from</span> <span class="nn">pygments.lexers.data</span> <span class="kn">import</span> <span class="n">YamlLexer</span>
+        <span class="kn">from</span> <span class="nn">pygments.lexers.c_cpp</span> <span class="kn">import</span> <span class="n">CLexer</span><span class="p">,</span> <span class="n">CppLexer</span>
+        <span class="kn">from</span> <span class="nn">pygments.lexers.r</span> <span class="kn">import</span> <span class="n">SLexer</span>
+        <span class="kn">from</span> <span class="nn">pygments.lexers.fortran</span> <span class="kn">import</span> <span class="n">FortranLexer</span>
+        <span class="kn">from</span> <span class="nn">pygments.lexers.matlab</span> <span class="kn">import</span> <span class="n">MatlabLexer</span>
+        <span class="kn">from</span> <span class="nn">pygments.lexers.html</span> <span class="kn">import</span> <span class="n">XmlLexer</span>
+        <span class="kn">from</span> <span class="nn">pygments.formatters</span> <span class="kn">import</span> <span class="n">Terminal256Formatter</span>
         <span class="n">lexer_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;python&#39;</span><span class="p">:</span> <span class="n">PythonLexer</span><span class="p">,</span>
                      <span class="s1">&#39;yaml&#39;</span><span class="p">:</span> <span class="n">YamlLexer</span><span class="p">,</span>
                      <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="n">CLexer</span><span class="p">,</span>
@@ -852,7 +761,7 @@
 <span class="sd">        RuntimeError: If the product cannot be removed.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">multitasking</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">multitasking</span>
     <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">timer_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">timer_class</span> <span class="o">=</span> <span class="n">YggClass</span><span class="p">()</span>
@@ -938,7 +847,7 @@
 <span class="sd">        list: The names of data types supported by yggdrasil.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">get_registered_types</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">get_registered_types</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_registered_types</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
 
 
@@ -953,7 +862,7 @@
 <span class="sd">        list: The names of communication mechanisms supported by yggdrasil.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">schema</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">schema</span>
     <span class="n">excl_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CommBase&#39;</span><span class="p">,</span> <span class="s1">&#39;DefaultComm&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">dont_include_value</span><span class="p">:</span>
         <span class="n">excl_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;ValueComm&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">]</span>
@@ -1245,7 +1154,7 @@
         <span class="s1">&#39;__truediv__&#39;</span><span class="p">,</span> <span class="s1">&#39;__xor__&#39;</span><span class="p">,</span> <span class="s1">&#39;next&#39;</span><span class="p">,</span> <span class="s1">&#39;__hash__&#39;</span>
     <span class="p">]</span>
     
-    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">classname</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">classname</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
         <span class="n">overrides</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;__overrides__&#39;</span><span class="p">,</span> <span class="p">[])</span>
         <span class="n">overrides</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;__slots__&#39;</span><span class="p">,</span> <span class="p">[]))</span>
         <span class="n">overrides</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span>
@@ -1273,21 +1182,21 @@
     
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_wrapped&quot;</span><span class="p">,</span> <span class="s2">&quot;__weakref__&quot;</span><span class="p">]</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wrapped</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wrapped</span><span class="p">):</span>
         <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_wrapped&quot;</span><span class="p">,</span> <span class="n">wrapped</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__overrides__&#39;</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_wrapped&quot;</span><span class="p">),</span> <span class="n">name</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="nf">__delattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__delattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__overrides__&#39;</span><span class="p">):</span>
             <span class="nb">object</span><span class="o">.</span><span class="fm">__delattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="nb">delattr</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_wrapped&quot;</span><span class="p">),</span> <span class="n">name</span><span class="p">)</span>
         
-    <span class="k">def</span> <span class="nf">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__overrides__&#39;</span><span class="p">):</span>
             <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
             <span class="k">return</span>
@@ -1301,16 +1210,16 @@
         <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;__reduce__&quot;</span><span class="p">)()</span>
     
     <span class="c1"># Special cases</span>
-    <span class="k">def</span> <span class="nf">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_wrapped&quot;</span><span class="p">))</span>
     
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_wrapped&quot;</span><span class="p">))</span>
     
-    <span class="k">def</span> <span class="nf">__bytes__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__bytes__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_wrapped&quot;</span><span class="p">))</span>
     
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_wrapped&quot;</span><span class="p">))</span></div>
 
 
@@ -1332,7 +1241,7 @@
 <span class="sd">        **kwargs: Additional keywords arguments are passed to Popen.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd_args</span><span class="p">,</span> <span class="n">forward_signals</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">for_matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd_args</span><span class="p">,</span> <span class="n">forward_signals</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">for_matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># stdbuf only for linux</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_linux</span><span class="p">:</span>
             <span class="n">stdbuf_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;stdbuf&#39;</span><span class="p">,</span> <span class="s1">&#39;-o0&#39;</span><span class="p">,</span> <span class="s1">&#39;-e0&#39;</span><span class="p">]</span>
@@ -1438,6 +1347,53 @@
             <span class="nb">print</span><span class="p">(</span><span class="n">str2bytes</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="import_all_modules"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.import_all_modules">[docs]</a><span class="k">def</span> <span class="nf">import_all_modules</span><span class="p">(</span><span class="n">base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">do_first</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import all yggdrasil modules.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base (str, optional): Base module to start from. Defaults to</span>
+<span class="sd">            &#39;yggdrasil&#39;.</span>
+<span class="sd">        exclude (list, optional): Modules that should not be imported.</span>
+<span class="sd">            Defaults to empty list.</span>
+<span class="sd">        do_first (list, optional): Modules that should be import first.</span>
+<span class="sd">            Defaults to empty list.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="s1">&#39;yggdrasil&#39;</span>
+    <span class="k">if</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">exclude</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">do_first</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">do_first</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;yggdrasil&#39;</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">do_first</span><span class="p">:</span>
+        <span class="n">import_all_modules</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">)</span>
+    <span class="n">exclude</span> <span class="o">=</span> <span class="n">exclude</span> <span class="o">+</span> <span class="n">do_first</span>
+    <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">if</span> <span class="n">parts</span><span class="p">:</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="o">*</span><span class="n">parts</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="s1">&#39;__init__.py&#39;</span><span class="p">)):</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">base</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">)</span> <span class="ow">or</span> <span class="n">base</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;tests&#39;</span><span class="p">):</span>
+        <span class="k">return</span>
+    <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="s1">&#39;*.py&#39;</span><span class="p">))):</span>
+        <span class="n">x_base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">x_base</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x_base</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;__.py&#39;</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">x_mod</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">x</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">x_mod</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">x_mod</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))):</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">continue</span>
+        <span class="n">next_module</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">import_all_modules</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">next_module</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                           <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span> <span class="o">+</span> <span class="n">do_first</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="TimeOut"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.TimeOut">[docs]</a><span class="k">class</span> <span class="nc">TimeOut</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for checking if a period of time has been elapsed.</span>
 
@@ -1456,7 +1412,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_time</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_time</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_time</span> <span class="o">=</span> <span class="n">max_time</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
@@ -1495,7 +1451,7 @@
 <div class="viewcode-block" id="YggLoggerAdapter"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.YggLoggerAdapter">[docs]</a><span class="k">class</span> <span class="nc">YggLoggerAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">LoggerAdapter</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Logger adapter for use with YggClass.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">class_name</span><span class="p">,</span> <span class="n">instance_name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">class_name</span><span class="p">,</span> <span class="n">instance_name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_class_name</span> <span class="o">=</span> <span class="n">class_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_instance_name</span> <span class="o">=</span> <span class="n">instance_name</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggLoggerAdapter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -1568,7 +1524,7 @@
 
     <span class="n">_base_defaults</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;uuid&#39;</span><span class="p">,</span> <span class="s1">&#39;working_dir&#39;</span><span class="p">,</span> <span class="s1">&#39;timeout&#39;</span><span class="p">,</span> <span class="s1">&#39;sleeptime&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">timeout</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span> <span class="n">sleeptime</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Defaults</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1670,13 +1626,13 @@
 <div class="viewcode-block" id="YggClass.debug_log"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.YggClass.debug_log">[docs]</a>    <span class="k">def</span> <span class="nf">debug_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn on debugging.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Setting debug_log&quot;</span><span class="p">)</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">get_ygg_loglevel</span><span class="p">,</span> <span class="n">set_ygg_loglevel</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="kn">import</span> <span class="n">get_ygg_loglevel</span><span class="p">,</span> <span class="n">set_ygg_loglevel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span> <span class="o">=</span> <span class="n">get_ygg_loglevel</span><span class="p">()</span>
         <span class="n">set_ygg_loglevel</span><span class="p">(</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggClass.reset_log"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.YggClass.reset_log">[docs]</a>    <span class="k">def</span> <span class="nf">reset_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resetting logging to prior value.&quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">set_ygg_loglevel</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="kn">import</span> <span class="n">set_ygg_loglevel</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">set_ygg_loglevel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span><span class="p">)</span></div>
 
@@ -1916,7 +1872,7 @@
 <span class="sd">            KeyError: If the key already exists.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">multitasking</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">multitasking</span>
         <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span>
         <span class="k">elif</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
@@ -2031,46 +1987,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

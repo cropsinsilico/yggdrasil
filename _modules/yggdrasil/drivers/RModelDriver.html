@@ -1,72 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.drivers.RModelDriver &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.drivers.RModelDriver &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-
-    
+    <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -74,19 +36,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
@@ -117,91 +68,49 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../../index.html">Module code</a> &raquo;</li>
-        
-          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
           <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
-        
       <li>yggdrasil.drivers.RModelDriver</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for yggdrasil.drivers.RModelDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">serialize</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">constants</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.InterpretedModelDriver</span> <span class="k">import</span> <span class="n">InterpretedModelDriver</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.PythonModelDriver</span> <span class="k">import</span> <span class="n">PythonModelDriver</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="k">import</span> <span class="n">CModelDriver</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.languages.R</span> <span class="k">import</span> <span class="n">install</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">serialize</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.InterpretedModelDriver</span> <span class="kn">import</span> <span class="n">InterpretedModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.PythonModelDriver</span> <span class="kn">import</span> <span class="n">PythonModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="kn">import</span> <span class="n">CModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.languages.R</span> <span class="kn">import</span> <span class="n">install</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="RModelDriver"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.RModelDriver.RModelDriver">[docs]</a><span class="k">class</span> <span class="nc">RModelDriver</span><span class="p">(</span><span class="n">InterpretedModelDriver</span><span class="p">):</span>  <span class="c1"># pragma: R</span>
+<div class="viewcode-block" id="RModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver">[docs]</a><span class="k">class</span> <span class="nc">RModelDriver</span><span class="p">(</span><span class="n">InterpretedModelDriver</span><span class="p">):</span>  <span class="c1"># pragma: R</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for running R models.</span>
 
 <span class="sd">    Args:</span>
@@ -319,7 +228,7 @@
     <span class="n">brackets</span> <span class="o">=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;{&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;}&#39;</span><span class="p">)</span>
     <span class="n">zero_based</span> <span class="o">=</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="RModelDriver.is_library_installed"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.RModelDriver.RModelDriver.is_library_installed">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="RModelDriver.is_library_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.is_library_installed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_library_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lib</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a dependency is installed.</span>
 
@@ -340,7 +249,7 @@
                 <span class="bp">cls</span><span class="o">.</span><span class="n">_library_cache</span><span class="p">[</span><span class="n">lib</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_library_cache</span><span class="p">[</span><span class="n">lib</span><span class="p">]</span></div>
         
-<div class="viewcode-block" id="RModelDriver.language_version"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.RModelDriver.RModelDriver.language_version">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="RModelDriver.language_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.language_version">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">language_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this language.</span>
 
@@ -355,7 +264,7 @@
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;skip_interpreter_flags&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">RModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">language_version</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RModelDriver.run_model"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.RModelDriver.RModelDriver.run_model">[docs]</a>    <span class="k">def</span> <span class="nf">run_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="RModelDriver.run_model"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.run_model">[docs]</a>    <span class="k">def</span> <span class="nf">run_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the model. Unless overridden, the model will be run using</span>
 <span class="sd">        run_executable.</span>
 
@@ -380,7 +289,7 @@
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;debug_flags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">RModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_model</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
-<div class="viewcode-block" id="RModelDriver.set_env"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.RModelDriver.RModelDriver.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="RModelDriver.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
 
 <span class="sd">        Returns:</span>
@@ -396,7 +305,7 @@
                                                       <span class="n">add_to_front</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
-<div class="viewcode-block" id="RModelDriver.comm_atexit"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.RModelDriver.RModelDriver.comm_atexit">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="RModelDriver.comm_atexit"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.comm_atexit">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">comm_atexit</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">comm</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations performed on comm at exit including draining receive.</span>
 <span class="sd">        </span>
@@ -413,7 +322,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="s1">&#39;dont_backlog&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
             <span class="n">comm</span><span class="o">.</span><span class="n">linger_close</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="RModelDriver.python2language"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.RModelDriver.RModelDriver.python2language">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="RModelDriver.python2language"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.python2language">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">python2language</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pyobj</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prepare a python object for transformation in R.</span>
 
@@ -446,7 +355,7 @@
                     <span class="n">pyobj</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">pyobj</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int32&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pyobj</span></div>
     
-<div class="viewcode-block" id="RModelDriver.write_model_wrapper"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.RModelDriver.RModelDriver.write_model_wrapper">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="RModelDriver.write_model_wrapper"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.write_model_wrapper">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_model_wrapper</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_file</span><span class="p">,</span> <span class="n">model_function</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to wrap a model function as an integrated</span>
 <span class="sd">        model.</span>
@@ -468,7 +377,7 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">RModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_model_wrapper</span><span class="p">(</span>
             <span class="n">model_file</span><span class="p">,</span> <span class="n">model_function</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RModelDriver.write_executable_import"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.RModelDriver.RModelDriver.write_executable_import">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="RModelDriver.write_executable_import"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.write_executable_import">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_executable_import</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add import statements to executable lines.</span>
 <span class="sd">       </span>
@@ -508,7 +417,7 @@
 
     <span class="c1"># The following is only provided for the yggcc CLI for building R</span>
     <span class="c1"># packages and should not be used directly</span>
-<div class="viewcode-block" id="RModelDriver.call_compiler"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.RModelDriver.RModelDriver.call_compiler">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="RModelDriver.call_compiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.call_compiler">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">call_compiler</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">package_dir</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">language</span><span class="o">=</span><span class="s1">&#39;c++&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                       <span class="n">use_ccache</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
@@ -530,7 +439,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">shutil</span>
         <span class="kn">import</span> <span class="nn">subprocess</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
         <span class="k">if</span> <span class="n">flags</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">flags</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">package_dir</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -616,7 +525,7 @@
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">makevar_copy</span><span class="p">):</span>
                 <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">makevar_copy</span><span class="p">,</span> <span class="n">makevar</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RModelDriver.write_initialize_oiter"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.RModelDriver.RModelDriver.write_initialize_oiter">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="RModelDriver.write_initialize_oiter"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.write_initialize_oiter">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_initialize_oiter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to initialize an array for iteration</span>
 <span class="sd">        output.</span>
@@ -638,7 +547,7 @@
             <span class="n">var</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="RModelDriver.write_finalize_oiter"><a class="viewcode-back" href="../../../advanced/yggdrasil_code.html#yggdrasil.drivers.RModelDriver.RModelDriver.write_finalize_oiter">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="RModelDriver.write_finalize_oiter"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.write_finalize_oiter">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_finalize_oiter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to finalize an array after iteration.</span>
 
@@ -664,50 +573,62 @@
              <span class="s1">&#39; mode=&quot;standard&quot;)&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]),</span>
             <span class="s1">&#39;}&#39;</span><span class="p">,</span>
         <span class="p">]</span>
-        <span class="k">return</span> <span class="n">out</span></div></div>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="RModelDriver.install_dependency"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.install_dependency">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">install_dependency</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="n">package_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Install a dependency.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            package (str): Name of the package that should be installed. If</span>
+<span class="sd">                the package manager supports it, this can include version</span>
+<span class="sd">                requirements.</span>
+<span class="sd">            package_manager (str, optional): Package manager that should be</span>
+<span class="sd">                used to install the package.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">package_manager</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cran&#39;</span><span class="p">,</span> <span class="s1">&#39;CRAN&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">package</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s1">&#39;c(&#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">package</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">package</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\&quot;</span><span class="si">{</span><span class="n">package</span><span class="si">}</span><span class="se">\&quot;</span><span class="s1">&#39;</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
+                <span class="s1">&#39;command&#39;</span><span class="p">,</span>
+                <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_interpreter</span><span class="p">(),</span> <span class="s1">&#39;-e&#39;</span><span class="p">,</span>
+                 <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">install.packages(</span><span class="si">{</span><span class="n">package</span><span class="si">}</span><span class="s1">, dep=TRUE, &#39;</span>
+                  <span class="sa">f</span><span class="s1">&#39;repos=</span><span class="se">\&quot;</span><span class="s1">http://cloud.r-project.org</span><span class="se">\&quot;</span><span class="s1">)</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">RModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">install_dependency</span><span class="p">(</span>
+            <span class="n">package</span><span class="p">,</span> <span class="n">package_manager</span><span class="o">=</span><span class="n">package_manager</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

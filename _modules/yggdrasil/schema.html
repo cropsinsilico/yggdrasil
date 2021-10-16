@@ -1,72 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.schema &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.schema &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -74,19 +36,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
@@ -117,91 +68,56 @@
 <li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-          <li><a href="../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
       <li>yggdrasil.schema</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for yggdrasil.schema</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">jsonschema.exceptions</span> <span class="k">import</span> <span class="n">ValidationError</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">metaschema</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">jsonschema.exceptions</span> <span class="kn">import</span> <span class="n">ValidationError</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">metaschema</span>
 
 
 <span class="n">_schema_fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
     <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;.ygg_schema.yml&#39;</span><span class="p">))</span>
 <span class="n">_schema</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">_constants_separator</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"># ======================================================</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;# Do not edit this file past this point as the following</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;# is generated by yggdrasil.schema.update_constants</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;# ======================================================</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="SchemaDict"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaDict">[docs]</a><span class="k">class</span> <span class="nc">SchemaDict</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;OrderedDict subclass for ordering schemas on read in Python 2.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
 
 
@@ -255,16 +171,10 @@
 
 <div class="viewcode-block" id="create_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.create_schema">[docs]</a><span class="k">def</span> <span class="nf">create_schema</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new schema from the registry.&quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">init_registry</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">old_env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_RUNNING_YGGSCHEMA&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;YGG_RUNNING_YGGSCHEMA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">SchemaRegistry</span><span class="p">(</span><span class="n">init_registry</span><span class="p">())</span>
-    <span class="k">finally</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">old_env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">del</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;YGG_RUNNING_YGGSCHEMA&#39;</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;YGG_RUNNING_YGGSCHEMA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_env</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">init_registry</span><span class="p">,</span> <span class="n">registering</span>
+    <span class="k">with</span> <span class="n">registering</span><span class="p">():</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">SchemaRegistry</span><span class="p">(</span><span class="n">init_registry</span><span class="p">(</span><span class="n">recurse</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="n">update_constants</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">x</span></div>
 
 
@@ -326,7 +236,9 @@
                 <span class="s1">&#39;function&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;instance&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;1darray&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;ndarray&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;ply&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">}</span>
+                <span class="s1">&#39;ply&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;any&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;null&quot;</span><span class="p">]}</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="n">convert_extended2base</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">)):</span>
@@ -405,11 +317,13 @@
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="update_constants"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.update_constants">[docs]</a><span class="k">def</span> <span class="nf">update_constants</span><span class="p">():</span>
+<div class="viewcode-block" id="update_constants"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.update_constants">[docs]</a><span class="k">def</span> <span class="nf">update_constants</span><span class="p">(</span><span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update constants.py with info from the schema.&quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
         <span class="n">get_compilation_tool_registry</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">schema</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">schema</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">as_lines</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">key_order</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -430,14 +344,19 @@
             <span class="n">out</span> <span class="o">+=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
 
-    <span class="n">separator</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"># ======================================================</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;# Do not edit this file past this point as the following</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;# is generated by yggdrasil.schema.update_constants</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;# ======================================================</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;constants.py&#39;</span><span class="p">)</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span>
-    <span class="n">drivers</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">subtypes</span><span class="p">}</span>
+    <span class="c1"># Component information</span>
+    <span class="n">component_registry</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">schema</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">component_registry</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;module&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">module</span><span class="p">,</span>
+            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">default_subtype</span><span class="p">,</span>
+            <span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">base_subtype_class_name</span><span class="p">,</span>
+            <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">subtype_key</span><span class="p">,</span>
+            <span class="s1">&#39;subtypes&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">subtype2class</span><span class="p">}</span>
+    <span class="c1"># Language driver information</span>
+    <span class="n">drivers</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+               <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">component_registry</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">][</span><span class="s1">&#39;subtypes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="n">language_cat</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;compiled&#39;</span><span class="p">,</span> <span class="s1">&#39;interpreted&#39;</span><span class="p">,</span> <span class="s1">&#39;build&#39;</span><span class="p">,</span> <span class="s1">&#39;dsl&#39;</span><span class="p">,</span> <span class="s1">&#39;other&#39;</span><span class="p">]</span>
     <span class="n">typemap</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;compiler&#39;</span><span class="p">:</span> <span class="s1">&#39;compiled&#39;</span><span class="p">,</span> <span class="s1">&#39;interpreter&#39;</span><span class="p">:</span> <span class="s1">&#39;interpreted&#39;</span><span class="p">}</span>
     <span class="n">lang2ext</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;yaml&#39;</span><span class="p">:</span> <span class="s1">&#39;.yml&#39;</span><span class="p">,</span> <span class="s1">&#39;executable&#39;</span><span class="p">:</span> <span class="s1">&#39;.exe&#39;</span><span class="p">}</span>
@@ -462,6 +381,9 @@
         <span class="n">languages_with_aliases</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">drv_type</span><span class="p">,</span> <span class="p">[])</span>
         <span class="n">languages_with_aliases</span><span class="p">[</span><span class="n">drv_type</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
         <span class="n">languages_with_aliases</span><span class="p">[</span><span class="n">drv_type</span><span class="p">]</span> <span class="o">+=</span> <span class="n">drv</span><span class="o">.</span><span class="n">language_aliases</span>
+    <span class="n">languages</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">languages</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">languages_with_aliases</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span>
+                              <span class="n">languages_with_aliases</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;linker&#39;</span><span class="p">,</span> <span class="s1">&#39;archiver&#39;</span><span class="p">]:</span>
         <span class="n">reg</span> <span class="o">=</span> <span class="n">get_compilation_tool_registry</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;by_language&#39;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="k">for</span> <span class="n">lang</span><span class="p">,</span> <span class="n">tools</span> <span class="ow">in</span> <span class="n">reg</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -476,8 +398,13 @@
                     <span class="n">compiler_env_vars</span><span class="p">[</span><span class="n">lang</span><span class="p">]</span> <span class="o">=</span> <span class="n">compilation_tool_vars</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">language_cat</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">languages</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
-        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">separator</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">separator</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">_constants_separator</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                 <span class="n">_constants_separator</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
     <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;# Component registry&quot;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;COMPONENT_REGISTRY = </span><span class="si">{</span><span class="n">as_lines</span><span class="p">(</span><span class="n">component_registry</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;# Language driver constants&quot;</span><span class="p">,</span>
         <span class="s2">&quot;LANG2EXT = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">as_lines</span><span class="p">(</span><span class="n">lang2ext</span><span class="p">),</span>
         <span class="s2">&quot;EXT2LANG = {v: k for k, v in LANG2EXT.items()}&quot;</span><span class="p">,</span>
         <span class="s2">&quot;LANGUAGES = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">as_lines</span><span class="p">(</span><span class="n">languages</span><span class="p">,</span> <span class="n">key_order</span><span class="o">=</span><span class="n">language_cat</span><span class="p">)]</span>
@@ -525,19 +452,18 @@
 <span class="sd">            associated values of the subtype_key property for this component.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># _subtype_keys = {&#39;model&#39;: &#39;language&#39;, &#39;comm&#39;: &#39;commtype&#39;, &#39;file&#39;: &#39;filetype&#39;,</span>
-    <span class="c1">#                  &#39;connection&#39;: &#39;connection_type&#39;}</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_type</span><span class="p">,</span> <span class="n">subtype_key</span><span class="p">,</span>
-                 <span class="n">schema_registry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">schema_subtypes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_type</span><span class="p">,</span> <span class="n">subtype_key</span><span class="p">,</span> <span class="n">schema_registry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">module</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">schema_subtypes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span> <span class="o">=</span> <span class="n">SchemaDict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_base_schema</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">schema_registry</span> <span class="o">=</span> <span class="n">schema_registry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">schema_type</span> <span class="o">=</span> <span class="n">schema_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">subtype_key</span> <span class="o">=</span> <span class="n">subtype_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schema_registry</span> <span class="o">=</span> <span class="n">schema_registry</span>
         <span class="k">if</span> <span class="n">schema_subtypes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">schema_subtypes</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span> <span class="o">=</span> <span class="n">schema_subtypes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="n">module</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ComponentSchema</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
 <div class="viewcode-block" id="ComponentSchema.identify_subtype"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.ComponentSchema.identify_subtype">[docs]</a>    <span class="k">def</span> <span class="nf">identify_subtype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
@@ -615,8 +541,9 @@
             <span class="k">if</span> <span class="n">unique</span><span class="p">:</span>
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;additionalProperties&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">if</span> <span class="s1">&#39;required&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
-                    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">])</span>
-                                           <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_base_schema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="p">[])))</span>
+                    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+                        <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">])</span>
+                             <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_base_schema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="p">[]))))</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]:</span>
                         <span class="k">del</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_schema</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -630,10 +557,9 @@
             <span class="k">if</span> <span class="n">subtype</span> <span class="o">==</span> <span class="s1">&#39;base&#39;</span><span class="p">:</span>
                 <span class="n">comp_cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_subtype_class</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
+                <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
                 <span class="n">comp_cls</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">schema_type</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">subtype</span><span class="p">,</span>
-                    <span class="n">without_schema</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">schema_type</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">subtype</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;oneOf&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">out</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;instance&#39;</span><span class="p">,</span>
                                    <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="n">comp_cls</span><span class="p">}]}</span>
         <span class="k">return</span> <span class="n">out</span></div>
@@ -665,7 +591,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;allOf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_subtype_schema</span><span class="p">(</span><span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="n">relaxed</span><span class="o">=</span><span class="n">relaxed</span><span class="p">),</span>
                             <span class="p">{</span><span class="s1">&#39;anyOf&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_subtype_schema</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                                       <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">keys</span><span class="p">()]}]</span>
+                                       <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">keys</span><span class="p">())]}]</span>
         <span class="k">if</span> <span class="n">allow_instance</span><span class="p">:</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;oneOf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;allOf&#39;</span><span class="p">:</span> <span class="n">out</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;allOf&#39;</span><span class="p">)},</span>
                             <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;instance&#39;</span><span class="p">,</span>
@@ -688,7 +614,7 @@
                <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_type</span><span class="p">,</span>
                <span class="s1">&#39;allOf&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_subtype_schema</span><span class="p">(</span><span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
                          <span class="p">{</span><span class="s1">&#39;anyOf&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_subtype_schema</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-                                    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">keys</span><span class="p">()]}]}</span>
+                                    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">keys</span><span class="p">())]}]}</span>
         <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="ComponentSchema.from_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.ComponentSchema.from_schema">[docs]</a>    <span class="nd">@classmethod</span>
@@ -718,9 +644,15 @@
         <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">schema_type</span><span class="p">,</span> <span class="n">subtype_key</span><span class="p">,</span> <span class="n">schema_registry</span><span class="o">=</span><span class="n">schema_registry</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">_base_schema</span> <span class="o">=</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;allOf&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">subt_schema</span><span class="p">:</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">_storage</span><span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">v</span>
+            <span class="n">v_class_name</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">_storage</span><span class="p">[</span><span class="n">v_class_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
             <span class="n">subtypes</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">out</span><span class="o">.</span><span class="n">subtype_key</span><span class="p">][</span><span class="s1">&#39;enum&#39;</span><span class="p">]</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">subtypes</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="p">[</span><span class="n">v_class_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">subtypes</span>
+            <span class="n">v_module</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">module</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="n">v_module</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span><span class="p">(</span><span class="n">v_module</span> <span class="o">==</span> <span class="n">out</span><span class="o">.</span><span class="n">module</span><span class="p">)</span>
         <span class="c1"># Remove subtype specific properties</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">subt_props</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="n">out</span><span class="o">.</span><span class="n">subtype_key</span><span class="p">:</span>
@@ -735,12 +667,12 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="ComponentSchema.from_registry"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.ComponentSchema.from_registry">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_registry</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">schema_type</span><span class="p">,</span> <span class="n">schema_classes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">from_registry</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">schema_type</span><span class="p">,</span> <span class="n">registry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Construct a ComponentSchema from a registry entry.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            schema_type (str): Name of component type to build.</span>
-<span class="sd">            schema_classes (list): List of classes for the component type.</span>
+<span class="sd">            registry (dict): Registry information for the component.</span>
 <span class="sd">            **kwargs: Additional keyword arguments are passed to the class</span>
 <span class="sd">                __init__ method.</span>
 
@@ -748,10 +680,15 @@
 <span class="sd">            ComponentSchema: Schema with information from classes.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">schema_classes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">schema_type</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">_schema_subtype_key</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">schema_subtypes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">registry</span><span class="p">[</span><span class="s1">&#39;subtypes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">schema_subtypes</span><span class="p">:</span>
+                <span class="n">schema_subtypes</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">schema_subtypes</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="n">registry</span><span class="p">[</span><span class="s1">&#39;module&#39;</span><span class="p">],</span>
+                      <span class="n">schema_subtypes</span><span class="o">=</span><span class="n">schema_subtypes</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">schema_type</span><span class="p">,</span> <span class="n">registry</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">registry</span><span class="p">[</span><span class="s1">&#39;classes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
@@ -787,13 +724,31 @@
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">base_subtype_class_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of base class for the subtype.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_base_subtype_class_name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">base_subtype_class</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_subtype_class_name</span>
+            
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">base_subtype_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;ComponentClass: Base class for the subtype.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_base_subtype_class&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">get_component_base_class</span>
-            <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subtype2class</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_base_subtype_class</span> <span class="o">=</span> <span class="n">get_component_base_class</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">schema_type</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">without_schema</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">default_class</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+                <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">default_class</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span>
+                <span class="n">default_class</span><span class="p">)</span>
+            <span class="n">base_class</span> <span class="o">=</span> <span class="bp">cls</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">_schema_type</span> <span class="o">!=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_type</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">base_class</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Could not determine a base class for &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">schema_type</span><span class="si">}</span><span class="s2"> (using class </span><span class="si">{</span><span class="bp">cls</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_base_subtype_class</span> <span class="o">=</span> <span class="n">base_class</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_base_subtype_class_name</span> <span class="o">=</span> <span class="n">base_class</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_subtype_class</span>
 
     <span class="nd">@property</span>
@@ -827,15 +782,17 @@
         <span class="k">assert</span><span class="p">(</span><span class="n">comp_cls</span><span class="o">.</span><span class="n">_schema_type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_type</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">comp_cls</span><span class="o">.</span><span class="n">_schema_subtype_key</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">subtype_key</span><span class="p">)</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">comp_cls</span><span class="o">.</span><span class="vm">__name__</span>
-        <span class="c1"># name = &#39;%s.%s&#39; % (comp_cls.__module__, comp_cls.__name__)</span>
+        <span class="n">fullname</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">comp_cls</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">comp_cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">subtype_module</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comp_cls</span><span class="o">.</span><span class="vm">__module__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
         <span class="c1"># Append subtype</span>
         <span class="n">subtype_list</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">comp_cls</span><span class="p">,</span> <span class="s1">&#39;_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">subtype_key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subtype_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">subtype_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">subtype_list</span><span class="p">]</span>
         <span class="n">subtype_list</span> <span class="o">+=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">comp_cls</span><span class="p">,</span> <span class="s1">&#39;_</span><span class="si">%s</span><span class="s1">_aliases&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">subtype_key</span><span class="p">,</span> <span class="p">[])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">subtype_list</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">subtype_module</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">)</span>
         <span class="c1"># Create new schema for subtype</span>
-        <span class="n">new_schema</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+        <span class="n">new_schema</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">fullname</span><span class="p">,</span>
                       <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Schema for </span><span class="si">%s</span><span class="s1"> component </span><span class="si">%s</span><span class="s1"> subtype.&#39;</span>
                                       <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schema_type</span><span class="p">,</span> <span class="n">subtype_list</span><span class="p">)),</span>
                       <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
@@ -879,9 +836,9 @@
         <span class="c1"># Update base schema, checking for compatiblity</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_base</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;required&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_schema</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_base_schema</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_base_schema</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span>
                     <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_base_schema</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">])</span>
-                    <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">new_schema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="p">[])))</span>
+                    <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">new_schema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="p">[]))))</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_schema</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
                     <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_schema</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span>
             <span class="n">prop_overlap</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
@@ -936,7 +893,7 @@
     <span class="n">_normalizers</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_default_required_components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="s1">&#39;connection&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SchemaRegistry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span> <span class="o">=</span> <span class="n">SchemaDict</span><span class="p">()</span>
@@ -1081,15 +1038,21 @@
                 <span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="s1">&#39;transform&#39;</span><span class="p">:</span> <span class="p">{</span>
                         <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/transform&quot;</span><span class="p">}}}},</span>
+                        <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/transform&quot;</span><span class="p">}},</span>
+                    <span class="s1">&#39;default_file&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/file&#39;</span><span class="p">}},</span>
+                <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;serializer&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/serializer&#39;</span><span class="p">}}},</span>
             <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span>
-                          <span class="s1">&#39;repository_url&#39;</span><span class="p">]},</span>
+                          <span class="s1">&#39;repository_url&#39;</span><span class="p">,</span> <span class="s1">&#39;repository_commit&#39;</span><span class="p">]},</span>
             <span class="s1">&#39;remove&#39;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;is_default&#39;</span><span class="p">,</span> <span class="s1">&#39;length_map&#39;</span><span class="p">,</span> <span class="s1">&#39;serializer&#39;</span><span class="p">,</span>
                          <span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;dont_copy&#39;</span><span class="p">,</span> <span class="s1">&#39;for_service&#39;</span><span class="p">,</span>
                          <span class="s1">&#39;send_converter&#39;</span><span class="p">,</span> <span class="s1">&#39;recv_converter&#39;</span><span class="p">,</span> <span class="s1">&#39;client_id&#39;</span><span class="p">,</span>
-                         <span class="s1">&#39;cookies&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;params&#39;</span><span class="p">,</span> <span class="s1">&#39;port&#39;</span><span class="p">],</span>
+                         <span class="s1">&#39;cookies&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;params&#39;</span><span class="p">,</span> <span class="s1">&#39;port&#39;</span><span class="p">,</span> <span class="s1">&#39;commtype&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;ocomm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;default_value&#39;</span><span class="p">],</span>
                 <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;is_default&#39;</span><span class="p">,</span> <span class="s1">&#39;length_map&#39;</span><span class="p">,</span>
                          <span class="s1">&#39;wait_for_creation&#39;</span><span class="p">,</span> <span class="s1">&#39;working_dir&#39;</span><span class="p">,</span>
                          <span class="s1">&#39;read_meth&#39;</span><span class="p">,</span> <span class="s1">&#39;in_temp&#39;</span><span class="p">,</span>
@@ -1105,19 +1068,37 @@
                           <span class="s1">&#39;aggregation&#39;</span><span class="p">,</span> <span class="s1">&#39;interpolation&#39;</span><span class="p">,</span> <span class="s1">&#39;synonyms&#39;</span><span class="p">,</span>
                           <span class="s1">&#39;driver&#39;</span><span class="p">]},</span>
             <span class="s1">&#39;order&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;repository_url&#39;</span><span class="p">,</span> <span class="s1">&#39;contact_email&#39;</span><span class="p">,</span>
-                          <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span>
-                          <span class="s1">&#39;outputs&#39;</span><span class="p">]},</span>
+                <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;repository_url&#39;</span><span class="p">,</span> <span class="s1">&#39;repository_commit&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;contact_email&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;datatype&#39;</span><span class="p">]},</span>
+            <span class="s1">&#39;update&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Zero or more channels carrying &#39;</span>
+                                        <span class="s1">&#39;input to the model&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/icomm&#39;</span><span class="p">}},</span>
+                    <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Zero or more channels carrying &#39;</span>
+                                        <span class="s1">&#39;output from the model&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/ocomm&#39;</span><span class="p">}},</span>
+                    <span class="s1">&#39;repository_commit&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Commit that should be checked out &#39;</span>
+                                        <span class="s1">&#39;from the model repository.&#39;</span><span class="p">)},</span>
+                    <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;minItems&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}},</span>
+                <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Path to a file in the model &#39;</span>
+                                        <span class="s1">&#39;repository&#39;</span><span class="p">)}}},</span>
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">prop</span>
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">model_form_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for generating a model YAML form.&quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.ScalarMetaschemaProperties</span> <span class="k">import</span> <span class="p">(</span>
-            <span class="n">_valid_types</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">constants</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_schema</span><span class="p">(</span><span class="n">for_form</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">scalar_types</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_valid_types</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">scalar_types</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">VALID_TYPES</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">meta</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">metaschema</span><span class="o">.</span><span class="n">_metaschema</span><span class="p">)</span>
         <span class="n">meta_prop</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;1darray&#39;</span><span class="p">,</span> <span class="s1">&#39;ndarray&#39;</span><span class="p">],</span>
@@ -1139,6 +1120,8 @@
             <span class="k">if</span> <span class="n">types</span><span class="p">:</span>
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;schema&#39;</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;options&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
                     <span class="s1">&#39;dependencies&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">types</span><span class="p">}}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;model&#39;</span><span class="p">]:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;schema&#39;</span><span class="p">,</span> <span class="s1">&#39;simpleTypes&#39;</span><span class="p">]:</span>
                 <span class="k">continue</span>
@@ -1149,53 +1132,60 @@
             <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
                 <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;[DEPRECATED]&#39;</span><span class="p">):</span>
                     <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="s1">&#39;file&#39;</span><span class="p">]:</span>
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;send_converter&#39;</span><span class="p">,</span> <span class="s1">&#39;recv_converter&#39;</span><span class="p">]:</span>
-                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;oneOf&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                    <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="n">items</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/transform&quot;</span><span class="p">})</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]:</span>
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;serializer&#39;</span><span class="p">]:</span>
-                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;oneOf&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                    <span class="p">{</span><span class="s2">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/definitions/serializer&quot;</span><span class="p">})</span>
+        <span class="c1"># Process based on model_form_schema_props</span>
         <span class="n">prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_form_schema_props</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">]:</span>
-            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;model&#39;</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">desc</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;model&#39;</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
-                <span class="s1">&#39; A full description&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;model&#39;</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;model&#39;</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;args&#39;</span><span class="p">][</span><span class="s1">&#39;minItems&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">rlist</span> <span class="ow">in</span> <span class="n">prop</span><span class="p">[</span><span class="s1">&#39;remove&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rlist</span><span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">adjust_definitions</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+            <span class="c1"># Remove</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">prop</span><span class="p">[</span><span class="s1">&#39;remove&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">rdict</span> <span class="ow">in</span> <span class="n">prop</span><span class="p">[</span><span class="s1">&#39;replace&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rdict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="k">if</span> <span class="s1">&#39;description&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">r</span><span class="p">]:</span>
-                    <span class="n">rdict</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="k">if</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+                    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;required&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="c1"># Replace</span>
+            <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">prop</span><span class="p">[</span><span class="s1">&#39;replace&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s1">&#39;description&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="p">{}):</span>
+                    <span class="n">v</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
                         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">r</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">])</span>
-            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">rdict</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">rlist</span> <span class="ow">in</span> <span class="n">prop</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+            <span class="c1"># Required</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="p">[])</span>
-            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rlist</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">prop</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;required&#39;</span><span class="p">]:</span>
                     <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;required&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-        <span class="c1"># for k, adict in prop[&#39;add&#39;].items():</span>
-        <span class="c1">#     out[&#39;definitions&#39;][k][&#39;properties&#39;].update(adict)</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">rlist</span> <span class="ow">in</span> <span class="n">prop</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rlist</span><span class="p">):</span>
+            <span class="c1"># Update</span>
+            <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">new</span> <span class="ow">in</span> <span class="n">prop</span><span class="p">[</span><span class="s1">&#39;update&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
+            <span class="c1"># Add</span>
+            <span class="c1"># out[&#39;definitions&#39;][k][&#39;properties&#39;].update(</span>
+            <span class="c1">#     prop[&#39;add&#39;].get(k, {}))</span>
+            <span class="c1"># Order</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">prop</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">[])):</span>
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">p</span><span class="p">][</span><span class="s1">&#39;propertyOrder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">))</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Update definitions</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="s1">&#39;file&#39;</span><span class="p">]:</span>
+            <span class="n">adjust_definitions</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;icomm&#39;</span><span class="p">,</span> <span class="s1">&#39;ocomm&#39;</span><span class="p">]:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;comm&#39;</span><span class="p">])</span>
+            <span class="n">adjust_definitions</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;icomm&#39;</span><span class="p">][</span><span class="s1">&#39;oneOf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;default file&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;default_file&#39;</span><span class="p">],</span>
+             <span class="s1">&#39;not&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;default_value&#39;</span><span class="p">]}},</span>
+            <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;default value&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;default_value&#39;</span><span class="p">],</span>
+             <span class="s1">&#39;not&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;default_file&#39;</span><span class="p">]}}]</span>
+        <span class="c1"># Adjust formating</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">out</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
             <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;properties&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;boolean&quot;</span><span class="p">:</span>
                     <span class="n">v</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;format&quot;</span><span class="p">,</span> <span class="s2">&quot;checkbox&quot;</span><span class="p">)</span>
+        <span class="c1"># Isolate model</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">))</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
             <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Model YAML Schema&#39;</span><span class="p">,</span>
             <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Schema for yggdrasil model YAML input files.&#39;</span><span class="p">)</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;comm&#39;</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;default_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/file&#39;</span><span class="p">}</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">convert_extended2base</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
 
@@ -1210,13 +1200,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="s1">&#39;full_schema&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span>
         <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="s1">&#39;full_schema&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SchemaRegistry.keys"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="SchemaRegistry.items"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.items">[docs]</a>    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">items</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s1">&#39;schema&#39;</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schema</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">schema</span><span class="p">)</span>
@@ -1282,12 +1275,12 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to validate.</span>
-<span class="sd">            **kwargs: Additional keyword arguments are passed to</span>
-<span class="sd">                yggdrasil.metaschema.validate_instance.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">metaschema</span><span class="o">.</span><span class="n">validate_instance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_form_schema</span><span class="p">,</span>
-                                            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="kn">import</span> <span class="nn">jsonschema</span>
+        <span class="n">jsonschema</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_form_schema</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.validate_component"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.validate_component">[docs]</a>    <span class="k">def</span> <span class="nf">validate_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp_name</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object against a specific component.</span>
@@ -1873,7 +1866,7 @@
                         <span class="n">args_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">instance</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">args_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">instance</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CPPModelDriver</span> <span class="k">import</span> <span class="n">CPPModelDriver</span>
+                    <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CPPModelDriver</span> <span class="kn">import</span> <span class="n">CPPModelDriver</span>
                     <span class="k">if</span> <span class="n">args_ext</span> <span class="ow">in</span> <span class="n">CPPModelDriver</span><span class="o">.</span><span class="n">language_ext</span><span class="p">:</span>
                         <span class="n">instance</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;CPPModelDriver&#39;</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -1950,46 +1943,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

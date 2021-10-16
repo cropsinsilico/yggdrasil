@@ -11,6 +11,10 @@ contact_email         Email address that should be used to contact the maintaine
                       parameter is only used in the model repository.                                                                                
 copies                The number of copies of the model that should be created.                                     int                              
 copy_index            Index of model in set of copies.                                                              int                              
+dependencies          A list of packages required by the model that are written in the same language                list                             
+                      as the model. If the package requires dependencies outside the language of the                                                 
+                      model, use the additional_dependencies parameter to provide them. If you need a                                                
+                      version of the package from a specific package manager, a mapping                                                              
 description           Description of the model. This parameter is only used in the model repository or              str                              
                       when providing the model as a service.                                                                                         
 function              The name of the model function that should be wrapped.                                        str                              
@@ -32,6 +36,8 @@ overwrite             If True, any existing compilation products will be overwri
 process               Process used to run the model.                                                                :class:`yggdrasil.tools.YggPopen`
 products              Files created by running the model. This includes compilation products such as                list                             
                       executables and/or object files.                                                                                               
+repository_commit     Commit that should be checked out in the model repository specified by                        str                              
+                      repository_url.                                                                                                                
 repository_url        URL for the git repository containing the model source code. If provided,                     str                              
                       relative paths in the model YAML definition will be considered relative to the                                                 
                       repository root directory.                                                                                                     
@@ -42,6 +48,8 @@ strace_flags          Flags to pass to strace/dtrace.                           
 timesync              If set, the name of the server performing timestep synchronization for the                    str                              
                       model.                                                                                                                         
 valgrind_flags        Flags to pass to valgrind.                                                                    list                             
+validation_command    Path to a validation command that can be used to verify that the model ran as                 str                              
+                      expected. A non-zero return code is taken to indicate failure.                                                                 
 with_strace           If True, the command is run with strace or dtrace.                                            bool                             
 with_valgrind         If True, the command is run with valgrind.                                                    bool                             
 wrapper_products      Files created in order to wrap the model.                                                     list                             

@@ -1,72 +1,35 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>sbml2 &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>sbml2 &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -74,19 +37,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
@@ -117,72 +69,31 @@
 <li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>sbml2</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/examples/sbml2.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="sbml2">
+             
+  <section id="sbml2">
 <span id="sbml2-rst"></span><h1>sbml2<a class="headerlink" href="#sbml2" title="Permalink to this headline">¶</a></h1>
 <p>A single SBML model runs with input from a files and output to a series of files. This example demonstrates how to control the SBML integration via model parameters in the YAML (e.g. tolerance, time steps, initial conditions).</p>
 <div class="contents local topic" id="contents">
@@ -190,1041 +101,535 @@
 <li><p><a class="reference internal" href="#sbml-version" id="id1">SBML Version</a></p></li>
 </ul>
 </div>
-<div class="section" id="sbml-version">
+<section id="sbml-version">
 <h2><a class="toc-backref" href="#id1">SBML Version</a><a class="headerlink" href="#sbml-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
-  2
-  3
-  4
-  5
-  6
-  7
-  8
-  9
- 10
- 11
- 12
- 13
- 14
- 15
- 16
- 17
- 18
- 19
- 20
- 21
- 22
- 23
- 24
- 25
- 26
- 27
- 28
- 29
- 30
- 31
- 32
- 33
- 34
- 35
- 36
- 37
- 38
- 39
- 40
- 41
- 42
- 43
- 44
- 45
- 46
- 47
- 48
- 49
- 50
- 51
- 52
- 53
- 54
- 55
- 56
- 57
- 58
- 59
- 60
- 61
- 62
- 63
- 64
- 65
- 66
- 67
- 68
- 69
- 70
- 71
- 72
- 73
- 74
- 75
- 76
- 77
- 78
- 79
- 80
- 81
- 82
- 83
- 84
- 85
- 86
- 87
- 88
- 89
- 90
- 91
- 92
- 93
- 94
- 95
- 96
- 97
- 98
- 99
-100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
-111
-112
-113
-114
-115
-116
-117
-118
-119
-120
-121
-122
-123
-124
-125
-126
-127
-128
-129
-130
-131
-132
-133
-134
-135
-136
-137
-138
-139
-140
-141
-142
-143
-144
-145
-146
-147
-148
-149
-150
-151
-152
-153
-154
-155
-156
-157
-158
-159
-160
-161
-162
-163
-164
-165
-166
-167
-168
-169
-170
-171
-172
-173
-174
-175
-176
-177
-178
-179
-180
-181
-182
-183
-184
-185
-186
-187
-188
-189
-190
-191
-192
-193
-194
-195
-196
-197
-198
-199
-200
-201
-202
-203
-204
-205
-206
-207
-208
-209
-210
-211
-212
-213
-214
-215
-216
-217
-218
-219
-220
-221
-222
-223
-224
-225
-226
-227
-228
-229
-230
-231
-232
-233
-234
-235
-236
-237
-238
-239
-240
-241
-242
-243
-244
-245
-246
-247
-248
-249
-250
-251
-252
-253
-254
-255
-256
-257
-258
-259
-260
-261
-262
-263
-264
-265
-266
-267
-268
-269
-270
-271
-272
-273
-274
-275
-276
-277
-278
-279
-280
-281
-282
-283
-284
-285
-286
-287
-288
-289
-290
-291
-292
-293
-294
-295
-296
-297
-298
-299
-300
-301
-302
-303
-304
-305
-306
-307
-308
-309
-310
-311
-312
-313
-314
-315
-316
-317
-318
-319
-320
-321
-322
-323
-324
-325
-326
-327
-328
-329
-330
-331
-332
-333
-334
-335
-336
-337
-338
-339
-340
-341
-342
-343
-344
-345
-346
-347
-348
-349
-350
-351
-352
-353
-354
-355
-356
-357
-358
-359
-360
-361
-362
-363
-364
-365
-366
-367
-368
-369
-370
-371
-372
-373
-374
-375
-376
-377
-378
-379
-380
-381
-382
-383
-384
-385
-386
-387
-388
-389
-390
-391
-392
-393
-394
-395
-396
-397
-398
-399
-400
-401
-402
-403
-404
-405
-406
-407
-408
-409
-410
-411
-412
-413
-414
-415
-416
-417
-418
-419
-420
-421
-422
-423
-424
-425
-426
-427
-428
-429
-430
-431
-432
-433
-434
-435
-436
-437
-438
-439
-440
-441
-442
-443
-444
-445
-446
-447
-448
-449
-450
-451
-452
-453
-454
-455
-456
-457
-458
-459
-460
-461
-462
-463
-464
-465
-466
-467
-468
-469
-470</pre></div></td><td class="code"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;sbml xmlns=&quot;http://www.sbml.org/sbml/level2&quot; xmlns:jd2=&quot;http://www.sys-bio.org/sbml/jd2&quot; level=&quot;2&quot; version=&quot;1&quot;&gt;
-  &lt;model id=&quot;feedback&quot; name=&quot;Feedback&quot;&gt;
-    &lt;annotation&gt;
-      &lt;jd2:JDesignerLayout xmlns:jd2=&quot;http://www.sys-bio.org/sbml/jd2&quot; version=&quot;2.0&quot; MajorVersion=&quot;2&quot; MinorVersion=&quot;3&quot; BuildVersion=&quot;45&quot;&gt;
-        &lt;jd2:header&gt;
-          &lt;jd2:VersionHeader JDesignerVersion=&quot;1.0&quot;/&gt;
-          &lt;jd2:ModelHeader ModelTitle=&quot;Feedback&quot;/&gt;
-          &lt;jd2:TimeCourseDetails timeStart=&quot;0&quot; timeEnd=&quot;25&quot; numberOfPoints=&quot;200&quot;/&gt;
-        &lt;/jd2:header&gt;
-        &lt;jd2:JDGraphicsHeader BackGroundColor=&quot;FFFFFFEF&quot;/&gt;
-        &lt;jd2:listOfCompartments&gt;
-          &lt;jd2:compartment id=&quot;compartment&quot; size=&quot;1&quot; visible=&quot;false&quot;&gt;
-            &lt;jd2:boundingBox x=&quot;0&quot; y=&quot;0&quot; w=&quot;0&quot; h=&quot;0&quot;/&gt;
-            &lt;jd2:membraneStyle thickness=&quot;12&quot; color=&quot;FF00A5FF&quot;/&gt;
-            &lt;jd2:interiorStyle color=&quot;FFEEEEFF&quot;/&gt;
-            &lt;jd2:text value=&quot;compartment&quot; visible=&quot;true&quot;&gt;
-              &lt;jd2:position rx=&quot;-31&quot; ry=&quot;-16&quot;/&gt;
-              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-            &lt;/jd2:text&gt;
-          &lt;/jd2:compartment&gt;
-        &lt;/jd2:listOfCompartments&gt;
-        &lt;jd2:listOfSpecies&gt;
-          &lt;jd2:species id=&quot;S1&quot; boundaryCondition=&quot;false&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;&gt;
-            &lt;jd2:positionLocked value=&quot;false&quot;/&gt;
-            &lt;jd2:boundingBox x=&quot;138&quot; y=&quot;104&quot;/&gt;
-            &lt;jd2:displayValue visible=&quot;false&quot;&gt;
-              &lt;jd2:position rx=&quot;0&quot; ry=&quot;0&quot;/&gt;
-              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-            &lt;/jd2:displayValue&gt;
-            &lt;jd2:text value=&quot;S1&quot; visible=&quot;true&quot;&gt;
-              &lt;jd2:position rx=&quot;4&quot; ry=&quot;6&quot;/&gt;
-              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-            &lt;/jd2:text&gt;
-            &lt;jd2:complex id=&quot;DefaultMolecule&quot; w=&quot;24&quot; h=&quot;24&quot; boundarySpeciesStyle=&quot;bsBox&quot; boundaryStyleColor=&quot;FF0000FF&quot; captionPosition=&quot;npCenter&quot; aliasBoundaryColor=&quot;FFFF0000&quot; aliasBoundaryThickness=&quot;3&quot;&gt;
-              &lt;jd2:subunit shape=&quot;suRoundSquare&quot;&gt;
-                &lt;jd2:boundingBox rx=&quot;0&quot; ry=&quot;0&quot; w=&quot;24&quot; h=&quot;24&quot;/&gt;
-                &lt;jd2:text value=&quot;S1&quot; visible=&quot;false&quot;&gt;
-                  &lt;jd2:position rx=&quot;6&quot; ry=&quot;5&quot;/&gt;
-                  &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-                &lt;/jd2:text&gt;
-                &lt;jd2:color scheme=&quot;gtHorizLinear&quot; startColor=&quot;FFCCFFFF&quot; endColor=&quot;FFFFFFFF&quot;/&gt;
-                &lt;jd2:edgeStyle color=&quot;FF969696&quot; thickness=&quot;1&quot; stroke=&quot;dsSolid&quot;/&gt;
-              &lt;/jd2:subunit&gt;
-            &lt;/jd2:complex&gt;
-          &lt;/jd2:species&gt;
-          &lt;jd2:species id=&quot;S2&quot; boundaryCondition=&quot;false&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;&gt;
-            &lt;jd2:positionLocked value=&quot;false&quot;/&gt;
-            &lt;jd2:boundingBox x=&quot;234&quot; y=&quot;143&quot;/&gt;
-            &lt;jd2:displayValue visible=&quot;false&quot;&gt;
-              &lt;jd2:position rx=&quot;0&quot; ry=&quot;0&quot;/&gt;
-              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-            &lt;/jd2:displayValue&gt;
-            &lt;jd2:text value=&quot;S2&quot; visible=&quot;true&quot;&gt;
-              &lt;jd2:position rx=&quot;4&quot; ry=&quot;6&quot;/&gt;
-              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-            &lt;/jd2:text&gt;
-            &lt;jd2:complex id=&quot;DefaultMolecule&quot; w=&quot;24&quot; h=&quot;24&quot; boundarySpeciesStyle=&quot;bsBox&quot; boundaryStyleColor=&quot;FF0000FF&quot; captionPosition=&quot;npCenter&quot; aliasBoundaryColor=&quot;FFFF0000&quot; aliasBoundaryThickness=&quot;3&quot;&gt;
-              &lt;jd2:subunit shape=&quot;suRoundSquare&quot;&gt;
-                &lt;jd2:boundingBox rx=&quot;0&quot; ry=&quot;0&quot; w=&quot;24&quot; h=&quot;24&quot;/&gt;
-                &lt;jd2:text value=&quot;S1&quot; visible=&quot;false&quot;&gt;
-                  &lt;jd2:position rx=&quot;6&quot; ry=&quot;5&quot;/&gt;
-                  &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-                &lt;/jd2:text&gt;
-                &lt;jd2:color scheme=&quot;gtHorizLinear&quot; startColor=&quot;FFCCFFFF&quot; endColor=&quot;FFFFFFFF&quot;/&gt;
-                &lt;jd2:edgeStyle color=&quot;FF969696&quot; thickness=&quot;1&quot; stroke=&quot;dsSolid&quot;/&gt;
-              &lt;/jd2:subunit&gt;
-            &lt;/jd2:complex&gt;
-          &lt;/jd2:species&gt;
-          &lt;jd2:species id=&quot;S3&quot; boundaryCondition=&quot;false&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;&gt;
-            &lt;jd2:positionLocked value=&quot;false&quot;/&gt;
-            &lt;jd2:boundingBox x=&quot;318&quot; y=&quot;178&quot;/&gt;
-            &lt;jd2:displayValue visible=&quot;false&quot;&gt;
-              &lt;jd2:position rx=&quot;0&quot; ry=&quot;0&quot;/&gt;
-              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-            &lt;/jd2:displayValue&gt;
-            &lt;jd2:text value=&quot;S3&quot; visible=&quot;true&quot;&gt;
-              &lt;jd2:position rx=&quot;4&quot; ry=&quot;6&quot;/&gt;
-              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-            &lt;/jd2:text&gt;
-            &lt;jd2:complex id=&quot;DefaultMolecule&quot; w=&quot;24&quot; h=&quot;24&quot; boundarySpeciesStyle=&quot;bsBox&quot; boundaryStyleColor=&quot;FF0000FF&quot; captionPosition=&quot;npCenter&quot; aliasBoundaryColor=&quot;FFFF0000&quot; aliasBoundaryThickness=&quot;3&quot;&gt;
-              &lt;jd2:subunit shape=&quot;suRoundSquare&quot;&gt;
-                &lt;jd2:boundingBox rx=&quot;0&quot; ry=&quot;0&quot; w=&quot;24&quot; h=&quot;24&quot;/&gt;
-                &lt;jd2:text value=&quot;S1&quot; visible=&quot;false&quot;&gt;
-                  &lt;jd2:position rx=&quot;6&quot; ry=&quot;5&quot;/&gt;
-                  &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-                &lt;/jd2:text&gt;
-                &lt;jd2:color scheme=&quot;gtHorizLinear&quot; startColor=&quot;FFCCFFFF&quot; endColor=&quot;FFFFFFFF&quot;/&gt;
-                &lt;jd2:edgeStyle color=&quot;FF969696&quot; thickness=&quot;1&quot; stroke=&quot;dsSolid&quot;/&gt;
-              &lt;/jd2:subunit&gt;
-            &lt;/jd2:complex&gt;
-          &lt;/jd2:species&gt;
-          &lt;jd2:species id=&quot;S4&quot; boundaryCondition=&quot;false&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;&gt;
-            &lt;jd2:positionLocked value=&quot;false&quot;/&gt;
-            &lt;jd2:boundingBox x=&quot;411&quot; y=&quot;212&quot;/&gt;
-            &lt;jd2:displayValue visible=&quot;false&quot;&gt;
-              &lt;jd2:position rx=&quot;0&quot; ry=&quot;0&quot;/&gt;
-              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-            &lt;/jd2:displayValue&gt;
-            &lt;jd2:text value=&quot;S4&quot; visible=&quot;true&quot;&gt;
-              &lt;jd2:position rx=&quot;4&quot; ry=&quot;6&quot;/&gt;
-              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-            &lt;/jd2:text&gt;
-            &lt;jd2:complex id=&quot;DefaultMolecule&quot; w=&quot;24&quot; h=&quot;24&quot; boundarySpeciesStyle=&quot;bsBox&quot; boundaryStyleColor=&quot;FF0000FF&quot; captionPosition=&quot;npCenter&quot; aliasBoundaryColor=&quot;FFFF0000&quot; aliasBoundaryThickness=&quot;3&quot;&gt;
-              &lt;jd2:subunit shape=&quot;suRoundSquare&quot;&gt;
-                &lt;jd2:boundingBox rx=&quot;0&quot; ry=&quot;0&quot; w=&quot;24&quot; h=&quot;24&quot;/&gt;
-                &lt;jd2:text value=&quot;S1&quot; visible=&quot;false&quot;&gt;
-                  &lt;jd2:position rx=&quot;6&quot; ry=&quot;5&quot;/&gt;
-                  &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-                &lt;/jd2:text&gt;
-                &lt;jd2:color scheme=&quot;gtHorizLinear&quot; startColor=&quot;FFCCFFFF&quot; endColor=&quot;FFFFFFFF&quot;/&gt;
-                &lt;jd2:edgeStyle color=&quot;FF969696&quot; thickness=&quot;1&quot; stroke=&quot;dsSolid&quot;/&gt;
-              &lt;/jd2:subunit&gt;
-            &lt;/jd2:complex&gt;
-          &lt;/jd2:species&gt;
-          &lt;jd2:species id=&quot;X0&quot; boundaryCondition=&quot;true&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;10&quot;&gt;
-            &lt;jd2:positionLocked value=&quot;false&quot;/&gt;
-            &lt;jd2:boundingBox x=&quot;33&quot; y=&quot;60&quot;/&gt;
-            &lt;jd2:displayValue visible=&quot;false&quot;&gt;
-              &lt;jd2:position rx=&quot;0&quot; ry=&quot;0&quot;/&gt;
-              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-            &lt;/jd2:displayValue&gt;
-            &lt;jd2:text value=&quot;X0&quot; visible=&quot;true&quot;&gt;
-              &lt;jd2:position rx=&quot;4&quot; ry=&quot;6&quot;/&gt;
-              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-            &lt;/jd2:text&gt;
-            &lt;jd2:complex id=&quot;DefaultMolecule&quot; w=&quot;24&quot; h=&quot;24&quot; boundarySpeciesStyle=&quot;bsBox&quot; boundaryStyleColor=&quot;FF0000FF&quot; captionPosition=&quot;npCenter&quot; aliasBoundaryColor=&quot;FFFF0000&quot; aliasBoundaryThickness=&quot;3&quot;&gt;
-              &lt;jd2:subunit shape=&quot;suRoundSquare&quot;&gt;
-                &lt;jd2:boundingBox rx=&quot;0&quot; ry=&quot;0&quot; w=&quot;24&quot; h=&quot;24&quot;/&gt;
-                &lt;jd2:text value=&quot;S1&quot; visible=&quot;false&quot;&gt;
-                  &lt;jd2:position rx=&quot;6&quot; ry=&quot;5&quot;/&gt;
-                  &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-                &lt;/jd2:text&gt;
-                &lt;jd2:color scheme=&quot;gtHorizLinear&quot; startColor=&quot;FFCCFFFF&quot; endColor=&quot;FFFFFFFF&quot;/&gt;
-                &lt;jd2:edgeStyle color=&quot;FF969696&quot; thickness=&quot;1&quot; stroke=&quot;dsSolid&quot;/&gt;
-              &lt;/jd2:subunit&gt;
-            &lt;/jd2:complex&gt;
-          &lt;/jd2:species&gt;
-          &lt;jd2:species id=&quot;X1&quot; boundaryCondition=&quot;true&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;&gt;
-            &lt;jd2:positionLocked value=&quot;false&quot;/&gt;
-            &lt;jd2:boundingBox x=&quot;415&quot; y=&quot;292&quot;/&gt;
-            &lt;jd2:displayValue visible=&quot;false&quot;&gt;
-              &lt;jd2:position rx=&quot;0&quot; ry=&quot;0&quot;/&gt;
-              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-            &lt;/jd2:displayValue&gt;
-            &lt;jd2:text value=&quot;X1&quot; visible=&quot;true&quot;&gt;
-              &lt;jd2:position rx=&quot;4&quot; ry=&quot;6&quot;/&gt;
-              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-            &lt;/jd2:text&gt;
-            &lt;jd2:complex id=&quot;DefaultMolecule&quot; w=&quot;24&quot; h=&quot;24&quot; boundarySpeciesStyle=&quot;bsBox&quot; boundaryStyleColor=&quot;FF0000FF&quot; captionPosition=&quot;npCenter&quot; aliasBoundaryColor=&quot;FFFF0000&quot; aliasBoundaryThickness=&quot;3&quot;&gt;
-              &lt;jd2:subunit shape=&quot;suRoundSquare&quot;&gt;
-                &lt;jd2:boundingBox rx=&quot;0&quot; ry=&quot;0&quot; w=&quot;24&quot; h=&quot;24&quot;/&gt;
-                &lt;jd2:text value=&quot;S1&quot; visible=&quot;false&quot;&gt;
-                  &lt;jd2:position rx=&quot;6&quot; ry=&quot;5&quot;/&gt;
-                  &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
-                &lt;/jd2:text&gt;
-                &lt;jd2:color scheme=&quot;gtHorizLinear&quot; startColor=&quot;FFCCFFFF&quot; endColor=&quot;FFFFFFFF&quot;/&gt;
-                &lt;jd2:edgeStyle color=&quot;FF969696&quot; thickness=&quot;1&quot; stroke=&quot;dsSolid&quot;/&gt;
-              &lt;/jd2:subunit&gt;
-            &lt;/jd2:complex&gt;
-          &lt;/jd2:species&gt;
-        &lt;/jd2:listOfSpecies&gt;
-        &lt;jd2:listOfReactions&gt;
-          &lt;jd2:reaction id=&quot;J0&quot; reversible=&quot;false&quot;&gt;
-            &lt;jd2:listOfReactants&gt;
-              &lt;jd2:speciesReference species=&quot;X0&quot; stoichiometry=&quot;1&quot;/&gt;
-            &lt;/jd2:listOfReactants&gt;
-            &lt;jd2:listOfProducts&gt;
-              &lt;jd2:speciesReference species=&quot;S1&quot; stoichiometry=&quot;1&quot;/&gt;
-            &lt;/jd2:listOfProducts&gt;
-            &lt;jd2:listOfModifierEdges&gt;
-              &lt;jd2:modifierEdge&gt;
-                &lt;jd2:speciesReference species=&quot;S4&quot;/&gt;
-                &lt;jd2:destinationReaction name=&quot;J0&quot; regulatorType=&quot;rtNegative&quot; relativePosition=&quot;0.415929203539823&quot; destinationArcId=&quot;0&quot; destinationLineSegmentId=&quot;0&quot;/&gt;
-                &lt;jd2:display lineThickness=&quot;2&quot; lineColor=&quot;FF0000FF&quot; lineDashStyle=&quot;dsSolid&quot; negativeMarkerStyle=&quot;rmBar&quot;&gt;
-                  &lt;jd2:lineType type=&quot;ltSegmentedLine&quot;&gt;
-                    &lt;jd2:pt x=&quot;423&quot; y=&quot;224&quot; type=&quot;modifier&quot; speciesRef=&quot;S4&quot;/&gt;
-                    &lt;jd2:pt x=&quot;353&quot; y=&quot;243&quot;/&gt;
-                    &lt;jd2:pt x=&quot;69&quot; y=&quot;127&quot;/&gt;
-                    &lt;jd2:pt x=&quot;84&quot; y=&quot;101&quot;/&gt;
-                  &lt;/jd2:lineType&gt;
-                &lt;/jd2:display&gt;
-              &lt;/jd2:modifierEdge&gt;
-            &lt;/jd2:listOfModifierEdges&gt;
-            &lt;jd2:kineticLaw type=&quot;explicit&quot;&gt;
-              &lt;jd2:rateEquation value=&quot;J0_VM1*(X0-S1/J0_Keq1)/(1+X0+S1+pow(S4,J0_h))&quot;/&gt;
-            &lt;/jd2:kineticLaw&gt;
-            &lt;jd2:display arrowStyle=&quot;ar1&quot; arrowFillColor=&quot;FF000000&quot; lineColor=&quot;FF838464&quot; lineThickness=&quot;2&quot;&gt;
-              &lt;jd2:lineType type=&quot;ltLine&quot;&gt;
-                &lt;jd2:edge&gt;
-                  &lt;jd2:pt x=&quot;45&quot; y=&quot;72&quot; type=&quot;substrate&quot; speciesRef=&quot;X0&quot;/&gt;
-                  &lt;jd2:pt x=&quot;150&quot; y=&quot;116&quot; type=&quot;product&quot; speciesRef=&quot;S1&quot;/&gt;
-                &lt;/jd2:edge&gt;
-              &lt;/jd2:lineType&gt;
-            &lt;/jd2:display&gt;
-          &lt;/jd2:reaction&gt;
-          &lt;jd2:reaction id=&quot;J1&quot; reversible=&quot;false&quot;&gt;
-            &lt;jd2:listOfReactants&gt;
-              &lt;jd2:speciesReference species=&quot;S1&quot; stoichiometry=&quot;1&quot;/&gt;
-            &lt;/jd2:listOfReactants&gt;
-            &lt;jd2:listOfProducts&gt;
-              &lt;jd2:speciesReference species=&quot;S2&quot; stoichiometry=&quot;1&quot;/&gt;
-            &lt;/jd2:listOfProducts&gt;
-            &lt;jd2:listOfModifierEdges/&gt;
-            &lt;jd2:kineticLaw type=&quot;explicit&quot;&gt;
-              &lt;jd2:rateEquation value=&quot;(10*S1-2*S2)/(1+S1+S2)&quot;/&gt;
-            &lt;/jd2:kineticLaw&gt;
-            &lt;jd2:display arrowStyle=&quot;ar1&quot; arrowFillColor=&quot;FF000000&quot; lineColor=&quot;FF838464&quot; lineThickness=&quot;2&quot;&gt;
-              &lt;jd2:lineType type=&quot;ltLine&quot;&gt;
-                &lt;jd2:edge&gt;
-                  &lt;jd2:pt x=&quot;150&quot; y=&quot;116&quot; type=&quot;substrate&quot; speciesRef=&quot;S1&quot;/&gt;
-                  &lt;jd2:pt x=&quot;246&quot; y=&quot;155&quot; type=&quot;product&quot; speciesRef=&quot;S2&quot;/&gt;
-                &lt;/jd2:edge&gt;
-              &lt;/jd2:lineType&gt;
-            &lt;/jd2:display&gt;
-          &lt;/jd2:reaction&gt;
-          &lt;jd2:reaction id=&quot;J2&quot; reversible=&quot;false&quot;&gt;
-            &lt;jd2:listOfReactants&gt;
-              &lt;jd2:speciesReference species=&quot;S2&quot; stoichiometry=&quot;1&quot;/&gt;
-            &lt;/jd2:listOfReactants&gt;
-            &lt;jd2:listOfProducts&gt;
-              &lt;jd2:speciesReference species=&quot;S3&quot; stoichiometry=&quot;1&quot;/&gt;
-            &lt;/jd2:listOfProducts&gt;
-            &lt;jd2:listOfModifierEdges/&gt;
-            &lt;jd2:kineticLaw type=&quot;explicit&quot;&gt;
-              &lt;jd2:rateEquation value=&quot;(10*S2-2*S3)/(1+S2+S3)&quot;/&gt;
-            &lt;/jd2:kineticLaw&gt;
-            &lt;jd2:display arrowStyle=&quot;ar1&quot; arrowFillColor=&quot;FF000000&quot; lineColor=&quot;FF838464&quot; lineThickness=&quot;2&quot;&gt;
-              &lt;jd2:lineType type=&quot;ltLine&quot;&gt;
-                &lt;jd2:edge&gt;
-                  &lt;jd2:pt x=&quot;246&quot; y=&quot;155&quot; type=&quot;substrate&quot; speciesRef=&quot;S2&quot;/&gt;
-                  &lt;jd2:pt x=&quot;330&quot; y=&quot;190&quot; type=&quot;product&quot; speciesRef=&quot;S3&quot;/&gt;
-                &lt;/jd2:edge&gt;
-              &lt;/jd2:lineType&gt;
-            &lt;/jd2:display&gt;
-          &lt;/jd2:reaction&gt;
-          &lt;jd2:reaction id=&quot;J3&quot; reversible=&quot;false&quot;&gt;
-            &lt;jd2:listOfReactants&gt;
-              &lt;jd2:speciesReference species=&quot;S3&quot; stoichiometry=&quot;1&quot;/&gt;
-            &lt;/jd2:listOfReactants&gt;
-            &lt;jd2:listOfProducts&gt;
-              &lt;jd2:speciesReference species=&quot;S4&quot; stoichiometry=&quot;1&quot;/&gt;
-            &lt;/jd2:listOfProducts&gt;
-            &lt;jd2:listOfModifierEdges/&gt;
-            &lt;jd2:kineticLaw type=&quot;explicit&quot;&gt;
-              &lt;jd2:rateEquation value=&quot;(10*S3-2*S4)/(1+S3+S4)&quot;/&gt;
-            &lt;/jd2:kineticLaw&gt;
-            &lt;jd2:display arrowStyle=&quot;ar1&quot; arrowFillColor=&quot;FF000000&quot; lineColor=&quot;FF838464&quot; lineThickness=&quot;2&quot;&gt;
-              &lt;jd2:lineType type=&quot;ltLine&quot;&gt;
-                &lt;jd2:edge&gt;
-                  &lt;jd2:pt x=&quot;330&quot; y=&quot;190&quot; type=&quot;substrate&quot; speciesRef=&quot;S3&quot;/&gt;
-                  &lt;jd2:pt x=&quot;423&quot; y=&quot;224&quot; type=&quot;product&quot; speciesRef=&quot;S4&quot;/&gt;
-                &lt;/jd2:edge&gt;
-              &lt;/jd2:lineType&gt;
-            &lt;/jd2:display&gt;
-          &lt;/jd2:reaction&gt;
-          &lt;jd2:reaction id=&quot;J4&quot; reversible=&quot;false&quot;&gt;
-            &lt;jd2:listOfReactants&gt;
-              &lt;jd2:speciesReference species=&quot;S4&quot; stoichiometry=&quot;1&quot;/&gt;
-            &lt;/jd2:listOfReactants&gt;
-            &lt;jd2:listOfProducts&gt;
-              &lt;jd2:speciesReference species=&quot;X1&quot; stoichiometry=&quot;1&quot;/&gt;
-            &lt;/jd2:listOfProducts&gt;
-            &lt;jd2:listOfModifierEdges/&gt;
-            &lt;jd2:kineticLaw type=&quot;explicit&quot;&gt;
-              &lt;jd2:rateEquation value=&quot;J4_V4*S4/(J4_KS4+S4)&quot;/&gt;
-            &lt;/jd2:kineticLaw&gt;
-            &lt;jd2:display arrowStyle=&quot;ar1&quot; arrowFillColor=&quot;FF000000&quot; lineColor=&quot;FF838464&quot; lineThickness=&quot;2&quot;&gt;
-              &lt;jd2:lineType type=&quot;ltLine&quot;&gt;
-                &lt;jd2:edge&gt;
-                  &lt;jd2:pt x=&quot;423&quot; y=&quot;224&quot; type=&quot;substrate&quot; speciesRef=&quot;S4&quot;/&gt;
-                  &lt;jd2:pt x=&quot;427&quot; y=&quot;304&quot; type=&quot;product&quot; speciesRef=&quot;X1&quot;/&gt;
-                &lt;/jd2:edge&gt;
-              &lt;/jd2:lineType&gt;
-            &lt;/jd2:display&gt;
-          &lt;/jd2:reaction&gt;
-        &lt;/jd2:listOfReactions&gt;
-      &lt;/jd2:JDesignerLayout&gt;
-    &lt;/annotation&gt;
-    &lt;listOfCompartments&gt;
-      &lt;compartment id=&quot;compartment&quot; size=&quot;1&quot;/&gt;
-    &lt;/listOfCompartments&gt;
-    &lt;listOfSpecies&gt;
-      &lt;species id=&quot;S1&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;/&gt;
-      &lt;species id=&quot;S2&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;/&gt;
-      &lt;species id=&quot;S3&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;/&gt;
-      &lt;species id=&quot;S4&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;/&gt;
-      &lt;species id=&quot;X0&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;10&quot; boundaryCondition=&quot;true&quot;/&gt;
-      &lt;species id=&quot;X1&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot; boundaryCondition=&quot;true&quot;/&gt;
-    &lt;/listOfSpecies&gt;
-    &lt;listOfParameters&gt;
-      &lt;parameter id=&quot;J0_VM1&quot; value=&quot;10&quot;/&gt;
-      &lt;parameter id=&quot;J0_Keq1&quot; value=&quot;10&quot;/&gt;
-      &lt;parameter id=&quot;J0_h&quot; value=&quot;10&quot;/&gt;
-      &lt;parameter id=&quot;J4_V4&quot; value=&quot;2.5&quot;/&gt;
-      &lt;parameter id=&quot;J4_KS4&quot; value=&quot;0.5&quot;/&gt;
-    &lt;/listOfParameters&gt;
-    &lt;listOfReactions&gt;
-      &lt;reaction id=&quot;J0&quot; reversible=&quot;false&quot;&gt;
-        &lt;listOfReactants&gt;
-          &lt;speciesReference species=&quot;X0&quot;/&gt;
-        &lt;/listOfReactants&gt;
-        &lt;listOfProducts&gt;
-          &lt;speciesReference species=&quot;S1&quot;/&gt;
-        &lt;/listOfProducts&gt;
-        &lt;listOfModifiers&gt;
-          &lt;modifierSpeciesReference species=&quot;S4&quot;/&gt;
-        &lt;/listOfModifiers&gt;
-        &lt;kineticLaw&gt;
-          &lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;
-            &lt;apply&gt;
-              &lt;divide/&gt;
-              &lt;apply&gt;
-                &lt;times/&gt;
-                &lt;ci&gt; J0_VM1 &lt;/ci&gt;
-                &lt;apply&gt;
-                  &lt;minus/&gt;
-                  &lt;ci&gt; X0 &lt;/ci&gt;
-                  &lt;apply&gt;
-                    &lt;divide/&gt;
-                    &lt;ci&gt; S1 &lt;/ci&gt;
-                    &lt;ci&gt; J0_Keq1 &lt;/ci&gt;
-                  &lt;/apply&gt;
-                &lt;/apply&gt;
-              &lt;/apply&gt;
-              &lt;apply&gt;
-                &lt;plus/&gt;
-                &lt;cn type=&quot;integer&quot;&gt; 1 &lt;/cn&gt;
-                &lt;ci&gt; X0 &lt;/ci&gt;
-                &lt;ci&gt; S1 &lt;/ci&gt;
-                &lt;apply&gt;
-                  &lt;power/&gt;
-                  &lt;ci&gt; S4 &lt;/ci&gt;
-                  &lt;ci&gt; J0_h &lt;/ci&gt;
-                &lt;/apply&gt;
-              &lt;/apply&gt;
-            &lt;/apply&gt;
-          &lt;/math&gt;
-        &lt;/kineticLaw&gt;
-      &lt;/reaction&gt;
-      &lt;reaction id=&quot;J1&quot; reversible=&quot;false&quot;&gt;
-        &lt;listOfReactants&gt;
-          &lt;speciesReference species=&quot;S1&quot;/&gt;
-        &lt;/listOfReactants&gt;
-        &lt;listOfProducts&gt;
-          &lt;speciesReference species=&quot;S2&quot;/&gt;
-        &lt;/listOfProducts&gt;
-        &lt;kineticLaw&gt;
-          &lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;
-            &lt;apply&gt;
-              &lt;divide/&gt;
-              &lt;apply&gt;
-                &lt;minus/&gt;
-                &lt;apply&gt;
-                  &lt;times/&gt;
-                  &lt;cn type=&quot;integer&quot;&gt; 10 &lt;/cn&gt;
-                  &lt;ci&gt; S1 &lt;/ci&gt;
-                &lt;/apply&gt;
-                &lt;apply&gt;
-                  &lt;times/&gt;
-                  &lt;cn type=&quot;integer&quot;&gt; 2 &lt;/cn&gt;
-                  &lt;ci&gt; S2 &lt;/ci&gt;
-                &lt;/apply&gt;
-              &lt;/apply&gt;
-              &lt;apply&gt;
-                &lt;plus/&gt;
-                &lt;cn type=&quot;integer&quot;&gt; 1 &lt;/cn&gt;
-                &lt;ci&gt; S1 &lt;/ci&gt;
-                &lt;ci&gt; S2 &lt;/ci&gt;
-              &lt;/apply&gt;
-            &lt;/apply&gt;
-          &lt;/math&gt;
-        &lt;/kineticLaw&gt;
-      &lt;/reaction&gt;
-      &lt;reaction id=&quot;J2&quot; reversible=&quot;false&quot;&gt;
-        &lt;listOfReactants&gt;
-          &lt;speciesReference species=&quot;S2&quot;/&gt;
-        &lt;/listOfReactants&gt;
-        &lt;listOfProducts&gt;
-          &lt;speciesReference species=&quot;S3&quot;/&gt;
-        &lt;/listOfProducts&gt;
-        &lt;kineticLaw&gt;
-          &lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;
-            &lt;apply&gt;
-              &lt;divide/&gt;
-              &lt;apply&gt;
-                &lt;minus/&gt;
-                &lt;apply&gt;
-                  &lt;times/&gt;
-                  &lt;cn type=&quot;integer&quot;&gt; 10 &lt;/cn&gt;
-                  &lt;ci&gt; S2 &lt;/ci&gt;
-                &lt;/apply&gt;
-                &lt;apply&gt;
-                  &lt;times/&gt;
-                  &lt;cn type=&quot;integer&quot;&gt; 2 &lt;/cn&gt;
-                  &lt;ci&gt; S3 &lt;/ci&gt;
-                &lt;/apply&gt;
-              &lt;/apply&gt;
-              &lt;apply&gt;
-                &lt;plus/&gt;
-                &lt;cn type=&quot;integer&quot;&gt; 1 &lt;/cn&gt;
-                &lt;ci&gt; S2 &lt;/ci&gt;
-                &lt;ci&gt; S3 &lt;/ci&gt;
-              &lt;/apply&gt;
-            &lt;/apply&gt;
-          &lt;/math&gt;
-        &lt;/kineticLaw&gt;
-      &lt;/reaction&gt;
-      &lt;reaction id=&quot;J3&quot; reversible=&quot;false&quot;&gt;
-        &lt;listOfReactants&gt;
-          &lt;speciesReference species=&quot;S3&quot;/&gt;
-        &lt;/listOfReactants&gt;
-        &lt;listOfProducts&gt;
-          &lt;speciesReference species=&quot;S4&quot;/&gt;
-        &lt;/listOfProducts&gt;
-        &lt;kineticLaw&gt;
-          &lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;
-            &lt;apply&gt;
-              &lt;divide/&gt;
-              &lt;apply&gt;
-                &lt;minus/&gt;
-                &lt;apply&gt;
-                  &lt;times/&gt;
-                  &lt;cn type=&quot;integer&quot;&gt; 10 &lt;/cn&gt;
-                  &lt;ci&gt; S3 &lt;/ci&gt;
-                &lt;/apply&gt;
-                &lt;apply&gt;
-                  &lt;times/&gt;
-                  &lt;cn type=&quot;integer&quot;&gt; 2 &lt;/cn&gt;
-                  &lt;ci&gt; S4 &lt;/ci&gt;
-                &lt;/apply&gt;
-              &lt;/apply&gt;
-              &lt;apply&gt;
-                &lt;plus/&gt;
-                &lt;cn type=&quot;integer&quot;&gt; 1 &lt;/cn&gt;
-                &lt;ci&gt; S3 &lt;/ci&gt;
-                &lt;ci&gt; S4 &lt;/ci&gt;
-              &lt;/apply&gt;
-            &lt;/apply&gt;
-          &lt;/math&gt;
-        &lt;/kineticLaw&gt;
-      &lt;/reaction&gt;
-      &lt;reaction id=&quot;J4&quot; reversible=&quot;false&quot;&gt;
-        &lt;listOfReactants&gt;
-          &lt;speciesReference species=&quot;S4&quot;/&gt;
-        &lt;/listOfReactants&gt;
-        &lt;listOfProducts&gt;
-          &lt;speciesReference species=&quot;X1&quot;/&gt;
-        &lt;/listOfProducts&gt;
-        &lt;kineticLaw&gt;
-          &lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;
-            &lt;apply&gt;
-              &lt;divide/&gt;
-              &lt;apply&gt;
-                &lt;times/&gt;
-                &lt;ci&gt; J4_V4 &lt;/ci&gt;
-                &lt;ci&gt; S4 &lt;/ci&gt;
-              &lt;/apply&gt;
-              &lt;apply&gt;
-                &lt;plus/&gt;
-                &lt;ci&gt; J4_KS4 &lt;/ci&gt;
-                &lt;ci&gt; S4 &lt;/ci&gt;
-              &lt;/apply&gt;
-            &lt;/apply&gt;
-          &lt;/math&gt;
-        &lt;/kineticLaw&gt;
-      &lt;/reaction&gt;
-    &lt;/listOfReactions&gt;
-  &lt;/model&gt;
-&lt;/sbml&gt;
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+<span class="linenos">  2</span>&lt;sbml xmlns=&quot;http://www.sbml.org/sbml/level2&quot; xmlns:jd2=&quot;http://www.sys-bio.org/sbml/jd2&quot; level=&quot;2&quot; version=&quot;1&quot;&gt;
+<span class="linenos">  3</span>  &lt;model id=&quot;feedback&quot; name=&quot;Feedback&quot;&gt;
+<span class="linenos">  4</span>    &lt;annotation&gt;
+<span class="linenos">  5</span>      &lt;jd2:JDesignerLayout xmlns:jd2=&quot;http://www.sys-bio.org/sbml/jd2&quot; version=&quot;2.0&quot; MajorVersion=&quot;2&quot; MinorVersion=&quot;3&quot; BuildVersion=&quot;45&quot;&gt;
+<span class="linenos">  6</span>        &lt;jd2:header&gt;
+<span class="linenos">  7</span>          &lt;jd2:VersionHeader JDesignerVersion=&quot;1.0&quot;/&gt;
+<span class="linenos">  8</span>          &lt;jd2:ModelHeader ModelTitle=&quot;Feedback&quot;/&gt;
+<span class="linenos">  9</span>          &lt;jd2:TimeCourseDetails timeStart=&quot;0&quot; timeEnd=&quot;25&quot; numberOfPoints=&quot;200&quot;/&gt;
+<span class="linenos"> 10</span>        &lt;/jd2:header&gt;
+<span class="linenos"> 11</span>        &lt;jd2:JDGraphicsHeader BackGroundColor=&quot;FFFFFFEF&quot;/&gt;
+<span class="linenos"> 12</span>        &lt;jd2:listOfCompartments&gt;
+<span class="linenos"> 13</span>          &lt;jd2:compartment id=&quot;compartment&quot; size=&quot;1&quot; visible=&quot;false&quot;&gt;
+<span class="linenos"> 14</span>            &lt;jd2:boundingBox x=&quot;0&quot; y=&quot;0&quot; w=&quot;0&quot; h=&quot;0&quot;/&gt;
+<span class="linenos"> 15</span>            &lt;jd2:membraneStyle thickness=&quot;12&quot; color=&quot;FF00A5FF&quot;/&gt;
+<span class="linenos"> 16</span>            &lt;jd2:interiorStyle color=&quot;FFEEEEFF&quot;/&gt;
+<span class="linenos"> 17</span>            &lt;jd2:text value=&quot;compartment&quot; visible=&quot;true&quot;&gt;
+<span class="linenos"> 18</span>              &lt;jd2:position rx=&quot;-31&quot; ry=&quot;-16&quot;/&gt;
+<span class="linenos"> 19</span>              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos"> 20</span>            &lt;/jd2:text&gt;
+<span class="linenos"> 21</span>          &lt;/jd2:compartment&gt;
+<span class="linenos"> 22</span>        &lt;/jd2:listOfCompartments&gt;
+<span class="linenos"> 23</span>        &lt;jd2:listOfSpecies&gt;
+<span class="linenos"> 24</span>          &lt;jd2:species id=&quot;S1&quot; boundaryCondition=&quot;false&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;&gt;
+<span class="linenos"> 25</span>            &lt;jd2:positionLocked value=&quot;false&quot;/&gt;
+<span class="linenos"> 26</span>            &lt;jd2:boundingBox x=&quot;138&quot; y=&quot;104&quot;/&gt;
+<span class="linenos"> 27</span>            &lt;jd2:displayValue visible=&quot;false&quot;&gt;
+<span class="linenos"> 28</span>              &lt;jd2:position rx=&quot;0&quot; ry=&quot;0&quot;/&gt;
+<span class="linenos"> 29</span>              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos"> 30</span>            &lt;/jd2:displayValue&gt;
+<span class="linenos"> 31</span>            &lt;jd2:text value=&quot;S1&quot; visible=&quot;true&quot;&gt;
+<span class="linenos"> 32</span>              &lt;jd2:position rx=&quot;4&quot; ry=&quot;6&quot;/&gt;
+<span class="linenos"> 33</span>              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos"> 34</span>            &lt;/jd2:text&gt;
+<span class="linenos"> 35</span>            &lt;jd2:complex id=&quot;DefaultMolecule&quot; w=&quot;24&quot; h=&quot;24&quot; boundarySpeciesStyle=&quot;bsBox&quot; boundaryStyleColor=&quot;FF0000FF&quot; captionPosition=&quot;npCenter&quot; aliasBoundaryColor=&quot;FFFF0000&quot; aliasBoundaryThickness=&quot;3&quot;&gt;
+<span class="linenos"> 36</span>              &lt;jd2:subunit shape=&quot;suRoundSquare&quot;&gt;
+<span class="linenos"> 37</span>                &lt;jd2:boundingBox rx=&quot;0&quot; ry=&quot;0&quot; w=&quot;24&quot; h=&quot;24&quot;/&gt;
+<span class="linenos"> 38</span>                &lt;jd2:text value=&quot;S1&quot; visible=&quot;false&quot;&gt;
+<span class="linenos"> 39</span>                  &lt;jd2:position rx=&quot;6&quot; ry=&quot;5&quot;/&gt;
+<span class="linenos"> 40</span>                  &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos"> 41</span>                &lt;/jd2:text&gt;
+<span class="linenos"> 42</span>                &lt;jd2:color scheme=&quot;gtHorizLinear&quot; startColor=&quot;FFCCFFFF&quot; endColor=&quot;FFFFFFFF&quot;/&gt;
+<span class="linenos"> 43</span>                &lt;jd2:edgeStyle color=&quot;FF969696&quot; thickness=&quot;1&quot; stroke=&quot;dsSolid&quot;/&gt;
+<span class="linenos"> 44</span>              &lt;/jd2:subunit&gt;
+<span class="linenos"> 45</span>            &lt;/jd2:complex&gt;
+<span class="linenos"> 46</span>          &lt;/jd2:species&gt;
+<span class="linenos"> 47</span>          &lt;jd2:species id=&quot;S2&quot; boundaryCondition=&quot;false&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;&gt;
+<span class="linenos"> 48</span>            &lt;jd2:positionLocked value=&quot;false&quot;/&gt;
+<span class="linenos"> 49</span>            &lt;jd2:boundingBox x=&quot;234&quot; y=&quot;143&quot;/&gt;
+<span class="linenos"> 50</span>            &lt;jd2:displayValue visible=&quot;false&quot;&gt;
+<span class="linenos"> 51</span>              &lt;jd2:position rx=&quot;0&quot; ry=&quot;0&quot;/&gt;
+<span class="linenos"> 52</span>              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos"> 53</span>            &lt;/jd2:displayValue&gt;
+<span class="linenos"> 54</span>            &lt;jd2:text value=&quot;S2&quot; visible=&quot;true&quot;&gt;
+<span class="linenos"> 55</span>              &lt;jd2:position rx=&quot;4&quot; ry=&quot;6&quot;/&gt;
+<span class="linenos"> 56</span>              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos"> 57</span>            &lt;/jd2:text&gt;
+<span class="linenos"> 58</span>            &lt;jd2:complex id=&quot;DefaultMolecule&quot; w=&quot;24&quot; h=&quot;24&quot; boundarySpeciesStyle=&quot;bsBox&quot; boundaryStyleColor=&quot;FF0000FF&quot; captionPosition=&quot;npCenter&quot; aliasBoundaryColor=&quot;FFFF0000&quot; aliasBoundaryThickness=&quot;3&quot;&gt;
+<span class="linenos"> 59</span>              &lt;jd2:subunit shape=&quot;suRoundSquare&quot;&gt;
+<span class="linenos"> 60</span>                &lt;jd2:boundingBox rx=&quot;0&quot; ry=&quot;0&quot; w=&quot;24&quot; h=&quot;24&quot;/&gt;
+<span class="linenos"> 61</span>                &lt;jd2:text value=&quot;S1&quot; visible=&quot;false&quot;&gt;
+<span class="linenos"> 62</span>                  &lt;jd2:position rx=&quot;6&quot; ry=&quot;5&quot;/&gt;
+<span class="linenos"> 63</span>                  &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos"> 64</span>                &lt;/jd2:text&gt;
+<span class="linenos"> 65</span>                &lt;jd2:color scheme=&quot;gtHorizLinear&quot; startColor=&quot;FFCCFFFF&quot; endColor=&quot;FFFFFFFF&quot;/&gt;
+<span class="linenos"> 66</span>                &lt;jd2:edgeStyle color=&quot;FF969696&quot; thickness=&quot;1&quot; stroke=&quot;dsSolid&quot;/&gt;
+<span class="linenos"> 67</span>              &lt;/jd2:subunit&gt;
+<span class="linenos"> 68</span>            &lt;/jd2:complex&gt;
+<span class="linenos"> 69</span>          &lt;/jd2:species&gt;
+<span class="linenos"> 70</span>          &lt;jd2:species id=&quot;S3&quot; boundaryCondition=&quot;false&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;&gt;
+<span class="linenos"> 71</span>            &lt;jd2:positionLocked value=&quot;false&quot;/&gt;
+<span class="linenos"> 72</span>            &lt;jd2:boundingBox x=&quot;318&quot; y=&quot;178&quot;/&gt;
+<span class="linenos"> 73</span>            &lt;jd2:displayValue visible=&quot;false&quot;&gt;
+<span class="linenos"> 74</span>              &lt;jd2:position rx=&quot;0&quot; ry=&quot;0&quot;/&gt;
+<span class="linenos"> 75</span>              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos"> 76</span>            &lt;/jd2:displayValue&gt;
+<span class="linenos"> 77</span>            &lt;jd2:text value=&quot;S3&quot; visible=&quot;true&quot;&gt;
+<span class="linenos"> 78</span>              &lt;jd2:position rx=&quot;4&quot; ry=&quot;6&quot;/&gt;
+<span class="linenos"> 79</span>              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos"> 80</span>            &lt;/jd2:text&gt;
+<span class="linenos"> 81</span>            &lt;jd2:complex id=&quot;DefaultMolecule&quot; w=&quot;24&quot; h=&quot;24&quot; boundarySpeciesStyle=&quot;bsBox&quot; boundaryStyleColor=&quot;FF0000FF&quot; captionPosition=&quot;npCenter&quot; aliasBoundaryColor=&quot;FFFF0000&quot; aliasBoundaryThickness=&quot;3&quot;&gt;
+<span class="linenos"> 82</span>              &lt;jd2:subunit shape=&quot;suRoundSquare&quot;&gt;
+<span class="linenos"> 83</span>                &lt;jd2:boundingBox rx=&quot;0&quot; ry=&quot;0&quot; w=&quot;24&quot; h=&quot;24&quot;/&gt;
+<span class="linenos"> 84</span>                &lt;jd2:text value=&quot;S1&quot; visible=&quot;false&quot;&gt;
+<span class="linenos"> 85</span>                  &lt;jd2:position rx=&quot;6&quot; ry=&quot;5&quot;/&gt;
+<span class="linenos"> 86</span>                  &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos"> 87</span>                &lt;/jd2:text&gt;
+<span class="linenos"> 88</span>                &lt;jd2:color scheme=&quot;gtHorizLinear&quot; startColor=&quot;FFCCFFFF&quot; endColor=&quot;FFFFFFFF&quot;/&gt;
+<span class="linenos"> 89</span>                &lt;jd2:edgeStyle color=&quot;FF969696&quot; thickness=&quot;1&quot; stroke=&quot;dsSolid&quot;/&gt;
+<span class="linenos"> 90</span>              &lt;/jd2:subunit&gt;
+<span class="linenos"> 91</span>            &lt;/jd2:complex&gt;
+<span class="linenos"> 92</span>          &lt;/jd2:species&gt;
+<span class="linenos"> 93</span>          &lt;jd2:species id=&quot;S4&quot; boundaryCondition=&quot;false&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;&gt;
+<span class="linenos"> 94</span>            &lt;jd2:positionLocked value=&quot;false&quot;/&gt;
+<span class="linenos"> 95</span>            &lt;jd2:boundingBox x=&quot;411&quot; y=&quot;212&quot;/&gt;
+<span class="linenos"> 96</span>            &lt;jd2:displayValue visible=&quot;false&quot;&gt;
+<span class="linenos"> 97</span>              &lt;jd2:position rx=&quot;0&quot; ry=&quot;0&quot;/&gt;
+<span class="linenos"> 98</span>              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos"> 99</span>            &lt;/jd2:displayValue&gt;
+<span class="linenos">100</span>            &lt;jd2:text value=&quot;S4&quot; visible=&quot;true&quot;&gt;
+<span class="linenos">101</span>              &lt;jd2:position rx=&quot;4&quot; ry=&quot;6&quot;/&gt;
+<span class="linenos">102</span>              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos">103</span>            &lt;/jd2:text&gt;
+<span class="linenos">104</span>            &lt;jd2:complex id=&quot;DefaultMolecule&quot; w=&quot;24&quot; h=&quot;24&quot; boundarySpeciesStyle=&quot;bsBox&quot; boundaryStyleColor=&quot;FF0000FF&quot; captionPosition=&quot;npCenter&quot; aliasBoundaryColor=&quot;FFFF0000&quot; aliasBoundaryThickness=&quot;3&quot;&gt;
+<span class="linenos">105</span>              &lt;jd2:subunit shape=&quot;suRoundSquare&quot;&gt;
+<span class="linenos">106</span>                &lt;jd2:boundingBox rx=&quot;0&quot; ry=&quot;0&quot; w=&quot;24&quot; h=&quot;24&quot;/&gt;
+<span class="linenos">107</span>                &lt;jd2:text value=&quot;S1&quot; visible=&quot;false&quot;&gt;
+<span class="linenos">108</span>                  &lt;jd2:position rx=&quot;6&quot; ry=&quot;5&quot;/&gt;
+<span class="linenos">109</span>                  &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos">110</span>                &lt;/jd2:text&gt;
+<span class="linenos">111</span>                &lt;jd2:color scheme=&quot;gtHorizLinear&quot; startColor=&quot;FFCCFFFF&quot; endColor=&quot;FFFFFFFF&quot;/&gt;
+<span class="linenos">112</span>                &lt;jd2:edgeStyle color=&quot;FF969696&quot; thickness=&quot;1&quot; stroke=&quot;dsSolid&quot;/&gt;
+<span class="linenos">113</span>              &lt;/jd2:subunit&gt;
+<span class="linenos">114</span>            &lt;/jd2:complex&gt;
+<span class="linenos">115</span>          &lt;/jd2:species&gt;
+<span class="linenos">116</span>          &lt;jd2:species id=&quot;X0&quot; boundaryCondition=&quot;true&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;10&quot;&gt;
+<span class="linenos">117</span>            &lt;jd2:positionLocked value=&quot;false&quot;/&gt;
+<span class="linenos">118</span>            &lt;jd2:boundingBox x=&quot;33&quot; y=&quot;60&quot;/&gt;
+<span class="linenos">119</span>            &lt;jd2:displayValue visible=&quot;false&quot;&gt;
+<span class="linenos">120</span>              &lt;jd2:position rx=&quot;0&quot; ry=&quot;0&quot;/&gt;
+<span class="linenos">121</span>              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos">122</span>            &lt;/jd2:displayValue&gt;
+<span class="linenos">123</span>            &lt;jd2:text value=&quot;X0&quot; visible=&quot;true&quot;&gt;
+<span class="linenos">124</span>              &lt;jd2:position rx=&quot;4&quot; ry=&quot;6&quot;/&gt;
+<span class="linenos">125</span>              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos">126</span>            &lt;/jd2:text&gt;
+<span class="linenos">127</span>            &lt;jd2:complex id=&quot;DefaultMolecule&quot; w=&quot;24&quot; h=&quot;24&quot; boundarySpeciesStyle=&quot;bsBox&quot; boundaryStyleColor=&quot;FF0000FF&quot; captionPosition=&quot;npCenter&quot; aliasBoundaryColor=&quot;FFFF0000&quot; aliasBoundaryThickness=&quot;3&quot;&gt;
+<span class="linenos">128</span>              &lt;jd2:subunit shape=&quot;suRoundSquare&quot;&gt;
+<span class="linenos">129</span>                &lt;jd2:boundingBox rx=&quot;0&quot; ry=&quot;0&quot; w=&quot;24&quot; h=&quot;24&quot;/&gt;
+<span class="linenos">130</span>                &lt;jd2:text value=&quot;S1&quot; visible=&quot;false&quot;&gt;
+<span class="linenos">131</span>                  &lt;jd2:position rx=&quot;6&quot; ry=&quot;5&quot;/&gt;
+<span class="linenos">132</span>                  &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos">133</span>                &lt;/jd2:text&gt;
+<span class="linenos">134</span>                &lt;jd2:color scheme=&quot;gtHorizLinear&quot; startColor=&quot;FFCCFFFF&quot; endColor=&quot;FFFFFFFF&quot;/&gt;
+<span class="linenos">135</span>                &lt;jd2:edgeStyle color=&quot;FF969696&quot; thickness=&quot;1&quot; stroke=&quot;dsSolid&quot;/&gt;
+<span class="linenos">136</span>              &lt;/jd2:subunit&gt;
+<span class="linenos">137</span>            &lt;/jd2:complex&gt;
+<span class="linenos">138</span>          &lt;/jd2:species&gt;
+<span class="linenos">139</span>          &lt;jd2:species id=&quot;X1&quot; boundaryCondition=&quot;true&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;&gt;
+<span class="linenos">140</span>            &lt;jd2:positionLocked value=&quot;false&quot;/&gt;
+<span class="linenos">141</span>            &lt;jd2:boundingBox x=&quot;415&quot; y=&quot;292&quot;/&gt;
+<span class="linenos">142</span>            &lt;jd2:displayValue visible=&quot;false&quot;&gt;
+<span class="linenos">143</span>              &lt;jd2:position rx=&quot;0&quot; ry=&quot;0&quot;/&gt;
+<span class="linenos">144</span>              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos">145</span>            &lt;/jd2:displayValue&gt;
+<span class="linenos">146</span>            &lt;jd2:text value=&quot;X1&quot; visible=&quot;true&quot;&gt;
+<span class="linenos">147</span>              &lt;jd2:position rx=&quot;4&quot; ry=&quot;6&quot;/&gt;
+<span class="linenos">148</span>              &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos">149</span>            &lt;/jd2:text&gt;
+<span class="linenos">150</span>            &lt;jd2:complex id=&quot;DefaultMolecule&quot; w=&quot;24&quot; h=&quot;24&quot; boundarySpeciesStyle=&quot;bsBox&quot; boundaryStyleColor=&quot;FF0000FF&quot; captionPosition=&quot;npCenter&quot; aliasBoundaryColor=&quot;FFFF0000&quot; aliasBoundaryThickness=&quot;3&quot;&gt;
+<span class="linenos">151</span>              &lt;jd2:subunit shape=&quot;suRoundSquare&quot;&gt;
+<span class="linenos">152</span>                &lt;jd2:boundingBox rx=&quot;0&quot; ry=&quot;0&quot; w=&quot;24&quot; h=&quot;24&quot;/&gt;
+<span class="linenos">153</span>                &lt;jd2:text value=&quot;S1&quot; visible=&quot;false&quot;&gt;
+<span class="linenos">154</span>                  &lt;jd2:position rx=&quot;6&quot; ry=&quot;5&quot;/&gt;
+<span class="linenos">155</span>                  &lt;jd2:font fontName=&quot;Arial&quot; fontSize=&quot;8&quot; fontColor=&quot;FF000000&quot;/&gt;
+<span class="linenos">156</span>                &lt;/jd2:text&gt;
+<span class="linenos">157</span>                &lt;jd2:color scheme=&quot;gtHorizLinear&quot; startColor=&quot;FFCCFFFF&quot; endColor=&quot;FFFFFFFF&quot;/&gt;
+<span class="linenos">158</span>                &lt;jd2:edgeStyle color=&quot;FF969696&quot; thickness=&quot;1&quot; stroke=&quot;dsSolid&quot;/&gt;
+<span class="linenos">159</span>              &lt;/jd2:subunit&gt;
+<span class="linenos">160</span>            &lt;/jd2:complex&gt;
+<span class="linenos">161</span>          &lt;/jd2:species&gt;
+<span class="linenos">162</span>        &lt;/jd2:listOfSpecies&gt;
+<span class="linenos">163</span>        &lt;jd2:listOfReactions&gt;
+<span class="linenos">164</span>          &lt;jd2:reaction id=&quot;J0&quot; reversible=&quot;false&quot;&gt;
+<span class="linenos">165</span>            &lt;jd2:listOfReactants&gt;
+<span class="linenos">166</span>              &lt;jd2:speciesReference species=&quot;X0&quot; stoichiometry=&quot;1&quot;/&gt;
+<span class="linenos">167</span>            &lt;/jd2:listOfReactants&gt;
+<span class="linenos">168</span>            &lt;jd2:listOfProducts&gt;
+<span class="linenos">169</span>              &lt;jd2:speciesReference species=&quot;S1&quot; stoichiometry=&quot;1&quot;/&gt;
+<span class="linenos">170</span>            &lt;/jd2:listOfProducts&gt;
+<span class="linenos">171</span>            &lt;jd2:listOfModifierEdges&gt;
+<span class="linenos">172</span>              &lt;jd2:modifierEdge&gt;
+<span class="linenos">173</span>                &lt;jd2:speciesReference species=&quot;S4&quot;/&gt;
+<span class="linenos">174</span>                &lt;jd2:destinationReaction name=&quot;J0&quot; regulatorType=&quot;rtNegative&quot; relativePosition=&quot;0.415929203539823&quot; destinationArcId=&quot;0&quot; destinationLineSegmentId=&quot;0&quot;/&gt;
+<span class="linenos">175</span>                &lt;jd2:display lineThickness=&quot;2&quot; lineColor=&quot;FF0000FF&quot; lineDashStyle=&quot;dsSolid&quot; negativeMarkerStyle=&quot;rmBar&quot;&gt;
+<span class="linenos">176</span>                  &lt;jd2:lineType type=&quot;ltSegmentedLine&quot;&gt;
+<span class="linenos">177</span>                    &lt;jd2:pt x=&quot;423&quot; y=&quot;224&quot; type=&quot;modifier&quot; speciesRef=&quot;S4&quot;/&gt;
+<span class="linenos">178</span>                    &lt;jd2:pt x=&quot;353&quot; y=&quot;243&quot;/&gt;
+<span class="linenos">179</span>                    &lt;jd2:pt x=&quot;69&quot; y=&quot;127&quot;/&gt;
+<span class="linenos">180</span>                    &lt;jd2:pt x=&quot;84&quot; y=&quot;101&quot;/&gt;
+<span class="linenos">181</span>                  &lt;/jd2:lineType&gt;
+<span class="linenos">182</span>                &lt;/jd2:display&gt;
+<span class="linenos">183</span>              &lt;/jd2:modifierEdge&gt;
+<span class="linenos">184</span>            &lt;/jd2:listOfModifierEdges&gt;
+<span class="linenos">185</span>            &lt;jd2:kineticLaw type=&quot;explicit&quot;&gt;
+<span class="linenos">186</span>              &lt;jd2:rateEquation value=&quot;J0_VM1*(X0-S1/J0_Keq1)/(1+X0+S1+pow(S4,J0_h))&quot;/&gt;
+<span class="linenos">187</span>            &lt;/jd2:kineticLaw&gt;
+<span class="linenos">188</span>            &lt;jd2:display arrowStyle=&quot;ar1&quot; arrowFillColor=&quot;FF000000&quot; lineColor=&quot;FF838464&quot; lineThickness=&quot;2&quot;&gt;
+<span class="linenos">189</span>              &lt;jd2:lineType type=&quot;ltLine&quot;&gt;
+<span class="linenos">190</span>                &lt;jd2:edge&gt;
+<span class="linenos">191</span>                  &lt;jd2:pt x=&quot;45&quot; y=&quot;72&quot; type=&quot;substrate&quot; speciesRef=&quot;X0&quot;/&gt;
+<span class="linenos">192</span>                  &lt;jd2:pt x=&quot;150&quot; y=&quot;116&quot; type=&quot;product&quot; speciesRef=&quot;S1&quot;/&gt;
+<span class="linenos">193</span>                &lt;/jd2:edge&gt;
+<span class="linenos">194</span>              &lt;/jd2:lineType&gt;
+<span class="linenos">195</span>            &lt;/jd2:display&gt;
+<span class="linenos">196</span>          &lt;/jd2:reaction&gt;
+<span class="linenos">197</span>          &lt;jd2:reaction id=&quot;J1&quot; reversible=&quot;false&quot;&gt;
+<span class="linenos">198</span>            &lt;jd2:listOfReactants&gt;
+<span class="linenos">199</span>              &lt;jd2:speciesReference species=&quot;S1&quot; stoichiometry=&quot;1&quot;/&gt;
+<span class="linenos">200</span>            &lt;/jd2:listOfReactants&gt;
+<span class="linenos">201</span>            &lt;jd2:listOfProducts&gt;
+<span class="linenos">202</span>              &lt;jd2:speciesReference species=&quot;S2&quot; stoichiometry=&quot;1&quot;/&gt;
+<span class="linenos">203</span>            &lt;/jd2:listOfProducts&gt;
+<span class="linenos">204</span>            &lt;jd2:listOfModifierEdges/&gt;
+<span class="linenos">205</span>            &lt;jd2:kineticLaw type=&quot;explicit&quot;&gt;
+<span class="linenos">206</span>              &lt;jd2:rateEquation value=&quot;(10*S1-2*S2)/(1+S1+S2)&quot;/&gt;
+<span class="linenos">207</span>            &lt;/jd2:kineticLaw&gt;
+<span class="linenos">208</span>            &lt;jd2:display arrowStyle=&quot;ar1&quot; arrowFillColor=&quot;FF000000&quot; lineColor=&quot;FF838464&quot; lineThickness=&quot;2&quot;&gt;
+<span class="linenos">209</span>              &lt;jd2:lineType type=&quot;ltLine&quot;&gt;
+<span class="linenos">210</span>                &lt;jd2:edge&gt;
+<span class="linenos">211</span>                  &lt;jd2:pt x=&quot;150&quot; y=&quot;116&quot; type=&quot;substrate&quot; speciesRef=&quot;S1&quot;/&gt;
+<span class="linenos">212</span>                  &lt;jd2:pt x=&quot;246&quot; y=&quot;155&quot; type=&quot;product&quot; speciesRef=&quot;S2&quot;/&gt;
+<span class="linenos">213</span>                &lt;/jd2:edge&gt;
+<span class="linenos">214</span>              &lt;/jd2:lineType&gt;
+<span class="linenos">215</span>            &lt;/jd2:display&gt;
+<span class="linenos">216</span>          &lt;/jd2:reaction&gt;
+<span class="linenos">217</span>          &lt;jd2:reaction id=&quot;J2&quot; reversible=&quot;false&quot;&gt;
+<span class="linenos">218</span>            &lt;jd2:listOfReactants&gt;
+<span class="linenos">219</span>              &lt;jd2:speciesReference species=&quot;S2&quot; stoichiometry=&quot;1&quot;/&gt;
+<span class="linenos">220</span>            &lt;/jd2:listOfReactants&gt;
+<span class="linenos">221</span>            &lt;jd2:listOfProducts&gt;
+<span class="linenos">222</span>              &lt;jd2:speciesReference species=&quot;S3&quot; stoichiometry=&quot;1&quot;/&gt;
+<span class="linenos">223</span>            &lt;/jd2:listOfProducts&gt;
+<span class="linenos">224</span>            &lt;jd2:listOfModifierEdges/&gt;
+<span class="linenos">225</span>            &lt;jd2:kineticLaw type=&quot;explicit&quot;&gt;
+<span class="linenos">226</span>              &lt;jd2:rateEquation value=&quot;(10*S2-2*S3)/(1+S2+S3)&quot;/&gt;
+<span class="linenos">227</span>            &lt;/jd2:kineticLaw&gt;
+<span class="linenos">228</span>            &lt;jd2:display arrowStyle=&quot;ar1&quot; arrowFillColor=&quot;FF000000&quot; lineColor=&quot;FF838464&quot; lineThickness=&quot;2&quot;&gt;
+<span class="linenos">229</span>              &lt;jd2:lineType type=&quot;ltLine&quot;&gt;
+<span class="linenos">230</span>                &lt;jd2:edge&gt;
+<span class="linenos">231</span>                  &lt;jd2:pt x=&quot;246&quot; y=&quot;155&quot; type=&quot;substrate&quot; speciesRef=&quot;S2&quot;/&gt;
+<span class="linenos">232</span>                  &lt;jd2:pt x=&quot;330&quot; y=&quot;190&quot; type=&quot;product&quot; speciesRef=&quot;S3&quot;/&gt;
+<span class="linenos">233</span>                &lt;/jd2:edge&gt;
+<span class="linenos">234</span>              &lt;/jd2:lineType&gt;
+<span class="linenos">235</span>            &lt;/jd2:display&gt;
+<span class="linenos">236</span>          &lt;/jd2:reaction&gt;
+<span class="linenos">237</span>          &lt;jd2:reaction id=&quot;J3&quot; reversible=&quot;false&quot;&gt;
+<span class="linenos">238</span>            &lt;jd2:listOfReactants&gt;
+<span class="linenos">239</span>              &lt;jd2:speciesReference species=&quot;S3&quot; stoichiometry=&quot;1&quot;/&gt;
+<span class="linenos">240</span>            &lt;/jd2:listOfReactants&gt;
+<span class="linenos">241</span>            &lt;jd2:listOfProducts&gt;
+<span class="linenos">242</span>              &lt;jd2:speciesReference species=&quot;S4&quot; stoichiometry=&quot;1&quot;/&gt;
+<span class="linenos">243</span>            &lt;/jd2:listOfProducts&gt;
+<span class="linenos">244</span>            &lt;jd2:listOfModifierEdges/&gt;
+<span class="linenos">245</span>            &lt;jd2:kineticLaw type=&quot;explicit&quot;&gt;
+<span class="linenos">246</span>              &lt;jd2:rateEquation value=&quot;(10*S3-2*S4)/(1+S3+S4)&quot;/&gt;
+<span class="linenos">247</span>            &lt;/jd2:kineticLaw&gt;
+<span class="linenos">248</span>            &lt;jd2:display arrowStyle=&quot;ar1&quot; arrowFillColor=&quot;FF000000&quot; lineColor=&quot;FF838464&quot; lineThickness=&quot;2&quot;&gt;
+<span class="linenos">249</span>              &lt;jd2:lineType type=&quot;ltLine&quot;&gt;
+<span class="linenos">250</span>                &lt;jd2:edge&gt;
+<span class="linenos">251</span>                  &lt;jd2:pt x=&quot;330&quot; y=&quot;190&quot; type=&quot;substrate&quot; speciesRef=&quot;S3&quot;/&gt;
+<span class="linenos">252</span>                  &lt;jd2:pt x=&quot;423&quot; y=&quot;224&quot; type=&quot;product&quot; speciesRef=&quot;S4&quot;/&gt;
+<span class="linenos">253</span>                &lt;/jd2:edge&gt;
+<span class="linenos">254</span>              &lt;/jd2:lineType&gt;
+<span class="linenos">255</span>            &lt;/jd2:display&gt;
+<span class="linenos">256</span>          &lt;/jd2:reaction&gt;
+<span class="linenos">257</span>          &lt;jd2:reaction id=&quot;J4&quot; reversible=&quot;false&quot;&gt;
+<span class="linenos">258</span>            &lt;jd2:listOfReactants&gt;
+<span class="linenos">259</span>              &lt;jd2:speciesReference species=&quot;S4&quot; stoichiometry=&quot;1&quot;/&gt;
+<span class="linenos">260</span>            &lt;/jd2:listOfReactants&gt;
+<span class="linenos">261</span>            &lt;jd2:listOfProducts&gt;
+<span class="linenos">262</span>              &lt;jd2:speciesReference species=&quot;X1&quot; stoichiometry=&quot;1&quot;/&gt;
+<span class="linenos">263</span>            &lt;/jd2:listOfProducts&gt;
+<span class="linenos">264</span>            &lt;jd2:listOfModifierEdges/&gt;
+<span class="linenos">265</span>            &lt;jd2:kineticLaw type=&quot;explicit&quot;&gt;
+<span class="linenos">266</span>              &lt;jd2:rateEquation value=&quot;J4_V4*S4/(J4_KS4+S4)&quot;/&gt;
+<span class="linenos">267</span>            &lt;/jd2:kineticLaw&gt;
+<span class="linenos">268</span>            &lt;jd2:display arrowStyle=&quot;ar1&quot; arrowFillColor=&quot;FF000000&quot; lineColor=&quot;FF838464&quot; lineThickness=&quot;2&quot;&gt;
+<span class="linenos">269</span>              &lt;jd2:lineType type=&quot;ltLine&quot;&gt;
+<span class="linenos">270</span>                &lt;jd2:edge&gt;
+<span class="linenos">271</span>                  &lt;jd2:pt x=&quot;423&quot; y=&quot;224&quot; type=&quot;substrate&quot; speciesRef=&quot;S4&quot;/&gt;
+<span class="linenos">272</span>                  &lt;jd2:pt x=&quot;427&quot; y=&quot;304&quot; type=&quot;product&quot; speciesRef=&quot;X1&quot;/&gt;
+<span class="linenos">273</span>                &lt;/jd2:edge&gt;
+<span class="linenos">274</span>              &lt;/jd2:lineType&gt;
+<span class="linenos">275</span>            &lt;/jd2:display&gt;
+<span class="linenos">276</span>          &lt;/jd2:reaction&gt;
+<span class="linenos">277</span>        &lt;/jd2:listOfReactions&gt;
+<span class="linenos">278</span>      &lt;/jd2:JDesignerLayout&gt;
+<span class="linenos">279</span>    &lt;/annotation&gt;
+<span class="linenos">280</span>    &lt;listOfCompartments&gt;
+<span class="linenos">281</span>      &lt;compartment id=&quot;compartment&quot; size=&quot;1&quot;/&gt;
+<span class="linenos">282</span>    &lt;/listOfCompartments&gt;
+<span class="linenos">283</span>    &lt;listOfSpecies&gt;
+<span class="linenos">284</span>      &lt;species id=&quot;S1&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;/&gt;
+<span class="linenos">285</span>      &lt;species id=&quot;S2&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;/&gt;
+<span class="linenos">286</span>      &lt;species id=&quot;S3&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;/&gt;
+<span class="linenos">287</span>      &lt;species id=&quot;S4&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot;/&gt;
+<span class="linenos">288</span>      &lt;species id=&quot;X0&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;10&quot; boundaryCondition=&quot;true&quot;/&gt;
+<span class="linenos">289</span>      &lt;species id=&quot;X1&quot; compartment=&quot;compartment&quot; initialConcentration=&quot;0&quot; boundaryCondition=&quot;true&quot;/&gt;
+<span class="linenos">290</span>    &lt;/listOfSpecies&gt;
+<span class="linenos">291</span>    &lt;listOfParameters&gt;
+<span class="linenos">292</span>      &lt;parameter id=&quot;J0_VM1&quot; value=&quot;10&quot;/&gt;
+<span class="linenos">293</span>      &lt;parameter id=&quot;J0_Keq1&quot; value=&quot;10&quot;/&gt;
+<span class="linenos">294</span>      &lt;parameter id=&quot;J0_h&quot; value=&quot;10&quot;/&gt;
+<span class="linenos">295</span>      &lt;parameter id=&quot;J4_V4&quot; value=&quot;2.5&quot;/&gt;
+<span class="linenos">296</span>      &lt;parameter id=&quot;J4_KS4&quot; value=&quot;0.5&quot;/&gt;
+<span class="linenos">297</span>    &lt;/listOfParameters&gt;
+<span class="linenos">298</span>    &lt;listOfReactions&gt;
+<span class="linenos">299</span>      &lt;reaction id=&quot;J0&quot; reversible=&quot;false&quot;&gt;
+<span class="linenos">300</span>        &lt;listOfReactants&gt;
+<span class="linenos">301</span>          &lt;speciesReference species=&quot;X0&quot;/&gt;
+<span class="linenos">302</span>        &lt;/listOfReactants&gt;
+<span class="linenos">303</span>        &lt;listOfProducts&gt;
+<span class="linenos">304</span>          &lt;speciesReference species=&quot;S1&quot;/&gt;
+<span class="linenos">305</span>        &lt;/listOfProducts&gt;
+<span class="linenos">306</span>        &lt;listOfModifiers&gt;
+<span class="linenos">307</span>          &lt;modifierSpeciesReference species=&quot;S4&quot;/&gt;
+<span class="linenos">308</span>        &lt;/listOfModifiers&gt;
+<span class="linenos">309</span>        &lt;kineticLaw&gt;
+<span class="linenos">310</span>          &lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;
+<span class="linenos">311</span>            &lt;apply&gt;
+<span class="linenos">312</span>              &lt;divide/&gt;
+<span class="linenos">313</span>              &lt;apply&gt;
+<span class="linenos">314</span>                &lt;times/&gt;
+<span class="linenos">315</span>                &lt;ci&gt; J0_VM1 &lt;/ci&gt;
+<span class="linenos">316</span>                &lt;apply&gt;
+<span class="linenos">317</span>                  &lt;minus/&gt;
+<span class="linenos">318</span>                  &lt;ci&gt; X0 &lt;/ci&gt;
+<span class="linenos">319</span>                  &lt;apply&gt;
+<span class="linenos">320</span>                    &lt;divide/&gt;
+<span class="linenos">321</span>                    &lt;ci&gt; S1 &lt;/ci&gt;
+<span class="linenos">322</span>                    &lt;ci&gt; J0_Keq1 &lt;/ci&gt;
+<span class="linenos">323</span>                  &lt;/apply&gt;
+<span class="linenos">324</span>                &lt;/apply&gt;
+<span class="linenos">325</span>              &lt;/apply&gt;
+<span class="linenos">326</span>              &lt;apply&gt;
+<span class="linenos">327</span>                &lt;plus/&gt;
+<span class="linenos">328</span>                &lt;cn type=&quot;integer&quot;&gt; 1 &lt;/cn&gt;
+<span class="linenos">329</span>                &lt;ci&gt; X0 &lt;/ci&gt;
+<span class="linenos">330</span>                &lt;ci&gt; S1 &lt;/ci&gt;
+<span class="linenos">331</span>                &lt;apply&gt;
+<span class="linenos">332</span>                  &lt;power/&gt;
+<span class="linenos">333</span>                  &lt;ci&gt; S4 &lt;/ci&gt;
+<span class="linenos">334</span>                  &lt;ci&gt; J0_h &lt;/ci&gt;
+<span class="linenos">335</span>                &lt;/apply&gt;
+<span class="linenos">336</span>              &lt;/apply&gt;
+<span class="linenos">337</span>            &lt;/apply&gt;
+<span class="linenos">338</span>          &lt;/math&gt;
+<span class="linenos">339</span>        &lt;/kineticLaw&gt;
+<span class="linenos">340</span>      &lt;/reaction&gt;
+<span class="linenos">341</span>      &lt;reaction id=&quot;J1&quot; reversible=&quot;false&quot;&gt;
+<span class="linenos">342</span>        &lt;listOfReactants&gt;
+<span class="linenos">343</span>          &lt;speciesReference species=&quot;S1&quot;/&gt;
+<span class="linenos">344</span>        &lt;/listOfReactants&gt;
+<span class="linenos">345</span>        &lt;listOfProducts&gt;
+<span class="linenos">346</span>          &lt;speciesReference species=&quot;S2&quot;/&gt;
+<span class="linenos">347</span>        &lt;/listOfProducts&gt;
+<span class="linenos">348</span>        &lt;kineticLaw&gt;
+<span class="linenos">349</span>          &lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;
+<span class="linenos">350</span>            &lt;apply&gt;
+<span class="linenos">351</span>              &lt;divide/&gt;
+<span class="linenos">352</span>              &lt;apply&gt;
+<span class="linenos">353</span>                &lt;minus/&gt;
+<span class="linenos">354</span>                &lt;apply&gt;
+<span class="linenos">355</span>                  &lt;times/&gt;
+<span class="linenos">356</span>                  &lt;cn type=&quot;integer&quot;&gt; 10 &lt;/cn&gt;
+<span class="linenos">357</span>                  &lt;ci&gt; S1 &lt;/ci&gt;
+<span class="linenos">358</span>                &lt;/apply&gt;
+<span class="linenos">359</span>                &lt;apply&gt;
+<span class="linenos">360</span>                  &lt;times/&gt;
+<span class="linenos">361</span>                  &lt;cn type=&quot;integer&quot;&gt; 2 &lt;/cn&gt;
+<span class="linenos">362</span>                  &lt;ci&gt; S2 &lt;/ci&gt;
+<span class="linenos">363</span>                &lt;/apply&gt;
+<span class="linenos">364</span>              &lt;/apply&gt;
+<span class="linenos">365</span>              &lt;apply&gt;
+<span class="linenos">366</span>                &lt;plus/&gt;
+<span class="linenos">367</span>                &lt;cn type=&quot;integer&quot;&gt; 1 &lt;/cn&gt;
+<span class="linenos">368</span>                &lt;ci&gt; S1 &lt;/ci&gt;
+<span class="linenos">369</span>                &lt;ci&gt; S2 &lt;/ci&gt;
+<span class="linenos">370</span>              &lt;/apply&gt;
+<span class="linenos">371</span>            &lt;/apply&gt;
+<span class="linenos">372</span>          &lt;/math&gt;
+<span class="linenos">373</span>        &lt;/kineticLaw&gt;
+<span class="linenos">374</span>      &lt;/reaction&gt;
+<span class="linenos">375</span>      &lt;reaction id=&quot;J2&quot; reversible=&quot;false&quot;&gt;
+<span class="linenos">376</span>        &lt;listOfReactants&gt;
+<span class="linenos">377</span>          &lt;speciesReference species=&quot;S2&quot;/&gt;
+<span class="linenos">378</span>        &lt;/listOfReactants&gt;
+<span class="linenos">379</span>        &lt;listOfProducts&gt;
+<span class="linenos">380</span>          &lt;speciesReference species=&quot;S3&quot;/&gt;
+<span class="linenos">381</span>        &lt;/listOfProducts&gt;
+<span class="linenos">382</span>        &lt;kineticLaw&gt;
+<span class="linenos">383</span>          &lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;
+<span class="linenos">384</span>            &lt;apply&gt;
+<span class="linenos">385</span>              &lt;divide/&gt;
+<span class="linenos">386</span>              &lt;apply&gt;
+<span class="linenos">387</span>                &lt;minus/&gt;
+<span class="linenos">388</span>                &lt;apply&gt;
+<span class="linenos">389</span>                  &lt;times/&gt;
+<span class="linenos">390</span>                  &lt;cn type=&quot;integer&quot;&gt; 10 &lt;/cn&gt;
+<span class="linenos">391</span>                  &lt;ci&gt; S2 &lt;/ci&gt;
+<span class="linenos">392</span>                &lt;/apply&gt;
+<span class="linenos">393</span>                &lt;apply&gt;
+<span class="linenos">394</span>                  &lt;times/&gt;
+<span class="linenos">395</span>                  &lt;cn type=&quot;integer&quot;&gt; 2 &lt;/cn&gt;
+<span class="linenos">396</span>                  &lt;ci&gt; S3 &lt;/ci&gt;
+<span class="linenos">397</span>                &lt;/apply&gt;
+<span class="linenos">398</span>              &lt;/apply&gt;
+<span class="linenos">399</span>              &lt;apply&gt;
+<span class="linenos">400</span>                &lt;plus/&gt;
+<span class="linenos">401</span>                &lt;cn type=&quot;integer&quot;&gt; 1 &lt;/cn&gt;
+<span class="linenos">402</span>                &lt;ci&gt; S2 &lt;/ci&gt;
+<span class="linenos">403</span>                &lt;ci&gt; S3 &lt;/ci&gt;
+<span class="linenos">404</span>              &lt;/apply&gt;
+<span class="linenos">405</span>            &lt;/apply&gt;
+<span class="linenos">406</span>          &lt;/math&gt;
+<span class="linenos">407</span>        &lt;/kineticLaw&gt;
+<span class="linenos">408</span>      &lt;/reaction&gt;
+<span class="linenos">409</span>      &lt;reaction id=&quot;J3&quot; reversible=&quot;false&quot;&gt;
+<span class="linenos">410</span>        &lt;listOfReactants&gt;
+<span class="linenos">411</span>          &lt;speciesReference species=&quot;S3&quot;/&gt;
+<span class="linenos">412</span>        &lt;/listOfReactants&gt;
+<span class="linenos">413</span>        &lt;listOfProducts&gt;
+<span class="linenos">414</span>          &lt;speciesReference species=&quot;S4&quot;/&gt;
+<span class="linenos">415</span>        &lt;/listOfProducts&gt;
+<span class="linenos">416</span>        &lt;kineticLaw&gt;
+<span class="linenos">417</span>          &lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;
+<span class="linenos">418</span>            &lt;apply&gt;
+<span class="linenos">419</span>              &lt;divide/&gt;
+<span class="linenos">420</span>              &lt;apply&gt;
+<span class="linenos">421</span>                &lt;minus/&gt;
+<span class="linenos">422</span>                &lt;apply&gt;
+<span class="linenos">423</span>                  &lt;times/&gt;
+<span class="linenos">424</span>                  &lt;cn type=&quot;integer&quot;&gt; 10 &lt;/cn&gt;
+<span class="linenos">425</span>                  &lt;ci&gt; S3 &lt;/ci&gt;
+<span class="linenos">426</span>                &lt;/apply&gt;
+<span class="linenos">427</span>                &lt;apply&gt;
+<span class="linenos">428</span>                  &lt;times/&gt;
+<span class="linenos">429</span>                  &lt;cn type=&quot;integer&quot;&gt; 2 &lt;/cn&gt;
+<span class="linenos">430</span>                  &lt;ci&gt; S4 &lt;/ci&gt;
+<span class="linenos">431</span>                &lt;/apply&gt;
+<span class="linenos">432</span>              &lt;/apply&gt;
+<span class="linenos">433</span>              &lt;apply&gt;
+<span class="linenos">434</span>                &lt;plus/&gt;
+<span class="linenos">435</span>                &lt;cn type=&quot;integer&quot;&gt; 1 &lt;/cn&gt;
+<span class="linenos">436</span>                &lt;ci&gt; S3 &lt;/ci&gt;
+<span class="linenos">437</span>                &lt;ci&gt; S4 &lt;/ci&gt;
+<span class="linenos">438</span>              &lt;/apply&gt;
+<span class="linenos">439</span>            &lt;/apply&gt;
+<span class="linenos">440</span>          &lt;/math&gt;
+<span class="linenos">441</span>        &lt;/kineticLaw&gt;
+<span class="linenos">442</span>      &lt;/reaction&gt;
+<span class="linenos">443</span>      &lt;reaction id=&quot;J4&quot; reversible=&quot;false&quot;&gt;
+<span class="linenos">444</span>        &lt;listOfReactants&gt;
+<span class="linenos">445</span>          &lt;speciesReference species=&quot;S4&quot;/&gt;
+<span class="linenos">446</span>        &lt;/listOfReactants&gt;
+<span class="linenos">447</span>        &lt;listOfProducts&gt;
+<span class="linenos">448</span>          &lt;speciesReference species=&quot;X1&quot;/&gt;
+<span class="linenos">449</span>        &lt;/listOfProducts&gt;
+<span class="linenos">450</span>        &lt;kineticLaw&gt;
+<span class="linenos">451</span>          &lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;
+<span class="linenos">452</span>            &lt;apply&gt;
+<span class="linenos">453</span>              &lt;divide/&gt;
+<span class="linenos">454</span>              &lt;apply&gt;
+<span class="linenos">455</span>                &lt;times/&gt;
+<span class="linenos">456</span>                &lt;ci&gt; J4_V4 &lt;/ci&gt;
+<span class="linenos">457</span>                &lt;ci&gt; S4 &lt;/ci&gt;
+<span class="linenos">458</span>              &lt;/apply&gt;
+<span class="linenos">459</span>              &lt;apply&gt;
+<span class="linenos">460</span>                &lt;plus/&gt;
+<span class="linenos">461</span>                &lt;ci&gt; J4_KS4 &lt;/ci&gt;
+<span class="linenos">462</span>                &lt;ci&gt; S4 &lt;/ci&gt;
+<span class="linenos">463</span>              &lt;/apply&gt;
+<span class="linenos">464</span>            &lt;/apply&gt;
+<span class="linenos">465</span>          &lt;/math&gt;
+<span class="linenos">466</span>        &lt;/kineticLaw&gt;
+<span class="linenos">467</span>      &lt;/reaction&gt;
+<span class="linenos">468</span>    &lt;/listOfReactions&gt;
+<span class="linenos">469</span>  &lt;/model&gt;
+<span class="linenos">470</span>&lt;/sbml&gt;
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">feedback</span>
-  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">sbml</span>
-  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/sbml2.xml</span>
-  <span class="nt">reset</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-  <span class="nt">steps</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
-  <span class="nt">skip_start_time</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-  <span class="nt">integrator_settings</span><span class="p">:</span>
-    <span class="nt">relative_tolerance</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0e-10</span>
-  <span class="nt">inputs</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">input</span>
-      <span class="nt">vars</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">time,S1,S2</span>
-      <span class="nt">default_file</span><span class="p">:</span>
-        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
-        <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="nt">outputs</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output</span>
-      <span class="nt">as_array</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-      <span class="nt">default_file</span><span class="p">:</span>
-        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output%d.txt</span>
-        <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-        <span class="nt">is_series</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">feedback</span>
+<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">sbml</span>
+<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/sbml2.xml</span>
+<span class="linenos"> 5</span>  <span class="nt">reset</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="linenos"> 6</span>  <span class="nt">steps</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="linenos"> 7</span>  <span class="nt">skip_start_time</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="linenos"> 8</span>  <span class="nt">integrator_settings</span><span class="p">:</span>
+<span class="linenos"> 9</span>    <span class="nt">relative_tolerance</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0e-10</span>
+<span class="linenos">10</span>  <span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos">11</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">input</span>
+<span class="linenos">12</span>      <span class="nt">vars</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">time,S1,S2</span>
+<span class="linenos">13</span>      <span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">14</span>        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+<span class="linenos">15</span>        <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">16</span>  <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">17</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output</span>
+<span class="linenos">18</span>      <span class="nt">as_array</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="linenos">19</span>      <span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">20</span>        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output%d.txt</span>
+<span class="linenos">21</span>        <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">22</span>        <span class="nt">is_series</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 </pre></div>
-</td></tr></table></div>
 </div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

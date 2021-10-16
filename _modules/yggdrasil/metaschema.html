@@ -1,72 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.metaschema &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.metaschema &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -74,19 +36,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
@@ -117,80 +68,41 @@
 <li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-          <li><a href="../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
       <li>yggdrasil.metaschema</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for yggdrasil.metaschema</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">jsonschema</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">yggdrasil</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="k">import</span> <span class="n">encode_json</span><span class="p">,</span> <span class="n">decode_json</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties</span> <span class="k">import</span> <span class="n">get_registered_properties</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">get_registered_types</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">constants</span><span class="p">,</span> <span class="n">units</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="kn">import</span> <span class="n">encode_json</span><span class="p">,</span> <span class="n">decode_json</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties</span> <span class="kn">import</span> <span class="n">get_registered_properties</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">get_registered_types</span>
 
 
 <span class="n">_metaschema_fbase</span> <span class="o">=</span> <span class="s1">&#39;.ygg_metaschema.json&#39;</span>
@@ -213,6 +125,11 @@
 <span class="n">_base_validator</span> <span class="o">=</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">validator_for</span><span class="p">(</span><span class="n">_base_schema</span><span class="p">)</span>
 
         
+<div class="viewcode-block" id="MetaschemaTypeError"><a class="viewcode-back" href="../../yggdrasil.metaschema.html#yggdrasil.metaschema.MetaschemaTypeError">[docs]</a><span class="k">class</span> <span class="nc">MetaschemaTypeError</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Error that should be raised when a class encounters a type it cannot handle.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
 <div class="viewcode-block" id="create_metaschema"><a class="viewcode-back" href="../../yggdrasil.metaschema.html#yggdrasil.metaschema.create_metaschema">[docs]</a><span class="k">def</span> <span class="nf">create_metaschema</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create the meta schema for validating ygg schema.</span>
 
@@ -288,7 +205,7 @@
 <span class="sd">        jsonschema.IValidator: JSON schema validator.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="k">import</span> <span class="n">normalizer</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="kn">import</span> <span class="n">normalizer</span>
     <span class="k">global</span> <span class="n">_validator</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">_validator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">overwrite</span><span class="p">:</span>
         <span class="n">metaschema</span> <span class="o">=</span> <span class="n">get_metaschema</span><span class="p">()</span>
@@ -379,49 +296,120 @@
     <span class="bp">cls</span> <span class="o">=</span> <span class="n">get_validator</span><span class="p">()</span>
     <span class="bp">cls</span><span class="o">.</span><span class="n">check_schema</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="data2dtype"><a class="viewcode-back" href="../../yggdrasil.metaschema.html#yggdrasil.metaschema.data2dtype">[docs]</a><span class="k">def</span> <span class="nf">data2dtype</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get numpy data type for an object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (object): Python object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.dtype: Numpy data type.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data_nounits</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_nounits</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">data_nounits</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_nounits</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="n">MetaschemaTypeError</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_nounits</span><span class="p">,</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">VALID_TYPES</span><span class="p">[</span><span class="s1">&#39;bytes&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">type</span><span class="p">):</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_nounits</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">data_nounits</span><span class="p">])</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">return</span> <span class="n">dtype</span></div>
+
+
+<div class="viewcode-block" id="definition2dtype"><a class="viewcode-back" href="../../yggdrasil.metaschema.html#yggdrasil.metaschema.definition2dtype">[docs]</a><span class="k">def</span> <span class="nf">definition2dtype</span><span class="p">(</span><span class="n">props</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get numpy data type for a type definition.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        props (dict): Type definition properties.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        np.dtype: Numpy data type.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">typename</span> <span class="o">=</span> <span class="n">props</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">typename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">typename</span> <span class="o">=</span> <span class="n">props</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">typename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Could not find type in dictionary&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;precision&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">props</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">typename</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">FLEXIBLE_TYPES</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="n">constants</span><span class="o">.</span><span class="n">VALID_TYPES</span><span class="p">[</span><span class="n">typename</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Precision required for type: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">typename</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">typename</span> <span class="o">==</span> <span class="s1">&#39;unicode&#39;</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="n">constants</span><span class="o">.</span><span class="n">VALID_TYPES</span><span class="p">[</span><span class="n">typename</span><span class="p">],</span>
+                        <span class="nb">int</span><span class="p">(</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">32</span><span class="p">)))</span>
+    <span class="k">elif</span> <span class="n">typename</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">FLEXIBLE_TYPES</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="n">constants</span><span class="o">.</span><span class="n">VALID_TYPES</span><span class="p">[</span><span class="n">typename</span><span class="p">],</span>
+                        <span class="nb">int</span><span class="p">(</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">8</span><span class="p">)))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">VALID_TYPES</span><span class="p">[</span><span class="n">typename</span><span class="p">],</span>
+                                 <span class="nb">int</span><span class="p">(</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">])))</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="type2numpy"><a class="viewcode-back" href="../../yggdrasil.metaschema.html#yggdrasil.metaschema.type2numpy">[docs]</a><span class="k">def</span> <span class="nf">type2numpy</span><span class="p">(</span><span class="n">typedef</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a type definition into a numpy dtype.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        typedef (dict): Type definition.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.dtype: Numpy data type.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">typedef</span><span class="p">)</span>
+         <span class="ow">and</span> <span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;array&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;items&#39;</span> <span class="ow">in</span> <span class="n">typedef</span><span class="p">))):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">as_array</span> <span class="o">=</span> <span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;1darray&#39;</span><span class="p">,</span> <span class="s1">&#39;ndarray&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">as_array</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">definition2dtype</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">as_array</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">dtype_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">field_names</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;1darray&#39;</span><span class="p">,</span> <span class="s1">&#39;ndarray&#39;</span><span class="p">]:</span>
+                    <span class="n">as_array</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">break</span>
+                <span class="n">dtype_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">definition2dtype</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">field_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;f</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">as_array</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">names</span><span class="o">=</span><span class="n">field_names</span><span class="p">,</span> <span class="n">formats</span><span class="o">=</span><span class="n">dtype_list</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">out</span></div>
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

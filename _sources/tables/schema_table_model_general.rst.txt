@@ -1,88 +1,101 @@
 .. _schema_table_model_general_rst:
 
-==================   =======   ========   ================================================================================
-Option               Type      Required   Description                                                                     
-==================   =======   ========   ================================================================================
-args                 array     X          The path to the file containing the model program that will be run by the driver
-                                          for the model's language and/or a list of arguments that should be passed as    
-                                          input to the model program or language executable (e.g. source code or          
-                                          configuration file for a domain specific language).                             
-language             string    X          The programming language that the model is written in. A list of available      
-                                          languages can be found :ref:`here <schema_table_model_subtype_rst>`. (Options   
-                                          described :ref:`here <schema_table_model_subtype_rst>`)                         
-name                 string    X          Name used for component in log messages.                                        
-working_dir          string    X          Working directory. If not provided, the current working directory is used.      
-allow_threading      boolean              If True, comm connections will be set up so that the model-side comms can be    
-                                          used by more than one thread. Defaults to False.                                
-client_of            array                The names of one or more models that this model will call as a server. If there 
-                                          are more than one, this should be specified as a sequence collection (list). The
-                                          corresponding channel(s) that should be passed to the yggdrasil API will be the 
-                                          name of the server model joined with the name of the client model with an       
-                                          underscore `<server_model>_<client_model>`. There will be one channel created   
-                                          for each server the model is a client of. Defaults to empty list. Use of        
-                                          `client_of` with `function` is not currently supported.                         
-contact_email        string               Email address that should be used to contact the maintainer of the model. This  
-                                          parameter is only used in the model repository.                                 
-copies               integer              The number of copies of the model that should be created. Defaults to 1.        
-description          string               Description of the model. This parameter is only used in the model repository or
-                                          when providing the model as a service.                                          
-driver               string               [DEPRECATED] Name of driver class that should be used.                          
-env                  object               Dictionary of environment variables that should be set when the driver starts.  
-                                          Defaults to {}.                                                                 
-function             string               If provided, an integrated model is created by wrapping the function named here.
-                                          The function must be located within the file specified by the source file listed
-                                          in the first argument. If not provided, the model must contain it's own calls to
-                                          the |yggdrasil| interface.                                                      
-inputs               array                Zero or more channels carrying input to the model. A full description of channel
-                                          entries and the options available for channels can be found                     
-                                          :ref:`here<yaml_comm_options>`.                                                 
-is_server                                 If `True`, the model is assumed to be a server for one or more client models and
-                                          an instance of :class:`yggdrasil.drivers.ServerDriver` is started. The          
-                                          corresponding channel that should be passed to the yggdrasil API will be the    
-                                          name of the model. If is_server is a dictionary, it should contain an 'input'   
-                                          key and an 'output' key. These are required to be the names of existing input   
-                                          and output channels in the model that will be co-opted by the server. (Note:    
-                                          This requires that the co-opted output channel's send method is called once for 
-                                          each time the co-opted input channel's recv method is called. If used with the  
-                                          `function` parameter, `is_server` must be a dictionary. Defaults to False.      
-iter_function_over   array                Variable(s) that should be received or sent as an array, but iterated over.     
-                                          Defaults to an empty array and is ignored.                                      
-logging_level        string               The level of logging messages that should be displayed by the model. Defaults to
-                                          the logging level as determined by the configuration file and environment       
-                                          variables.                                                                      
-outputs              array                Zero or more channels carrying output from the model. A full description of     
-                                          channel entries and the options available for channels can be found             
-                                          :ref:`here<yaml_comm_options>`.                                                 
-outputs_in_inputs    boolean              If True, outputs from wrapped model functions are passed by pointer as inputs   
-                                          for modification and the return value will be a flag. If False, outputs are     
-                                          limited to return values. Defaults to the value of the class attribute          
-                                          outputs_in_inputs.                                                              
-overwrite            boolean              If True, any existing model products (compilation products, wrapper scripts,    
-                                          etc.) are removed prior to the run. If False, the products are not removed.     
-                                          Defaults to True. Setting this to False can improve the performance,            
-                                          particularly for models that take a long time to compile, but this should only  
-                                          be done once the model has been fully debugged to ensure that each run is tested
-                                          on a clean copy of the model. The value of this keyword also determines whether 
-                                          or not products are removed after a run.                                        
-preserve_cache       boolean              If True model products will be kept following the run, otherwise all products   
-                                          will be cleaned up. Defaults to False. This keyword is superceeded by overwrite.
-products             array                Paths to files created by the model that should be cleaned up when the model    
-                                          exits. Entries can be absolute paths or paths relative to the working directory.
-                                          Defaults to [].                                                                 
-repository_url       string               URL for the git repository containing the model source code. If provided,       
-                                          relative paths in the model YAML definition will be considered relative to the  
-                                          repository root directory.                                                      
-source_products      array                Files created by running the model that are source files. These files will be   
-                                          removed without checking their extension so users should avoid adding files to  
-                                          this list unless they are sure they should be deleted. Defaults to [].          
-strace_flags         array                Flags to pass to strace (or dtrace). Defaults to [].                            
-timesync                                  If set, the model is assumed to call a send then receive of the state at each   
-                                          timestep for syncronization with other models that are also integrating in time.
-                                          If a string is provided, it is assumed to be the name of the server that will   
-                                          handle timestep synchronization. If a boolean is provided, the name of the      
-                                          server will be assumed to be 'timestep'. Defaults to False.                     
-valgrind_flags       array                Flags to pass to valgrind. Defaults to [].                                      
-with_strace          boolean              If True, the command is run with strace (on Linux) or dtrace (on MacOS).        
-                                          Defaults to False.                                                              
-with_valgrind        boolean              If True, the command is run with valgrind. Defaults to False.                   
-==================   =======   ========   ================================================================================
+=======================   =======   ========   ================================================================================
+Option                    Type      Required   Description                                                                     
+=======================   =======   ========   ================================================================================
+args                      array     X          The path to the file containing the model program that will be run by the driver
+                                               for the model's language and/or a list of arguments that should be passed as    
+                                               input to the model program or language executable (e.g. source code or          
+                                               configuration file for a domain specific language).                             
+language                  string    X          The programming language that the model is written in. A list of available      
+                                               languages can be found :ref:`here <schema_table_model_subtype_rst>`. (Options   
+                                               described :ref:`here <schema_table_model_subtype_rst>`)                         
+name                      string    X          Name used for component in log messages.                                        
+working_dir               string    X          Working directory. If not provided, the current working directory is used.      
+additional_dependencies   object               A mapping between languages and lists of packages in those languages that are   
+                                               required by the model.                                                          
+allow_threading           boolean              If True, comm connections will be set up so that the model-side comms can be    
+                                               used by more than one thread. Defaults to False.                                
+client_of                 array                The names of one or more models that this model will call as a server. If there 
+                                               are more than one, this should be specified as a sequence collection (list). The
+                                               corresponding channel(s) that should be passed to the yggdrasil API will be the 
+                                               name of the server model joined with the name of the client model with an       
+                                               underscore `<server_model>_<client_model>`. There will be one channel created   
+                                               for each server the model is a client of. Defaults to empty list. Use of        
+                                               `client_of` with `function` is not currently supported.                         
+contact_email             string               Email address that should be used to contact the maintainer of the model. This  
+                                               parameter is only used in the model repository.                                 
+copies                    integer              The number of copies of the model that should be created. Defaults to 1.        
+dependencies              array                A list of packages required by the model that are written in the same language  
+                                               as the model. If the package requires dependencies outside the language of the  
+                                               model. use the additional_dependencies parameter to provide them. If you need a 
+                                               version of the package from a specific package manager, a mapping with 'package'
+                                               and 'package_manager' fields can be provided instead of just the name of the    
+                                               package.                                                                        
+description               string               Description of the model. This parameter is only used in the model repository or
+                                               when providing the model as a service.                                          
+driver                    string               [DEPRECATED] Name of driver class that should be used.                          
+env                       object               Dictionary of environment variables that should be set when the driver starts.  
+                                               Defaults to {}.                                                                 
+function                  string               If provided, an integrated model is created by wrapping the function named here.
+                                               The function must be located within the file specified by the source file listed
+                                               in the first argument. If not provided, the model must contain it's own calls to
+                                               the |yggdrasil| interface.                                                      
+inputs                    array                Zero or more channels carrying input to the model. A full description of channel
+                                               entries and the options available for channels can be found                     
+                                               :ref:`here<yaml_comm_options>`.                                                 
+is_server                                      If `True`, the model is assumed to be a server for one or more client models and
+                                               an instance of :class:`yggdrasil.drivers.ServerDriver` is started. The          
+                                               corresponding channel that should be passed to the yggdrasil API will be the    
+                                               name of the model. If is_server is a dictionary, it should contain an 'input'   
+                                               key and an 'output' key. These are required to be the names of existing input   
+                                               and output channels in the model that will be co-opted by the server. (Note:    
+                                               This requires that the co-opted output channel's send method is called once for 
+                                               each time the co-opted input channel's recv method is called. If used with the  
+                                               `function` parameter, `is_server` must be a dictionary. Defaults to False.      
+iter_function_over        array                Variable(s) that should be received or sent as an array, but iterated over.     
+                                               Defaults to an empty array and is ignored.                                      
+logging_level             string               The level of logging messages that should be displayed by the model. Defaults to
+                                               the logging level as determined by the configuration file and environment       
+                                               variables.                                                                      
+outputs                   array                Zero or more channels carrying output from the model. A full description of     
+                                               channel entries and the options available for channels can be found             
+                                               :ref:`here<yaml_comm_options>`.                                                 
+outputs_in_inputs         boolean              If True, outputs from wrapped model functions are passed by pointer as inputs   
+                                               for modification and the return value will be a flag. If False, outputs are     
+                                               limited to return values. Defaults to the value of the class attribute          
+                                               outputs_in_inputs.                                                              
+overwrite                 boolean              If True, any existing model products (compilation products, wrapper scripts,    
+                                               etc.) are removed prior to the run. If False, the products are not removed.     
+                                               Defaults to True. Setting this to False can improve the performance,            
+                                               particularly for models that take a long time to compile, but this should only  
+                                               be done once the model has been fully debugged to ensure that each run is tested
+                                               on a clean copy of the model. The value of this keyword also determines whether 
+                                               or not products are removed after a run.                                        
+preserve_cache            boolean              If True model products will be kept following the run, otherwise all products   
+                                               will be cleaned up. Defaults to False. This keyword is superceeded by overwrite.
+products                  array                Paths to files created by the model that should be cleaned up when the model    
+                                               exits. Entries can be absolute paths or paths relative to the working directory.
+                                               Defaults to [].                                                                 
+repository_commit         string               Commit that should be checked out in the model repository specified by          
+                                               repository_url. If not provided, the most recent commit on the default branch   
+                                               will be used.                                                                   
+repository_url            string               URL for the git repository containing the model source code. If provided,       
+                                               relative paths in the model YAML definition will be considered relative to the  
+                                               repository root directory.                                                      
+source_products           array                Files created by running the model that are source files. These files will be   
+                                               removed without checking their extension so users should avoid adding files to  
+                                               this list unless they are sure they should be deleted. Defaults to [].          
+strace_flags              array                Flags to pass to strace (or dtrace). Defaults to [].                            
+timesync                                       If set, the model is assumed to call a send then receive of the state at each   
+                                               timestep for syncronization with other models that are also integrating in time.
+                                               If a string is provided, it is assumed to be the name of the server that will   
+                                               handle timestep synchronization. If a boolean is provided, the name of the      
+                                               server will be assumed to be 'timestep'. Defaults to False.                     
+valgrind_flags            array                Flags to pass to valgrind. Defaults to [].                                      
+validation_command        string               Path to a validation command that can be used to verify that the model ran as   
+                                               expected. A non-zero return code is taken to indicate failure.                  
+with_strace               boolean              If True, the command is run with strace (on Linux) or dtrace (on MacOS).        
+                                               Defaults to False.                                                              
+with_valgrind             boolean              If True, the command is run with valgrind. Defaults to False.                   
+=======================   =======   ========   ================================================================================

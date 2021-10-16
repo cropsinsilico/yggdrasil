@@ -1,72 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.yamlfile &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.yamlfile &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -74,19 +36,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
@@ -117,71 +68,30 @@
 <li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-          <li><a href="../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
       <li>yggdrasil.yamlfile</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for yggdrasil.yamlfile</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">copy</span>
@@ -191,9 +101,9 @@
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">git</span>
 <span class="kn">import</span> <span class="nn">io</span> <span class="k">as</span> <span class="nn">sio</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">standardize</span><span class="p">,</span> <span class="n">get_schema</span>
-<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">urlparse</span>
-<span class="kn">from</span> <span class="nn">yaml.constructor</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="kn">import</span> <span class="n">standardize</span><span class="p">,</span> <span class="n">get_schema</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>
+<span class="kn">from</span> <span class="nn">yaml.constructor</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ConstructorError</span><span class="p">,</span> <span class="n">BaseConstructor</span><span class="p">,</span> <span class="n">Constructor</span><span class="p">,</span> <span class="n">SafeConstructor</span><span class="p">)</span>
 
 
@@ -221,22 +131,27 @@
                         <span class="n">no_duplicates_constructor</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="clone_github_repo"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.clone_github_repo">[docs]</a><span class="k">def</span> <span class="nf">clone_github_repo</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+<div class="viewcode-block" id="clone_github_repo"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.clone_github_repo">[docs]</a><span class="k">def</span> <span class="nf">clone_github_repo</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">commit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">local_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clone a GitHub repository, returning the path to the local copy of the</span>
 <span class="sd">    file pointed to by the URL if there is one.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fname (str): URL to a GitHub repository or a file in a GitHub</span>
 <span class="sd">            repository that should be cloned.</span>
-
+<span class="sd">        commit (str, optional): Commit that should be checked out. Defaults</span>
+<span class="sd">            to None and the HEAD of the default branch is used.</span>
+<span class="sd">        local_directory (str, optional): Local directory that the file should</span>
+<span class="sd">            be cloned into. Defaults to None and the current working directory</span>
+<span class="sd">            will be used.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        str: Path to the local copy of the repository or file in the</span>
 <span class="sd">            repository.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    
-    <span class="kn">from</span> <span class="nn">yggdrasil.services</span> <span class="k">import</span> <span class="n">_service_host_env</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.services</span> <span class="kn">import</span> <span class="n">_service_host_env</span><span class="p">,</span> <span class="n">_service_repo_dir</span>
+    <span class="k">if</span> <span class="n">local_directory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">local_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_service_repo_dir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
     <span class="c1"># make sure we start with a full url</span>
     <span class="k">if</span> <span class="s1">&#39;http&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fname</span><span class="p">:</span>
         <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://github.com/&#39;</span> <span class="o">+</span> <span class="n">fname</span>
@@ -252,7 +167,7 @@
     <span class="n">reponame</span> <span class="o">=</span> <span class="n">splitpath</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="c1"># the full path is the file name and location</span>
     <span class="c1"># turn the file path into an os based format</span>
-    <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">splitpath</span><span class="p">)</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_directory</span><span class="p">,</span> <span class="o">*</span><span class="n">splitpath</span><span class="p">)</span>
     <span class="c1"># check to see if the file already exists, and clone if it does not</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_service_host_env</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
@@ -263,13 +178,16 @@
         <span class="n">cloneurl</span> <span class="o">=</span> <span class="n">parsed</span><span class="o">.</span><span class="n">scheme</span> <span class="o">+</span> <span class="s1">&#39;://&#39;</span> <span class="o">+</span> <span class="n">parsed</span><span class="o">.</span><span class="n">netloc</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">owner</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span>\
             <span class="n">reponame</span>
         <span class="c1"># clone the repo into the appropriate directory</span>
-        <span class="n">repo</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">Repo</span><span class="o">.</span><span class="n">clone_from</span><span class="p">(</span><span class="n">cloneurl</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">reponame</span><span class="p">))</span>
+        <span class="n">repo</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">Repo</span><span class="o">.</span><span class="n">clone_from</span><span class="p">(</span><span class="n">cloneurl</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_directory</span><span class="p">,</span>
+                                                          <span class="n">owner</span><span class="p">,</span> <span class="n">reponame</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">commit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">checkout</span><span class="p">(</span><span class="n">commit</span><span class="p">)</span>
         <span class="n">repo</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="c1"># now that it is cloned, just pass the yaml file (and path) onwards</span>
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="load_yaml"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.load_yaml">[docs]</a><span class="k">def</span> <span class="nf">load_yaml</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+<div class="viewcode-block" id="load_yaml"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.load_yaml">[docs]</a><span class="k">def</span> <span class="nf">load_yaml</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">yaml_param</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">directory_for_clones</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml file defining a run.</span>
 
 <span class="sd">    Args:</span>
@@ -281,6 +199,12 @@
 <span class="sd">            YAML file (the server is assumed to be github.com if not given)</span>
 <span class="sd">            (foo/bar/yam/interesting.yaml will be interpreted as</span>
 <span class="sd">            http://github.com/foo/bar/yam/interesting.yml).</span>
+<span class="sd">        yaml_param (dict, optional): Parameters that should be used in</span>
+<span class="sd">            mustache formatting of YAML files. Defaults to None and is</span>
+<span class="sd">            ignored.</span>
+<span class="sd">        directory_for_clones (str, optional): Directory that git repositories</span>
+<span class="sd">            should be cloned into. Defaults to None and the current working</span>
+<span class="sd">            directory will be used.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Contents of yaml file.</span>
@@ -294,7 +218,8 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="c1"># pull foreign file</span>
         <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;git:&#39;</span><span class="p">):</span>
-            <span class="n">fname</span> <span class="o">=</span> <span class="n">clone_github_repo</span><span class="p">(</span><span class="n">fname</span><span class="p">[</span><span class="mi">4</span><span class="p">:])</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">clone_github_repo</span><span class="p">(</span><span class="n">fname</span><span class="p">[</span><span class="mi">4</span><span class="p">:],</span>
+                                      <span class="n">local_directory</span><span class="o">=</span><span class="n">directory_for_clones</span><span class="p">)</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Unable locate yaml file </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
@@ -307,9 +232,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;stream&#39;</span><span class="p">)</span>
     <span class="c1"># Mustache replace vars</span>
+    <span class="k">if</span> <span class="n">yaml_param</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">yaml_param</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">yamlparsed</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
     <span class="n">yamlparsed</span> <span class="o">=</span> <span class="n">chevron</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
-        <span class="n">sio</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">yamlparsed</span><span class="p">)</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">))</span>
+        <span class="n">sio</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">yamlparsed</span><span class="p">)</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="o">**</span><span class="n">yaml_param</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.json&#39;</span><span class="p">):</span>
         <span class="n">yamlparsed</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">yamlparsed</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -322,7 +249,7 @@
     <span class="k">return</span> <span class="n">yamlparsed</span></div>
 
 
-<div class="viewcode-block" id="prep_yaml"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.prep_yaml">[docs]</a><span class="k">def</span> <span class="nf">prep_yaml</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+<div class="viewcode-block" id="prep_yaml"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.prep_yaml">[docs]</a><span class="k">def</span> <span class="nf">prep_yaml</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">yaml_param</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">directory_for_clones</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prepare yaml to be parsed by jsonschema including covering backwards</span>
 <span class="sd">    compatible options.</span>
 
@@ -330,16 +257,24 @@
 <span class="sd">        files (str, list): Either the path to a single yaml file or a list of</span>
 <span class="sd">            yaml files. Entries can also be opened file descriptors for files</span>
 <span class="sd">            containing YAML documents or pre-loaded YAML documents.</span>
+<span class="sd">        yaml_param (dict, optional): Parameters that should be used in</span>
+<span class="sd">            mustache formatting of YAML files. Defaults to None and is</span>
+<span class="sd">            ignored.</span>
+<span class="sd">        directory_for_clones (str, optional): Directory that git repositories</span>
+<span class="sd">            should be cloned into. Defaults to None and the current working</span>
+<span class="sd">            directory will be used.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: YAML ready to be parsed using schema.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.services</span> <span class="k">import</span> <span class="n">IntegrationServiceManager</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.services</span> <span class="kn">import</span> <span class="n">IntegrationServiceManager</span>
     <span class="c1"># Load each file</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">files</span><span class="p">]</span>
-    <span class="n">yamls</span> <span class="o">=</span> <span class="p">[</span><span class="n">load_yaml</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
+    <span class="n">yamls</span> <span class="o">=</span> <span class="p">[</span><span class="n">load_yaml</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">yaml_param</span><span class="o">=</span><span class="n">yaml_param</span><span class="p">,</span>
+                       <span class="n">directory_for_clones</span><span class="o">=</span><span class="n">directory_for_clones</span><span class="p">)</span>
+             <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
     <span class="c1"># Load files pointed to</span>
     <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">yamls</span><span class="p">:</span>
         <span class="k">if</span> <span class="s1">&#39;include&#39;</span> <span class="ow">in</span> <span class="n">y</span><span class="p">:</span>
@@ -361,7 +296,7 @@
                 <span class="n">y</span><span class="p">[</span><span class="s1">&#39;models&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">services</span><span class="p">:</span>
             <span class="n">request</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;start&#39;</span><span class="p">}</span>
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;yamls&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;yamls&#39;</span><span class="p">,</span> <span class="s1">&#39;yaml_param&#39;</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
                     <span class="n">request</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
             <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
@@ -380,7 +315,10 @@
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                     <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;models&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;repository_url&#39;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">):</span>
-                        <span class="n">repo_dir</span> <span class="o">=</span> <span class="n">clone_github_repo</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;repository_url&#39;</span><span class="p">])</span>
+                        <span class="n">repo_dir</span> <span class="o">=</span> <span class="n">clone_github_repo</span><span class="p">(</span>
+                            <span class="n">x</span><span class="p">[</span><span class="s1">&#39;repository_url&#39;</span><span class="p">],</span>
+                            <span class="n">commit</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;repository_commit&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                            <span class="n">local_directory</span><span class="o">=</span><span class="n">directory_for_clones</span><span class="p">)</span>
                         <span class="n">x</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;working_dir&#39;</span><span class="p">,</span> <span class="n">repo_dir</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">x</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;working_dir&#39;</span><span class="p">,</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;working_dir&#39;</span><span class="p">])</span>
@@ -394,7 +332,8 @@
 
 
 <div class="viewcode-block" id="parse_yaml"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.parse_yaml">[docs]</a><span class="k">def</span> <span class="nf">parse_yaml</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">complete_partial</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">partial_commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-               <span class="n">model_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">model_submission</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+               <span class="n">model_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">model_submission</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">yaml_param</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">directory_for_clones</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse list of yaml files.</span>
 
 <span class="sd">    Args:</span>
@@ -412,6 +351,12 @@
 <span class="sd">        model_submission (bool, optional): If True, the YAML will be evaluated</span>
 <span class="sd">            as a submission to the yggdrasil model repository and model_only</span>
 <span class="sd">            will be set to True. Defaults to False.</span>
+<span class="sd">        yaml_param (dict, optional): Parameters that should be used in</span>
+<span class="sd">            mustache formatting of YAML files. Defaults to None and is</span>
+<span class="sd">            ignored.</span>
+<span class="sd">        directory_for_clones (str, optional): Directory that git repositories</span>
+<span class="sd">            should be cloned into. Defaults to None and the current working</span>
+<span class="sd">            directory will be used.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If the yml dictionary is missing a required keyword or</span>
@@ -425,16 +370,15 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span>
     <span class="c1"># Parse files using schema</span>
-    <span class="n">yml_prep</span> <span class="o">=</span> <span class="n">prep_yaml</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+    <span class="n">yml_prep</span> <span class="o">=</span> <span class="n">prep_yaml</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">yaml_param</span><span class="o">=</span><span class="n">yaml_param</span><span class="p">,</span>
+                         <span class="n">directory_for_clones</span><span class="o">=</span><span class="n">directory_for_clones</span><span class="p">)</span>
     <span class="c1"># print(&#39;prepped&#39;)</span>
     <span class="c1"># pprint.pprint(yml_prep)</span>
     <span class="k">if</span> <span class="n">model_submission</span><span class="p">:</span>
         <span class="n">models</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">yml</span> <span class="ow">in</span> <span class="n">yml_prep</span><span class="p">[</span><span class="s1">&#39;models&#39;</span><span class="p">]:</span>
             <span class="n">wd</span> <span class="o">=</span> <span class="n">yml</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;working_dir&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">validate_model_submission</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                            <span class="n">no_defaults</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                            <span class="n">required_defaults</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">validate_model_submission</span><span class="p">(</span><span class="n">yml</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">wd</span><span class="p">:</span>
                 <span class="n">x</span><span class="p">[</span><span class="s1">&#39;working_dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wd</span>
             <span class="n">models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -898,46 +842,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

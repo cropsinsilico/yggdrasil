@@ -1,72 +1,35 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Datatypes &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Datatypes &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -74,19 +37,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
@@ -117,72 +69,31 @@
 <li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Datatypes</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/advanced/datatypes.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="datatypes">
+             
+  <section id="datatypes">
 <span id="datatypes-rst"></span><h1>Datatypes<a class="headerlink" href="#datatypes" title="Permalink to this headline">¶</a></h1>
 <p>Model input and outputs are described in model YAML files by several
 properties, including type. The type assigned to an input/output determines
@@ -195,14 +106,14 @@ specified by strings, while more complex datatypes can be described directly
 in the YAML file using a <a class="reference external" href="https://json-schema.org/">JSON Schema</a> (See below).
 When the YAML specification files are read in these datatypes are validated
 against the yggdrasil <a class="reference internal" href="metaschema.html#metaschema-rst"><span class="std std-ref">metaschema</span></a>.</p>
-<div class="section" id="primary-datatypes">
+<section id="primary-datatypes">
 <h2>Primary Datatypes<a class="headerlink" href="#primary-datatypes" title="Permalink to this headline">¶</a></h2>
 <p>yggdrasil supports all of the following basic data types which include the
 core JSON data types, as well as several additional datatypes that yggdrasil
 defines for convenience. Simple datatypes can be specified via strings, while
 collection datatypes require a schema that can be used to validate data being
 passed (dynamic arrays/objects are not yet supported).</p>
-<div class="section" id="simple-datatypes">
+<section id="simple-datatypes">
 <h3>Simple Datatypes<a class="headerlink" href="#simple-datatypes" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="datatype-table-simple-rst">
 <colgroup>
@@ -255,8 +166,8 @@ passed (dynamic arrays/objects are not yet supported).</p>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="collection-datatypes">
+</section>
+<section id="collection-datatypes">
 <h3>Collection Datatypes<a class="headerlink" href="#collection-datatypes" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="datatype-table-container-rst">
 <colgroup>
@@ -297,8 +208,8 @@ passed (dynamic arrays/objects are not yet supported).</p>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="yggdrasil-datatypes">
+</section>
+<section id="yggdrasil-datatypes">
 <h3>yggdrasil Datatypes<a class="headerlink" href="#yggdrasil-datatypes" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="datatype-table-yggdrasil-rst">
 <colgroup>
@@ -400,52 +311,36 @@ subtype</p></td>
 </tbody>
 </table>
 <p>Information on adding new datatypes can be found <a class="reference internal" href="../development/new_datatype.html#new-datatype-rst"><span class="std std-ref">here</span></a></p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

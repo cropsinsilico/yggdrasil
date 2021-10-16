@@ -1,74 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Transformed I/O &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Transformed I/O &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Timestep Synchronization" href="timesync_io.html" />
     <link rel="prev" title="Conditional I/O" href="conditional_io.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -76,19 +39,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
@@ -128,210 +80,114 @@
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Transformed I/O</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/transformed_io.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="transformed-i-o">
+             
+  <section id="transformed-i-o">
 <span id="transformed-io-rst"></span><h1>Transformed I/O<a class="headerlink" href="#transformed-i-o" title="Permalink to this headline">¶</a></h1>
 <p>In addition to I/O <a class="reference internal" href="examples/conditional_io.html#conditional-io-rst"><span class="std std-ref">filters</span></a>, yggdrasil also provides methods for specifying transformations that should be performed on input/output received/returned by a model. In addition to type specific operations (e.g. mapping field names, selecting columns), yggdrasil also supports generic transformations via arbitrary Python statements and/or Python functions.</p>
-<div class="section" id="transformed-output">
+<section id="transformed-output">
 <h2>Transformed Output<a class="headerlink" href="#transformed-output" title="Permalink to this headline">¶</a></h2>
 <p>In the example below, the output from model A is passed to both model B and C, however model B and C expect slightly different forms of the varaible, which as output by model A, is a rate with units of g/s. In the case of model B, it expects an input value in the form of a rate multiplied by 10 to account for accumulation across 10 producers. In the case of Model C, it expects an input value in the form of a rate density, requiring the value returned by model A to be normalized by an area.</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">modelA_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
-    <span class="n">out_val</span> <span class="o">=</span> <span class="n">in_val</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;modelA_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">out_val</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">modelA_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="n">out_val</span> <span class="o">=</span> <span class="n">in_val</span>
+<span class="linenos">3</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;modelA_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+<span class="linenos">4</span>    <span class="k">return</span> <span class="n">out_val</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">modelB_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
-    <span class="n">out_val</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">in_val</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;modelB_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">modelB_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="n">out_val</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">in_val</span>
+<span class="linenos">3</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;modelB_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+<span class="linenos">4</span>    <span class="k">return</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
-
-
-<span class="k">def</span> <span class="nf">modelC_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
-    <span class="n">out_val</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;modelC_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span>
-
-
-<span class="k">def</span> <span class="nf">transform_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">in_val</span> <span class="o">/</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;cm**2&#39;</span><span class="p">))</span>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="k">def</span> <span class="nf">modelC_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
+<span class="linenos"> 5</span>    <span class="n">out_val</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span>
+<span class="linenos"> 6</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;modelC_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+<span class="linenos"> 7</span>    <span class="k">return</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span>
+<span class="linenos">10</span><span class="k">def</span> <span class="nf">transform_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
+<span class="linenos">11</span>    <span class="k">return</span> <span class="p">(</span><span class="n">in_val</span> <span class="o">/</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;cm**2&#39;</span><span class="p">))</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/transformed_io.html">Example in other languages</a>)</p>
 <p>To instruct yggdrasil to transform output from model A into the forms expected by models B &amp; C, the YAML should containg a connection to both models with the <code class="docutils literal notranslate"><span class="pre">transform</span></code> parameter added to both.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.py</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA_function</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.py</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelB_function</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelC</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelC_function</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA:input</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-    <span class="nt">outputs</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB:input</span>
-        <span class="nt">transform</span><span class="p">:</span>
-          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelC:input</span>
-        <span class="nt">transform</span><span class="p">:</span>
-          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB:output</span>  <span class="c1"># Connection between model B, function 1 output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
-    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
-    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelC:output</span>  <span class="c1"># Connection between model C, function 1 output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
-    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/(s*(cm**2)),g/(s*(cm**2))</span>
-    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
+<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.py</span>
+<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA_function</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
+<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.py</span>
+<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelB_function</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelC</span>
+<span class="linenos">13</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos">14</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py</span>
+<span class="linenos">15</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelC_function</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">18</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+<span class="linenos">19</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA:input</span>
+<span class="linenos">20</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+<span class="linenos">22</span>    <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">23</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB:input</span>
+<span class="linenos">24</span>        <span class="nt">transform</span><span class="p">:</span>
+<span class="linenos">25</span>          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
+<span class="linenos">26</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelC:input</span>
+<span class="linenos">27</span>        <span class="nt">transform</span><span class="p">:</span>
+<span class="linenos">28</span>          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
+<span class="linenos">29</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB:output</span>  <span class="c1"># Connection between model B, function 1 output and file</span>
+<span class="linenos">30</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
+<span class="linenos">31</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">32</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
+<span class="linenos">33</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
+<span class="linenos">34</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<span class="linenos">35</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelC:output</span>  <span class="c1"># Connection between model C, function 1 output and file</span>
+<span class="linenos">36</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
+<span class="linenos">37</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">38</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
+<span class="linenos">39</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/(s*(cm**2)),g/(s*(cm**2))</span>
+<span class="linenos">40</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/transformed_io.html">Example in other languages</a>)</p>
 <p><code class="docutils literal notranslate"><span class="pre">transform</span></code> values are maps with parameters specifying how the input/output should be transformed before being receieved/returned by a model. In the above example, the transform for model B uses a Python expression (the <code class="docutils literal notranslate"><span class="pre">statement</span></code> parameter) in terms of <code class="docutils literal notranslate"><span class="pre">%x%</span></code> which stands in for the variable being based by the comm. Alternately, the transform for model C uses a reference to a Python function. <code class="docutils literal notranslate"><span class="pre">function</span></code> values take the form <code class="docutils literal notranslate"><span class="pre">&lt;filename&gt;:&lt;function</span> <span class="pre">name&gt;</span></code> where <code class="docutils literal notranslate"><span class="pre">filename</span></code> is the full path to the location of a Python source file containing the desired function that should be used to transform the received data and <code class="docutils literal notranslate"><span class="pre">function</span> <span class="pre">name</span></code> is the name of the desired function. Functions used in such cases should take a single argument (the variable or tuple of variables being passed by the connection), and return the transformed value. The path to the file containing the function can be absolute or relative to the directory containing the yaml file.</p>
 <p>Additional <code class="docutils literal notranslate"><span class="pre">transform</span></code> parameter options are provided below.</p>
-</div>
-<div class="section" id="transform-options">
+</section>
+<section id="transform-options">
 <h2>Transform Options<a class="headerlink" href="#transform-options" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="general-transform-options">
+<section id="general-transform-options">
 <h3>General Transform Options<a class="headerlink" href="#general-transform-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-transform-general-rst">
 <colgroup>
@@ -366,8 +222,8 @@ created.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="transform-types">
+</section>
+<section id="transform-types">
 <h3>Transform Types<a class="headerlink" href="#transform-types" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-transform-subtype-rst">
 <colgroup>
@@ -398,8 +254,8 @@ created.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="type-specific-transform-options">
+</section>
+<section id="type-specific-transform-options">
 <h3>Type Specific Transform Options<a class="headerlink" href="#type-specific-transform-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-transform-specific-rst">
 <colgroup>
@@ -467,56 +323,39 @@ more complex relationships are required, use the FunctionTransform class.</p></t
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="timesync_io.html" class="btn btn-neutral float-right" title="Timestep Synchronization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="conditional_io.html" class="btn btn-neutral float-left" title="Conditional I/O" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="timesync_io.html" class="btn btn-neutral float-right" title="Timestep Synchronization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

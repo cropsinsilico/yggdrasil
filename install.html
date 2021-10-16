@@ -1,74 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Installation &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Installation &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Getting started" href="getting_started.html" />
     <link rel="prev" title="Overview" href="includeme.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -76,19 +39,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
@@ -144,72 +96,31 @@
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Installation</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/install.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="installation">
+             
+  <section id="installation">
 <span id="install-rst"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -231,7 +142,7 @@
 <p><strong>Mac Users</strong></p>
 <p>If you will be running C/C++/Fortran models, you will need to install the command line developer tools on Mac which provides several utilities for compilation and code management (e.g. clang, gcc, make, git). <a class="reference external" href="https://cloudtechpoint.medium.com/how-to-install-command-line-tools-homebrew-in-macos-without-xcode-1b910742d923">This</a> article outlines how to check if they are installed and install them if they are not. It also describes how to install the Homebrew package manager, which will be useful for installing non-Python dependencies if you do not plan on using conda to install yggdrasil.</p>
 </div>
-<div class="section" id="conda-installation-recommended">
+<section id="conda-installation-recommended">
 <h2>Conda Installation (recommended)<a class="headerlink" href="#conda-installation-recommended" title="Permalink to this headline">¶</a></h2>
 <p>Download and install Miniconda from <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">here</a> (or Anaconda from <a class="reference external" href="https://www.anaconda.com/download/">here</a> if you would like additional Python libraries installed by default). There are conda distributions available for yggdrasil from <a class="reference external" href="https://github.com/conda-forge/yggdrasil-feedstock">conda-forge</a>. You can install yggdrasil from conda-forge by calling:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install -c conda-forge yggdrasil
@@ -270,12 +181,12 @@ the terminal (or Anaconda Prompt on Windows).:</p>
 </div>
 <p>See discussion <a class="reference external" href="https://github.com/conda/conda/issues/7690">here</a> for additional ideas on why conda might be hanging.</p>
 </div>
-</div>
-<div class="section" id="development-installation">
+</section>
+<section id="development-installation">
 <h2>Development Installation<a class="headerlink" href="#development-installation" title="Permalink to this headline">¶</a></h2>
 <p>If you would like to contribute to yggdrasil, instructions on setting up a development environment can be found <a class="reference internal" href="development/general.html#dev-env-rst"><span class="std std-ref">here</span></a>.</p>
-</div>
-<div class="section" id="manual-installation">
+</section>
+<section id="manual-installation">
 <span id="manual-install-rst"></span><h2>Manual Installation<a class="headerlink" href="#manual-installation" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -343,7 +254,7 @@ yggdrasil command line tools (e.g. <code class="docutils literal notranslate"><s
 their full path. Usually, this directory can be found using the following
 Python commands:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">distutils.sysconfig</span> <span class="k">import</span> <span class="n">get_python_lib</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">distutils.sysconfig</span> <span class="kn">import</span> <span class="n">get_python_lib</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_python_lib</span><span class="p">(),</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;bin&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -366,8 +277,8 @@ Windows (&gt;=7), the following command will permanently modify your path:</p>
 </pre></div>
 </div>
 <p>The changes will take affect the next time you open the terminal.</p>
-</div>
-<div class="section" id="user-defined-rapidjson">
+</section>
+<section id="user-defined-rapidjson">
 <h2>User Defined rapidjson<a class="headerlink" href="#user-defined-rapidjson" title="Permalink to this headline">¶</a></h2>
 <p>If you would like to use an existing installation of the
 <a class="reference external" href="http://rapidjson.org/">rapidjson</a>
@@ -375,8 +286,8 @@ header-only library, you can pass the flag
 <code class="docutils literal notranslate"><span class="pre">--rapidjson-include-dir=&lt;user_defined_dir&gt;</span></code> to either of the <code class="docutils literal notranslate"><span class="pre">pip</span></code>
 installation commands from above with the location of the
 existing rapidjson include directory.</p>
-</div>
-<div class="section" id="additional-steps-on-windows">
+</section>
+<section id="additional-steps-on-windows">
 <h2>Additional Steps on Windows<a class="headerlink" href="#additional-steps-on-windows" title="Permalink to this headline">¶</a></h2>
 <p>As local communication on Windows is handled by ZeroMQ, running models written
 in C or C++ will require installing the ZeroMQ libraries for C and C++.
@@ -393,7 +304,7 @@ overhead. We recommend installing zeromq &amp; czmq via apt on Linux
 (<code class="docutils literal notranslate"><span class="pre">apt-get</span> <span class="pre">libczmq-dev</span> <span class="pre">libzmq3-dev</span></code>) or Homebrew
 on Mac (<code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">czmq</span> <span class="pre">zmq</span></code>) if you do not use conda.</p>
 </div>
-<div class="section" id="installing-via-vcpkg">
+<section id="installing-via-vcpkg">
 <h3>Installing via vcpkg<a class="headerlink" href="#installing-via-vcpkg" title="Permalink to this headline">¶</a></h3>
 <p>You can install the ZeroMQ C and C++ libraries via vcpkg (instructions for
 installing vcpkg found <a class="reference external" href="https://github.com/microsoft/vcpkg">here</a>. To
@@ -417,8 +328,8 @@ running <code class="docutils literal notranslate"><span class="pre">yggconfig</
 <p>If you do not do this, you will need to manually add the paths to the czmq and
 zeromq libraries/headers to your yggdrasil configuration file (See
 <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">Configuration Options</span></a>).</p>
-</div>
-<div class="section" id="building-from-source">
+</section>
+<section id="building-from-source">
 <h3>Building from Source<a class="headerlink" href="#building-from-source" title="Permalink to this headline">¶</a></h3>
 <p>Instructions for installing the ZeroMQ C and C++ libraries can be found
 <a class="reference external" href="https://github.com/zeromq/czmq#building-and-installing">here</a>
@@ -430,9 +341,9 @@ that it cannot find these libraries, you can manually set them in your
 If you install these libraries after installing yggdrasil you can re-configure
 yggdrasil and have it search for the libraries again by calling <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code>
 from the command line or by setting the appropriate config options manually.</p>
-</div>
-</div>
-<div class="section" id="additional-steps-for-matlab-models">
+</section>
+</section>
+<section id="additional-steps-for-matlab-models">
 <h2>Additional Steps for Matlab Models<a class="headerlink" href="#additional-steps-for-matlab-models" title="Permalink to this headline">¶</a></h2>
 <p>To run Matlab models, you will need an existing Matlab installation and license and
 the <code class="docutils literal notranslate"><span class="pre">matlab</span></code> executable must be on your path (i.e. you can call <code class="docutils literal notranslate"><span class="pre">matlab</span></code>
@@ -486,26 +397,26 @@ line.</p>
 <p class="admonition-title">Note</p>
 <p>yggdrasil cannot currently run Matlab models if Matlab is installed via a Citrix environment as yggdrasil needs command line access to the Matlab executable and access to the environment in which Matlab models are run.</p>
 </div>
-</div>
-<div class="section" id="additional-steps-for-r-models">
+</section>
+<section id="additional-steps-for-r-models">
 <span id="install-r-rst"></span><h2>Additional Steps for R Models<a class="headerlink" href="#additional-steps-for-r-models" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="rtools-windows-only">
+<section id="rtools-windows-only">
 <h3>Rtools (Windows only)<a class="headerlink" href="#rtools-windows-only" title="Permalink to this headline">¶</a></h3>
 <p>On Windows, if you do not install the R dependencies via conda, you will also need to install Rtools so that the R dependencies with C/C++/Fortran components can be compiled if they need to be installed from source. The Rtools installer and instructions for installing Rtools for R&lt;4.0.0 can be found <a class="reference external" href="https://cran.r-project.org/bin/windows/Rtools/history.html">here</a>. For R&gt;=4.0.0, you will need to install Rtools40 instead (installer/instructions <a class="reference external" href="https://cran.r-project.org/bin/windows/Rtools/">here</a>).</p>
-</div>
-<div class="section" id="r-interpreter">
+</section>
+<section id="r-interpreter">
 <h3>R Interpreter<a class="headerlink" href="#r-interpreter" title="Permalink to this headline">¶</a></h3>
 <p>To run R models, you will need to install the
 <a class="reference external" href="https://www.r-project.org/">R interpreter</a> (we recommend R &gt;= 3.5). If you installed yggdrasil using conda, this will be installed for you, but if you are not using conda, you will need to install R yourself along with the <a class="reference external" href="https://www.unidata.ucar.edu/software/udunits/">udunits</a> package.</p>
-<div class="section" id="mac">
+<section id="mac">
 <h4>Mac<a class="headerlink" href="#mac" title="Permalink to this headline">¶</a></h4>
 <p>On Mac, this can be done via Homebrew:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ brew install r
 $ brew install udunits
 </pre></div>
 </div>
-</div>
-<div class="section" id="linux">
+</section>
+<section id="linux">
 <h4>Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h4>
 <p>On Linux this can be done via apt. Installing R &gt;= 3.5 (recommended) requires first adding a source entry and key for your OS as shown below for for Xenial distribution of Ubuntu (Details on <a class="reference external" href="https://cloud.r-project.org/bin/linux/ubuntu/README.html">ubuntu</a>, <a class="reference external" href="https://cloud.r-project.org/bin/linux/debian/">debian</a>, <a class="reference external" href="https://cloud.r-project.org/bin/linux/redhat/README">redhat</a> installation):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo add-apt-repository &#39;deb https://cloud.r-project.org/bin/linux/ubuntu xenial-cran35/&#39;
@@ -516,13 +427,13 @@ $ sudo apt-get install libudunits2-dev
 </pre></div>
 </div>
 <p>If you don’t want the latest version, you can install the default using the last two lines on Ubuntu and Debian.</p>
-</div>
-<div class="section" id="windows">
+</section>
+<section id="windows">
 <h4>Windows<a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h4>
 <p>On Windows, you will need to download and run the installer. Links to the R 3.6 installer and additoinal information about the installation process on Windows can be found <a class="reference external" href="https://cran.r-project.org/bin/windows/base/">here</a>.</p>
-</div>
-</div>
-<div class="section" id="r-dependencies">
+</section>
+</section>
+<section id="r-dependencies">
 <h3>R Dependencies<a class="headerlink" href="#r-dependencies" title="Permalink to this headline">¶</a></h3>
 <p>Even if you install the R interpreter yourself, yggdrasil will attempt to install the R dependencies it needs via <a class="reference external" href="https://cran.r-project.org/">CRAN</a> when it is installed. If this fails, you may need to install these yourself from within the R interpreter. yggdrasil’s R dependencies include <a class="reference external" href="https://blog.rstudio.com/2018/03/26/reticulate-r-interface-to-python/">reticulate</a> for calling Python from R, <a class="reference external" href="https://cran.r-project.org/web/packages/zeallot/index.html">zeallot</a> for allowing assignment of output to multiple variables, <a class="reference external" href="https://cran.r-project.org/web/packages/units/index.html">units</a> for tracking physical units in R, <a class="reference external" href="https://cran.r-project.org/web/packages/bit64/index.html">bit64</a> for 64bit integers, and <a class="reference external" href="https://cran.r-project.org/web/packages/R6/index.html">R6</a> for creating interface classes with teardown methods.</p>
 <p>These packages can by installed from CRAN from the R interpreter.:</p>
@@ -565,9 +476,9 @@ ERROR: sub-architecture &#39;R.dSYM&#39; is not installed
 <p class="admonition-title">Note</p>
 <p>If you see errors along the lines of <code class="docutils literal notranslate"><span class="pre">'lib</span> <span class="pre">=</span> <span class="pre">&quot;/usr/local/lib/R/site-library&quot;'</span> <span class="pre">is</span> <span class="pre">not</span> <span class="pre">writable</span></code> when running <code class="docutils literal notranslate"><span class="pre">ygginstall</span> <span class="pre">R</span></code>, it is likely that the directory R is attempting to install in requires staff privileges to edit. On Unix systems (Linux/Mac), if you have <code class="docutils literal notranslate"><span class="pre">sudo</span></code> access you can either add yourself to the staff group (e.g. <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">usermod</span> <span class="pre">-a</span> <span class="pre">-G</span> <span class="pre">staff</span> <span class="pre">your_user_name</span></code>; then log off and back on) or add the <code class="docutils literal notranslate"><span class="pre">--sudoR</span></code> flag to the installation call (i.e. <code class="docutils literal notranslate"><span class="pre">ygginstall</span> <span class="pre">R</span> <span class="pre">--sudoR</span></code>). On windows, you can open R from an administrator prompt and install the dependencies from CRAN directly as shown above. If you do not have administrator access, you can pick a directory that you have write access to and add it to the list of paths checked by R for R libraries in your .Rprofile file (i.e. add <code class="docutils literal notranslate"><span class="pre">.libPaths(</span> <span class="pre">c(</span> <span class="pre">&quot;~/userLibrary&quot;</span> <span class="pre">,</span> <span class="pre">.libPaths()</span> <span class="pre">)</span> <span class="pre">)</span></code>). <a class="reference external" href="https://support.rstudio.com/hc/en-us/articles/360047157094-Managing-R-with-Rprofile-Renviron-Rprofile-site-Renviron-site-rsession-conf-and-repos-conf">This article</a> describes what the .Rprofile file is and how to locate it. <a class="reference external" href="https://www.accelebrate.com/library/how-to-articles/r-rstudio-library">This article</a> discusses this in the context of Rstudio and how to make these changes via the Rstudio GUI on Windows.</p>
 </div>
-</div>
-</div>
-<div class="section" id="additional-steps-for-rabbitmq-message-passing">
+</section>
+</section>
+<section id="additional-steps-for-rabbitmq-message-passing">
 <h2>Additional Steps for RabbitMQ Message Passing<a class="headerlink" href="#additional-steps-for-rabbitmq-message-passing" title="Permalink to this headline">¶</a></h2>
 <p>RabbitMQ connections allow messages to be passed between models when the
 models are not running on the same machine. To use these connections,
@@ -582,8 +493,8 @@ downloading, installing, and starting a RabbitMQ server can be found
 <a class="reference external" href="https://www.rabbitmq.com/download.html">here</a>. The default values
 for RabbitMQ related properties in the config file are set to the defaults
 for starting a RabbitMQ server.</p>
-</div>
-<div class="section" id="additional-steps-for-opensimroot">
+</section>
+<section id="additional-steps-for-opensimroot">
 <h2>Additional Steps for OpenSimRoot<a class="headerlink" href="#additional-steps-for-opensimroot" title="Permalink to this headline">¶</a></h2>
 <p>If you would like to use OpenSimRoot, you will need to install GNU make. If you are on Linux/Mac or used conda to install yggdrasil it is likely that it will already be installed (you can run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">--version</span></code> to check). If it is not installed, and you are using a Mac OS, you can install XCode and the command line developer tools to get make and several other GNU tools (see relavent section of <a class="reference external" href="https://cloudtechpoint.medium.com/how-to-install-command-line-tools-homebrew-in-macos-without-xcode-1b910742d923">this article</a>). If you are not on Mac, we recommend installing it via a package manager, e.g.</p>
 <ul class="simple">
@@ -591,55 +502,38 @@ for starting a RabbitMQ server.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">make</span></code> on Linux</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">choco</span> <span class="pre">install</span> <span class="pre">make</span></code> on Windows</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="getting_started.html" class="btn btn-neutral float-right" title="Getting started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="includeme.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="getting_started.html" class="btn btn-neutral float-right" title="Getting started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

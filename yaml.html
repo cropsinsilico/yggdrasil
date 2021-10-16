@@ -1,74 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>YAML Files &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>YAML Files &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Configuration Files" href="config.html" />
     <link rel="prev" title="Timestep Synchronization" href="timesync_io.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -76,19 +39,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
@@ -148,72 +100,31 @@
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>YAML Files</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/yaml.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="yaml-files">
+             
+  <section id="yaml-files">
 <span id="yaml-rst"></span><h1>YAML Files<a class="headerlink" href="#yaml-files" title="Permalink to this headline">¶</a></h1>
 <p>Models and communication between models during are specified by the user in one
 or more YAML files. YAML files have a human readable structure that can be parsed
@@ -229,7 +140,7 @@ or a mix of both.</p></li>
 <li><p>Mappings: Mapping entries use a colon and a space (: ) to seperate a
 <code class="docutils literal notranslate"><span class="pre">key:</span> <span class="pre">value</span></code> pair. Keys are text and values can be text or a collection.</p></li>
 </ul>
-<div class="section" id="models">
+<section id="models">
 <h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
 <p>At the root level of a yggdrasil YAML, should be a mapping key <code class="docutils literal notranslate"><span class="pre">model:</span></code>
 or <code class="docutils literal notranslate"><span class="pre">models:</span></code>. This denotes information pertaining to the model(s) that should
@@ -288,8 +199,8 @@ options for communication channels).</p>
     <span class="o">-</span> <span class="n">out_channel_name3</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="connections">
+</section>
+<section id="connections">
 <h2>Connections<a class="headerlink" href="#connections" title="Permalink to this headline">¶</a></h2>
 <p>In order to connect models inputs/outputs to files and/or other model
 inputs/outputs, the yaml(s) must all contain a <code class="docutils literal notranslate"><span class="pre">connections</span></code> key/value pair.
@@ -341,8 +252,8 @@ available options, can be found <a class="reference internal" href="#yaml-conn-o
 connect communication channels/files. Any additional keys in the connection
 entry will be passed to the input/output driver that is created for the
 connection.</p>
-</div>
-<div class="section" id="validation">
+</section>
+<section id="validation">
 <h2>Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>
 <p>yggdrasil uses a <a class="reference internal" href="advanced/schema.html#schema-rst"><span class="std std-ref">JSON schema</span></a> to validate the provided
 YAML specification files. If you would like to validate a set of YAML specification
@@ -350,17 +261,17 @@ files without running the integration, this can be done via the <code class="doc
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggvalidate name1.yml name2.yml ...
 </pre></div>
 </div>
-</div>
-<div class="section" id="model-options">
+</section>
+<section id="model-options">
 <span id="yaml-model-options"></span><h2>Model Options<a class="headerlink" href="#model-options" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="general-model-options">
+<section id="general-model-options">
 <h3>General Model Options<a class="headerlink" href="#general-model-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-model-general-rst">
 <colgroup>
-<col style="width: 16%" />
+<col style="width: 19%" />
 <col style="width: 6%" />
 <col style="width: 7%" />
-<col style="width: 71%" />
+<col style="width: 68%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -395,13 +306,19 @@ described <a class="reference internal" href="#schema-table-model-subtype-rst"><
 <td><p>X</p></td>
 <td><p>Working directory. If not provided, the current working directory is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>allow_threading</p></td>
+<tr class="row-even"><td><p>additional_dependencies</p></td>
+<td><p>object</p></td>
+<td></td>
+<td><p>A mapping between languages and lists of packages in those languages that are
+required by the model.</p></td>
+</tr>
+<tr class="row-odd"><td><p>allow_threading</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True, comm connections will be set up so that the model-side comms can be
 used by more than one thread. Defaults to False.</p></td>
 </tr>
-<tr class="row-odd"><td><p>client_of</p></td>
+<tr class="row-even"><td><p>client_of</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>The names of one or more models that this model will call as a server. If there
@@ -412,16 +329,26 @@ underscore <cite>&lt;server_model&gt;_&lt;client_model&gt;</cite>. There will be
 for each server the model is a client of. Defaults to empty list. Use of
 <cite>client_of</cite> with <cite>function</cite> is not currently supported.</p></td>
 </tr>
-<tr class="row-even"><td><p>contact_email</p></td>
+<tr class="row-odd"><td><p>contact_email</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>Email address that should be used to contact the maintainer of the model. This
 parameter is only used in the model repository.</p></td>
 </tr>
-<tr class="row-odd"><td><p>copies</p></td>
+<tr class="row-even"><td><p>copies</p></td>
 <td><p>integer</p></td>
 <td></td>
 <td><p>The number of copies of the model that should be created. Defaults to 1.</p></td>
+</tr>
+<tr class="row-odd"><td><p>dependencies</p></td>
+<td><p>array</p></td>
+<td></td>
+<td><p>A list of packages required by the model that are written in the same language
+as the model. If the package requires dependencies outside the language of the
+model. use the additional_dependencies parameter to provide them. If you need a
+version of the package from a specific package manager, a mapping with ‘package’
+and ‘package_manager’ fields can be provided instead of just the name of the
+package.</p></td>
 </tr>
 <tr class="row-even"><td><p>description</p></td>
 <td><p>string</p></td>
@@ -520,26 +447,33 @@ will be cleaned up. Defaults to False. This keyword is superceeded by overwrite.
 exits. Entries can be absolute paths or paths relative to the working directory.
 Defaults to [].</p></td>
 </tr>
-<tr class="row-odd"><td><p>repository_url</p></td>
+<tr class="row-odd"><td><p>repository_commit</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>Commit that should be checked out in the model repository specified by
+repository_url. If not provided, the most recent commit on the default branch
+will be used.</p></td>
+</tr>
+<tr class="row-even"><td><p>repository_url</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>URL for the git repository containing the model source code. If provided,
 relative paths in the model YAML definition will be considered relative to the
 repository root directory.</p></td>
 </tr>
-<tr class="row-even"><td><p>source_products</p></td>
+<tr class="row-odd"><td><p>source_products</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>Files created by running the model that are source files. These files will be
 removed without checking their extension so users should avoid adding files to
 this list unless they are sure they should be deleted. Defaults to [].</p></td>
 </tr>
-<tr class="row-odd"><td><p>strace_flags</p></td>
+<tr class="row-even"><td><p>strace_flags</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>Flags to pass to strace (or dtrace). Defaults to [].</p></td>
 </tr>
-<tr class="row-even"><td><p>timesync</p></td>
+<tr class="row-odd"><td><p>timesync</p></td>
 <td></td>
 <td></td>
 <td><p>If set, the model is assumed to call a send then receive of the state at each
@@ -548,10 +482,16 @@ If a string is provided, it is assumed to be the name of the server that will
 handle timestep synchronization. If a boolean is provided, the name of the
 server will be assumed to be ‘timestep’. Defaults to False.</p></td>
 </tr>
-<tr class="row-odd"><td><p>valgrind_flags</p></td>
+<tr class="row-even"><td><p>valgrind_flags</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>Flags to pass to valgrind. Defaults to [].</p></td>
+</tr>
+<tr class="row-odd"><td><p>validation_command</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>Path to a validation command that can be used to verify that the model ran as
+expected. A non-zero return code is taken to indicate failure.</p></td>
 </tr>
 <tr class="row-even"><td><p>with_strace</p></td>
 <td><p>boolean</p></td>
@@ -566,8 +506,8 @@ Defaults to False.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="available-languages">
+</section>
+<section id="available-languages">
 <h3>Available Languages<a class="headerlink" href="#available-languages" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-model-subtype-rst">
 <colgroup>
@@ -646,8 +586,8 @@ to monitor it on the root process.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="language-specific-model-options">
+</section>
+<section id="language-specific-model-options">
 <h3>Language Specific Model Options<a class="headerlink" href="#language-specific-model-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-model-specific-rst">
 <colgroup>
@@ -678,12 +618,12 @@ to monitor it on the root process.</p></td>
 <td><p>string</p></td>
 <td><p>Directory where the build should be saved. Defaults to &lt;sourcedir&gt;/build. It can
 be relative to working_dir or absolute.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>buildfile</p></td>
 <td><p>string</p></td>
 <td></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-even"><td><p>compiler</p></td>
 <td><p>string</p></td>
@@ -691,7 +631,7 @@ be relative to working_dir or absolute.</p></td>
 provided, the compiler will be determined based on configuration options for the
 language (if present) and the registered compilers that are available on the
 current operating system.</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘cxx’, ‘fortran’, ‘cmake’, ‘make’]</p></td>
+<td><p>[‘c’, ‘fortran’, ‘make’, ‘cpp’, ‘c++’, ‘cxx’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>compiler_flags</p></td>
 <td><p>array</p></td>
@@ -699,7 +639,7 @@ current operating system.</p></td>
 the compiler flags will be determined based on configuration options for the
 language (if present), the compiler defaults, and the default_compiler_flags
 class attribute.</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘cxx’, ‘fortran’, ‘cmake’, ‘make’]</p></td>
+<td><p>[‘c’, ‘fortran’, ‘make’, ‘cpp’, ‘c++’, ‘cxx’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-even"><td><p>configuration</p></td>
 <td><p>string</p></td>
@@ -719,28 +659,28 @@ relative. Defaults to False.</p></td>
 <td><p>Environment variable where the compiler executable should be stored for use
 within the Makefile. If not provided, this will be determined by the target
 language driver.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>env_compiler_flags</p></td>
 <td><p>string</p></td>
 <td><p>Environment variable where the compiler flags should be stored (including those
 required to compile against the yggdrasil interface). If not provided, this
 will be determined by the target language driver.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-even"><td><p>env_linker</p></td>
 <td><p>string</p></td>
 <td><p>Environment variable where the linker executable should be stored for use within
 the Makefile. If not provided, this will be determined by the target language
 driver.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>env_linker_flags</p></td>
 <td><p>string</p></td>
 <td><p>Environment variable where the linker flags should be stored (including those
 required to link against the yggdrasil interface). If not provided, this will
 be determined by the target language driver.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-even"><td><p>integrator</p></td>
 <td><p>string</p></td>
@@ -763,14 +703,14 @@ be determined by the target language driver.</p></td>
 <td><p>Name or path of interpreter executable that should be used to run the model. If
 not provided, the interpreter will be determined based on configuration options
 for the language (if present) and the default_interpreter class attribute.</p></td>
-<td><p>[‘R’, ‘matlab’, ‘dummy’, ‘r’, ‘sbml’, ‘timesync’, ‘lpy’, ‘python’]</p></td>
+<td><p>[‘matlab’, ‘sbml’, ‘timesync’, ‘python’, ‘r’, ‘lpy’, ‘dummy’, ‘R’]</p></td>
 </tr>
 <tr class="row-even"><td><p>interpreter_flags</p></td>
 <td><p>array</p></td>
 <td><p>Flags that should be passed to the interpreter when running the model. If not
 provided, the flags are determined based on configuration options for the
 language (if present) and the default_interpreter_flags class attribute.</p></td>
-<td><p>[‘R’, ‘matlab’, ‘dummy’, ‘r’, ‘sbml’, ‘timesync’, ‘lpy’, ‘python’]</p></td>
+<td><p>[‘matlab’, ‘sbml’, ‘timesync’, ‘python’, ‘r’, ‘lpy’, ‘dummy’, ‘R’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>linker</p></td>
 <td><p>string</p></td>
@@ -778,7 +718,7 @@ language (if present) and the default_interpreter_flags class attribute.</p></td
 provided, the linker will be determined based on configuration options for the
 language (if present) and the registered linkers that are available on the
 current operating system</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘cxx’, ‘fortran’, ‘cmake’, ‘make’]</p></td>
+<td><p>[‘c’, ‘fortran’, ‘make’, ‘cpp’, ‘c++’, ‘cxx’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-even"><td><p>linker_flags</p></td>
 <td><p>array</p></td>
@@ -786,7 +726,7 @@ current operating system</p></td>
 the linker flags will be determined based on configuration options for the
 language (if present), the linker defaults, and the default_linker_flags class
 attribute.</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘cxx’, ‘fortran’, ‘cmake’, ‘make’]</p></td>
+<td><p>[‘c’, ‘fortran’, ‘make’, ‘cpp’, ‘c++’, ‘cxx’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>makedir</p></td>
 <td><p>string</p></td>
@@ -823,7 +763,7 @@ selections will be returned.</p></td>
 <td><p>If True, no interpreter will be added to the arguments. This should only be used
 for subclasses that will not be invoking the model via the command line.
 Defaults to False.</p></td>
-<td><p>[‘R’, ‘matlab’, ‘dummy’, ‘r’, ‘sbml’, ‘timesync’, ‘lpy’, ‘python’]</p></td>
+<td><p>[‘matlab’, ‘sbml’, ‘timesync’, ‘python’, ‘r’, ‘lpy’, ‘dummy’, ‘R’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>skip_start_time</p></td>
 <td><p>boolean</p></td>
@@ -836,7 +776,7 @@ False. This option is ignored if only_output_final_step is True.</p></td>
 <td><p>Source files that should be compiled into an executable. Defaults to an empty
 list and the driver will search for a source file based on the model executable
 (the first model argument).</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘cxx’, ‘fortran’, ‘cmake’, ‘make’]</p></td>
+<td><p>[‘c’, ‘fortran’, ‘make’, ‘cpp’, ‘c++’, ‘cxx’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>sourcedir</p></td>
 <td><p>string</p></td>
@@ -885,37 +825,37 @@ variable in everything but name and units) or mappings with the keys:</p></td>
 <td><p>string</p></td>
 <td><p>Make target that should be built to create the model executable. Defaults to
 None.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>target_compiler</p></td>
 <td><p>string</p></td>
 <td><p>Compilation tool that should be used to compile the target language. Defaults to
 None and will be set based on the selected language driver.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-even"><td><p>target_compiler_flags</p></td>
 <td><p>array</p></td>
 <td><p>Compilation flags that should be passed to the target language compiler.
 Defaults to [].</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>target_language</p></td>
 <td><p>string</p></td>
 <td><p>Language that the target is written in. Defaults to None and will be set based
 on the source files provided.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-even"><td><p>target_linker</p></td>
 <td><p>string</p></td>
 <td><p>Compilation tool that should be used to link the target language. Defaults to
 None and will be set based on the selected language driver.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>target_linker_flags</p></td>
 <td><p>array</p></td>
 <td><p>Linking flags that should be passed to the target language linker. Defaults to
 [].</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-even"><td><p>update_interval</p></td>
 <td><p>object</p></td>
@@ -933,11 +873,11 @@ symunit. Defaults to False.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-<div class="section" id="input-output-options">
+</section>
+</section>
+<section id="input-output-options">
 <span id="yaml-comm-options"></span><h2>Input/Output Options<a class="headerlink" href="#input-output-options" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="general-input-output-comm-options">
+<section id="general-input-output-comm-options">
 <h3>General Input/Output Comm Options<a class="headerlink" href="#general-input-output-comm-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-comm-general-rst">
 <colgroup>
@@ -1089,8 +1029,8 @@ sent/received. Ignored if not provided.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="available-comm-types">
+</section>
+<section id="available-comm-types">
 <h3>Available Comm Types<a class="headerlink" href="#available-comm-types" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-comm-subtype-rst">
 <colgroup>
@@ -1132,11 +1072,11 @@ sent/received. Ignored if not provided.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-<div class="section" id="file-options">
+</section>
+</section>
+<section id="file-options">
 <span id="yaml-file-options"></span><h2>File Options<a class="headerlink" href="#file-options" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="general-file-options">
+<section id="general-file-options">
 <h3>General File Options<a class="headerlink" href="#general-file-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-file-general-rst">
 <colgroup>
@@ -1279,8 +1219,8 @@ immediately.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="available-file-types">
+</section>
+<section id="available-file-types">
 <h3>Available File Types<a class="headerlink" href="#available-file-types" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-file-subtype-rst">
 <colgroup>
@@ -1339,8 +1279,8 @@ for 3D structures.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="file-type-specific-options">
+</section>
+<section id="file-type-specific-options">
 <h3>File Type Specific Options<a class="headerlink" href="#file-type-specific-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-file-specific-rst">
 <colgroup>
@@ -1360,13 +1300,13 @@ for 3D structures.</p></td>
 <tr class="row-even"><td><p>comment</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
-<td><p>[‘table’, ‘map’, ‘netcdf’, ‘json’, ‘mat’, ‘pickle’, ‘wofost’, ‘yaml’, ‘ply’, ‘pandas’, ‘ascii’, ‘obj’]</p></td>
+<td><p>[‘table’, ‘mat’, ‘netcdf’, ‘json’, ‘pickle’, ‘obj’, ‘pandas’, ‘wofost’, ‘ascii’, ‘yaml’, ‘ply’, ‘map’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>datatype</p></td>
 <td><p>schema</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
-<td><p>[‘table’, ‘map’, ‘netcdf’, ‘json’, ‘mat’, ‘pickle’, ‘wofost’, ‘yaml’, ‘ply’, ‘pandas’, ‘ascii’, ‘obj’]</p></td>
+<td><p>[‘table’, ‘mat’, ‘netcdf’, ‘json’, ‘pickle’, ‘obj’, ‘pandas’, ‘wofost’, ‘ascii’, ‘yaml’, ‘ply’, ‘map’]</p></td>
 </tr>
 <tr class="row-even"><td><p>default_flow_style</p></td>
 <td><p>boolean</p></td>
@@ -1378,7 +1318,7 @@ they will always be serialized in the flow style. See <a class="reference extern
 <td><p>string</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘pandas’, ‘table’, ‘wofost’, ‘map’]</p></td>
+<td><p>[‘table’, ‘pandas’, ‘wofost’, ‘map’]</p></td>
 </tr>
 <tr class="row-even"><td><p>encoding</p></td>
 <td><p>string</p></td>
@@ -1394,7 +1334,7 @@ seiralized structure. Defaults to ‘t’.</p></td>
 <tr class="row-even"><td><p>newline</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
-<td><p>[‘table’, ‘map’, ‘netcdf’, ‘json’, ‘mat’, ‘pickle’, ‘wofost’, ‘yaml’, ‘ply’, ‘pandas’, ‘ascii’, ‘obj’]</p></td>
+<td><p>[‘table’, ‘mat’, ‘netcdf’, ‘json’, ‘pickle’, ‘obj’, ‘pandas’, ‘wofost’, ‘ascii’, ‘yaml’, ‘ply’, ‘map’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>no_header</p></td>
 <td><p>boolean</p></td>
@@ -1435,7 +1375,7 @@ to True.</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 </tr>
 <tr class="row-even"><td><p>variables</p></td>
 <td><p>array</p></td>
@@ -1450,11 +1390,11 @@ Defaults to False.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-<div class="section" id="connection-options">
+</section>
+</section>
+<section id="connection-options">
 <span id="yaml-conn-options"></span><h2>Connection Options<a class="headerlink" href="#connection-options" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="general-connection-options">
+<section id="general-connection-options">
 <h3>General Connection Options<a class="headerlink" href="#general-connection-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-connection-general-rst">
 <colgroup>
@@ -1518,8 +1458,8 @@ the messages in the order they are provided.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="available-connection-types">
+</section>
+<section id="available-connection-types">
 <h3>Available Connection Types<a class="headerlink" href="#available-connection-types" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-connection-subtype-rst">
 <colgroup>
@@ -1555,8 +1495,8 @@ the messages in the order they are provided.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="additional-options">
+</section>
+<section id="additional-options">
 <h3>Additional Options<a class="headerlink" href="#additional-options" title="Permalink to this headline">¶</a></h3>
 <p>In addition the the options above, there are several comm (channel/file)
 options that are also valid options for connections for convenience (i.e. at
@@ -1599,9 +1539,9 @@ of available file types.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-<div class="section" id="driver-method">
+</section>
+</section>
+<section id="driver-method">
 <h2>Driver Method<a class="headerlink" href="#driver-method" title="Permalink to this headline">¶</a></h2>
 <p>For backwards compatibility, yggdrasil also allows connections to be specified
 using drivers. In this scheme, there is no <code class="docutils literal notranslate"><span class="pre">connections</span></code> section in the yaml(s).
@@ -1641,55 +1581,38 @@ location of the YAML file.</p></td>
 driver. A full description of the available input/output drivers and potential
 arguments can be found <a class="reference internal" href="advanced/io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</p>
 <p>In general, this method of specifying connections is not recommended.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="config.html" class="btn btn-neutral float-right" title="Configuration Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="timesync_io.html" class="btn btn-neutral float-left" title="Timestep Synchronization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="config.html" class="btn btn-neutral float-right" title="Configuration Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

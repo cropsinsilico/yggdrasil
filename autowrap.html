@@ -1,74 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Autowrapping Model Functions &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Autowrapping Model Functions &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Conditional I/O" href="conditional_io.html" />
     <link rel="prev" title="Server/Client I/O" href="server_client_io.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -76,19 +39,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
@@ -122,143 +74,75 @@
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Autowrapping Model Functions</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/autowrap.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="autowrapping-model-functions">
+             
+  <section id="autowrapping-model-functions">
 <span id="autowrap-rst"></span><h1>Autowrapping Model Functions<a class="headerlink" href="#autowrapping-model-functions" title="Permalink to this headline">¶</a></h1>
 <p>If your model can be expressed as a function in one of the supported languages, yggdrasil can automatically create the wrapper to make calls to the interface. In the example below, the two models being connected are just functions with one input and one output.</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
-    <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
-    <span class="k">return</span> <span class="n">out_buf</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model A: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
+<span class="linenos">3</span>    <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
+<span class="linenos">4</span>    <span class="k">return</span> <span class="n">out_buf</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
-    <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
-    <span class="k">return</span> <span class="n">out_buf</span>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model B: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
+<span class="linenos">3</span>    <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
+<span class="linenos">4</span>    <span class="k">return</span> <span class="n">out_buf</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/model_function.html">Example in other languages</a>)</p>
 <p>In order to allow yggdrasil to wrap model functions, the corresponding entry in the YAML specification file should include a value for the <code class="docutils literal notranslate"><span class="pre">function</span></code> parameter which should be the name of the model function within the model file (provided via the <code class="docutils literal notranslate"><span class="pre">args</span></code> parameter). If no inputs or outputs are provided, yggdrasil will attempt to parse the definition for the target model function in order to determine the model’s inputs and outputs. If inputs and/or outputs are provided in the YAML they must either match the number of inputs and/or outputs in the function defintion (as below) or there must only be one and all of the model’s inputs and/or outputs will be bundled as an array.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model_function_modelA.py</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model_function_modelB.py</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
+<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model_function_modelA.py</span>
+<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+<span class="linenos"> 6</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos"> 7</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
+<span class="linenos">10</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos">11</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model_function_modelB.py</span>
+<span class="linenos">12</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+<span class="linenos">13</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">14</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">17</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+<span class="linenos">18</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
+<span class="linenos">22</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/model_function.html">Example in other languages</a>)</p>
-<div class="section" id="notes-on-autowrapping-c-c-model-functions">
+<section id="notes-on-autowrapping-c-c-model-functions">
 <h2>Notes on Autowrapping C/C++ Model Functions<a class="headerlink" href="#notes-on-autowrapping-c-c-model-functions" title="Permalink to this headline">¶</a></h2>
 <p>The autowrapping of C/C++ models differs from other languages in several respects.</p>
 <ol class="arabic simple">
@@ -266,55 +150,38 @@
 <li><p>For C models, the user must explicitly specify the names of the output variables as it is not possible for yggdrasil to determine whether a variable is an input or output based on the function definition alone since input variables can also be pointers. In the case of C++ models, yggdrasil can identify output variables based on the presence of the “pass by reference” operator <code class="docutils literal notranslate"><span class="pre">&amp;</span></code>. If a C++ model definition defines an output variable as a pointer instead, the user must explicitly declare the output variables as in the case of a C model.</p></li>
 <li><p>For input and output strings, yggdrasil assumes that the string variable (or pointer) is immediately followed by a variable (or pointer) that contains (or will contain) the string length.</p></li>
 </ol>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="conditional_io.html" class="btn btn-neutral float-right" title="Conditional I/O" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="server_client_io.html" class="btn btn-neutral float-left" title="Server/Client I/O" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="conditional_io.html" class="btn btn-neutral float-right" title="Conditional I/O" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

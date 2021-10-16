@@ -1,72 +1,35 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -74,19 +37,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
@@ -117,71 +69,30 @@
 <li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>&lt;no title&gt;</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/tables/class_table_ModelDriver_attr.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <table class="docutils align-default" id="class-table-modeldriver-attr-rst">
 <colgroup>
 <col style="width: 14%" />
@@ -229,78 +140,92 @@ parameter is only used in the model repository.</p></td>
 <td></td>
 <td><p>int</p></td>
 </tr>
-<tr class="row-even"><td><p>description</p></td>
+<tr class="row-even"><td><p>dependencies</p></td>
+<td><p>A list of packages required by the model that are written in the same language
+as the model. If the package requires dependencies outside the language of the
+model, use the additional_dependencies parameter to provide them. If you need a
+version of the package from a specific package manager, a mapping</p></td>
+<td></td>
+<td><p>list</p></td>
+</tr>
+<tr class="row-odd"><td><p>description</p></td>
 <td><p>Description of the model. This parameter is only used in the model repository or
 when providing the model as a service.</p></td>
 <td></td>
 <td><p>str</p></td>
 </tr>
-<tr class="row-odd"><td><p>function</p></td>
+<tr class="row-even"><td><p>function</p></td>
 <td><p>The name of the model function that should be wrapped.</p></td>
 <td></td>
 <td><p>str</p></td>
 </tr>
-<tr class="row-even"><td><p>is_server</p></td>
+<tr class="row-odd"><td><p>is_server</p></td>
 <td><p>If True, the model is assumed to be a server and an instance of
 <code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.ServerDriver</span></code> is started. If a dict, the input/output
 channels with the specified names in the dict will be replaced with a server.</p></td>
 <td></td>
 <td><p>bool, dict</p></td>
 </tr>
-<tr class="row-odd"><td><p>iter_function_over</p></td>
+<tr class="row-even"><td><p>iter_function_over</p></td>
 <td><p>Variable(s) that should be received or sent as an array, but iterated over.</p></td>
 <td></td>
 <td><p>array</p></td>
 </tr>
-<tr class="row-even"><td><p>model_args</p></td>
+<tr class="row-odd"><td><p>model_args</p></td>
 <td><p>Runtime arguments for running the model on the command line.</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td><p>model_file</p></td>
+<tr class="row-even"><td><p>model_file</p></td>
 <td><p>Full path to the model executable or interpretable script.</p></td>
 <td></td>
 <td><p>str</p></td>
 </tr>
-<tr class="row-even"><td><p>model_function_info</p></td>
+<tr class="row-odd"><td><p>model_function_info</p></td>
 <td><p>Parameters recovered by parsing the provided model function definition.</p></td>
 <td></td>
 <td><p>dict</p></td>
 </tr>
-<tr class="row-odd"><td><p>model_index</p></td>
+<tr class="row-even"><td><p>model_index</p></td>
 <td><p>Index of model in list of models being run.</p></td>
 <td></td>
 <td><p>int</p></td>
 </tr>
-<tr class="row-even"><td><p>model_src</p></td>
+<tr class="row-odd"><td><p>model_src</p></td>
 <td><p>Full path to the model source code. For interpreted languages, this will be the
 same as model_file.</p></td>
 <td></td>
 <td><p>str</p></td>
 </tr>
-<tr class="row-odd"><td><p>modified_files</p></td>
+<tr class="row-even"><td><p>modified_files</p></td>
 <td><p>List of pairs of originals and copies of files that should be restored during
 cleanup.</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>overwrite</p></td>
+<tr class="row-odd"><td><p>overwrite</p></td>
 <td><p>If True, any existing compilation products will be overwritten by compilation
 and cleaned up following the run. Otherwise, existing products will be used and
 will remain after the run.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td><p>process</p></td>
+<tr class="row-even"><td><p>process</p></td>
 <td><p>Process used to run the model.</p></td>
 <td></td>
 <td><p><a class="reference internal" href="../advanced/code_python.html#yggdrasil.tools.YggPopen" title="yggdrasil.tools.YggPopen"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggPopen</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td><p>products</p></td>
+<tr class="row-odd"><td><p>products</p></td>
 <td><p>Files created by running the model. This includes compilation products such as
 executables and/or object files.</p></td>
 <td></td>
 <td><p>list</p></td>
+</tr>
+<tr class="row-even"><td><p>repository_commit</p></td>
+<td><p>Commit that should be checked out in the model repository specified by
+repository_url.</p></td>
+<td></td>
+<td><p>str</p></td>
 </tr>
 <tr class="row-odd"><td><p>repository_url</p></td>
 <td><p>URL for the git repository containing the model source code. If provided,
@@ -332,17 +257,23 @@ model.</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>with_strace</p></td>
+<tr class="row-even"><td><p>validation_command</p></td>
+<td><p>Path to a validation command that can be used to verify that the model ran as
+expected. A non-zero return code is taken to indicate failure.</p></td>
+<td></td>
+<td><p>str</p></td>
+</tr>
+<tr class="row-odd"><td><p>with_strace</p></td>
 <td><p>If True, the command is run with strace or dtrace.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td><p>with_valgrind</p></td>
+<tr class="row-even"><td><p>with_valgrind</p></td>
 <td><p>If True, the command is run with valgrind.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-even"><td><p>wrapper_products</p></td>
+<tr class="row-odd"><td><p>wrapper_products</p></td>
 <td><p>Files created in order to wrap the model.</p></td>
 <td></td>
 <td><p>list</p></td>
@@ -352,46 +283,30 @@ model.</p></td>
 
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

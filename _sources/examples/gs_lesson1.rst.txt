@@ -13,14 +13,14 @@ C Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/src/gs_lesson1.c
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/gs_lesson1/src/gs_lesson1.c
    :language: c
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/gs_lesson1_c.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/gs_lesson1/gs_lesson1_c.yml
    :language: yaml
    :linenos:
 
@@ -31,14 +31,14 @@ C++ Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/src/gs_lesson1.cpp
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/gs_lesson1/src/gs_lesson1.cpp
    :language: c++
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/gs_lesson1_cpp.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/gs_lesson1/gs_lesson1_cpp.yml
    :language: yaml
    :linenos:
 
@@ -49,14 +49,14 @@ Fortran Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/src/gs_lesson1.f90
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/gs_lesson1/src/gs_lesson1.f90
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/gs_lesson1_fortran.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/gs_lesson1/gs_lesson1_fortran.yml
    :language: yaml
    :linenos:
 
@@ -67,14 +67,14 @@ Matlab Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/src/gs_lesson1.m
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/gs_lesson1/src/gs_lesson1.m
    :language: matlab
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/gs_lesson1_matlab.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/gs_lesson1/gs_lesson1_matlab.yml
    :language: yaml
    :linenos:
 
@@ -85,14 +85,14 @@ Python Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/src/gs_lesson1.py
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/gs_lesson1/src/gs_lesson1.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/gs_lesson1_python.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/gs_lesson1/gs_lesson1_python.yml
    :language: yaml
    :linenos:
 
@@ -103,14 +103,14 @@ R Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/src/gs_lesson1.R
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/gs_lesson1/src/gs_lesson1.R
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/gs_lesson1_r.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/gs_lesson1/gs_lesson1_r.yml
    :language: yaml
    :linenos:
 

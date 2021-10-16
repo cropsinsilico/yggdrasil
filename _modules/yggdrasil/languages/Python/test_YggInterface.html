@@ -1,72 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>yggdrasil.languages.Python.test_YggInterface &mdash; yggdrasil v1.8.0+0.gb02b1b11f.dirty documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>yggdrasil.languages.Python.test_YggInterface &mdash; yggdrasil v1.8.1 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
-
-    
+    <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v1.8.0
+                v1.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -74,19 +36,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
@@ -117,92 +68,50 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../glossary.html">Glossary</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../index.html">yggdrasil</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
-        
-          <li><a href="../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
           <li><a href="../../languages.html">yggdrasil.languages</a> &raquo;</li>
-        
       <li>yggdrasil.languages.Python.test_YggInterface</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for yggdrasil.languages.Python.test_YggInterface</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">flaky</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">get_comm</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.interface</span> <span class="k">import</span> <span class="n">YggInterface</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">YGG_MSG_EOF</span><span class="p">,</span> <span class="n">get_YGG_MSG_MAX</span><span class="p">,</span> <span class="n">YGG_MSG_BUF</span><span class="p">,</span> <span class="n">is_lang_installed</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="k">import</span> <span class="n">ConnectionDriver</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">YggTestClassInfo</span><span class="p">,</span> <span class="n">assert_equal</span><span class="p">,</span> <span class="n">assert_raises</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">get_comm</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface</span> <span class="kn">import</span> <span class="n">YggInterface</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">get_YGG_MSG_MAX</span><span class="p">,</span> <span class="n">is_lang_installed</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="kn">import</span> <span class="n">ConnectionDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">YggTestClassInfo</span><span class="p">,</span> <span class="n">assert_equal</span><span class="p">,</span> <span class="n">assert_raises</span>
 
 
 <span class="n">YGG_MSG_MAX</span> <span class="o">=</span> <span class="n">get_YGG_MSG_MAX</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="ModelEnv"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.ModelEnv">[docs]</a><span class="k">class</span> <span class="nc">ModelEnv</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="ModelEnv"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.ModelEnv">[docs]</a><span class="k">class</span> <span class="nc">ModelEnv</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">new_kw</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">new_kw</span><span class="p">):</span>
         <span class="n">new_kw</span><span class="p">[</span><span class="s1">&#39;YGG_SUBPROCESS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span>
         <span class="k">if</span> <span class="n">language</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">new_kw</span><span class="p">[</span><span class="s1">&#39;YGG_MODEL_LANGUAGE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">language</span>
@@ -212,10 +121,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">old_kw</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
             
-    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">old_kw</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">del</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
@@ -223,28 +132,28 @@
                 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span></div>
 
 
-<div class="viewcode-block" id="test_maxMsgSize"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.test_maxMsgSize">[docs]</a><span class="k">def</span> <span class="nf">test_maxMsgSize</span><span class="p">():</span>
+<div class="viewcode-block" id="test_maxMsgSize"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.test_maxMsgSize">[docs]</a><span class="k">def</span> <span class="nf">test_maxMsgSize</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test max message size.&quot;&quot;&quot;</span>
     <span class="n">assert_equal</span><span class="p">(</span><span class="n">YggInterface</span><span class="o">.</span><span class="n">maxMsgSize</span><span class="p">(),</span> <span class="n">YGG_MSG_MAX</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="test_eof_msg"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.test_eof_msg">[docs]</a><span class="k">def</span> <span class="nf">test_eof_msg</span><span class="p">():</span>
+<div class="viewcode-block" id="test_eof_msg"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.test_eof_msg">[docs]</a><span class="k">def</span> <span class="nf">test_eof_msg</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test eof message signal.&quot;&quot;&quot;</span>
-    <span class="n">assert_equal</span><span class="p">(</span><span class="n">YggInterface</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">(),</span> <span class="n">YGG_MSG_EOF</span><span class="p">)</span></div>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">YggInterface</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">(),</span> <span class="n">constants</span><span class="o">.</span><span class="n">YGG_MSG_EOF</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="test_bufMsgSize"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.test_bufMsgSize">[docs]</a><span class="k">def</span> <span class="nf">test_bufMsgSize</span><span class="p">():</span>
+<div class="viewcode-block" id="test_bufMsgSize"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.test_bufMsgSize">[docs]</a><span class="k">def</span> <span class="nf">test_bufMsgSize</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test buf message size.&quot;&quot;&quot;</span>
-    <span class="n">assert_equal</span><span class="p">(</span><span class="n">YggInterface</span><span class="o">.</span><span class="n">bufMsgSize</span><span class="p">(),</span> <span class="n">YGG_MSG_BUF</span><span class="p">)</span></div>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">YggInterface</span><span class="o">.</span><span class="n">bufMsgSize</span><span class="p">(),</span> <span class="n">constants</span><span class="o">.</span><span class="n">YGG_MSG_BUF</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="test_init"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.test_init">[docs]</a><span class="k">def</span> <span class="nf">test_init</span><span class="p">():</span>
+<div class="viewcode-block" id="test_init"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.test_init">[docs]</a><span class="k">def</span> <span class="nf">test_init</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error on init.&quot;&quot;&quot;</span>
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">,</span> <span class="n">YggInterface</span><span class="o">.</span><span class="n">YggInput</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">,</span> <span class="n">YggInterface</span><span class="o">.</span><span class="n">YggOutput</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="do_send_recv"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.do_send_recv">[docs]</a><span class="k">def</span> <span class="nf">do_send_recv</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%f</span><span class="se">\\</span><span class="s1">n</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">2</span><span class="p">)],</span>
+<div class="viewcode-block" id="do_send_recv"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.do_send_recv">[docs]</a><span class="k">def</span> <span class="nf">do_send_recv</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%f</span><span class="se">\\</span><span class="s1">n</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">2</span><span class="p">)],</span>
                  <span class="n">input_interface</span><span class="o">=</span><span class="s1">&#39;YggInput&#39;</span><span class="p">,</span> <span class="n">output_interface</span><span class="o">=</span><span class="s1">&#39;YggOutput&#39;</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to perform simple send/receive between two comms using a</span>
 <span class="sd">    language interface that calls the Python interface.</span>
@@ -287,12 +196,12 @@
             <span class="n">o</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="c1"># Input</span>
             <span class="n">assert_equal</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">recv</span><span class="p">(),</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">converter</span><span class="p">(</span><span class="n">msg</span><span class="p">)))</span>
-            <span class="n">assert_equal</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">recv</span><span class="p">(),</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">converter</span><span class="p">(</span><span class="n">YGG_MSG_EOF</span><span class="p">)))</span>
+            <span class="n">assert_equal</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">recv</span><span class="p">(),</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">converter</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">YGG_MSG_EOF</span><span class="p">)))</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="n">iodrv</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="test_YggInit_language"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.test_YggInit_language">[docs]</a><span class="k">def</span> <span class="nf">test_YggInit_language</span><span class="p">():</span>
+<div class="viewcode-block" id="test_YggInit_language"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.test_YggInit_language">[docs]</a><span class="k">def</span> <span class="nf">test_YggInit_language</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test access to YggInit via languages that call the Python interface.&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">language</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_lang_installed</span><span class="p">(</span><span class="n">language</span><span class="p">):</span>
@@ -300,28 +209,28 @@
         <span class="n">do_send_recv</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="test_YggInit_backwards"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.test_YggInit_backwards">[docs]</a><span class="k">def</span> <span class="nf">test_YggInit_backwards</span><span class="p">():</span>
+<div class="viewcode-block" id="test_YggInit_backwards"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.test_YggInit_backwards">[docs]</a><span class="k">def</span> <span class="nf">test_YggInit_backwards</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check access to old class names for backwards compat.&quot;&quot;&quot;</span>
     <span class="n">do_send_recv</span><span class="p">(</span><span class="n">input_interface</span><span class="o">=</span><span class="s1">&#39;CisInput&#39;</span><span class="p">,</span>
                  <span class="n">output_interface</span><span class="o">=</span><span class="s1">&#39;PsiOutput&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="test_YggInit_variables"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.test_YggInit_variables">[docs]</a><span class="k">def</span> <span class="nf">test_YggInit_variables</span><span class="p">():</span>
+<div class="viewcode-block" id="test_YggInit_variables"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.test_YggInit_variables">[docs]</a><span class="k">def</span> <span class="nf">test_YggInit_variables</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test Matlab interface for variables.&quot;&quot;&quot;</span>
     <span class="n">assert_equal</span><span class="p">(</span><span class="n">YggInterface</span><span class="o">.</span><span class="n">YggInit</span><span class="p">(</span><span class="s1">&#39;YGG_MSG_MAX&#39;</span><span class="p">),</span> <span class="n">YGG_MSG_MAX</span><span class="p">)</span>
-    <span class="n">assert_equal</span><span class="p">(</span><span class="n">YggInterface</span><span class="o">.</span><span class="n">YggInit</span><span class="p">(</span><span class="s1">&#39;YGG_MSG_EOF&#39;</span><span class="p">),</span> <span class="n">YGG_MSG_EOF</span><span class="p">)</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">YggInterface</span><span class="o">.</span><span class="n">YggInit</span><span class="p">(</span><span class="s1">&#39;YGG_MSG_EOF&#39;</span><span class="p">),</span> <span class="n">constants</span><span class="o">.</span><span class="n">YGG_MSG_EOF</span><span class="p">)</span>
     <span class="n">assert_equal</span><span class="p">(</span><span class="n">YggInterface</span><span class="o">.</span><span class="n">YggInit</span><span class="p">(</span><span class="s1">&#39;YGG_MSG_EOF&#39;</span><span class="p">),</span>
                  <span class="n">YggInterface</span><span class="o">.</span><span class="n">YggInit</span><span class="p">(</span><span class="s1">&#39;CIS_MSG_EOF&#39;</span><span class="p">))</span>
     <span class="n">assert_equal</span><span class="p">(</span><span class="n">YggInterface</span><span class="o">.</span><span class="n">YggInit</span><span class="p">(</span><span class="s1">&#39;YGG_MSG_EOF&#39;</span><span class="p">),</span>
                  <span class="n">YggInterface</span><span class="o">.</span><span class="n">YggInit</span><span class="p">(</span><span class="s1">&#39;PSI_MSG_EOF&#39;</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="TestBase"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestBase">[docs]</a><span class="k">class</span> <span class="nc">TestBase</span><span class="p">(</span><span class="n">YggTestClassInfo</span><span class="p">):</span>
+<div class="viewcode-block" id="TestBase"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestBase">[docs]</a><span class="k">class</span> <span class="nc">TestBase</span><span class="p">(</span><span class="n">YggTestClassInfo</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for interface classes.&quot;&quot;&quot;</span>
 
     <span class="n">_mod</span> <span class="o">=</span> <span class="s1">&#39;yggdrasil.interface.YggInterface&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;test&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model1</span> <span class="o">=</span> <span class="s1">&#39;model1&#39;</span>
@@ -370,7 +279,7 @@
                          <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">]})</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="TestBase.get_options"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestBase.get_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestBase.get_options"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestBase.get_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span><span class="p">:</span>
@@ -389,7 +298,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_messages</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;send&#39;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="TestBase.setup"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestBase.setup"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start driver and instance.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">return</span>
@@ -421,7 +330,7 @@
                                     <span class="n">nprev_thread</span><span class="o">=</span><span class="n">nprev_thread</span><span class="p">,</span>
                                     <span class="n">nprev_fd</span><span class="o">=</span><span class="n">nprev_fd</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestBase.teardown"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestBase.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestBase.teardown"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestBase.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop the driver.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iodriver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">iodriver</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
@@ -447,13 +356,13 @@
                        <span class="n">YGG_MODEL_NAME</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
 
-<div class="viewcode-block" id="TestBase.create_instance"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestBase.create_instance">[docs]</a>    <span class="k">def</span> <span class="nf">create_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestBase.create_instance"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestBase.create_instance">[docs]</a>    <span class="k">def</span> <span class="nf">create_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new instance of the class.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="n">ModelEnv</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model_env</span><span class="p">):</span>
             <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create_instance</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
-<div class="viewcode-block" id="TestBase.remove_instance"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestBase.remove_instance">[docs]</a>    <span class="k">def</span> <span class="nf">remove_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inst</span><span class="p">):</span>
+<div class="viewcode-block" id="TestBase.remove_instance"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestBase.remove_instance">[docs]</a>    <span class="k">def</span> <span class="nf">remove_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inst</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove an instance.&quot;&quot;&quot;</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">is_interface</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -461,19 +370,19 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">TestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">remove_instance</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span></div></div>
             
     
-<div class="viewcode-block" id="TestYggInput"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggInput">[docs]</a><span class="k">class</span> <span class="nc">TestYggInput</span><span class="p">(</span><span class="n">TestBase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggInput">[docs]</a><span class="k">class</span> <span class="nc">TestYggInput</span><span class="p">(</span><span class="n">TestBase</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test basic input to python.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggInput&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggInput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;input&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">==</span> <span class="n">TestYggInput</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;table_example&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;format_str&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">}</span>
 
-<div class="viewcode-block" id="TestYggInput.test_msg"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggInput.test_msg">[docs]</a>    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggInput.test_msg"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggInput.test_msg">[docs]</a>    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving message.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;recv&#39;</span><span class="p">]:</span>
@@ -491,28 +400,28 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div></div>
             
 
-<div class="viewcode-block" id="TestYggInputMatlab"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggInputMatlab">[docs]</a><span class="k">class</span> <span class="nc">TestYggInputMatlab</span><span class="p">(</span><span class="n">TestYggInput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggInputMatlab"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggInputMatlab">[docs]</a><span class="k">class</span> <span class="nc">TestYggInputMatlab</span><span class="p">(</span><span class="n">TestYggInput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test basic input to python as passed from matlab.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggInputMatlab</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;matlab&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;table_example&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;format_str&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_matlab</span><span class="p">}</span></div>
 
 
-<div class="viewcode-block" id="TestYggOutput"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYggOutput</span><span class="p">(</span><span class="n">TestBase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYggOutput</span><span class="p">(</span><span class="n">TestBase</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test basic output to python.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggOutput&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggOutput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;output&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">==</span> <span class="n">TestYggOutput</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;table_example&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;format_str&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">}</span>
 
-<div class="viewcode-block" id="TestYggOutput.test_msg"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggOutput.test_msg">[docs]</a>    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggOutput.test_msg"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggOutput.test_msg">[docs]</a>    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving message.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;send&#39;</span><span class="p">]:</span>
@@ -538,22 +447,22 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div></div>
         
 
-<div class="viewcode-block" id="TestYggOutputMatlab"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggOutputMatlab">[docs]</a><span class="k">class</span> <span class="nc">TestYggOutputMatlab</span><span class="p">(</span><span class="n">TestYggOutput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggOutputMatlab"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggOutputMatlab">[docs]</a><span class="k">class</span> <span class="nc">TestYggOutputMatlab</span><span class="p">(</span><span class="n">TestYggOutput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test basic output to python as passed from matlab.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggOutputMatlab</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;matlab&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;table_example&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;format_str&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_matlab</span><span class="p">}</span></div>
 
 
-<div class="viewcode-block" id="TestYggRpcClient"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient">[docs]</a><span class="nd">@flaky</span><span class="o">.</span><span class="n">flaky</span>
+<div class="viewcode-block" id="TestYggRpcClient"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient">[docs]</a><span class="nd">@flaky</span><span class="o">.</span><span class="n">flaky</span>
 <span class="k">class</span> <span class="nc">TestYggRpcClient</span><span class="p">(</span><span class="n">TestYggOutput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test client-side RPC communication with Python.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggRpcClient&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">model1</span><span class="p">,</span>
                            <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">]</span>
@@ -561,7 +470,7 @@
                                  <span class="s1">&#39;response_kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;format_str&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">}}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_messages</span> <span class="o">=</span> <span class="p">[(</span><span class="sa">b</span><span class="s1">&#39;one&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)]</span>
         
-<div class="viewcode-block" id="TestYggRpcClient.setup"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggRpcClient.setup"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start driver and instance.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_comm</span><span class="o">.</span><span class="n">drain_server_signon_messages</span><span class="p">()</span></div>
@@ -581,7 +490,7 @@
              <span class="s1">&#39;partner_model&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model1</span><span class="p">}]</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
         
-<div class="viewcode-block" id="TestYggRpcClient.test_msg"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient.test_msg">[docs]</a>    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggRpcClient.test_msg"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient.test_msg">[docs]</a>    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving message.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_msg</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">:</span>
@@ -592,30 +501,30 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div></div>
         
 
-<div class="viewcode-block" id="TestYggRpcClientMatlab"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClientMatlab">[docs]</a><span class="nd">@flaky</span><span class="o">.</span><span class="n">flaky</span>
+<div class="viewcode-block" id="TestYggRpcClientMatlab"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClientMatlab">[docs]</a><span class="nd">@flaky</span><span class="o">.</span><span class="n">flaky</span>
 <span class="k">class</span> <span class="nc">TestYggRpcClientMatlab</span><span class="p">(</span><span class="n">TestYggRpcClient</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test client-side RPC communication with Python as passed through Matlab.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcClientMatlab</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;matlab&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">model1</span><span class="p">,</span>
                            <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_matlab</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_matlab</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="TestYggRpcServer"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer">[docs]</a><span class="nd">@flaky</span><span class="o">.</span><span class="n">flaky</span>
+<div class="viewcode-block" id="TestYggRpcServer"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer">[docs]</a><span class="nd">@flaky</span><span class="o">.</span><span class="n">flaky</span>
 <span class="k">class</span> <span class="nc">TestYggRpcServer</span><span class="p">(</span><span class="n">TestYggInput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test server-side RPC communication with Python.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggRpcServer&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcServer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_comm_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="s1">&#39;client&#39;</span><span class="p">,</span>
                                  <span class="s1">&#39;response_kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;format_str&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">}}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_messages</span> <span class="o">=</span> <span class="p">[(</span><span class="sa">b</span><span class="s1">&#39;one&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)]</span>
         
-<div class="viewcode-block" id="TestYggRpcServer.setup"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggRpcServer.setup"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start driver and instance.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcServer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">drain_server_signon_messages</span><span class="p">()</span></div>
@@ -642,7 +551,7 @@
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;YGG_NCLIENTS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
         <span class="k">return</span> <span class="n">out</span>
         
-<div class="viewcode-block" id="TestYggRpcServer.test_msg"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer.test_msg">[docs]</a>    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggRpcServer.test_msg"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer.test_msg">[docs]</a>    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving message.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcServer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_msg</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">:</span>
@@ -653,56 +562,56 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div></div>
         
         
-<div class="viewcode-block" id="TestYggRpcServerMatlab"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServerMatlab">[docs]</a><span class="nd">@flaky</span><span class="o">.</span><span class="n">flaky</span>
+<div class="viewcode-block" id="TestYggRpcServerMatlab"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServerMatlab">[docs]</a><span class="nd">@flaky</span><span class="o">.</span><span class="n">flaky</span>
 <span class="k">class</span> <span class="nc">TestYggRpcServerMatlab</span><span class="p">(</span><span class="n">TestYggRpcServer</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test server-side RPC communication with Python as passed through Matlab.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcServerMatlab</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;matlab&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_matlab</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_matlab</span><span class="p">]</span></div>
 
 
 <span class="c1"># AsciiFile</span>
-<div class="viewcode-block" id="TestYggAsciiFileInput"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileInput">[docs]</a><span class="k">class</span> <span class="nc">TestYggAsciiFileInput</span><span class="p">(</span><span class="n">TestYggInput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggAsciiFileInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileInput">[docs]</a><span class="k">class</span> <span class="nc">TestYggAsciiFileInput</span><span class="p">(</span><span class="n">TestYggInput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test input from an unformatted text file.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggAsciiFileInput&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggAsciiFileInput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span> <span class="o">=</span> <span class="s1">&#39;AsciiFileComm&#39;</span></div>
 
 
-<div class="viewcode-block" id="TestYggAsciiFileOutput"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYggAsciiFileOutput</span><span class="p">(</span><span class="n">TestYggOutput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggAsciiFileOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYggAsciiFileOutput</span><span class="p">(</span><span class="n">TestYggOutput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test output to an unformatted text file.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggAsciiFileOutput&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggAsciiFileOutput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span> <span class="o">=</span> <span class="s1">&#39;AsciiFileComm&#39;</span></div>
 
 
 <span class="c1"># AsciiTable</span>
-<div class="viewcode-block" id="TestYggAsciiTableInput"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableInput">[docs]</a><span class="k">class</span> <span class="nc">TestYggAsciiTableInput</span><span class="p">(</span><span class="n">TestYggAsciiFileInput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggAsciiTableInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableInput">[docs]</a><span class="k">class</span> <span class="nc">TestYggAsciiTableInput</span><span class="p">(</span><span class="n">TestYggAsciiFileInput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test input from an ascii table.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggAsciiTableInput&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggAsciiTableInput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span> <span class="o">=</span> <span class="s1">&#39;AsciiTableComm&#39;</span></div>
 
         
-<div class="viewcode-block" id="TestYggAsciiTableOutput"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYggAsciiTableOutput</span><span class="p">(</span><span class="n">TestYggAsciiFileOutput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggAsciiTableOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYggAsciiTableOutput</span><span class="p">(</span><span class="n">TestYggAsciiFileOutput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test output from an ascii table.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggAsciiTableOutput&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggAsciiTableOutput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span> <span class="o">=</span> <span class="s1">&#39;AsciiTableComm&#39;</span>
@@ -710,33 +619,33 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span> <span class="o">=</span> <span class="p">{}</span></div>
 
 
-<div class="viewcode-block" id="TestYggAsciiTableOutputMatlab"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutputMatlab">[docs]</a><span class="k">class</span> <span class="nc">TestYggAsciiTableOutputMatlab</span><span class="p">(</span><span class="n">TestYggAsciiTableOutput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggAsciiTableOutputMatlab"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutputMatlab">[docs]</a><span class="k">class</span> <span class="nc">TestYggAsciiTableOutputMatlab</span><span class="p">(</span><span class="n">TestYggAsciiTableOutput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test output from an ascii table as passed through Matlab.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggAsciiTableOutputMatlab</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;matlab&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_matlab</span><span class="p">]</span></div>
         
 
 <span class="c1"># AsciiTable Array</span>
-<div class="viewcode-block" id="TestYggAsciiArrayInput"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiArrayInput">[docs]</a><span class="k">class</span> <span class="nc">TestYggAsciiArrayInput</span><span class="p">(</span><span class="n">TestYggAsciiTableInput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggAsciiArrayInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiArrayInput">[docs]</a><span class="k">class</span> <span class="nc">TestYggAsciiArrayInput</span><span class="p">(</span><span class="n">TestYggAsciiTableInput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test input from an ASCII table.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggAsciiArrayInput&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggAsciiArrayInput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span> <span class="o">=</span> <span class="s1">&#39;AsciiTableComm&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;array_columns&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
 
 
-<div class="viewcode-block" id="TestYggAsciiArrayOutput"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiArrayOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYggAsciiArrayOutput</span><span class="p">(</span><span class="n">TestYggAsciiTableOutput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggAsciiArrayOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiArrayOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYggAsciiArrayOutput</span><span class="p">(</span><span class="n">TestYggAsciiTableOutput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test input from an ASCII table.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggAsciiArrayOutput&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggAsciiArrayOutput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span> <span class="o">=</span> <span class="s1">&#39;AsciiTableComm&#39;</span>
@@ -744,47 +653,47 @@
         
 
 <span class="c1"># Pickle</span>
-<div class="viewcode-block" id="TestYggPickleInput"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggPickleInput">[docs]</a><span class="k">class</span> <span class="nc">TestYggPickleInput</span><span class="p">(</span><span class="n">TestYggInput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggPickleInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggPickleInput">[docs]</a><span class="k">class</span> <span class="nc">TestYggPickleInput</span><span class="p">(</span><span class="n">TestYggInput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test input from a pickle file.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggPickleInput&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggPickleInput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span> <span class="o">=</span> <span class="s1">&#39;PickleFileComm&#39;</span></div>
 
 
-<div class="viewcode-block" id="TestYggPickleOutput"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggPickleOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYggPickleOutput</span><span class="p">(</span><span class="n">TestYggOutput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggPickleOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggPickleOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYggPickleOutput</span><span class="p">(</span><span class="n">TestYggOutput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test output from a pickle.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggPickleOutput&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggPickleOutput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span> <span class="o">=</span> <span class="s1">&#39;PickleFileComm&#39;</span></div>
 
         
 <span class="c1"># Pandas</span>
-<div class="viewcode-block" id="TestYggPandasInput"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggPandasInput">[docs]</a><span class="k">class</span> <span class="nc">TestYggPandasInput</span><span class="p">(</span><span class="n">TestYggInput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggPandasInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggPandasInput">[docs]</a><span class="k">class</span> <span class="nc">TestYggPandasInput</span><span class="p">(</span><span class="n">TestYggInput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test input from a pandas file.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggPandasInput&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggPandasInput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span> <span class="o">=</span> <span class="s1">&#39;PandasFileComm&#39;</span></div>
         <span class="c1"># self.testing_option_kws = {&#39;as_frames&#39;: True}</span>
 
 
-<div class="viewcode-block" id="TestYggPandasOutput"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggPandasOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYggPandasOutput</span><span class="p">(</span><span class="n">TestYggOutput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggPandasOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggPandasOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYggPandasOutput</span><span class="p">(</span><span class="n">TestYggOutput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test output from a pandas.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggPandasOutput&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggPandasOutput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span> <span class="o">=</span> <span class="s1">&#39;PandasFileComm&#39;</span></div>
@@ -792,92 +701,76 @@
 
 
 <span class="c1"># Ply</span>
-<div class="viewcode-block" id="TestYggPlyInput"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggPlyInput">[docs]</a><span class="k">class</span> <span class="nc">TestYggPlyInput</span><span class="p">(</span><span class="n">TestYggInput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggPlyInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggPlyInput">[docs]</a><span class="k">class</span> <span class="nc">TestYggPlyInput</span><span class="p">(</span><span class="n">TestYggInput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test input from a ply file.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggPlyInput&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggPlyInput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span> <span class="o">=</span> <span class="s1">&#39;PlyFileComm&#39;</span></div>
 
 
-<div class="viewcode-block" id="TestYggPlyOutput"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggPlyOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYggPlyOutput</span><span class="p">(</span><span class="n">TestYggOutput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggPlyOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggPlyOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYggPlyOutput</span><span class="p">(</span><span class="n">TestYggOutput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test output from a ply.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggPlyOutput&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggPlyOutput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span> <span class="o">=</span> <span class="s1">&#39;PlyFileComm&#39;</span></div>
 
 
 <span class="c1"># Obj</span>
-<div class="viewcode-block" id="TestYggObjInput"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggObjInput">[docs]</a><span class="k">class</span> <span class="nc">TestYggObjInput</span><span class="p">(</span><span class="n">TestYggInput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggObjInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggObjInput">[docs]</a><span class="k">class</span> <span class="nc">TestYggObjInput</span><span class="p">(</span><span class="n">TestYggInput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test input from a obj file.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggObjInput&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggObjInput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span> <span class="o">=</span> <span class="s1">&#39;ObjFileComm&#39;</span></div>
 
 
-<div class="viewcode-block" id="TestYggObjOutput"><a class="viewcode-back" href="../../../../advanced/yggdrasil_code.html#yggdrasil.languages.Python.test_YggInterface.TestYggObjOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYggObjOutput</span><span class="p">(</span><span class="n">TestYggOutput</span><span class="p">):</span>
+<div class="viewcode-block" id="TestYggObjOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggObjOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYggObjOutput</span><span class="p">(</span><span class="n">TestYggOutput</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test output from a obj.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggObjOutput&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggObjOutput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span> <span class="o">=</span> <span class="s1">&#39;ObjFileComm&#39;</span></div>
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017, Meagan Lang, David Raila.
-
-    </p>
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
