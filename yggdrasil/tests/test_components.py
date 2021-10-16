@@ -1,4 +1,4 @@
-from yggdrasil.tests import assert_raises
+import pytest
 from yggdrasil import components
 
 
@@ -16,7 +16,8 @@ def test_import_component():
     components.import_component('serializer', 'PandasSerialize')
     # Test access to file through comm (including error)
     components.import_component('comm', 'pickle')
-    assert_raises(ValueError, components.import_component, 'comm', 'invalid')
+    with pytest.raises(components.ComponentError):
+        components.import_component('comm', 'invalid')
     # Tests with registry suspended
     out = components.suspend_registry()
     components.import_component('serializer')

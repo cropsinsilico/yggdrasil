@@ -329,7 +329,7 @@ def create_env(method, python, name=None, packages=None, init=_on_ci):
 
     """
     cmds = ["echo Creating test environment using %s..." % method]
-    major, minor = [int(x) for x in python.split('.')]
+    major, minor = [int(x) for x in python.split('.')][:2]
     if name is None:
         name = '%s%s' % (method, python.replace('.', ''))
     if packages is None:
@@ -782,7 +782,7 @@ def install_deps(method, return_commands=False, verbose=False,
         ]
     if fallback_to_conda:
         cmds.append("%s update --all" % CONDA_CMD)
-    if install_opts['R'] and (not fallback_to_conda):
+    if install_opts['R'] and (not fallback_to_conda) and (not only_python):
         # TODO: Test split installation where r-base is installed from
         # conda and the R dependencies are installed from CRAN?
         if _is_linux:

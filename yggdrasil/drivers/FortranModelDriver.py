@@ -3,14 +3,12 @@ import re
 import copy
 import logging
 from collections import OrderedDict
-from yggdrasil import platform, tools
+from yggdrasil import platform, tools, constants
 from yggdrasil.languages import get_language_dir
 from yggdrasil.drivers import CModelDriver
 from yggdrasil.drivers.CompiledModelDriver import (
     CompilerBase, CompiledModelDriver, get_compilation_tool,
     get_compilation_tool_registry)
-from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
-    _valid_types)
 
 
 logger = logging.getLogger(__name__)
@@ -643,7 +641,7 @@ class FortranModelDriver(CompiledModelDriver):
                 out['type'] = 'ndarray'
                 if shape[0] not in '*:':
                     out['shape'] = [int(i) for i in shape]
-        if out['type'] in _valid_types:
+        if out['type'] in constants.VALID_TYPES:
             out['subtype'] = out['type']
             out['type'] = 'scalar'
         return out
@@ -1131,7 +1129,7 @@ class FortranModelDriver(CompiledModelDriver):
         if datatype.get('subtype', datatype['type']) in ['bytes', 'unicode']:
             if 'precision' not in datatype:
                 datatype = dict(datatype, precision=0)
-        elif datatype.get('subtype', datatype['type']) in _valid_types:
+        elif datatype.get('subtype', datatype['type']) in constants.VALID_TYPES:
             datatype.setdefault('precision', 32)
         out = super(FortranModelDriver, cls).write_type_def(
             name, datatype, **kwargs)

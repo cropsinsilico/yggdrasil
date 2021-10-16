@@ -5,6 +5,7 @@ import uuid
 import json
 import traceback
 import yaml
+import glob
 import pprint
 import functools
 import threading
@@ -17,6 +18,7 @@ from yggdrasil.config import ygg_cfg
 
 
 _service_host_env = 'YGGDRASIL_SERVICE_HOST_URL'
+_service_repo_dir = 'YGGDRASIL_SERVICE_REPO_DIR'
 _default_service_type = ygg_cfg.get('services', 'default_type', 'flask')
 _default_commtype = ygg_cfg.get('services', 'default_comm', None)
 _default_address = ygg_cfg.get('services', 'address', None)
@@ -127,7 +129,7 @@ class ServiceBase(YggClass):
         logging.basicConfig(level=log_level)
 
     def start_server(self, remote_url=None, with_coverage=False,
-                     log_level=None):
+                     log_level=None, model_repository=None):
         r"""Start the server.
 
         Args:
@@ -140,12 +142,18 @@ class ServiceBase(YggClass):
                 with coverage. Defaults to False.
             log_level (int, optional): Level of log messages that should be
                 printed. Defaults to None and is ignored.
+            model_repository (str, optional): URL of directory in a Git
+                repository containing YAMLs that should be added to the model
+                registry. Defaults to None and is ignored.
 
         """
         if remote_url is None:
             remote_url = os.environ.get(_service_host_env, None)
         if remote_url is None:
             remote_url = self.address
+        if model_repository is not None:
+            repo_dir = self.registry.add_from_repository(model_repository)
+            os.environ.setdefault(_service_repo_dir, repo_dir)
         os.environ.setdefault(_service_host_env, remote_url)
         if log_level is not None:
             self.set_log_level(log_level)
@@ -1078,6 +1086,38 @@ class IntegrationServiceRegistry(object):
             registry.pop(k)
         self.save(registry)
 
+    def add_from_repository(self, model_repository, directory=None):
+        r"""Add integration services to the registry from a repository of
+        model YAMLs.
+
+        Args:
+            model_repository (str): URL of directory in a Git repository
+                containing YAMLs that should be added to the model registry.
+            directory (str, optional): Directory where services from the
+                model_repository should be cloned. Defaults to
+                '~/.yggdrasil_service'.
+
+        Returns:
+            str: The directory where the repositories were cloned.
+
+        """
+        from yggdrasil.yamlfile import clone_github_repo, prep_yaml
+        if directory is None:
+            directory = os.path.expanduser(
+                os.path.join('~', '.yggdrasil_services'))
+        yaml_dir = clone_github_repo(model_repository,
+                                     local_directory=directory)
+        yaml_files = (glob.glob(os.path.join(yaml_dir, '*.yaml'))
+                      + glob.glob(os.path.join(yaml_dir, '*.yml')))
+        for x in yaml_files:
+            # Calling prep_yaml allows the model repositories to be cloned
+            # in advance to circumvent th hold place on git cloning on the
+            # service manager (these models are assumed to be vetted so
+            # they do not pose a security risk).
+            prep_yaml(x, directory_for_clones=directory)
+            self.add(os.path.splitext(os.path.basename(x))[0], x)
+        return directory
+
     def add(self, name, yamls=None, **kwargs):
         r"""Add an integration service to the registry.
 
@@ -1102,7 +1142,7 @@ class IntegrationServiceRegistry(object):
             assert(yamls)
             collection = {name: dict(kwargs, name=name, yamls=yamls)}
         for k, v in collection.items():
-            if k in registry:
+            if (k in registry) and (registry[k] != v):
                 old = pprint.pformat(registry[k])
                 new = pprint.pformat(v)
                 raise ValueError(f"There is an registry integration "
@@ -1119,11 +1159,21 @@ def validate_model_submission(fname):
     the yggdrasil model repository.
 
     Args:
-        fname (str): YAML file to validate.
+        fname (str): YAML file to validate or directory in which to check
+            each of the YAML files.
 
     """
-    import glob
     from yggdrasil import yamlfile, runner
+    if isinstance(fname, list):
+        for x in fname:
+            validate_model_submission(x)
+        return
+    elif os.path.isdir(fname):
+        files = sorted(glob.glob(os.path.join(fname, '*.yml'))
+                       + glob.glob(os.path.join(fname, '*.yaml')))
+        for x in files:
+            validate_model_submission(x)
+        return
     # 1-2. YAML syntax and schema
     yml = yamlfile.parse_yaml(fname, model_submission=True)
     # 3a. LICENSE
@@ -1135,5 +1185,5 @@ def validate_model_submission(fname):
             break
     else:
         raise RuntimeError("Model repository does not contain a LICENSE file.")
-    # 4. Run
-    runner.run(fname)
+    # 4. Run & validate
+    runner.run(fname, validate=True)

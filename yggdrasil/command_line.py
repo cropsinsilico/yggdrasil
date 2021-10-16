@@ -7,7 +7,9 @@ import subprocess
 import argparse
 import pprint
 import shutil
-from yggdrasil.constants import LANGUAGES, LANGUAGES_WITH_ALIASES
+from yggdrasil import constants
+LANGUAGES = getattr(constants, 'LANGUAGES', {})
+LANGUAGES_WITH_ALIASES = getattr(constants, 'LANGUAGES_WITH_ALIASES', {})
 
 
 logger = logging.getLogger(__name__)
@@ -139,7 +141,7 @@ class SubCommand(metaclass=SubCommandMeta):
                 if isinstance(v_flag, list):
                     v.extend(v_flag)
                 if (len(v) == 0) or ('all' in v):
-                    setattr(args, k, LANGUAGES['all'])
+                    setattr(args, k, LANGUAGES.get('all', []))
                     args.all_languages = True
         return args
 
@@ -225,7 +227,11 @@ class yggrun(SubCommand):
           'help': 'Number of MPI processes to run on.'}),
         (('--mpi-tag-start', ),
          {'type': int, 'default': 0,
-          'help': 'Tag that MPI communications should start at.'})]
+          'help': 'Tag that MPI communications should start at.'}),
+        (('--validate', ),
+         {'action': 'store_true',
+          'help': ('Validate the run via model validation commands on '
+                   'completion.')})]
 
     @classmethod
     def add_arguments(cls, parser, **kwargs):
@@ -252,7 +258,8 @@ class yggrun(SubCommand):
         with config.parser_config(args):
             runner.run(args.yamlfile, ygg_debug_prefix=prog,
                        production_run=args.production_run,
-                       mpi_tag_start=args.mpi_tag_start)
+                       mpi_tag_start=args.mpi_tag_start,
+                       validate=args.validate)
 
 
 class integration_service_manager(SubCommand):
@@ -328,7 +335,17 @@ class integration_service_manager(SubCommand):
                                    'registered integration.')}),
                         (('--with-coverage', ),
                          {'action': 'store_true',
-                          'help': ('Enable coverage cleanup for testing.')})]),
+                          'help': ('Enable coverage cleanup for testing.')}),
+                        (('--model-repository', ),
+                         {'type': str,
+                          'help': ('URL for a directory in a Git repository '
+                                   'containing models that should be loaded '
+                                   'into the service manager registry.')}),
+                        (('--log-level', ),
+                         {'type': int,
+                          'help': ('Level of logging that should be '
+                                   'performed for the service manager '
+                                   'application.')})]),
                 ArgumentParser(
                     name='stop',
                     help=('Stop an integration service manager or '
@@ -405,7 +422,10 @@ class integration_service_manager(SubCommand):
                 if not x.is_running:
                     x.start_server(
                         remote_url=getattr(args, 'remote_url', None),
-                        with_coverage=getattr(args, 'with_coverage', False))
+                        with_coverage=getattr(args, 'with_coverage', False),
+                        model_repository=getattr(args, 'model_repository',
+                                                 None),
+                        log_level=getattr(args, 'log_level', None))
             else:
                 x.send_request(integration_name,
                                yamls=integration_yamls,
@@ -450,7 +470,7 @@ class ygginfo(SubCommand):
             description='Compilation tool types to get info about.',
             arguments=[
                 (('language', ),
-                 {'choices': LANGUAGES_WITH_ALIASES['compiled'],
+                 {'choices': LANGUAGES_WITH_ALIASES.get('compiled', []),
                   'type': str.lower,
                   'help': 'Language to get tool information for.'}),
                 (('--toolname', ),
@@ -832,14 +852,18 @@ class validate_yaml(SubCommand):
                    'ensuring that it is part of a complete integration.')}),
         (('--model-submission', ),
          {'action': 'store_true',
-          'help': ('Validate a YAML against the schema for submissions to '
-                   'the yggdrasil model repository.')})]
+          'help': ('Validate a YAML against the requirements for '
+                   'submissions to the yggdrasil model repository.')})]
 
     @classmethod
     def func(cls, args):
-        from yggdrasil import yamlfile
-        yamlfile.parse_yaml(args.yamlfile, model_only=args.model_only,
-                            model_submission=args.model_submission)
+        if args.model_submission:
+            from yggdrasil.services import validate_model_submission
+            validate_model_submission(args.yamlfile)
+        else:
+            from yggdrasil import yamlfile
+            yamlfile.parse_yaml(args.yamlfile, model_only=args.model_only,
+                                model_submission=args.model_submission)
         logger.info("Validation succesful.")
 
 
@@ -856,7 +880,8 @@ class yggcc(SubCommand):
                    "R package.")}),
         (('--language', ),
          {'default': None,
-          'choices': [None] + LANGUAGES_WITH_ALIASES['compiled'] + ['R', 'r'],
+          'choices': ([None] + LANGUAGES_WITH_ALIASES.get('compiled', [])
+                      + ['R', 'r']),
           'help': ("Language of the source code. If not provided, "
                    "the language will be determined from the "
                    "source extension.")}),
@@ -899,8 +924,8 @@ class yggcompile(SubCommand):
     arguments = [
         (('language', ),
          {'nargs': '*', 'default': ['all'],
-          # 'choices': (['all'] + LANGUAGES_WITH_ALIASES['compiled']
-          #             + LANGUAGES_WITH_ALIASES['compiled_dsl']),
+          # 'choices': (['all'] + LANGUAGES_WITH_ALIASES.get('compiled', [])
+          #             + LANGUAGES_WITH_ALIASES.get('compiled_dsl', [])),
           'help': ("One or more languages to compile dependencies "
                    "for.")}),
         (('--toolname', ),
@@ -935,7 +960,7 @@ class yggclean(SubCommand):
     arguments = [
         (('language', ),
          {'nargs': '*', 'default': ['all'],
-          # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
+          # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
           'help': ("One or more languages to clean up dependencies "
                    "for.")})]
 
@@ -1076,12 +1101,12 @@ class update_config(SubCommand):
     arguments = (
         [(('languages', ),
           {'nargs': '*',
-           # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
+           # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
            'default': [],
            'help': 'One or more languages that should be configured.'}),
          (('--languages', ),
           {'nargs': '+', 'dest': 'languages_flag',
-           # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
+           # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
            'default': [],
            'help': 'One or more languages that should be configured.'}),
          (('--show-file', ),
@@ -1095,11 +1120,11 @@ class update_config(SubCommand):
            'help': 'Overwrite the existing file.'}),
          (('--disable-languages', ),
           {'nargs': '+', 'default': [],
-           'choices': LANGUAGES_WITH_ALIASES['all'],
+           'choices': LANGUAGES_WITH_ALIASES.get('all', []),
            'help': 'One or more languages that should be disabled.'}),
          (('--enable-languages', ),
           {'nargs': '+', 'default': [],
-           'choices': LANGUAGES_WITH_ALIASES['all'],
+           'choices': LANGUAGES_WITH_ALIASES.get('all', []),
            'help': 'One or more languages that should be enabled.'}),
          (('--quiet', '-q'),
           {'action': 'store_true',
@@ -1120,15 +1145,15 @@ class update_config(SubCommand):
         + [(('--%s-compiler' % k, ),
             {'help': ('Name or path to compiler that should be used to compile '
                       'models written in %s.' % k)})
-           for k in LANGUAGES['compiled']]
+           for k in LANGUAGES.get('compiled', [])]
         + [(('--%s-linker' % k, ),
             {'help': ('Name or path to linker that should be used to link '
                       'models written in %s.' % k)})
-           for k in LANGUAGES['compiled']]
+           for k in LANGUAGES.get('compiled', [])]
         + [(('--%s-archiver' % k, ),
             {'help': ('Name or path to archiver that should be used to create '
                       'static libraries for models written in %s.' % k)})
-           for k in LANGUAGES['compiled']]
+           for k in LANGUAGES.get('compiled', [])]
     )
     # TODO: Move these into the language directories?
     language_arguments = {
@@ -1189,7 +1214,7 @@ class update_config(SubCommand):
         if preargs.languages_flag:
             prelang += preargs.languages_flag
         if (len(prelang) == 0) or ('all' in prelang):
-            prelang = LANGUAGES['all']
+            prelang = LANGUAGES.get('all', [])
         # TODO: The languages could be subparsers
         for k, v in cls.language_arguments.items():
             if k in prelang:
@@ -1221,7 +1246,7 @@ class update_config(SubCommand):
                     lang_kwargs.setdefault(k, {})
                     lang_kwargs[k][name] = getattr(args, name)
         for x in ['compiler', 'linker', 'archiver']:
-            for k in LANGUAGES['compiled']:
+            for k in LANGUAGES.get('compiled', []):
                 if getattr(args, '%s_%s' % (k, x), None):
                     lang_kwargs.setdefault(k, {})
                     lang_kwargs[k][x] = getattr(args, '%s_%s' % (k, x))
@@ -1269,7 +1294,8 @@ class regen_schema(SubCommand):
                 os.remove(schema._schema_fname)
             schema.clear_schema()
             schema.init_schema()
-        schema.update_constants()
+        else:
+            schema.update_constants()
 
 
 class yggmodelform(SubCommand):

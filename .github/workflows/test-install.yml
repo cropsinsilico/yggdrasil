@@ -44,7 +44,7 @@ jobs:
         - macos-latest
         - windows-latest
         python-version:
-        - 3.6
+        - 3.7
         install-method:
         - pip
         test-flags1:
@@ -61,7 +61,7 @@ jobs:
         - true
         include:
         - os: windows-latest
-          python-version: 3.6
+          python-version: 3.7
           install-method: pip
           test-flags1: --long-running --languages cpp
           test-flags2: --long-running --skip-languages c++
@@ -351,7 +351,7 @@ jobs:
         - macos-latest
         - windows-latest
         python-version:
-        - 3.6
+        - 3.7
         install-method:
         - conda
         test-flags1:
@@ -364,7 +364,7 @@ jobs:
         - true
         include:
         - os: ubuntu-latest
-          python-version: 3.7
+          python-version: 3.6
           install-method: conda
           test-flags1: --long-running
           test-flags2: ''
@@ -679,7 +679,7 @@ jobs:
         os:
         - ubuntu-latest
         python-version:
-        - 3.6
+        - 3.7
         install-method:
         - pip
         test-flags1:
@@ -981,7 +981,7 @@ jobs:
         os:
         - ubuntu-latest
         python-version:
-        - 3.6
+        - 3.7
         install-method:
         - conda
         test-flags1:
@@ -1295,7 +1295,7 @@ jobs:
         - macos-latest
         - windows-latest
         python-version:
-        - 3.6
+        - 3.7
         install-method:
         - pip
         test-flags1:
@@ -1672,3 +1672,32 @@ jobs:
       run: python utils/build_docker.py --push
     - name: Build and push executable docker images for the new release
       run: python utils/build_docker.py --push executable
+  schema:
+    name: Update the schema used by the model submission form
+    needs:
+    - test_pip
+    - test_conda
+    - test_rmq_pip
+    - test_rmq_conda
+    - test_stripped
+    - docs
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: 'python -m pip install PyGithub
+
+        python utils/setup_test_env.py install pip
+
+        '
+    - name: Verify installation
+      run: python utils/setup_test_env.py verify
+    - name: Update the form
+      run: python utils/update_form_schema.py

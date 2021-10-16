@@ -1,12 +1,11 @@
 import numpy as np
 import copy
 import pandas
+from yggdrasil import constants
 from yggdrasil.communication.transforms.TransformBase import TransformBase
-from yggdrasil.metaschema.datatypes import type2numpy
+from yggdrasil.metaschema import type2numpy
 from yggdrasil.serialize import (
     consolidate_array, pandas2numpy, numpy2pandas, dict2list)
-from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
-    _valid_types, _flexible_types)
 
 
 class ArrayTransform(TransformBase):
@@ -63,7 +62,7 @@ class ArrayTransform(TransformBase):
                 s = (s,)
             t = '1darray'
         elif ((x['type'] == 'scalar')
-              or (x['type'] in _valid_types)):
+              or (x['type'] in constants.VALID_TYPES)):
             s = (1,)
             t = 'scalar'
         else:
@@ -71,11 +70,11 @@ class ArrayTransform(TransformBase):
                                   "to array elements.") % x['type'])
         subt = x.get('subtype', x['type'])
         title = x.get('title', None)
-        assert(subt in _valid_types)
+        assert(subt in constants.VALID_TYPES)
         if subtype:
             out = {'type': t, 'subtype': subt,
                    'shape': s, 'title': title}
-            if subt not in _flexible_types:
+            if subt not in constants.FLEXIBLE_TYPES:
                 out['precision'] = x.get('precision', 0)
         else:
             out = {'type': t, 'shape': s}
@@ -264,7 +263,7 @@ class ArrayTransform(TransformBase):
                     subtype=x.get('subtype', x['type']))
                for x in base_types]
         for i, x in enumerate(out):
-            if x['subtype'] in _flexible_types:
+            if x['subtype'] in constants.FLEXIBLE_TYPES:
                 x['precision'] = max(
                     [y['items'][i].get('precision', 0) for y in items])
                 if x['precision'] == 0:

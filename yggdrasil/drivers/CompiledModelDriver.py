@@ -902,13 +902,36 @@ class CompilationToolBase(object):
         else:
             base_paths = ['/usr', os.path.join('/usr', 'local')]
         if platform._is_mac:
-            base_paths.append('/Library/Developer/CommandLineTools/usr')
+            macos_sdkroot = cfg.get('c', 'macos_sdkroot', None)
+            base_paths += [
+                '/Library/Developer/CommandLineTools/usr',
+                # XCode >= 12
+                '/Applications/Xcode.app/Contents/Developer/'
+                'Toolchains/XcodeDefault.xctoolchain/usr']
+            if macos_sdkroot is not None:
+                base_paths.append(os.path.join(macos_sdkroot, 'usr'))
+                if 'Platforms' in macos_sdkroot:
+                    base_paths.append(
+                        os.path.join(
+                            macos_sdkroot.split('/Platforms', 1)[0],
+                            'Toolchains/XcodeDefault.xctoolchain/usr'))
         if libtype == 'include':
             suffix = 'include'
         else:
             suffix = 'lib'
         for base in base_paths:
             paths.append(os.path.join(base, suffix))
+        if platform._is_mac:
+            # Check homebrew llvm
+            # paths.append('/usr/local/Cellar/llvm/')
+            for x in glob.glob(os.path.join(
+                    macos_sdkroot.split('/Platforms', 1)[0], 'Platforms',
+                    '*', '')):
+                if ((('AppleTV' not in x) and ('iPhoneOS' not in x)
+                     and ('WatchOS' not in x))):
+                    paths.append(x)
+            paths += [
+                "/usr/local/Cellar/llvm/"]
         out = []
         for x in paths:
             if x and (x not in out) and os.path.isdir(x):
@@ -2708,19 +2731,19 @@ class CompiledModelDriver(ModelDriver):
                 if os.path.isfile(libinfo[libtype]):
                     out = libinfo[libtype]
                 else:  # pragma: no cover
-                    out = cls.cfg.get(dep_lang, '%s_%s' % (dep, libtype), None)
-            elif cls.cfg.has_option(dep_lang, '%s_%s' % (dep, libtype)):
-                out = cls.cfg.get(dep_lang, '%s_%s' % (dep, libtype))
+                    out = cls.cfg.get(dep_lang, f'{dep}_{libtype}', None)
+            elif cls.cfg.has_option(dep_lang, f'{dep}_{libtype}'):
+                out = cls.cfg.get(dep_lang, f'{dep}_{libtype}')
             else:
                 libtype_found = []
                 for k in libtype_list:
-                    if cls.cfg.has_option(dep_lang, '%s_%s' % (dep, k)):
+                    if cls.cfg.has_option(dep_lang, f'{dep}_{k}'):
                         libtype_found.append(k)
                 if len(libtype_found) > 0:
-                    raise ValueError(("A '%s' library could not be located for "
-                                      "dependency '%s', but one or more "
-                                      "libraries of types %s were found.")
-                                     % (libtype, dep, libtype_found))
+                    raise ValueError(f"A '{libtype}' library could not be "
+                                     f"located for dependency '{dep}', but "
+                                     f"one or more libraries of types "
+                                     f"{libtype_found} were found.")
             # TODO: CLEANUP
             if platform._is_win and out and out.endswith('.lib'):  # pragma: windows
                 if tool is None:
@@ -3328,7 +3351,7 @@ class CompiledModelDriver(ModelDriver):
             cfg.add_section(cls.language)
         for k, v in kwargs.items():
             if k not in ['compiler', 'linker', 'archiver']:  # pragma: debug
-                raise ValueError("Unexpected configuration option: '%s'" % k)
+                raise ValueError(f"Unexpected configuration option: '{k}'")
             vtool = None
             try:
                 vtool = get_compilation_tool(k, v)
@@ -3339,10 +3362,10 @@ class CompiledModelDriver(ModelDriver):
                         vtool = vreg
                         break
             if not vtool:  # pragma: debug
-                raise ValueError("Could not locate a %s tool '%s'." % (k, v))
+                raise ValueError(f"Could not locate a {k} tool '{v}'.")
             cfg.set(cls.language, k, vtool.toolname)
             if os.path.isfile(v):
-                cfg.set(cls.language, '%s_executable' % vtool.toolname, v)
+                cfg.set(cls.language, f'{vtool.toolname}_executable', v)
         # Call __func__ to avoid direct invoking of class which dosn't exist
         # in after_registration where this is called
         return ModelDriver.configure.__func__(cls, cfg)
@@ -3429,16 +3452,16 @@ class CompiledModelDriver(ModelDriver):
         for t in v.keys():
             fname = v[t]
             assert(isinstance(fname, str))
-            opt = '%s_%s' % (k, t)
+            opt = f'{k}_{t}'
             if t in ['libtype', 'language']:
                 continue
             elif t in ['include']:
-                desc_end = '%s headers' % k
+                desc_end = f'{k} headers'
             elif t in ['static', 'shared']:
-                desc_end = '%s %s library' % (k, t)
+                desc_end = f'{k} {t} library'
             else:  # pragma: completion
-                desc_end = '%s %s' % (k, t)
-            desc = 'The full path to the directory containing %s.' % desc_end
+                desc_end = f'{k} {t}'
+            desc = f'The full path to the directory containing {desc_end}.'
             if cfg.has_option(k_lang, opt):
                 continue
             if os.path.isabs(fname):

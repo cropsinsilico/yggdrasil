@@ -1,7 +1,6 @@
 from yggdrasil import units
 from yggdrasil.metaschema.datatypes.ScalarMetaschemaType import (
     ScalarMetaschemaType)
-from yggdrasil.metaschema.properties import ScalarMetaschemaProperties
 
 
 class OneDArrayMetaschemaType(ScalarMetaschemaType):
@@ -11,7 +10,7 @@ class OneDArrayMetaschemaType(ScalarMetaschemaType):
     description = 'A 1D array with or without units.'
     properties = ['length']
     metadata_properties = ['length']
-    python_types = ScalarMetaschemaProperties._all_python_arrays
+    python_types = units.ALL_PYTHON_ARRAYS_WITH_UNITS
 
     @classmethod
     def validate(cls, obj, raise_errors=False):
@@ -43,7 +42,7 @@ class NDArrayMetaschemaType(ScalarMetaschemaType):
     description = 'An ND array with or without units.'
     properties = ['shape']
     metadata_properties = ['shape']
-    python_types = ScalarMetaschemaProperties._all_python_arrays
+    python_types = units.ALL_PYTHON_ARRAYS_WITH_UNITS
 
     @classmethod
     def validate(cls, obj, raise_errors=False):

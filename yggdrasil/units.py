@@ -2,10 +2,20 @@ import re
 import numpy as np
 import pandas as pd
 import unyt
-from yggdrasil import tools
+from collections import OrderedDict
+from yggdrasil import tools, constants
 _unit_quantity = unyt.array.unyt_quantity
 _unit_array = unyt.array.unyt_array
 _ureg_unyt = None
+
+
+PYTHON_SCALARS_WITH_UNITS = OrderedDict([
+    (k, tuple(list(v) + [_unit_quantity]))
+    for k, v in constants.PYTHON_SCALARS.items()])
+ALL_PYTHON_ARRAYS_WITH_UNITS = tuple(
+    list(constants.ALL_PYTHON_ARRAYS) + [_unit_array])
+ALL_PYTHON_SCALARS_WITH_UNITS = tuple(
+    list(constants.ALL_PYTHON_SCALARS) + [_unit_quantity])
 
 
 def get_ureg():

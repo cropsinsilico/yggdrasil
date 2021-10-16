@@ -11,12 +11,10 @@ import tempfile
 import asyncio
 from collections import OrderedDict
 from pprint import pformat
-from yggdrasil import platform, tools, languages, multitasking
-from yggdrasil.components import import_component, import_all_components
+from yggdrasil import platform, tools, languages, multitasking, constants
+from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.metaschema.datatypes import is_default_typedef
-from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
-    _valid_types)
 from queue import Empty
 logger = logging.getLogger(__name__)
 
@@ -45,7 +43,7 @@ def remove_product(product, check_for_source=False, **kwargs):
         RuntimeError: If the product cannot be removed.
 
     """
-    import_all_components('model')
+    tools.import_all_modules('yggdrasil.drivers')
     source_keys = list(_map_language_ext.keys())
     if '.exe' in source_keys:  # pragma: windows
         source_keys.remove('.exe')
@@ -173,12 +171,28 @@ class ModelDriver(Driver):
             the model source code. If provided, relative paths in the model
             YAML definition will be considered relative to the repository root
             directory.
+        repository_commit (str, optional): Commit that should be checked out
+            in the model repository specified by repository_url. If not
+            provided, the most recent commit on the default branch will be used.
         description (str, optional): Description of the model. This parameter
             is only used in the model repository or when providing the model
             as a service.
         contact_email (str, optional): Email address that should be used to
             contact the maintainer of the model. This parameter is only used
             in the model repository.
+        validation_command (str, optional): Path to a validation command that
+            can be used to verify that the model ran as expected. A non-zero
+            return code is taken to indicate failure.
+        dependencies (list, optional): A list of packages required by the
+            model that are written in the same language as the model. If the
+            package requires dependencies outside the language of the model.
+            use the additional_dependencies parameter to provide them. If you
+            need a version of the package from a specific package manager,
+            a mapping with 'package' and 'package_manager' fields can be
+            provided instead of just the name of the package.
+        additional_dependencies (dict, optional): A mapping between languages
+            and lists of packages in those languages that are required by the
+            model.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Class Attributes:
@@ -287,12 +301,27 @@ class ModelDriver(Driver):
             source code. If provided, relative paths in the model YAML
             definition will be considered relative to the repository root
             directory.
+        repository_commit (str): Commit that should be checked out in the
+            model repository specified by repository_url.
         description (str): Description of the model. This parameter is only
             used in the model repository or when providing the model as a
             service.
         contact_email (str): Email address that should be used to contact the
             maintainer of the model. This parameter is only used in the model
             repository.
+        validation_command (str): Path to a validation command that can be
+            used to verify that the model ran as expected. A non-zero return
+            code is taken to indicate failure.
+        dependencies (list): A list of packages required by the model that are
+            written in the same language as the model. If the package requires
+            dependencies outside the language of the model, use the
+            additional_dependencies parameter to provide them. If you need a
+            version of the package from a specific package manager, a mapping
+            
+            with 'package' and 'package_manager' fields can be provided
+            instead of just the name of the package.
+        additional_dependencies (dict): A mapping between languages and lists
+            of packages in those languages that are required by the model.
 
     Raises:
         RuntimeError: If both with_strace and with_valgrind are True.
@@ -311,7 +340,7 @@ class ModelDriver(Driver):
                          'languages can be found :ref:`here <'
                          'schema_table_model_subtype_rst>`.')},
         'args': {'type': 'array',
-                 'items': {'type': 'string'}},
+                 'items': {'type': 'string', 'minLength': 1}},
         'inputs': {'type': 'array', 'default': [],
                    'items': {'$ref': '#/definitions/comm'},
                    'description': (
@@ -393,8 +422,34 @@ class ModelDriver(Driver):
         'allow_threading': {'type': 'boolean'},
         'copies': {'type': 'integer', 'default': 1, 'minimum': 1},
         'repository_url': {'type': 'string'},
+        'repository_commit': {'type': 'string'},
         'description': {'type': 'string'},
-        'contact_email': {'type': 'string'}}
+        'contact_email': {'type': 'string'},
+        'validation_command': {'type': 'string'},
+        'dependencies': {
+            'type': 'array',
+            'items': {'oneOf': [
+                {'type': 'string'},
+                {'type': 'object',
+                 'required': ['package'],
+                 'properties': {
+                     'package': {'type': 'string'},
+                     'package_manager': {'type': 'string'},
+                     'arguments': {'type': 'string'}},
+                 'additionalProperties': False}]}},
+        'additional_dependencies': {
+            'type': 'object',
+            'additionalProperties': {
+                'type': 'array',
+                'items': {'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'object',
+                     'required': ['package'],
+                     'properties': {
+                         'package': {'type': 'string'},
+                         'package_manager': {'type': 'string'},
+                         'arguments': {'type': 'string'}},
+                     'additionalProperties': False}]}}}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     
@@ -519,6 +574,13 @@ class ModelDriver(Driver):
         if self.function:
             self.wrapper_products.append(args[0])
         self.wrapper_products += self.write_wrappers()
+        # Install dependencies
+        if self.dependencies:
+            self.install_model_dependencies(self.dependencies)
+        if self.additional_dependencies:
+            for language, v in self.additional_dependencies.items():
+                drv = import_component('model', language)
+                drv.install_model_dependencies(v)
 
     @staticmethod
     def before_registration(cls):
@@ -770,6 +832,109 @@ class ModelDriver(Driver):
 
         """
         return []
+
+    @classmethod
+    def install_model_dependencies(cls, dependencies, always_yes=False):
+        r"""Install any dependencies required by the model.
+
+        Args:
+            dependencies (list): Dependencies that should be installed.
+            always_yes (bool, optional): If True, the package manager will
+                not ask users for input during installation. Defaults to
+                False.
+
+        """
+        packages = {}
+        for x in dependencies:
+            if isinstance(x, str):
+                x = {'package': x}
+            if x.get('arguments', None):
+                cls.install_dependency(always_yes=always_yes, **x)
+            else:
+                packages.setdefault(x.get('package_manager', None), [])
+                packages[x.get('package_manager', None)].append(
+                    x['package'])
+        for k, v in packages.items():
+            cls.install_dependency(v, package_manager=k,
+                                   always_yes=always_yes)
+
+    @classmethod
+    def install_dependency(cls, package=None, package_manager=None,
+                           arguments=None, command=None, always_yes=False):
+        r"""Install a dependency.
+
+        Args:
+            package (str): Name of the package that should be installed. If
+                the package manager supports it, this can include version
+                requirements.
+            package_manager (str, optional): Package manager that should be
+                used to install the package.
+            arguments (str, optional): Additional arguments that should be
+                passed to the package manager.
+            command (list, optional): Command that should be used to
+                install the package.
+            always_yes (bool, optional): If True, the package manager will
+                not ask users for input during installation. Defaults to
+                False.
+
+        """
+        assert(package)
+        if isinstance(package, str):
+            package = package.split()
+        if package_manager is None:
+            if tools.get_conda_prefix():
+                package_manager = 'conda'
+            elif platform._is_mac:
+                package_manager = 'brew'
+            elif platform._is_linux:
+                package_manager = 'apt'
+            elif platform._is_win:
+                package_manager = 'choco'
+        yes_cmd = []
+        cmd_kwargs = {}
+        if command:
+            cmd = copy.copy(command)
+        elif package_manager == 'conda':
+            cmd = ['conda', 'install'] + package
+            if platform._is_win:  # pragma: windows
+                # Conda commands must be run on the shell on windows as it
+                # is implemented as a batch script
+                cmd.insert(0, 'call')
+                cmd_kwargs['shell'] = True
+            yes_cmd = ['-y']
+        elif package_manager == 'brew':
+            cmd = ['brew', 'install'] + package
+        elif package_manager == 'apt':
+            cmd = ['apt-get', 'install'] + package
+            if bool(os.environ.get('GITHUB_ACTIONS', False)):
+                # Only enable sudo for testing, otherwise allow the user to
+                # decide if they want to run yggdrasil with sudo, or just
+                # install the dependencies themselves
+                cmd.insert(0, 'sudo')
+            yes_cmd = ['-y']
+        elif package_manager == 'choco':
+            cmd = ['choco', 'install'] + package
+        elif package_manager == 'vcpkg':
+            cmd = ['vcpkg.exe', 'install', '--triplet', 'x64-windows']
+            cmd += package
+        else:
+            package_managers = {'pip': 'python',
+                                'cran': 'r'}
+            if package_manager in package_managers:
+                drv = import_component(
+                    'model', package_managers[package_manager])
+                return drv.install_dependency(
+                    package=package, package_manager=package_manager,
+                    arguments=arguments, always_yes=always_yes)
+            raise NotImplementedError(f"Unsupported package manager: "
+                                      f"{package_manager}")
+        if arguments:
+            cmd += arguments.split()
+        if always_yes:
+            cmd += yes_cmd
+        if cmd_kwargs.get('shell', False):
+            cmd = ' '.join(cmd)
+        subprocess.check_call(cmd, **cmd_kwargs)
         
     def model_command(self):
         r"""Return the command that should be used to run the model.
@@ -877,6 +1042,13 @@ class ModelDriver(Driver):
         except (subprocess.CalledProcessError, OSError) as e:  # pragma: debug
             raise RuntimeError("Could not call command '%s': %s"
                                % (' '.join(cmd), e))
+
+    def run_validation(self):
+        r"""Run the validation script for the model."""
+        if not self.validation_command:
+            return
+        subprocess.check_call(self.validation_command.split(),
+                              cwd=self.working_dir)
         
     def run_model(self, return_process=True, **kwargs):
         r"""Run the model. Unless overridden, the model will be run using
@@ -2638,11 +2810,11 @@ class ModelDriver(Driver):
                          'precision': 64, 'length': len(datatype['shape'])}},
                     definitions=definitions,
                     requires_freeing=requires_freeing)
-        elif datatype['type'] in ['ply', 'obj', '1darray',
-                                  'scalar', 'boolean', 'null',
-                                  'number', 'integer', 'string',
-                                  'class', 'function', 'instance',
-                                  'schema', 'any'] + list(_valid_types.keys()):
+        elif datatype['type'] in (['ply', 'obj', '1darray', 'scalar',
+                                   'boolean', 'null', 'number', 'integer',
+                                   'string', 'class', 'function', 'instance',
+                                   'schema', 'any']
+                                  + list(constants.VALID_TYPES.keys())):
             pass
         else:  # pragma: debug
             raise ValueError(("Cannot create %s version of type "
@@ -2764,7 +2936,7 @@ class ModelDriver(Driver):
                 keys['ndim'] = 0
                 keys['shape'] = cls.function_param['null']
             keys['units'] = datatype.get('units', '')
-        elif (typename == 'scalar') or (typename in _valid_types):
+        elif (typename == 'scalar') or (typename in constants.VALID_TYPES):
             keys['subtype'] = datatype.get('subtype', datatype['type'])
             keys['units'] = datatype.get('units', '')
             if keys['subtype'] in ['bytes', 'string', 'unicode']:

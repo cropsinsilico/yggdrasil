@@ -3,7 +3,7 @@ import copy
 import numpy as np
 import pandas
 import io as sio
-from yggdrasil import platform, units, scanf, tools
+from yggdrasil import platform, units, scanf, tools, constants
 try:
     from astropy.io import ascii as apy_ascii
     from astropy.table import Table as apy_Table
@@ -13,16 +13,6 @@ except ImportError:  # pragma: no cover
     # print("astropy is not installed, reading/writing as an array will be "
     #       + "disabled. astropy can be installed using 'pip install astropy'.")
     _use_astropy = False
-
-
-_fmt_char = b'%'
-_default_comment = b'# '
-_default_delimiter = b'\t'
-_default_newline = b'\n'
-_fmt_char_str = _fmt_char.decode("utf-8")
-_default_comment_str = _default_comment.decode("utf-8")
-_default_delimiter_str = _default_delimiter.decode("utf-8")
-_default_newline_str = _default_newline.decode("utf-8")
 
 
 def extract_formats(fmt_str):
@@ -601,7 +591,7 @@ def format2table(fmt_str):
         out['newline'] = fmt_rem
     seps = set(seps)
     if len(seps) == 0:
-        out['delimiter'] = _default_delimiter
+        out['delimiter'] = constants.DEFAULT_DELIMITER
     elif len(seps) == 1:
         out['delimiter'] = list(seps)[0]
     elif len(seps) > 1:
@@ -619,22 +609,22 @@ def table2format(fmts=[], delimiter=None, newline=None, comment=None):
         fmts (list, optional): List of format codes for each column. Defaults to
             [].
         delimiter (bytes, optional): String used to separate columns. Defaults
-            to _default_delimiter.
+            to constants.DEFAULT_DELIMITER.
         newline (bytes, optional): String used to indicate the end of a table
-            line. Defaults to _default_newline.
+            line. Defaults to constants.DEFAULT_NEWLINE.
         comment (bytes, optional): String that should be prepended to the format
-            string to indicate a comment. Defaults to _default_comment.
+            string to indicate a comment. Defaults to constants.DEFAULT_COMMENT.
 
     Returns:
         str, bytes: Table format string.
 
     """
     if delimiter is None:
-        delimiter = _default_delimiter
+        delimiter = constants.DEFAULT_DELIMITER
     if newline is None:
-        newline = _default_newline
+        newline = constants.DEFAULT_NEWLINE
     if comment is None:
-        comment = _default_comment
+        comment = constants.DEFAULT_COMMENT
     if isinstance(fmts, np.dtype):
         fmts = nptype2cformat(fmts)
     bytes_fmts = tools.str2bytes(fmts, recurse=True)
@@ -891,13 +881,13 @@ def format_header(format_str=None, dtype=None,
             specified, the formats will not be part of the header.
         comment (bytes, optional): String that should be used to comment the
             header lines. If not provided and not in format_str, defaults to
-            _default_comment.
+            constants.DEFAULT_COMMENT.
         delimiter (bytes, optional): String that should be used to separate
             columns. If not provided and not in format_str, defaults to
-            _default_delimiter.
+            constants.DEFAULT_DELIMITER.
         newline (bytes, optional): String that should be used to end lines in
             the table. If not provided and not in format_str, defaults to
-            _default_newline.
+            constants.DEFAULT_NEWLINE.
         field_names (list, optional): List of field names that should be
             included in the header. If not provided and dtype is None, names
             will not be included in the header.
@@ -930,11 +920,11 @@ def format_header(format_str=None, dtype=None,
         if field_names is None:
             field_names = [n.encode("utf-8") for n in dtype.names]
     if delimiter is None:
-        delimiter = _default_delimiter
+        delimiter = constants.DEFAULT_DELIMITER
     if comment is None:
-        comment = _default_comment
+        comment = constants.DEFAULT_COMMENT
     if newline is None:
-        newline = _default_newline
+        newline = constants.DEFAULT_NEWLINE
     # Get count of fields
     if fmts is not None:
         nfld = len(fmts)
@@ -955,8 +945,8 @@ def format_header(format_str=None, dtype=None,
     return out
 
 
-def discover_header(fd, serializer, newline=_default_newline,
-                    comment=_default_comment, delimiter=None,
+def discover_header(fd, serializer, newline=constants.DEFAULT_NEWLINE,
+                    comment=constants.DEFAULT_COMMENT, delimiter=None,
                     lineno_format=None, lineno_names=None, lineno_units=None,
                     use_astropy=False):
     r"""Discover ASCII table header info from a file.
@@ -966,13 +956,13 @@ def discover_header(fd, serializer, newline=_default_newline,
         serializer (DefaultSerialize): Serializer that should be updated with
             header information.
         newline (str, optional): Newline character that should be used to split
-            header if it is not already a list. Defaults to _default_newline.
+            header if it is not already a list. Defaults to constants.DEFAULT_NEWLINE.
         comment (bytes, optional): String that should be used to mark the
             header lines. If not provided and not in format_str, defaults to
-            _default_comment.
+            constants.DEFAULT_COMMENT.
         delimiter (bytes, optional): String that should be used to separate
             columns. If not provided and not in format_str, defaults to
-            _default_delimiter.
+            constants.DEFAULT_DELIMITER.
         lineno_format (int, optional): Line number where formats are located.
             If not provided, an attempt will be made to locate one.
         lineno_names (int, optional): Line number where field names are located.
@@ -1039,14 +1029,14 @@ def discover_header(fd, serializer, newline=_default_newline,
     fd.seek(prev_pos + header_size)
 
 
-def parse_header(header, newline=_default_newline, lineno_format=None,
+def parse_header(header, newline=constants.DEFAULT_NEWLINE, lineno_format=None,
                  lineno_names=None, lineno_units=None):
     r"""Parse an ASCII table header to get information about the table.
 
     Args:
         header (list, str): Header lines that should be parsed.
         newline (str, optional): Newline character that should be used to split
-            header if it is not already a list. Defaults to _default_newline.
+            header if it is not already a list. Defaults to constants.DEFAULT_NEWLINE.
         lineno_format (int, optional): Line number where formats are located.
             If not provided, an attempt will be made to locate one.
         lineno_names (int, optional): Line number where field names are located.
@@ -1077,7 +1067,8 @@ def parse_header(header, newline=_default_newline, lineno_format=None,
         out['format_str'] = header[lineno_format].split(info['comment'])[-1]
     else:
         ncol = 0
-        out.update(delimiter=_default_delimiter, comment=_default_comment,
+        out.update(delimiter=constants.DEFAULT_DELIMITER,
+                   comment=constants.DEFAULT_COMMENT,
                    fmts=[])
     out.setdefault('newline', newline)
     # Use explicit lines for names & units

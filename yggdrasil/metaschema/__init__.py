@@ -2,7 +2,9 @@ import os
 import copy
 import pprint
 import jsonschema
+import numpy as np
 import yggdrasil
+from yggdrasil import constants, units
 from yggdrasil.metaschema.encoder import encode_json, decode_json
 from yggdrasil.metaschema.properties import get_registered_properties
 from yggdrasil.metaschema.datatypes import get_registered_types
@@ -28,6 +30,11 @@ if os.path.isfile(_metaschema_fname):
 _base_validator = jsonschema.validators.validator_for(_base_schema)
 
         
+class MetaschemaTypeError(TypeError):
+    r"""Error that should be raised when a class encounters a type it cannot handle."""
+    pass
+
+
 def create_metaschema(overwrite=False):
     r"""Create the meta schema for validating ygg schema.
 
@@ -194,3 +201,90 @@ def normalize_instance(obj, schema, **kwargs):
     cls = get_validator()
     cls.check_schema(schema)
     return cls(schema).normalize(obj, **kwargs)
+
+
+def data2dtype(data):
+    r"""Get numpy data type for an object.
+
+    Args:
+        data (object): Python object.
+
+    Returns:
+        np.dtype: Numpy data type.
+
+    """
+    data_nounits = units.get_data(data)
+    if isinstance(data_nounits, np.ndarray):
+        dtype = data_nounits.dtype
+    elif isinstance(data_nounits, (list, dict, tuple)):
+        raise MetaschemaTypeError
+    elif isinstance(data_nounits,
+                    np.dtype(constants.VALID_TYPES['bytes']).type):
+        dtype = np.array(data_nounits).dtype
+    else:
+        dtype = np.array([data_nounits]).dtype
+    return dtype
+
+
+def definition2dtype(props):
+    r"""Get numpy data type for a type definition.
+
+    Args:
+        props (dict): Type definition properties.
+        
+    Returns:
+        np.dtype: Numpy data type.
+
+    """
+    typename = props.get('subtype', None)
+    if typename is None:
+        typename = props.get('type', None)
+        if typename is None:
+            raise KeyError('Could not find type in dictionary')
+    if ('precision' not in props):
+        if typename in constants.FLEXIBLE_TYPES:
+            out = np.dtype((constants.VALID_TYPES[typename]))
+        else:
+            raise RuntimeError("Precision required for type: '%s'" % typename)
+    elif typename == 'unicode':
+        out = np.dtype((constants.VALID_TYPES[typename],
+                        int(props['precision'] // 32)))
+    elif typename in constants.FLEXIBLE_TYPES:
+        out = np.dtype((constants.VALID_TYPES[typename],
+                        int(props['precision'] // 8)))
+    else:
+        out = np.dtype('%s%d' % (constants.VALID_TYPES[typename],
+                                 int(props['precision'])))
+    return out
+
+
+def type2numpy(typedef):
+    r"""Convert a type definition into a numpy dtype.
+
+    Args:
+        typedef (dict): Type definition.
+
+    Returns:
+        np.dtype: Numpy data type.
+
+    """
+    out = None
+    if ((isinstance(typedef, dict) and ('type' in typedef)
+         and (typedef['type'] == 'array') and ('items' in typedef))):
+        if isinstance(typedef['items'], dict):
+            as_array = (typedef['items']['type'] in ['1darray', 'ndarray'])
+            if as_array:
+                out = definition2dtype(typedef['items'])
+        elif isinstance(typedef['items'], (list, tuple)):
+            as_array = True
+            dtype_list = []
+            field_names = []
+            for i, x in enumerate(typedef['items']):
+                if x['type'] not in ['1darray', 'ndarray']:
+                    as_array = False
+                    break
+                dtype_list.append(definition2dtype(x))
+                field_names.append(x.get('title', 'f%d' % i))
+            if as_array:
+                out = np.dtype(dict(names=field_names, formats=dtype_list))
+    return out

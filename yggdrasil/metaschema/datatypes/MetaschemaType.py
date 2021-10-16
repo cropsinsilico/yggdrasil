@@ -3,11 +3,11 @@ import copy
 import uuid
 import importlib
 import jsonschema
-from yggdrasil import tools
+from yggdrasil import constants
 from yggdrasil.metaschema import (get_metaschema, get_validator, encoder,
-                                  validate_instance)
+                                  validate_instance, MetaschemaTypeError)
 from yggdrasil.metaschema.datatypes import (
-    MetaschemaTypeError, MetaschemaTypeMeta, compare_schema, YGG_MSG_HEAD,
+    MetaschemaTypeMeta, compare_schema,
     get_type_class, conversions, is_default_typedef)
 from yggdrasil.metaschema.properties import get_metaschema_property
 
@@ -650,7 +650,7 @@ class MetaschemaType(object):
             if k in kwargs:
                 raise RuntimeError("'%s' is a reserved keyword in the metadata." % k)
         if ((isinstance(obj, bytes)
-             and ((obj == tools.YGG_MSG_EOF) or kwargs.get('raw', False)
+             and ((obj == constants.YGG_MSG_EOF) or kwargs.get('raw', False)
                   or dont_encode))):
             metadata = kwargs
             data = obj
@@ -668,7 +668,8 @@ class MetaschemaType(object):
             return data
         metadata['size'] = len(data)
         metadata.setdefault('id', str(uuid.uuid4()))
-        header = YGG_MSG_HEAD + encoder.encode_json(metadata) + YGG_MSG_HEAD
+        header = (constants.YGG_MSG_HEAD + encoder.encode_json(metadata)
+                  + constants.YGG_MSG_HEAD)
         if (max_header_size > 0) and (len(header) > max_header_size):
             metadata_type = metadata
             metadata = {}
@@ -678,10 +679,13 @@ class MetaschemaType(object):
                 if k in metadata_type:
                     metadata[k] = metadata_type.pop(k)
             assert(metadata)
-            data = (encoder.encode_json(metadata_type) + YGG_MSG_HEAD + data)
+            data = (encoder.encode_json(metadata_type)
+                    + constants.YGG_MSG_HEAD + data)
             metadata['size'] = len(data)
             metadata['type_in_data'] = True
-            header = YGG_MSG_HEAD + encoder.encode_json(metadata) + YGG_MSG_HEAD
+            header = (constants.YGG_MSG_HEAD
+                      + encoder.encode_json(metadata)
+                      + constants.YGG_MSG_HEAD)
             if len(header) > max_header_size:  # pragma: debug
                 raise AssertionError(("The header is larger (%d) than the "
                                       "maximum (%d): %.100s...")
@@ -717,17 +721,17 @@ class MetaschemaType(object):
         if not isinstance(msg, bytes):
             raise TypeError("Message to be deserialized is not bytes type.")
         # Check for header
-        if msg.startswith(YGG_MSG_HEAD):
+        if msg.startswith(constants.YGG_MSG_HEAD):
             if metadata is not None:
                 raise ValueError("Metadata in header and provided by keyword.")
-            _, metadata, data = msg.split(YGG_MSG_HEAD, 2)
+            _, metadata, data = msg.split(constants.YGG_MSG_HEAD, 2)
             if len(metadata) == 0:
                 metadata = dict(size=len(data))
             else:
                 metadata = encoder.decode_json(metadata)
         elif isinstance(metadata, dict) and metadata.get('type_in_data', False):
-            assert(msg.count(YGG_MSG_HEAD) == 1)
-            typedef, data = msg.split(YGG_MSG_HEAD, 1)
+            assert(msg.count(constants.YGG_MSG_HEAD) == 1)
+            typedef, data = msg.split(constants.YGG_MSG_HEAD, 1)
             if len(typedef) > 0:
                 metadata.update(encoder.decode_json(typedef))
             metadata.pop('type_in_data')
@@ -736,13 +740,13 @@ class MetaschemaType(object):
             data = msg
             if metadata is None:
                 metadata = dict(size=len(msg))
-                if (((len(msg) > 0) and (msg != tools.YGG_MSG_EOF)
+                if (((len(msg) > 0) and (msg != constants.YGG_MSG_EOF)
                      and (not is_default_typedef(self._typedef))
                      and (not dont_decode))):
                     raise ValueError("Header marker not in message.")
         # Set flags based on data
         metadata['incomplete'] = (len(data) < metadata['size'])
-        if (data == tools.YGG_MSG_EOF):
+        if (data == constants.YGG_MSG_EOF):
             metadata['raw'] = True
         # Return based on flags
         if no_data:

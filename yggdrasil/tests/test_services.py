@@ -72,11 +72,14 @@ def check_settings(service_type, partial_commtype=None):
 def running_service(service_type, partial_commtype=None, with_coverage=False):
     r"""Context manager to run and clean-up an integration service."""
     check_settings(service_type, partial_commtype)
+    model_repo = "https://github.com/cropsinsilico/yggdrasil_models_test/models"
     log_level = logging.ERROR
     args = [sys.executable, "-m", "yggdrasil", "integration-service-manager",
             f"--service-type={service_type}"]
     if partial_commtype is not None:
         args.append(f"--commtype={partial_commtype}")
+    args += ["start", f"--model-repository={model_repo}",
+             f"--log-level={log_level}"]
     package_dir = None
     process_kws = {}
     if with_coverage:
@@ -97,7 +100,8 @@ def running_service(service_type, partial_commtype=None, with_coverage=False):
         lines[-1] += ')'
         lines += ['assert(not srv.is_running)',
                   f'srv.start_server(with_coverage={with_coverage},',
-                  f'                 log_level={log_level})']
+                  f'                 log_level={log_level},'
+                  f'                 model_repository=\'{model_repo}\')']
         with open(script_path, 'w') as fd:
             fd.write('\n'.join(lines))
         args = [sys.executable, script_path]
@@ -186,7 +190,7 @@ class TestServices(object):
             self.cli = None
 
     def call_integration_service(self, cli, yamls, test_yml, copy_yml=None,
-                                 name='test'):
+                                 name='test', yaml_param=None):
         r"""Call an integration that includes a service."""
         remote_yml = '_remote'.join(os.path.splitext(test_yml))
         yamls = copy.copy(yamls)
@@ -202,12 +206,17 @@ class TestServices(object):
                 remote_code = 'a'
             else:
                 remote_code = 'w'
+            lines = ['service:',
+                     f'    name: {name}',
+                     f'    yamls: [{test_yml}]',
+                     f'    type: {service_type}',
+                     f'    address: {address}']
+            if yaml_param:
+                lines.append('    yaml_param:')
+                for k, v in yaml_param.items():
+                    lines.append(f'        {k}: "{v}"')
             with open(remote_yml, remote_code) as fd:
-                fd.write('\n'.join(['service:',
-                                    f'    name: {name}',
-                                    f'    yamls: [{test_yml}]',
-                                    f'    type: {service_type}',
-                                    f'    address: {address}']))
+                fd.write('\n'.join(lines))
             r = runner.get_runner(yamls)
             r.run()
             assert(not r.error_flag)
@@ -219,9 +228,9 @@ class TestServices(object):
         r"""Test that sending a request for a git YAML fails."""
         cli = running_service
         test_yml = ("git:https://github.com/cropsinsilico/example-fakemodel/"
-                    "fakemodel.yml")
+                    "fakemodel3.yml")
         assert(not os.path.isfile(
-            "cropsinsilico/example-fakemodel/fakemodel.yml"))
+            "cropsinsilico/example-fakemodel/fakemodel3.yml"))
         assert_raises(ServerError, cli.send_request, yamls=test_yml,
                       action='start')
 
@@ -255,6 +264,7 @@ class TestServices(object):
         test_yml = ex_yamls['fakeplant']['python']
         assert_raises(KeyError, cli.registry.remove, 'test')
         assert_raises(ServerError, cli.send_request, 'test')
+        print(cli.send_request('FakePlant'))
         cli.registry.add('test', test_yml, namespace='remote')
         print(cli.send_request('test'))
         assert_raises(ValueError, cli.registry.add, 'test', [test_yml])
@@ -272,7 +282,7 @@ class TestServices(object):
             cli.registry.add(reg_coll)
             print(cli.send_request('photosynthesis', namespace='phot'))
             assert_raises(ValueError, cli.registry.add,
-                          'photosynthesis', [test_yml])
+                          'photosynthesis', [test_yml], invalid=1)
             cli.send_request('photosynthesis', action='stop')
             cli.registry.remove(reg_coll)
             assert_raises(KeyError, cli.registry.remove, 'photosynthesis')
@@ -297,8 +307,9 @@ class TestServices(object):
         if (((running_service.commtype != 'rest')
              or (running_service.service_type != 'flask'))):
             pytest.skip("redundent test")  # pragma: testing
-        os.environ.update(FIB_ITERATIONS='3',
+        yaml_param = dict(FIB_ITERATIONS='3',
                           FIB_SERVER_SLEEP_SECONDS='0.01')
+        os.environ.update(yaml_param)
         yamls = ex_yamls['rpcFib']['all_nomatlab']
         service = None
         for x in yamls:
@@ -306,7 +317,8 @@ class TestServices(object):
                 service = x
                 break
         self.call_integration_service(running_service, yamls, service,
-                                      name='rpcFibSrv')
+                                      name='rpcFibSrv',
+                                      yaml_param=yaml_param)
 
     def test_calling_service_as_function(self, running_service):
         r"""Test calling an integrations as a service in an integration."""
@@ -340,10 +352,30 @@ def test_validate_model_submission():
     try:
         fname = os.path.join(os.path.dirname(__file__), 'yamls',
                              'FakePlant.yaml')
-        validate_model_submission(fname)
+        validate_model_submission([fname])
         os.remove(os.path.join('cropsinsilico', 'example-fakemodel',
                                'LICENSE'))
         assert_raises(RuntimeError, validate_model_submission, fname)
     finally:
         if os.path.isfile('cropsinsilico/example-fakemodel/fakemodel.yml'):
             git.rmtree("cropsinsilico")
+
+
+def test_validate_model_repo():
+    r"""Test validation of YAMLs in the model repository."""
+    import git
+    import tempfile
+    dest = os.path.join(tempfile.gettempdir(), "model_repo")
+    url = "https://github.com/cropsinsilico/yggdrasil_models"
+    for x in [url, url + "_test"]:
+        try:
+            repo = git.Repo.clone_from(x, dest)
+            model_dir = os.path.join(dest, "models")
+            if os.path.isdir(model_dir):
+                # This condition can be removed once there are models in the
+                # non-dev repository
+                validate_model_submission(model_dir)
+            repo.close()
+        finally:
+            if os.path.isdir(dest):
+                git.rmtree(dest)

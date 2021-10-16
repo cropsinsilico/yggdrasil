@@ -1,3 +1,4 @@
+import pytest
 import os
 import copy
 import unittest
@@ -470,7 +471,30 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         for line, kwargs, splits in vals:
             self.assert_equal(
                 self.import_cls.split_line(line, **kwargs), splits)
-    
+
+    def test_install_model_dependencies(self, deps=None):
+        r"""Test install_model_dependencies."""
+        if deps is None:
+            if self.import_cls.language == 'c':
+                deps = [
+                    "cmake",
+                    {"package_manager": "pip", "package": "pyyaml",
+                     "arguments": "-v"},
+                    {"package": "cmake", "arguments": "-v"}]
+                if platform._is_win:  # pragma: windows
+                    from yggdrasil import tools
+                    if not tools.get_conda_prefix():
+                        deps.append({"package_manager": "vcpkg",
+                                     "package": "czmq"})
+                else:
+                    deps.append('doxygen')
+            else:
+                deps = []
+        self.import_cls.install_model_dependencies(deps, always_yes=True)
+        with pytest.raises(NotImplementedError):
+            self.import_cls.install_dependency(
+                'invalid', package_manager='invalid')
+
 
 class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
     r"""Test runner for basic ModelDriver class."""

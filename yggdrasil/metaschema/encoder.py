@@ -36,11 +36,11 @@ def string2import(s):
 
     """
     pkg_mod = s.split(u':')
-    if len(pkg_mod) == 2:
+    if (len(pkg_mod) == 2) and (not s.startswith('http')) and (' ' not in s):
         try:
             mod = importlib.import_module(pkg_mod[0])
             s = getattr(mod, pkg_mod[1])
-        except (ImportError, AttributeError):
+        except (ImportError, AttributeError):  # pragma: debug
             pass
     return s
 
@@ -50,8 +50,8 @@ class JSONReadableEncoder(stdjson.JSONEncoder):
 
     def default(self, o):  # pragma: no cover
         r"""Encoder that allows for expansion types."""
-        from yggdrasil.metaschema.datatypes import (
-            encode_data_readable, MetaschemaTypeError)
+        from yggdrasil.metaschema import MetaschemaTypeError
+        from yggdrasil.metaschema.datatypes import encode_data_readable
         try:
             return encode_data_readable(o)
         except MetaschemaTypeError:
@@ -63,8 +63,8 @@ class JSONEncoder(_json_encoder):
 
     def default(self, o):
         r"""Encoder that allows for expansion types."""
-        from yggdrasil.metaschema.datatypes import (
-            encode_data, MetaschemaTypeError)
+        from yggdrasil.metaschema import MetaschemaTypeError
+        from yggdrasil.metaschema.datatypes import encode_data
         try:
             return encode_data(o)
         except MetaschemaTypeError:

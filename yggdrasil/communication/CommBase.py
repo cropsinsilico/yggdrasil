@@ -7,13 +7,13 @@ import types
 import time
 import collections
 import numpy as np
-from yggdrasil import tools, multitasking
-from yggdrasil.tools import YGG_MSG_EOF
+from yggdrasil import tools, multitasking, constants
 from yggdrasil.communication import (
     new_comm, get_comm, determine_suffix, TemporaryCommunicationError,
     import_comm, check_env_for_address)
-from yggdrasil.components import import_component, create_component
-from yggdrasil.metaschema.datatypes import MetaschemaTypeError, type2numpy
+from yggdrasil.components import (
+    import_component, create_component, ComponentError)
+from yggdrasil.metaschema import MetaschemaTypeError, type2numpy
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 from yggdrasil.serialize import consolidate_array
@@ -31,10 +31,6 @@ FLAG_SKIP = 3
 FLAG_EOF = 4
 FLAG_INCOMPLETE = 5
 FLAG_EMPTY = 6
-
-
-YGG_CLIENT_INI = b'YGG_BEGIN_CLIENT'
-YGG_CLIENT_EOF = b'YGG_END_CLIENT'
 
 
 class NeverMatch(Exception):
@@ -576,7 +572,6 @@ class CommBase(tools.YggClass):
         'for_service': {'type': 'boolean', 'default': False}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
-    _default_serializer_class = None
     _schema_excluded_from_class_validation = ['datatype']
     is_file = False
     _maxMsgSize = 0
@@ -751,12 +746,8 @@ class CommBase(tools.YggClass):
         if self.serializer is None:
             # Get serializer class
             if seri_cls is None:
-                if (((seri_kws['seritype'] == self._default_serializer)
-                     and (self._default_serializer_class is not None))):
-                    seri_cls = self._default_serializer_class
-                else:
-                    seri_cls = import_component('serializer',
-                                                subtype=seri_kws['seritype'])
+                seri_cls = import_component('serializer',
+                                            subtype=seri_kws['seritype'])
             # Recover keyword arguments for serializer passed to comm class
             for k in seri_cls.seri_kws():
                 if k in kwargs:
@@ -783,7 +774,7 @@ class CommBase(tools.YggClass):
                 if isinstance(iv, str):
                     try:
                         iv = create_component('transform', subtype=iv)
-                    except ValueError:
+                    except ComponentError:
                         iv = None
                 elif isinstance(iv, dict):
                     from yggdrasil.schema import get_schema
@@ -811,15 +802,6 @@ class CommBase(tools.YggClass):
                               subtype=filter_schema.identify_subtype(self.filter))
             self.filter = create_component('filter', **filter_kws)
 
-    @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration."""
-        tools.YggClass.before_registration(cls)
-        cls._default_serializer_class = import_component('serializer',
-                                                         cls._default_serializer,
-                                                         without_schema=True)
-
     @classmethod
     def get_testing_options(cls, serializer=None, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
@@ -842,13 +824,13 @@ class CommBase(tools.YggClass):
         """
         if serializer is None:
             serializer = cls._default_serializer
-        if (((serializer == cls._default_serializer)
-             and (cls._default_serializer_class is not None))):
-            seri_cls = cls._default_serializer_class
-        else:
-            seri_cls = import_component('serializer', serializer)
+        seri_cls = import_component('serializer', serializer)
         out_seri = seri_cls.get_testing_options(**kwargs)
-        out = {'kwargs': out_seri['kwargs'],
+        out = {'attributes': ['name', 'address', 'direction',
+                              'serializer', 'recv_timeout',
+                              'close_on_eof_recv', 'opp_address',
+                              'opp_comms', 'maxMsgSize'],
+               'kwargs': out_seri['kwargs'],
                'send': copy.deepcopy(out_seri['objects']),
                'msg': out_seri['objects'][0],
                'contents': out_seri['contents'],
@@ -876,11 +858,11 @@ class CommBase(tools.YggClass):
         Args:
             nindent (int, optional): Number of tabs that should be used to
                 indent each line. Defaults to 0.
-            extra_lines_before (list, optional): Additional lines that should be
-                added to the beginning of the default print message. Defaults to
-                empty list if not provided.
-            extra_lines_after (list, optional): Additional lines that should be
-                added to the end of the default print message. Defaults to
+            extra_lines_before (list, optional): Additional lines that should
+                be added to the beginning of the default print message.
+                Defaults to empty list if not provided.
+            extra_lines_after (list, optional): Additional lines that should
+                be added to the end of the default print message. Defaults to
                 empty list if not provided.
                 
         Returns:
@@ -973,7 +955,7 @@ class CommBase(tools.YggClass):
                 try:
                     drv = import_component('model', language)
                     out = drv.is_comm_installed(commtype=cls._commtype)
-                except ValueError:
+                except ComponentError:
                     out = False
         return out
 
@@ -1378,7 +1360,7 @@ class CommBase(tools.YggClass):
     @property
     def eof_msg(self):
         r"""str: Message indicating EOF."""
-        return YGG_MSG_EOF
+        return constants.YGG_MSG_EOF
 
     def is_eof(self, msg):
         r"""Determine if a message is an EOF.
@@ -1532,9 +1514,9 @@ class CommBase(tools.YggClass):
             bool: True if the object is empty, False otherwise.
 
         """
-        from yggdrasil.tests import assert_equal
         try:
-            assert_equal(msg, emsg, dont_print_diff=True)
+            from yggdrasil.tests import assert_equal
+            assert_equal(msg, emsg)
         except AssertionError:
             return False
         return True
@@ -2025,7 +2007,7 @@ class CommBase(tools.YggClass):
         # Make duplicates
         once_per_partner = ((msg.flag == FLAG_EOF)
                             or (isinstance(msg.args, bytes)
-                                and (msg.args == YGG_CLIENT_EOF)))
+                                and (msg.args == constants.YGG_CLIENT_EOF)))
         if once_per_partner and (self.partner_copies > 1):
             self.debug("Sending %s to %d model(s)", msg.args,
                        self.partner_copies)

@@ -1,3 +1,4 @@
+from yggdrasil import constants
 from yggdrasil.drivers.ConnectionDriver import ConnectionDriver, run_remotely
 from yggdrasil.drivers.RPCResponseDriver import RPCResponseDriver
 from yggdrasil.communication import CommBase
@@ -109,7 +110,7 @@ class RPCRequestDriver(ConnectionDriver):
             clients = self.clients
             if (direction == "input") and (name in clients) and (len(clients) > 1):
                 super(RPCRequestDriver, self).send_message(
-                    CommBase.CommMessage(args=CommBase.YGG_CLIENT_EOF,
+                    CommBase.CommMessage(args=constants.YGG_CLIENT_EOF,
                                          flag=CommBase.FLAG_SUCCESS),
                     header_kwargs={'raw': True, 'model': name},
                     skip_processing=True)
@@ -172,7 +173,7 @@ class RPCRequestDriver(ConnectionDriver):
         if msg.flag != CommBase.FLAG_EOF:
             # Remove client that signed off
             if ((msg.header.get('raw', False)
-                 and (msg.args == CommBase.YGG_CLIENT_EOF))):  # pragma: intermittent
+                 and (msg.args == constants.YGG_CLIENT_EOF))):  # pragma: intermittent
                 self.remove_model('input', msg.header['model'])
                 return True
             with self.lock:

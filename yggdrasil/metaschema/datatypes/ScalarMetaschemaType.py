@@ -2,12 +2,12 @@ import numpy as np
 import copy
 import warnings
 import base64
-from yggdrasil import units
+from yggdrasil import units, constants
+from yggdrasil.metaschema import data2dtype, definition2dtype
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.datatypes.FixedMetaschemaType import (
     create_fixed_type_class)
-from yggdrasil.metaschema.properties import (
-    get_metaschema_property, ScalarMetaschemaProperties)
+from yggdrasil.metaschema.properties import get_metaschema_property
 
 
 class ScalarMetaschemaType(MetaschemaType):
@@ -25,7 +25,7 @@ class ScalarMetaschemaType(MetaschemaType):
     definition_properties = ['subtype']
     metadata_properties = ['subtype', 'precision', 'units']
     extract_properties = ['subtype', 'precision', 'units']
-    python_types = ScalarMetaschemaProperties._all_python_scalars
+    python_types = units.ALL_PYTHON_SCALARS_WITH_UNITS
 
     @classmethod
     def validate(cls, obj, raise_errors=False):
@@ -44,13 +44,12 @@ class ScalarMetaschemaType(MetaschemaType):
             obj = obj.reshape((1, ))[0]
         if super(ScalarMetaschemaType, cls).validate(units.get_data(obj),
                                                      raise_errors=raise_errors):
-            dtype = ScalarMetaschemaProperties.data2dtype(obj)
+            dtype = data2dtype(obj)
             if cls.is_fixed and ('subtype' in cls.fixed_properties):
                 type_list = [
-                    ScalarMetaschemaProperties._valid_types[
-                        cls.fixed_properties['subtype']]]
+                    constants.VALID_TYPES[cls.fixed_properties['subtype']]]
             else:
-                type_list = ScalarMetaschemaProperties._valid_numpy_types
+                type_list = constants.NUMPY_TYPES
             if dtype.name.startswith(tuple(type_list)):
                 return True
             else:
@@ -103,7 +102,7 @@ class ScalarMetaschemaType(MetaschemaType):
                 else:
                     obj = str(obj)
             else:
-                dtype = ScalarMetaschemaProperties._python_scalars[
+                dtype = units.PYTHON_SCALARS_WITH_UNITS[
                     cls.fixed_properties['subtype']][0]
                 try:
                     obj = dtype(obj)
@@ -183,7 +182,7 @@ class ScalarMetaschemaType(MetaschemaType):
 
         """
         bytes = base64.decodebytes(obj.encode('ascii'))
-        dtype = ScalarMetaschemaProperties.definition2dtype(typedef)
+        dtype = definition2dtype(typedef)
         arr = np.frombuffer(bytes, dtype=dtype)
         # arr = np.fromstring(bytes, dtype=dtype)
         if 'shape' in typedef:
@@ -210,7 +209,7 @@ class ScalarMetaschemaType(MetaschemaType):
         typedef0 = cls.encode_type(obj)
         typedef1 = copy.deepcopy(typedef0)
         typedef1.update(**typedef)
-        dtype = ScalarMetaschemaProperties.definition2dtype(typedef1)
+        dtype = definition2dtype(typedef1)
         arr = cls.to_array(obj).astype(dtype, casting='same_kind')
         out = cls.from_array(arr, unit_str=typedef0.get('units', None),
                              dtype=dtype, typedef=typedef)
@@ -231,7 +230,7 @@ class ScalarMetaschemaType(MetaschemaType):
         if isinstance(obj_nounits, np.ndarray):
             arr = obj_nounits
         else:
-            dtype = ScalarMetaschemaProperties.data2dtype(obj_nounits)
+            dtype = data2dtype(obj_nounits)
             arr = np.array([obj_nounits], dtype=dtype)
         return arr
         
@@ -255,9 +254,9 @@ class ScalarMetaschemaType(MetaschemaType):
 
         """
         # if (typedef is None) and (dtype is not None):
-        #     typedef = ScalarMetaschemaProperties.dtype2definition(dtype)
+        #     typedef = dtype2definition(dtype)
         # elif (dtype is None) and (typedef is not None):
-        #     dtype = ScalarMetaschemaProperties.definition2dtype(typedef)
+        #     dtype = definition2dtype(typedef)
         if (cls.name not in ['1darray', 'ndarray']) and (arr.ndim > 0):
             out = arr[0]
         else:
@@ -267,7 +266,7 @@ class ScalarMetaschemaType(MetaschemaType):
             out = cls.as_python_type(out, typedef)
         if unit_str is not None:
             if dtype is None:
-                dtype = ScalarMetaschemaProperties.data2dtype(out)
+                dtype = data2dtype(out)
             out = units.add_units(out, unit_str, dtype=dtype)
         return out
 
@@ -285,7 +284,7 @@ class ScalarMetaschemaType(MetaschemaType):
         """
         out = super(ScalarMetaschemaType, cls).get_extract_properties(metadata)
         dtype = metadata.get('subtype', metadata['type'])
-        if (((dtype in ScalarMetaschemaProperties._flexible_types)
+        if (((dtype in constants.FLEXIBLE_TYPES)
              and (metadata['type'] not in ['1darray', 'ndarray'])
              and (not metadata.get('fixed_precision', False)))):
             out.remove('precision')
@@ -308,7 +307,7 @@ class ScalarMetaschemaType(MetaschemaType):
         if ((isinstance(typedef, dict)
              and (typedef.get('type', '1darray') not in ['1darray', 'ndarray']))):
             stype = typedef.get('subtype', typedef.get('type', None))
-            py_type = ScalarMetaschemaProperties._python_scalars[stype][0]
+            py_type = units.PYTHON_SCALARS_WITH_UNITS[stype][0]
             if np.dtype(py_type) == type(obj):
                 obj = py_type(obj)
         return obj
@@ -324,7 +323,7 @@ class ScalarMetaschemaType(MetaschemaType):
             object: Python object of the specified type.
 
         """
-        dtype = ScalarMetaschemaProperties.definition2dtype(typedef)
+        dtype = definition2dtype(typedef)
         if typedef['type'] == '1darray':
             out = np.zeros(typedef.get('length', 2), dtype)
         elif typedef['type'] == 'ndarray':
@@ -336,7 +335,7 @@ class ScalarMetaschemaType(MetaschemaType):
 
 
 # Dynamically create explicity scalar classes for shorthand
-for t in ScalarMetaschemaProperties._valid_types.keys():
+for t in constants.VALID_TYPES.keys():
     short_doc = 'A %s value with or without units.' % t
     long_doc = ('%s\n\n'
                 '    Developer Notes:\n'
@@ -344,6 +343,6 @@ for t in ScalarMetaschemaProperties._valid_types.keys():
     kwargs = {'target_globals': globals(),
               '__doc__': long_doc,
               '__module__': ScalarMetaschemaType.__module__,
-              'python_types': ScalarMetaschemaProperties._python_scalars[t]}
+              'python_types': units.PYTHON_SCALARS_WITH_UNITS[t]}
     create_fixed_type_class(t, short_doc, ScalarMetaschemaType,
                             {'subtype': t}, **kwargs)

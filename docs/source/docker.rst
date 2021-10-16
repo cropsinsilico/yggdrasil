@@ -83,7 +83,7 @@ Then the Dockerfile that will be able to run those services is
 
 .. code-block:: docker
 
-   FROM cropsinsilico/yggdrasil-service:1.7.0
+   FROM cropsinsilico/yggdrasil-service:v1.8.0
    COPY services.yml .
    COPY foo ./foo
    COPY bar ./bar

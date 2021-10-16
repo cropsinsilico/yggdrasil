@@ -157,17 +157,26 @@ class ForkComm(CommBase.CommBase):
             x.disconnect()
         super(ForkComm, self).disconnect()
         
-    def printStatus(self, nindent=0, return_str=False, **kwargs):
-        r"""Print status of the communicator."""
-        out = super(ForkComm, self).printStatus(nindent=nindent,
-                                                return_str=return_str,
-                                                **kwargs)
-        for x in self.comm_list:
-            x_out = x.printStatus(nindent=nindent + 1, return_str=return_str)
-            if return_str:
-                out += '\n' + x_out
-        return out
+    def get_status_message(self, **kwargs):
+        r"""Return lines composing a status message.
+        
+        Args:
+            **kwargs: Keyword arguments are passed on to the parent class's
+                method.
+                
+        Returns:
+            tuple(list, prefix): Lines composing the status message and the
+                prefix string used for the last message.
 
+        """
+        nindent = kwargs.get('nindent', 0)
+        extra_lines_after = ['%-15s: %s' % ('pattern', self.pattern)]
+        for x in self.comm_list:
+            extra_lines_after += x.get_status_message(nindent=nindent + 1)[0]
+        extra_lines_after += kwargs.get('extra_lines_after', [])
+        kwargs['extra_lines_after'] = extra_lines_after
+        return super(ForkComm, self).get_status_message(**kwargs)
+        
     def __len__(self):
         return len(self.comm_list)
 

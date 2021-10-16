@@ -1,4 +1,4 @@
-from yggdrasil.serialize import _default_newline_str
+from yggdrasil import constants
 from yggdrasil.serialize.SerializeBase import SerializeBase
 from yggdrasil.metaschema.datatypes.PlyMetaschemaType import PlyDict
 
@@ -25,7 +25,7 @@ class PlySerialize(SerializeBase):
     _schema_subtype_description = ('Serialize 3D structures using Ply format.')
     _schema_properties = {
         'newline': {'type': 'string',
-                    'default': _default_newline_str}}
+                    'default': constants.DEFAULT_NEWLINE_STR}}
     default_datatype = {'type': 'ply'}
     concats_as_str = False
 

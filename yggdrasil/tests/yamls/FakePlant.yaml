@@ -6,7 +6,6 @@
   language: python
   inputs:
   - name: photosynthesis_rate
-    commtype: default
     datatype:
       type: bytes
     default_file:
@@ -14,11 +13,16 @@
       filetype: table
   outputs:
   - name: growth_rate
-    commtype: default
     datatype:
       type: bytes
     default_file:
       name: ./Output/output.txt
       filetype: table
   repository_url: https://github.com/cropsinsilico/example-fakemodel
+  repository_commit: 498d04b7c98078fbd8d608f860882dc571476fd8
   description: Example model submission
+  validation_command: validate.py
+  dependencies:
+  - numpy
+  additional_dependencies:
+    c++: [cmake]

@@ -2,6 +2,17 @@
 History
 =======
 
+1.8.1 (2021-10-15) Minor updates to support model submission form development
+------------------
+
+* Added --model_repository option to the integration-service-manager CLI
+* Preload models from the model repository into the service manager registry
+* Added validation_command option to model schema that can be used to validate a run on completion via the 'validate' runner option
+* Added dependencies and additional_dependencies options to model schema that can be used to specify packages that should be installed for a model
+* Refactor registration to use constants to prevent failure on circular import and speed up import time
+* Migrate constants into the constants module
+* Fix various bugs introduced by updates to GHA images and dependencies by pinning or updating use (e.g. jsonschema, libroadrunner, mac version, R version)
+
 1.8.0 (2021-09-15) Support for REST API based communicators, running integrations as services, and connecting to remote integration services
 ------------------
 
