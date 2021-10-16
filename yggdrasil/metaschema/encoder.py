@@ -40,7 +40,7 @@ def string2import(s):
         try:
             mod = importlib.import_module(pkg_mod[0])
             s = getattr(mod, pkg_mod[1])
-        except (ImportError, AttributeError):
+        except (ImportError, AttributeError):  # pragma: debug
             pass
     return s
 
