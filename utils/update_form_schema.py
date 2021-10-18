@@ -19,7 +19,7 @@ def update_schema(token):
     repo_name = "cropsinsilico/model_submission_form"
     msg = f"Update model form schema to version for yggdrasil {ver}"
     branch = f"schema-update-{ver}"
-    schema = "static/model.json"
+    schema = "model_submission_form/static/model.json"
     gh = Github(token)
     repo = gh.get_repo(repo_name)
     main = repo.get_branch('main')
