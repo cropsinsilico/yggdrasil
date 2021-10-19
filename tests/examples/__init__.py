@@ -5,7 +5,7 @@ import tempfile
 import shutil
 import importlib
 from yggdrasil.components import import_component
-from yggdrasil import runner, tools, platform, constants
+from yggdrasil import runner, tools, platform
 from yggdrasil.examples import (
     get_example_yaml, get_example_source, get_example_languages,
     ext_map, display_example, source)
@@ -62,21 +62,20 @@ _examples = sorted([x for x in source.keys() if x not in
                      'timed_pipe', 'transforms', 'types',
                      # Below have explicit tests so they can be run with MPI
                      'gs_lesson4', 'rpc_lesson3b', 'model_error_with_io']])
-_languages = sorted(constants.LANGUAGES['all'])
 
 
 @pytest.mark.suite("examples", disabled=True)
 class TestExample(base_class):
     r"""Base class for running examples."""
 
-    examples = _examples
+    parametrize_example_name = _examples
 
-    @pytest.fixture(scope="class")  # , params=_examples)
+    @pytest.fixture(scope="class")
     def example_name(self, request):
         r"""str: Name of example being tested."""
         return request.param
 
-    @pytest.fixture(scope="class", autouse=True)  # , params=_languages)
+    @pytest.fixture(scope="class", autouse=True)
     def language(self, request, example_name, check_required_languages):
         r"""str: Language of the currect test."""
         avail_langs = get_example_languages(example_name)
@@ -146,26 +145,6 @@ class TestExample(base_class):
             else:
                 os.environ[k] = v
 
-    @pytest.fixture(scope="class", autouse=True, params=[_default_comm])
-    def commtype(self, request, check_required_comms, change_default_comm,
-                 language, running_service):
-        r"""str: Comm used by the current test."""
-        out = request.param
-        check_required_comms([out], language=language)
-        with change_default_comm(out):
-            if out == 'ipc':
-                from yggdrasil.communication.IPCComm import (
-                    ipcrm_queues, ipc_queues)
-                qlist = ipc_queues()
-                if qlist:  # pragma: debug
-                    print('Existing queues:', qlist)
-                    ipcrm_queues()
-            if out == 'rest':
-                with running_service('flask', partial_commtype='rest'):
-                    yield out
-            else:
-                yield out
-        
     @pytest.fixture
     def namespace(self, example_name, uuid):
         r"""str: Namespace for the example."""
@@ -300,7 +279,7 @@ class TestExample(base_class):
         return example_cleanup_w
     
     def test_example(self, example_name, language, namespace, yaml,
-                     commtype, setup_env, expects_error, on_mpi,
+                     setup_env, expects_error, on_mpi,
                      mpi_rank, check_results, example_cleanup,
                      adv_global_mpi_tag):
         r"""This runs an example in the correct language."""

@@ -16,10 +16,10 @@ class TestForkComm(base_class):
         from yggdrasil.communication.ForkComm import ForkComm
         return ForkComm
     
-    @pytest.fixture(scope="class", autouse=True, params=["fork"])
-    def component_subtype(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
+    @pytest.fixture(scope="class", autouse=True)
+    def commtype(self):
+        r"""Communicator type being tested."""
+        return "fork"
 
     @pytest.fixture(scope="class", autouse=True)
     def ncomm(self):

@@ -9,15 +9,15 @@ class TestZMQComm(base_class):
     test_send_recv_nolimit = None
     test_eof_no_close = None
 
-    @pytest.fixture(scope="class", autouse=True, params=["zmq"])
-    def component_subtype(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
+    @pytest.fixture(scope="class", autouse=True)
+    def commtype(self):
+        r"""Communicator type being tested."""
+        return "zmq"
 
-    @pytest.fixture(scope="class", autouse=True, params=[False])
-    def use_async(self, request):
+    @pytest.fixture(scope="class", autouse=True)
+    def use_async(self):
         r"""Whether communicator should be asynchronous or not."""
-        return request.param
+        return False
 
     @pytest.fixture(scope="class", autouse=True,
                     params=["inproc", "tcp", "ipc"])

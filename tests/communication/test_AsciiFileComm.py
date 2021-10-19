@@ -5,10 +5,10 @@ from tests.communication.test_FileComm import TestFileComm as base_class
 class TestAsciiFileComm(base_class):
     r"""Test for AsciiFileComm communication class."""
 
-    @pytest.fixture(scope="class", autouse=True, params=["ascii"])
-    def component_subtype(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
+    @pytest.fixture(scope="class", autouse=True)
+    def filetype(self):
+        r"""Communicator type being tested."""
+        return "ascii"
 
     def test_send_recv_comment(self, send_comm, recv_comm, testing_options):
         r"""Test send/recv with commented message."""

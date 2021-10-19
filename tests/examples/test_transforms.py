@@ -16,11 +16,11 @@ _untyped_lang = tuple([k for k, v in constants.LANGUAGE_PROPERTIES.items()
 class TestExampleTransforms(base_class):
     r"""Test the Transforms example."""
 
-    examples = ['transforms']
-    languages = _untyped_lang
+    parametrize_example_name = ['transforms']
+    parametrize_language = _untyped_lang
+    parametrize_transform = ['table', 'array', 'pandas']
 
-    @pytest.fixture(scope="class", autouse=True,
-                    params=['table', 'array', 'pandas'])
+    @pytest.fixture(scope="class", autouse=True)
     def transform(self, request):
         r"""str: Transform being tested."""
         return request.param

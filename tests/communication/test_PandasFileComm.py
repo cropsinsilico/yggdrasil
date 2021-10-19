@@ -9,10 +9,10 @@ from tests.communication.test_AsciiTableComm import (
 class TestPandasFileComm(base_class):
     r"""Test for PandasFileComm communication class."""
 
-    @pytest.fixture(scope="class", autouse=True, params=["pandas"])
-    def component_subtype(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
+    @pytest.fixture(scope="class", autouse=True)
+    def filetype(self):
+        r"""Communicator type being tested."""
+        return "pandas"
 
     @pytest.fixture(scope="class", autouse=True,
                     params=[{}, {'no_names': True}])
@@ -31,10 +31,10 @@ class TestPandasFileComm(base_class):
 class TestPandasFileComm_single(TestPandasFileComm):
     r"""Test for PandasFileComm communication class with field names sent."""
 
-    @pytest.fixture(scope="class", autouse=True, params=[{}])
-    def options(self, request):
+    @pytest.fixture(scope="class", autouse=True)
+    def options(self):
         r"""Arguments that should be provided when getting testing options."""
-        return request.param
+        return {}
     
     @pytest.fixture(scope="class")
     def testing_options(self):

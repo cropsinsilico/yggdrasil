@@ -20,26 +20,32 @@ class TestConnectionDriver(base_class):
     r"""Test class for the ConnectionDriver class."""
 
     _component_type = 'connection'
+    parametrize_commtype = [_default_comm]
 
-    @pytest.fixture(scope="class", params=['connection'])
-    def component_subtype(self, request):
+    @pytest.fixture(scope="class")
+    def component_subtype(self):
         r"""Subtype of component being tested."""
+        return 'connection'
+
+    @pytest.fixture(scope="class")
+    def default_comm(self):
+        r"""str: Name of the default communicator."""
+        return _default_comm
+
+    @pytest.fixture(scope="class")
+    def commtype(self, request):
+        r"""str: Name of the communicator being tested."""
         return request.param
 
     @pytest.fixture(scope="class")
-    def comm_name(self):
-        r"""str: Name of the communicator being tested."""
-        return _default_comm
-
-    @pytest.fixture(scope="class", params=[_default_comm])
-    def icomm_name(self, request):
+    def icomm_name(self, default_comm):
         r"""str: Name of the input communicator being tested."""
-        return request.param
+        return default_comm
     
-    @pytest.fixture(scope="class", params=[_default_comm])
-    def ocomm_name(self, request):
+    @pytest.fixture(scope="class")
+    def ocomm_name(self, default_comm):
         r"""str: Name of the output communicator being tested."""
-        return request.param
+        return default_comm
 
     @pytest.fixture(scope="class", autouse=True)
     def running_service_for_comms(self, icomm_name, ocomm_name,
@@ -57,9 +63,9 @@ class TestConnectionDriver(base_class):
                    instance.ocomm.maxMsgSize)
 
     @pytest.fixture(scope="class")
-    def is_output(self, comm_name, ocomm_name):
+    def is_output(self, default_comm, ocomm_name):
         r"""bool: True if the connection is for output."""
-        return (ocomm_name != comm_name)
+        return (ocomm_name != default_comm)
 
     @pytest.fixture(scope="class")
     def test_msg(self, testing_options):
@@ -528,6 +534,8 @@ _comm_types = sorted(
 class TestOutputDriver(TestConnectionDriver):
     r"""Test output drivers for supported comm types."""
 
+    parametrize_commtype = [x for x in _comm_types if x not in ['value']]
+
     @pytest.fixture(scope="class")
     def component_subtype(self):
         r"""Subtype of component being tested."""
@@ -538,15 +546,16 @@ class TestOutputDriver(TestConnectionDriver):
         r"""Arguments for a new instance of the tested class."""
         return (name, 'test')
     
-    @pytest.fixture(scope="class", params=[x for x in _comm_types
-                                           if x not in ['value']])
-    def ocomm_name(self, request):
+    @pytest.fixture(scope="class")
+    def ocomm_name(self, commtype):
         r"""str: Name of the output communicator being tested."""
-        return request.param
+        return commtype
 
 
 class TestInputDriver(TestConnectionDriver):
     r"""Test input drivers for supported comm types."""
+
+    parametrize_commtype = _comm_types
 
     @pytest.fixture(scope="class")
     def component_subtype(self):
@@ -558,7 +567,7 @@ class TestInputDriver(TestConnectionDriver):
         r"""Arguments for a new instance of the tested class."""
         return (name, 'test')
     
-    @pytest.fixture(scope="class", params=_comm_types)
-    def icomm_name(self, request):
+    @pytest.fixture(scope="class")
+    def icomm_name(self, commtype):
         r"""str: Name of the input communicator being tested."""
-        return request.param
+        return commtype

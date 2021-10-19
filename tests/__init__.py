@@ -276,10 +276,10 @@ class TestComponentBase(TestClassBase):
         cls = import_component(component_type, component_subtype)
         return cls
 
-    @pytest.fixture(scope="class", autouse=True, params=[{}])
-    def options(self, request):
+    @pytest.fixture(scope="class", autouse=True)
+    def options(self):
         r"""Arguments that should be provided when getting testing options."""
-        return request.param
+        return {}
 
     @pytest.fixture(scope="class")
     def testing_options(self, python_class, options):

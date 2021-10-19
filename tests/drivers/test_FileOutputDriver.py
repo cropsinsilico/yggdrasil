@@ -2,7 +2,7 @@ import pytest
 import os
 from yggdrasil import constants
 from tests.drivers.test_ConnectionDriver import (
-    TestConnectionDriver as base_class)
+    TestOutputDriver as base_class)
 
 
 _filetypes = sorted(constants.COMPONENT_REGISTRY['file']['subtypes'].keys())
@@ -11,6 +11,8 @@ _filetypes = sorted(constants.COMPONENT_REGISTRY['file']['subtypes'].keys())
 class TestFileOutputDriver(base_class):
     r"""Test class for FileOutputDriver."""
 
+    parametrize_filetype = _filetypes
+    
     test_send_recv = None
     test_send_recv_nolimit = None
     test_send_recv_closed = None
@@ -20,10 +22,15 @@ class TestFileOutputDriver(base_class):
         r"""Subtype of component being tested."""
         return 'file_output'
 
-    @pytest.fixture(scope="class", params=_filetypes)
-    def ocomm_name(self, request):
-        r"""str: Name of the input communicator being tested."""
+    @pytest.fixture(scope="class")
+    def filetype(self, request):
+        r"""str: Name of the file type being tested."""
         return request.param
+
+    @pytest.fixture(scope="class")
+    def commtype(self, filetype):
+        r"""str: Name of the communicator being tested."""
+        return filetype
 
     @pytest.fixture
     def instance_args(self, name, filepath):
@@ -104,8 +111,8 @@ class TestAsciiTableArrayOutputDriver(TestFileOutputDriver):
     r"""Test class for FileOutputDriver reading to a table as an array."""
 
     @pytest.fixture(scope="class")
-    def ocomm_name(self):
-        r"""str: Name of the output communicator being tested."""
+    def filetype(self):
+        r"""str: Name of the file type being tested."""
         return 'table'
 
     @pytest.fixture(scope="class")

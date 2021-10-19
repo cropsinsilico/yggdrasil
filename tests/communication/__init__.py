@@ -42,19 +42,20 @@ _communicators = sorted([x for x in get_supported_comm()
 class BaseComm(TestComponentBase):
 
     _component_type = 'comm'
+    parametrize_commtype = _communicators
+    parametrize_use_async = [False, True]
 
-    @pytest.fixture(scope="class", autouse=True,
-                    params=_communicators)
-    def component_subtype(self, request):
+    @pytest.fixture(scope="class", autouse=True)
+    def component_subtype(self, commtype):
         r"""Subtype of component being tested."""
+        return commtype
+
+    @pytest.fixture(scope="class", autouse=True)
+    def commtype(self, request):
+        r"""Communicator type being tested."""
         return request.param
 
     @pytest.fixture(scope="class", autouse=True)
-    def commtype(self, component_subtype):
-        r"""Communicator type being tested."""
-        return component_subtype
-
-    @pytest.fixture(scope="class", autouse=True, params=[False, True])
     def use_async(self, request):
         r"""Whether communicator should be asynchronous or not."""
         return request.param

@@ -44,25 +44,36 @@ _filetypes = sorted([x for x in schema.get_schema()['file'].subtypes
 
 
 @pytest.mark.usefixtures("unyts_equality_patch")
-@pytest.mark.suite("files")
+@pytest.mark.suite("files", ignore="comms")
 class TestFileComm(base_class):
     r"""Test for FileComm communication class."""
 
     _component_type = 'file'
+    parametrize_filetype = _filetypes
 
     test_send_recv_nolimit = None
     test_work_comm = None
     test_send_recv_raw = None
     
-    @pytest.fixture(scope="class", autouse=True, params=_filetypes)
-    def component_subtype(self, request):
+    @pytest.fixture(scope="class", autouse=True)
+    def component_subtype(self, filetype):
         r"""Subtype of component being tested."""
+        return filetype
+
+    @pytest.fixture(scope="class", autouse=True)
+    def filetype(self, request):
+        r"""Communicator type being tested."""
         return request.param
 
-    @pytest.fixture(scope="class", autouse=True, params=[False])
-    def use_async(self, request):
+    @pytest.fixture(scope="class", autouse=True)
+    def commtype(self, filetype):
+        r"""Communicator type being tested."""
+        return filetype
+
+    @pytest.fixture(scope="class", autouse=True)
+    def use_async(self):
         r"""Whether communicator should be asynchronous or not."""
-        return request.param
+        return False
     
     def get_send_comm_kwargs(self, *args, **kwargs):
         r"""Get keyword arguments for creating a send comm."""
@@ -89,6 +100,11 @@ class TestFileComm(base_class):
         r"""Communicator for receiving messages."""
         return recv_comm
 
+    @pytest.fixture
+    def global_comm(self, global_recv_comm):
+        r"""Global communicator."""
+        return global_recv_comm
+    
     @pytest.fixture(scope="class")
     def maxMsgSize(self):
         r"""int: Maximum message size."""
@@ -221,17 +237,15 @@ class TestFileComm(base_class):
 class TestFileComm_readline(TestFileComm):
     r"""Test for FileComm communication class with read_meth = 'readline'."""
 
-    @pytest.fixture(scope="class", autouse=True,
-                    params=['ascii'])
-    def component_subtype(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
+    @pytest.fixture(scope="class", autouse=True)
+    def filetype(self):
+        r"""Communicator type being tested."""
+        return "ascii"
 
-    @pytest.fixture(scope="class", autouse=True,
-                    params=[{'read_meth': 'readline'}])
+    @pytest.fixture(scope="class", autouse=True)
     def options(self, request):
         r"""Arguments that should be provided when getting testing options."""
-        return request.param
+        return {'read_meth': 'readline'}
     
     def get_recv_comm_kwargs(self, *args, **kwargs):
         r"""Get keyword arguments for creating a recv comm."""

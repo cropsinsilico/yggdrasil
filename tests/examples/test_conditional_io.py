@@ -8,7 +8,7 @@ from yggdrasil.components import create_component
 class TestExampleConditionalIO(base_class):
     r"""Test the conditional_io example."""
 
-    examples = ['conditional_io']
+    parametrize_example_name = ['conditional_io']
 
     @pytest.fixture
     def expected_output_files(self, yamldir):

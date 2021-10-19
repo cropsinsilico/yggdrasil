@@ -16,7 +16,7 @@ _typed_lang = tuple([k for k, v in constants.LANGUAGE_PROPERTIES.items()
                      if (v['full_language'] and v['is_typed'])])
 
 
-@pytest.mark.suite("types", disabled=True, exclusive=True)
+@pytest.mark.suite("types", disabled=True, ignore="examples")
 class TestExampleTypes(base_class):
     r"""Test the Types example."""
 

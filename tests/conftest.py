@@ -2,13 +2,14 @@ import os
 import gc
 import re
 import sys
+import glob
 import shutil
 import pytest
 import logging
 import subprocess
 import contextlib
 from yggdrasil import platform, constants
-from yggdrasil.tools import get_supported_lang
+from yggdrasil.tools import get_supported_lang, get_supported_comm
 from yggdrasil.components import import_component
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
 logger = logging.getLogger(__name__)
@@ -21,10 +22,20 @@ _weakref_registry = []
 _markers = [
     ("long_running", "--long-running",
      "tests that take a long time to run", None),
-    ("extra_example", "--with-extra-examples",
+    ("extra_example", "--extra-examples",
      "tests for superfluous examples", None),
     ("production_run", "--production-run", None)
 ]
+_params = {
+    "example_name": [],
+    "language": sorted(constants.LANGUAGES['all']),
+    "commtype": sorted(get_supported_comm()),
+    "filetype": sorted(list(
+        constants.COMPONENT_REGISTRY["file"]["subtypes"].keys())),
+    "use_async": [False, True],
+    "transform": None,
+    "filter": None,
+}
 _mpi_paths = [
     os.path.join("communication", "test_MPIComm.py"),
     os.path.join("examples", "test_gs_lesson4.py"),
@@ -34,7 +45,8 @@ if platform._is_win:
     _example1_pattern = "[a-g]*"
 else:
     _example1_pattern = "[A-Za-g]*"
-    _mpi_paths.append(os.path.join("examples", "test_model_error_with_io.py"))
+    _mpi_paths.append(
+        os.path.join("examples", "test_model_error_with_io.py"))
 _suites = [
     ("top", "tests without an explicit suite", [""], []),
     ("examples", "examples", ["examples"], []),
@@ -56,8 +68,7 @@ _suites = [
       os.path.join("drivers", "test_RPCRequestDriver.py")], []),
     ("models", "model drivers",
      [os.path.join("drivers", "test_*ModelDriver.py")], []),
-    ("mpi", "MPI based communication", _mpi_paths,
-     ["--suite=examples", "--suite=comms"]),
+    ("mpi", "MPI based communication", _mpi_paths, []),
 ]
 
 
@@ -177,8 +188,8 @@ def pytest_cmdline_preparse(args, dont_exit=False):
         else:
             idx = args.index(x)
             suite = args[idx + 1]
-        suite_files += [os.path.join(_test_directory, f)
-                        for f in suite_map[suite][0]]
+        for f in suite_map[suite][0]:
+            suite_files += glob.glob(os.path.join(_test_directory, f))
         args += suite_map[suite][1]
     if suite_files:
         existing_files = [x for x in args if
@@ -186,7 +197,7 @@ def pytest_cmdline_preparse(args, dont_exit=False):
                           or (os.path.isfile(x.split('::')[0])
                               and (x.split('::')[0].endswith(".py")))]
         if not existing_files:
-            args += suite_files
+            args += ['--end-yggdrasil-opts'] + sorted(suite_files)
 
 
 def pytest_addoption(parser):
@@ -194,6 +205,12 @@ def pytest_addoption(parser):
     for x in _markers:
         parser.addoption(x[1], action="store_true", default=False,
                          help=f"run {x[2]} tests")
+    for k, v in _params.items():
+        if v is None:
+            v = sorted(list(constants.COMPONENT_REGISTRY[k]["subtypes"].keys()))
+        parser.addoption(f"--parametrize-{k.replace('_', '-')}",
+                         help=f"Set '{k}' test parameter", nargs='*',
+                         choices=v)
     parser.addoption('--ci', action='store_true',
                      help=('Perform additional operations required for '
                            'testing on continuous integration services.'))
@@ -207,16 +224,16 @@ def pytest_addoption(parser):
                          constants.COMPONENT_REGISTRY['comm']['subtypes'].keys()),
                      help="Communicator that should be used by default.")
     parser.addoption('--suite', '--suites', '--test-suite',
-                     type=str, action="append",
-                     choices=[x[0] for x in _suites],
+                     # type=str, action="extend",  # python >= 3.8
+                     nargs='*', choices=[x[0] for x in _suites],
                      help="Test suite that should be run.")
     parser.addoption('--language', '--languages',
-                     type=str, action="append",
-                     choices=languages,
+                     # type=str, action="extend",  # python >= 3.8
+                     nargs='*', choices=languages,
                      help="Language(s) that should be tested.")
     parser.addoption('--skip-language', '--skip-languages',
-                     type=str, action="append",
-                     choices=languages,
+                     # type=str, action="extend",  # python >= 3.8
+                     nargs='*', choices=languages,
                      help="Language(s) that should be tested.")
     parser.addoption('--write-script', type=str,
                      help=("Name of script that should be created to run "
@@ -228,18 +245,18 @@ def pytest_addoption(parser):
                      help="Flags for an additional test that should be run")
     parser.addoption('--nocapture', action="store_true",
                      help="Don't capture output or log messages from tests.")
+    parser.addoption('--end-yggdrasil-opts', action="store_true",
+                     help="Internal use only")
 
 
 def pytest_configure(config):
     for x in _markers:
         config.addinivalue_line("markers", f"{x[0]}: {x[2]}")
     config.addinivalue_line(
-        "markers", ("suite(name,disabled=False,exclusive=False): mark test "
+        "markers", ("suite(name,disabled=False,ignore=[]): mark test "
                     "as belonging to a group of tests, whether or not the "
-                    "suite should be disabled by default (defaults to "
-                    "False), and if the test should only be run on the basis "
-                    "of the registered suite, ignoring any suites included "
-                    "by parent classes (defaults to False)."))
+                    "suite should be disabled by default, and suites "
+                    "included by parent classes that should be ignored"))
     config.addinivalue_line(
         "markers", ("language(name): mark test as requiring a language is "
                     "installed"))
@@ -288,6 +305,13 @@ def pytest_collection_modifyitems(config, items):
     for item in items:
         # Suites
         suites = [mark.args[0] for mark in item.iter_markers(name="suite")]
+        for mark in item.iter_markers(name="suite"):
+            ignore = mark.kwargs.get('ignore', [])
+            if isinstance(ignore, str):
+                ignore = [ignore]
+            for suite in ignore:
+                while suite in suites:
+                    suites.remove(suite)
         if 'examples' in suites:
             example_name = item.listnames()[-1].split('[')[-1].split('-')[0]
             if re.match(_example1_pattern, example_name):
@@ -296,20 +320,12 @@ def pytest_collection_modifyitems(config, items):
                 suites.append('examples_part2')
         suites_disabled = [mark.kwargs.get('disabled', False)
                            for mark in item.iter_markers(name="suite")]
-        suites_exclusive = [idx for idx, mark in
-                            enumerate(item.iter_markers(name="suite"))
-                            if mark.kwargs.get('exclusive', False)]
         skip_x = None
         if selected_suites:
             if (((suites and not any(x in selected_suites for x in suites))
                  or (not suites and ('top' not in selected_suites)))):
                 skip_x = pytest.mark.skip(
                     reason=f"none of test's suites ({suites}) selected.")
-            elif suites_exclusive and (suites[suites_exclusive[-1]]
-                                       not in selected_suites):
-                skip_x = pytest.mark.skip(
-                    reason=(f"test's top most exclusive suite "
-                            f"({suites[suites_exclusive[-1]]}) not selected"))
         elif any(suites_disabled):
             skip_x = pytest.mark.skip(
                 reason=f"one of test's suites ({suites}) not selected.")
@@ -351,6 +367,37 @@ def pytest_collection_modifyitems(config, items):
                     pytest.mark.skip(
                         reason=(f"test requires languages {absent_langs!r} "
                                 f"NOT be installed")))
+
+
+def pytest_generate_tests(metafunc):
+    for k, v in _params.items():
+        if k not in metafunc.fixturenames:
+            continue
+        fixture = getattr(metafunc.cls, k, None)
+        if ((fixture
+             and ('request' not in
+                  fixture.__wrapped__.__code__.co_varnames))):
+            continue
+        flag = f"--parametrize-{k.replace('_', '-')}"
+        scope = None
+        if metafunc.config.getoption(flag):
+            params = metafunc.config.getoption(flag)
+        elif metafunc.cls and hasattr(metafunc.cls, f"parametrize_{k}"):
+            params = getattr(metafunc.cls, f"parametrize_{k}")
+            if callable(params):
+                params = params(metafunc)
+            scope = "class"
+        else:
+            if metafunc.cls:
+                scope = "class"
+            else:
+                scope = None
+            if v is None:
+                params = sorted(list(
+                    constants.COMPONENT_REGISTRY[k]["subtypes"].keys()))
+            else:
+                params = v
+        metafunc.parametrize(k, params, indirect=True, scope=scope)
 
 
 def write_pytest_script(fname, argv):

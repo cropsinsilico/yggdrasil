@@ -2,8 +2,7 @@ import pytest
 import os
 import tempfile
 from yggdrasil import constants
-from tests.drivers.test_ConnectionDriver import (
-    TestConnectionDriver as base_class)
+from tests.drivers.test_ConnectionDriver import TestInputDriver as base_class
 
 
 _filetypes = sorted(
@@ -14,6 +13,8 @@ _filetypes = sorted(
 class TestFileInputDriver(base_class):
     r"""Test class for FileInputDriver."""
 
+    parametrize_filetype = _filetypes
+
     test_send_recv = None
     test_send_recv_nolimit = None
     
@@ -22,10 +23,15 @@ class TestFileInputDriver(base_class):
         r"""Subtype of component being tested."""
         return 'file_input'
 
-    @pytest.fixture(scope="class", params=_filetypes)
-    def icomm_name(self, request):
-        r"""str: Name of the input communicator being tested."""
+    @pytest.fixture(scope="class")
+    def filetype(self, request):
+        r"""str: Name of the file type being tested."""
         return request.param
+
+    @pytest.fixture(scope="class")
+    def commtype(self, filetype):
+        r"""str: Name of the communicator being tested."""
+        return filetype
 
     @pytest.fixture
     def instance_args(self, name, filepath):
@@ -81,8 +87,8 @@ class TestPandasInputDriver(TestFileInputDriver):
     r"""Test class for FileInputDriver reading from a pandas table."""
     
     @pytest.fixture(scope="class")
-    def icomm_name(self):
-        r"""str: Name of the input communicator being tested."""
+    def filetype(self):
+        r"""str: Name of the file type being tested."""
         return 'pandas'
 
     @pytest.fixture(scope="class")
@@ -95,8 +101,8 @@ class TestAsciiTableArrayInputDriver(TestFileInputDriver):
     r"""Test class for FileInputDriver reading from a table as an array."""
 
     @pytest.fixture(scope="class")
-    def icomm_name(self):
-        r"""str: Name of the input communicator being tested."""
+    def filetype(self):
+        r"""str: Name of the file type being tested."""
         return 'table'
 
     @pytest.fixture(scope="class")

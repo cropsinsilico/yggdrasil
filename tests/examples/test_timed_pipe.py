@@ -1,18 +1,12 @@
 import pytest
 import os
 from tests.examples import TestExample as base_class
-from yggdrasil.tools import get_supported_comm
 
 
-_commtypes = sorted([x for x in get_supported_comm(dont_include_value=True)
-                     if x not in ['value', 'buffer', 'rmq_async']])
-
-
-@pytest.mark.parametrize("commtype", _commtypes, indirect=True)
 class TestTimedPipeBase(base_class):
     r"""Base class for testing TimedPipe example with various comm types."""
 
-    examples = ['timed_pipe']
+    parametrize_example_name = ['timed_pipe']
 
     @pytest.fixture(scope="class")
     def env(self):
@@ -31,3 +25,25 @@ class TestTimedPipeBase(base_class):
     def output_files(self, tempdir):
         r"""Output file."""
         return [os.path.join(tempdir, 'output_timed_pipe.txt')]
+
+    @pytest.fixture(scope="class", autouse=True)
+    def commtype(self, request, check_required_comms, change_default_comm,
+                 language, running_service):
+        r"""str: Comm used by the current test."""
+        out = request.param
+        if out in ['value', 'buffer', 'rmq_async']:
+            pytest.skip("invalid commtype for integration")
+        check_required_comms([out], language=language)
+        with change_default_comm(out):
+            if out == 'ipc':
+                from yggdrasil.communication.IPCComm import (
+                    ipcrm_queues, ipc_queues)
+                qlist = ipc_queues()
+                if qlist:  # pragma: debug
+                    print('Existing queues:', qlist)
+                    ipcrm_queues()
+            if out == 'rest':
+                with running_service('flask', partial_commtype='rest'):
+                    yield out
+            else:
+                yield out

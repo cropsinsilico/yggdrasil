@@ -11,10 +11,10 @@ from tests import timeout_decorator
 class TestRMQAsyncComm(base_class):
     r"""Test for RMQAsyncComm communication class."""
 
-    @pytest.fixture(scope="class", autouse=True, params=["rmq_async"])
-    def component_subtype(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
+    @pytest.fixture(scope="class", autouse=True)
+    def commtype(self):
+        r"""Communicator type being tested."""
+        return "rmq_async"
 
     @pytest.fixture(autouse=True)
     def ensure_comm(self, send_comm, recv_comm):

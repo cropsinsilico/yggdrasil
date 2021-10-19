@@ -5,6 +5,7 @@ from tests.communication import TestComm as base_class
 import utils
 
 
+@pytest.mark.suite('mpi')
 @pytest.mark.mpi(min_size=2)
 class TestMPIComm(base_class):
     r"""Test class for MPIComm."""
@@ -15,9 +16,9 @@ class TestMPIComm(base_class):
     test_invalid_direction = None
     test_work_comm = None
 
-    @pytest.fixture(scope="class")
-    def component_subtype(self):
-        r"""Subtype of component being tested."""
+    @pytest.fixture(scope="class", autouse=True)
+    def commtype(self):
+        r"""Communicator type being tested."""
         return "mpi"
 
     @pytest.fixture(scope="class")

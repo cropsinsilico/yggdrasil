@@ -7,7 +7,7 @@ from tests.examples import TestExample as base_class
 class TestExampleSaM(base_class):
     r"""Test the SaM example."""
 
-    examples = ["SaM"]
+    parametrize_example_name = ["SaM"]
 
     @pytest.fixture
     def results(self, language):

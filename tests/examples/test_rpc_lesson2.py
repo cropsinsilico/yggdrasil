@@ -6,7 +6,7 @@ from tests.examples import TestExample as base_class
 class TestExampleRPC2(base_class):
     r"""Test the rpc_lesson2 example."""
     
-    examples = ['rpc_lesson2']
+    parametrize_example_name = ['rpc_lesson2']
     niter1 = 3
     niter2 = 5
 

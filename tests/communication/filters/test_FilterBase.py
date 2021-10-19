@@ -1,9 +1,5 @@
 import pytest
 from tests import TestComponentBase as base_class
-from yggdrasil import constants
-
-
-_filters = sorted(constants.COMPONENT_REGISTRY['filter']['subtypes'].keys())
 
 
 class TestFilterBase(base_class):
@@ -11,9 +7,14 @@ class TestFilterBase(base_class):
 
     _component_type = 'filter'
 
-    @pytest.fixture(scope="class", autouse=True, params=_filters)
-    def component_subtype(self, request):
+    @pytest.fixture(scope="class", autouse=True)
+    def component_subtype(self, filter):
         r"""Subtype of component being tested."""
+        return filter
+
+    @pytest.fixture(scope="class", autouse=True)
+    def filter(self, request):
+        r"""str: Filter being tested."""
         return request.param
 
     @pytest.fixture

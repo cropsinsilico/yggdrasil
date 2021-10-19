@@ -8,10 +8,10 @@ class TestValueComm(base_class):
 
     comm = 'ValueComm'
 
-    @pytest.fixture(scope="class", autouse=True, params=["value"])
-    def component_subtype(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
+    @pytest.fixture(scope="class", autouse=True)
+    def commtype(self):
+        r"""Communicator type being tested."""
+        return "value"
 
     def create_recv_comm(self, name, commtype, use_async, testing_options,
                          **kwargs):

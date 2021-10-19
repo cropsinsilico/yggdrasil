@@ -48,7 +48,7 @@ jobs:
         install-method:
         - pip
         test-flags1:
-        - --long-running --suite=timing --suite=demos --suite=top
+        - --long-running --suites timing demos top
         - --suite=examples --separate-test='--ci --cov-append --suite=mpi --write-script=run_mpi.sh
           --run-with-mpi=3'
         - --suite=types --skip-languages c c++
@@ -243,7 +243,7 @@ jobs:
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        pytest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
+        pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
@@ -356,7 +356,7 @@ jobs:
         test-flags1:
         - --long-running --separate-test='--ci --cov-append --suite=mpi --write-script=run_mpi.sh'
         test-flags2:
-        - --with-examples examples/tests/test_backwards.py
+        - --suite=examples --parametrize-example-name=backwards
         install-c:
         - true
         install-mpi:
@@ -386,7 +386,7 @@ jobs:
         - os: macos-latest
           python-version: 3.8
           install-method: conda
-          test-flags1: tests/test_tools.py --with-examples examples/tests/test_rpc_lesson3.py
+          test-flags1: tests/test_tools.py --suites examples top --parametrize-example-name=rpc_lesson3
           test-flags2: ''
           install-c: true
           install-mpi: false
@@ -569,7 +569,7 @@ jobs:
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        pytest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
+        pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
@@ -871,7 +871,7 @@ jobs:
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        pytest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
+        pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
@@ -1175,7 +1175,7 @@ jobs:
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        pytest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
+        pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
@@ -1478,7 +1478,7 @@ jobs:
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        pytest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
+        pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)

@@ -13,10 +13,10 @@ class TestServerComm(base_class):
     test_work_comm = None
     test_send_recv_raw = None
 
-    @pytest.fixture(scope="class", autouse=True, params=['server'])
-    def component_subtype(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
+    @pytest.fixture(scope="class", autouse=True)
+    def commtype(self):
+        r"""Communicator type being tested."""
+        return "server"
 
     @pytest.fixture(scope="class", autouse=True)
     def python_class(self):

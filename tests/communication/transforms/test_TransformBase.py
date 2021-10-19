@@ -3,11 +3,7 @@ from tests import TestComponentBase as base_class
 import collections
 import numpy as np
 import copy
-from yggdrasil import constants
 from yggdrasil.communication import new_comm
-
-
-_transforms = sorted(constants.COMPONENT_REGISTRY['transform']['subtypes'].keys())
 
 
 @pytest.mark.usefixtures("pandas_equality_patch")
@@ -16,9 +12,14 @@ class TestTransformBase(base_class):
 
     _component_type = 'transform'
     
-    @pytest.fixture(scope="class", autouse=True, params=_transforms)
-    def component_subtype(self, request):
+    @pytest.fixture(scope="class", autouse=True)
+    def component_subtype(self, transform):
         r"""Subtype of component being tested."""
+        return transform
+
+    @pytest.fixture(scope="class", autouse=True)
+    def transform(self, request):
+        r"""str: Transformation being tested."""
         return request.param
 
     @pytest.fixture

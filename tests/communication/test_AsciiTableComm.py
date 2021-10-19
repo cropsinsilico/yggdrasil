@@ -37,10 +37,10 @@ class TestAsciiTableComm(base_class):
 
     test_send_recv_comment = None
 
-    @pytest.fixture(scope="class", autouse=True, params=["table"])
-    def component_subtype(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
+    @pytest.fixture(scope="class", autouse=True)
+    def filetype(self):
+        r"""Communicator type being tested."""
+        return "table"
 
     @pytest.fixture(scope="class")
     def map_sent2recv(self, testing_options):
