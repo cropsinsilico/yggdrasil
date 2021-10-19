@@ -1,0 +1,20 @@
+model:
+  name: ode1
+  language: ode
+  args: df/dt=A*t*f(t)
+  parameters:
+    A: -2.0
+  boundary_conditions:
+    f(0): 1.0
+  inputs:
+    - name: input
+      vars: [t, A]
+      default_file:
+        name: ./Input/input.txt
+        filetype: table
+  outputs:
+    - name: output
+      vars: [f]
+      default_file:
+        name: ./output.txt
+        filetype: table

@@ -79,6 +79,7 @@ requirements:
     - requests
     - scipy
     - six
+    - sympy
     - sysv_ipc  # [unix]
     - unyt  # [not py2k]
     - zeromq

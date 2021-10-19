@@ -1299,6 +1299,21 @@ definitions:
             minLength: 1
             type: string
           type: array
+        assumptions:
+          additionalProperties:
+            additionalProperties:
+              type: boolean
+            type: object
+          description: Mapping between a variable or parameter name and a map of sympy
+            assumption keywords for that variable. A full list of supported sympy
+            assumptions can be found here https://docs.sympy.org/latest/modules/core.html#module-sympy.core.
+            assumptions
+          type: object
+        boundary_conditions:
+          additionalProperties:
+            type: float
+          description: Mapping between variables and their boundary conditions.
+          type: object
         builddir:
           description: Directory where the build should be saved. Defaults to <sourcedir>/build.
             It can be relative to working_dir or absolute.
@@ -1333,6 +1348,17 @@ definitions:
           items:
             type: string
           type: array
+        compute_method:
+          choices:
+          - integrate
+          - steady_state
+          default: integrate
+          description: 'Method that should be used to compute outputs for received
+            inputs. Valid methods include: integrate: Compute the value(s) of the
+            ODE solution for the parameters/independent variable values received as
+            input. steady_state: Determine the steady state solution to the ODE equations
+            based on parameter values received as input.'
+          type: string
         configuration:
           default: Release
           description: Build type/configuration that should be built. Defaults to
@@ -1377,6 +1403,13 @@ definitions:
               - package
               type: object
           type: array
+        dependent_vars:
+          description: Names of dependent variables in the provided equations. If
+            not provided, all variables in the equation that are not parameters or
+            the independent variable will be considered a dependent variable.
+          items:
+            type: string
+          type: array
         description:
           description: Description of the model. This parameter is only used in the
             model repository or when providing the model as a service.
@@ -1411,11 +1444,24 @@ definitions:
             (including those required to link against the |yggdrasil| interface).
             If not provided, this will be determined by the target language driver.
           type: string
+        fsolve_kws:
+          description: Options that should be passed to the scipy fsolve routine when
+            solving for the steady state solution if numeric integration is used (in
+            the even that sympy cannot find a symbolic solution or use_numeric is
+            True).
+          type: object
         function:
           description: If provided, an integrated model is created by wrapping the
             function named here. The function must be located within the file specified
             by the source file listed in the first argument. If not provided, the
             model must contain it's own calls to the |yggdrasil| interface.
+          type: string
+        independent_var:
+          description: Name of independent variable. Defaults to 't'.
+          type: string
+        independent_var_units:
+          description: Units of the independent variable. If not provided, the independent
+            variable is treated as unitless.
           type: string
         inputs:
           default: []
@@ -1520,6 +1566,7 @@ definitions:
           - make
           - matlab
           - mpi
+          - ode
           - osr
           - python
           - r
@@ -1560,6 +1607,11 @@ definitions:
         name:
           description: Name used for component in log messages.
           type: string
+        odeint_kws:
+          description: Options that should be passed to the scipy odeint integration
+            routine if numeric integration is used (in the event that sympy cannot
+            find a symbolic solution or use_numeric is True).
+          type: object
         only_output_final_step:
           default: false
           description: If True, only the final timestep is output. Defaults to False.
@@ -1588,6 +1640,12 @@ definitions:
             of this keyword also determines whether or not products are removed after
             a run.
           type: boolean
+        parameters:
+          additionalProperties:
+            type: float
+          description: Mapping between named parameters in the equations and their
+            values.
+          type: object
         preserve_cache:
           default: false
           description: If True model products will be kept following the run, otherwise
@@ -1820,6 +1878,11 @@ definitions:
             additional export modules that output at a shorter rate, the existing
             table of values will be extrapolated.
           type: object
+        use_numeric:
+          default: false
+          description: If True, numeric methods will be used to find a solution without
+            attempting to find a symbolic solution. Defaults to False.
+          type: boolean
         use_symunit:
           default: false
           description: If True, input/output variables with units will be represented
@@ -2365,6 +2428,100 @@ definitions:
               in Matlab using symunit. Defaults to False.
             type: boolean
         title: yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['ode'] subtype.
+        properties:
+          assumptions:
+            additionalProperties:
+              additionalProperties:
+                type: boolean
+              type: object
+            description: Mapping between a variable or parameter name and a map of
+              sympy assumption keywords for that variable. A full list of supported
+              sympy assumptions can be found here https://docs.sympy.org/latest/modules/core.html#module-sympy.core.
+              assumptions
+            type: object
+          boundary_conditions:
+            additionalProperties:
+              type: float
+            description: Mapping between variables and their boundary conditions.
+            type: object
+          compute_method:
+            choices:
+            - integrate
+            - steady_state
+            default: integrate
+            description: 'Method that should be used to compute outputs for received
+              inputs. Valid methods include: integrate: Compute the value(s) of the
+              ODE solution for the parameters/independent variable values received
+              as input. steady_state: Determine the steady state solution to the ODE
+              equations based on parameter values received as input.'
+            type: string
+          dependent_vars:
+            description: Names of dependent variables in the provided equations. If
+              not provided, all variables in the equation that are not parameters
+              or the independent variable will be considered a dependent variable.
+            items:
+              type: string
+            type: array
+          fsolve_kws:
+            description: Options that should be passed to the scipy fsolve routine
+              when solving for the steady state solution if numeric integration is
+              used (in the even that sympy cannot find a symbolic solution or use_numeric
+              is True).
+            type: object
+          independent_var:
+            description: Name of independent variable. Defaults to 't'.
+            type: string
+          independent_var_units:
+            description: Units of the independent variable. If not provided, the independent
+              variable is treated as unitless.
+            type: string
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is a symbolic ODE model.
+            enum:
+            - ode
+            type: string
+          odeint_kws:
+            description: Options that should be passed to the scipy odeint integration
+              routine if numeric integration is used (in the event that sympy cannot
+              find a symbolic solution or use_numeric is True).
+            type: object
+          parameters:
+            additionalProperties:
+              type: float
+            description: Mapping between named parameters in the equations and their
+              values.
+            type: object
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+          use_numeric:
+            default: false
+            description: If True, numeric methods will be used to find a solution
+              without attempting to find a symbolic solution. Defaults to False.
+            type: boolean
+        title: yggdrasil.drivers.ODEModelDriver.ODEModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['osr'] subtype.

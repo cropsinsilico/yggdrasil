@@ -110,14 +110,12 @@ def test_default_schema():
 def test_create_schema():
     r"""Test re-creating the schema."""
     f_schema = schema._schema_fname
-    f_consts = os.path.join(os.path.dirname(schema.__file__), 'constants.py')
+    f_consts = schema._constants_fname
     old_schema = open(f_schema, 'r').read()
     old_consts = open(f_consts, 'r').read()
     try:
         os.remove(f_schema)
-        open(f_consts, 'w').write(
-            old_consts.split(schema._constants_separator)[0]
-            + schema._constants_separator)
+        schema.restore_constants()
         subprocess.check_call(['yggschema'])
         new_schema = open(f_schema, 'r').read()
         new_consts = open(f_consts, 'r').read()

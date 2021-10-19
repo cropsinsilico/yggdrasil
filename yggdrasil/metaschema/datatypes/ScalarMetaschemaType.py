@@ -105,7 +105,12 @@ class ScalarMetaschemaType(MetaschemaType):
                 dtype = units.PYTHON_SCALARS_WITH_UNITS[
                     cls.fixed_properties['subtype']][0]
                 try:
-                    obj = dtype(obj)
+                    if isinstance(obj, str) and (' ' in obj):
+                        sobj, sunit = obj.split(' ', 1)
+                    else:
+                        sobj = units.get_data(obj)
+                        sunit = units.get_units(obj)
+                    obj = units.add_units(dtype(sobj), sunit)
                 except (TypeError, ValueError):
                     pass
         return obj

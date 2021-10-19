@@ -8,7 +8,7 @@ from yggdrasil.components import import_component
 from yggdrasil import runner, tools, platform
 from yggdrasil.examples import (
     get_example_yaml, get_example_source, get_example_languages,
-    ext_map, display_example, source)
+    ext_map, display_example, yamls)
 from tests import TestBase as base_class
 
 
@@ -56,7 +56,7 @@ def test_display_example():
     display_example('hello', 'r')
 
 
-_examples = sorted([x for x in source.keys() if x not in
+_examples = sorted([x for x in yamls.keys() if x not in
                     ['SaM', 'ascii_io', 'conditional_io', 'rpcFib',
                      'rpc_lesson1', 'rpc_lesson2', 'rpc_lesson2b',
                      'timed_pipe', 'transforms', 'types',
