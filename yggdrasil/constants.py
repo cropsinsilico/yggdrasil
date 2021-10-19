@@ -172,6 +172,7 @@ COMPONENT_REGISTRY = {
             'make': 'MakeModelDriver',
             'matlab': 'MatlabModelDriver',
             'mpi': 'MPIPartnerModel',
+            'ode': 'ODEModelDriver',
             'osr': 'OSRModelDriver',
             'python': 'PythonModelDriver',
             'r': 'RModelDriver',
@@ -245,7 +246,7 @@ LANGUAGES = {
     'build': [
         'cmake', 'make'],
     'dsl': [
-        'lpy', 'osr', 'sbml'],
+        'lpy', 'ode', 'osr', 'sbml'],
     'other': [
         'dummy', 'executable', 'mpi', 'timesync'],
 }
@@ -263,7 +264,7 @@ LANGUAGES_WITH_ALIASES = {
     'build': [
         'cmake', 'make'],
     'dsl': [
-        'lpy', 'osr', 'sbml'],
+        'lpy', 'ode', 'osr', 'sbml'],
     'other': [
         'dummy', 'executable', 'mpi', 'timesync'],
 }
@@ -408,6 +409,11 @@ LANGUAGE_PROPERTIES = {
     },
     'mpi': {
         'executable_type': 'other',
+        'full_language': False,
+        'is_typed': False,
+    },
+    'ode': {
+        'executable_type': 'dsl',
         'full_language': False,
         'is_typed': False,
     },

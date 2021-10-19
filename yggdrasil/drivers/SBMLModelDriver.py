@@ -161,24 +161,13 @@ class SBMLModelDriver(DSLModelDriver):  # pragma: sbml
                     integrator=None, integrator_settings={}):
         r"""Set up model class instance."""
         import roadrunner
-        from yggdrasil.languages.Python.YggInterface import (
-            YggInput, YggOutput)
         model = roadrunner.RoadRunner(model_file)
         if integrator is not None:
             model.setIntegrator(integrator)
         for k, v in integrator_settings.items():
             model.getIntegrator().setValue(k, v)
-        input_map = {}
-        output_map = {}
-        for x in inputs:
-            input_map[x['name']] = {
-                'vars': x.get('vars', []),
-                'comm': YggInput(x['name'], new_process=True)}
-        for x in outputs:
-            output_map[x['name']] = {
-                'as_array': x.get('as_array', False),
-                'vars': x.get('vars', []),
-                'comm': YggOutput(x['name'], new_process=True)}
+        input_map, output_map = cls.setup_interface(
+            inputs=inputs, outputs=outputs)
         return model, input_map, output_map
 
     @classmethod
@@ -215,5 +204,5 @@ class SBMLModelDriver(DSLModelDriver):  # pragma: sbml
 
         """
         out = super(SBMLModelDriver, cls).get_testing_options(**kwargs)
-        out['requires_io'] = True
+        out['requires_partner'] = True
         return out

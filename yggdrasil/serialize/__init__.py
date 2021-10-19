@@ -1096,6 +1096,8 @@ def parse_header(header, newline=constants.DEFAULT_NEWLINE, lineno_format=None,
                     is_unit = False
                     break
             if is_unit:
+                if ('field_units' in out) and ('field_names' not in out):
+                    out['field_names'] = out.pop('field_units')
                 if 'field_units' in out:
                     raise RuntimeError("Two lines could contain the field units.")
                 out['field_units'] = cols

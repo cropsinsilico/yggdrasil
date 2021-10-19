@@ -76,6 +76,24 @@ class DSLModelDriver(InterpretedModelDriver):  # pragma: no cover
         r"""dict: Keyword arguments for the model wrapper."""
         return {'env': self.set_env()}
 
+    @classmethod
+    def setup_interface(cls, inputs=[], outputs=[]):
+        r"""Setup interface classes to receive/send messages."""
+        from yggdrasil.languages.Python.YggInterface import (
+            YggInput, YggOutput)
+        input_map = {}
+        output_map = {}
+        for x in inputs:
+            input_map[x['name']] = {
+                'vars': x.get('vars', []),
+                'comm': YggInput(x['name'], new_process=True)}
+        for x in outputs:
+            output_map[x['name']] = {
+                'as_array': x.get('as_array', False),
+                'vars': x.get('vars', []),
+                'comm': YggOutput(x['name'], new_process=True)}
+        return input_map, output_map
+        
     def queue_recv(self):
         r"""Receive a message from the model process."""
         while not (self.model_process.pipe[0].poll()

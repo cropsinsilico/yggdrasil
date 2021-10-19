@@ -1,0 +1,36 @@
+model:
+  name: ode4
+  language: ode
+  args:
+    y'' = -(b/m) * y' - (k/m) * y
+  compute_method: steady_state
+  independent_var_units: s
+  parameters:
+    m: 2.0 kg
+    k: 10.0 N/m
+    b: 10.0 N*s/m
+  assumptions:
+    m:
+      positive: true
+    k:
+      positive: true
+    b:
+      positive: true
+    y:
+      real: true
+  boundary_conditions:
+    y(0): 5.0 m
+    y'(0): 0.0 m/s
+  inputs:
+    - name: input
+      vars: [m]
+      default_file:
+        name: ./Input/input.txt
+        filetype: table
+        field_units: [kg]
+  outputs:
+    - name: output
+      vars: [y]
+      default_file:
+        name: ./output.txt
+        filetype: table

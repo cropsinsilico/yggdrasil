@@ -11,6 +11,7 @@ from yggdrasil import metaschema
 
 _schema_fname = os.path.abspath(os.path.join(
     os.path.dirname(__file__), '.ygg_schema.yml'))
+_constants_fname = os.path.join(os.path.dirname(__file__), 'constants.py')
 _schema = None
 _constants_separator = (
     "\n# ======================================================\n"
@@ -222,6 +223,13 @@ def get_model_form_schema(fname_dst=None, **kwargs):
     return out
 
 
+def restore_constants():
+    r"""Restore the constants file to its original state."""
+    contents = open(_constants_fname, 'r').read()
+    open(_constants_fname, 'w').write(
+        contents.split(_constants_separator)[0] + _constants_separator)
+
+
 def update_constants(schema=None):
     r"""Update constants.py with info from the schema."""
     from yggdrasil.components import import_component
@@ -249,7 +257,6 @@ def update_constants(schema=None):
             out += repr(x)
         return out
 
-    filename = os.path.join(os.path.dirname(__file__), 'constants.py')
     # Component information
     component_registry = {}
     for k, v in schema.items():
@@ -310,7 +317,7 @@ def update_constants(schema=None):
                 if (x == 'compiler') and (lang not in compiler_env_vars):
                     compiler_env_vars[lang] = compilation_tool_vars[k].copy()
     language_cat = list(languages.keys())
-    with open(filename, 'r') as fd:
+    with open(_constants_fname, 'r') as fd:
         lines = [fd.read().split(_constants_separator)[0],
                  _constants_separator[1:]]
     lines += [
@@ -343,7 +350,7 @@ def update_constants(schema=None):
         "COMPILATION_TOOL_VARS = %s" % as_lines(compilation_tool_vars)]
     lines += [
         "LANGUAGE_PROPERTIES = %s" % as_lines(language_properties)]
-    with open(filename, 'w') as fd:
+    with open(_constants_fname, 'w') as fd:
         fd.write('\n'.join(lines) + '\n')
 
 

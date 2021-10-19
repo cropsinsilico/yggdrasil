@@ -2,6 +2,24 @@
 History
 =======
 
+1.9.0 (2021-XX-XX) Add support for symbolic ODEs
+------------------
+
+* Added ODEModelDriver for 'ode' language models that integrate ordinary differential equations (ODEs) symbolically represented in the YAML file using the sympy package
+* Added ode1 example of symbolic ODE model solved symbolically and integrated
+* Added ode2 example of symbolic ODE model solved numerically on failure to solve symbolically and integrated
+* Added ode3 example of symbolic ODE model solved symbolically using roots for the steady state solution
+* Added ode4 example of symbolic ODE model solved symbolically for the steady state solution
+* Added ode5 example of symbolic ODE model solved numerically for the steady state solution
+* Remove existing generated constants entries before regeneration
+
+TODO
+~~~~
+
+* Regenerate schema
+* Guess at inputs/outputs if not specified in the YAML?
+* Docs
+
 1.8.2 (2021-XX-XX) Migrate tests out of package & into pytest fixtures
 ------------------
 

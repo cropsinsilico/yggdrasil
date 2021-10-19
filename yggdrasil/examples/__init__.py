@@ -1,14 +1,13 @@
 """Tools for accessing examples from python."""
 import os
 import glob
-import logging
 from yggdrasil import tools, languages, serialize, constants
 
 
 # TODO: This can be generated from the drivers
 ext_map = dict(constants.LANG2EXT, executable='',
                make='.cpp', cmake='.cpp', dummy='',
-               osr='.xml', sbml='.xml', mpi='')
+               osr='.xml', sbml='.xml', mpi='', ode='')
 for lang in tools.get_supported_lang():
     if lang.lower() not in ext_map:
         ext_map[lang.lower()] = languages.get_language_ext(lang)
@@ -32,10 +31,8 @@ def register_example(example_dir):
     # Check that the source directory and test exist
     example_base = os.path.basename(example_dir)
     srcdir = os.path.join(example_dir, 'src')
-    if not os.path.isdir(srcdir):  # pragma: no cover
-        if not tools.is_subprocess():
-            logging.error("Missing source directory: %s" % srcdir)
-        return {}
+    if not os.path.isdir(srcdir):
+        srcdir = None
     # Determine which languages are present in the example
     lang_base = []
     lang_avail = []
@@ -55,6 +52,8 @@ def register_example(example_dir):
             lang_avail.remove(k)
     elif example_base.startswith('sbml'):
         lang_avail = ['sbml']
+    elif example_base.startswith('ode'):
+        lang_avail = ['ode']
     elif example_base.startswith('osr'):
         lang_search = example_base + '_%s.yml'
         lang_base += ['osr']
@@ -140,7 +139,7 @@ def register_example(example_dir):
         elif example_base in ['types', 'transforms']:
             yml_names = ['%s.yml' % example_base]
             src_names = ['src.py', 'dst.py']
-        elif example_base.startswith('sbml'):
+        elif example_base.startswith(('sbml', 'ode')):
             yml_names = ['%s.yml' % example_base]
             src_names = ['%s.xml' % example_base]
         else:
@@ -153,26 +152,30 @@ def register_example(example_dir):
                         continue
                     elif (lang == 'all_nomatlab') and (lsrc == 'matlab'):
                         continue
-                    src_names += sorted(
-                        glob.glob(os.path.join(srcdir,
-                                               '*' + ext_map[lsrc])))
+                    if srcdir is not None:
+                        src_names += sorted(
+                            glob.glob(os.path.join(srcdir,
+                                                   '*' + ext_map[lsrc])))
             else:
-                src_names = sorted(
-                    glob.glob(os.path.join(
-                        srcdir, '*' + ext_map.get(lang, ''))))
+                if srcdir is not None:
+                    src_names = sorted(
+                        glob.glob(os.path.join(
+                            srcdir, '*' + ext_map.get(lang, ''))))
             for ilang_base in lang_base:
-                src_names += sorted(
-                    glob.glob(os.path.join(
-                        srcdir, '*' + ext_map.get(ilang_base, ''))))
+                if srcdir is not None:
+                    src_names += sorted(
+                        glob.glob(os.path.join(
+                            srcdir, '*' + ext_map.get(ilang_base, ''))))
         out_yml[lang] = [os.path.join(example_dir, y) for y in yml_names]
-        if src_is_abs:
-            out_src[lang] = src_names
-        else:
-            out_src[lang] = [os.path.join(srcdir, s) for s in src_names]
         if len(out_yml[lang]) == 1:
             out_yml[lang] = out_yml[lang][0]
-        if len(out_src[lang]) == 1:
-            out_src[lang] = out_src[lang][0]
+        if srcdir is not None:
+            if src_is_abs:
+                out_src[lang] = src_names
+            else:
+                out_src[lang] = [os.path.join(srcdir, s) for s in src_names]
+            if len(out_src[lang]) == 1:
+                out_src[lang] = out_src[lang][0]
     return lang_base, lang_avail, out_yml, out_src
 
 

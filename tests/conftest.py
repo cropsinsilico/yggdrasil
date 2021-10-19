@@ -941,7 +941,9 @@ def assert_equal_file_contents():
 
     def assert_equal_file_contents_w(a, b):
         if a != b:  # pragma: debug
-            odiff = '\n'.join(list(difflib.Differ().compare(a, b)))
+            alines = a.splitlines(keepends=True)
+            blines = b.splitlines(keepends=True)
+            odiff = '\n'.join(list(difflib.Differ().compare(alines, blines)))
             raise AssertionError(('File contents do not match expected '
                                   'result Diff:\n%s') % odiff)
     return assert_equal_file_contents_w

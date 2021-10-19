@@ -72,9 +72,10 @@ class TestModelDriver(base_class):
         check_required_languages(required_languages)
 
     @pytest.fixture(scope="class")
-    def source(self, python_class, scripts):
+    def source(self, python_class, scripts, testing_options):
         r"""str: Source code to use for tests."""
-        # if python_class.language is not None:
+        if 'source' in testing_options:
+            return testing_options['source']
         out = scripts[python_class.language.lower()]
         if not isinstance(out, list):
             out = [out]
@@ -83,6 +84,8 @@ class TestModelDriver(base_class):
     @pytest.fixture(scope="class")
     def working_dir(self, source):
         r"""Working director."""
+        if not source:
+            return ''
         return os.path.dirname(source[0])
     
     @pytest.fixture

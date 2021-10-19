@@ -1288,7 +1288,10 @@ class regen_schema(SubCommand):
 
     @classmethod
     def func(cls, args):
+        import imp
         from yggdrasil import schema
+        schema.restore_constants()
+        imp.reload(constants)
         if not args.only_constants:
             if os.path.isfile(schema._schema_fname):
                 os.remove(schema._schema_fname)

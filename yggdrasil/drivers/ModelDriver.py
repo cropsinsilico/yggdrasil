@@ -567,7 +567,6 @@ class ModelDriver(Driver):
         # Parse arguments
         self.debug(str(args))
         self.parse_arguments(args)
-        assert(self.model_file is not None)
         # Remove products
         if self.overwrite:
             self.remove_products()
@@ -725,7 +724,7 @@ class ModelDriver(Driver):
             for x in cls.base_languages:
                 out += import_component('model', x).get_language_ext()
         return out
-        
+    
     def parse_arguments(self, args, default_model_dir=None):
         r"""Sort model arguments to determine which one is the executable
         and which ones are arguments.
@@ -747,13 +746,16 @@ class ModelDriver(Driver):
         self.raw_model_file = args[0]
         self.model_file = self.raw_model_file
         self.model_args = args[1:]
-        if (self.language != 'executable') and (not os.path.isabs(self.model_file)):
-            model_file = os.path.normpath(os.path.join(default_model_dir,
-                                                       self.model_file))
+        if (((self.language != 'executable')
+             and (not os.path.isabs(self.model_file)))):
+            model_file = os.path.normpath(
+                os.path.join(default_model_dir,
+                             self.model_file))
             self.model_file = model_file
         self.model_dir = os.path.dirname(self.model_file)
-        self.debug("model_file = '%s', model_dir = '%s', model_args = '%s'",
-                   self.model_file, self.model_dir, self.model_args)
+        self.debug(f"model_file = '{self.model_file}', "
+                   f"model_dir = '{self.model_dir}', "
+                   f"model_args = '{self.model_args}'")
 
     def init_from_function(self, args):
         r"""Initialize model parameters based on the wrapped function."""

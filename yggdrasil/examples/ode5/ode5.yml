@@ -1,0 +1,27 @@
+# https://towardsdatascience.com/ordinal-differential-equation-ode-in-python-8dc1de21323b
+model:
+  name: ode5
+  language: ode
+  args: dRp/dt = (k1*S*(Rt-Rp)/(km1+Rt-Rp)) - k2*Rp/(km2+Rp)
+  compute_method: steady_state
+  parameters:
+    k1: 1.0
+    k2: 1.0
+    Rt: 1.0
+    km1: 0.05
+    km2: 0.05
+    S: 0.0
+  boundary_conditions:
+    Rp(0): 1.0
+  inputs:
+    - name: input
+      vars: [S]
+      default_file:
+        name: ./Input/input.txt
+        filetype: table
+  outputs:
+    - name: output
+      vars: [Rp]
+      default_file:
+        name: ./output.txt
+        filetype: table

@@ -1,0 +1,22 @@
+model:
+  name: ode3
+  language: ode
+  args: dy/dx = -a*y + exp(-y)
+  compute_method: steady_state
+  parameters:
+    a: 1
+  boundary_conditions:
+    y(0): 0.0
+  inputs:
+    - name: input
+      vars: [a]
+      default_file:
+        name: ./Input/input.txt
+        filetype: table
+        field_units: ['n/a']
+  outputs:
+    - name: output
+      vars: [y]
+      default_file:
+        name: ./output.txt
+        filetype: table
