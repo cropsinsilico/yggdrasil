@@ -154,7 +154,7 @@ class TestYggClass(base_class):
         return request.param
 
     @pytest.fixture(scope="class", autouse=True, params=[None, 'matlab'])
-    def language(self, request, filecomm, direction):
+    def interface_language(self, request, filecomm, direction):
         r"""str: Language being tested."""
         if ((request.param and filecomm
              and not ((filecomm == 'AsciiTableComm')
@@ -205,8 +205,8 @@ class TestYggClass(base_class):
         return dict(testing_options.get('kwargs', {}))
 
     @pytest.fixture(scope="class")
-    def format_str(self, language):
-        if language == 'matlab':
+    def format_str(self, interface_language):
+        if interface_language == 'matlab':
             return self.fmt_str_matlab
         else:
             return self.fmt_str
@@ -350,9 +350,9 @@ class TestYggClass(base_class):
 
     @pytest.fixture
     def instance(self, python_class, instance_args, instance_kwargs,
-                 language, model_env, close_comm):
+                 interface_language, model_env, close_comm):
         r"""New instance of the python class for testing."""
-        with ModelEnv(language=language, **model_env):
+        with ModelEnv(language=interface_language, **model_env):
             out = python_class(*instance_args, **instance_kwargs)
             yield out
             out.is_interface = False

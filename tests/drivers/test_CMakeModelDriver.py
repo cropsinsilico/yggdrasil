@@ -160,6 +160,11 @@ class TestCMakeModelDriver(base_class):
     def builddir(self, sourcedir):
         r"""Directory that build will occur in."""
         return os.path.join(sourcedir, 'build')
+
+    @pytest.fixture(autouse=True)
+    def dont_verify_fds(self, verify_count_fds, disable_verify_count_fds):
+        r"""Turn off verification, fds linger on windows."""
+        yield
     
     @pytest.fixture
     def instance_kwargs(self, testing_options, timeout, sourcedir,

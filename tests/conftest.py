@@ -208,9 +208,10 @@ def pytest_addoption(parser):
     for k, v in _params.items():
         if v is None:
             v = sorted(list(constants.COMPONENT_REGISTRY[k]["subtypes"].keys()))
+        choices = v if v else None
         parser.addoption(f"--parametrize-{k.replace('_', '-')}",
                          help=f"Set '{k}' test parameter", nargs='*',
-                         choices=v)
+                         choices=choices)
     parser.addoption('--ci', action='store_true',
                      help=('Perform additional operations required for '
                            'testing on continuous integration services.'))
@@ -380,12 +381,17 @@ def pytest_generate_tests(metafunc):
             continue
         flag = f"--parametrize-{k.replace('_', '-')}"
         scope = None
+        class_params = None
+        if metafunc.cls and hasattr(metafunc.cls, f"parametrize_{k}"):
+            class_params = getattr(metafunc.cls, f"parametrize_{k}")
+            if callable(class_params):
+                class_params = class_params(metafunc)
         if metafunc.config.getoption(flag):
             params = metafunc.config.getoption(flag)
-        elif metafunc.cls and hasattr(metafunc.cls, f"parametrize_{k}"):
-            params = getattr(metafunc.cls, f"parametrize_{k}")
-            if callable(params):
-                params = params(metafunc)
+            if class_params:
+                params = [x for x in params if x in class_params]
+        elif class_params:
+            params = class_params
             scope = "class"
         else:
             if metafunc.cls:

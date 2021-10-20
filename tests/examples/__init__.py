@@ -205,8 +205,15 @@ class TestExample(base_class):
         return out
 
     @pytest.fixture(scope="class")
-    def expected_output_files(self, input_files):  # pragma: debug
+    def expected_output_files(self, testing_options,
+                              yamldir, input_files):  # pragma: debug
         r"""list: Examples of expected output for the run."""
+        if 'expected_output_files' in testing_options:
+            out = testing_options['expected_output_files']
+            if isinstance(out, str):
+                out = [out]
+            out = [os.path.join(yamldir, x) for x in out]
+            return out
         return input_files
 
     @pytest.fixture(scope="class")

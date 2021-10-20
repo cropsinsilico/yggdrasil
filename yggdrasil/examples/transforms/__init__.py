@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import pandas as pd
 from yggdrasil import units, tools
 from yggdrasil.components import ComponentError, create_component
 
@@ -26,7 +27,7 @@ def get_test_data(transform=None):
     lst = [units.add_units(arr[n], u) for n, u
            in zip(field_names, field_units)]
     if transform == 'table':
-        return rows[0]
+        return list(rows[0])
     return lst
 
 
@@ -53,4 +54,9 @@ def check_received_data(transform, x_recv):
     tools.pprint_encoded(x_recv)
     print('EXPECTED:')
     tools.pprint_encoded(x_sent)
-    assert(x_recv == x_sent)
+    if isinstance(x_sent, np.ndarray):
+        np.testing.assert_array_equal(x_recv, x_sent)
+    elif isinstance(x_sent, pd.DataFrame):
+        pd.testing.assert_frame_equal(x_recv, x_sent)
+    else:
+        assert(x_recv == x_sent)

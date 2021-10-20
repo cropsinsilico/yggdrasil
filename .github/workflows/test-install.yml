@@ -51,7 +51,7 @@ jobs:
         - --long-running --suites timing demos top
         - --suite=examples --separate-test='--ci --cov-append --suite=mpi --write-script=run_mpi.sh
           --run-with-mpi=3'
-        - --suite=types --skip-languages c c++
+        - --suite=types --skip-languages c cpp
         - --suite=types --languages c cpp
         test-flags2:
         - ''
