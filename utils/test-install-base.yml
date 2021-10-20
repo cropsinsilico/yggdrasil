@@ -379,8 +379,8 @@ jobs:
           - os: macos-latest
             python-version: 3.8
             install-method: conda
-            test-flags1: tests/test_tools.py --suites examples top --parametrize-example-name=rpc_lesson3
-            test-flags2: ""
+            test-flags1: --suites examples top --parametrize-example-name=rpc_lesson3
+            test-flags2: tests/test_tools.py
             install-c: true
             install-mpi: false
       fail-fast: false

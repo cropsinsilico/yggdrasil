@@ -91,6 +91,47 @@ def extract_suites(args):
     return out
 
 
+def setup_ci(args):
+    import site
+    top_dir = os.path.dirname(os.getcwd())
+    package_dir = os.path.join(site.getsitepackages()[0], 'yggdrasil')
+    assert(os.path.isdir(package_dir))
+    args += ['-v',
+             '--import-mode=importlib',
+             f'--cov={package_dir}',
+             '-c', 'setup.cfg',
+             '--cov-config=.coveragerc',
+             '--ignore=yggdrasil/rapidjson/']
+    # f'--rootdir={package_dir}']
+    if not any(x.startswith('--with-mpi') for x in args):
+        args += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
+    # Additional checks
+    if not os.path.isfile('setup.cfg'):
+        raise RuntimeError("The CI tests must be run from the root "
+                           "directory of the yggdrasil git repository.")
+    src_cmd = ('python -c \"import versioneer; '
+               'print(versioneer.get_version())\"')
+    dst_cmd = ('python -c \"import yggdrasil; '
+               'print(yggdrasil.__version__)\"')
+    src_ver = subprocess.check_output(src_cmd, shell=True)
+    dst_ver = subprocess.check_output(dst_cmd, shell=True, cwd=top_dir)
+    if src_ver != dst_ver:  # pragma: debug
+        raise RuntimeError(("Versions do not match:\n"
+                            "\tSource version: %s\n"
+                            "\tBuild  version: %s\n")
+                           % (src_ver, dst_ver))
+    subprocess.check_call(
+        ["flake8", "yggdrasil", "--append-config", "setup.cfg"])
+    if os.environ.get("YGG_CONDA", None):
+        subprocess.check_call(["python", "create_coveragerc.py"])
+    if not os.path.isfile(".coveragerc"):
+        raise RuntimeError(".coveragerc file dosn't exist.")
+    with open(".coveragerc", "r") as fd:
+        print(fd.read())
+    subprocess.check_call(["yggdrasil", "info", "--verbose"])
+    args.remove('--ci')
+
+
 # def pytest_load_initial_conftests(args):
 def pytest_cmdline_preparse(args, dont_exit=False):
     r"""Adjust the pytest arguments before testing."""
@@ -123,6 +164,12 @@ def pytest_cmdline_preparse(args, dont_exit=False):
             if '--with-mpi' not in args:
                 args.append('--with-mpi')
             args += ['-p', 'no:flaky']
+    # Continuous integration
+    if ('--ci' in args) and (not _on_mpi):
+        setup_ci(args)
+        # Must launch in separate process so that pytest recognizes
+        # the added --cov={install_dir} and --import-mode=importlib flags
+        run_process = True
     # Write a script to call later
     write_script = [x for x in args if x.startswith('--write-script')]
     if write_script:
@@ -169,52 +216,12 @@ def pytest_cmdline_preparse(args, dont_exit=False):
     # Run test in separate process
     if run_process:
         flag = subprocess.call(prefix
-                               + [sys.executable, '-m', 'pytest']
+                               + ['pytest']
+                               # + [sys.executable, '-m', 'pytest']
                                + args)
         if dont_exit:
             return flag
         sys.exit(flag)
-    # Continuous integration
-    if ('--ci' in args) and (not _on_mpi):
-        top_dir = os.path.dirname(os.getcwd())
-        package_dir = subprocess.check_output(
-            ['python -c \"import yggdrasil; print(yggdrasil.__file__)\"'],
-            shell=True, cwd=top_dir).decode('utf-8').strip()
-        import yggdrasil
-        package_dir2 = os.path.abspath(os.path.dirname(yggdrasil.__file__))
-        print(f"Package directory: {package_dir}, {package_dir2}")
-        args += ['-v',
-                 f'--cov={package_dir}',
-                 '-c', 'setup.cfg',
-                 '--cov-config=.coveragerc',
-                 '--ignore=yggdrasil/rapidjson/']
-        # f'--rootdir={package_dir}']
-        if not any(x.startswith('--with-mpi') for x in args):
-            args += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
-        # Additional checks
-        if not os.path.isfile('setup.cfg'):
-            raise RuntimeError("The CI tests must be run from the root "
-                               "directory of the yggdrasil git repository.")
-        src_cmd = ('python -c \"import versioneer; '
-                   'print(versioneer.get_version())\"')
-        dst_cmd = ('python -c \"import yggdrasil; '
-                   'print(yggdrasil.__version__)\"')
-        src_ver = subprocess.check_output(src_cmd, shell=True)
-        dst_ver = subprocess.check_output(dst_cmd, shell=True, cwd=top_dir)
-        if src_ver != dst_ver:  # pragma: debug
-            raise RuntimeError(("Versions do not match:\n"
-                                "\tSource version: %s\n"
-                                "\tBuild  version: %s\n")
-                               % (src_ver, dst_ver))
-        subprocess.check_call(
-            ["flake8", "yggdrasil", "--append-config", "setup.cfg"])
-        if os.environ.get("YGG_CONDA", None):
-            subprocess.check_call(["python", "create_coveragerc.py"])
-        if not os.path.isfile(".coveragerc"):
-            raise RuntimeError(".coveragerc file dosn't exist.")
-        with open(".coveragerc", "r") as fd:
-            print(fd.read())
-        subprocess.check_call(["yggdrasil", "info", "--verbose"])
     # Add test suites paths
     suite_map = {x[0]: (x[2], x[3]) for x in _suites}
     suite_files = []
@@ -229,6 +236,7 @@ def pytest_cmdline_preparse(args, dont_exit=False):
                               and (x.split('::')[0].endswith(".py")))]
         if not existing_files:
             args += ['--end-yggdrasil-opts'] + sorted(suite_files)
+    print(f"Updated args: {args}")
 
 
 def pytest_addoption(parser):
