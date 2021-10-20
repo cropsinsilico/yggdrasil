@@ -138,7 +138,8 @@ def pytest_cmdline_preparse(args, dont_exit=False):
         args.remove(write_script[0])
         write_pytest_script(fname,
                             prefix
-                            + [sys.executable, '-m', 'pytest']
+                            + ['pytest']
+                            # + [sys.executable, '-m', 'pytest']
                             + args)
         if dont_exit:
             return 0
@@ -152,6 +153,7 @@ def pytest_cmdline_preparse(args, dont_exit=False):
             idx = args.index(x) + 1
             x_args = args[idx].split()
             del args[idx]
+        args.remove(x)
         for k in args:
             excluded = tuple([m[1] for m in _markers]
                              + ['--suite', '--suites', '--test-suite',
@@ -162,7 +164,6 @@ def pytest_cmdline_preparse(args, dont_exit=False):
                  and not any(k_args.startswith(k.split('=')[0])
                              for k_args in x_args))):
                 x_args.append(k)
-        args.remove(x)
         assert(any([xx.startswith('--write-script') for xx in x_args]))
         pytest_cmdline_preparse(x_args, dont_exit=True)
     # Run test in separate process
@@ -178,7 +179,7 @@ def pytest_cmdline_preparse(args, dont_exit=False):
         top_dir = os.path.dirname(os.getcwd())
         package_dir = subprocess.check_output(
             ['python -c \"import yggdrasil; print(yggdrasil.__file__)\"'],
-            shell=True, cwd=top_dir)
+            shell=True, cwd=top_dir).decode('utf-8').strip()
         import yggdrasil
         package_dir2 = os.path.abspath(os.path.dirname(yggdrasil.__file__))
         print(f"Package directory: {package_dir}, {package_dir2}")
@@ -186,8 +187,8 @@ def pytest_cmdline_preparse(args, dont_exit=False):
                  f'--cov={package_dir}',
                  '-c', 'setup.cfg',
                  '--cov-config=.coveragerc',
-                 '--ignore=yggdrasil/rapidjson/',
-                 f'--rootdir={package_dir}']
+                 '--ignore=yggdrasil/rapidjson/']
+        # f'--rootdir={package_dir}']
         if not any(x.startswith('--with-mpi') for x in args):
             args += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
         # Additional checks
