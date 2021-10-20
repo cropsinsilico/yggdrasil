@@ -49,7 +49,7 @@ jobs:
         - pip
         test-flags1:
         - --long-running --suites timing demos top
-        - --suite=examples --separate-test='--ci --cov-append --suite=mpi --write-script=run_mpi.sh
+        - --suite=examples --separate-test='--suite=mpi --write-script=run_mpi.sh
           --run-with-mpi=3'
         - --suite=types --skip-languages c cpp
         - --suite=types --languages c cpp
@@ -354,7 +354,7 @@ jobs:
         install-method:
         - conda
         test-flags1:
-        - --long-running --separate-test='--ci --cov-append --suite=mpi --write-script=run_mpi.sh'
+        - --long-running --separate-test='--suite=mpi --write-script=run_mpi.sh'
         test-flags2:
         - --suite=examples --parametrize-example-name=backwards
         install-c:

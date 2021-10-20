@@ -30,8 +30,10 @@ class TestDriver(base_class):
     def instance_kwargs(self, testing_options, timeout, working_dir,
                         polling_interval, namespace):
         r"""Keyword arguments for a new instance of the tested class."""
-        return dict(testing_options.get('kwargs', {}),
-                    yml={'working_dir': working_dir},
+        yml = {}
+        if working_dir:
+            yml['working_dir'] = working_dir
+        return dict(testing_options.get('kwargs', {}), yml=yml,
                     timeout=timeout, sleeptime=polling_interval,
                     namespace=namespace)
 
@@ -41,7 +43,8 @@ class TestDriver(base_class):
                  working_dir, is_installed):
         r"""New instance of the python class for testing."""
         curpath = os.getcwd()
-        os.chdir(working_dir)
+        if working_dir:
+            os.chdir(working_dir)
         out = python_class(*instance_args, **instance_kwargs)
         try:
             yield out

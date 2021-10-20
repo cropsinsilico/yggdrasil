@@ -49,16 +49,22 @@ class TestModelDriver(base_class):
     r"""Test parameters for basic ModelDriver class."""
 
     _component_type = 'model'
+    parametrize_language = _models
 
-    @pytest.fixture(scope="class", autouse=True, params=_models)
-    def component_subtype(self, request):
+    @pytest.fixture(scope="class", autouse=True)
+    def component_subtype(self, language):
         r"""Subtype of component being tested."""
+        return language
+
+    @pytest.fixture(scope="class")
+    def language(self, request):
+        r"""str: Language being tested."""
         return request.param
 
     @pytest.fixture(scope="class")
-    def required_languages(self, component_subtype):
+    def required_languages(self, language):
         r"""list: Languages required by the test."""
-        return [component_subtype]
+        return [language]
 
     @pytest.fixture(scope="class", autouse=True)
     def check_enabled(self, required_languages, check_required_languages):
@@ -190,8 +196,9 @@ class TestModelDriver(base_class):
         r"""Test running with valgrind."""
         if testing_options.get('requires_partner', False):
             pytest.skip("requires partner model to run")
-        valgrind_log = os.path.join(
-            working_dir, f"valgrind_log_{uuid.replace('-', '_')}.log")
+        valgrind_log = f"valgrind_log_{uuid.replace('-', '_')}.log"
+        if working_dir:
+            valgrind_log = os.path.join(working_dir, valgrind_log)
         try:
             run_model_instance(with_valgrind=True, with_strace=False,
                                valgrind_flags=['--leak-check=full',

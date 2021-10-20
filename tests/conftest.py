@@ -152,6 +152,16 @@ def pytest_cmdline_preparse(args, dont_exit=False):
             idx = args.index(x) + 1
             x_args = args[idx].split()
             del args[idx]
+        for k in args:
+            excluded = tuple([m[1] for m in _markers]
+                             + ['--suite', '--suites', '--test-suite',
+                                '--language', '--languages',
+                                '--skip-language', '--skip-languages',
+                                '--parametrize-', '--default-comm'])
+            if ((k.startswith('-') and (not k.startswith(excluded))
+                 and not any(k_args.startswith(k.split('=')[0])
+                             for k_args in x_args))):
+                x_args.append(k)
         args.remove(x)
         assert(any([xx.startswith('--write-script') for xx in x_args]))
         pytest_cmdline_preparse(x_args, dont_exit=True)
@@ -165,8 +175,13 @@ def pytest_cmdline_preparse(args, dont_exit=False):
         sys.exit(flag)
     # Continuous integration
     if ('--ci' in args) and (not _on_mpi):
+        top_dir = os.path.dirname(os.getcwd())
+        package_dir = subprocess.check_output(
+            ['python -c \"import yggdrasil; print(yggdrasil.__file__)\"'],
+            shell=True, cwd=top_dir)
         import yggdrasil
-        package_dir = os.path.abspath(os.path.dirname(yggdrasil.__file__))
+        package_dir2 = os.path.abspath(os.path.dirname(yggdrasil.__file__))
+        print(f"Package directory: {package_dir}, {package_dir2}")
         args += ['-v',
                  f'--cov={package_dir}',
                  '-c', 'setup.cfg',
@@ -179,7 +194,6 @@ def pytest_cmdline_preparse(args, dont_exit=False):
         if not os.path.isfile('setup.cfg'):
             raise RuntimeError("The CI tests must be run from the root "
                                "directory of the yggdrasil git repository.")
-        top_dir = os.path.dirname(os.getcwd())
         src_cmd = ('python -c \"import versioneer; '
                    'print(versioneer.get_version())\"')
         dst_cmd = ('python -c \"import yggdrasil; '
@@ -687,6 +701,9 @@ def running_service(pytestconfig, check_service_manager_settings,
     def running_service_w(service_type, partial_commtype=None):
         from yggdrasil.services import (
             IntegrationServiceManager)
+        if ((((service_type, partial_commtype) == ('flask', 'rmq'))
+             and platform._is_win)):
+            pytest.skip("excluded on windows")
         check_service_manager_settings(service_type, partial_commtype)
         model_repo = "https://github.com/cropsinsilico/yggdrasil_models_test/models"
         log_level = logging.ERROR

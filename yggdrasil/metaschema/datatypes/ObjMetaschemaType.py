@@ -1016,7 +1016,9 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
 
         """
         kwargs.setdefault('numeric_value', 0)
-        return super(ObjMetaschemaType, cls)._generate_data(typedef, **kwargs)
+        out = super(ObjMetaschemaType, cls)._generate_data(typedef, **kwargs)
+        out['texcoords'][0].update(v=1.0, w=1.0)
+        return out
 
 
 ObjDict._type_class = ObjMetaschemaType
