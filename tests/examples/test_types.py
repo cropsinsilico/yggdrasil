@@ -20,8 +20,8 @@ _typed_lang = tuple([k for k, v in constants.LANGUAGE_PROPERTIES.items()
 class TestExampleTypes(base_class):
     r"""Test the Types example."""
 
-    examples = ['types']
-    languages = _full_lang
+    parametrize_example_name = ['types']
+    parametrize_language = _full_lang
     # iter_flaky = [('c', 'instance', '*'), ('cpp', 'instance', '*')]
 
     @pytest.fixture(scope="class")
