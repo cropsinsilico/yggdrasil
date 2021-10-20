@@ -6,7 +6,7 @@ import shutil
 from yggdrasil.services import (
     IntegrationServiceManager, ServerError, validate_model_submission)
 from yggdrasil.examples import yamls as ex_yamls
-from yggdrasil import runner, import_as_function
+from yggdrasil import runner, import_as_function, platform
 
 
 def _make_ids(ids):
@@ -95,6 +95,7 @@ class TestServices(object):
             if os.path.isfile(remote_yml):
                 os.remove(remote_yml)
 
+    @pytest.mark.skipif(platform._is_win, reason="not on windows")
     def test_git_fails(self, running_service):
         r"""Test that sending a request for a git YAML fails."""
         cli = running_service

@@ -11,6 +11,7 @@ import contextlib
 from yggdrasil import platform, constants
 from yggdrasil.tools import get_supported_lang, get_supported_comm
 from yggdrasil.components import import_component
+from yggdrasil.multitasking import _on_mpi
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -72,23 +73,42 @@ _suites = [
 ]
 
 
+def extract_suites(args):
+    suites = [x for x in args if x.startswith(('--suite', '--suites',
+                                               '--test-suite'))]
+    out = []
+    for x in suites:
+        if '=' in x:
+            out.append(x.split('=', 1)[-1])
+        else:
+            idx = args.index(x) + 1
+            while (idx < len(args)) and (not args[idx].startswith('-')):
+                out.append(args[idx])
+                idx += 1
+    return out
+
+
 # def pytest_load_initial_conftests(args):
 def pytest_cmdline_preparse(args, dont_exit=False):
     r"""Adjust the pytest arguments before testing."""
-    # TODO: count, separate_tests
+    # TODO: count?
     # Check for run in separate process before adding CI args
     run_process = False
     prefix = []
+    suites = extract_suites(args)
     # Disable output capture
     if '--nocapture' in args:
         args += ['-s', '-o', 'log_cli=true']
         args.remove('--nocapture')
     # MPI process should be started
     mpi_flag = [x for x in args if x.startswith('--run-with-mpi')]
+    if ('mpi' in suites) and (not mpi_flag) and (not _on_mpi):
+        mpi_flag = ['--run-with-mpi=2']
+        args.append(mpi_flag[0])
     if mpi_flag:
         assert(len(mpi_flag) == 1)
         if '=' in mpi_flag[0]:
-            nproc = mpi_flag[0].split('=')[-1]
+            nproc = mpi_flag[0].split('=', 1)[-1]
         else:
             idx = args.index(mpi_flag[0]) + 1
             nproc = args[idx]
@@ -105,7 +125,7 @@ def pytest_cmdline_preparse(args, dont_exit=False):
     if write_script:
         assert(len(write_script) == 1)
         if '=' in write_script[0]:
-            fname = write_script[0].split('=')[-1]
+            fname = write_script[0].split('=', 1)[-1]
         else:
             idx = args.index(write_script[0]) + 1
             fname = args[idx]
@@ -121,16 +141,16 @@ def pytest_cmdline_preparse(args, dont_exit=False):
             return 0
         sys.exit(0)
     # Check for separate tests
-    separate_tests = [x for x in args if x.startswith('--separate-tests')]
+    separate_tests = [x for x in args if x.startswith('--separate-test')]
     for x in separate_tests:
         if '=' in x:
-            x_args = x.split('=')[-1].split()
+            x_args = x.split('=', 1)[-1].split()
         else:
             idx = args.index(x) + 1
             x_args = args[idx].split()
             del args[idx]
         args.remove(x)
-        assert(any(xx.startswith('--write-script') for xx in x_args))
+        assert(any([xx.startswith('--write-script') for xx in x_args]))
         pytest_cmdline_preparse(x_args, dont_exit=True)
     # Run test in separate process
     if run_process:
@@ -178,16 +198,9 @@ def pytest_cmdline_preparse(args, dont_exit=False):
             print(fd.read())
         subprocess.check_call(["yggdrasil", "info", "--verbose"])
     # Add test suites paths
-    suites = [x for x in args if x.startswith(('--suite', '--suites',
-                                               '--test-suite'))]
     suite_map = {x[0]: (x[2], x[3]) for x in _suites}
     suite_files = []
-    for x in suites:
-        if '=' in x:
-            suite = x.split('=')[-1]
-        else:
-            idx = args.index(x)
-            suite = args[idx + 1]
+    for suite in suites:
         for f in suite_map[suite][0]:
             suite_files += glob.glob(os.path.join(_test_directory, f))
         args += suite_map[suite][1]
