@@ -216,7 +216,7 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
             container, index, default)
 
     @classmethod
-    def _generate_data(cls, typedef):
+    def _generate_data(cls, typedef, **kwargs):
         r"""Generate mock data for the specified type.
 
         Args:
@@ -230,9 +230,11 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
             nitems = typedef.get('minItems', 1)
             out = cls._container_type()
             for i in range(nitems):
-                cls._assign(out, i, generate_data(typedef[cls._json_property]))
+                cls._assign(out, i, generate_data(typedef[cls._json_property],
+                                                  **kwargs))
         else:
-            out = super(JSONArrayMetaschemaType, cls)._generate_data(typedef)
+            out = super(JSONArrayMetaschemaType, cls)._generate_data(typedef,
+                                                                     **kwargs)
         return out
 
     @classmethod

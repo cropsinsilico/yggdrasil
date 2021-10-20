@@ -480,6 +480,30 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         return out
 
     @classmethod
+    def write_expand_single_element(cls, output_var, add_cond=False):
+        r"""Write lines allowing extraction of the only element from a single
+        element array as a stand-alone variable if the variable is an array
+        and only has one element.
+
+        Args:
+            output_var (str): Name of the variable that should be conditionally
+                expanded.
+            add_cond (str, optional): Additional condition that must be
+                satisfied for the array element to be extracted. Defaults to
+                False and is ignored.
+
+        Returns:
+            list: Lines added the conditional expansion of single element
+                arrays.
+
+        """
+        if not add_cond:
+            add_cond = []
+        add_cond.append(f"is.null(names({output_var}))")
+        return super(RModelDriver, cls).write_expand_single_element(
+            output_var, add_cond)
+        
+    @classmethod
     def install_dependency(cls, package, package_manager=None, **kwargs):
         r"""Install a dependency.
 

@@ -285,7 +285,7 @@ class ContainerMetaschemaType(MetaschemaType):
         return out
 
     @classmethod
-    def _generate_data(cls, typedef):
+    def _generate_data(cls, typedef, **kwargs):
         r"""Generate mock data for the specified type.
 
         Args:
@@ -298,5 +298,5 @@ class ContainerMetaschemaType(MetaschemaType):
         out = cls._container_type()
         for k, v in cls._iterate(typedef[cls._json_property]):
             vcls = get_type_class(v['type'])
-            cls._assign(out, k, vcls.generate_data(v))
+            cls._assign(out, k, vcls.generate_data(v, **kwargs))
         return out

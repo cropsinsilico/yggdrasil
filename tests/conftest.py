@@ -9,7 +9,8 @@ import logging
 import subprocess
 import contextlib
 from yggdrasil import platform, constants
-from yggdrasil.tools import get_supported_lang, get_supported_comm
+from yggdrasil.tools import (
+    get_supported_lang, get_supported_comm, get_supported_type)
 from yggdrasil.components import import_component
 from yggdrasil.multitasking import _on_mpi
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
@@ -36,6 +37,8 @@ _params = {
     "use_async": [False, True],
     "transform": None,
     "filter": None,
+    "serializer": None,
+    "typename": get_supported_type(),
 }
 _mpi_paths = [
     os.path.join("communication", "test_MPIComm.py"),
@@ -161,7 +164,7 @@ def pytest_cmdline_preparse(args, dont_exit=False):
             return flag
         sys.exit(flag)
     # Continuous integration
-    if '--ci' in args:
+    if ('--ci' in args) and (not _on_mpi):
         import yggdrasil
         package_dir = os.path.abspath(os.path.dirname(yggdrasil.__file__))
         args += ['-v',
@@ -225,6 +228,8 @@ def pytest_addoption(parser):
         parser.addoption(f"--parametrize-{k.replace('_', '-')}",
                          help=f"Set '{k}' test parameter", nargs='*',
                          choices=choices)
+    parser.addoption('--second-attempt', action='store_true',
+                     help=('Indicates the is the second attempt.'))
     parser.addoption('--ci', action='store_true',
                      help=('Perform additional operations required for '
                            'testing on continuous integration services.'))
@@ -439,8 +444,8 @@ def write_pytest_script(fname, argv):
     os.chmod(fname, (stat.S_IRWXU
                      | stat.S_IRGRP | stat.S_IXGRP
                      | stat.S_IROTH | stat.S_IXOTH))
-    print("Wrote test script to '%s':\n\t%s"
-          % (fname, '\n\t'.join(lines)))
+    contents = '\n\t' + '\n\t'.join(lines)
+    print(f"Wrote test script to '{fname}':{contents}")
 
 
 # Session level constants
@@ -567,10 +572,14 @@ def yamls():
 @pytest.fixture(scope="session", autouse=True)
 def config_env(pytestconfig):
     r"""Set environment variables based on CLI options."""
+    second_attempt = pytestconfig.getoption("--second-attempt")
     production_run = pytestconfig.getoption("--production-run")
     default_comm = pytestconfig.getoption("--default-comm")
     debug = pytestconfig.getoption("--ygg-debug")
     loglevel = pytestconfig.getoption("--ygg-loglevel")
+    if second_attempt:
+        production_run = False
+        debug = True
     from yggdrasil import config
     with config.temp_config(production_run=production_run,
                             debug=debug, default_comm=default_comm,

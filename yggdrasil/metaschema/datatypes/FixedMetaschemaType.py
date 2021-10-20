@@ -297,7 +297,7 @@ class FixedMetaschemaType(MetaschemaType):
         return out
 
     @classmethod
-    def _generate_data(cls, typedef):
+    def _generate_data(cls, typedef, **kwargs):
         r"""Generate mock data for the specified type.
 
         Args:
@@ -308,4 +308,4 @@ class FixedMetaschemaType(MetaschemaType):
 
         """
         typedef0 = cls.typedef_fixed2base(typedef)
-        return generate_data(typedef0)
+        return generate_data(typedef0, **kwargs)

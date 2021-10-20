@@ -563,15 +563,17 @@ def compare_schema(schema1, schema2, root1=None, root2=None):
         yield e
 
 
-def generate_data(typedef):
+def generate_data(typedef, **kwargs):
     r"""Generate mock data for the specified type.
 
     Args:
         typedef (dict): Type definition.
+        **kwargs: Additional keyword arguments are passed to the generating
+            class's generate_data method.
 
     Returns:
         object: Python object of the specified type.
 
     """
     type_cls = get_type_class(typedef['type'])
-    return type_cls.generate_data(typedef)
+    return type_cls.generate_data(typedef, **kwargs)

@@ -272,7 +272,7 @@ class MultiMetaschemaType(MetaschemaType):
         return out
 
     @classmethod
-    def _generate_data(cls, typedef):
+    def _generate_data(cls, typedef, **kwargs):
         r"""Generate mock data for the specified type.
 
         Args:
@@ -287,7 +287,7 @@ class MultiMetaschemaType(MetaschemaType):
         for t in types:
             try:
                 return cls.type_classes[t].generate_data(
-                    dict(typedef, type=t))
+                    dict(typedef, type=t), **kwargs)
             except BaseException:
                 pass
         raise NotImplementedError  # pragma: debug

@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+from yggdrasil import units
 from tests.serialize import TestSerializeBase as base_class
 
 
@@ -31,8 +32,10 @@ _options = [
                    'field_names': [b'a', b'b'],
                    'field_units': [b'cm', b'g']},
         'empty': [],
-        'objects': [[np.zeros(3, 'float'), np.zeros(3, 'float')],
-                    [np.ones(3, 'float'), np.ones(3, 'float')]],
+        'objects': [[units.add_units(np.zeros(3, 'float'), 'cm'),
+                     units.add_units(np.zeros(3, 'float'), 'g')],
+                    [units.add_units(np.ones(3, 'float'), 'cm'),
+                     units.add_units(np.ones(3, 'float'), 'g')]],
         'extra_kwargs': {},
         'typedef': {'type': 'array',
                     'items': [{'type': '1darray',
@@ -60,10 +63,10 @@ _options = [
 class TestDefaultSerialize(base_class):
     r"""Test class for DefaultSerialize class."""
 
-    @pytest.fixture(scope="class", autouse=True, params=['default'])
-    def component_subtype(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
+    @pytest.fixture(scope="class", autouse=True)
+    def serializer(self):
+        r"""str: Serializer being tested."""
+        return "default"
 
     @pytest.fixture(scope="class", autouse=True, params=_options)
     def options(self, request):

@@ -763,7 +763,7 @@ class MetaschemaType(object):
 
     # TESTING METHODS
     @classmethod
-    def _generate_data(cls, typedef):
+    def _generate_data(cls, typedef, **kwargs):
         r"""Generate mock data for the specified type.
 
         Args:
@@ -776,7 +776,7 @@ class MetaschemaType(object):
         raise NotImplementedError  # pragma: debug
     
     @classmethod
-    def generate_data(cls, typedef):
+    def generate_data(cls, typedef, **kwargs):
         r"""Generate mock data for the specified type.
 
         Args:
@@ -790,7 +790,7 @@ class MetaschemaType(object):
         typedef = cls.normalize_definition(typedef)
         if hasattr(cls, 'example_data'):
             return cls.example_data
-        return cls._generate_data(typedef)
+        return cls._generate_data(typedef, **kwargs)
 
     @classmethod
     def get_test_data(cls, typedef=None):

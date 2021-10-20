@@ -22,10 +22,16 @@ class TestSerializeBase(base_class):
     r"""Test class for SerializeBase class."""
 
     _component_type = 'serializer'
+    parametrize_serializer = _seritypes
     
-    @pytest.fixture(scope="class", autouse=True, params=_seritypes)
-    def component_subtype(self, request):
+    @pytest.fixture(scope="class", autouse=True)
+    def component_subtype(self, serializer):
         r"""Subtype of component being tested."""
+        return serializer
+
+    @pytest.fixture(scope="class", autouse=True)
+    def serializer(self, request):
+        r"""str: Serializer being tested."""
         return request.param
 
     @pytest.fixture(scope="class")

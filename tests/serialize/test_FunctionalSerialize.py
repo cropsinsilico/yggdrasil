@@ -7,10 +7,10 @@ from yggdrasil.serialize import DefaultSerialize
 class TestFunctionalSerialize(base_class):
     r"""Test class for FunctionalSerialize."""
 
-    @pytest.fixture(scope="class", autouse=True, params=['functional'])
-    def component_subtype(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
+    @pytest.fixture(scope="class", autouse=True)
+    def serializer(self):
+        r"""str: Serializer being tested."""
+        return "functional"
 
     @pytest.fixture(scope="class", autouse=True,
                     params=[{'as_format': True}])

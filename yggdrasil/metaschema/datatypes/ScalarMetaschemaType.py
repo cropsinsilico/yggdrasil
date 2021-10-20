@@ -313,7 +313,7 @@ class ScalarMetaschemaType(MetaschemaType):
         return obj
 
     @classmethod
-    def _generate_data(cls, typedef):
+    def _generate_data(cls, typedef, numeric_value=None):
         r"""Generate mock data for the specified type.
 
         Args:
@@ -330,6 +330,8 @@ class ScalarMetaschemaType(MetaschemaType):
                 value = b'x' * int(typedef['precision'] / 8)
             else:
                 value = 'x' * int(typedef['precision'] / 32)
+        elif numeric_value is not None:
+            value = numeric_value
         else:
             value = 1.0
         if typedef['type'] == '1darray':

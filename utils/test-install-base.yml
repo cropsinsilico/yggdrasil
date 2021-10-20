@@ -269,7 +269,7 @@ jobs:
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none --ygg-debug
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run generated test script (1st)
       if: ${{ contains(matrix.test-flags1, '--write-script') }}
       id: test1_script
@@ -280,7 +280,7 @@ jobs:
     - name: Re-run test script failures (1st)
       if: ${{ steps.test1_script.outcome == 'failure' }}
       run: |
-        pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none --ygg-debug
+        pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none --second-attempt
         ./run_mpi.sh
     - name: Run tests (2nd)
       if: ${{ matrix.test-flags2 != '' && !contains(matrix.test-flags2, '--write-script') }}
@@ -289,7 +289,7 @@ jobs:
       continue-on-error: true
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none --ygg-debug
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run generated test script (2nd)
       if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--write-script') }}
       id: test2_script
@@ -300,7 +300,7 @@ jobs:
     - name: Re-run test script failures (2nd)
       if: ${{ steps.test2_script.outcome == 'failure' }}
       run: |
-        pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none --ygg-debug
+        pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none --second-attempt
         ./run_mpi.sh
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main

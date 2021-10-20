@@ -195,7 +195,7 @@ def test_locate_file():
     # Multiple files
     mdir, mpat, mans = make_temp_multiple()
     with pytest.warns(RuntimeWarning):
-        mout = tools.locate_file([mpat])
+        mout = tools.locate_file([mpat], show_alternates=True)
         assert(isinstance(mout, (bytes, str)))
         assert(mout == mans[0])
     

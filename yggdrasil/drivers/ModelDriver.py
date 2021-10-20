@@ -4032,7 +4032,7 @@ class ModelDriver(Driver):
             return [cls.format_function_param('assign', **kwargs)]
 
     @classmethod
-    def write_expand_single_element(cls, output_var):
+    def write_expand_single_element(cls, output_var, add_cond=False):
         r"""Write lines allowing extraction of the only element from a single
         element array as a stand-alone variable if the variable is an array
         and only has one element.
@@ -4040,6 +4040,9 @@ class ModelDriver(Driver):
         Args:
             output_var (str): Name of the variable that should be conditionally
                 expanded.
+            add_cond (list, optional): Additional conditions that must be
+                satisfied for the array element to be extracted. Defaults to
+                False and is ignored.
 
         Returns:
             list: Lines added the conditional expansion of single element
@@ -4048,15 +4051,19 @@ class ModelDriver(Driver):
         """
         if 'istype' not in cls.function_param:
             return []
+        cond = ('(%s) %s (%s %s 1)' % (
+            cls.format_function_param('istype',
+                                      variable=output_var,
+                                      type=cls.type_map['array']),
+            cls.function_param.get('and', '&&'),
+            cls.format_function_param('len',
+                                      variable=output_var),
+            cls.function_param.get('equ', '==')))
+        if add_cond:
+            for x in add_cond:
+                cond += f" {cls.function_param.get('and', '&&')} {x}"
         out = cls.write_if_block(
-            ('(%s) %s (%s %s 1)' % (
-                cls.format_function_param('istype',
-                                          variable=output_var,
-                                          type=cls.type_map['array']),
-                cls.function_param.get('and', '&&'),
-                cls.format_function_param('len',
-                                          variable=output_var),
-                cls.function_param.get('equ', '=='))),
+            cond,
             cls.format_function_param(
                 'assign', name=output_var,
                 value=cls.format_function_param(

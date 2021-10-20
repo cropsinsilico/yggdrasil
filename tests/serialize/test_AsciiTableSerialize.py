@@ -41,10 +41,10 @@ _options = [
 class TestAsciiTableSerialize(base_class):
     r"""Test class for AsciiTableSerialize class."""
 
-    @pytest.fixture(scope="class", autouse=True, params=['table'])
-    def component_subtype(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
+    @pytest.fixture(scope="class", autouse=True)
+    def serializer(self):
+        r"""str: Serializer being tested."""
+        return "table"
 
     @pytest.fixture(scope="class", autouse=True, params=_options)
     def options(self, request):

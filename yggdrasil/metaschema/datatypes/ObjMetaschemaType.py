@@ -1004,5 +1004,19 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
                         iprop[k]['maximum'] = len(obj[e_depends]) - 1
         return out
 
+    @classmethod
+    def _generate_data(cls, typedef, **kwargs):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        kwargs.setdefault('numeric_value', 0)
+        return super(ObjMetaschemaType, cls)._generate_data(typedef, **kwargs)
+
 
 ObjDict._type_class = ObjMetaschemaType

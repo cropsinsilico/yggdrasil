@@ -7,10 +7,10 @@ from tests.serialize.test_AsciiTableSerialize import (
 class TestPandasSerialize(base_class):
     r"""Test class for TestPandasSerialize class."""
 
-    @pytest.fixture(scope="class", autouse=True, params=['pandas'])
-    def component_subtype(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
+    @pytest.fixture(scope="class", autouse=True)
+    def serializer(self):
+        r"""str: Serializer being tested."""
+        return "pandas"
 
     @pytest.fixture(scope="class", autouse=True,
                     params=[{}, {'no_header': True},

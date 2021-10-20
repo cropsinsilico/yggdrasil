@@ -5,10 +5,10 @@ from tests.serialize import TestSerializeBase as base_class
 class TestAsciiMapSerialize(base_class):
     r"""Test class for TestAsciiMapSerialize class."""
 
-    @pytest.fixture(scope="class", autouse=True, params=['map'])
-    def component_subtype(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
+    @pytest.fixture(scope="class", autouse=True)
+    def serializer(self):
+        r"""str: Serializer being tested."""
+        return "map"
 
     def test_error_delim(self, instance):
         r"""Test error for message with too many delimiters on a line."""

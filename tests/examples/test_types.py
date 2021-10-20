@@ -3,7 +3,7 @@ import os
 import copy
 import yaml
 import importlib
-from yggdrasil import constants, tools
+from yggdrasil import constants
 from yggdrasil.components import import_component
 from yggdrasil.languages import get_language_ext
 from yggdrasil.metaschema.datatypes import encode_type
@@ -43,8 +43,7 @@ class TestExampleTypes(base_class):
         r"""str: The full path to the yaml file for this example."""
         return os.path.join(os.path.dirname(__file__), 'types', 'types.yml')
 
-    @pytest.fixture(scope="class", autouse=True,
-                    params=tools.get_supported_type())
+    @pytest.fixture(scope="class", autouse=True)
     def typename(self, request):
         r"""str: Type being tested."""
         return request.param
