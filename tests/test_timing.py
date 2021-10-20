@@ -54,12 +54,12 @@ class TimedRunTestBase(base_class):
     _cls = 'TimedRun'
 
     @pytest.fixture
-    def count(self, instance):
+    def count(self):
         r"""int: Number of messages to use for tests."""
         return 1
 
     @pytest.fixture
-    def size(self, instance):
+    def size(self):
         r"""int: Size of messages to use for tests."""
         return 1
 
@@ -73,26 +73,15 @@ class TimedRunTestBase(base_class):
         r"""str: Language to test."""
         return _test_lang
 
-    @pytest.fixture(scope="class", autouse=True, params=[False])
-    def dont_use_pyperf(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
-    
     @pytest.fixture
     def instance_args(self, language):
         r"""Arguments for a new instance of the tested class."""
         return (language, language)
 
     @pytest.fixture
-    def instance_kwargs(self, dont_use_pyperf):
+    def instance_kwargs(self):
         r"""Keyword arguments for a new instance of the tested class."""
-        return {'test_name': 'timed_pipe',
-                'filename': None,
-                'platform': None,
-                'python_ver': None,
-                'comm_type': None,
-                'dont_use_pyperf': dont_use_pyperf,
-                'max_errors': 5}
+        return {}
 
     @pytest.fixture
     def time_run_args(self, count, size):
@@ -144,14 +133,14 @@ class TestTimedRun(TimedRunTestBase):
     r"""Test class for the TimedRun class using existing data."""
 
     @pytest.fixture
-    def instance_kwargs(self, dont_use_pyperf):
+    def instance_kwargs(self):
         r"""Keyword arguments for a new instance of the tested class."""
         return {'test_name': 'timed_pipe',
                 'filename': None,
                 'platform': _base_environment['platform'],
                 'python_ver': _base_environment['python_ver'],
                 'comm_type': _base_environment['comm_type'],
-                'dont_use_pyperf': dont_use_pyperf,
+                'dont_use_pyperf': False,
                 'max_errors': 5}
 
     @pytest.fixture
@@ -326,11 +315,11 @@ class TestTimedRunTemp(TimedRunTestBase):
                 'dont_use_pyperf': dont_use_pyperf,
                 'max_errors': 5}
 
-    @pytest.fixture(scope="class", autouse=True, params=[False, True])
+    @pytest.fixture(scope="class", params=[False, True])
     def dont_use_pyperf(self, request):
         r"""Subtype of component being tested."""
         return request.param
-
+    
     @pytest.fixture(autouse=True)
     def cleanup_files(self, instance):
         r"""Remove the temporary file if it exists."""
