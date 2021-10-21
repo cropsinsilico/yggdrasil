@@ -152,8 +152,8 @@ class TestCMakeModelDriver(base_class):
     r"""Test runner for CMakeModelDriver."""
 
     @pytest.fixture(scope="class")
-    def component_subtype(self):
-        r"""Subtype of component being tested."""
+    def language(self):
+        r"""str: Language being tested."""
         return 'cmake'
 
     @pytest.fixture

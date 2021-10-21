@@ -436,9 +436,9 @@ def pytest_generate_tests(metafunc):
                 class_params = class_params(metafunc)
         if metafunc.config.getoption(flag):
             params = metafunc.config.getoption(flag)
-            if class_params:
+            if isinstance(class_params, list):
                 params = [x for x in params if x in class_params]
-        elif class_params:
+        elif isinstance(class_params, list):
             params = class_params
             scope = "class"
         else:

@@ -7,12 +7,9 @@ import shutil
 
 class TestBuildModelDriver(base_class):
     r"""Test parameters for BuildModelDriver."""
-    
-    @pytest.fixture(scope="class", params=[])
-    def component_subtype(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
 
+    parametrize_language = []
+    
     test_build = None
     test_call_linker = None
     test_parse_arguments = None

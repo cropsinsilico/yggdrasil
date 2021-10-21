@@ -61,8 +61,8 @@ class TestMatlabModelDriver(base_class):  # pragma: matlab
     r"""Test parameters for MatlabModelDriver."""
 
     @pytest.fixture(scope="class")
-    def component_subtype(self):
-        r"""Subtype of component being tested."""
+    def language(self):
+        r"""str: Language being tested."""
         return 'matlab'
 
     # @pytest.fixture(autouse=True)

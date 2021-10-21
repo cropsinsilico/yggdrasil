@@ -2,12 +2,9 @@ import os
 import uuid
 import copy
 import pytest
-import utils
-# from utils import generate_component_tests, generate_component_subtests
 from yggdrasil.communication import open_file_comm
 from yggdrasil.communication import new_comm, get_comm
 from yggdrasil.tools import get_supported_comm
-# from test_FileComm import TestFileComm
 from tests import TestComponentBase
 
 
@@ -138,7 +135,7 @@ class BaseComm(TestComponentBase):
     
     @pytest.fixture(scope="class")
     def do_send_recv(self, wait_on_function, testing_options, map_sent2recv,
-                     n_msg_expected, nested_approx):
+                     n_msg_expected, nested_approx, logger):
         r"""Factory for method to perform send/recv checks for comms."""
         def wrapped_do_send_recv(send_comm, recv_comm, message=None,
                                  send_params=None, recv_params=None):
@@ -158,8 +155,8 @@ class BaseComm(TestComponentBase):
                 if message is None:
                     message = testing_options['msg']
                 args = (copy.deepcopy(message),)
-            utils.logger.debug(f"sending {send_params.get('count', 1)} "
-                               f"copies of {message!s:.100}")
+            logger.debug(f"sending {send_params.get('count', 1)} "
+                         f"copies of {message!s:.100}")
             for _ in range(send_params.get('count', 1)):
                 flag = getattr(send_comm, send_params.get('method', 'send'))(
                     *args, **send_params.get('kwargs', {}))
@@ -173,8 +170,8 @@ class BaseComm(TestComponentBase):
                     recv_params['message'] = message
                 else:
                     recv_params['message'] = map_sent2recv(message)
-            utils.logger.debug(f"expecting {recv_params.get('count', 1)} "
-                               f"copies of {recv_params['message']!s:.100}")
+            logger.debug(f"expecting {recv_params.get('count', 1)} "
+                         f"copies of {recv_params['message']!s:.100}")
             for _ in range(recv_params.get('count', 1)):
                 if not recv_params.get('skip_wait', False):
                     wait_on_function(
@@ -348,17 +345,19 @@ class TestComm(BaseComm):
         with pytest.raises(RuntimeError):
             python_class('test%s' % uuid.uuid4())
 
-    def test_error_send(self, monkeypatch, send_comm, testing_options):
+    def test_error_send(self, monkeypatch, send_comm, testing_options,
+                        magic_error_replacement):
         r"""Test error on send."""
         monkeypatch.setattr(send_comm, '_safe_send',
-                            utils.magic_error_replacement)
+                            magic_error_replacement)
         flag = send_comm.send(testing_options['msg'])
         assert(not flag)
 
-    def test_error_recv(self, monkeypatch, recv_comm):
+    def test_error_recv(self, monkeypatch, recv_comm,
+                        magic_error_replacement):
         r"""Test error on recv."""
         monkeypatch.setattr(recv_comm, '_safe_recv',
-                            utils.magic_error_replacement)
+                            magic_error_replacement)
         flag, msg_recv = recv_comm.recv(timeout=5.0)
         assert(not flag)
 

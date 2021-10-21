@@ -181,12 +181,8 @@ class TestDummyCompiler(TestCompilationTool):
 class TestCompiledModelDriver(model_base_class):
     r"""Test runner for CompiledModelDriver."""
 
-    @pytest.fixture(scope="class", autouse=True,
-                    params=constants.LANGUAGES['compiled'])
-    def component_subtype(self, request):
-        r"""Subtype of component being tested."""
-        return request.param
-    
+    parametrize_language = constants.LANGUAGES['compiled']
+
     @pytest.fixture(scope="class")
     def compiler(self, python_class):
         r"""Compiler for the class."""

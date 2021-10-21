@@ -2,7 +2,6 @@ import copy
 import pytest
 from yggdrasil.communication import CommBase, new_comm, get_comm
 from tests.communication import TestComm as base_class
-import utils
 
 
 @pytest.mark.suite('mpi')
@@ -256,7 +255,7 @@ class TestMPIComm(base_class):
 
     @pytest.fixture(scope="class")
     def do_send_recv(self, wait_on_function, testing_options, map_sent2recv,
-                     n_msg_expected, sync, timeout, nested_approx):
+                     n_msg_expected, sync, timeout, nested_approx, logger):
         r"""Factory for method to perform send/recv checks for comms."""
 
         def do_send(send_comm, send_params):
@@ -265,8 +264,8 @@ class TestMPIComm(base_class):
             if 'eof' not in send_params.get('method', 'send'):
                 send_params['count'] *= len(send_comm.ranks)
             sync(send_comm)
-            utils.logger.debug(f"sending {send_params.get('count', 1)} "
-                               f"copies of {send_params['message']!s:.100}")
+            logger.debug(f"sending {send_params.get('count', 1)} "
+                         f"copies of {send_params['message']!s:.100}")
             for _ in range(send_params.get('count', 1)):
                 flag = getattr(send_comm, send_params.get('method', 'send'))(
                     *send_params['args'], **send_params.get('kwargs', {}))
@@ -288,8 +287,8 @@ class TestMPIComm(base_class):
                 recv_params['count'] *= len(recv_comm.ranks)
             assert(recv_comm.n_msg_recv == recv_params.get('n_init', 0))
             sync(recv_comm)
-            utils.logger.debug(f"expecting {recv_params.get('count', 1)} "
-                               f"copies of {recv_params['message']!s:.100}")
+            logger.debug(f"expecting {recv_params.get('count', 1)} "
+                         f"copies of {recv_params['message']!s:.100}")
             for _ in range(recv_params.get('count', 1)):
                 if not recv_params.get('skip_wait', False):
                     wait_on_function(

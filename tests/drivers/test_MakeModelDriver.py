@@ -38,8 +38,8 @@ class TestMakeModelDriver(base_class):
     r"""Test runner for MakeModelDriver."""
 
     @pytest.fixture(scope="class")
-    def component_subtype(self):
-        r"""Subtype of component being tested."""
+    def language(self):
+        r"""str: Language being tested."""
         return 'make'
 
     @pytest.fixture
