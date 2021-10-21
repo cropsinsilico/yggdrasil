@@ -228,6 +228,10 @@ def pytest_cmdline_preparse(args, dont_exit=False):
             return flag
         sys.exit(flag)
     # Add test suites paths
+    existing_files = [x for x in args if
+                      os.path.isdir(x)
+                      or (os.path.isfile(x.split('::')[0])
+                          and (x.split('::')[0].endswith(".py")))]
     suite_map = {x[0]: (x[2], x[3]) for x in _suites}
     suite_files = []
     for suite in suites:
@@ -235,12 +239,10 @@ def pytest_cmdline_preparse(args, dont_exit=False):
             suite_files += glob.glob(os.path.join(_test_directory, f))
         args += suite_map[suite][1]
     if suite_files:
-        existing_files = [x for x in args if
-                          os.path.isdir(x)
-                          or (os.path.isfile(x.split('::')[0])
-                              and (x.split('::')[0].endswith(".py")))]
         if not existing_files:
             args += ['--end-yggdrasil-opts'] + sorted(suite_files)
+    elif not existing_files:
+        args += ['--end-yggdrasil-opts'] + ["tests"]
     print(f"Updated args: {args}")
 
 
