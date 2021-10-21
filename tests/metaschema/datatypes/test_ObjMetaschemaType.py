@@ -76,6 +76,8 @@ class TestObjDict(base_class_dict):
     @pytest.fixture
     def objects_trimesh(self, instance):
         r"""Objects for testing transformation to/from trimesh class."""
+        if not ObjMetaschemaType.trimesh:
+            pytest.skip("trimesh not available")
         orig = copy.deepcopy(instance)
         for k in ['material', 'params', 'points', 'surfaces', 'texcoords',
                   'curves', 'curve2Ds', 'lines', 'edges', 'normals']:

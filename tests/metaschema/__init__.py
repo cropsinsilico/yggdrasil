@@ -6,10 +6,7 @@ import shutil
 import tempfile
 import warnings
 from yggdrasil import metaschema, constants
-
-
-def test_func():  # pragma: debug
-    pass
+from yggdrasil.metaschema.datatypes.FunctionMetaschemaType import example_func
 
 
 _valid_objects = {'unicode': u'hello',
@@ -29,7 +26,7 @@ _valid_objects = {'unicode': u'hello',
                                      {'vertex_index': 1},
                                      {'vertex_index': 2}]]},
                   'schema': {'type': 'string'},
-                  'function': test_func}
+                  'function': example_func}
 
 
 _normalize_objects = [
@@ -70,9 +67,12 @@ _normalize_objects = [
     ({'type': 'array', 'items': [{'type': 'int'}, {'type': 'int'}]},
      '1, 2', [1, 2]),
     ({'type': 'array', 'items': {'type': 'int'}}, None, None),
-    ({'type': 'function'}, '%s:test_func' % __name__, test_func),
-    ({'type': 'function'}, '%s:invalid_func' % __name__,
-     '%s:invalid_func' % __name__),
+    ({'type': 'function'},
+     'yggdrasil.metaschema.datatypes.FunctionMetaschemaType:example_func',
+     example_func),
+    ({'type': 'function'},
+     'yggdrasil.metaschema.datatypes.FunctionMetaschemaType:invalid_func',
+     'yggdrasil.metaschema.datatypes.FunctionMetaschemaType:invalid_func'),
     ({'type': 'schema'}, {'units': 'g'},
      {'type': 'scalar', 'units': 'g', 'subtype': 'float', 'precision': int(64)}),
     ({'type': 'any', 'temptype': {'type': 'float'}}, '1', float(1))]

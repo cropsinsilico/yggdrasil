@@ -10,19 +10,23 @@ from yggdrasil.metaschema.datatypes import encode_type
 from tests.examples import TestExample as base_class
 
 
-_full_lang = tuple([k for k, v in constants.LANGUAGE_PROPERTIES.items()
-                    if v['full_language']])
-_typed_lang = tuple([k for k, v in constants.LANGUAGE_PROPERTIES.items()
-                     if (v['full_language'] and v['is_typed'])])
+_full_lang = sorted([k for k, v in constants.LANGUAGE_PROPERTIES.items()
+                     if v['full_language']])
+_typed_lang = sorted([k for k, v in constants.LANGUAGE_PROPERTIES.items()
+                      if (v['full_language'] and v['is_typed'])])
 
 
 @pytest.mark.suite("types", disabled=True, ignore="examples")
 class TestExampleTypes(base_class):
     r"""Test the Types example."""
 
-    parametrize_example_name = ['types']
     parametrize_language = _full_lang
     # iter_flaky = [('c', 'instance', '*'), ('cpp', 'instance', '*')]
+
+    @pytest.fixture(scope="class")
+    def example_name(self):
+        r"""str: Name of example being tested."""
+        return "types"
 
     @pytest.fixture(scope="class")
     def example_module(self, example_name):

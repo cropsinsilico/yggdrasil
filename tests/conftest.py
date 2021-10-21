@@ -29,7 +29,8 @@ _markers = [
 ]
 _params = {
     "example_name": [],
-    "language": sorted(constants.LANGUAGES['all']),
+    "language": sorted([x for x in constants.LANGUAGES['all']
+                        if x not in ['mpi', 'dummy']]),
     "commtype": sorted(get_supported_comm()),
     "filetype": sorted(list(
         constants.COMPONENT_REGISTRY["file"]["subtypes"].keys())),
@@ -436,9 +437,9 @@ def pytest_generate_tests(metafunc):
                 class_params = class_params(metafunc)
         if metafunc.config.getoption(flag):
             params = metafunc.config.getoption(flag)
-            if isinstance(class_params, list):
+            if isinstance(class_params, (list, tuple)):
                 params = [x for x in params if x in class_params]
-        elif isinstance(class_params, list):
+        elif isinstance(class_params, (list, tuple)):
             params = class_params
             scope = "class"
         else:

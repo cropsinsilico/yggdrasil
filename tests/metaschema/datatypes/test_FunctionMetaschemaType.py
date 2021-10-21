@@ -1,11 +1,7 @@
 import pytest
 from tests.metaschema.datatypes.test_MetaschemaType import (
     TestMetaschemaType as base_class)
-
-
-def valid_function():  # pragma: debug
-    r"""Valid function for testing."""
-    pass
+from yggdrasil.metaschema.datatypes.FunctionMetaschemaType import example_func
 
 
 class TestFunctionMetaschemaType(base_class):
@@ -17,7 +13,7 @@ class TestFunctionMetaschemaType(base_class):
     @pytest.fixture(scope="class")
     def value(self):
         r"""function: Test function."""
-        return valid_function
+        return example_func
     
     @pytest.fixture(scope="class")
     def valid_encoded(self, python_class, typedef_base):
@@ -44,7 +40,8 @@ class TestFunctionMetaschemaType(base_class):
     def valid_normalize(self):
         r"""list: Pairs of pre-/post-normalized objects."""
         return [(None, None),
-                ('%s:valid_function' % __name__, valid_function)]
+                ('yggdrasil.metaschema.datatypes.FunctionMetaschemaType'
+                 ':example_func', example_func)]
 
     def test_decode_data_errors(self, python_class):
         r"""Test errors in decode_data."""

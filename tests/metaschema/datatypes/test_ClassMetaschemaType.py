@@ -1,13 +1,9 @@
 import pytest
 from tests.metaschema.datatypes.test_MetaschemaType import (
     TestMetaschemaType as base_class)
+from yggdrasil.metaschema.datatypes.ClassMetaschemaType import ExampleClass
 import os
 import tempfile
-
-
-class ValidClass(object):  # pragma: debug
-    r"""Valid class for testing."""
-    pass
 
 
 class TestClassMetaschemaType(base_class):
@@ -19,7 +15,7 @@ class TestClassMetaschemaType(base_class):
     @pytest.fixture(scope="class")
     def value(self):
         r"""type: Test class."""
-        return ValidClass
+        return ExampleClass
     
     @pytest.fixture(scope="class")
     def valid_encoded(self, python_class, typedef_base):
@@ -46,7 +42,8 @@ class TestClassMetaschemaType(base_class):
     def valid_normalize(self):
         r"""list: Pairs of pre-/post-normalized objects."""
         return [(None, None),
-                ('%s:ValidClass' % __name__, ValidClass)]
+                ('yggdrasil.metaschema.datatypes.ClassMetaschemaType:'
+                 'ExampleClass', ExampleClass)]
 
     def test_module_file(self, python_class):
         r"""Test decoding data that includes the full path to the module file."""

@@ -1,6 +1,6 @@
 import pytest
 import pickle
-from yggdrasil import multitasking, tools
+from yggdrasil import multitasking
 from tests import TestClassBase as base_class
 
 
@@ -13,10 +13,6 @@ class LockedTstClass(multitasking.LockedObject):
 
     _base_class = TstClass
     _base_attr = ['x']
-
-
-def target():
-    raise RuntimeError("Test error.")
 
 
 def test_LockedAttr():
@@ -40,7 +36,7 @@ def test_WaitableFunction():
 
 def test_TaskThread():
     r"""Test thread based Task."""
-    q = multitasking.Task(target=target)
+    q = multitasking.Task(target=multitasking.test_target_error)
     assert(not q.is_alive())
     q.start()
     q._base._errored.wait(1.0)
@@ -51,7 +47,8 @@ def test_TaskThread():
 
 def test_TaskProcess():
     r"""Test process based Task."""
-    q = multitasking.Task(target=target, task_method='parallel')
+    q = multitasking.Task(target=multitasking.test_target_error,
+                          task_method='parallel')
     assert(not q.is_alive())
     q.start()
     q.join(60.0)
@@ -216,7 +213,8 @@ class TestYggTask(base_class):
                         context):
         r"""Keyword arguments for a new instance of the tested class."""
         return dict(timeout=timeout, sleeptime=polling_interval,
-                    target=self.target, task_method=task_method,
+                    target=multitasking.test_target_sleep,
+                    task_method=task_method,
                     context=context)
 
     @pytest.fixture
@@ -233,10 +231,6 @@ class TestYggTask(base_class):
         # until after tests due to presence of a ref in pytest fixtures
         out.disconnect()
         
-    @staticmethod
-    def target():  # pragma: no cover
-        tools.sleep(10.0)
-
     def test_id(self, instance):
         r"""Test process ID and ident."""
         instance.pid
@@ -281,5 +275,6 @@ class TestYggProcessFork(TestYggTask):
     def instance_kwargs(self, timeout, polling_interval, task_method):
         r"""Keyword arguments for a new instance of the tested class."""
         return dict(timeout=timeout, sleeptime=polling_interval,
-                    target=self.target, task_method=task_method,
+                    target=multitasking.test_target_sleep,
+                    task_method=task_method,
                     context=multitasking.mp_ctx)

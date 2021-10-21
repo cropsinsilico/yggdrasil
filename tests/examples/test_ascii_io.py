@@ -9,7 +9,10 @@ from tests.examples import TestExample as base_class
 class TestExampleAsciiIO(base_class):
     r"""Test the AsciiIO example."""
 
-    parametrize_example_name = ['ascii_io']
+    @pytest.fixture(scope="class")
+    def example_name(self):
+        r"""str: Name of example being tested."""
+        return "ascii_io"
 
     @pytest.fixture
     def input_file(self, yamldir):

@@ -199,6 +199,8 @@ class TestPlyDict(base_class_dict):
     def test_to_from_trimesh(self, python_class, objects_trimesh,
                              remove_hd_faces):
         r"""Test transformation to/from trimesh class."""
+        if not PlyMetaschemaType.trimesh:
+            pytest.skip("trimesh not available")
         for y0 in objects_trimesh:
             y0 = remove_hd_faces(y0)
             x = y0.as_trimesh()

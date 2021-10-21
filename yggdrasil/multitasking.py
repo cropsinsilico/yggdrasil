@@ -8,7 +8,7 @@ import threading
 import queue
 import multiprocessing
 import asyncio
-from yggdrasil.tools import YggClass
+from yggdrasil.tools import YggClass, sleep
 MPI = None
 _on_mpi = False
 _mpi_rank = -1
@@ -31,6 +31,14 @@ _main_thread = threading.main_thread()
 _thread_registry = weakref.WeakValueDictionary()
 _lock_registry = weakref.WeakValueDictionary()
 logger = logging.getLogger(__name__)
+
+
+def test_target_error():  # pragma: debug
+    raise RuntimeError("Test error.")
+
+
+def test_target_sleep():  # pragma: debug
+    sleep(10.0)
 
 
 def check_processes():  # pragma: debug

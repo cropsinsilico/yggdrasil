@@ -9,16 +9,20 @@ from yggdrasil.components import import_component
 from tests.examples import TestExample as base_class
 
 
-_untyped_lang = tuple([k for k, v in constants.LANGUAGE_PROPERTIES.items()
-                       if (v['full_language'] and not v['is_typed'])])
+_untyped_lang = sorted([k for k, v in constants.LANGUAGE_PROPERTIES.items()
+                        if (v['full_language'] and not v['is_typed'])])
 
 
 class TestExampleTransforms(base_class):
     r"""Test the Transforms example."""
 
-    parametrize_example_name = ['transforms']
     parametrize_language = _untyped_lang
     parametrize_transform = ['table', 'array', 'pandas']
+
+    @pytest.fixture(scope="class")
+    def example_name(self):
+        r"""str: Name of example being tested."""
+        return "transforms"
 
     @pytest.fixture(scope="class", autouse=True)
     def transform(self, request):
