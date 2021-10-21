@@ -6,7 +6,6 @@ from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
 from yggdrasil.communication import new_comm, CommBase
 from tests import timeout_decorator
 from tests.drivers.test_Driver import TestDriver as base_class
-from tests.helpers import utils
 
 
 _default_comm = tools.get_default_comm()
@@ -215,13 +214,14 @@ class TestConnectionDriver(base_class):
         instance.confirm_output(timeout=1.0)
 
     def test_error_init_ocomm(self, monkeypatch, python_class,
-                              instance_args, instance_kwargs):
+                              instance_args, instance_kwargs,
+                              MagicTestError):
         r"""Test forwarding of error from init of ocomm."""
         orig = python_class._init_single_comm
 
         def error_init_single_comm(self, direction, *args):
             if direction == 'output':
-                x = utils.MagicTestError()
+                x = MagicTestError()
                 x.instance = self
                 raise x
             else:
@@ -229,46 +229,48 @@ class TestConnectionDriver(base_class):
         with monkeypatch.context() as m:
             m.setattr(python_class, '_init_single_comm',
                       error_init_single_comm)
-            with pytest.raises(utils.MagicTestError) as excinfo:
+            with pytest.raises(MagicTestError) as excinfo:
                 python_class(*instance_args, **instance_kwargs)
             excinfo.value.instance.disconnect()
 
-    def test_error_open_icomm(self, monkeypatch, instance):
+    def test_error_open_icomm(self, monkeypatch, instance,
+                              MagicTestError, magic_error_replacement):
         r"""Test fowarding of error from open of icomm."""
         with monkeypatch.context() as m:
             if hasattr(instance.icomm, '_wrapped'):
                 m.setattr(instance.icomm._wrapped, 'open',
-                          utils.magic_error_replacement)
+                          magic_error_replacement)
             else:
-                m.setattr(instance.icomm, 'open',
-                          utils.magic_error_replacement)
-            with pytest.raises(utils.MagicTestError):
+                m.setattr(instance.icomm, 'open', magic_error_replacement)
+            with pytest.raises(MagicTestError):
                 instance.open_comm()
             assert(instance.icomm.is_closed)
 
-    def test_error_close_icomm(self, monkeypatch, instance):
+    def test_error_close_icomm(self, monkeypatch, instance,
+                               MagicTestError, magic_error_replacement):
         r"""Test forwarding of error from close of icomm."""
         instance.open_comm()
         with monkeypatch.context() as m:
             if hasattr(instance.icomm, '_wrapped'):
                 m.setattr(instance.icomm._wrapped, '_close',
-                          utils.magic_error_replacement)
+                          magic_error_replacement)
             else:
                 m.setattr(instance.icomm, 'close',
-                          utils.magic_error_replacement)
-            with pytest.raises(utils.MagicTestError):
+                          magic_error_replacement)
+            with pytest.raises(MagicTestError):
                 instance.close_comm()
         assert(instance.ocomm.is_closed)
         instance.icomm.close()
         assert(instance.icomm.is_closed)
         
-    def test_error_close_ocomm(self, monkeypatch, instance):
+    def test_error_close_ocomm(self, monkeypatch, instance,
+                               MagicTestError, magic_error_replacement):
         r"""Test forwarding of error from close of ocomm."""
         instance.open_comm()
         with monkeypatch.context() as m:
             m.setattr(instance.ocomm, '_close',
-                      utils.magic_error_replacement)
-            with pytest.raises(utils.MagicTestError):
+                      magic_error_replacement)
+            with pytest.raises(MagicTestError):
                 instance.close_comm()
         assert(instance.icomm.is_closed)
         instance.ocomm.close()

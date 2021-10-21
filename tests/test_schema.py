@@ -5,7 +5,6 @@ import tempfile
 import subprocess
 from jsonschema import ValidationError
 from yggdrasil import schema, components
-from tests.helpers.utils import functions_equal
 
 
 def filter_func_ex():  # pragma: no cover
@@ -17,8 +16,8 @@ filter_func_ex_name = '%s:filter_func_ex' % __file__
 
 
 @pytest.fixture
-def normalize_objects(patch_equality):
-    filter_func_ex2 = patch_equality(filter_func_ex, functions_equal)
+def normalize_objects(patch_equality, functions_equality):
+    filter_func_ex2 = patch_equality(filter_func_ex, functions_equality)
     return [
         ({'models': [{
             'name': 'modelA',

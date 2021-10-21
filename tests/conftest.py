@@ -13,7 +13,6 @@ from yggdrasil.tools import (
     get_supported_lang, get_supported_comm, get_supported_type)
 from yggdrasil.components import import_component
 from yggdrasil.multitasking import _on_mpi
-sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
@@ -94,7 +93,11 @@ def extract_suites(args):
 def setup_ci(args):
     import site
     top_dir = os.path.dirname(os.getcwd())
-    package_dir = os.path.join(site.getsitepackages()[0], 'yggdrasil')
+    for x in site.getsitepackages():
+        package_dir = os.path.join(x, 'yggdrasil')
+        if os.path.isdir(package_dir):
+            break
+    print(f"SITE PACKAGES: {site.getsitepackages()}")
     assert(os.path.isdir(package_dir))
     args += ['-v',
              '--import-mode=importlib',
@@ -211,6 +214,8 @@ def pytest_cmdline_preparse(args, dont_exit=False):
                  and not any(k_args.startswith(k.split('=')[0])
                              for k_args in x_args))):
                 x_args.append(k)
+            elif k in ['-c']:
+                x_args += [k, args[args.index(k) + 1]]
         assert(any([xx.startswith('--write-script') for xx in x_args]))
         pytest_cmdline_preparse(x_args, dont_exit=True)
     # Run test in separate process
@@ -480,6 +485,31 @@ def project_dir():
 
 
 @pytest.fixture(scope="session")
+def logger():
+    r"""Package logger."""
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    return logger
+
+
+@pytest.fixture(scope="session")
+def MagicTestError():
+    class MagicTestError(Exception):
+        r"""Special exception for testing."""
+        pass
+    return MagicTestError
+
+
+@pytest.fixture(scope="session")
+def magic_error_replacement(MagicTestError):
+    r"""Replacement for monkeypatching to raise an error."""
+    def magic_error_replacement_w(*args, **kwargs):
+        raise MagicTestError()
+    return magic_error_replacement_w
+
+
+@pytest.fixture(scope="session")
 def timeout():
     r"""Time that should be waited during time outs."""
     return 10.0
@@ -565,30 +595,6 @@ def yamls():
         ('osr', 'osr_model.yml')]
     yamls = {k: os.path.join(yaml_dir, v) for k, v in yaml_list}
     return yamls
-
-
-# @pytest.fixture(scope="session")
-# def field_name():
-#     r"""Table field names."""
-#     return [b'name', b'count', b'size']
-
-
-# @pytest.fixture(scope="session")
-# def field_units():
-#     r"""Table field units."""
-#     return [b'n/a', b'umol', b'cm']
-
-
-# @pytest.fixture(scope="session")
-# def comment():
-#     r"""Comment character."""
-#     return b'# '
-
-
-# @pytest.fixture(scope="session")
-# def newline():
-#     r"""Newline character."""
-#     return b'\n'
 
 
 # Fixtures based on CLI options
@@ -792,6 +798,19 @@ def run_once(request):
         pytest.skip(f"{request.cls.__name__}.{request.function.__name__} "
                     f"already ran")
     _test_registry.append(key)
+
+
+@pytest.fixture
+def pprint_diff():
+    r"""Get the diff between the pprint.pformat string for two objects."""
+    def pprint_diff_w(x, y):
+        import difflib
+        import pprint
+        from yggdrasil import tools
+        tools.print_encoded('\n'.join(difflib.ndiff(
+            pprint.pformat(x).splitlines(),
+            pprint.pformat(y).splitlines())))
+    return pprint_diff_w
 
 
 @pytest.fixture(scope="session")
@@ -1013,6 +1032,17 @@ def unyts_equality_patch(monkeypatch, unyts_equality):
         m.setattr(unyt.array.unyt_array, '__eq__', unyts_equality)
         yield
         
+
+@pytest.fixture(scope="session")
+def functions_equality():
+    def functions_equality_w(a, b):
+        a_str = f"{a.__module__}.{a.__name__}"
+        b_str = f"{b.__module__}.{b.__name__}"
+        if not (a_str.endswith(b_str) or b_str.endswith(a_str)):
+            return False
+        return a.__dict__ == b.__dict__
+    return functions_equality_w
+
 
 @pytest.fixture(scope="session")
 def nested_approx(patch_equality, pandas_equality):
