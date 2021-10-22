@@ -362,15 +362,11 @@ class TestComm(BaseComm):
         assert(not flag)
 
     def test_send_recv_after_close(self, commtype, send_comm, recv_comm,
-                                   testing_options):
+                                   testing_options, wait_on_function):
         r"""Test that opening twice dosn't cause errors and that send/recv
         after close returns false."""
         send_comm.open()
         recv_comm.open()
-        if 'rmq' in commtype:
-            send_comm.bind()
-            recv_comm.bind()
-            recv_comm.close()
         send_comm.close()
         recv_comm.close()
         assert(send_comm.is_closed)

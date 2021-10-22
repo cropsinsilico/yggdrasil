@@ -34,7 +34,7 @@ _params = {
     "commtype": sorted(get_supported_comm()),
     "filetype": sorted(list(
         constants.COMPONENT_REGISTRY["file"]["subtypes"].keys())),
-    "use_async": [False, True],
+    "use_async": ['False', 'True'],
     "transform": None,
     "filter": None,
     "serializer": None,
@@ -440,6 +440,8 @@ def pytest_generate_tests(metafunc):
                 class_params = class_params(metafunc)
         if metafunc.config.getoption(flag):
             params = metafunc.config.getoption(flag)
+            if k == 'use_async':
+                params = [(x.lower() in ['true', '1']) for x in params]
             if isinstance(class_params, (list, tuple)):
                 params = [x for x in params if x in class_params]
         elif isinstance(class_params, (list, tuple)):

@@ -321,6 +321,8 @@ class RMQComm(CommBase.CommBase):
 
     def close_queue(self, skip_unbind=False):
         r"""Close the queue if the channel exists."""
+        if self.direction != 'recv':
+            return
         with self.rmq_lock:
             if self.channel and (not self.is_client):
                 try:
@@ -342,7 +344,10 @@ class RMQComm(CommBase.CommBase):
         with self.rmq_lock:
             if self.channel is not None:
                 self.debug('Closing the channel')
-                self.channel.close()
+                try:
+                    self.channel.close()
+                except pika.exceptions.ChannelWrongStateError:
+                    pass
 
     def close_connection(self, *args, **kwargs):
         r"""Close the connection."""
