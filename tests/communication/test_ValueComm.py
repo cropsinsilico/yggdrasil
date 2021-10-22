@@ -95,8 +95,9 @@ class TestValueComm(base_class):
         with pytest.raises(RuntimeError):
             recv_comm.send(None)
 
-    def test_purge(self, recv_comm):
+    def test_purge(self, recv_comm, wait_on_function):
         r"""Test purging messages from the comm."""
+        wait_on_function(lambda: recv_comm.n_msg > 0)
         assert(recv_comm.n_msg > 0)
         recv_comm.purge()
         assert(recv_comm.n_msg == 0)

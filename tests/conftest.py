@@ -164,10 +164,13 @@ def pytest_cmdline_preparse(args, dont_exit=False):
         args.remove(mpi_flag[0])
         if int(nproc) > 1:
             run_process = True
-            prefix = ['mpiexec', '-n', nproc]
+            prefix = ['mpiexec', '-n', nproc, sys.executable, '-m']
             if '--with-mpi' not in args:
                 args.append('--with-mpi')
             args += ['-p', 'no:flaky']
+            for x in ['--reruns=2', '--reruns-delay=1', '--timeout=900']:
+                if x in args:
+                    args.remove(x)
     # Continuous integration
     if ('--ci' in args) and (not _on_mpi):
         setup_ci(args)
@@ -211,12 +214,12 @@ def pytest_cmdline_preparse(args, dont_exit=False):
                                 '--language', '--languages',
                                 '--skip-language', '--skip-languages',
                                 '--parametrize-', '--default-comm'])
-            if ((k.startswith('-') and (not k.startswith(excluded))
-                 and not any(k_args.startswith(k.split('=')[0])
-                             for k_args in x_args))):
-                x_args.append(k)
-            elif k in ['-c']:
+            if k in ['-c']:
                 x_args += [k, args[args.index(k) + 1]]
+            elif ((k.startswith('-') and (not k.startswith(excluded))
+                   and not any(k_args.startswith(k.split('=')[0])
+                               for k_args in x_args))):
+                x_args.append(k)
         assert(any([xx.startswith('--write-script') for xx in x_args]))
         pytest_cmdline_preparse(x_args, dont_exit=True)
     # Run test in separate process
@@ -1278,7 +1281,7 @@ def verify_count_fds(wait_on_function, first_test, count_fds,
     nfds = count_fds()
     yield
     gc.collect()
-    if not (first_test or _dont_verify_count_fds):
+    if not (first_test or _dont_verify_count_fds or platform._is_win):
         def on_timeout():  # pragma: debug
             global _weakref_registry
             for x in _weakref_registry:
