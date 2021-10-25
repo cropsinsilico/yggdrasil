@@ -296,7 +296,7 @@ class TestMPIComm(base_class):
                                  or (recv_comm.n_msg_recv > 0)))
                 flag, msg = getattr(
                     recv_comm, recv_params.get('method', 'recv'))(
-                        **recv_params.get('kwargs', {'timeout': 0}))
+                        **recv_params.get('kwargs', {'timeout': 0.1}))
                 assert(flag == recv_params.get('flag', True))
                 assert(msg == nested_approx(recv_params['message']))
             recv_comm.printStatus()

@@ -61,11 +61,13 @@ class TestSerializeBase(base_class):
             return nested_approx(obj)
         return wrapped_map_sent2recv
 
-    def test_field_specs(self, instance, testing_options):
+    def test_field_specs(self, instance, testing_options, nested_approx):
         r"""Test field specifiers."""
         assert(instance.numpy_dtype == testing_options['dtype'])
-        assert(instance.extra_kwargs == testing_options['extra_kwargs'])
-        assert(instance.typedef == testing_options['typedef'])
+        assert(instance.extra_kwargs
+               == nested_approx(testing_options['extra_kwargs']))
+        assert(instance.typedef
+               == nested_approx(testing_options['typedef']))
         if isinstance(instance.typedef.get('items', []), dict):
             with pytest.raises(Exception):
                 instance.get_field_names()

@@ -144,6 +144,7 @@ def pytest_cmdline_preparse(args, dont_exit=False):
     run_process = False
     prefix = []
     suites = extract_suites(args)
+    second_attempt = ('--second-attempt' in args)
     # Disable output capture
     if '--nocapture' in args:
         args += ['-s', '-o', 'log_cli=true']
@@ -221,7 +222,8 @@ def pytest_cmdline_preparse(args, dont_exit=False):
                                for k_args in x_args))):
                 x_args.append(k)
         assert(any([xx.startswith('--write-script') for xx in x_args]))
-        pytest_cmdline_preparse(x_args, dont_exit=True)
+        if not second_attempt:
+            pytest_cmdline_preparse(x_args, dont_exit=True)
     # Run test in separate process
     if run_process:
         flag = subprocess.call(prefix
@@ -470,11 +472,13 @@ def write_pytest_script(fname, argv):
     """
     import stat
     from yggdrasil import platform
+    cmd = ' '.join(argv)
     if platform._is_win:
-        lines = [' '.join(argv)]
+        cmd = cmd.replace('\\', '\\\\')
+        lines = [cmd + ' %*']
     else:
         lines = ['#!/bin/bash',
-                 ' '.join(argv)]
+                 cmd + ' $@']
     with open(fname, 'w') as fd:
         fd.write('\n'.join(lines))
     os.chmod(fname, (stat.S_IRWXU

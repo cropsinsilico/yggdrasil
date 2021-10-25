@@ -247,8 +247,6 @@ jobs:
 
         '
     - name: Run tests (1st)
-      if: ${{ matrix.os == 'windows-latest' || !contains(matrix.test-flags1, '--write-script')
-        }}
       id: test1
       run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
@@ -259,23 +257,13 @@ jobs:
     - name: Run generated test script (1st)
       if: ${{ contains(matrix.test-flags1, '--write-script') }}
       id: test1_script
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }}
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh
       continue-on-error: true
     - name: Re-run test script failures (1st)
       if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run tests (2nd)
-      if: ${{ matrix.test-flags2 != '' && !contains(matrix.test-flags2, '--write-script')
-        }}
+      if: ${{ matrix.test-flags2 != '' }}
       id: test2
       run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
       continue-on-error: true
@@ -287,20 +275,11 @@ jobs:
       if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--write-script')
         }}
       id: test2_script
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }}
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh
       continue-on-error: true
     - name: Re-run test script failures (2nd)
       if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -573,8 +552,6 @@ jobs:
 
         '
     - name: Run tests (1st)
-      if: ${{ matrix.os == 'windows-latest' || !contains(matrix.test-flags1, '--write-script')
-        }}
       id: test1
       run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
@@ -585,23 +562,13 @@ jobs:
     - name: Run generated test script (1st)
       if: ${{ contains(matrix.test-flags1, '--write-script') }}
       id: test1_script
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }}
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh
       continue-on-error: true
     - name: Re-run test script failures (1st)
       if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run tests (2nd)
-      if: ${{ matrix.test-flags2 != '' && !contains(matrix.test-flags2, '--write-script')
-        }}
+      if: ${{ matrix.test-flags2 != '' }}
       id: test2
       run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
       continue-on-error: true
@@ -613,20 +580,11 @@ jobs:
       if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--write-script')
         }}
       id: test2_script
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }}
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh
       continue-on-error: true
     - name: Re-run test script failures (2nd)
       if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -875,8 +833,6 @@ jobs:
 
         '
     - name: Run tests (1st)
-      if: ${{ matrix.os == 'windows-latest' || !contains(matrix.test-flags1, '--write-script')
-        }}
       id: test1
       run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
@@ -887,23 +843,13 @@ jobs:
     - name: Run generated test script (1st)
       if: ${{ contains(matrix.test-flags1, '--write-script') }}
       id: test1_script
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }}
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh
       continue-on-error: true
     - name: Re-run test script failures (1st)
       if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run tests (2nd)
-      if: ${{ matrix.test-flags2 != '' && !contains(matrix.test-flags2, '--write-script')
-        }}
+      if: ${{ matrix.test-flags2 != '' }}
       id: test2
       run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
       continue-on-error: true
@@ -915,20 +861,11 @@ jobs:
       if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--write-script')
         }}
       id: test2_script
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }}
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh
       continue-on-error: true
     - name: Re-run test script failures (2nd)
       if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -1179,8 +1116,6 @@ jobs:
 
         '
     - name: Run tests (1st)
-      if: ${{ matrix.os == 'windows-latest' || !contains(matrix.test-flags1, '--write-script')
-        }}
       id: test1
       run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
@@ -1191,23 +1126,13 @@ jobs:
     - name: Run generated test script (1st)
       if: ${{ contains(matrix.test-flags1, '--write-script') }}
       id: test1_script
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }}
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh
       continue-on-error: true
     - name: Re-run test script failures (1st)
       if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run tests (2nd)
-      if: ${{ matrix.test-flags2 != '' && !contains(matrix.test-flags2, '--write-script')
-        }}
+      if: ${{ matrix.test-flags2 != '' }}
       id: test2
       run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
       continue-on-error: true
@@ -1219,20 +1144,11 @@ jobs:
       if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--write-script')
         }}
       id: test2_script
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }}
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh
       continue-on-error: true
     - name: Re-run test script failures (2nd)
       if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -1482,8 +1398,6 @@ jobs:
 
         '
     - name: Run tests (1st)
-      if: ${{ matrix.os == 'windows-latest' || !contains(matrix.test-flags1, '--write-script')
-        }}
       id: test1
       run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
@@ -1494,23 +1408,13 @@ jobs:
     - name: Run generated test script (1st)
       if: ${{ contains(matrix.test-flags1, '--write-script') }}
       id: test1_script
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }}
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh
       continue-on-error: true
     - name: Re-run test script failures (1st)
       if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run tests (2nd)
-      if: ${{ matrix.test-flags2 != '' && !contains(matrix.test-flags2, '--write-script')
-        }}
+      if: ${{ matrix.test-flags2 != '' }}
       id: test2
       run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
       continue-on-error: true
@@ -1522,20 +1426,11 @@ jobs:
       if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--write-script')
         }}
       id: test2_script
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }}
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh
       continue-on-error: true
     - name: Re-run test script failures (2nd)
       if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: 'pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
-
-        ./run_mpi.sh
-
-        '
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
