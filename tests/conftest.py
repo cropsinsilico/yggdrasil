@@ -165,7 +165,10 @@ def pytest_cmdline_preparse(args, dont_exit=False):
         args.remove(mpi_flag[0])
         if int(nproc) > 1:
             run_process = True
-            prefix = ['mpiexec', '-n', nproc, sys.executable, '-m']
+            prefix = ['mpiexec', '-n', nproc]
+            if os.environ.get('CI', False) and platform._is_linux:
+                prefix.append('--oversubscribe')
+            prefix += [sys.executable, '-m']
             if '--with-mpi' not in args:
                 args.append('--with-mpi')
             args += ['-p', 'no:flaky']

@@ -51,13 +51,13 @@ class TestAsciiTableSerialize(base_class):
         r"""Arguments that should be provided when getting testing options."""
         return request.param
 
-    def test_field_specs(self, instance, testing_options):
+    def test_field_specs(self, instance, testing_options, nested_approx):
         r"""Test field specifiers."""
         if not instance.initialized:
             instance.serialize(testing_options['objects'][0],
                                no_metadata=True)
         super(TestAsciiTableSerialize, self).test_field_specs(
-            instance, testing_options)
+            instance, testing_options, nested_approx)
         # Specific to this class
         if 'format_str' in testing_options:
             assert(instance.format_str
