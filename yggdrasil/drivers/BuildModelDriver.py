@@ -1,33 +1,8 @@
 import os
 import glob
-import contextlib
-import threading
 from yggdrasil import components, constants
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase)
-
-
-_buildfile_locks_lock = threading.RLock()
-_buildfile_locks = {}
-
-
-def get_buildfile_lock(fname, context):
-    r"""Get a lock for a buildfile to prevent simultaneous access,
-    creating one as necessary.
-
-    Args:
-        name (str): Build file.
-        context (threading.Context): Threading context.
-
-    Returns:
-        threading.RLock: Lock for the buildfile.
-
-    """
-    global _buildfile_locks
-    with _buildfile_locks_lock:
-        if fname not in _buildfile_locks:
-            _buildfile_locks[fname] = context.RLock()
-    return _buildfile_locks[fname]
 
 
 class BuildToolBase(CompilerBase):
@@ -166,6 +141,7 @@ class BuildModelDriver(CompiledModelDriver):
     full_language = False
     is_build_tool = True
     buildfile_base = None
+    allow_parallel_build = False
 
     def __init__(self, *args, **kwargs):
         self.target_language_driver = None
@@ -254,42 +230,15 @@ class BuildModelDriver(CompiledModelDriver):
                                                           self.builddir))
         kwargs.setdefault('default_model_dir', self.builddir)
         super(BuildModelDriver, self).parse_arguments(args, **kwargs)
-        # Add the buildfile_lock and pass the file
-        self.buildfile_lock = get_buildfile_lock(self.buildfile, self.context)
-        if self._mpi_rank > 0:
-            self.send_mpi(self.buildfile, tag=self._mpi_tags['BUILDFILE'])
-
-    @contextlib.contextmanager
-    def buildfile_locked(self, dry_run=False):
-        r"""Context manager for locked build file."""
-        try:
-            if not dry_run:
-                self.buildfile_lock.acquire()
-                if self._mpi_rank > 0:
-                    self.recv_mpi(tag=self._mpi_tags['LOCK_BUILDFILE'])
-            yield
-        finally:
-            if not dry_run:
-                if self._mpi_rank > 0:
-                    self.send_mpi('UNLOCK_BUILDFILE',
-                                  tag=self._mpi_tags['UNLOCK_BUILDFILE'])
-                self.buildfile_lock.release()
 
     @classmethod
-    def mpi_partner_init(cls, self):
-        r"""Actions initializing an MPIPartnerModel."""
-        self.buildfile = self.recv_mpi(tag=self._mpi_tags['BUILDFILE'])
-        self.buildfile_lock = get_buildfile_lock(self.buildfile,
-                                                 self.context)
-
-    @classmethod
-    def partner_buildfile_lock(cls, self):
-        r"""Actions completing buildfile lock on MPIPartnerModels."""
-        with self.buildfile_lock:
-            self.send_mpi('LOCK_BUILDFILE',
-                          tag=self._mpi_tags['LOCK_BUILDFILE'])
-            self.recv_mpi(tag=self._mpi_tags['UNLOCK_BUILDFILE'])
-
+    def get_buildfile_lock(cls, **kwargs):
+        r"""Get a lock for a buildfile to prevent simultaneous access,
+        creating one as necessary."""
+        if kwargs.get('instance', None):
+            kwargs.setdefault('fname', kwargs['instance'].buildfile)
+        return super(BuildModelDriver, cls).get_buildfile_lock(**kwargs)
+    
     @classmethod
     def get_source_dir(cls, fname=None, source_dir=None):
         if source_dir is None:

@@ -13,9 +13,9 @@ History
 TODO
 ~~~~
 
+* Remove debug messages in conftest.py
 * Debug GHA workflow
-  * MPI running on ubuntu (not enouch slots)
-  * MPI running on mac os (killed before MPI_INIT)
+  * MPI running on mac & windows os (killed before MPI_INIT)
   * flaky error on windows service tests (REST API, services, etc)
 
     At D:\a\_temp\e0ad0e4c-2625-400d-87c2-edc46259b4dc.ps1:3 char:5

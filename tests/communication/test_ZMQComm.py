@@ -106,7 +106,7 @@ class TestZMQComm(base_class):
     @pytest.mark.skipif(platform._is_mac, reason="Testing on MacOS")
     @pytest.mark.skipif(platform._is_win, reason="Testing on Windows")
     def test_error_on_send_open_twice(self, run_once, python_module,
-                                      python_class):
+                                      python_class, close_comm):
         r"""Test creation of the same send socket twice for an error."""
         from yggdrasil.communication import new_comm
         import zmq
@@ -118,7 +118,7 @@ class TestZMQComm(base_class):
             with pytest.raises(zmq.ZMQError):
                 python_class(name1 + '_2', socket_type=s,
                              address=comm1.opp_address, socket_action='bind')
-            comm1.close()
+            close_comm(comm1)
 
 
 class TestZMQCommClient(TestZMQComm):

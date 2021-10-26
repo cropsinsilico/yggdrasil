@@ -200,10 +200,11 @@ class MakeModelDriver(BuildModelDriver):
             cls.default_compiler = 'nmake'
         
     @classmethod
-    def mpi_partner_cleanup(cls, self):
-        r"""Actions cleaning up an MPIPartnerModel."""
-        super(MakeModelDriver, cls).mpi_partner_cleanup(self)
-        cls.partner_buildfile_lock(self)
+    def get_buildfile_lock(cls, **kwargs):
+        r"""Get a lock for a buildfile to prevent simultaneous access,
+        creating one as necessary."""
+        kwargs.setdefault('when_to_lock', 'cleanup')
+        return super(MakeModelDriver, cls).get_buildfile_lock(**kwargs)
         
     def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an argument

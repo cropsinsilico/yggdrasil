@@ -750,12 +750,6 @@ class CMakeModelDriver(BuildModelDriver):
     use_env_vars = False
     buildfile_base = 'CMakeLists.txt'
 
-    @classmethod
-    def mpi_partner_init(cls, self):
-        r"""Actions initializing an MPIPartnerModel."""
-        super(CMakeModelDriver, cls).mpi_partner_init(self)
-        cls.partner_buildfile_lock(self)
-        
     def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an argument
         is a source file, compilation flag, or runtime option/flag that should

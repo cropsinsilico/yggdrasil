@@ -704,10 +704,14 @@ class CommBase(tools.YggClass):
         if self.is_interface:
             atexit.register(self.atexit)
         self._init_before_open(**kwargs)
-        if dont_open:
-            self.bind()
-        else:
-            self.open()
+        try:
+            if dont_open:
+                self.bind()
+            else:
+                self.open()
+        except BaseException:
+            self.close()
+            raise
         self.logger._instance_name += (
             '=>%s[%s]' % (str(self.address).replace('%', '%%'),
                           self.direction.upper()))

@@ -6,6 +6,8 @@ import glob
 import logging
 import subprocess
 import shutil
+import contextlib
+import threading
 from collections import OrderedDict
 from yggdrasil import platform, tools, scanf
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_products
@@ -24,6 +26,22 @@ if _conda_prefix is not None:
     _system_suffix += '_' + os.path.basename(_conda_prefix)
 if _venv_prefix is not None:
     _system_suffix += '_' + os.path.basename(_venv_prefix)
+_buildfile_locks_lock = threading.RLock()
+_buildfile_locks = {}
+
+
+class LockedFile(object):
+    r"""Class for locking files during compilation."""
+
+    def __init__(self, fname, context, when_to_lock="init"):
+        self.fname = fname
+        self.lock = context.RLock()
+        self.when_to_lock = when_to_lock
+
+    @property
+    def message(self):
+        r"""str: Message form."""
+        return {'fname': self.fname, 'when_to_lock': self.when_to_lock}
 
 
 def get_compatible_tool(tool, tooltype, language, default=False):
@@ -2086,6 +2104,10 @@ class CompiledModelDriver(ModelDriver):
             set explictly by instance or config file
         default_linker_flags (list): Flags that should be passed to the
             linker by default for this language.
+        allow_parallel_build (bool): If True, a file can be compiled by
+            two processes simultaneously. If False, it cannot and an
+            MPI barrier will be used to prevent simultaneous compilation.
+            Defaults to True.
 
     Attributes:
         source_files (list): Source files.
@@ -2131,8 +2153,10 @@ class CompiledModelDriver(ModelDriver):
                          'key': 'archiver_flags',
                          'type': list}]
     is_build_tool = False
+    allow_parallel_build = True
 
     def __init__(self, name, args, skip_compile=False, **kwargs):
+        self.buildfile_lock = None
         super(CompiledModelDriver, self).__init__(name, args, **kwargs)
         # Compile
         if not skip_compile:
@@ -2260,6 +2284,82 @@ class CompiledModelDriver(ModelDriver):
             self.products, source_products=self.source_products)
         self.debug("source_files: %s", str(self.source_files))
         self.debug("model_file: %s", self.model_file)
+        # Add the buildfile_lock and pass the file
+        if not self.allow_parallel_build:
+            self.buildfile_lock = self.get_buildfile_lock(instance=self)
+            if self._mpi_rank > 0:
+                self.send_mpi(self.buildfile_lock.message,
+                              tag=self._mpi_tags['BUILDFILE'])
+
+    @classmethod
+    def get_buildfile_lock(cls, fname=None, context=None, instance=None,
+                           **kwargs):
+        r"""Get a lock for a buildfile to prevent simultaneous access,
+        creating one as necessary.
+
+        Args:
+            name (str): Build file.
+            context (threading.Context): Threading context.
+            instance (ModelDriver): Driver instance that should be used.
+            **kwargs: Additional keyword arguments are passed to the FileLock
+                initialization.
+
+        Returns:
+            FileLock: Lock for the buildfile.
+
+        """
+        global _buildfile_locks
+        assert(fname is not None)
+        if (context is None) and (instance is not None):
+            context = instance.context
+        with _buildfile_locks_lock:
+            if fname not in _buildfile_locks:
+                _buildfile_locks[fname] = LockedFile(fname, context, **kwargs)
+        return _buildfile_locks[fname]
+
+    @contextlib.contextmanager
+    def buildfile_locked(self, dry_run=False):
+        r"""Context manager for locked build file."""
+        if self.allow_parallel_build:
+            dry_run = True
+        try:
+            if not dry_run:
+                self.buildfile_lock.lock.acquire()
+                if self._mpi_rank > 0:
+                    self.recv_mpi(tag=self._mpi_tags['LOCK_BUILDFILE'])
+            yield
+        finally:
+            if not dry_run:
+                if self._mpi_rank > 0:
+                    self.send_mpi('UNLOCK_BUILDFILE',
+                                  tag=self._mpi_tags['UNLOCK_BUILDFILE'])
+                self.buildfile_lock.lock.release()
+
+    @classmethod
+    def mpi_partner_init(cls, self):
+        r"""Actions initializing an MPIPartnerModel."""
+        if not cls.allow_parallel_build:
+            message = self.recv_mpi(tag=self._mpi_tags['BUILDFILE'])
+            message['context'] = self.context
+            self.buildfile_lock = cls.get_buildfile_lock(**message)
+            if self.buildfile_lock.when_to_lock == 'init':
+                cls.partner_buildfile_lock(self)
+
+    @classmethod
+    def mpi_partner_cleanup(cls, self):
+        r"""Actions cleaning up an MPIPartnerModel."""
+        super(CompiledModelDriver, cls).mpi_partner_cleanup(self)
+        if (((not cls.allow_parallel_build)
+             and (self.buildfile_lock.when_to_lock == 'cleanup'))):
+            cls.partner_buildfile_lock(self)
+        
+    @classmethod
+    def partner_buildfile_lock(cls, self):
+        r"""Actions completing buildfile lock on MPIPartnerModels."""
+        with self.buildfile_lock.lock:
+            self.send_mpi('LOCK_BUILDFILE',
+                          tag=self._mpi_tags['LOCK_BUILDFILE'])
+            self.recv_mpi(tag=self._mpi_tags['UNLOCK_BUILDFILE'])
 
     def set_target_language(self):
         r"""Set the language of the target being compiled (usually the same
