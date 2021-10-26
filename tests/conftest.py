@@ -477,7 +477,7 @@ def write_pytest_script(fname, argv):
     from yggdrasil import platform
     cmd = ' '.join(argv)
     if platform._is_win:
-        cmd = cmd.replace('\\', '\\\\')
+        cmd = cmd.replace('\\', '/')
         lines = [cmd + ' %*']
     else:
         lines = ['#!/bin/bash',
@@ -1318,6 +1318,10 @@ def cleanup_communicators(communicator_types):
 
 
 # MPI utilities
+_global_tag = 0
+_mpi_error_exchange = None
+
+
 @pytest.fixture(scope="session")
 def mpi_comm():
     r"""MPI communicator."""
@@ -1350,3 +1354,102 @@ def mpi_rank(mpi_comm):
 def on_mpi(mpi_size):
     r"""bool: True if this is an MPI run."""
     return (mpi_size > 1)
+
+
+def new_mpi_exchange():
+    from yggdrasil.multitasking import MPIErrorExchange
+    global _mpi_error_exchange
+    global _global_tag
+    if _mpi_error_exchange is None:
+        _mpi_error_exchange = MPIErrorExchange(global_tag=_global_tag)
+    else:
+        _global_tag = _mpi_error_exchange.global_tag
+        _mpi_error_exchange.reset(global_tag=_global_tag)
+    return _mpi_error_exchange
+
+
+@pytest.fixture(scope="session")
+def adv_global_mpi_tag():
+    def adv_global_mpi_tag_w(value=1):
+        global _mpi_error_exchange
+        assert(_mpi_error_exchange is not None)
+        out = _mpi_error_exchange.global_tag
+        _mpi_error_exchange.global_tag += value
+        return out
+    return adv_global_mpi_tag_w
+
+
+@pytest.fixture(scope="session")
+def sync_mpi_exchange():
+    def sync_mpi_exchange_w(*args, **kwargs):
+        global _mpi_error_exchange
+        assert(_mpi_error_exchange is not None)
+        return _mpi_error_exchange.sync(*args, **kwargs)
+    return sync_mpi_exchange_w
+
+
+# Method of raising errors when other process fails
+# https://docs.pytest.org/en/latest/example/simple.html#
+# making-test-result-information-available-in-fixtures
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    # execute all other hooks to obtain the report object
+    outcome = yield
+    rep = outcome.get_result()
+    # set a report attribute for each phase of a call, which can
+    # be "setup", "call", "teardown"
+    setattr(item, "rep_" + rep.when, rep)
+
+
+@pytest.fixture(autouse=True)
+def sync_mpi_result(request, on_mpi):
+    r"""Synchronize results between MPI ranks."""
+    mpi_exchange = None
+    if on_mpi:
+        mpi_exchange = new_mpi_exchange()
+        mpi_exchange.sync()
+    yield
+    if on_mpi:
+        failure = (request.node.rep_setup.failed
+                   or getattr(getattr(request.node, 'rep_call', None),
+                              'failed', False))
+        mpi_exchange.finalize(failure)
+
+
+# Monkey patch pytest-cov plugin with MPI Barriers to prevent multiple
+# MPI processes from attempting to modify the .coverage data file at
+# the same time and limit the coverage output to the rank 0 process
+@pytest.fixture(scope="session", autouse=True)
+def finalize_mpi(request, on_mpi, mpi_comm, mpi_rank, mpi_size):
+    """Slow down the exit on MPI processes to prevent collision in access
+    to .coverage file."""
+    if not on_mpi:
+        return
+    manager = request.config.pluginmanager
+    plugin_class = manager.get_plugin('pytest_cov').CovPlugin
+    plugin = None
+    for x in manager.get_plugins():
+        if isinstance(x, plugin_class):
+            plugin = x
+            break
+    if not plugin:  # pragma: no cover
+        return
+    old_finish = getattr(plugin.cov_controller, 'finish')
+
+    def new_finish():
+        mpi_comm.Barrier()
+        for _ in range(mpi_rank):
+            mpi_comm.Barrier()
+        old_finish()
+        # These lines come after coverage collection
+        for _ in range(mpi_rank, mpi_size):  # pragma: testing
+            mpi_comm.Barrier()  # pragma: testing
+        mpi_comm.Barrier()  # pragma: testing
+
+    plugin.cov_controller.finish = new_finish
+    if mpi_rank != 0:
+
+        def new_is_worker(session):  # pragma: testing
+            return True
+
+        plugin._is_worker = new_is_worker

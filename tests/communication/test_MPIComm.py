@@ -21,25 +21,6 @@ class TestMPIComm(base_class):
         return "mpi"
 
     @pytest.fixture(scope="class")
-    def mpi_comm(self):
-        r"""MPI communicator."""
-        try:
-            from mpi4py import MPI
-            return MPI.COMM_WORLD
-        except ImportError:  # pragma: debug
-            pytest.skip("tests not run with MPI")
-
-    @pytest.fixture(scope="class")
-    def mpi_rank(self, mpi_comm):
-        r"""int: MPI rank"""
-        return mpi_comm.Get_rank()
-
-    @pytest.fixture(scope="class")
-    def mpi_size(self, mpi_comm):
-        r"""int: MPI size"""
-        return mpi_comm.Get_size()
-
-    @pytest.fixture(scope="class")
     def root_direction(self):
         r"""str: Direction of communicator on the root process."""
         return 'send'
