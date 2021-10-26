@@ -254,10 +254,12 @@ jobs:
       if: ${{ contains(matrix.test-flags1, '--write-script') }}
       id: test1_script
       run: ./run_mpi.sh
+      shell: bash -l {0}
       continue-on-error: true
     - name: Re-run test script failures (1st)
       if: ${{ steps.test1_script.outcome == 'failure' }}
       run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
+      shell: bash -l {0}
 
     - name: Run tests (2nd)
       if: ${{ matrix.test-flags2 != '' }}
@@ -272,10 +274,12 @@ jobs:
       if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--write-script') }}
       id: test2_script
       run: ./run_mpi.sh
+      shell: bash -l {0}
       continue-on-error: true
     - name: Re-run test script failures (2nd)
       if: ${{ steps.test2_script.outcome == 'failure' }}
       run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
+      shell: bash -l {0}
 
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main

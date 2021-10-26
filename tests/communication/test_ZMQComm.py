@@ -1,6 +1,6 @@
 import pytest
 from yggdrasil import platform
-from tests.communication import TestComm as base_class
+from tests.communication.test_CommBase import TestComm as base_class
 
 
 class TestZMQComm(base_class):

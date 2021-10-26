@@ -291,4 +291,4 @@ class TestComponentBase(TestClassBase):
     @pytest.fixture
     def instance_kwargs(self, testing_options):
         r"""Keyword arguments for a new instance of the tested class."""
-        return dict(testing_options.get('kwargs', {}))
+        return copy.deepcopy(testing_options.get('kwargs', {}))

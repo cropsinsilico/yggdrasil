@@ -1,6 +1,6 @@
 import pytest
 import flaky
-from tests.communication import TestComm as base_class
+from tests.communication.test_CommBase import TestComm as base_class
 from yggdrasil.communication import new_comm
 from yggdrasil.communication.RMQComm import RMQComm
 from tests import timeout_decorator

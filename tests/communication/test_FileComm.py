@@ -3,7 +3,7 @@ import os
 import jsonschema
 from yggdrasil import schema
 from yggdrasil.communication import new_comm
-from tests.communication import TestComm as base_class
+from tests.communication.test_CommBase import TestComm as base_class
 
 
 def test_wait_for_creation():

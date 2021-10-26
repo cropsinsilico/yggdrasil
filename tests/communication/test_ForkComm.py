@@ -1,5 +1,5 @@
 import pytest
-from tests.communication import TestComm as base_class
+from tests.communication.test_CommBase import TestComm as base_class
 
 
 class TestForkComm(base_class):

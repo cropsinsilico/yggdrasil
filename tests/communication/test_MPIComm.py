@@ -1,7 +1,7 @@
 import copy
 import pytest
 from yggdrasil.communication import CommBase, new_comm, get_comm
-from tests.communication import TestComm as base_class
+from tests.communication.test_CommBase import TestComm as base_class
 
 
 @pytest.mark.suite('mpi')

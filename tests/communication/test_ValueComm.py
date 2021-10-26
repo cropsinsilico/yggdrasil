@@ -1,6 +1,6 @@
 import pytest
 from yggdrasil.communication import new_comm
-from tests.communication import BaseComm as base_class
+from tests.communication.test_CommBase import BaseComm as base_class
 
 
 class TestValueComm(base_class):

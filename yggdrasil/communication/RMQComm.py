@@ -346,7 +346,8 @@ class RMQComm(CommBase.CommBase):
                 self.debug('Closing the channel')
                 try:
                     self.channel.close()
-                except pika.exceptions.ChannelWrongStateError:
+                except (pika.exceptions.ChannelWrongStateError,
+                        pika.exceptions.StreamLostError):
                     pass
 
     def close_connection(self, *args, **kwargs):
@@ -483,8 +484,9 @@ class RMQComm(CommBase.CommBase):
 
     def purge(self):
         r"""Remove all messages from the associated queue."""
-        with self.rmq_lock:
-            with self._closing_thread.lock:
-                if self.is_open:
-                    self.channel.queue_purge(queue=self.queue)
+        if not self._closing.has_started():
+            with self.rmq_lock:
+                with self._closing_thread.lock:
+                    if self.is_open:
+                        self.channel.queue_purge(queue=self.queue)
         super(RMQComm, self).purge()

@@ -1,7 +1,7 @@
 import pytest
 import uuid
 from yggdrasil.communication import new_comm
-from tests.communication import TestComm as base_class
+from tests.communication.test_CommBase import TestComm as base_class
 
 
 class TestServerComm(base_class):
