@@ -200,15 +200,13 @@ def get_source(lang, direction, test_name='timed_pipe'):
 @contextlib.contextmanager
 def change_default_comm(default_comm):
     from yggdrasil.communication.DefaultComm import DefaultComm
-    old_default_comm = os.environ.get('YGG_DEFAULT_COMM', None)
-    if default_comm is None:
-        os.environ.pop('YGG_DEFAULT_COMM', None)
-    else:
+    old_default_comm = os.environ.pop('YGG_DEFAULT_COMM', None)
+    if default_comm is not None:
         os.environ['YGG_DEFAULT_COMM'] = default_comm
     DefaultComm._reset_alias()
     yield
     del os.environ['YGG_DEFAULT_COMM']
-    if old_default_comm is not None:
+    if old_default_comm is not None:  # pragma: debug
         os.environ['YGG_DEFAULT_COMM'] = old_default_comm
     DefaultComm._reset_alias()
 

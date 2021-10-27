@@ -489,6 +489,8 @@ class TestModelDriver(base_class):
 
     def test_cleanup_dependencies(self, python_class):
         r"""Test cleanup_dependencies method."""
+        # Run twice to ensure things work even if it has been cleand up
+        python_class.cleanup_dependencies()
         python_class.cleanup_dependencies()
 
     def test_split_line(self, python_class, testing_options):

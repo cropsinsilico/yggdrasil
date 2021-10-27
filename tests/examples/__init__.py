@@ -261,6 +261,8 @@ class TestExample(base_class):
                       check_file_size, check_file_contents, testing_options):
         r"""This should be overridden with checks for the result."""
         def check_results_w():
+            if testing_options.get('validation_function', False):
+                testing_options['validation_function']()
             if testing_options.get('skip_check_results', False):
                 return
             res_list = results

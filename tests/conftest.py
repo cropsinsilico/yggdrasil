@@ -76,21 +76,6 @@ _suites = [
 ]
 
 
-def extract_suites(args):
-    suites = [x for x in args if x.startswith(('--suite', '--suites',
-                                               '--test-suite'))]
-    out = []
-    for x in suites:
-        if '=' in x:
-            out.append(x.split('=', 1)[-1])
-        else:
-            idx = args.index(x) + 1
-            while (idx < len(args)) and (not args[idx].startswith('-')):
-                out.append(args[idx])
-                idx += 1
-    return out
-
-
 def setup_ci(args):
     import site
     top_dir = os.path.dirname(os.getcwd())
@@ -135,32 +120,55 @@ def setup_ci(args):
     args.remove('--ci')
 
 
+def option_cases(args, option, remove=False, requires_arg=False):
+    r"""Get the index(es) of CLI option instances if it exists."""
+    out = []
+    values = []
+    if not isinstance(option, (tuple, list)):
+        option = [option]
+    for i, x in enumerate(args):
+        if x.split('=')[0] in option:
+            out.append((i, x))
+            if requires_arg:
+                if '=' in x:
+                    values.append(x.split('=')[-1])
+                elif requires_arg == 'multiple':
+                    idx = i + 1
+                    while (idx < len(args)) and (not args[idx].startswith('-')):
+                        out.append((idx, args[idx]))
+                        values.append(args[idx])
+                        idx += 1
+                else:
+                    out.append((i + 1, args[i + 1]))
+                    values.append(args[i + 1])
+    if remove:
+        for x in out[::-1]:
+            del args[x[0]]
+    if requires_arg:
+        return values
+    return [x[1] for x in out]
+
+
 # def pytest_load_initial_conftests(args):
 def pytest_cmdline_preparse(args, dont_exit=False):
     r"""Adjust the pytest arguments before testing."""
     # Check for run in separate process before adding CI args
     run_process = False
     prefix = []
-    suites = extract_suites(args)
+    suites = option_cases(args, ('--suite', '--suites', '--test-suite'),
+                          requires_arg='multiple')
     second_attempt = ('--second-attempt' in args)
     # Disable output capture
-    if '--nocapture' in args:
+    if option_cases(args, '--nocapture', remove=True):
         args += ['-s', '-o', 'log_cli=true']
-        args.remove('--nocapture')
     # MPI process should be started
-    mpi_flag = [x for x in args if x.startswith('--run-with-mpi')]
+    mpi_flag = option_cases(args, '--run-with-mpi', remove=True,
+                            requires_arg=True)
     if ('mpi' in suites) and (not mpi_flag) and (not _on_mpi):
-        mpi_flag = ['--run-with-mpi=2']
-        args.append(mpi_flag[0])
+        mpi_flag = ['2']
     if mpi_flag:
         assert(len(mpi_flag) == 1)
-        if '=' in mpi_flag[0]:
-            nproc = mpi_flag[0].split('=', 1)[-1]
-        else:
-            idx = args.index(mpi_flag[0]) + 1
-            nproc = args[idx]
-            del args[idx]
-        args.remove(mpi_flag[0])
+        nproc = mpi_flag[0]
         if int(nproc) > 1:
             run_process = True
             prefix = ['mpiexec', '-n', nproc]
@@ -180,18 +188,13 @@ def pytest_cmdline_preparse(args, dont_exit=False):
         # the added --cov={install_dir} and --import-mode=importlib flags
         run_process = True
     # Write a script to call later
-    write_script = [x for x in args if x.startswith('--write-script')]
+    write_script = option_cases(args, '--write-script', remove=True,
+                                requires_arg=True)
     if write_script:
         assert(len(write_script) == 1)
-        if '=' in write_script[0]:
-            fname = write_script[0].split('=', 1)[-1]
-        else:
-            idx = args.index(write_script[0]) + 1
-            fname = args[idx]
-            del args[idx]
+        fname = write_script[0]
         if not os.path.isabs(fname):
             fname = os.path.abspath(fname)
-        args.remove(write_script[0])
         write_pytest_script(fname,
                             prefix
                             + ['pytest']
@@ -201,15 +204,10 @@ def pytest_cmdline_preparse(args, dont_exit=False):
             return 0
         sys.exit(0)
     # Check for separate tests
-    separate_tests = [x for x in args if x.startswith('--separate-test')]
+    separate_tests = option_cases(args, '--separate-test', remove=True,
+                                  requires_arg=True)
     for x in separate_tests:
-        if '=' in x:
-            x_args = x.split('=', 1)[-1].split()
-        else:
-            idx = args.index(x) + 1
-            x_args = args[idx].split()
-            del args[idx]
-        args.remove(x)
+        x_args = x.split()
         for k in args:
             excluded = tuple([m[1] for m in _markers]
                              + ['--suite', '--suites', '--test-suite',
@@ -218,11 +216,11 @@ def pytest_cmdline_preparse(args, dont_exit=False):
                                 '--parametrize-', '--default-comm'])
             if k in ['-c']:
                 x_args += [k, args[args.index(k) + 1]]
-            elif ((k.startswith('-') and (not k.startswith(excluded))
-                   and not any(k_args.startswith(k.split('=')[0])
+            elif ((k.startswith('-') and (k.split('=')[0] not in excluded)
+                   and not any(k_args.split('=')[0] == k.split('=')[0]
                                for k_args in x_args))):
                 x_args.append(k)
-        assert(any([xx.startswith('--write-script') for xx in x_args]))
+        assert(any([(xx.split('=')[0] == '--write-script') for xx in x_args]))
         if not second_attempt:
             pytest_cmdline_preparse(x_args, dont_exit=True)
     # Run test in separate process
@@ -376,6 +374,8 @@ def pytest_collection_modifyitems(config, items):
                 suites.append('examples_part2')
         suites_disabled = [mark.kwargs.get('disabled', False)
                            for mark in item.iter_markers(name="suite")]
+        if suites and not any(suites_disabled):
+            suites.append('top')
         skip_x = None
         if selected_suites:
             if (((suites and not any(x in selected_suites for x in suites))

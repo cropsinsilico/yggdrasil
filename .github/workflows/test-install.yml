@@ -49,7 +49,7 @@ jobs:
         - pip
         test-flags1:
         - --long-running --suites timing demos top
-        - --suite=examples --separate-test='--suite=mpi --write-script=run_mpi.sh
+        - --suite=examples --extra-examples --separate-test='--suite=mpi --write-script=run_mpi.sh
           --run-with-mpi=3'
         - --suite=types --skip-languages c cpp
         - --suite=types --languages c cpp

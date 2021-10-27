@@ -639,7 +639,7 @@ class SerializeBase(tools.YggClass):
                     setattr(self, rk, v)
         return typedef
 
-    def func_serialize(self, args):
+    def func_serialize(self, args):  # pragma: debug
         r"""Serialize a message.
 
         Args:
@@ -652,7 +652,7 @@ class SerializeBase(tools.YggClass):
         """
         raise NotImplementedError("func_serialize not implemented.")
 
-    def func_deserialize(self, msg):
+    def func_deserialize(self, msg):  # pragma: debug
         r"""Deserialize a message.
 
         Args:

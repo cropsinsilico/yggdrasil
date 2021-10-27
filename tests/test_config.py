@@ -73,6 +73,8 @@ def test_parser_config():
     with pytest.raises(ValueError):
         config.resolve_config_parser(
             parser.parse_args(['--production-run', '--debug']))
+    args1 = config.resolve_config_parser(
+        parser.parse_args(['--production-run']))
     args2 = config.resolve_config_parser(
         parser.parse_args(['--debug']))
     args3 = config.resolve_config_parser(
@@ -84,6 +86,9 @@ def test_parser_config():
     args2.validate_messages = 'True'
     for k, v in old_var.items():
         assert(os.environ.get(k, None) == v)
+    with config.parser_config(args1):
+        assert(os.environ.get('YGG_VALIDATE_COMPONENTS', '') == 'false')
+        assert(os.environ.get('YGG_VALIDATE_MESSAGES', '') == 'false')
     with config.parser_config(args2):
         assert(os.environ.get('YGG_DEBUG', '') == 'DEBUG')
         assert(os.environ.get('YGG_CLIENT_DEBUG', '') == 'DEBUG')
