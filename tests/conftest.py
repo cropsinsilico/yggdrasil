@@ -479,10 +479,11 @@ def write_pytest_script(fname, argv):
     cmd = ' '.join(argv)
     if platform._is_win:
         cmd = cmd.replace('\\', '/')
-    #     lines = [cmd + ' %*']
-    # else:
-    lines = ['#!/bin/bash',
-             cmd + ' $@']
+    if platform._is_win and (not os.environ.get("CONDA_PREFIX", None)):
+        lines = [cmd + ' %*']
+    else:
+        lines = ['#!/bin/bash',
+                 cmd + ' $@']
     with open(fname, 'w') as fd:
         fd.write('\n'.join(lines))
     os.chmod(fname, (stat.S_IRWXU
