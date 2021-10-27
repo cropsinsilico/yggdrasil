@@ -2107,7 +2107,7 @@ class CompiledModelDriver(ModelDriver):
         allow_parallel_build (bool): If True, a file can be compiled by
             two processes simultaneously. If False, it cannot and an
             MPI barrier will be used to prevent simultaneous compilation.
-            Defaults to True.
+            Defaults to False.
 
     Attributes:
         source_files (list): Source files.
@@ -2153,7 +2153,8 @@ class CompiledModelDriver(ModelDriver):
                          'key': 'archiver_flags',
                          'type': list}]
     is_build_tool = False
-    allow_parallel_build = True
+    allow_parallel_build = False
+    locked_buildfile = None
 
     def __init__(self, name, args, skip_compile=False, **kwargs):
         self.buildfile_lock = None
@@ -2309,6 +2310,8 @@ class CompiledModelDriver(ModelDriver):
 
         """
         global _buildfile_locks
+        if fname is None:
+            fname = cls.locked_buildfile
         assert(fname is not None)
         if (context is None) and (instance is not None):
             context = instance.context
@@ -3772,40 +3775,44 @@ class CompiledModelDriver(ModelDriver):
             str: Compiled model file path.
 
         """
-        if source_files is None:
-            source_files = self.source_files
-        if not skip_interface_flags:
-            kwargs['logging_level'] = self.numeric_logging_level
-        default_kwargs = dict(out=self.model_file,
-                              compiler_flags=self.compiler_flags,
-                              for_model=True,
-                              skip_interface_flags=skip_interface_flags,
-                              overwrite=self.overwrite,
-                              working_dir=self.working_dir,
-                              products=self.products,
-                              toolname=self.get_tool_instance('compiler',
-                                                              return_prop='name'),
-                              suffix=('_%s' % self.name))
-        if not kwargs.get('dont_link', False):
-            default_kwargs.update(linker_flags=self.linker_flags)
-        for k, v in default_kwargs.items():
-            kwargs.setdefault(k, v)
-        if ((isinstance(kwargs['out'], str) and os.path.isfile(kwargs['out'])
-             and (not kwargs['overwrite']))):
-            self.debug("Result already exists: %s", kwargs['out'])
-            return kwargs['out']
-        if 'env' not in kwargs:
-            kwargs['env'] = self.set_env(for_compile=True,
-                                         toolname=kwargs['toolname'])
-        try:
-            if not kwargs.get('dry_run', False):
-                self.compile_dependencies_instance(toolname=kwargs['toolname'])
-            return self.call_compiler(source_files, **kwargs)
-        except BaseException:
-            self.cleanup_products()
-            raise
-        finally:
-            self.restore_files()
+        dont_lock_buildfile = (kwargs.pop('dont_lock_buildfile', False)
+                               or kwargs.get('dry_run', False))
+        with self.buildfile_locked(dry_run=dont_lock_buildfile):
+            if source_files is None:
+                source_files = self.source_files
+            if not skip_interface_flags:
+                kwargs['logging_level'] = self.numeric_logging_level
+            default_kwargs = dict(out=self.model_file,
+                                  compiler_flags=self.compiler_flags,
+                                  for_model=True,
+                                  skip_interface_flags=skip_interface_flags,
+                                  overwrite=self.overwrite,
+                                  working_dir=self.working_dir,
+                                  products=self.products,
+                                  toolname=self.get_tool_instance(
+                                      'compiler', return_prop='name'),
+                                  suffix=('_%s' % self.name))
+            if not kwargs.get('dont_link', False):
+                default_kwargs.update(linker_flags=self.linker_flags)
+            for k, v in default_kwargs.items():
+                kwargs.setdefault(k, v)
+            if ((isinstance(kwargs['out'], str) and os.path.isfile(kwargs['out'])
+                 and (not kwargs['overwrite']))):
+                self.debug("Result already exists: %s", kwargs['out'])
+                return kwargs['out']
+            if 'env' not in kwargs:
+                kwargs['env'] = self.set_env(for_compile=True,
+                                             toolname=kwargs['toolname'])
+            try:
+                if not kwargs.get('dry_run', False):
+                    self.compile_dependencies_instance(
+                        toolname=kwargs['toolname'])
+                return self.call_compiler(source_files, **kwargs)
+            except BaseException:
+                self.cleanup_products()
+                raise
+            finally:
+                self.restore_files()
 
     @classmethod
     def get_internal_suffix(cls, commtype=None):

@@ -1,4 +1,5 @@
 import pytest
+import copy
 from tests import TestComponentBase as base_class
 import os
 
@@ -33,7 +34,7 @@ class TestDriver(base_class):
         yml = {}
         if working_dir:
             yml['working_dir'] = working_dir
-        return dict(testing_options.get('kwargs', {}), yml=yml,
+        return dict(copy.deepcopy(testing_options.get('kwargs', {})), yml=yml,
                     timeout=timeout, sleeptime=polling_interval,
                     namespace=namespace)
 

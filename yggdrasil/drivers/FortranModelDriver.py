@@ -376,7 +376,7 @@ class FortranModelDriver(CompiledModelDriver):
     max_line_width = 72
     global_scope_macro = ('#define WITH_GLOBAL_SCOPE(COMM) call '
                           'set_global_comm(); COMM; call unset_global_comm()')
-    allow_parallel_build = False
+    locked_buildfile = 'fygg.mod'
     
     @staticmethod
     def before_registration(cls):
@@ -425,13 +425,6 @@ class FortranModelDriver(CompiledModelDriver):
                     "standards.")
 
     @classmethod
-    def get_buildfile_lock(cls, **kwargs):
-        r"""Get a lock for a buildfile to prevent simultaneous access,
-        creating one as necessary."""
-        kwargs.setdefault('fname', 'fygg.mod')
-        return super(FortranModelDriver, cls).get_buildfile_lock(**kwargs)
-    
-    @classmethod
     def set_env_class(cls, **kwargs):
         r"""Set environment variables that are instance independent.
 
@@ -465,8 +458,7 @@ class FortranModelDriver(CompiledModelDriver):
 
         """
         kwargs.setdefault('standard', self.standard)
-        with self.buildfile_locked(kwargs.get('dry_run', False)):
-            return super(FortranModelDriver, self).compile_model(**kwargs)
+        return super(FortranModelDriver, self).compile_model(**kwargs)
 
     @classmethod
     def get_internal_suffix(cls, commtype=None):

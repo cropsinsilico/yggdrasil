@@ -9,19 +9,7 @@ History
 * Refactor tests to use pytest fixtures instead of the unittest setup/teardown structure
 * Remove the yggtest CLI and migrate options into pytest CLI options
 * Update the GHA workflow to use the new pytest based CLI
-
-TODO
-~~~~
-
-* Remove debug messages in conftest.py
-* Debug GHA workflow
-  * MPI running on mac & windows os (killed before MPI_INIT)
-  * flaky error on windows service tests (REST API, services, etc)
-
-    At D:\a\_temp\e0ad0e4c-2625-400d-87c2-edc46259b4dc.ps1:3 char:5
-    + if ((Test-Path -LiteralPath variable:\LASTEXITCODE)) { exit $LASTEXIT …
-      +     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	    [DBG]: PS D:\a\yggdrasil\yggdrasil>>
+* Use lock to prevent parallel compilation for all compiled languages
 
 1.8.1 (2021-10-15) Minor updates to support model submission form development
 ------------------

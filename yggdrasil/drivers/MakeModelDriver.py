@@ -271,7 +271,8 @@ class MakeModelDriver(BuildModelDriver):
                                   # source_files=[],  # Unknown source files, use target
                                   for_model=False,  # flags are in environment
                                   working_dir=self.makedir,
-                                  makefile=self.buildfile)
+                                  makefile=self.buildfile,
+                                  dont_lock_buildfile=True)
             if target is not None:
                 default_kwargs['target'] = target
             for k, v in default_kwargs.items():

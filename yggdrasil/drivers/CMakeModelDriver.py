@@ -1031,6 +1031,7 @@ class CMakeModelDriver(BuildModelDriver):
                                     allow_error=True, **kwargs)
         out = None
         with self.buildfile_locked(kwargs.get('dry_run', False)):
+            kwargs['dont_lock_buildfile'] = True
             default_kwargs = dict(target=target,
                                   sourcedir=self.sourcedir,
                                   builddir=self.builddir,

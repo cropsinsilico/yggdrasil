@@ -731,7 +731,7 @@ class CModelDriver(CompiledModelDriver):
     include_channel_obj = True
     is_typed = True
     brackets = (r'{', r'}')
-    allow_parallel_build = False
+    locked_buildfile = 'datatypes.o'
 
     @staticmethod
     def after_registration(cls, **kwargs):
@@ -785,27 +785,6 @@ class CModelDriver(CompiledModelDriver):
                 if '-fPIC' not in cls.internal_libraries[x]['compiler_flags']:
                     cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
         
-    @classmethod
-    def get_buildfile_lock(cls, **kwargs):
-        r"""Get a lock for a buildfile to prevent simultaneous access,
-        creating one as necessary."""
-        kwargs.setdefault('fname', 'datatypes.o')
-        return super(CModelDriver, cls).get_buildfile_lock(**kwargs)
-    
-    def compile_model(self, **kwargs):
-        r"""Compile model executable(s).
-
-        Args:
-            **kwargs: Keyword arguments are passed to the parent class's
-            method.
-
-        Returns:
-            str: Compiled model file path.
-
-        """
-        with self.buildfile_locked(kwargs.get('dry_run', False)):
-            return super(CModelDriver, self).compile_model(**kwargs)
-
     @classmethod
     def configure(cls, cfg, macos_sdkroot=None, vcpkg_dir=None, **kwargs):
         r"""Add configuration options for this language. This includes locating

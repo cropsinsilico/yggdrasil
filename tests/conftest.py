@@ -98,7 +98,6 @@ def setup_ci(args):
         package_dir = os.path.join(x, 'yggdrasil')
         if os.path.isdir(package_dir):
             break
-    print(f"SITE PACKAGES: {site.getsitepackages()}")
     assert(os.path.isdir(package_dir))
     args += ['-v',
              '--import-mode=importlib',
@@ -139,7 +138,6 @@ def setup_ci(args):
 # def pytest_load_initial_conftests(args):
 def pytest_cmdline_preparse(args, dont_exit=False):
     r"""Adjust the pytest arguments before testing."""
-    # TODO: count?
     # Check for run in separate process before adding CI args
     run_process = False
     prefix = []
@@ -172,7 +170,6 @@ def pytest_cmdline_preparse(args, dont_exit=False):
             if '--with-mpi' not in args:
                 args.append('--with-mpi')
             args += ['-p', 'no:flaky']
-            args += ['-s', '-o', 'log_cli=true']  # TODO: remove this
             for x in ['--reruns=2', '--reruns-delay=1', '--timeout=900']:
                 if x in args:
                     args.remove(x)
@@ -1408,19 +1405,14 @@ def sync_mpi_result(request, on_mpi):
     r"""Synchronize results between MPI ranks."""
     mpi_exchange = None
     if on_mpi:
-        print("new mpi exchange", request.node)
         mpi_exchange = new_mpi_exchange()
-        print("before sync in setup", mpi_exchange.global_tag, request.node)
         mpi_exchange.sync()
-        print("after sync in setup", mpi_exchange.global_tag, request.node)
     yield
     if on_mpi:
-        print("before sync in teardown", mpi_exchange.global_tag, request.node)
         failure = (request.node.rep_setup.failed
                    or getattr(getattr(request.node, 'rep_call', None),
                               'failed', False))
         mpi_exchange.finalize(failure)
-        print("after sync in teardown", mpi_exchange.global_tag, request.node)
 
 
 # Monkey patch pytest-cov plugin with MPI Barriers to prevent multiple
