@@ -127,11 +127,11 @@ def option_cases(args, option, remove=False, requires_arg=False):
     if not isinstance(option, (tuple, list)):
         option = [option]
     for i, x in enumerate(args):
-        if x.split('=')[0] in option:
+        if x.split('=', 1)[0] in option:
             out.append((i, x))
             if requires_arg:
                 if '=' in x:
-                    values.append(x.split('=')[-1])
+                    values.append(x.split('=', 1)[-1])
                 elif requires_arg == 'multiple':
                     idx = i + 1
                     while (idx < len(args)) and (not args[idx].startswith('-')):
@@ -216,11 +216,11 @@ def pytest_cmdline_preparse(args, dont_exit=False):
                                 '--parametrize-', '--default-comm'])
             if k in ['-c']:
                 x_args += [k, args[args.index(k) + 1]]
-            elif ((k.startswith('-') and (k.split('=')[0] not in excluded)
-                   and not any(k_args.split('=')[0] == k.split('=')[0]
+            elif ((k.startswith('-') and (k.split('=', 1)[0] not in excluded)
+                   and not any(k_args.split('=', 1)[0] == k.split('=', 1)[0]
                                for k_args in x_args))):
                 x_args.append(k)
-        assert(any([(xx.split('=')[0] == '--write-script') for xx in x_args]))
+        assert(any([(xx.split('=', 1)[0] == '--write-script') for xx in x_args]))
         if not second_attempt:
             pytest_cmdline_preparse(x_args, dont_exit=True)
     # Run test in separate process
