@@ -516,9 +516,8 @@ def get_config_parser(parser=None, description=None, skip_sections=None):
     if parser is None:
         parser = argparse.ArgumentParser(description=description)
     for k, v in _cfg_map.items():
-        if k[0] in skip_sections:
-            continue
-        parser.add_argument(*['--' + x for x in v['args']], **v['kwargs'])
+        if k[0] not in skip_sections:
+            parser.add_argument(*['--' + x for x in v['args']], **v['kwargs'])
     parser.add_argument('--production-run', action='store_true',
                         help=('Turn off safe guards in order to improve '
                               'performance. This is equivalent to '

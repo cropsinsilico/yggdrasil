@@ -53,11 +53,11 @@ def test_get_compilation_tool():
             assert(CompiledModelDriver.get_compilation_tool(tooltype, v) == out)
         with pytest.raises(ValueError):
             CompiledModelDriver.get_compilation_tool('compiler', 'invalid')
-    # else:
-    #     with pytest.raises(NotImplementedError):
-    #         CModelDriver.get_tool('compiler')
-    #     assert(CModelDriver.get_tool(
-    #         'compiler', default='invalid') == 'invalid')
+    else:
+        with pytest.raises(NotImplementedError):
+            CModelDriver.get_tool('compiler')
+        assert(CModelDriver.get_tool(
+            'compiler', default='invalid') == 'invalid')
     assert(CompiledModelDriver.get_compilation_tool('compiler', 'invalid',
                                                     default='invalid')
            == 'invalid')

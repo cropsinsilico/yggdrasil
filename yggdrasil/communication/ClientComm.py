@@ -108,16 +108,6 @@ class ClientComm(CommBase.CommBase):
         return self.ocomm.maxMsgSize
         
     @classmethod
-    def underlying_comm_class(self):
-        r"""str: Name of underlying communication class."""
-        return import_comm().underlying_comm_class()
-
-    @classmethod
-    def comm_count(cls):
-        r"""int: Number of communication connections."""
-        return import_comm().comm_count()
-
-    @classmethod
     def new_comm_kwargs(cls, name, request_commtype=None, **kwargs):
         r"""Initialize communication with new comms.
 

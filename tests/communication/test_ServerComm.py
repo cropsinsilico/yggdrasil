@@ -41,6 +41,10 @@ class TestServerComm(base_class):
     def test_call(self, send_comm, recv_comm, testing_options, timeout,
                   wait_on_function):
         r"""Test RPC call."""
+        send_comm.maxMsgSize
+        recv_comm.maxMsgSize
+        send_comm.opp_comms
+        recv_comm.opp_comms
         send_comm.sched_task(0.0, send_comm.rpcCall,
                              args=[testing_options['msg']],
                              store_output=True)

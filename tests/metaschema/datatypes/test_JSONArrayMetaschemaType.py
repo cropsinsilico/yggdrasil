@@ -29,6 +29,8 @@ def test_coerce(nested_approx):
 
     for y in msg_send_list:
         do_send_recv(y)
+    assert(JSONArrayMetaschemaType.coerce_type({'a': 'hello', 'b': 'world'})
+           == [{'a': 'hello', 'b': 'world'}])
     
 
 class TestJSONArrayMetaschemaType(base_class):

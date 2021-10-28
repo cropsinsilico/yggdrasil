@@ -152,8 +152,6 @@ class MPIComm(CommBase.CommBase):
             assert(kwargs.get('address', 'generate') in ['generate',
                                                          'address'])
             ranks = kwargs['partner_mpi_ranks']
-        if ranks and (kwargs.get('address', None) is None):
-            kwargs['address'] = 'generate'
         self._request_lock = RLock(task_method='thread')
         self.requests = []
         self.unused_tags = {}

@@ -347,7 +347,7 @@ class RMQComm(CommBase.CommBase):
                 try:
                     self.channel.close()
                 except (pika.exceptions.ChannelWrongStateError,
-                        pika.exceptions.StreamLostError):
+                        pika.exceptions.StreamLostError):  # pragma: debug
                     pass
 
     def close_connection(self, *args, **kwargs):

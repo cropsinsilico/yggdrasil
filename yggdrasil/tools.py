@@ -734,6 +734,33 @@ def get_supported_platforms():
     return copy.deepcopy(platform._supported_platforms)
 
 
+def is_language_alias(x, language):
+    r"""Check if a string is an alias for a language.
+
+    Args:
+        x (str): String to check.
+        language (str, list): One or more language to check aliases of.
+
+    Returns:
+        str, bool: Returns the version of the language in the provided set if
+            x is an alias and False otherwise.
+
+    """
+    if isinstance(language, str):
+        language = [language]
+    for xx in [x, x.lower(), x.upper()]:
+        if xx in language:
+            return xx
+    aliases = []
+    for k, v in constants.ALIASED_LANGUAGES.items():
+        if x in v:
+            aliases = v
+    for v in aliases:
+        if v in language:
+            return v
+    return False
+
+
 def get_supported_lang():
     r"""Get a list of the model programming languages that are supported
     by yggdrasil.

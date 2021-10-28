@@ -79,17 +79,13 @@ class TestExample(base_class):
     def language(self, request, example_name, check_required_languages):
         r"""str: Language of the currect test."""
         avail_langs = get_example_languages(example_name)
-        if request.param in avail_langs:
-            lang = request.param
-        elif request.param.lower() in avail_langs:
-            lang = request.param.lower()
-        elif request.param.upper() in avail_langs:
-            lang = request.param.upper()
-        else:
-            pytest.skip(f"example dosn't have a {request.param} version")
+        lang = tools.is_language_alias(request.param, avail_langs)
+        if not lang:
+            pytest.skip(f"example dosn't have a {request.param} version "
+                        f"(supported: {avail_langs})")
         check_required_languages(
             get_example_languages(example_name, language=lang))
-        return request.param
+        return lang
 
     @pytest.fixture(scope="class", autouse=True)
     def prepare_makefile(self, language, mpi_rank, yamldir):

@@ -999,6 +999,8 @@ class CommBase(tools.YggClass):
         r"""str: Name of underlying communication class."""
         if cls._commtype in [None, 'fork']:
             return False
+        elif cls._commtype in ['client', 'server']:
+            return import_comm().underlying_comm_class()
         return cls._commtype
 
     @classmethod
@@ -1344,7 +1346,7 @@ class CommBase(tools.YggClass):
             return self.n_msg_send
 
     @property
-    def n_msg_recv(self):
+    def n_msg_recv(self):  # pragma: debug
         r"""int: The number of incoming messages in the connection."""
         return 0
 
@@ -1648,7 +1650,7 @@ class CommBase(tools.YggClass):
     @property
     def get_work_comm_kwargs(self):
         r"""dict: Keyword arguments for an existing work comm."""
-        if self._commtype is None:
+        if self._commtype is None:  # pragma: debug
             raise IncompleteBaseComm(
                 "Base comm class '%s' cannot create work comm."
                 % self.__class__.__name__)
@@ -1665,7 +1667,7 @@ class CommBase(tools.YggClass):
     @property
     def create_work_comm_kwargs(self):
         r"""dict: Keyword arguments for a new work comm."""
-        if self._commtype is None:
+        if self._commtype is None:  # pragma: debug
             raise IncompleteBaseComm(
                 "Base comm class '%s' cannot create work comm."
                 % self.__class__.__name__)

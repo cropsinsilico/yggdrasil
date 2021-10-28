@@ -128,7 +128,7 @@ class BaseComm(TestComponentBase):
     
     @pytest.fixture(scope="class")
     def do_send_recv(self, wait_on_function, testing_options, map_sent2recv,
-                     n_msg_expected, nested_approx, logger):
+                     n_msg_expected, nested_approx, logger, timeout):
         r"""Factory for method to perform send/recv checks for comms."""
         def wrapped_do_send_recv(send_comm, recv_comm, message=None,
                                  send_params=None, recv_params=None):
@@ -178,6 +178,13 @@ class BaseComm(TestComponentBase):
             if not send_params.get('skip_wait', False):
                 wait_on_function(
                     lambda: send_comm.is_closed or (send_comm.n_msg_send == 0))
+            if 'eof' not in send_params.get('method', 'send'):
+                send_comm.wait_for_confirm(timeout=timeout)
+                recv_comm.wait_for_confirm(timeout=timeout)
+                assert(send_comm.is_confirmed)
+                assert(recv_comm.is_confirmed)
+                send_comm.confirm(noblock=True)
+                recv_comm.confirm(noblock=True)
             assert(send_comm.n_msg_send == 0)
             assert(recv_comm.n_msg_recv == 0)
         return wrapped_do_send_recv
@@ -245,21 +252,30 @@ class BaseComm(TestComponentBase):
         return process_send_message(out)
 
     @pytest.fixture(scope="class")
-    def msg_array(self, testing_options, process_send_message):
+    def msg_array(self, testing_options, process_send_message, python_class):
         r"""array: Test message that should be used for send_array/recv_array
         tests."""
         out = testing_options.get('msg_array', None)
         if out is None:
-            pytest.skip("No array message for communicator")
+            if python_class._commtype == 'ipc':
+                out = python_class.get_testing_options(
+                    table_example=True, array_columns=True,
+                    include_oldkws=True)['msg_array']
+            else:
+                pytest.skip("No array message for communicator")
         return process_send_message(out)
 
     @pytest.fixture(scope="class")
-    def msg_dict(self, testing_options, process_send_message):
+    def msg_dict(self, testing_options, process_send_message, python_class):
         r"""dict: Test message that should be used for send_dict/recv_dict
         tests."""
         out = testing_options.get('dict', None)
         if not out:
-            pytest.skip("No dict message for communicator")
+            if python_class._commtype in ['ipc', 'fork']:
+                out = python_class.get_testing_options(
+                    table_example=True, array_columns=True)['dict']
+            else:
+                pytest.skip("No dict message for communicator")
         return process_send_message(out)
 
     @pytest.fixture(scope="class")
@@ -280,7 +296,7 @@ class BaseComm(TestComponentBase):
             try:
                 assert(objs[0] == objs[1])
             except BaseException:
-                return process_send_message(objs[0])
+                return process_send_message(objs[1])
         pytest.skip("There aren't enough unique objects.")
 
     @pytest.fixture(scope="class")
@@ -297,7 +313,7 @@ class BaseComm(TestComponentBase):
 
     @pytest.fixture
     def filtered_comms(self, send_comm, recv_comm, msg_filter_send,
-                       msg_filter_recv):
+                       msg_filter_recv, nested_approx):
         r"""Add filters to the send and receive communicators."""
         from yggdrasil.communication.filters.StatementFilter import (
             StatementFilter)
@@ -313,7 +329,7 @@ class BaseComm(TestComponentBase):
 
         def fcond(x):
             try:
-                assert(x == msg_filter_recv)
+                assert(x == nested_approx(msg_filter_recv))
                 return False
             except BaseException:
                 return True

@@ -60,6 +60,8 @@ class TestZMQComm(base_class):
                          testing_options, do_send_recv):
         r"""Test router receipt of message from the dealer with an
         identity."""
+        send_comm.protocol
+        send_comm.host
         if socket_type != 'ROUTER':
             pytest.skip("Only valid for ROUTER socket_type")
         temp = send_comm

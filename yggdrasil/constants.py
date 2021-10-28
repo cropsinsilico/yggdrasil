@@ -273,6 +273,12 @@ LANGUAGES_WITH_ALIASES['all'] = (
     + LANGUAGES_WITH_ALIASES['build']
     + LANGUAGES_WITH_ALIASES['dsl']
     + LANGUAGES_WITH_ALIASES['other'])
+ALIASED_LANGUAGES = {
+    'R': [
+        'R', 'r'],
+    'c++': [
+        'c++', 'cpp', 'cxx'],
+}
 COMPILER_ENV_VARS = {
     'c': {
         'exec': 'CC',

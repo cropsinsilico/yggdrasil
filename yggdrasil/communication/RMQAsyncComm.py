@@ -13,7 +13,7 @@ class RMQTaskLoop(multitasking.YggTaskLoop):
         self.comm = weakref.proxy(comm)
         super(RMQTaskLoop, self).__init__(*args, **kwargs)
     
-    def atexit(self):
+    def atexit(self):  # pragma: debug
         if self.comm.is_interface:
             if self.comm.direction == 'send' and self.comm.is_open:
                 self.comm.send_eof()
@@ -101,7 +101,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
 
     def check_for_close(self):
         r"""bool: Check if close has been called from the main process."""
-        if self._external_close.is_set():
+        if self._external_close.is_set():  # pragma: debug
             self._closing.start()
             if self._reconnecting.is_running():
                 self._reconnecting.stop()
@@ -140,7 +140,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
             self._reconnect_delay = min(self._reconnect_delay, 30)
             self.info(f'Reconnecting after {self._reconnect_delay} seconds')
             self._external_close.wait(self._reconnect_delay)
-            if self._external_close.is_set():
+            if self._external_close.is_set():  # pragma: debug
                 self._reconnecting.stop()
                 raise BreakLoop("external close")
             self.reset_for_reconnection()
@@ -325,7 +325,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 assert(self._closing.has_stopped())
                 return
             self._external_close.set()
-            if self._reconnecting.is_running():
+            if self._reconnecting.is_running():  # pragma: debug
                 self._reconnecting.stopped.wait(10.0)
                 return
             if self.connection is not None:
@@ -340,7 +340,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
                     # Not called here because KeyboardInterrupt is not used
                     # to stop the loop
                     # self.connection.ioloop.start()
-                elif self.connection is not None:
+                elif self.connection is not None:  # pragma: debug
                     self.connection.ioloop.stop()
                     self.close_channel()
                     self.close_connection()
@@ -392,7 +392,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self.debug(f'Channel {channel} was closed: {reason}, {type(reason)}')
         self.close_queue(skip_unbind=True)
         kwargs = {}
-        if isinstance(reason, pika.exceptions.ChannelClosedByBroker):
+        if isinstance(reason, pika.exceptions.ChannelClosedByBroker):  # pragma: debug
             self._closing.start()
             self._consuming.stop()
             kwargs['reply_code'] = reason.reply_code

@@ -7,8 +7,6 @@ class TransformBase(ComponentBase):
     r"""Base class for message transforms.
 
     Args:
-        initial_state (dict, optional): Dictionary of initial state variables
-            that should be set when the transform is created.
         original_datatype (dict, optional): Datatype associated with expected
             messages. Defaults to None.
 
@@ -17,14 +15,11 @@ class TransformBase(ComponentBase):
     _transformtype = None
     _schema_type = 'transform'
     _schema_subtype_key = 'transformtype'
-    _schema_properties = {'initial_state': {'type': 'object'},
-                          'original_datatype': {'type': 'schema'}}
+    _schema_properties = {'original_datatype': {'type': 'schema'}}
 
     def __init__(self, *args, **kwargs):
         self._state = {}
         super(TransformBase, self).__init__(*args, **kwargs)
-        if self.initial_state:
-            self._state = self.initial_state
         self.transformed_datatype = None
         if self.original_datatype:
             self.set_original_datatype(self.original_datatype)
@@ -119,18 +114,3 @@ class TransformBase(ComponentBase):
                 self.set_original_datatype(encode_type(x))
             out = self.evaluate_transform(x, no_copy=no_copy)
         return out
-
-    @classmethod
-    def get_testing_options(cls):
-        r"""Get testing options for the transform class.
-
-        Returns:
-            list: Multiple dictionaries of keywords and messages before/after
-                pairs that will result from the transform created by the provided
-                keywords.
-        
-        """
-        return [{'in/out': [(1, NotImplementedError)],
-                 'kwargs': {'initial_state': {'test': 1},
-                            'original_datatype': {
-                                'type': 'int'}}}]
