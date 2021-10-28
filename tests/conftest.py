@@ -174,7 +174,7 @@ def pytest_cmdline_preparse(args, dont_exit=False):
             prefix = ['mpiexec', '-n', nproc]
             if os.environ.get('CI', False) and platform._is_linux:
                 prefix.append('--oversubscribe')
-            prefix += [sys.executable, '-m']
+            # prefix += [sys.executable, '-m']
             if '--with-mpi' not in args:
                 args.append('--with-mpi')
             args += ['-p', 'no:flaky']
@@ -204,8 +204,9 @@ def pytest_cmdline_preparse(args, dont_exit=False):
             return 0
         sys.exit(0)
     # Check for separate tests
-    separate_tests = option_cases(args, '--separate-test', remove=True,
-                                  requires_arg=True)
+    separate_tests = option_cases(args,
+                                  ('--separate-test', '--separate-tests'),
+                                  remove=True, requires_arg=True)
     for x in separate_tests:
         x_args = x.split()
         for k in args:
