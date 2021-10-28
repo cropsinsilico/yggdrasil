@@ -296,8 +296,12 @@ class TestExample(base_class):
     def test_example(self, example_name, language, namespace, yaml,
                      setup_env, expects_error, on_mpi,
                      mpi_rank, check_results, example_cleanup,
-                     adv_global_mpi_tag):
+                     adv_global_mpi_tag, optionally_disable_verify_count_fds):
         r"""This runs an example in the correct language."""
+        if example_name.startswith('timesync'):
+            # Timesync examples include ploting in the verification script
+            # which opens file descriptors that are not promptly cleaned up
+            optionally_disable_verify_count_fds()
         assert(yaml is not None)
         # Run
         mpi_tag_start = None

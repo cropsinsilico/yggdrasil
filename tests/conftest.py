@@ -1228,9 +1228,16 @@ def disable_verify_count_threads():
 
 
 @pytest.fixture
-def disable_verify_count_fds():
-    global _dont_verify_count_fds
-    _dont_verify_count_fds = True
+def optionally_disable_verify_count_fds():
+    def optionally_disable_verify_count_fds_w():
+        global _dont_verify_count_fds
+        _dont_verify_count_fds = True
+    return optionally_disable_verify_count_fds_w
+
+
+@pytest.fixture
+def disable_verify_count_fds(optionally_disable_verify_count_fds):
+    optionally_disable_verify_count_fds()
     yield
 
 
