@@ -251,7 +251,7 @@ jobs:
       run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none --second-attempt
 
     - name: Run generated test script (1st)
-      if: ${{ contains(matrix.test-flags1, '--write-script') }}
+      if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
       id: test1_script
       run: ./run_mpi.sh
       continue-on-error: true
@@ -269,7 +269,7 @@ jobs:
       run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none --second-attempt
 
     - name: Run generated test script (2nd)
-      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--write-script') }}
+      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script') }}
       id: test2_script
       run: ./run_mpi.sh
       continue-on-error: true
