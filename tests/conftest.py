@@ -138,9 +138,11 @@ def option_cases(args, option, remove=False, requires_arg=False):
                         out.append((idx, args[idx]))
                         values.append(args[idx])
                         idx += 1
-                else:
+                elif ((i + 1) < len(args)) and (not args[i + 1].startswith('-')):
                     out.append((i + 1, args[i + 1]))
                     values.append(args[i + 1])
+                else:
+                    values.append(None)
     if remove:
         for x in out[::-1]:
             del args[x[0]]
@@ -161,9 +163,19 @@ def pytest_cmdline_preparse(args, dont_exit=False):
     # Disable output capture
     if option_cases(args, '--nocapture', remove=True):
         args += ['-s', '-o', 'log_cli=true']
-    # MPI process should be started
-    mpi_flag = option_cases(args, '--run-with-mpi', remove=True,
+    # MPI script
+    mpi_script = option_cases(args, '--mpi-script', remove=True,
+                              requires_arg=True)
+    mpi_flag = option_cases(args, '--mpi-nproc', remove=True,
                             requires_arg=True)
+    if mpi_script:
+        mpi_test_args = [
+            '--suite=mpi', f'--write-script={mpi_script[0]}']
+        if mpi_flag:
+            mpi_test_args.append(f'--mpi-nproc={mpi_flag[0]}')
+        args.append(f'--separate-test={" ".join(mpi_test_args)}')
+        mpi_flag = []
+    # MPI process should be started
     if ('mpi' in suites) and (not mpi_flag) and (not _on_mpi):
         mpi_flag = ['2']
     if mpi_flag:
@@ -293,8 +305,14 @@ def pytest_addoption(parser):
     parser.addoption('--write-script', type=str,
                      help=("Name of script that should be created to run "
                            "tests."))
-    parser.addoption('--run-with-mpi', type=int, default=1,
+    parser.addoption('--mpi-nproc', type=int, default=1,
                      help="Number of MPI processes to run tests on.")
+    parser.addoption('--mpi-script', type=str,
+                     help=("Name of script that should be written to "
+                           "run MPI tests. If --mpi-nproc is not set, it "
+                           "will default to 2. If --mpi-nproc is set, it "
+                           "will only be used in the MPI script that is "
+                           "generated."))
     parser.addoption('--separate-tests', '--separate-test',
                      type=str, action="append",
                      help="Flags for an additional test that should be run")
