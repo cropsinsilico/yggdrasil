@@ -746,7 +746,8 @@ class ZMQComm(CommBase.CommBase):
 
     def disconnect_socket(self, dont_close=False):
         r"""Disconnect from address."""
-        if not hasattr(self, 'socket_lock'):
+        if not hasattr(self, 'socket_lock'):  # pragma: debug
+            # Only occurs if there is an error in the class set up
             return
         with self.socket_lock:
             if getattr(self, '_connected', False):

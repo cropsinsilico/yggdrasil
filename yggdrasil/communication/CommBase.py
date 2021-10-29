@@ -1065,14 +1065,10 @@ class CommBase(tools.YggClass):
         for ienv in [env, os.environ]:
             if name in ienv:
                 kwargs.setdefault('address', ienv[name])
-        new_commtype = kwargs.pop('commtype', None)
         if dont_create:
             args = tuple([name] + list(args))
         else:
             args, kwargs = cls.new_comm_kwargs(name, *args, **kwargs)
-        if new_commtype is not None:
-            new_cls = import_comm(new_commtype)
-            return new_cls(*args, **kwargs)
         return cls(*args, **kwargs)
 
     @property
@@ -1246,7 +1242,7 @@ class CommBase(tools.YggClass):
     @property
     def is_open(self):
         r"""bool: True if the connection is open."""
-        return False
+        return False  # pragma: debug
 
     @property
     def is_closed(self):

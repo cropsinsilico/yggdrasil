@@ -2541,7 +2541,8 @@ class CompiledModelDriver(ModelDriver):
                         out = getattr(out_comp, tooltype)()
                     except BaseException:  # pragma: debug
                         out = None
-            if out is None:
+            if out is None:  # pragma: debug
+                # Github Actions images now include GNU compilers by default
                 if default is False:
                     raise NotImplementedError(
                         "%s not set for language '%s' (toolname=%s)."
@@ -3037,7 +3038,7 @@ class CompiledModelDriver(ModelDriver):
         else:
             tooltype = 'linker'
         tool = cls.get_tool(tooltype, toolname=toolname)
-        if tool is False:
+        if tool is False:  # pragma: debug
             raise RuntimeError("No %s tool for language %s."
                                % (tooltype, cls.language))
         kwargs = cls.update_linker_kwargs(toolname=toolname, **kwargs)

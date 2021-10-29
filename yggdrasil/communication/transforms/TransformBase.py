@@ -68,7 +68,7 @@ class TransformBase(ComponentBase):
                     if 'title' in y:
                         x.setdefault('title', y['title'])
             return out
-        except NotImplementedError:
+        except NotImplementedError:  # pragma: debug
             return datatype
 
     def evaluate_transform(self, x, no_copy=False):
@@ -84,7 +84,7 @@ class TransformBase(ComponentBase):
             object: The transformed message.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: debug
 
     def __call__(self, x, no_copy=False, no_init=False):
         r"""Call transform on the provided message.

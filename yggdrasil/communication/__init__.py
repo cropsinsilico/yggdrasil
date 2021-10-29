@@ -195,20 +195,6 @@ def get_comm(name, **kwargs):
     return new_comm(name, **kwargs)
     
 
-def cleanup_comms(commtype=None):
-    r"""Call cleanup_comms for the appropriate communicator class.
-
-    Args:
-        commtype (str, optional): Name of communicator class. Defaults to
-            'default' if not provided.
-
-    Returns:
-        int: Number of comms closed.
-
-    """
-    return import_comm(commtype).cleanup_comms()
-
-
 @contextmanager
 def open_file_comm(fname, mode, filetype='binary', **kwargs):
     r"""Context manager to open a file comm in a way similar to how
@@ -259,4 +245,4 @@ def get_open_fds():  # pragma: debug
     return nprocs
 
 
-__all__ = ['new_comm', 'get_comm', 'cleanup_comms']
+__all__ = ['new_comm', 'get_comm']

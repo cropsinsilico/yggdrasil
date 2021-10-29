@@ -162,6 +162,13 @@ def test_get_conda_env():
 def test_get_python_c_library():
     r"""Test get_python_c_library."""
     tools.get_python_c_library(allow_failure=True)
+
+
+def test_is_language_alias():
+    r"""Test is_language_alias."""
+    assert(tools.is_language_alias('c++', 'cpp'))
+    assert(tools.is_language_alias('r', 'R'))
+    assert(tools.is_language_alias('MATLAB', 'matlab'))
     
 
 def test_get_supported():

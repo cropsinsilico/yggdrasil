@@ -555,7 +555,7 @@ class TestComm(BaseComm):
                      send_params={'method': 'send_array'},
                      recv_params={'method': 'recv_array'})
 
-    def test_send_recv_dict(self, run_once, send_comm, recv_comm, msg_dict,
+    def test_send_recv_dict(self, send_comm, recv_comm, msg_dict,
                             do_send_recv):
         r"""Test send/recv message as dict."""
         do_send_recv(send_comm, recv_comm, msg_dict,

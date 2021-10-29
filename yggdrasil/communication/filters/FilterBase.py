@@ -29,7 +29,7 @@ class FilterBase(ComponentBase):
             bool: True if the message will pass through the filter, False otherwise.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: debug
 
     def __call__(self, x):
         r"""Call filter on the provided message.
