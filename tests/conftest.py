@@ -146,6 +146,9 @@ def pytest_cmdline_preparse(args, dont_exit=False):
     pargs = parser.parse_known_and_unknown_args(args)[0]
     run_process = False
     prefix = []
+    for k in ['separate_tests', 'suite']:
+        if getattr(pargs, k, None) is None:
+            setattr(pargs, k, [])
     # Disable output capture
     if pargs.nocapture:
         remove_option(args, 'nocapture')
@@ -200,8 +203,6 @@ def pytest_cmdline_preparse(args, dont_exit=False):
     # Check for separate tests
     if pargs.separate_tests:
         remove_option(args, 'separate_tests')
-    else:
-        pargs.separate_tests = []
     for x in pargs.separate_tests:
         x_args = x.split()
         x_args_copy = copy.copy(args)
