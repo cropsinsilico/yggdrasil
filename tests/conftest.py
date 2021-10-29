@@ -7,6 +7,7 @@ import copy
 import shutil
 import pytest
 import logging
+import argparse
 import subprocess
 import contextlib
 from yggdrasil import platform, constants
@@ -77,6 +78,26 @@ _suites = [
 ]
 
 
+class DummyParser(argparse.ArgumentParser):
+
+    def __init__(self, isolate_options=[]):
+        self.isolate_options = isolate_options
+        super(DummyParser, self).__init__()
+        self.add_argument("file_or_dir", nargs="*")
+        add_options_to_parser(self)
+
+    def addoption(self, *args, **kwargs):
+        name = args[0].lstrip('-').replace('-', '_')
+        if self.isolate_options and not (
+                (name in self.isolate_options)
+                or (args[0] in self.isolate_options)):
+            return
+        self.add_argument(*args, **kwargs)
+
+    def parse_known_and_unknown_args(self, *args, **kwargs):
+        return self.parse_known_args(*args, **kwargs)
+
+
 def setup_ci(args):
     import site
     top_dir = os.path.dirname(os.getcwd())
@@ -121,13 +142,11 @@ def setup_ci(args):
 
 
 def remove_option(args, options, remove_file_or_dir=False):
-    from _pytest.config.argparsing import Parser
     if isinstance(options, str):
         options = [options]
     args_copy = copy.copy(args)
     # print("BEFORE", args)
-    parser = Parser()
-    pytest_addoption(parser, isolate_options=options)
+    parser = DummyParser(isolate_options=options)
     parsed_args, remaining = parser.parse_known_and_unknown_args(args)
     if not remove_file_or_dir:
         remaining += parsed_args.file_or_dir
@@ -139,10 +158,8 @@ def remove_option(args, options, remove_file_or_dir=False):
 # def pytest_load_initial_conftests(args):
 def pytest_cmdline_preparse(args, dont_exit=False):
     r"""Adjust the pytest arguments before testing."""
-    from _pytest.config.argparsing import Parser
     # Check for run in separate process before adding CI args
-    parser = Parser()
-    pytest_addoption(parser)
+    parser = DummyParser()
     pargs = parser.parse_known_and_unknown_args(args)[0]
     run_process = False
     prefix = []
@@ -239,17 +256,12 @@ def pytest_cmdline_preparse(args, dont_exit=False):
     print(f"Updated args: {args}")
 
 
-def pytest_addoption(parser, isolate_options=[]):
-    languages = sorted(get_supported_lang())
-    old_method = None
-    if isolate_options:
-        old_method = parser.addoption
+def pytest_addoption(parser):
+    add_options_to_parser(parser)
 
-        def new_method(*args, **kwargs):
-            name = args[0].lstrip('-').replace('-', '_')
-            if (name in isolate_options) or (args[0] in isolate_options):
-                old_method(*args, **kwargs)
-        parser.addoption = new_method
+
+def add_options_to_parser(parser):
+    languages = sorted(get_supported_lang())
     for x in _markers:
         parser.addoption(x[1], action="store_true", default=False,
                          help=f"run {x[2]} tests")
@@ -304,8 +316,6 @@ def pytest_addoption(parser, isolate_options=[]):
                      help="Don't capture output or log messages from tests.")
     parser.addoption('--end-yggdrasil-opts', action="store_true",
                      help="Internal use only")
-    if old_method is not None:
-        parser.addoption = old_method
 
 
 def pytest_configure(config):
