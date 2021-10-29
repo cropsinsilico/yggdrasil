@@ -3,6 +3,7 @@ import gc
 import re
 import sys
 import glob
+import copy
 import shutil
 import pytest
 import logging
@@ -117,155 +118,137 @@ def setup_ci(args):
     with open(".coveragerc", "r") as fd:
         print(fd.read())
     subprocess.check_call(["yggdrasil", "info", "--verbose"])
-    args.remove('--ci')
 
 
-def option_cases(args, option, remove=False, requires_arg=False):
-    r"""Get the index(es) of CLI option instances if it exists."""
-    out = []
-    values = []
-    if not isinstance(option, (tuple, list)):
-        option = [option]
-    for i, x in enumerate(args):
-        if x.split('=', 1)[0] in option:
-            out.append((i, x))
-            if requires_arg:
-                if '=' in x:
-                    values.append(x.split('=', 1)[-1])
-                elif requires_arg == 'multiple':
-                    idx = i + 1
-                    while (idx < len(args)) and (not args[idx].startswith('-')):
-                        out.append((idx, args[idx]))
-                        values.append(args[idx])
-                        idx += 1
-                elif ((i + 1) < len(args)) and (not args[i + 1].startswith('-')):
-                    out.append((i + 1, args[i + 1]))
-                    values.append(args[i + 1])
-                else:
-                    values.append(None)
-    if remove:
-        for x in out[::-1]:
-            del args[x[0]]
-    if requires_arg:
-        return values
-    return [x[1] for x in out]
+def remove_option(args, options, remove_file_or_dir=False):
+    from _pytest.config.argparsing import Parser
+    if isinstance(options, str):
+        options = [options]
+    args_copy = copy.copy(args)
+    # print("BEFORE", args)
+    parser = Parser()
+    pytest_addoption(parser, isolate_options=options)
+    parsed_args, remaining = parser.parse_known_and_unknown_args(args)
+    if not remove_file_or_dir:
+        remaining += parsed_args.file_or_dir
+    args.clear()
+    args += [x for x in args_copy if x in remaining]
+    # print("AFTER ", args, set(args_copy) - set(args))
 
 
 # def pytest_load_initial_conftests(args):
 def pytest_cmdline_preparse(args, dont_exit=False):
     r"""Adjust the pytest arguments before testing."""
+    from _pytest.config.argparsing import Parser
     # Check for run in separate process before adding CI args
+    parser = Parser()
+    pytest_addoption(parser)
+    pargs = parser.parse_known_and_unknown_args(args)[0]
     run_process = False
     prefix = []
-    suites = option_cases(args, ('--suite', '--suites', '--test-suite'),
-                          requires_arg='multiple')
-    second_attempt = ('--second-attempt' in args)
     # Disable output capture
-    if option_cases(args, '--nocapture', remove=True):
+    if pargs.nocapture:
+        remove_option(args, 'nocapture')
         args += ['-s', '-o', 'log_cli=true']
     # MPI script
-    mpi_script = option_cases(args, '--mpi-script', remove=True,
-                              requires_arg=True)
-    mpi_flag = option_cases(args, '--mpi-nproc', remove=True,
-                            requires_arg=True)
-    if mpi_script:
+    if pargs.mpi_script:
+        remove_option(args, 'mpi_script')
         mpi_test_args = [
-            '--suite=mpi', f'--write-script={mpi_script[0]}']
-        if mpi_flag:
-            mpi_test_args.append(f'--mpi-nproc={mpi_flag[0]}')
-        args.append(f'--separate-test={" ".join(mpi_test_args)}')
-        mpi_flag = []
+            '--suite=mpi', f'--write-script={pargs.mpi_script}']
+        if pargs.mpi_nproc > 1:
+            remove_option(args, 'mpi_nproc')
+            mpi_test_args.append(f'--mpi-nproc={pargs.mpi_nproc}')
+            pargs.mpi_nproc = 1
+        mpi_test_args = " ".join(mpi_test_args)
+        args.append(f'--separate-test={mpi_test_args}')
+        if not pargs.separate_tests:
+            pargs.separate_tests = []
+        pargs.separate_tests.append(mpi_test_args)
     # MPI process should be started
-    if ('mpi' in suites) and (not mpi_flag) and (not _on_mpi):
-        mpi_flag = ['2']
-    if mpi_flag:
-        assert(len(mpi_flag) == 1)
-        nproc = mpi_flag[0]
-        if int(nproc) > 1:
-            run_process = True
-            prefix = ['mpiexec', '-n', nproc]
-            if os.environ.get('CI', False) and platform._is_linux:
-                prefix.append('--oversubscribe')
-            # prefix += [sys.executable, '-m']
-            if '--with-mpi' not in args:
-                args.append('--with-mpi')
-            args += ['-p', 'no:flaky']
-            for x in ['--reruns=2', '--reruns-delay=1', '--timeout=900']:
-                if x in args:
-                    args.remove(x)
+    if ('mpi' in pargs.suite) and (pargs.mpi_nproc <= 1) and (not _on_mpi):
+        pargs.mpi_nproc = 2
+    if pargs.mpi_nproc > 1:
+        remove_option(args, 'mpi_nproc')
+        run_process = True
+        prefix = ['mpiexec', '-n', str(pargs.mpi_nproc)]
+        if os.environ.get('CI', False) and platform._is_linux:
+            prefix.append('--oversubscribe')
+        if '--with-mpi' not in args:
+            args.append('--with-mpi')
+        args += ['-p', 'no:flaky']
+        for x in ['--reruns=2', '--reruns-delay=1', '--timeout=900']:
+            if x in args:
+                args.remove(x)
     # Continuous integration
-    if ('--ci' in args) and (not _on_mpi):
+    if pargs.ci and (not _on_mpi):
         setup_ci(args)
+        # remove_option(args, 'ci')
+        args.remove('--ci')  # Much faster
         # Must launch in separate process so that pytest recognizes
         # the added --cov={install_dir} and --import-mode=importlib flags
         run_process = True
     # Write a script to call later
-    write_script = option_cases(args, '--write-script', remove=True,
-                                requires_arg=True)
-    if write_script:
-        assert(len(write_script) == 1)
-        fname = write_script[0]
-        if not os.path.isabs(fname):
-            fname = os.path.abspath(fname)
-        write_pytest_script(fname,
-                            prefix
-                            + ['pytest']
-                            # + [sys.executable, '-m', 'pytest']
-                            + args)
+    if pargs.write_script:
+        remove_option(args, 'write_script')
+        if not os.path.isabs(pargs.write_script):
+            pargs.write_script = os.path.abspath(pargs.write_script)
+        write_pytest_script(pargs.write_script,
+                            prefix + ['pytest'] + args)
         if dont_exit:
             return 0
         sys.exit(0)
     # Check for separate tests
-    separate_tests = option_cases(args,
-                                  ('--separate-test', '--separate-tests'),
-                                  remove=True, requires_arg=True)
-    for x in separate_tests:
+    if pargs.separate_tests:
+        remove_option(args, 'separate_tests')
+    else:
+        pargs.separate_tests = []
+    for x in pargs.separate_tests:
         x_args = x.split()
-        for k in args:
-            excluded = tuple([m[1] for m in _markers]
-                             + ['--suite', '--suites', '--test-suite',
-                                '--language', '--languages',
-                                '--skip-language', '--skip-languages',
-                                '--parametrize-', '--default-comm'])
-            if k in ['-c']:
-                x_args += [k, args[args.index(k) + 1]]
-            elif ((k.startswith('-') and (k.split('=', 1)[0] not in excluded)
-                   and not any(k_args.split('=', 1)[0] == k.split('=', 1)[0]
-                               for k_args in x_args))):
-                x_args.append(k)
-        assert(any([(xx.split('=', 1)[0] == '--write-script') for xx in x_args]))
-        if not second_attempt:
+        x_args_copy = copy.copy(args)
+        excluded = ([m[1] for m in _markers]
+                    + ['suite', 'language', 'skip_language', 'default_comm']
+                    + [f'parametrize_{k}' for k in _params.keys()])
+        remove_option(x_args_copy, excluded, remove_file_or_dir=True)
+        x_args += x_args_copy
+        # x_args_keys = [k.split('=')[0] for k in x_args if k.startswith('-')]
+        # for k in x_args_copy:
+        #     if k.split('=')[0] not in x_args_keys:
+        #         x_args.append(k)
+        assert(any((k.split('=', 1)[0] == '--write-script') for k in x_args))
+        if not pargs.second_attempt:
             pytest_cmdline_preparse(x_args, dont_exit=True)
     # Run test in separate process
     if run_process:
-        flag = subprocess.call(prefix
-                               + ['pytest']
-                               # + [sys.executable, '-m', 'pytest']
-                               + args)
+        flag = subprocess.call(prefix + ['pytest'] + args)
         if dont_exit:
             return flag
         sys.exit(flag)
     # Add test suites paths
-    existing_files = [x for x in args if
-                      os.path.isdir(x)
-                      or (os.path.isfile(x.split('::')[0])
-                          and (x.split('::')[0].endswith(".py")))]
     suite_map = {x[0]: (x[2], x[3]) for x in _suites}
     suite_files = []
-    for suite in suites:
+    for suite in pargs.suite:
         for f in suite_map[suite][0]:
             suite_files += glob.glob(os.path.join(_test_directory, f))
         args += suite_map[suite][1]
     if suite_files:
-        if not existing_files:
+        if not pargs.file_or_dir:
             args += ['--end-yggdrasil-opts'] + sorted(suite_files)
-    elif not existing_files:
+    elif not pargs.file_or_dir:
         args += ['--end-yggdrasil-opts'] + ["tests"]
     print(f"Updated args: {args}")
 
 
-def pytest_addoption(parser):
+def pytest_addoption(parser, isolate_options=[]):
     languages = sorted(get_supported_lang())
+    old_method = None
+    if isolate_options:
+        old_method = parser.addoption
+
+        def new_method(*args, **kwargs):
+            name = args[0].lstrip('-').replace('-', '_')
+            if (name in isolate_options) or (args[0] in isolate_options):
+                old_method(*args, **kwargs)
+        parser.addoption = new_method
     for x in _markers:
         parser.addoption(x[1], action="store_true", default=False,
                          help=f"run {x[2]} tests")
@@ -320,6 +303,8 @@ def pytest_addoption(parser):
                      help="Don't capture output or log messages from tests.")
     parser.addoption('--end-yggdrasil-opts', action="store_true",
                      help="Internal use only")
+    if old_method is not None:
+        parser.addoption = old_method
 
 
 def pytest_configure(config):
