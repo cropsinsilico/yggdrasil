@@ -80,7 +80,7 @@ def get_compatible_tool(tool, tooltype, language, default=False):
                               "associated with a tool named %s")
                              % (tooltype, language, tool))
         tool = out
-    if isinstance(tool, bool):
+    if isinstance(tool, bool):  # pragma: debug
         return tool
     if (tool.tooltype == tooltype) and (language in tool.languages):
         return tool
@@ -2323,8 +2323,7 @@ class CompiledModelDriver(ModelDriver):
     @contextlib.contextmanager
     def buildfile_locked(self, dry_run=False):
         r"""Context manager for locked build file."""
-        if self.allow_parallel_build:
-            dry_run = True
+        dry_run = (dry_run or self.allow_parallel_build)
         try:
             if not dry_run:
                 self.buildfile_lock.lock.acquire()
