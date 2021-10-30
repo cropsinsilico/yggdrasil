@@ -84,6 +84,7 @@ class DummyParser(argparse.ArgumentParser):
         self.isolate_options = isolate_options
         super(DummyParser, self).__init__()
         self.add_argument("file_or_dir", nargs="*")
+        self.add_argument('-c', type=str, nargs=1)
         add_options_to_parser(self)
 
     def addoption(self, *args, **kwargs):
