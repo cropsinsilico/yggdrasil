@@ -88,7 +88,9 @@ class TestModelDriver(base_class):
     @pytest.fixture
     def instance_args(self, name, source, testing_options):
         r"""Arguments for a new instance of the tested class."""
-        return tuple([name, source + testing_options.get('args', [])])
+        return tuple(
+            [name, source + copy.deepcopy(
+                testing_options.get('args', []))])
 
     @pytest.fixture(scope="class")
     def python_class_installed(self, python_class):

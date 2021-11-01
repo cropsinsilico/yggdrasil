@@ -117,10 +117,12 @@ class TestForkComm(base_class):
                                           recv_comm, polling_interval,
                                           do_send_recv):
         r"""Test send/recv with filter that blocks recv."""
-        # Wait if not async?
         do_send_recv(send_comm, recv_comm, msg_filter_recv,
                      recv_params={'message': recv_comm.empty_obj_recv,
-                                  'skip_wait': True,
+                                  # Don't need to skip since
+                                  # filter is evaluated after
+                                  # receipt for fork comm
+                                  'skip_wait': False,
                                   'count': 1,
                                   'kwargs': {'timeout': 10 * polling_interval}})
         

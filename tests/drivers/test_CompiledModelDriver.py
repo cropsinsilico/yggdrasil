@@ -192,17 +192,21 @@ class TestCompiledModelDriver(model_base_class):
     def instance_args(self, name, source, testing_options, compiler,
                       is_installed):
         r"""Arguments for a new instance of the tested class."""
-        return tuple([name, ([compiler.get_output_file(source[0])]
-                             + testing_options.get('args', []))])
+        return tuple(
+            [name, ([compiler.get_output_file(source[0])]
+                    + copy.deepcopy(
+                        testing_options.get('args', [])))])
 
     @pytest.fixture
     def instance_kwargs(self, testing_options, timeout, working_dir,
                         polling_interval, namespace, source):
         r"""Keyword arguments for a new instance of the tested class."""
-        return dict(testing_options.get('kwargs', {}),
-                    yml={'working_dir': working_dir},
-                    timeout=timeout, sleeptime=polling_interval,
-                    namespace=namespace, source_files=source)
+        return dict(
+            copy.deepcopy(
+                testing_options.get('kwargs', {})),
+            yml={'working_dir': working_dir},
+            timeout=timeout, sleeptime=polling_interval,
+            namespace=namespace, source_files=source)
     
     @pytest.fixture
     def run_model_instance_kwargs(self):
