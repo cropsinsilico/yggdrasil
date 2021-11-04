@@ -7,7 +7,7 @@ def test_get_language_dir():
     with pytest.raises(ValueError):
         languages.get_language_dir('invalid')
     test_lang = constants.LANGUAGES_WITH_ALIASES['all']
-    test_skip = ['make', 'cmake', 'executable', 'timesync', 'osr', 'mpi']
+    test_skip = ['make', 'cmake', 'executable', 'timesync', 'osr', 'mpi', 'ode']
     for lang in test_lang:
         if lang in test_skip:
             continue

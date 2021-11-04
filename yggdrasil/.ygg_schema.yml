@@ -1608,9 +1608,13 @@ definitions:
           description: Name used for component in log messages.
           type: string
         odeint_kws:
-          description: Options that should be passed to the scipy odeint integration
+          description: 'Options that should be passed to the scipy odeint integration
             routine if numeric integration is used (in the event that sympy cannot
-            find a symbolic solution or use_numeric is True).
+            find a symbolic solution or use_numeric is True). In addition to the keyword
+            arguments accepted by scipy.integrate.odeint, the following are also supported:
+            from_prev (bool, optional): If True, the integration should always begin
+            from the previous end state instead of starting from the initial conditions
+            (default behavior).'
           type: object
         only_output_final_step:
           default: false
@@ -2500,9 +2504,13 @@ definitions:
             - ode
             type: string
           odeint_kws:
-            description: Options that should be passed to the scipy odeint integration
+            description: 'Options that should be passed to the scipy odeint integration
               routine if numeric integration is used (in the event that sympy cannot
-              find a symbolic solution or use_numeric is True).
+              find a symbolic solution or use_numeric is True). In addition to the
+              keyword arguments accepted by scipy.integrate.odeint, the following
+              are also supported: from_prev (bool, optional): If True, the integration
+              should always begin from the previous end state instead of starting
+              from the initial conditions (default behavior).'
             type: object
           parameters:
             additionalProperties:

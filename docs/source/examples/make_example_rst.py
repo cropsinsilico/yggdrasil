@@ -18,9 +18,10 @@ lang2print = {'python': 'Python',
               'fortran': 'Fortran',
               'sbml': 'SBML',
               'osr': 'OpenSimRoot',
+              'ode': 'ODE',
               'dummy': 'Dummy',
               'timesync': 'Timesync'}
-_default_lang = ['python', 'cpp', 'c', 'R', 'fortran', 'matlab', 'sbml']
+_default_lang = ['python', 'cpp', 'c', 'R', 'fortran', 'matlab', 'sbml', 'ode']
 
 
 def get_file(fname, local=False):
@@ -60,6 +61,8 @@ def make_rst_file(k):
 
         
 def make_src_file(k):
+    if not source.get(k, []):
+        return
     fname = get_src_file(k, local=True)
     with open(fname, 'w') as fd:
         write_src_ref(fd, k)
@@ -82,6 +85,8 @@ def get_rel_path(fname, upone=False):
 def get_default_lang(k):
     if k == 'rpc_lesson3b':
         return 'cpp'
+    elif k.startswith('ode'):
+        return 'ode'
     else:
         for x in _default_lang:
             if x in source[k]:
@@ -157,7 +162,8 @@ def write_lang(fd, k, lang):
     head = '%s Version' % lang2print[lang]
     fd.write(head + '\n')
     fd.write((len(head) * '-') + '\n\n')
-    write_src(fd, k, lang)
+    if lang in source[k]:
+        write_src(fd, k, lang)
     fd.write('\n')
     write_yml(fd, k, lang)
     fd.write('\n')
@@ -216,9 +222,7 @@ def write_yml(fd, k, lang, upone=False):
                         replacements=replacements)
 
         
-rst_examples = source.keys()
+rst_examples = [k for k, v in yamls.items() if v]
 make_toc_file(rst_examples)
 for k in rst_examples:
-    if not yamls[k]:
-        continue
     make_rst_file(k)
