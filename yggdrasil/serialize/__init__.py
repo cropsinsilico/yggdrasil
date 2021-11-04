@@ -1082,8 +1082,6 @@ def parse_header(header, newline=constants.DEFAULT_NEWLINE, lineno_format=None,
             out['newline'])[0].split(out['delimiter'])
     # Locate units & names
     for i in range(len(header)):
-        if ('field_units' in out) and ('field_names' in out):
-            break
         if i in excl_lines:
             continue
         cols = header[i].split(out['comment'])[-1].split(

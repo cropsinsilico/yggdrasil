@@ -502,7 +502,7 @@ def test_parse_header():
     header3 = [header[0], header[0]]
     with pytest.raises(RuntimeError):
         serialize.parse_header(header3)
-    header4 = [header[1], header[1]]
+    header4 = [header[0], header[1], header[1]]
     with pytest.raises(RuntimeError):
         serialize.parse_header(header4)
 
