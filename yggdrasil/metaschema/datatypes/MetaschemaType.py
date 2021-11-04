@@ -1,7 +1,6 @@
 import six
 import copy
 import uuid
-import importlib
 import jsonschema
 from yggdrasil import constants
 from yggdrasil.metaschema import (get_metaschema, get_validator, encoder,
@@ -764,7 +763,7 @@ class MetaschemaType(object):
 
     # TESTING METHODS
     @classmethod
-    def _generate_data(cls, typedef):
+    def _generate_data(cls, typedef, **kwargs):
         r"""Generate mock data for the specified type.
 
         Args:
@@ -777,7 +776,7 @@ class MetaschemaType(object):
         raise NotImplementedError  # pragma: debug
     
     @classmethod
-    def generate_data(cls, typedef):
+    def generate_data(cls, typedef, **kwargs):
         r"""Generate mock data for the specified type.
 
         Args:
@@ -791,36 +790,11 @@ class MetaschemaType(object):
         typedef = cls.normalize_definition(typedef)
         if hasattr(cls, 'example_data'):
             return cls.example_data
-        return cls._generate_data(typedef)
-    
+        return cls._generate_data(typedef, **kwargs)
+
     @classmethod
-    def import_test_class(cls):
-        r"""Import the test class for this class.
-
-        Returns:
-            class: Test class for this class.
-
-        """
-        tmod = importlib.import_module(cls.get_test_module())
-        tcls = cls.get_test_class()
-        return getattr(tmod, tcls)
-    
-    @classmethod
-    def get_test_class(cls):
-        r"""Determine the test class for the class.
-
-        Returns:
-            str: Name of the test class for this class.
-
-        """
-        return 'Test%s' % cls.__name__
-    
-    @classmethod
-    def get_test_module(cls):
-        r"""Determine the test module for the class.
-
-        Returns:
-            str: Full Python "path" to module containing the test class.
-
-        """
-        return '%s.tests.test_%s' % tuple(cls.__module__.rsplit('.', 1))
+    def get_test_data(cls, typedef=None):
+        r"""object: Test data."""
+        if typedef is None:
+            typedef = {'type': cls.name}
+        return cls.generate_data(typedef)

@@ -348,6 +348,28 @@ class ForkComm(CommBase.CommBase):
         return True
 
     @property
+    def n_msg_direct_recv(self):
+        r"""int: Number of messages currently being routed in recv."""
+        if self.pattern == 'gather':
+            return min([x.n_msg_direct_recv for x in self.comm_list])
+        return sum([x.n_msg_direct_recv for x in self.comm_list])
+        
+    @property
+    def n_msg_direct_send(self):
+        r"""int: Number of messages currently being routed in send."""
+        if self.pattern in ['broadcast', 'scatter']:
+            return max([x.n_msg_direct_send for x in self.comm_list])
+        return sum([x.n_msg_direct_send for x in self.comm_list])
+
+    @property
+    def n_msg_direct(self):
+        r"""int: Number of messages currently being routed."""
+        if self.direction == 'send':
+            return self.n_msg_direct_send
+        else:
+            return self.n_msg_direct_recv
+
+    @property
     def n_msg_recv(self):
         r"""int: The number of incoming messages in the connection."""
         if self.pattern == 'gather':

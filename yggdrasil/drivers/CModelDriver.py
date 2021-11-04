@@ -731,6 +731,7 @@ class CModelDriver(CompiledModelDriver):
     include_channel_obj = True
     is_typed = True
     brackets = (r'{', r'}')
+    locked_buildfile = 'datatypes.o'
 
     @staticmethod
     def after_registration(cls, **kwargs):
@@ -1931,4 +1932,78 @@ class CModelDriver(CompiledModelDriver):
         out += super(CModelDriver, cls).write_assign_to_output(
             dst_var, src_var, outputs_in_inputs=outputs_in_inputs,
             **kwargs)
+        return out
+
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for driver instance.
+                deps (list): Dependencies to install.
+
+        """
+        out = super(CModelDriver, cls).get_testing_options(**kwargs)
+        # Test types
+        out['replacement_code_types'] = {}
+        for k, v in cls.type_map.items():
+            if v == '*':
+                knew = {'type': k, 'subtype': 'float',
+                        'precision': 32}
+                vnew = 'float*'
+                out['replacement_code_types'][(k, v)] = (knew, vnew)
+            elif 'X' in v:
+                knew = {'type': k, 'precision': 64}
+                if k == 'complex':
+                    vnew = v.replace('X', 'float')
+                else:
+                    vnew = v.replace('X', '64')
+                out['replacement_code_types'][(k, v)] = (knew, vnew)
+        # Code composition parameters
+        out.setdefault('write_function_def_params', [])
+        out['write_function_def_params'] += [
+            # Single output
+            {'inputs': [{'name': 'x', 'value': 1.0,
+                         'datatype': {'type': 'float',
+                                      'precision': 32,
+                                      'units': 'cm'}}],
+             'outputs': [{'name': 'y',
+                          'datatype': {'type': 'float',
+                                       'precision': 32,
+                                       'units': 'cm'}}],
+             'outputs_in_inputs': False,
+             'dont_add_lengths': True},
+            # No output
+            {'inputs': [{'name': 'x', 'value': 1.0,
+                         'datatype': {'type': 'float',
+                                      'precision': 32,
+                                      'units': 'cm'}}],
+             'outputs': [],
+             'outputs_in_inputs': False},
+            # No length variable
+            {'inputs': [{'name': 'x', 'value': '"hello"',
+                         'length_var': 'length_x',
+                         'datatype': {'type': 'string',
+                                      'precision': 20,
+                                      'units': ''}},
+                        {'name': 'length_x', 'value': 5,
+                         'datatype': {'type': 'uint',
+                                      'precision': 64},
+                         'is_length_var': True}],
+             'outputs': [{'name': 'y',
+                          'length_var': 'length_y',
+                          'datatype': {'type': 'string',
+                                       'precision': 20,
+                                       'units': ''}},
+                         {'name': 'length_y',
+                          'datatype': {'type': 'uint',
+                                       'precision': 64},
+                          'is_length_var': True}],
+             'dont_add_lengths': True},
+        ]
         return out

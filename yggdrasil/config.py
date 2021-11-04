@@ -63,30 +63,6 @@ _cfg_map = {
         'env': 'YGG_MSG_PW', 'help': 'RabbitMQ password.'},
     ('parallel', 'cluster'): {
         'env': 'YGG_CLUSTER', 'help': 'Cluster that should be used.'},
-    ('testing', 'enable_examples'): {
-        'env': 'YGG_ENABLE_EXAMPLE_TESTS', 'arg': 'with-examples',
-        'action': 'store_true',
-        'help': 'Run example tests when encountered.'},
-    ('testing', 'enable_demos'): {
-        'env': 'YGG_ENABLE_DEMO_TESTS', 'arg': 'with-demos',
-        'action': 'store_true',
-        'help': 'Run demo tests when encountered.'},
-    ('testing', 'languages'): {
-        'env': 'YGG_TEST_LANGUAGE', 'arg': 'language',
-        'default': [], 'nargs': '+', 'type': str,
-        'help': 'Language(s) that sould not be tested.'},
-    ('testing', 'skip_languages'): {
-        'env': 'YGG_TEST_SKIP_LANGUAGE', 'arg': 'skip-language',
-        'default': [], 'nargs': '+', 'type': str,
-        'help': 'Language(s) that sould not be tested.'},
-    ('testing', 'enable_long'): {
-        'env': 'YGG_ENABLE_LONG_TESTS', 'arg': 'long-running',
-        'action': 'store_true',
-        'help': 'Run long tests when encounterd.'},
-    ('testing', 'enable_production_runs'): {
-        'env': 'YGG_TEST_PRODUCTION_RUNS',
-        'action': 'store_true',
-        'help': 'Run production level tests when encountered.'},
     ('general', 'default_comm'): {
         'env': 'YGG_DEFAULT_COMM', 'type': str,
         'help': 'Comm type that should be used by default.'},
@@ -540,9 +516,8 @@ def get_config_parser(parser=None, description=None, skip_sections=None):
     if parser is None:
         parser = argparse.ArgumentParser(description=description)
     for k, v in _cfg_map.items():
-        if k[0] in skip_sections:
-            continue
-        parser.add_argument(*['--' + x for x in v['args']], **v['kwargs'])
+        if k[0] not in skip_sections:
+            parser.add_argument(*['--' + x for x in v['args']], **v['kwargs'])
     parser.add_argument('--production-run', action='store_true',
                         help=('Turn off safe guards in order to improve '
                               'performance. This is equivalent to '
@@ -637,14 +612,10 @@ def acquire_env(new_env):
     # old_env = {k: os.environ.get(k, None) for k in _key2env.values()}
     set_env = {}
     for k, v in new_env.items():
+        if v is None:
+            continue
         k_env = _key2env.get(k, k)
         old_env.setdefault(k_env, os.environ.get(k_env, None))
-        if (((k_env in ['YGG_TEST_LANGUAGE', 'YGG_TEST_SKIP_LANGUAGE'])
-             and isinstance(v, list))):
-            if len(v) == 0:
-                continue
-            from yggdrasil.components import import_component
-            v = [import_component('model', x).language for x in v]
         if not isinstance(v, str):
             v = json.dumps(v)
         set_env[k_env] = v

@@ -14,13 +14,10 @@ class FilterBase(ComponentBase):
     _filtertype = None
     _schema_type = 'filter'
     _schema_subtype_key = 'filtertype'
-    _schema_properties = {'initial_state': {'type': 'object'}}
 
     def __init__(self, *args, **kwargs):
         self._state = {}
         super(FilterBase, self).__init__(*args, **kwargs)
-        if self.initial_state:
-            self._state = self.initial_state
 
     def evaluate_filter(self, x):
         r"""Call filter on the provided message.
@@ -32,7 +29,7 @@ class FilterBase(ComponentBase):
             bool: True if the message will pass through the filter, False otherwise.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: debug
 
     def __call__(self, x):
         r"""Call filter on the provided message.
@@ -56,15 +53,3 @@ class FilterBase(ComponentBase):
             print(out, type(out))
             raise
         return out
-
-    @classmethod
-    def get_testing_options(cls):
-        r"""Get testing options for the filter class.
-
-        Returns:
-            list: Mutiple dictionaries of keywords and messages that will
-                pass/fail for those keywords.
-        
-        """
-        return [{'error': [(1, NotImplementedError)],
-                 'kwargs': {'initial_state': {'a': int(1)}}}]

@@ -376,3 +376,22 @@ class OSRModelDriver(ExecutableModelDriver):
         r"""Cleanup dependencies."""
         cls.compile_dependencies(target='cleanygg')
         super(OSRModelDriver, cls).cleanup_dependencies(*args, **kwargs)
+
+    @classmethod
+    def get_testing_options(cls):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for driver instance.
+                deps (list): Dependencies to install.
+
+        """
+        out = super(OSRModelDriver, cls).get_testing_options()
+        out['kwargs'].update(
+            timesync={'name': 'timesync',
+                      'inputs': ['carbonAllocation2Roots'],
+                      'outputs': ['carbonAllocation2Roots']},
+            copy_xml_to_osr=True)
+        out['requires_partner'] = True
+        return out

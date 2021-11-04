@@ -82,7 +82,8 @@ class ClientComm(CommBase.CommBase):
         lines.append('%s%-15s:' % (prefix, 'request comm'))
         lines += self.ocomm.get_status_message(nindent=(nindent + 1))[0]
         lines.append('%s%-15s:' % (prefix, 'response comms'))
-        lines += self.icomm.get_status_message(nindent=(nindent + 1))[0]
+        if self.icomm:
+            lines += self.icomm.get_status_message(nindent=(nindent + 1))[0]
         return lines, prefix
     
     @classmethod
@@ -106,16 +107,6 @@ class ClientComm(CommBase.CommBase):
         r"""int: Maximum size of a single message that should be sent."""
         return self.ocomm.maxMsgSize
         
-    @classmethod
-    def underlying_comm_class(self):
-        r"""str: Name of underlying communication class."""
-        return import_comm().underlying_comm_class()
-
-    @classmethod
-    def comm_count(cls):
-        r"""int: Number of communication connections."""
-        return import_comm().comm_count()
-
     @classmethod
     def new_comm_kwargs(cls, name, request_commtype=None, **kwargs):
         r"""Initialize communication with new comms.
@@ -197,6 +188,11 @@ class ClientComm(CommBase.CommBase):
     def n_msg_send_drain(self):
         r"""int: The number of outgoing messages in the connection to drain."""
         return self.ocomm.n_msg_send_drain
+
+    @property
+    def n_msg_direct(self):
+        r"""int: Number of messages currently being routed."""
+        return self.ocomm.n_msg_direct
 
     def atexit(self):  # pragma: debug
         r"""Close operations."""
@@ -340,3 +336,22 @@ class ClientComm(CommBase.CommBase):
         r"""Sleep while waiting for messages to be drained."""
         if direction == 'send':
             self.ocomm.drain_messages(direction='send', **kwargs)
+
+    def disconnect(self, *args, **kwargs):
+        r"""Disconnect the comm."""
+        if hasattr(self, 'ocomm'):
+            self.ocomm.disconnect()
+        if getattr(self, 'icomm', None):
+            self.icomm.disconnect()
+        super(ClientComm, self).disconnect()
+
+    # ALIASED PROPERTIES WITH SETTERS
+    @property
+    def filter(self):
+        r"""FilterBase: filter for the communicator."""
+        return self.ocomm.filter
+
+    @filter.setter
+    def filter(self, x):
+        r"""Set the filter."""
+        self.ocomm.filter = x

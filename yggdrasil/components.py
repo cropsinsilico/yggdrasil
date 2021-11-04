@@ -348,10 +348,6 @@ class ComponentMeta(type):
     
     def __new__(meta, name, bases, class_dict):
         cls = type.__new__(meta, name, bases, class_dict)
-        # Return early for error classes which should be unregistered duplicates
-        # of the base class
-        if getattr(cls, '_is_error_class', False):
-            return cls
         # Determine subtype
         subtype = None
         if cls._schema_subtype_key is not None:

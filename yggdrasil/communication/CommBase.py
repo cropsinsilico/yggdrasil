@@ -704,10 +704,14 @@ class CommBase(tools.YggClass):
         if self.is_interface:
             atexit.register(self.atexit)
         self._init_before_open(**kwargs)
-        if dont_open:
-            self.bind()
-        else:
-            self.open()
+        try:
+            if dont_open:
+                self.bind()
+            else:
+                self.open()
+        except BaseException:
+            self.close()
+            raise
         self.logger._instance_name += (
             '=>%s[%s]' % (str(self.address).replace('%', '%%'),
                           self.direction.upper()))
@@ -836,6 +840,9 @@ class CommBase(tools.YggClass):
                'contents': out_seri['contents'],
                'objects': out_seri['objects']}
         out['recv'] = copy.deepcopy(out['send'])
+        for i in range(len(out['recv'])):
+            if isinstance(out['recv'][i], tuple):
+                out['recv'][i] = list(out['recv'][i])
         out['dict'] = seri_cls.object2dict(out['msg'], **out['kwargs'])
         if not out_seri.get('exact_contents', True):
             out['exact_contents'] = False
@@ -992,6 +999,8 @@ class CommBase(tools.YggClass):
         r"""str: Name of underlying communication class."""
         if cls._commtype in [None, 'fork']:
             return False
+        elif cls._commtype in ['client', 'server']:
+            return import_comm().underlying_comm_class()
         return cls._commtype
 
     @classmethod
@@ -1056,14 +1065,10 @@ class CommBase(tools.YggClass):
         for ienv in [env, os.environ]:
             if name in ienv:
                 kwargs.setdefault('address', ienv[name])
-        new_commtype = kwargs.pop('commtype', None)
         if dont_create:
             args = tuple([name] + list(args))
         else:
             args, kwargs = cls.new_comm_kwargs(name, *args, **kwargs)
-        if new_commtype is not None:
-            new_cls = import_comm(new_commtype)
-            return new_cls(*args, **kwargs)
         return cls(*args, **kwargs)
 
     @property
@@ -1217,7 +1222,7 @@ class CommBase(tools.YggClass):
             self.drain_messages(variable='n_msg_send')
             self.wait_for_confirm(timeout=self._timeout_drain,
                                   active_confirm=active_confirm)
-        self.debug("Finished (timeout_drain = %s)", str(self._timeout_drain))
+        self.debug("Finished (timeout_drain = {str(self._timeout_drain)})")
 
     def language_atexit(self):  # pragma: debug
         r"""Close operations specific to the language."""
@@ -1226,19 +1231,18 @@ class CommBase(tools.YggClass):
 
     def atexit(self):  # pragma: debug
         r"""Close operations."""
-        self.debug('atexit begins (n_msg=%d)', self.n_msg)
+        self.debug(f'atexit begins (n_msg={self.n_msg})')
         self.language_atexit()
         self.debug('atexit after language_atexit, but before close')
         self.close()
         self.debug(
-            'atexit finished: closed=%s, n_msg=%d, close_alive=%s',
-            self.is_closed, self.n_msg,
-            self._closing_thread.is_alive())
+            f'atexit finished: closed={self.is_closed}, n_msg={self.n_msg}, '
+            f'close_alive={self._closing_thread.is_alive()}')
 
     @property
     def is_open(self):
         r"""bool: True if the connection is open."""
-        return False
+        return False  # pragma: debug
 
     @property
     def is_closed(self):
@@ -1338,7 +1342,7 @@ class CommBase(tools.YggClass):
             return self.n_msg_send
 
     @property
-    def n_msg_recv(self):
+    def n_msg_recv(self):  # pragma: debug
         r"""int: The number of incoming messages in the connection."""
         return 0
 
@@ -1515,8 +1519,13 @@ class CommBase(tools.YggClass):
 
         """
         try:
-            from yggdrasil.tests import assert_equal
-            assert_equal(msg, emsg)
+            import pandas
+            if isinstance(msg, np.ndarray):
+                np.testing.assert_array_equal(msg, emsg)
+            elif isinstance(msg, pandas.DataFrame):
+                pandas.testing.assert_frame_equal(msg, emsg)
+            else:
+                assert(msg == emsg)
         except AssertionError:
             return False
         return True
@@ -1637,7 +1646,7 @@ class CommBase(tools.YggClass):
     @property
     def get_work_comm_kwargs(self):
         r"""dict: Keyword arguments for an existing work comm."""
-        if self._commtype is None:
+        if self._commtype is None:  # pragma: debug
             raise IncompleteBaseComm(
                 "Base comm class '%s' cannot create work comm."
                 % self.__class__.__name__)
@@ -1654,7 +1663,7 @@ class CommBase(tools.YggClass):
     @property
     def create_work_comm_kwargs(self):
         r"""dict: Keyword arguments for a new work comm."""
-        if self._commtype is None:
+        if self._commtype is None:  # pragma: debug
             raise IncompleteBaseComm(
                 "Base comm class '%s' cannot create work comm."
                 % self.__class__.__name__)

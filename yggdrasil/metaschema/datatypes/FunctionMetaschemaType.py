@@ -3,6 +3,10 @@ from yggdrasil.metaschema.datatypes.ClassMetaschemaType import (
     ClassMetaschemaType)
 
 
+def example_func(x):  # pragma: debug
+    return x
+
+
 class FunctionMetaschemaType(ClassMetaschemaType):
     r"""Type for evaluating functions."""
 
@@ -22,6 +26,4 @@ class FunctionMetaschemaType(ClassMetaschemaType):
             object: Python object of the specified type.
 
         """
-        def example_func(x):  # pragma: debug
-            return x
         return example_func

@@ -3,7 +3,7 @@ import copy
 import numpy as np
 import warnings
 import io as sio
-from yggdrasil import platform, serialize, units
+from yggdrasil import platform, serialize
 from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
     JSONArrayMetaschemaType)
 from yggdrasil.serialize.AsciiTableSerialize import AsciiTableSerialize
@@ -371,9 +371,7 @@ class PandasSerialize(AsciiTableSerialize):
                            + b'three\t3\t3.0\n')
         out['concatenate'] = [([], [])]
         if not_as_frames:
-            # Strip units since pandas data frames are not serialized with units
-            out['objects'] = [[units.get_data(ix) for ix in x]
-                              for x in out['objects']]
+            pass
         elif no_header:
             out['objects'] = [serialize.list2pandas(x) for x in out['objects']]
             out['dtype'] = np.dtype(','.join([x[1] for x in out['dtype'].descr]))

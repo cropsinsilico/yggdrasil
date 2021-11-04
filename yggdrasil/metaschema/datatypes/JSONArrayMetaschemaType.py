@@ -216,7 +216,7 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
             container, index, default)
 
     @classmethod
-    def _generate_data(cls, typedef):
+    def _generate_data(cls, typedef, **kwargs):
         r"""Generate mock data for the specified type.
 
         Args:
@@ -230,7 +230,38 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
             nitems = typedef.get('minItems', 1)
             out = cls._container_type()
             for i in range(nitems):
-                cls._assign(out, i, generate_data(typedef[cls._json_property]))
+                cls._assign(out, i, generate_data(typedef[cls._json_property],
+                                                  **kwargs))
         else:
-            out = super(JSONArrayMetaschemaType, cls)._generate_data(typedef)
+            out = super(JSONArrayMetaschemaType, cls)._generate_data(typedef,
+                                                                     **kwargs)
         return out
+
+    @classmethod
+    def get_test_data(cls, typedef=None):
+        r"""object: Test data."""
+        if typedef is None:
+            typedef = {
+                'type': 'array',
+                'items': [
+                    {'type': 'float',
+                     'precision': 32,
+                     'units': ''},
+                    {'type': 'bytes',
+                     'precision': 40,
+                     'units': ''},
+                    {'type': 'unicode',
+                     'precision': 40,
+                     'units': ''},
+                    {'type': 'object',
+                     'properties': {'nested': {'type': 'int',
+                                               'precision': 64,
+                                               'units': ''}}},
+                    {'type': 'array',
+                     'items': [{'type': 'complex',
+                                'precision': 128,
+                                'units': ''},
+                               {'type': 'uint',
+                                'precision': 8,
+                                'units': ''}]}]}
+        return super(JSONArrayMetaschemaType, cls).get_test_data(typedef)

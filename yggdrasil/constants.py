@@ -273,6 +273,12 @@ LANGUAGES_WITH_ALIASES['all'] = (
     + LANGUAGES_WITH_ALIASES['build']
     + LANGUAGES_WITH_ALIASES['dsl']
     + LANGUAGES_WITH_ALIASES['other'])
+ALIASED_LANGUAGES = {
+    'R': [
+        'R', 'r'],
+    'c++': [
+        'c++', 'cpp', 'cxx'],
+}
 COMPILER_ENV_VARS = {
     'c': {
         'exec': 'CC',
@@ -347,5 +353,82 @@ COMPILATION_TOOL_VARS = {
     'nmake': {
         'exec': None,
         'flags': None,
+    },
+}
+LANGUAGE_PROPERTIES = {
+    'R': {
+        'executable_type': 'interpreted',
+        'full_language': True,
+        'is_typed': False,
+    },
+    'c': {
+        'executable_type': 'compiled',
+        'full_language': True,
+        'is_typed': True,
+    },
+    'c++': {
+        'executable_type': 'compiled',
+        'full_language': True,
+        'is_typed': True,
+    },
+    'cmake': {
+        'executable_type': 'build',
+        'full_language': False,
+        'is_typed': False,
+    },
+    'dummy': {
+        'executable_type': 'other',
+        'full_language': False,
+        'is_typed': False,
+    },
+    'executable': {
+        'executable_type': 'other',
+        'full_language': False,
+        'is_typed': False,
+    },
+    'fortran': {
+        'executable_type': 'compiled',
+        'full_language': True,
+        'is_typed': True,
+    },
+    'lpy': {
+        'executable_type': 'dsl',
+        'full_language': False,
+        'is_typed': False,
+    },
+    'make': {
+        'executable_type': 'build',
+        'full_language': False,
+        'is_typed': False,
+    },
+    'matlab': {
+        'executable_type': 'interpreted',
+        'full_language': True,
+        'is_typed': False,
+    },
+    'mpi': {
+        'executable_type': 'other',
+        'full_language': False,
+        'is_typed': False,
+    },
+    'osr': {
+        'executable_type': 'dsl',
+        'full_language': False,
+        'is_typed': False,
+    },
+    'python': {
+        'executable_type': 'interpreted',
+        'full_language': True,
+        'is_typed': False,
+    },
+    'sbml': {
+        'executable_type': 'dsl',
+        'full_language': False,
+        'is_typed': False,
+    },
+    'timesync': {
+        'executable_type': 'other',
+        'full_language': False,
+        'is_typed': False,
     },
 }

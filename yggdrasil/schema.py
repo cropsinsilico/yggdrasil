@@ -267,9 +267,11 @@ def update_constants(schema=None):
     lang2ext = {'yaml': '.yml', 'executable': '.exe'}
     languages = {k: [] for k in language_cat}
     languages_with_aliases = {k: [] for k in language_cat}
+    language_properties = {}
     compiler_env_vars = {}
     compilation_tool_vars = {}
     complete = []
+    aliased_languages = {}
     for k, drv in drivers.items():
         if drv.language in complete:
             continue
@@ -286,6 +288,12 @@ def update_constants(schema=None):
         languages_with_aliases.setdefault(drv_type, [])
         languages_with_aliases[drv_type].append(drv.language)
         languages_with_aliases[drv_type] += drv.language_aliases
+        if drv.language_aliases:
+            aliased_languages[drv.language] = [drv.language] + drv.language_aliases
+        language_properties[drv.language] = {
+            'executable_type': drv_type,
+            'is_typed': drv.is_typed,
+            'full_language': drv.full_language}
     languages = {k: sorted(v) for k, v in languages.items()}
     languages_with_aliases = {k: sorted(v) for k, v in
                               languages_with_aliases.items()}
@@ -329,8 +337,12 @@ def update_constants(schema=None):
               for k in language_cat[1:]]
     lines[-1] += ")"
     lines += [
+        "ALIASED_LANGUAGES = %s" % as_lines(aliased_languages)]
+    lines += [
         "COMPILER_ENV_VARS = %s" % as_lines(compiler_env_vars),
         "COMPILATION_TOOL_VARS = %s" % as_lines(compilation_tool_vars)]
+    lines += [
+        "LANGUAGE_PROPERTIES = %s" % as_lines(language_properties)]
     with open(filename, 'w') as fd:
         fd.write('\n'.join(lines) + '\n')
 

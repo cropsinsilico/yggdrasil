@@ -1036,5 +1036,19 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
                     'maximum'] = nvert - 1
         return out
 
+    @classmethod
+    def _generate_data(cls, typedef, **kwargs):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        kwargs.setdefault('numeric_value', 0)
+        return super(PlyMetaschemaType, cls)._generate_data(typedef, **kwargs)
+
 
 PlyDict._type_class = PlyMetaschemaType

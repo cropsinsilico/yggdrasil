@@ -120,16 +120,6 @@ class ServerComm(CommBase.CommBase):
         return self.icomm.maxMsgSize
         
     @classmethod
-    def underlying_comm_class(self):
-        r"""str: Name of underlying communication class."""
-        return import_comm().underlying_comm_class()
-
-    @classmethod
-    def comm_count(cls):
-        r"""int: Number of communication connections."""
-        return import_comm().comm_count()
-
-    @classmethod
     def new_comm_kwargs(cls, name, request_commtype=None, **kwargs):
         r"""Initialize communication with new comms.
 
@@ -205,6 +195,11 @@ class ServerComm(CommBase.CommBase):
     def n_msg_recv_drain(self):
         r"""int: The number of messages in the connection to drain."""
         return self.icomm.n_msg_recv_drain
+
+    @property
+    def n_msg_direct(self):
+        r"""int: Number of messages currently being routed."""
+        return self.icomm.n_msg_direct
 
     @property
     def open_clients(self):
@@ -400,3 +395,33 @@ class ServerComm(CommBase.CommBase):
         r"""Drain server signon messages. This should only be used
         for testing purposes."""
         self.icomm.drain_server_signon_messages(**kwargs)
+
+    def disconnect(self, *args, **kwargs):
+        r"""Disconnect the comm."""
+        if hasattr(self, 'icomm'):
+            self.icomm.disconnect()
+        if hasattr(self, 'ocomm'):
+            for k, v in self.ocomm.items():
+                v.disconnect()
+        super(ServerComm, self).disconnect()
+
+    # ALIASED PROPERTIES WITH SETTERS
+    @property
+    def close_on_eof_recv(self):
+        r"""bool: True if the comm will close when EOF is received."""
+        return self.icomm.close_on_eof_recv
+
+    @close_on_eof_recv.setter
+    def close_on_eof_recv(self, x):
+        r"""Set close_on_eof_recv."""
+        self.icomm.close_on_eof_recv = x
+
+    @property
+    def filter(self):
+        r"""FilterBase: filter for the communicator."""
+        return self.icomm.filter
+
+    @filter.setter
+    def filter(self, x):
+        r"""Set the filter."""
+        self.icomm.filter = x

@@ -199,3 +199,21 @@ class SBMLModelDriver(DSLModelDriver):  # pragma: sbml
         # except IndexError:
         #     out = {k: out[:, i] for i, k in enumerate(out.colnames)}
         return end_time, out
+
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for driver instance.
+                deps (list): Dependencies to install.
+
+        """
+        out = super(SBMLModelDriver, cls).get_testing_options(**kwargs)
+        out['requires_io'] = True
+        return out

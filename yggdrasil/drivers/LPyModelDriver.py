@@ -36,3 +36,21 @@ class LPyModelDriver(PythonModelDriver):  # pragma: lpy
             return openalea.lpy.__version__.LPY_VERSION_STR
         except ImportError:  # pragma: debug
             raise RuntimeError("openalea.lpy not installed.")
+
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for driver instance.
+                deps (list): Dependencies to install.
+
+        """
+        out = super(LPyModelDriver, cls).get_testing_options(**kwargs)
+        out['requires_partner'] = True
+        return out

@@ -44,11 +44,15 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                 assert(v[0].shape == v[1].shape)
                 for i in range(len(v[0])):
                     arr_lines.append(self._array_fmt % (v[0][i], v[1][i]))
+                v_units = [str(getattr(vv, 'units', '-')) for vv in v]
+                arr_lines[0] += f"\t! [{'; '.join(v_units)}]"
                 iline += (',\n' + indent).join(arr_lines)
             elif isinstance(v, str):
                 iline += "\'%s\'" % v
             else:
                 iline += json.dumps(v, cls=JSONReadableEncoder)
+                if hasattr(v, 'units'):
+                    iline += f'\t! [{v.units}]'
             lines.append(iline)
         return tools.str2bytes('\n'.join(lines))
 
@@ -207,8 +211,7 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                            'DVSI': 0.0,
                            'DVSEND': 2.0,
                            'SSATB': [
-                               units.add_units(
-                                   np.array([0.0, 2.0]), 'ha/kg'),
+                               np.array([0.0, 2.0]),
                                units.add_units(
                                    np.array([0.0, 0.0]), 'ha/kg')]}]
         out['empty'] = dict()

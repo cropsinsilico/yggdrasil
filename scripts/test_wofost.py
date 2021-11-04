@@ -1,6 +1,6 @@
 import numpy as np
+import pprint
 from yggdrasil import units
-from yggdrasil.tests import assert_equal
 from yggdrasil.communication.NetCDFFileComm import NetCDFFileComm
 from yggdrasil.serialize.WOFOSTParamSerialize import WOFOSTParamSerialize
 
@@ -26,9 +26,9 @@ data = {
 in_file = NetCDFFileComm('test_recv', address=fname_netcdf, direction='recv')
 flag, data_recv = in_file.recv()
 assert(flag)
-assert_equal(data_recv, data)
+assert(data_recv == data)
 
-import pprint; pprint.pprint(data)
+pprint.pprint(data)
 
 with open(fname_netcdf, 'rb') as fd:
     print(fd.read())

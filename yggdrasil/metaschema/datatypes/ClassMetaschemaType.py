@@ -5,6 +5,19 @@ from yggdrasil import platform, tools
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
+class ExampleClass(object):  # pragma: debug
+
+    def __init__(self, *args, **kwargs):
+        self._input_args = args
+        self._input_kwargs = kwargs
+        
+    def __eq__(self, solf):
+        if not isinstance(solf, self.__class__):  # pragma: debug
+            return False
+        return ((self._input_args == solf._input_args)
+                and (self._input_kwargs == solf._input_kwargs))
+
+
 class ClassMetaschemaType(MetaschemaType):
     r"""Type for evaluating classes."""
 
@@ -106,4 +119,4 @@ class ClassMetaschemaType(MetaschemaType):
             object: Python object of the specified type.
 
         """
-        return ClassMetaschemaType
+        return ExampleClass

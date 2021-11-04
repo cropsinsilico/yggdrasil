@@ -62,7 +62,7 @@ def remove_product(product, check_for_source=False, **kwargs):
     tools.remove_path(product, **kwargs)
         
 
-def remove_products(products, source_products, timer_class=None):
+def remove_products(products, source_products):
     r"""Delete products produced during the process of running the model.
 
     Args:
@@ -73,9 +73,9 @@ def remove_products(products, source_products, timer_class=None):
 
     """
     for p in source_products:
-        remove_product(p, timer_class=timer_class)
+        remove_product(p)
     for p in products:
-        remove_product(p, timer_class=timer_class, check_for_source=True)
+        remove_product(p, check_for_source=True)
 
 
 class ModelDriver(Driver):
@@ -496,7 +496,8 @@ class ModelDriver(Driver):
     _disconnect_attr = (Driver._disconnect_attr
                         + ['queue', 'queue_thread',
                            'event_process_kill_called',
-                           'event_process_kill_complete'])
+                           'event_process_kill_complete',
+                           'model_process'])
     _mpi_tags = {'ENV': 1,
                  'START': 2,
                  'STOP_RANK0': 3,  # Stopped by partner
@@ -1890,7 +1891,7 @@ class ModelDriver(Driver):
         r"""Delete products produced during the process of running the model."""
         products = self.products
         source_products = self.source_products + self.wrapper_products
-        remove_products(products, source_products, timer_class=self)
+        remove_products(products, source_products)
             
     @classmethod
     def cleanup_dependencies(cls, products=[], verbose=False):
@@ -4031,7 +4032,7 @@ class ModelDriver(Driver):
             return [cls.format_function_param('assign', **kwargs)]
 
     @classmethod
-    def write_expand_single_element(cls, output_var):
+    def write_expand_single_element(cls, output_var, add_cond=False):
         r"""Write lines allowing extraction of the only element from a single
         element array as a stand-alone variable if the variable is an array
         and only has one element.
@@ -4039,6 +4040,9 @@ class ModelDriver(Driver):
         Args:
             output_var (str): Name of the variable that should be conditionally
                 expanded.
+            add_cond (list, optional): Additional conditions that must be
+                satisfied for the array element to be extracted. Defaults to
+                False and is ignored.
 
         Returns:
             list: Lines added the conditional expansion of single element
@@ -4047,15 +4051,19 @@ class ModelDriver(Driver):
         """
         if 'istype' not in cls.function_param:
             return []
+        cond = ('(%s) %s (%s %s 1)' % (
+            cls.format_function_param('istype',
+                                      variable=output_var,
+                                      type=cls.type_map['array']),
+            cls.function_param.get('and', '&&'),
+            cls.format_function_param('len',
+                                      variable=output_var),
+            cls.function_param.get('equ', '==')))
+        if add_cond:
+            for x in add_cond:
+                cond += f" {cls.function_param.get('and', '&&')} {x}"
         out = cls.write_if_block(
-            ('(%s) %s (%s %s 1)' % (
-                cls.format_function_param('istype',
-                                          variable=output_var,
-                                          type=cls.type_map['array']),
-                cls.function_param.get('and', '&&'),
-                cls.format_function_param('len',
-                                          variable=output_var),
-                cls.function_param.get('equ', '=='))),
+            cond,
             cls.format_function_param(
                 'assign', name=output_var,
                 value=cls.format_function_param(
@@ -4340,4 +4348,31 @@ class ModelDriver(Driver):
         out.append(cls.function_param.get('try_end',
                                           cls.function_param.get(
                                               'block_end', '')))
+        return out
+
+    @classmethod
+    def get_testing_options(cls):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for driver instance.
+                deps (list): Dependencies to install.
+
+        """
+        out = dict(
+            kwargs={}, deps=[],
+            write_function_def_params=[
+                {'inputs': [{'name': 'x', 'value': 1.0,
+                             'datatype': {'type': 'float',
+                                          'precision': 32,
+                                          'units': 'cm'}}],
+                 'outputs': [{'name': 'y',
+                              'datatype': {'type': 'float',
+                                           'precision': 32,
+                                           'units': 'cm'}}]}],
+            split_lines=[('abcdef', {'length': 3, 'force_split': True},
+                          ['abc', 'def']),
+                         ('    abc', {'length': 3, 'force_split': True},
+                          ['    abc'])])
         return out

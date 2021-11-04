@@ -80,6 +80,12 @@ class RESTComm(CommBase.CommBase):
         self._is_open = False
         super(RESTComm, self).__init__(*args, **kwargs)
 
+    def atexit(self):  # pragma: debug
+        r"""Close operations."""
+        if self.direction == 'send':
+            self.linger()
+        super(RESTComm, self).atexit()
+        
     @property
     def is_open(self):
         r"""bool: True if the connection is open."""

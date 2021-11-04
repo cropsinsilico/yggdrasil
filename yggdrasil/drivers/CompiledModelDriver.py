@@ -6,6 +6,8 @@ import glob
 import logging
 import subprocess
 import shutil
+import contextlib
+import threading
 from collections import OrderedDict
 from yggdrasil import platform, tools, scanf
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_products
@@ -24,6 +26,22 @@ if _conda_prefix is not None:
     _system_suffix += '_' + os.path.basename(_conda_prefix)
 if _venv_prefix is not None:
     _system_suffix += '_' + os.path.basename(_venv_prefix)
+_buildfile_locks_lock = threading.RLock()
+_buildfile_locks = {}
+
+
+class LockedFile(object):
+    r"""Class for locking files during compilation."""
+
+    def __init__(self, fname, context, when_to_lock="init"):
+        self.fname = fname
+        self.lock = context.RLock()
+        self.when_to_lock = when_to_lock
+
+    @property
+    def message(self):
+        r"""str: Message form."""
+        return {'fname': self.fname, 'when_to_lock': self.when_to_lock}
 
 
 def get_compatible_tool(tool, tooltype, language, default=False):
@@ -62,7 +80,7 @@ def get_compatible_tool(tool, tooltype, language, default=False):
                               "associated with a tool named %s")
                              % (tooltype, language, tool))
         tool = out
-    if isinstance(tool, bool):
+    if isinstance(tool, bool):  # pragma: debug
         return tool
     if (tool.tooltype == tooltype) and (language in tool.languages):
         return tool
@@ -2086,6 +2104,10 @@ class CompiledModelDriver(ModelDriver):
             set explictly by instance or config file
         default_linker_flags (list): Flags that should be passed to the
             linker by default for this language.
+        allow_parallel_build (bool): If True, a file can be compiled by
+            two processes simultaneously. If False, it cannot and an
+            MPI barrier will be used to prevent simultaneous compilation.
+            Defaults to False.
 
     Attributes:
         source_files (list): Source files.
@@ -2131,8 +2153,11 @@ class CompiledModelDriver(ModelDriver):
                          'key': 'archiver_flags',
                          'type': list}]
     is_build_tool = False
+    allow_parallel_build = False
+    locked_buildfile = None
 
     def __init__(self, name, args, skip_compile=False, **kwargs):
+        self.buildfile_lock = None
         super(CompiledModelDriver, self).__init__(name, args, **kwargs)
         # Compile
         if not skip_compile:
@@ -2260,6 +2285,83 @@ class CompiledModelDriver(ModelDriver):
             self.products, source_products=self.source_products)
         self.debug("source_files: %s", str(self.source_files))
         self.debug("model_file: %s", self.model_file)
+        # Add the buildfile_lock and pass the file
+        if not self.allow_parallel_build:
+            self.buildfile_lock = self.get_buildfile_lock(instance=self)
+            if self._mpi_rank > 0:
+                self.send_mpi(self.buildfile_lock.message,
+                              tag=self._mpi_tags['BUILDFILE'])
+
+    @classmethod
+    def get_buildfile_lock(cls, fname=None, context=None, instance=None,
+                           **kwargs):
+        r"""Get a lock for a buildfile to prevent simultaneous access,
+        creating one as necessary.
+
+        Args:
+            name (str): Build file.
+            context (threading.Context): Threading context.
+            instance (ModelDriver): Driver instance that should be used.
+            **kwargs: Additional keyword arguments are passed to the FileLock
+                initialization.
+
+        Returns:
+            FileLock: Lock for the buildfile.
+
+        """
+        global _buildfile_locks
+        if fname is None:
+            fname = cls.locked_buildfile
+        assert(fname is not None)
+        if (context is None) and (instance is not None):
+            context = instance.context
+        with _buildfile_locks_lock:
+            if fname not in _buildfile_locks:
+                _buildfile_locks[fname] = LockedFile(fname, context, **kwargs)
+        return _buildfile_locks[fname]
+
+    @contextlib.contextmanager
+    def buildfile_locked(self, dry_run=False):
+        r"""Context manager for locked build file."""
+        dry_run = (dry_run or self.allow_parallel_build)
+        try:
+            if not dry_run:
+                self.buildfile_lock.lock.acquire()
+                if self._mpi_rank > 0:
+                    self.recv_mpi(tag=self._mpi_tags['LOCK_BUILDFILE'])
+            yield
+        finally:
+            if not dry_run:
+                if self._mpi_rank > 0:
+                    self.send_mpi('UNLOCK_BUILDFILE',
+                                  tag=self._mpi_tags['UNLOCK_BUILDFILE'])
+                self.buildfile_lock.lock.release()
+
+    @classmethod
+    def mpi_partner_init(cls, self):
+        r"""Actions initializing an MPIPartnerModel."""
+        if not cls.allow_parallel_build:
+            message = self.recv_mpi(tag=self._mpi_tags['BUILDFILE'])
+            message['context'] = self.context
+            self.buildfile_lock = cls.get_buildfile_lock(**message)
+            if self.buildfile_lock.when_to_lock == 'init':
+                cls.partner_buildfile_lock(self)
+
+    @classmethod
+    def mpi_partner_cleanup(cls, self):
+        r"""Actions cleaning up an MPIPartnerModel."""
+        super(CompiledModelDriver, cls).mpi_partner_cleanup(self)
+        if (((not cls.allow_parallel_build)
+             and (self.buildfile_lock.when_to_lock == 'cleanup'))):
+            cls.partner_buildfile_lock(self)
+        
+    @classmethod
+    def partner_buildfile_lock(cls, self):
+        r"""Actions completing buildfile lock on MPIPartnerModels."""
+        with self.buildfile_lock.lock:
+            self.send_mpi('LOCK_BUILDFILE',
+                          tag=self._mpi_tags['LOCK_BUILDFILE'])
+            self.recv_mpi(tag=self._mpi_tags['UNLOCK_BUILDFILE'])
 
     def set_target_language(self):
         r"""Set the language of the target being compiled (usually the same
@@ -2438,7 +2540,8 @@ class CompiledModelDriver(ModelDriver):
                         out = getattr(out_comp, tooltype)()
                     except BaseException:  # pragma: debug
                         out = None
-            if out is None:
+            if out is None:  # pragma: debug
+                # Github Actions images now include GNU compilers by default
                 if default is False:
                     raise NotImplementedError(
                         "%s not set for language '%s' (toolname=%s)."
@@ -2934,7 +3037,7 @@ class CompiledModelDriver(ModelDriver):
         else:
             tooltype = 'linker'
         tool = cls.get_tool(tooltype, toolname=toolname)
-        if tool is False:
+        if tool is False:  # pragma: debug
             raise RuntimeError("No %s tool for language %s."
                                % (tooltype, cls.language))
         kwargs = cls.update_linker_kwargs(toolname=toolname, **kwargs)
@@ -3672,40 +3775,44 @@ class CompiledModelDriver(ModelDriver):
             str: Compiled model file path.
 
         """
-        if source_files is None:
-            source_files = self.source_files
-        if not skip_interface_flags:
-            kwargs['logging_level'] = self.numeric_logging_level
-        default_kwargs = dict(out=self.model_file,
-                              compiler_flags=self.compiler_flags,
-                              for_model=True,
-                              skip_interface_flags=skip_interface_flags,
-                              overwrite=self.overwrite,
-                              working_dir=self.working_dir,
-                              products=self.products,
-                              toolname=self.get_tool_instance('compiler',
-                                                              return_prop='name'),
-                              suffix=('_%s' % self.name))
-        if not kwargs.get('dont_link', False):
-            default_kwargs.update(linker_flags=self.linker_flags)
-        for k, v in default_kwargs.items():
-            kwargs.setdefault(k, v)
-        if ((isinstance(kwargs['out'], str) and os.path.isfile(kwargs['out'])
-             and (not kwargs['overwrite']))):
-            self.debug("Result already exists: %s", kwargs['out'])
-            return kwargs['out']
-        if 'env' not in kwargs:
-            kwargs['env'] = self.set_env(for_compile=True,
-                                         toolname=kwargs['toolname'])
-        try:
-            if not kwargs.get('dry_run', False):
-                self.compile_dependencies_instance(toolname=kwargs['toolname'])
-            return self.call_compiler(source_files, **kwargs)
-        except BaseException:
-            self.cleanup_products()
-            raise
-        finally:
-            self.restore_files()
+        dont_lock_buildfile = (kwargs.pop('dont_lock_buildfile', False)
+                               or kwargs.get('dry_run', False))
+        with self.buildfile_locked(dry_run=dont_lock_buildfile):
+            if source_files is None:
+                source_files = self.source_files
+            if not skip_interface_flags:
+                kwargs['logging_level'] = self.numeric_logging_level
+            default_kwargs = dict(out=self.model_file,
+                                  compiler_flags=self.compiler_flags,
+                                  for_model=True,
+                                  skip_interface_flags=skip_interface_flags,
+                                  overwrite=self.overwrite,
+                                  working_dir=self.working_dir,
+                                  products=self.products,
+                                  toolname=self.get_tool_instance(
+                                      'compiler', return_prop='name'),
+                                  suffix=('_%s' % self.name))
+            if not kwargs.get('dont_link', False):
+                default_kwargs.update(linker_flags=self.linker_flags)
+            for k, v in default_kwargs.items():
+                kwargs.setdefault(k, v)
+            if ((isinstance(kwargs['out'], str) and os.path.isfile(kwargs['out'])
+                 and (not kwargs['overwrite']))):
+                self.debug("Result already exists: %s", kwargs['out'])
+                return kwargs['out']
+            if 'env' not in kwargs:
+                kwargs['env'] = self.set_env(for_compile=True,
+                                             toolname=kwargs['toolname'])
+            try:
+                if not kwargs.get('dry_run', False):
+                    self.compile_dependencies_instance(
+                        toolname=kwargs['toolname'])
+                return self.call_compiler(source_files, **kwargs)
+            except BaseException:
+                self.cleanup_products()
+                raise
+            finally:
+                self.restore_files()
 
     @classmethod
     def get_internal_suffix(cls, commtype=None):
@@ -3848,4 +3955,32 @@ class CompiledModelDriver(ModelDriver):
         # Compile using the tool after updating the flags
         kwargs = cls.update_linker_kwargs(toolname=toolname, **kwargs)
         out = tool.call(obj, **kwargs)
+        return out
+
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for driver instance.
+                deps (list): Dependencies to install.
+
+        """
+        out = super(CompiledModelDriver, cls).get_testing_options(**kwargs)
+        out.update(
+            args=['1'],
+        )
+        if cls.is_installed() and (not getattr(cls, 'is_build_tool', False)):
+            compiler = cls.get_tool('compiler')
+            linker = cls.get_tool('linker')
+            script_dir = os.path.join('tests', 'scripts')
+            include_flag = compiler.create_flag('include_dirs', script_dir)
+            library_flag = linker.create_flag('library_dirs', script_dir)
+            out['kwargs'].update(compiler_flags=include_flag,
+                                 linker_flags=library_flag)
         return out

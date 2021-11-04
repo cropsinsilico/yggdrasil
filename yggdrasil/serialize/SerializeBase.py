@@ -250,6 +250,10 @@ class SerializeBase(tools.YggClass):
                                       'field_names': ['name', 'count', 'size'],
                                       'field_units': ['n/a', umol, 'cm']})
                 out['extra_kwargs']['format_str'] = out['kwargs']['format_str']
+                out['objects'] = [
+                    [units.add_units(x, u) for x, u in
+                     zip(row, out['kwargs']['field_units'])]
+                    for row in out['objects']]
                 if 'format_str' in cls._attr_conv:
                     out['extra_kwargs']['format_str'] = tools.str2bytes(
                         out['extra_kwargs']['format_str'])
@@ -635,7 +639,7 @@ class SerializeBase(tools.YggClass):
                     setattr(self, rk, v)
         return typedef
 
-    def func_serialize(self, args):
+    def func_serialize(self, args):  # pragma: debug
         r"""Serialize a message.
 
         Args:
@@ -648,7 +652,7 @@ class SerializeBase(tools.YggClass):
         """
         raise NotImplementedError("func_serialize not implemented.")
 
-    def func_deserialize(self, msg):
+    def func_deserialize(self, msg):  # pragma: debug
         r"""Deserialize a message.
 
         Args:

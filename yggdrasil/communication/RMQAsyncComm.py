@@ -1,8 +1,26 @@
 import functools
+import weakref
 from yggdrasil import tools, multitasking
 from yggdrasil.communication import (
     RMQComm, NoMessages, TemporaryCommunicationError)
 from yggdrasil.communication.RMQComm import pika
+
+
+class RMQTaskLoop(multitasking.YggTaskLoop):
+    r"""Task loop for RMQ consumer."""
+
+    def __init__(self, comm, *args, **kwargs):
+        self.comm = weakref.proxy(comm)
+        super(RMQTaskLoop, self).__init__(*args, **kwargs)
+    
+    def atexit(self):  # pragma: debug
+        if self.comm.is_interface:
+            if self.comm.direction == 'send' and self.comm.is_open:
+                self.comm.send_eof()
+                self.comm.linger()
+                self.join(10.0)
+            self.comm.close()
+        super(RMQTaskLoop, self).atexit()
 
 
 class RMQAsyncComm(RMQComm.RMQComm):
@@ -26,7 +44,9 @@ class RMQAsyncComm(RMQComm.RMQComm):
     _commtype = 'rmq_async'
     _schema_subtype_description = ('Asynchronous RabbitMQ connection.')
     _disconnect_attr = (RMQComm.RMQComm._disconnect_attr
-                        + ['_rmq_thread', '_consuming', '_reconnecting'])
+                        + ['rmq_thread', '_consuming', '_reconnecting',
+                           '_buffered_messages', '_deliveries',
+                           '_external_close'])
 
     def _init_before_open(self, **kwargs):
         r"""Initialize null variables and RMQ async thread."""
@@ -34,12 +54,13 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self.times_connected = 0
         self.rmq_thread_count = 0
         self.rmq_thread = self.new_run_thread()
-        self._consuming = multitasking.ProcessEvent()
-        self._reconnecting = multitasking.ProcessEvent()
+        self._consuming = multitasking.ProcessEvent(task_method='thread')
+        self._reconnecting = multitasking.ProcessEvent(task_method='thread')
         self._reconnect_delay = 0
         self._prefetch_count = 2
-        self._buffered_messages = multitasking.Queue()
-        self._deliveries = multitasking.LockedDict()
+        self._buffered_messages = multitasking.Queue(task_method='thread')
+        self._deliveries = multitasking.LockedDict(task_method='thread')
+        self._external_close = multitasking.Event(task_method='thread')
         # self._publish_interval = 0
         self._acked = 0
         self._nacked = 0
@@ -57,9 +78,10 @@ class RMQAsyncComm(RMQComm.RMQComm):
         if name is None:
             name = self.name
         self.rmq_thread_count += 1
-        return multitasking.YggTask(
-            name=name + '.RMQThread%d' % self.rmq_thread_count,
-            target=self.run_thread)
+        return RMQTaskLoop(
+            self, name=f'{name}.RMQThread{self.rmq_thread_count}',
+            target=self.run_thread, task_method='thread',
+            daemon=self.is_interface)
 
     def reset_for_reconnection(self):
         r"""Reset variables in preparation for reconnection."""
@@ -77,35 +99,58 @@ class RMQAsyncComm(RMQComm.RMQComm):
             for k in list(self._deliveries.keys()):
                 self._deliveries.pop(k)
 
+    def check_for_close(self):
+        r"""bool: Check if close has been called from the main process."""
+        if self._external_close.is_set():  # pragma: debug
+            self._closing.start()
+            if self._reconnecting.is_running():
+                self._reconnecting.stop()
+            self.connection.ioloop.stop()
+            return True
+        return False
+
     def run_thread(self):
         r"""Connect to the connection and begin the IO loop."""
-        while not self._closing.has_started():
-            try:
-                self.debug('')
-                self.connect()
-                self.connection.ioloop.start()
-                self.debug("returning")
-            except BaseException as e:  # pragma: debug
-                self.error("Error in RMQ thread %s: %s", type(e), e)
+        class BreakLoop(multitasking.BreakLoopException):
+            def __init__(solf, *args, **kwargs):
                 self.stop()
-                break
-            if self._reconnecting.is_running():
-                self.stop()
-                if self._consuming.has_started():
-                    self._reconnect_delay = 0
-                else:
-                    self._reconnect_delay += 1
-                self._reconnect_delay = min(self._reconnect_delay, 30)
-                self.info('Reconnecting after %d seconds',
-                          self._reconnect_delay)
-                self.sleep(self._reconnect_delay)
-                self.reset_for_reconnection()
+                super(BreakLoop, solf).__init__(*args, **kwargs)
+
+        if self._closing.has_started():
+            raise BreakLoop("closing")
+        try:
+            self.debug('')
+            self.connect()
+            self.connection.ioloop.start()
+            self._consuming.stop()
+            self.debug("returning")
+        except BaseException as e:  # pragma: debug
+            self.error("Error in RMQ thread %s: %s", type(e), e)
+            raise BreakLoop(e)
+        self.close_queue(skip_unbind=True)
+        self.close_channel()
+        self.close_connection()
+        if self._closing.has_started():
+            self._closing.stop()
+        if self._reconnecting.is_running():
+            if self._consuming.has_started():
+                self._reconnect_delay = 0
+            else:
+                self._reconnect_delay += 1
+            self._reconnect_delay = min(self._reconnect_delay, 30)
+            self.info(f'Reconnecting after {self._reconnect_delay} seconds')
+            self._external_close.wait(self._reconnect_delay)
+            if self._external_close.is_set():  # pragma: debug
+                self._reconnecting.stop()
+                raise BreakLoop("external close")
+            self.reset_for_reconnection()
 
     def start_run_thread(self):
         r"""Start the run thread and wait for it to finish."""
         with self.rmq_lock:
             if self.rmq_thread.was_started:
                 return
+            self._opening.start()
             self.rmq_thread.start()
         # Wait for connection to be established
         self._opening.stopped.wait(self.timeout)
@@ -121,13 +166,15 @@ class RMQAsyncComm(RMQComm.RMQComm):
         r"""Declare queue to get random new queue."""
         if self._opening.has_started() or self._closing.has_started():
             return
-        self._opening.start()
         self.start_run_thread()  # Start ioloop in a new thread
         # Register queue
         if not self.queue:  # pragma: debug
             self.error("Queue was not initialized.")
         self.register_comm(self.address, (self.connection, self.channel))
         super(RMQComm.RMQComm, self).bind()
+        multitasking.wait_on_function(
+            lambda: self._opening.has_stopped() or self._closing.has_started(),
+            timeout=self.timeout)
     
     def _close(self, linger=False):
         r"""Close the connection.
@@ -142,7 +189,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
         if not self._closing.has_stopped():  # pragma: debug
             if self.connection is not None:
                 self.connection.ioloop.stop()
-            self.error("Closing has not completed")
+            self._closing.stop()
+            self.error("Closing has not completed, resources may be leaked")
         if not self.is_client:
             self.unregister_comm(self.address)
         with self.rmq_lock:
@@ -155,6 +203,10 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 raise RuntimeError(
                     self.logger.process("Thread still running.", {})[0])
 
+    def atexit(self):  # pragma: debug
+        r"""Close operations."""
+        super(RMQComm.RMQComm, self).atexit()
+        
     @property
     def is_open(self):
         r"""bool: True if the connection and channel are open."""
@@ -213,11 +265,12 @@ class RMQAsyncComm(RMQComm.RMQComm):
     def close_channel(self):
         r"""Close the channel if it exists."""
         if self.channel:
+            self.close_queue(skip_unbind=True)
             self.channel.add_callback(
                 self.on_channel_closeok, [pika.spec.Channel.CloseOk])
         super(RMQAsyncComm, self).close_channel()
         
-    def close_connection(self):
+    def close_connection(self, *args, **kwargs):
         r"""Close the connection."""
         if self.direction == 'recv':
             self._consuming.stop()
@@ -225,7 +278,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
             if self.connection.is_closing or self.connection.is_closed:
                 self.debug('Connection is closing or already closed')
             else:
-                super(RMQAsyncComm, self).close_connection()
+                super(RMQAsyncComm, self).close_connection(*args, **kwargs)
         
     # CONNECTION
     def connect(self):
@@ -245,40 +298,53 @@ class RMQAsyncComm(RMQComm.RMQComm):
 
     def on_connection_open_error(self, unused_connection, err):  # pragma: debug
         r"""Actions that must be taken when the connection fails to open."""
-        self.debug('Connection open failed: %s', err)
-        self.reconnect()
+        self.debug(f'Connection open failed: {err}')
+        if not self._external_close.is_set():
+            self.reconnect()
 
     def on_connection_closed(self, connection, reason):
         r"""Actions that must be taken when the connection is closed. Set the
         channel to None. If the connection is meant to be closing, stop the
         IO loop. Otherwise, wait 5 seconds and try to reconnect."""
         with self.rmq_lock:
+            self.close_queue(skip_unbind=True)
             self.channel = None
-            if self._closing.has_started():
+            if self._closing.has_started() or self._external_close.is_set():
                 self.debug('Connection closed')
-                self.connection.ioloop.stop()
                 self._closing.stop()
             else:
-                self.debug('Connection closed, reconnect necessary: %s', reason)
+                self.debug(f'Connection closed, reconnecting: {reason}')
                 self.reconnect()
+            self.connection.ioloop.stop()
 
     def stop(self, call_on_thread=False):
         r"""Stop the ioloop."""
         if call_on_thread:
+            if not self.rmq_thread.is_alive():
+                # Ensure that shutdown is not prevented by flags
+                assert(self._closing.has_stopped())
+                return
+            self._external_close.set()
+            if self._reconnecting.is_running():  # pragma: debug
+                self._reconnecting.stopped.wait(10.0)
+                return
             if self.connection is not None:
                 self.connection.ioloop.add_callback_threadsafe(self.stop)
             return
         if not self._closing.has_started():
             self._closing.start()
-            self.debug('Stopping')
+            self.debug(f'Stopping {self.direction}')
             if self.direction == 'recv':
                 if self._consuming.is_running():
                     self.stop_consuming()
                     # Not called here because KeyboardInterrupt is not used
                     # to stop the loop
                     # self.connection.ioloop.start()
-                else:
+                elif self.connection is not None:  # pragma: debug
                     self.connection.ioloop.stop()
+                    self.close_channel()
+                    self.close_connection()
+                    self._closing.stop()
                 self.debug('Stopped')
             else:
                 self.close_channel()
@@ -290,24 +356,18 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self.debug('')
         if not self.original_queue:  # pragma: debug
             self.error("Cannot reconnect to a queue with a generated name.")
-            self.connection.ioloop.stop()
-            self._closing.start()
-            self._closing.stop()
             return
         self._reconnecting.started.clear()
         self._reconnecting.stopped.clear()
         self._reconnecting.start()  # stopped by re-opening
         self._opening.stopped.clear()
-        if self.direction == 'recv':
-            self.stop()
-        else:
-            self.connection.ioloop.call_later(
-                5, self.connection.ioloop.stop)
 
     # CHANNEL
     def open_channel(self):
         r"""Open a RabbitMQ channel."""
         self.debug('Creating a new channel')
+        if self.check_for_close():  # pragma: debug
+            return
         self.connection.channel(on_open_callback=self.on_channel_open)
 
     def on_channel_open(self, channel):
@@ -316,6 +376,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self.debug('Channel opened')
         self.channel = channel
         self.add_on_channel_close_callback()
+        if self.check_for_close():  # pragma: debug
+            return
         self.setup_exchange(self.exchange)
 
     def add_on_channel_close_callback(self):
@@ -327,14 +389,16 @@ class RMQAsyncComm(RMQComm.RMQComm):
     def on_channel_closed(self, channel, reason):
         r"""Actions to perform when the channel is closed. Close the
         connection."""
-        self.debug('Channel %i was closed: %s', channel, reason)
-        if self.direction == 'recv':
-            self.close_connection()
-        else:
-            self.channel = None
-            if not self._closing.has_started():
-                self.close_connection()
-                # self.connection.close()
+        self.debug(f'Channel {channel} was closed: {reason}, {type(reason)}')
+        self.close_queue(skip_unbind=True)
+        kwargs = {}
+        if isinstance(reason, pika.exceptions.ChannelClosedByBroker):  # pragma: debug
+            self._closing.start()
+            self._consuming.stop()
+            kwargs['reply_code'] = reason.reply_code
+            kwargs['reply_text'] = reason.reply_text
+        self.channel = None
+        self.close_connection(**kwargs)
 
     # EXCHANGE
     def setup_exchange(self, exchange_name):
@@ -351,6 +415,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
         r"""Actions to perform once an exchange is succesfully declared.
         Set up the queue."""
         self.debug('Exchange declared: %s', userdata)
+        if self.check_for_close():  # pragma: debug
+            return
         self.setup_queue(self.queue)
 
     # QUEUE
@@ -359,7 +425,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         if self.original_queue is None:
             self.original_queue = queue_name
         passive = self.original_queue.startswith('amq.')
-        self.debug('Declaring queue %s (passive=%s)', queue_name, passive)
+        self.debug(f'Declaring queue {queue_name} (passive={passive})')
         cb = functools.partial(self.on_queue_declareok, userdata=queue_name)
         self.channel.queue_declare(queue=queue_name, callback=cb,
                                    exclusive=False, passive=passive)
@@ -368,10 +434,12 @@ class RMQAsyncComm(RMQComm.RMQComm):
         r"""Actions to perform once the queue is succesfully declared. Bind
         the queue."""
         queue_name = userdata
-        self.debug('Binding %s to %s', self.exchange, queue_name)
+        self.debug(f'Binding {self.exchange} to {queue_name}')
         if not self.queue:
             self.address += method_frame.method.queue
         cb = functools.partial(self.on_bindok, userdata=queue_name)
+        if self.check_for_close():  # pragma: debug
+            return
         self.channel.queue_bind(
             queue_name,
             self.exchange,
@@ -381,6 +449,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
         r"""Actions to perform once the queue is succesfully bound. Start
         consuming messages."""
         self.debug('Queue bound')
+        if self.check_for_close():  # pragma: debug
+            return
         if self.direction == 'recv':
             self.set_qos()
         else:
@@ -396,6 +466,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
     def on_basic_qos_ok(self, unused_frame):
         r"""Actions to perform one the qos is set."""
         self.debug('QOS set to: %d', 1)
+        if self.check_for_close():  # pragma: debug
+            return
         self.start_consuming()
 
     def start_consuming(self):

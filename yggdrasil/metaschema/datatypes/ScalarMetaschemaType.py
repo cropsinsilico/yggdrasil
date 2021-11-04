@@ -313,7 +313,7 @@ class ScalarMetaschemaType(MetaschemaType):
         return obj
 
     @classmethod
-    def _generate_data(cls, typedef):
+    def _generate_data(cls, typedef, numeric_value=None):
         r"""Generate mock data for the specified type.
 
         Args:
@@ -324,14 +324,42 @@ class ScalarMetaschemaType(MetaschemaType):
 
         """
         dtype = definition2dtype(typedef)
-        if typedef['type'] == '1darray':
-            out = np.zeros(typedef.get('length', 2), dtype)
-        elif typedef['type'] == 'ndarray':
-            out = np.zeros(typedef['shape'], dtype)
+        subtype = typedef.get('subtype', typedef['type'])
+        if subtype in ['bytes', 'unicode']:
+            if subtype == 'bytes':
+                value = b'x' * int(typedef['precision'] / 8)
+            else:
+                value = 'x' * int(typedef['precision'] / 32)
+        elif numeric_value is not None:
+            value = numeric_value
         else:
-            out = np.zeros(1, dtype)[0]
+            value = 1.0
+        if typedef['type'] == '1darray':
+            out = np.repeat(np.array([value], dtype),
+                            typedef.get('length', 2))
+        elif typedef['type'] == 'ndarray':
+            out = np.tile(np.array([value], dtype),
+                          typedef.get('shape', (4, 5)))
+        else:
+            out = np.array([value], dtype)[0]
         out = units.add_units(out, typedef.get('units', ''))
         return out
+
+    @classmethod
+    def get_test_data(cls, typedef=None):
+        r"""object: Test data."""
+        if typedef is None:
+            typedef = {'type': cls.name}
+        if not hasattr(cls, 'fixed_properties'):
+            typedef.setdefault('subtype', 'float')
+        subtype = typedef.get('subtype', typedef['type'])
+        if subtype in ['bytes', 'unicode']:
+            typedef.setdefault('precision', 3 * 32)
+        elif subtype == 'complex':
+            typedef.setdefault('precision', 64)
+        else:
+            typedef.setdefault('precision', 32)
+        return super(ScalarMetaschemaType, cls).get_test_data(typedef)
 
 
 # Dynamically create explicity scalar classes for shorthand

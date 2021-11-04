@@ -256,12 +256,27 @@ def display_source_diff(fname1, fname2, number_lines=False,
     print(lines)
     
 
-def get_fds():  # pragma: debug
+def get_fds(by_column=None):  # pragma: debug
     r"""Get a list of open file descriptors."""
     out = subprocess.check_output(
         'lsof -p {} | grep -v txt'.format(os.getpid()), shell=True)
-    return out.splitlines()[1:]
+    out = out.splitlines()[1:]
+    if by_column is not None:
+        return {x.split()[by_column]: x for x in out}
+    return out
 
+
+@contextlib.contextmanager
+def track_fds(prefix=''):  # pragma: debug
+    fds0 = get_fds(by_column=3)
+    yield
+    fds1 = get_fds(by_column=3)
+    new_fds = set(fds1.keys()) - set(fds0.keys())
+    diff = [fds1[k] for k in sorted(new_fds)]
+    if diff:
+        print(f'{prefix}{len(diff)} fds\n\t' + '\n\t'.join(
+            [str(x) for x in diff]))
+    
 
 def get_shell():
     r"""Get the type of shell that yggdrasil was called from.
@@ -649,28 +664,21 @@ def locate_path(fname, basedir=os.path.abspath(os.sep)):
     return out
 
 
-def remove_path(fpath, timer_class=None, timeout=None):
+def remove_path(fpath, timeout=60.0):
     r"""Delete a single file.
 
     Args:
         fpath (str): Full path to a file or directory that should be
             removed.
-        timer_class (YggClass, optional): Class that should be used to
-            generate a timer that is used to wait for file to be removed.
-            Defaults to None and a new class instance will be created.
         timeout (float, optional): Time (in seconds) that should be
             waited before raising an error that a file cannot be removed.
-            Defaults to None and will be set by the timer_class.
+            Defaults to 60.0.
 
     Raises:
         RuntimeError: If the product cannot be removed.
 
     """
     from yggdrasil import multitasking
-    if timeout is None:
-        if timer_class is None:
-            timer_class = YggClass()
-        timeout = timer_class.timeout
     if os.path.isdir(fpath):
         ftype = 'directory'
         fcheck = os.path.isdir
@@ -726,6 +734,33 @@ def get_supported_platforms():
     return copy.deepcopy(platform._supported_platforms)
 
 
+def is_language_alias(x, language):
+    r"""Check if a string is an alias for a language.
+
+    Args:
+        x (str): String to check.
+        language (str, list): One or more language to check aliases of.
+
+    Returns:
+        str, bool: Returns the version of the language in the provided set if
+            x is an alias and False otherwise.
+
+    """
+    if isinstance(language, str):
+        language = [language]
+    for xx in [x, x.lower(), x.upper()]:
+        if xx in language:
+            return xx
+    aliases = []
+    for k, v in constants.ALIASED_LANGUAGES.items():
+        if x in v:
+            aliases = v
+    for v in aliases:
+        if v in language:
+            return v
+    return False
+
+
 def get_supported_lang():
     r"""Get a list of the model programming languages that are supported
     by yggdrasil.
@@ -734,11 +769,6 @@ def get_supported_lang():
         list: The names of programming languages supported by yggdrasil.
     
     """
-    # from yggdrasil import schema
-    # s = schema.get_schema()
-    # out = s['model'].subtypes
-    # if 'r' in out:
-    #     out[out.index('r')] = 'R'
     out = constants.LANGUAGES['all'].copy()
     if 'c++' in out:
         out[out.index('c++')] = 'cpp'
@@ -767,12 +797,11 @@ def get_supported_comm(dont_include_value=False):
         list: The names of communication mechanisms supported by yggdrasil.
 
     """
-    from yggdrasil import schema
+    from yggdrasil import constants
     excl_list = ['CommBase', 'DefaultComm', 'default']
     if dont_include_value:
         excl_list += ['ValueComm', 'value']
-    s = schema.get_schema()
-    out = s['comm'].subtypes
+    out = list(constants.COMPONENT_REGISTRY['comm']['subtypes'].keys())
     for k in excl_list:
         if k in out:
             out.remove(k)
@@ -889,9 +918,9 @@ def get_default_comm():
                 raise Exception('Could not locate an installed comm.')
     if _default_comm.endswith('Comm'):
         _default_comm = import_component('comm', _default_comm)._commtype
-    if _default_comm == 'rmq':  # pragma: debug
-        raise NotImplementedError('RMQ cannot be the default comm because '
-                                  + 'there is not an RMQ C interface.')
+    # if _default_comm == 'rmq':  # pragma: debug
+    #     raise NotImplementedError('RMQ cannot be the default comm because '
+    #                               + 'there is not an RMQ C interface.')
     return _default_comm
 
 
@@ -1177,13 +1206,25 @@ class YggPopen(subprocess.Popen):
                     # - https://stackoverflow.com/questions/30139401/
                     #       filter-out-command-that-needs-a-terminal-in-python-
                     #       subprocess-module
-                    master_fd, slave_fd = pty.openpty()
-                    kwargs.setdefault('stdin', slave_fd)
+                    parent_fd, child_fd = pty.openpty()
+                    kwargs.setdefault('stdin', child_fd)
+                    self.pty = (parent_fd, child_fd)
 
                 kwargs.setdefault('preexec_fn', os.setpgrp)
         # if platform._is_win:  # pragma: windows
         #     kwargs.setdefault('universal_newlines', True)
         super(YggPopen, self).__init__(cmd_args, **kwargs)
+
+    def disconnect(self):
+        r"""Disconnect objects using resources."""
+        if hasattr(self, 'pty'):  # pragma: matlab
+            os.close(self.pty[0])
+            os.close(self.pty[1])
+            del self.pty
+
+    def __del__(self, *args, **kwargs):
+        self.disconnect()
+        super(YggPopen, self).__del__(*args, **kwargs)
 
     def kill(self, *args, **kwargs):
         r"""On windows using CTRL_BREAK_EVENT to kill the process."""

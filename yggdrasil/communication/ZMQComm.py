@@ -282,8 +282,8 @@ class ZMQProxy(CommBase.CommServer):
                 return self.backlog.pop(0)
             msg = self.cli_socket.recv_multipart()
             if msg[1].startswith(self.server_signon_msg):
-                self.debug(("A server has signed on after %d attempts, "
-                            "activating proxy.") % self.nsignon)
+                self.debug(f"A server has signed on after {self.nsignon} "
+                           f"attempts, activating proxy.")
                 self.server_active = True
                 return None
             # if msg[1].startswith(self.server_signoff_msg):
@@ -744,9 +744,10 @@ class ZMQComm(CommBase.CommBase):
                 self._bound = False
             self.debug('Unbound socket')
 
-    def disconnect(self, dont_close=False):
+    def disconnect_socket(self, dont_close=False):
         r"""Disconnect from address."""
-        if not hasattr(self, 'socket_lock'):
+        if not hasattr(self, 'socket_lock'):  # pragma: debug
+            # Only occurs if there is an error in the class set up
             return
         with self.socket_lock:
             if getattr(self, '_connected', False):
@@ -931,10 +932,12 @@ class ZMQComm(CommBase.CommBase):
         with self.reply_socket_lock:
             if (self.reply_socket_send is not None):
                 self.reply_socket_send.close(linger=0)  # self.zmq_sleeptime)
+                self.reply_socket_send = None
                 self.unregister_comm("REPLY_SEND_" + self.reply_socket_address)
             for k, socket in self.reply_socket_recv.items():
                 socket.close(linger=0)
                 self.unregister_comm("REPLY_RECV_" + k)
+            self.reply_socket_recv = {}
 
     def _close(self, linger=False):
         r"""Close the connection.
@@ -964,7 +967,7 @@ class ZMQComm(CommBase.CommBase):
                 if self._bound:
                     self.unbind()
                 elif self._connected:
-                    self.disconnect()
+                    self.disconnect_socket()
                 self.socket.close(linger=0)
                 # if self.protocol == 'ipc':
                 #     print(self.host, os.path.isfile(self.host))
@@ -1261,19 +1264,24 @@ class ZMQComm(CommBase.CommBase):
         if not ((self.direction == 'recv')
                 and (self.is_server or self.allow_multiple_comms)):
             return
+        # Wait for messages to be drained by the async thread
+        if self.is_async:
+            multitasking.wait_on_function(
+                lambda: self.cli_address is not None, timeout=10.0)
+            multitasking.wait_on_function(
+                lambda: self.n_msg == 0, timeout=10.0)
+            return
         # Wait for signon message
-        T = self.start_timeout(10.0)
-        while ((not T.is_out) and (self.n_msg == 0)):  # pragma: debug
-            self.sleep()
-        self.stop_timeout()
+        multitasking.wait_on_function(lambda: self.n_msg != 0, timeout=10.0)
+
         # Drain signon messages
-        T = self.start_timeout(10.0)
-        while ((not T.is_out) and (self.n_msg > 0)):  # pragma: debug
+        def drain_signon():
             flag, msg = self.recv(timeout=0)
             assert(flag)
             assert(self.is_empty_recv(msg))
-            self.sleep()
-        self.stop_timeout()
+            return (self.n_msg == 0)
+
+        multitasking.wait_on_function(drain_signon, timeout=10.0)
         
     def confirm_send(self, noblock=False):
         r"""Confirm that sent message was received."""

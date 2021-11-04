@@ -13,10 +13,12 @@ def main(fileA, fileB, example_name):
         ax1 = fig.add_subplot(2, 2, 1)
         ax2 = fig.add_subplot(2, 2, 2, sharey=ax1)
         ax3 = fig.add_subplot(2, 2, 3, sharex=ax1)
+        axs = [ax1, ax2, ax3]
     else:
         figsize = None
         fig = plt.figure(figsize=figsize)
         ax1 = fig.add_subplot(1, 1, 1)
+        axs = [ax1]
     dataA = AsciiTableComm('test', address=fileA, direction='recv',
                            as_array=True).recv_dict()[1]
     dataB = AsciiTableComm('test', address=fileB, direction='recv',
@@ -58,7 +60,7 @@ def main(fileA, fileB, example_name):
                  'm--', label='b (model B)')
         ax3.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=2)
         plt.subplots_adjust(left=0.075, right=0.95, wspace=0.1, hspace=0.45)
-    plt.show()
+    return fig, axs
 
 
 if __name__ == '__main__':
@@ -67,4 +69,5 @@ if __name__ == '__main__':
         example_name = sys.argv[3]
     else:
         example_name = 'timesync1'
-    main(sys.argv[1], sys.argv[2], example_name)
+    fig, axs = main(sys.argv[1], sys.argv[2], example_name)
+    plt.show()

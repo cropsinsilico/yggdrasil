@@ -1184,10 +1184,6 @@ definitions:
             take the message as input and return a boolean, True if the message should
             pass through the filter, False if it should not.
           type: function
-        initial_state:
-          description: Dictionary of initial state variables that should be set when
-            the filter is created.
-          type: object
         statement:
           description: Python statement in terms of the message as represented by
             the string "%x%" that should evaluate to a boolean, True if the message
@@ -3085,10 +3081,6 @@ definitions:
             is the name of the function. The function should take the message as input
             and return the transformed message.
           type: function
-        initial_state:
-          description: Dictionary of initial state variables that should be set when
-            the transform is created.
-          type: object
         map:
           additionalProperties:
             type: string
