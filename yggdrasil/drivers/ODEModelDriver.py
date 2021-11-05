@@ -37,6 +37,24 @@ class RetryWithNumeric(RetryODE):
     pass
 
 
+def _get_function(x):
+    r"""Extract the function from an expression."""
+    from sympy.core.function import AppliedUndef, Subs, Derivative
+    if isinstance(x, AppliedUndef):
+        return x.func, x.args[0]
+    elif isinstance(x, (Subs, Derivative)):
+        if isinstance(x, Subs):
+            x = x.doit()
+        if isinstance(x, Subs):
+            deriv = x.expr
+            arg = x.point[0]
+        else:
+            deriv = x
+            arg = x.variables[0]
+        return deriv.expr.func, arg
+    return None, None
+
+
 class ODEModel(object):
     r"""Class for handling ODE calculations.
 
@@ -49,9 +67,9 @@ class ODEModel(object):
         funcs (list): sympy.Function symbols for the functions being solved.
         local_map (dict): Mapping between strings and the corresponding sympy
             objects.
-        ics (dict, optional): Boundary conditions.
-        param (dict, optional): Constant values for parameters in the
-            equation that are not expected to change.
+        ics (dict): Boundary conditions.
+        param (dict): Constant values for parameters in the equations that
+            are not expected to change.
         odeint_kws (dict, optional): Keyword arguments that should be passed
             to scipy.integrate.odeint if it is called in integrating the
             equations numerically.
@@ -60,29 +78,24 @@ class ODEModel(object):
             state solution numerically.
         use_numeric (bool, optional): If True, the equations will be solved
             numerically even if a symbolic solution is possible.
-        t_units (str, optional): Units of the independent variable.
+        units (dict, optional): Units for the variables in the equations.
 
     """
 
-    def __init__(self, eqns, t, funcs, local_map, ics=None,
-                 param=None, odeint_kws=None, fsolve_kws=None,
-                 use_numeric=False, t_units=None):
+    def __init__(self, eqns, t, funcs, local_map, ics, param,
+                 odeint_kws=None, fsolve_kws=None, use_numeric=False,
+                 units=None):
         self.eqns0 = [eqns[f.diff(t)] for f in funcs]
         self.eqns = None
         self.constants = None
         self.t = t
-        self.t_units = t_units
+        self.units = units
         self.funcs = funcs
         self.local_map = local_map
-        if ics is None:
-            ics = {}
         self.ics = ics
-        if param is None:
-            param = {}
         self.param = param
         self.sympy_vars = tuple(
-            [self.t] + self.funcs
-            + [self.local_map[x] for x in self.param.keys()])
+            [t] + funcs + [self.local_map[x] for x in param.keys()])
         self.sol = None
         if odeint_kws is None:
             odeint_kws = {}
@@ -117,15 +130,10 @@ class ODEModel(object):
                 value for the determined solution.
 
         """
-        from sympy import sympify, Function
         new_ics = {}
-        iparam = {}
-        for k, v in inputs.items():
-            ks = sympify(k, locals=self.local_map)
-            if isinstance(ks, Function):
-                new_ics[ks] = v
-            else:
-                iparam[self.local_map[k]] = v
+        iparam = ODEModelDriver.normalize_ics(
+            inputs, self.t, self.local_map, units=self.units,
+            store_funcs=new_ics)
         self.ics.update(new_ics)
         method_order = [{}, {'use_numeric': True}]
         if compute_method == 'steady_state':
@@ -133,7 +141,8 @@ class ODEModel(object):
         constants_changed = (
             (self.constants is None)
             or any(k in self.constants for k in inputs.keys()))
-        if (self.sol is None) or new_ics or constants_changed:
+        sol = self.sol
+        if (sol is None) or new_ics or constants_changed:
             temp_solution = False
             if constants_changed:
                 self.reset_constants(inputs)
@@ -143,15 +152,18 @@ class ODEModel(object):
                     break
                 except NotImplementedError as e:
                     # Indicates Sympy could not find a symbolic solution
-                    logger.error(f"Sympy raised NotImplementedError('{e}')")
+                    logger.info(f"Sympy raised NotImplementedError('{e}'). "
+                                f"Another method will be tried.")
                 except RetryODE as e:
                     temp_solution = temp_solution or e.temp_solution
+            if not sol:
+                raise ODEError("No solution could be found")
             if not temp_solution:
                 self.sol = sol
         try:
-            result = self.sol(iparam, constants=self.constants)
+            result = sol(iparam, constants=self.constants)
         except RetryWithNumeric as e:
-            assert(not self.sol.is_numeric)
+            assert(not sol.is_numeric)
             sol = self.solve(compute_method, use_numeric=True)
             result = sol(iparam, constants=self.constants)
             if not e.temp_solution:
@@ -165,6 +177,9 @@ class ODEModel(object):
             compute_method (str): Method that should be used to find a solution.
             use_numeric (bool, optional): If True, the solution will be found
                 numerically. Defaults to False.
+            from_roots (bool, optional): If True, the steady state solution
+                will be found for solving for the equation roots. Defaults to
+                False.
 
         Returns:
             LambdifySolution: Solution that can be called to determine the
@@ -177,14 +192,16 @@ class ODEModel(object):
             use_numeric = True
         dsol = None
         kws = {}
+        soltype = None
         if use_numeric:
-            logger.info("NUMERIC SOLUTION")
+            soltype = "NUMERIC"
             dsol = {f: eqn.rhs for f, eqn in zip(self.funcs, self.eqns)}
             if compute_method == 'integrate':
                 kws.update(ics=self.ics, method='odeint', **self.odeint_kws)
             elif compute_method == 'steady_state':
                 kws.update(ics=self.ics, method='fsolve', **self.fsolve_kws)
         elif (compute_method == 'steady_state') and from_roots:
+            soltype = "SYMBOLIC STEADY STATE"
             dsol = solve([Eq(eqn.rhs, sympify(0.0)) for eqn in self.eqns],
                          self.funcs, dict=True)
             if len(dsol) > 1:
@@ -192,22 +209,21 @@ class ODEModel(object):
                     f"More than one symbolic solution for equation roots, "
                     f"retrying numerically: {dsol}")
             dsol = dsol[0]
-            logger.info("SYMBOLIC STEADY STATE")
         else:
-            dsol = dsolve_system(self.eqns, funcs=self.funcs,
-                                 t=self.t, ics=self.ics)
-            if len(dsol) > 1:
+            soltype = "SYMBOLIC"
+            dsol = dsolve_system(self.eqns, funcs=self.funcs, t=self.t,
+                                 ics=self.ics)
+            if len(dsol) > 1:  # pragma: debug
                 raise MultipleSolutionsError(
                     f"There is more than one symbolic solution, "
                     f"retrying numerically: {dsol}")
             dsol = {eqn.lhs: eqn.rhs for eqn in dsol[0]}
-            logger.info('SYMBOLIC SOLUTION')
             if compute_method == 'steady_state':
                 from sympy import oo
                 kws = {'method': 'flimit', 'limits': {self.t: oo}}
-        logger.info(f'SOLUTION: {dsol}')
+        logger.info(f'{soltype} SOLUTION: {dsol}')
         sol = LambdifySolution(self.sympy_vars, dsol, self.funcs,
-                               t_units=self.t_units, **kws)
+                               units=self.units, **kws)
         return sol
 
 
@@ -226,6 +242,8 @@ class LambdifySolution(object):
             the equations. If not provided (or None), the solution will be
             symbolic and is assumed to already be represented by the provided
             equations.
+        units (dict, optional): Units associated with variables in the provided
+            equations.
         limits (dict, optional): Mapping of variable limits that should be
             applied after other substitutions are made.
         **kws: Additional keyword arguments will be passed to the numeric
@@ -233,19 +251,33 @@ class LambdifySolution(object):
     
     """
 
-    def __init__(self, args, eqns, funcs, ics=None, method=None, t_units=None,
-                 **kws):
+    def __init__(self, args, eqns, funcs, ics=None, method=None,
+                 units=None, **kws):
         from sympy import lambdify
+        self.t = args[0]
         self.args = args
         self.eqns = eqns
         self.funcs = funcs
         self.ics = ics
         self.method = method
-        self.t_units = t_units
+        self.units = units
+        self.args_units = [units.get(a, None) for a in args]
+        self.funcs_units = [units.get(f, None) for f in funcs]
         self.kws = kws
-        self.solution = lambdify(args, [eqns[f] for f in funcs])
+        self.lambdified = lambdify(args, [eqns[f] for f in funcs])
         self.is_numeric = (method in ['odeint', 'fsolve'])
         self.last_state = None
+
+    def solution(self, *args):
+        r"""Call the lambdified solution."""
+        args = [unyts.add_units(a, u)
+                if (u and not unyts.has_units(a) and (a is not None))
+                else a for a, u in zip(args, self.args_units)]
+        out = self.lambdified(*args)
+        out = [unyts.add_units(x, u)
+               if (u and not unyts.has_units(x)) else x
+               for x, u in zip(out, self.funcs_units)]
+        return out
 
     @property
     def order(self):
@@ -254,28 +286,21 @@ class LambdifySolution(object):
 
     def get_t0(self):
         r"""Get the independent variable associated with the provided ICs."""
-        from sympy import Subs
         from sympy.core.numbers import Number
         t0 = None
         for v in self.ics.keys():
-            if isinstance(v, Subs):
-                tv = v.args[-1][0]
-            else:
-                tv = v.args[0]
+            _, tv = _get_function(v)
             if t0 is None:
                 t0 = tv
             else:
                 assert(tv == t0)
         t0_f = t0
         if isinstance(t0, Number):
-            # TODO: Allow non float?
+            # TODO: Check for non-float (e.g. complex)?
             t0_f = np.float64(t0)
-        if self.t_units:
-            t0_f = unyts.add_units(t0_f, self.t_units)
         return t0, t0_f
 
-    def _fodeint(self, X, t, args, units):
-        X = [unyts.add_units(x, u) if u else x for x, u in zip(X, units)]
+    def _fodeint(self, X, t, args):
         args = [t] + list(X) + list(args)
         return self.solution(*args)
 
@@ -286,32 +311,25 @@ class LambdifySolution(object):
             t0_f, X0 = self.last_state
         else:
             t0, t0_f = self.get_t0()
-            X0 = [self.ics[f.subs(self.args[0], t0)] for f in self.funcs]
-        units = [unyts.get_units(x) for x in X0]
+            X0 = [self.ics[f.subs(self.t, t0)] for f in self.funcs]
         param = [iparam.get(k, None) for k in self.order]
         NX = len(X0) + 1
         t = np.array([t0_f, param[0]])
-        if unyts.has_units(t0_f):
-            t = unyts.add_units(t, t0_f.units)
-        out = odeint(self._fodeint, X0, t, args=(param[NX:], units),
-                     **kwargs)[-1]
+        out = odeint(self._fodeint, X0, t, args=(param[NX:],), **kwargs)[-1]
         self.last_state = (t[-1], out)
         return out
 
-    def _fsolve(self, X, args, units):
-        X = [unyts.add_units(x, u) if u else x for x, u in zip(X, units)]
+    def _fsolve(self, X, args):
         args = list(X) + list(args)
         return [X[0]] + self.solution(*args)
 
     def fsolve(self, iparam, **kwargs):
         r"""Wrapper for calling scipy.optimize.fsolve."""
         from scipy.optimize import fsolve
-        # TODO: Allow ics to be set to last value
         t0, t0_f = self.get_t0()
-        X0 = [t0_f] + [self.ics[f.subs(self.args[0], t0)] for f in self.funcs]
-        units = [unyts.get_units(x) for x in X0]
+        X0 = [t0_f] + [self.ics[f.subs(self.t, t0)] for f in self.funcs]
         param = [iparam.get(k, None) for k in self.order[len(X0):]]
-        return fsolve(self._fsolve, X0, args=(param, units))[1:]
+        return fsolve(self._fsolve, X0, args=(param,))[1:]
 
     def flimit(self, iparam, limits={}):
         r"""Compute the value through substitution followed by limit."""
@@ -324,7 +342,7 @@ class LambdifySolution(object):
             for k, v in limits.items():
                 try:
                     x = x.limit(k, v)
-                except NotImplementedError:
+                except NotImplementedError:  # pragma: debug
                     raise RetryWithNumeric("Complex limit")
             if isinstance(x, Limit):
                 raise RetryWithNumeric("Complex limit")
@@ -341,7 +359,7 @@ class LambdifySolution(object):
                 out = self.solution(*[iparam.get(k, None) for k in self.order])
             except BaseException as e:  # pragma: debug
                 raise RetryWithNumeric(e)
-            if any(np.isnan(x) for x in out):
+            if any(np.isnan(x) for x in out):  # pragma: debug
                 raise RetryWithNumeric("NaN", temp_solution=True)
             return out
         return getattr(self, self.method)(iparam, **self.kws)
@@ -534,6 +552,37 @@ class ODEModelDriver(DSLModelDriver):
                        + out[m.end():])
         return out
 
+    @classmethod
+    def normalize_ics(cls, ics, t, local_map, units=None, store_funcs=None):
+        r"""Normalize ICs, adding units as necessary."""
+        from sympy import sympify
+        arg_regex = r'(?:\-|\+)?\d+(?:\.\d+)?(?:(?:e|E)(\-|\+)?\d+?)?'
+        out = {}
+        for k, v in ics.items():
+            m = cls.extract_derivatives(k, arg_regex=arg_regex, match=True)
+            f = None
+            if m:
+                f = local_map[m['f']]
+                arg = float(m['t'])
+                kt = f(t).diff(t, int(m['n']))
+                k0 = kt.subs(t, arg)
+            else:
+                k0 = sympify(k, locals=local_map)
+                f, arg = _get_function(k0)
+                kt = k0
+                if f:
+                    kt = k0.subs(arg, t)
+            if f and units and units.get(t, None):
+                tic = unyts.add_units(float(arg), units[t])
+                k0 = kt.subs(t, tic)
+            if (units is not None) and unyts.has_units(v):
+                units[kt] = unyts.get_units(v)
+            if (store_funcs is not None) and f:
+                store_funcs[k0] = v
+            else:
+                out[k0] = v
+        return out
+
     @property
     def model_wrapper_kwargs(self):
         r"""dict: Keyword arguments for the model wrapper."""
@@ -571,19 +620,18 @@ class ODEModelDriver(DSLModelDriver):
             'dependent_funcs': []}
         equations = [cls.replace_derivatives(x, symbols) for x in equations]
         dependent_vars += symbols['dependent_funcs']
+        if parameters is None:
+            parameters = {}
         if assumptions is None:
             assumptions = {}
         if independent_var is None:
-            if symbols['independent_var']:
-                independent_var = symbols['independent_var']
-            else:
-                independent_var = 't'
+            assert(symbols['independent_var'])
+            independent_var = symbols['independent_var']
         local_map = {
             independent_var: Symbol(
                 independent_var, **assumptions.get(independent_var, {}))}
-        if parameters:
-            for k in parameters.keys():
-                local_map[k] = Symbol(k, **assumptions.get(k, {}))
+        for k in parameters.keys():
+            local_map[k] = Symbol(k, **assumptions.get(k, {}))
 
         def add_function(x, skip_dep=False):
             if isinstance(x, str):
@@ -643,27 +691,12 @@ class ODEModelDriver(DSLModelDriver):
             rhs = add_vars(x.split('=')[1])
             eqns[lhs] = Eq(lhs, rhs)
             nder[lhs.expr] = max(nder[lhs.expr], lhs.args[1][1])
-        ics = None
+        ics = {}
+        units = None
         if boundary_conditions:
-            ics = {}
-            arg_regex = r'(?:\-|\+)?\d+(?:\.\d+)?(?:(?:e|E)(\-|\+)?\d+?)?'
-            for k, v in boundary_conditions.items():
-                m = cls.extract_derivatives(k, arg_regex=arg_regex,
-                                            match=True)
-                if m:
-                    if independent_var_units:
-                        m['t'] = unyts.add_units(float(m['t']),
-                                                 independent_var_units)
-                    k = local_map[m['f']](t).diff(t, int(m['n'])).subs(
-                        t, m['t'])
-                    tic = m['t']
-                else:
-                    k = sympify(k, locals=local_map)
-                    tic = float(k.args[0])
-                    if independent_var_units:
-                        tic = unyts.add_units(tic, independent_var_units)
-                        k = k.subs(k.args[0], tic)
-                ics[k] = v
+            units = {t: independent_var_units}
+            ics = cls.normalize_ics(boundary_conditions, t, local_map,
+                                    units=units)
         # Use substitutions to make intermediate orders explicit
         subs = {}
         for f, nmax in nder.items():
@@ -684,11 +717,11 @@ class ODEModelDriver(DSLModelDriver):
                     eqns[f] = eqns[f].subs(k, v)
             for f in list(ics.keys()):
                 ics[f.subs(k, v).doit()] = ics.pop(f)
-        return ODEModel(eqns, t, funcs,
-                        local_map, ics=ics, param=parameters,
+            for f in list(units.keys()):
+                units[f.subs(k, v).doit()] = units.pop(f)
+        return ODEModel(eqns, t, funcs, local_map, ics, parameters,
                         odeint_kws=odeint_kws, fsolve_kws=fsolve_kws,
-                        use_numeric=use_numeric,
-                        t_units=independent_var_units)
+                        use_numeric=use_numeric, units=units)
 
     @classmethod
     def model_wrapper(cls, env=None, working_dir=None, inputs=[],
