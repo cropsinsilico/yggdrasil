@@ -4,6 +4,7 @@ import pandas as pd
 import unyt
 from collections import OrderedDict
 from yggdrasil import tools, constants
+_unit_object = unyt.unit_object.Unit
 _unit_quantity = unyt.array.unyt_quantity
 _unit_array = unyt.array.unyt_array
 _ureg_unyt = None
@@ -246,10 +247,11 @@ def add_units(arr, unit_str, dtype=None):
 
     """
     ureg = get_ureg()
-    unit_str = tools.bytes2str(unit_str)
-    if is_null_unit(unit_str):
-        return arr
-    unit_str = convert_unit_string(unit_str)
+    if not isinstance(unit_str, _unit_object):
+        unit_str = tools.bytes2str(unit_str)
+        if is_null_unit(unit_str):
+            return arr
+        unit_str = convert_unit_string(unit_str)
     if has_units(arr):
         return convert_to(arr, unit_str)
     if dtype is None:

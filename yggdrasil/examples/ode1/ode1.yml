@@ -3,12 +3,13 @@ model:
   language: ode
   args: df/dt=A*t*f(t)
   parameters:
-    A: -2.0
+    A: -2.0 hr**-2
   boundary_conditions:
-    f(0): 1.0
+    f(0): 1.0 kg
+  independent_var_units: hr
   inputs:
     - name: input
-      vars: [t, A]
+      vars: [t, A, f(0)]
       default_file:
         name: ./Input/input.txt
         filetype: table
