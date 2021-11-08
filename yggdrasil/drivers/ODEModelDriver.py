@@ -277,6 +277,7 @@ class LambdifySolution(object):
         out = [unyts.add_units(x, u)
                if (u and not unyts.has_units(x)) else x
                for x, u in zip(out, self.funcs_units)]
+        # print("result", out)
         return out
 
     @property
@@ -633,7 +634,7 @@ class ODEModelDriver(DSLModelDriver):
         for k in parameters.keys():
             local_map[k] = Symbol(k, **assumptions.get(k, {}))
 
-        def add_function(x, skip_dep=False):
+        def add_function(x):
             if isinstance(x, str):
                 x_str = x
                 if '(' not in x:
@@ -653,22 +654,11 @@ class ODEModelDriver(DSLModelDriver):
                 return v
             local_map[str(xf)] = xf
             local_map[v] = x
-            if not skip_dep:
-                if v not in dependent_vars:
-                    dependent_vars.append(v)
             return x
 
         def add_vars(x):
             if isinstance(x, str):
-                try:
-                    x = sympify(x, locals=local_map)
-                except TypeError:
-                    # Allows for the equation in the YAML to use the function
-                    # name without arguments (e.g. 'f' vs 'f(t)')
-                    local_map2 = dict(local_map)
-                    for v in dependent_vars:
-                        local_map2[v.split('(', 1)[0]] = local_map[v]
-                    x = sympify(x, locals=local_map2)
+                x = sympify(x, locals=local_map)
             v = str(x)
             if v in local_map:
                 return local_map[v]
@@ -678,12 +668,10 @@ class ODEModelDriver(DSLModelDriver):
                 # This is not a stable API, so a new class may need to be
                 # created for future versions of sympy
                 x._args = tuple(add_vars(xx) for xx in x.args)
-            elif isinstance(x, Symbol) and (str(x) != independent_var):
-                x = add_function(v)
             return x
 
         t = local_map[independent_var]
-        funcs = [add_function(v, skip_dep=True) for v in dependent_vars]
+        funcs = [add_function(v) for v in dependent_vars]
         eqns = {}
         nder = {f: 0 for f in funcs}
         for x in equations:
@@ -730,8 +718,6 @@ class ODEModelDriver(DSLModelDriver):
         r"""Model wrapper."""
         if env is not None:
             os.environ.update(env)
-        if working_dir is not None:
-            os.chdir(working_dir)
         # Setup interface objects
         input_map, output_map = cls.setup_interface(
             inputs=inputs, outputs=outputs)
@@ -777,8 +763,7 @@ class ODEModelDriver(DSLModelDriver):
         out.update(
             requires_partner=True,
             source=[],
-            args=['d^2f/dx^2=-9*f(x)+A'],
+            args=['d^2f/dx^2=-9*f(x)'],
             kwargs={'independent_var': 'x',
-                    'boundary_conditions': {'f(0)': 1.0},
-                    'parameters': {'A': 1}})
+                    'boundary_conditions': {'f(0)': 1.0}})
         return out
