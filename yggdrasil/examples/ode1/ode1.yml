@@ -9,13 +9,11 @@ model:
   independent_var_units: hr
   inputs:
     - name: input
-      vars: [t, A, f(0)]
       default_file:
         name: ./Input/input.txt
         filetype: table
   outputs:
     - name: output
-      vars: [f]
       default_file:
         name: ./output.txt
         filetype: table

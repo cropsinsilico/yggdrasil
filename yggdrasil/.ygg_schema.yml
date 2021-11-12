@@ -1354,10 +1354,10 @@ definitions:
           - steady_state
           default: integrate
           description: 'Method that should be used to compute outputs for received
-            inputs. Valid methods include: integrate: Compute the value(s) of the
-            ODE solution for the parameters/independent variable values received as
-            input. steady_state: Determine the steady state solution to the ODE equations
-            based on parameter values received as input.'
+            inputs. Valid methods include: integrate: [DEFAULT] Compute the value(s)
+            of the ODE solution for the parameters/independent variable values received
+            as input. steady_state: Determine the steady state solution to the ODE
+            equations based on parameter values received as input.'
           type: string
         configuration:
           default: Release
@@ -1447,7 +1447,7 @@ definitions:
         fsolve_kws:
           description: Options that should be passed to the scipy fsolve routine when
             solving for the steady state solution if numeric integration is used (in
-            the even that sympy cannot find a symbolic solution or use_numeric is
+            the event that sympy cannot find a symbolic solution or use_numeric is
             True).
           type: object
         function:
@@ -1457,7 +1457,8 @@ definitions:
             model must contain it's own calls to the |yggdrasil| interface.
           type: string
         independent_var:
-          description: Name of independent variable. Defaults to 't'.
+          description: Name of independent variable. Defaults to 't' if it cannot
+            be inferred from the expression.
           type: string
         independent_var_units:
           description: Units of the independent variable. If not provided, the independent
@@ -1608,13 +1609,13 @@ definitions:
           description: Name used for component in log messages.
           type: string
         odeint_kws:
-          description: 'Options that should be passed to the scipy odeint integration
-            routine if numeric integration is used (in the event that sympy cannot
-            find a symbolic solution or use_numeric is True). In addition to the keyword
-            arguments accepted by scipy.integrate.odeint, the following are also supported:
-            from_prev (bool, optional): If True, the integration should always begin
-            from the previous end state instead of starting from the initial conditions
-            (default behavior).'
+          description: 'Keyword arguments that should be passed to scipy.integrate.odeint
+            if it is called in integrating the equations numerically. If ''name''
+            in present, scipy.integrate.ode will be used instead and these arguments
+            will be passed to the set_integrator method. In addition, the following
+            keywords are also supported: from_prev (bool, optional): If True, the
+            integration should always begin from the previous end state instead of
+            starting from the initial conditions (default behavior).'
           type: object
         only_output_final_step:
           default: false
@@ -2457,8 +2458,8 @@ definitions:
             - steady_state
             default: integrate
             description: 'Method that should be used to compute outputs for received
-              inputs. Valid methods include: integrate: Compute the value(s) of the
-              ODE solution for the parameters/independent variable values received
+              inputs. Valid methods include: integrate: [DEFAULT] Compute the value(s)
+              of the ODE solution for the parameters/independent variable values received
               as input. steady_state: Determine the steady state solution to the ODE
               equations based on parameter values received as input.'
             type: string
@@ -2472,11 +2473,12 @@ definitions:
           fsolve_kws:
             description: Options that should be passed to the scipy fsolve routine
               when solving for the steady state solution if numeric integration is
-              used (in the even that sympy cannot find a symbolic solution or use_numeric
+              used (in the event that sympy cannot find a symbolic solution or use_numeric
               is True).
             type: object
           independent_var:
-            description: Name of independent variable. Defaults to 't'.
+            description: Name of independent variable. Defaults to 't' if it cannot
+              be inferred from the expression.
             type: string
           independent_var_units:
             description: Units of the independent variable. If not provided, the independent
@@ -2504,13 +2506,13 @@ definitions:
             - ode
             type: string
           odeint_kws:
-            description: 'Options that should be passed to the scipy odeint integration
-              routine if numeric integration is used (in the event that sympy cannot
-              find a symbolic solution or use_numeric is True). In addition to the
-              keyword arguments accepted by scipy.integrate.odeint, the following
-              are also supported: from_prev (bool, optional): If True, the integration
-              should always begin from the previous end state instead of starting
-              from the initial conditions (default behavior).'
+            description: 'Keyword arguments that should be passed to scipy.integrate.odeint
+              if it is called in integrating the equations numerically. If ''name''
+              in present, scipy.integrate.ode will be used instead and these arguments
+              will be passed to the set_integrator method. In addition, the following
+              keywords are also supported: from_prev (bool, optional): If True, the
+              integration should always begin from the previous end state instead
+              of starting from the initial conditions (default behavior).'
             type: object
           parameters:
             additionalProperties:

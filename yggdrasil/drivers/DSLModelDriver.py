@@ -84,14 +84,16 @@ class DSLModelDriver(InterpretedModelDriver):  # pragma: no cover
         input_map = {}
         output_map = {}
         for x in inputs:
-            input_map[x['name']] = {
-                'vars': x.get('vars', []),
-                'comm': YggInput(x['name'], new_process=True)}
+            input_map[x['name']] = dict(
+                x,
+                vars=x.get('vars', []),
+                comm=YggInput(x['name'], new_process=True))
         for x in outputs:
-            output_map[x['name']] = {
-                'as_array': x.get('as_array', False),
-                'vars': x.get('vars', []),
-                'comm': YggOutput(x['name'], new_process=True)}
+            output_map[x['name']] = dict(
+                x,
+                as_array=x.get('as_array', False),
+                vars=x.get('vars', []),
+                comm=YggOutput(x['name'], new_process=True))
         return input_map, output_map
         
     def queue_recv(self):

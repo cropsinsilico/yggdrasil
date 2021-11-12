@@ -1,13 +1,30 @@
 import os
 import re
+import copy
+import pprint
 import logging
 import numpy as np
 from yggdrasil import units as unyts
 from yggdrasil.drivers.DSLModelDriver import DSLModelDriver
+try:
+    import sympy
+    from sympy import (sympify, lambdify, Symbol, Function, Derivative, Eq,
+                       Limit, solve, oo)
+    from sympy.core.numbers import Number
+    from sympy.core.function import UndefinedFunction, AppliedUndef, Subs
+    from sympy.solvers.ode.systems import dsolve_system
+except ImportError:
+    pass
 logger = logging.getLogger(__name__)
 
 
+# TODO:
+#   - Allow inputs to be called at more than two levels, this would also
+#     apply to the automated wrapping of model functions
+
+
 class ODEError(BaseException):
+    r"""Error indicating a problems with creating/evaluating an ODE model."""
     pass
 
 
@@ -38,10 +55,21 @@ class RetryWithNumeric(RetryODE):
 
 
 def _get_function(x):
-    r"""Extract the function from an expression."""
-    from sympy.core.function import AppliedUndef, Subs, Derivative
+    r"""Utility for extracting components from an expression containing
+    a function or derivative.
+
+    Args:
+        x (sympy.Expression): SymPy expression for a function or derivative.
+
+    Returns:
+        tuple: The function object, the independent variable symbol that the
+            function depends on, and the order of the derivative (if one is
+            present). If there is not a function or derivative present, all
+            three tuple members will be None.
+
+    """
     if isinstance(x, AppliedUndef):
-        return x.func, x.args[0]
+        return x.func, x.args[0], None
     elif isinstance(x, (Subs, Derivative)):
         if isinstance(x, Subs):
             x = x.doit()
@@ -51,90 +79,429 @@ def _get_function(x):
         else:
             deriv = x
             arg = x.variables[0]
-        return deriv.expr.func, arg
-    return None, None
+        degree = deriv.args[1][1]
+        return deriv.expr.func, arg, degree
+    return None, None, None
 
 
 class ODEModel(object):
     r"""Class for handling ODE calculations.
 
     Args:
-        eqns (list): Sympy symbolic representation of an ODE
+        eqns (list): String symbolic representation of an ODE
             equation or system of equations with the form
             dx/dt = ... such that the righthand side of each
             equation is the expresion for the derivative.
-        t (sympy.Symbol): Independent variable.
-        funcs (list): sympy.Function symbols for the functions being solved.
-        local_map (dict): Mapping between strings and the corresponding sympy
-            objects.
-        ics (dict): Boundary conditions.
-        param (dict): Constant values for parameters in the equations that
-            are not expected to change.
+        t (str, optional): Independent variable name. Defaults to 't' if it
+            cannot be inferred from the expression.
+        funcs (list, optional): String symbols for the functions being solved.
+            If not provided, the names of the dependent variables are inferred
+            from the equations.
+        ics (dict, optional): Boundary conditions.
+        param (dict, optional): Constant values for parameters in the
+            equations that are not expected to change.
+        assumptions (dict, optional): Mapping between a variable or parameter
+            name and a map of sympy assumption keywords for that variable. A
+            full list of supported sympy assumptions can be found here
+            https://docs.sympy.org/latest/modules/core.html#module-sympy.core.
+              assumptions
+        units (dict, optional): Units for the variables in the equations.
+        t_units (str, optional): Units for the independent variable. It will
+            be treated as dimensionless if not provided.
         odeint_kws (dict, optional): Keyword arguments that should be passed
             to scipy.integrate.odeint if it is called in integrating the
-            equations numerically.
-        fsolve_kws (dict, optional): Keyword arguments that should be passed
-            to scipy.optimize.fsolve if it is called in finding the steady
-            state solution numerically.
-        use_numeric (bool, optional): If True, the equations will be solved
-            numerically even if a symbolic solution is possible.
-        units (dict, optional): Units for the variables in the equations.
+            equations numerically. If 'name' in present, scipy.integrate.ode
+            will be used instead and these arguments will be passed to the
+            set_integrator method. In addition, the following keywords are
+            also supported:
+              from_prev (bool, optional): If True, the integration should
+                  always begin from the previous end state instead of starting
+                  from the initial conditions (default behavior).
+        fsolve_kws (dict, optional): Options that should be passed to the
+            scipy fsolve routine when solving for the steady state solution if
+            numeric integration is used (in the event that sympy cannot find
+            a symbolic solution or use_numeric is True).
+        use_numeric (bool, optional): If True, numeric methods will be used to
+            find a solution without attempting to find a symbolic solution.
+            Defaults to False.
 
     """
+    _derivative_regexes = [
+        r'd(?:\^(?P<n_top>\d+))?\s*(?P<f>\w+)\s*'
+        r'(?:\(\s*(?P<args>ARG\s*(?:\,\s*ARG\s*)*)\))?\s*/'
+        r'\s*d\s*(?P<t>\w+)(?:\^(?P<n_bottom>\d+))?',
+        r'(?P<f>\w+)\s*(?P<n_tics>\'+)(?:\s*\(\s*(?P<t>ARG)\s*\))?'
+    ]
+    _noarg_function_regex = (
+        r'(?<!\w)FUNC(?!(?:\w)|(?:\s*\())'
+    )
+    _function_regex = (
+        r'(?<!\w)FUNC\((?P<args>\s*ARG\s*(?:\,\s*ARG\s*)*)\)'
+    )
+    _func_regex = r'\w+'
+    _arg_regex = (
+        r'(?:(?:\w+)|(?:(?:\-|\+)?\d+(?:\.\d+)?'
+        r'(?:(?:e|E)(\-|\+)?\d+?)?))'
+    )
 
-    def __init__(self, eqns, t, funcs, local_map, ics, param,
-                 odeint_kws=None, fsolve_kws=None, use_numeric=False,
-                 units=None):
-        self.eqns0 = [eqns[f.diff(t)] for f in funcs]
-        self.eqns = None
-        self.constants = None
-        self.t = t
-        self.units = units
-        self.funcs = funcs
-        self.local_map = local_map
-        self.ics = ics
-        self.param = param
-        self.sympy_vars = tuple(
-            [t] + funcs + [self.local_map[x] for x in param.keys()])
-        self.sol = None
+    def __init__(self, eqns, t=None, funcs=None, ics={}, param=None,
+                 assumptions=None, units=None, t_units=None,
+                 odeint_kws=None, fsolve_kws=None, use_numeric=False):
+        if funcs is None:
+            funcs = []
+        if param is None:
+            param = {}
+        if assumptions is None:
+            assumptions = {}
+        if units is None:
+            units = {}
         if odeint_kws is None:
             odeint_kws = {}
-        self.odeint_kws = odeint_kws
         if fsolve_kws is None:
             fsolve_kws = {}
-        self.fsolve_kws = fsolve_kws
+        self.eqns = {}
+        self.constants = None
+        self.t = None
+        self.units = dict(units)
+        self.funcs = []
+        self.local_map = {k: Symbol(k, **assumptions.get(k, {}))
+                          for k in param.keys()}
+        self.ics = {}
+        self.param = dict(param)
+        self.assumptions = dict(assumptions)
+        self.t_units = t_units
+        if t is not None:
+            self.add_t(t)
+        if isinstance(eqns, str):
+            eqns = [eqns]
+        eqns = [self.replace_derivatives(eqn) for eqn in eqns]
+        for x in funcs:
+            self.add_func(x.split('(', 1)[0])
+        eqns = [self.replace_functions(eqn) for eqn in eqns]
+        for x in eqns:
+            lhs = self.sympify(x.split('=')[0])
+            rhs = self.sympify(x.split('=')[1])
+            self.eqns[lhs] = Eq(lhs, rhs)
+            for k in self.locate_unknown_symbols(self.eqns[lhs]):
+                self.local_map[str(k)] = k
+                self.param[str(k)] = None
+        assert(not self.normalize_inputs(ics))
+        self.complete_system()
+        self.funcs_deriv = [f.diff(self.t) for f in self.funcs]
+        self.sol = None
+        self.odeint_kws = dict(odeint_kws)
+        self.fsolve_kws = dict(fsolve_kws)
         self.use_numeric = use_numeric
 
-    def reset_constants(self, inputs):
-        r"""Reset the constants and equations."""
-        self.constants = {self.local_map[k]: v for k, v
-                          in self.param.items() if k not in inputs}
-        self.eqns = self.eqns0
-        # self.eqns = []
-        # for eqn in self.eqns0:
-        #     x = eqn
-        #     for k, v in self.constants.items():
-        #         x = x.subs(k, v)
-        #     self.eqns.append(x)
+    @property
+    def func_names(self):
+        r"""list: Names of independent variables in the equations."""
+        return [str(f.__class__) for f in self.funcs]
 
-    def __call__(self, compute_method, inputs):
+    @property
+    def sympy_vars(self):
+        r"""tuple: Order of variables in arguments to lambdified equations."""
+        return tuple([self.t] + self.funcs
+                     + [self.local_map[x] for x in self.param.keys()])
+            
+    def __str__(self):
+        return (f"ODEModel(t='{self.t}',funcs={self.funcs},param={self.param},"
+                f"ics={self.ics}")
+
+    def add_t(self, x):
+        r"""Add an independent variable for the set of equations.
+
+        Args:
+            x (str): Variable name.
+
+        Returns:
+            sympy.Symbol: Variable symbol.
+
+        """
+        if (self.t is None) and (x is not None):
+            self.t = Symbol(x, **self.assumptions.get(x, {}))
+            self.local_map[x] = self.t
+            if self.t_units:
+                self.units[self.t] = self.t_units
+        return self.t
+
+    def add_func(self, x):
+        r"""Add a dependent variable for the set of equations.
+
+        Args:
+            x (str): Variable name.
+
+        Returns:
+            sympy.Symbol: Function symbol.
+
+        """
+        if isinstance(x, str):
+            x_str = x
+            if '(' not in x:
+                # Assume that function depends on independent var
+                x_str += f'({self.t})'
+            x = sympify(x_str, locals=self.local_map)
+        else:
+            x_str = str(x)
+        xf = x.__class__
+        xfunc, xargs = x_str.split('(', 1)
+        if (str(xf) != xfunc) or (xfunc in self.assumptions):
+            xa = sympify('f(' + xargs, locals=self.local_map)
+            xf = Function(xfunc, **self.assumptions.get(xfunc, {}))
+            x = xf(*xa.args)
+        v = str(x)
+        if xf == getattr(sympy, str(xf), None):
+            return v
+        if x not in self.funcs:
+            self.local_map[str(xf)] = xf
+            self.local_map[v] = x
+            self.funcs.append(x)
+        return x
+
+    def extract_derivatives(self, equation):
+        r"""Get information about derivatives contained in the provided
+        equation.
+
+        Args:
+            equation (str): Equation to extract derivatives from.
+
+        Returns:
+            list: Match dictionaries for the matched derivatives.
+
+        """
+        
+        def match2dict(m):
+            mdict = m.groupdict()
+            iout = {'name': m.group(0),
+                    'f': m.group('f'),
+                    't': mdict.get('t', 't'),
+                    'n': 1}
+            iout['tval'] = mdict.get('args', iout['t'])
+            if iout['tval']:
+                iout['tval'] = iout['tval'].strip()
+            if mdict.get('n_tics', None):
+                iout['n'] = len(mdict['n_tics'])
+            elif mdict.get('n_top', None) or mdict.get('n_bottom', None):
+                assert(mdict['n_top'] == mdict['n_bottom'])
+                iout['n'] = int(mdict['n_top'])
+            return iout
+            
+        out = []
+        for regex in self._derivative_regexes:
+            regex = regex.replace('ARG', self._arg_regex)
+            for m in re.finditer(regex, equation):
+                out.append(match2dict(m))
+        return out
+
+    def check_t(self, eqn, t, subs=None):
+        r"""Check that a function argument is either a constant or matches the
+        independent variable from previously parsed equations.
+
+        Args:
+            eqn (str): Equation containing the independent variable being checked.
+            t (str): Dependent variable to check against the existing one.
+            subs (list, optional): Existing list that substitutions should be
+                added to for constants.
+
+        """
+        if t and (t != str(self.t)):
+            try:
+                t = float(t)
+                if self.t in self.units:
+                    t = unyts.add_units(t, self.units[self.t])
+                if isinstance(subs, list) and (len(subs) == 0):
+                    subs.append((self.t, t))
+                else:
+                    return False
+            except (TypeError, ValueError):
+                raise ODEError(f"One equation ({eqn}) has a different "
+                               f"independent variable ({t}) than "
+                               f"other equations ({self.t})")
+        return True
+    
+    def replace_derivatives(self, eqn, subs=None):
+        r"""Replace derivative expressions with versions that sympy can
+        parse.
+
+        Args:
+            eqn (str): Equation to be modified.
+            subs (list, optional): Existing list that substitutions should be
+                added to for constants.
+
+        Returns:
+            str: Modified equation.
+
+        """
+        replace_derivs = []
+        for x in self.extract_derivatives(eqn):
+            replace_derivs.append(x)
+            self.add_t(x['t'])
+        self.add_t('t')  # Fallback
+        out = eqn
+        for x in replace_derivs:
+            self.add_func(x['f'])
+            args = [f"{x['f']}({self.t})"] + x['n'] * [str(self.t)]
+            replacement = f"Derivative({', '.join(args)})"
+            if x['t'] != x['tval']:
+                assert(self.check_t(eqn, x['t']))
+            if not self.check_t(eqn, x['tval'], subs=subs):
+                replacement += f".subs({self.t}, {x['tval']})"
+            out = out.replace(x['name'], replacement)
+        return out
+
+    def replace_functions(self, eqn, subs=None):
+        r"""Replace function expressions without forms with explicit
+        functional dependence on the independent variable with versions that
+        sympy can parse.
+
+        Args:
+            eqn (str): Equation to be modified.
+            subs (list, optional): Existing list that substitutions should be
+                added to for constants.
+
+        Returns:
+            str: Modified equation.
+
+        """
+        out = eqn
+        for k, v in self.local_map.items():
+            if isinstance(v, UndefinedFunction):
+                func_regex = self._function_regex.replace('FUNC', k).replace(
+                    'ARG', self._arg_regex)
+                for m in reversed(list(re.finditer(func_regex, out))):
+                    if self.check_t(eqn, m.group('args'), subs=subs):
+                        out = (out[:m.start()]
+                               + f"{k}({self.t})"
+                               + out[m.end():])
+                # Places where function name appears without arguments,
+                # assuming (t) is implied
+                func_regex = self._noarg_function_regex.replace('FUNC', k)
+                for m in reversed(list(re.finditer(func_regex, out))):
+                    out = (out[:m.start()]
+                           + f"{k}({self.t})"
+                           + out[m.end():])
+        return out
+
+    def sympify(self, x):
+        r"""Convert an expression into a Sympy symbolic expression.
+
+        Args:
+            x (str): Expression.
+
+        Returns:
+            sympy.Expression: Symbolic expression.
+
+        """
+        subs = []
+        out = self.replace_derivatives(x, subs=subs)
+        out = self.replace_functions(out, subs=subs)
+        out = sympify(out, locals=self.local_map)
+        for a, b in subs:
+            out = out.subs(a, b)
+        return out
+
+    def locate_unknown_symbols(self, x):
+        r"""Locate symbols in the provided expression that are not existing
+        parameters or independent/dependent variables.
+
+        Args:
+            x (sympy.Expression): Expression.
+
+        Returns:
+            list: Unregistered symbols from x.
+
+        """
+        out = []
+        if isinstance(x, Symbol):
+            if not ((x == self.t) or (x in self.funcs) or (str(x) in self.param)):
+                out.append(x)
+        for xx in x.args:
+            out += self.locate_unknown_symbols(xx)
+        return out
+
+    def normalize_inputs(self, inputs):
+        r"""Normalize model inputs, adding units as necessary and sorting out
+        initial conditions. If there are units present for a variable that
+        does not already have assigned units, they are added.
+        
+        Args:
+            inputs (dict): Mapping of model inputs including dependent
+                variables, parameters, and/or initial conditions where the
+                keys are strings.
+        
+        Returns:
+            dict: Mapping of model inputs where keys are symbols. Initial
+                conditions are added to the 'ics' class member.
+
+        """
+        out = {}
+        if inputs:
+            for k, v in inputs.items():
+                k0 = self.sympify(k)
+                f, arg, _ = _get_function(k0)
+                kt = k0
+                if f:
+                    kt = k0.subs(arg, self.t)
+                if unyts.has_units(v):
+                    if kt in self.units:
+                        v = v.in_units(self.units[kt])
+                    else:
+                        self.units[kt] = unyts.get_units(v)
+                if f:
+                    self.ics[k0] = v
+                    self.sol = None
+                else:
+                    out[k0] = v
+        return out
+
+    def complete_system(self):
+        r"""Complete the system of equations by introducing dummy equations
+        for missing derivatives."""
+        nder = {}
+        for x in self.eqns.keys():
+            f, _, deg = _get_function(x)
+            if deg:
+                nder.setdefault(f, 0)
+                nder[f] = max(nder[f], deg)
+        subs = {}
+        t = self.t
+        for f, nmax in nder.items():
+            for i in range(1, nmax):
+                k = f(t).diff(t, i)
+                if k not in self.eqns:
+                    v = Function(f"{f}_d{i}")(t)
+                    self.eqns[k] = Eq(k, v)
+                    self.funcs.append(v)
+                    self.local_map[str(v)] = v
+                    k2 = f(t).diff(t, i + 1)
+                    subs[k] = v
+                    if k2 in self.eqns:
+                        self.eqns[v.diff(t, 1)] = self.eqns.pop(k2)
+        for k, v in subs.items():
+            for f in list(self.eqns.keys()):
+                if f != k:
+                    self.eqns[f] = self.eqns[f].subs(k, v)
+            for f in list(self.ics.keys()):
+                self.ics[f.subs(k, v).doit()] = self.ics.pop(f)
+            for f in list(self.units.keys()):
+                self.units[f.subs(k, v).doit()] = self.units.pop(f)
+
+    # Methods for solving ODE
+    def __call__(self, compute_method, inputs, output_vars):
         r"""Find a solution.
 
         Args:
             compute_method (str): Method that should be used to find a solution.
             inputs (dict): A mapping of values for the independent variable,
                 parameters, and/or dependent variables.
+            output_vars (list): Variables that should be output.
 
         Returns:
             dict: Mapping between the names of independent variables and their
                 value for the determined solution.
 
         """
-        new_ics = {}
-        iparam = ODEModelDriver.normalize_ics(
-            inputs, self.t, self.local_map, units=self.units,
-            store_funcs=new_ics)
-        self.ics.update(new_ics)
+        iparam = self.normalize_inputs(inputs)
         method_order = [{}, {'use_numeric': True}]
         if compute_method == 'steady_state':
             method_order.insert(1, {'from_roots': True})
@@ -142,13 +509,16 @@ class ODEModel(object):
             (self.constants is None)
             or any(k in self.constants for k in inputs.keys()))
         sol = self.sol
-        if (sol is None) or new_ics or constants_changed:
+        if (sol is None) or constants_changed:
             temp_solution = False
             if constants_changed:
-                self.reset_constants(inputs)
+                self.constants = {self.local_map[k]: v for k, v
+                                  in self.param.items() if k not in inputs}
+            first_attempt = constants_changed
             for kwargs in method_order:
                 try:
-                    sol = self.solve(compute_method, **kwargs)
+                    sol = self.solve(compute_method,
+                                     first_attempt=first_attempt, **kwargs)
                     break
                 except NotImplementedError as e:
                     # Indicates Sympy could not find a symbolic solution
@@ -156,6 +526,7 @@ class ODEModel(object):
                                 f"Another method will be tried.")
                 except RetryODE as e:
                     temp_solution = temp_solution or e.temp_solution
+                first_attempt = False
             if not sol:
                 raise ODEError("No solution could be found")
             if not temp_solution:
@@ -168,9 +539,17 @@ class ODEModel(object):
             result = sol(iparam, constants=self.constants)
             if not e.temp_solution:
                 self.sol = sol
-        return {str(f.__class__): x for f, x in zip(self.funcs, result)}
+        out = {str(f.__class__): x for f, x in zip(self.funcs, result)}
+        for v in output_vars:
+            if v in self.funcs:
+                continue
+            else:
+                iparam.update({f: x for f, x in zip(self.funcs, result)})
+                out[v] = sol.evaluate(v, iparam, constants=self.constants)
+        return out
         
-    def solve(self, compute_method, use_numeric=False, from_roots=False):
+    def solve(self, compute_method, use_numeric=False, from_roots=False,
+              first_attempt=True):
         r"""Determine a solution and return a function form.
 
         Args:
@@ -180,29 +559,35 @@ class ODEModel(object):
             from_roots (bool, optional): If True, the steady state solution
                 will be found for solving for the equation roots. Defaults to
                 False.
+            first_attempt (bool, optional): If True, this is the first attempt
+                at a solution and additional log messages will be emitted.
+                Defaults to False.
 
         Returns:
             LambdifySolution: Solution that can be called to determine the
                 value of variables for desired parameters.
 
         """
-        from sympy import sympify, Eq, solve
-        from sympy.solvers.ode.systems import dsolve_system
         if self.use_numeric:
             use_numeric = True
+        derivs = {eqn.lhs: eqn.rhs for eqn in self.eqns.values()}
+        if first_attempt:
+            derivs_str = pprint.pformat({str(k): str(v) for k, v in derivs.items()})
+            logger.info(f'SYMBOLIC ODE EQUATIONS:\n{derivs_str}')
         dsol = None
         kws = {}
         soltype = None
         if use_numeric:
             soltype = "NUMERIC"
-            dsol = {f: eqn.rhs for f, eqn in zip(self.funcs, self.eqns)}
             if compute_method == 'integrate':
                 kws.update(ics=self.ics, method='odeint', **self.odeint_kws)
             elif compute_method == 'steady_state':
                 kws.update(ics=self.ics, method='fsolve', **self.fsolve_kws)
+            dsol = {}
         elif (compute_method == 'steady_state') and from_roots:
             soltype = "SYMBOLIC STEADY STATE"
-            dsol = solve([Eq(eqn.rhs, sympify(0.0)) for eqn in self.eqns],
+            dsol = solve([Eq(self.eqns[f].rhs, sympify(0.0))
+                          for f in self.funcs_deriv],
                          self.funcs, dict=True)
             if len(dsol) > 1:
                 raise MultipleSolutionsError(
@@ -211,18 +596,20 @@ class ODEModel(object):
             dsol = dsol[0]
         else:
             soltype = "SYMBOLIC"
-            dsol = dsolve_system(self.eqns, funcs=self.funcs, t=self.t,
-                                 ics=self.ics)
+            dsol = dsolve_system([self.eqns[f] for f in self.funcs_deriv],
+                                 funcs=self.funcs, t=self.t, ics=self.ics)
             if len(dsol) > 1:  # pragma: debug
                 raise MultipleSolutionsError(
                     f"There is more than one symbolic solution, "
                     f"retrying numerically: {dsol}")
+            
             dsol = {eqn.lhs: eqn.rhs for eqn in dsol[0]}
             if compute_method == 'steady_state':
-                from sympy import oo
                 kws = {'method': 'flimit', 'limits': {self.t: oo}}
-        logger.info(f'{soltype} SOLUTION: {dsol}')
-        sol = LambdifySolution(self.sympy_vars, dsol, self.funcs,
+        if dsol:
+            dsol_str = {str(k): str(v) for k, v in dsol.items()}
+            logger.info(f'{soltype} SOLUTION:\n{dsol_str}')
+        sol = LambdifySolution(self.sympy_vars, derivs, dsol, self.funcs,
                                units=self.units, **kws)
         return sol
 
@@ -233,8 +620,8 @@ class LambdifySolution(object):
     Args:
         args (list): sympy.Symbol variables in the provided equations that
             are accepted as inputs to the solution function.
-        eqns (list): sympy expressions for the solutions or derivatives that
-            will be solved numerically.
+        sys (dict): Mapping between lhs & rhs in system of equations.
+        sol (dict): Mapping between functions and solutions to sys.
         funcs (list): sympy.Function independent variables in the provided
             equations.
         ics (dict, optional): Boundary conditions for the provided equations.
@@ -251,34 +638,79 @@ class LambdifySolution(object):
     
     """
 
-    def __init__(self, args, eqns, funcs, ics=None, method=None,
+    def __init__(self, args, sys, sol, funcs, ics=None, method=None,
                  units=None, **kws):
-        from sympy import lambdify
         self.t = args[0]
         self.args = args
-        self.eqns = eqns
+        self.sys = sys
+        self.sol = sol
         self.funcs = funcs
         self.ics = ics
         self.method = method
         self.units = units
-        self.args_units = [units.get(a, None) for a in args]
-        self.funcs_units = [units.get(f, None) for f in funcs]
+        self.t_units = units.get(self.t, None)
         self.kws = kws
-        self.lambdified = lambdify(args, [eqns[f] for f in funcs])
-        self.is_numeric = (method in ['odeint', 'fsolve'])
+        self.is_numeric = (not bool(sol))
+        if self.is_numeric:
+            eqns = [sys[Derivative(f, self.t)] for f in funcs]
+        else:
+            eqns = [sol[f] for f in funcs]
+        self.solution = self.lambdify(args, eqns, funcs)
         self.last_state = None
+        self._expressions = {}
 
-    def solution(self, *args):
-        r"""Call the lambdified solution."""
-        args = [unyts.add_units(a, u)
-                if (u and not unyts.has_units(a) and (a is not None))
-                else a for a, u in zip(args, self.args_units)]
-        out = self.lambdified(*args)
-        out = [unyts.add_units(x, u)
-               if (u and not unyts.has_units(x)) else x
-               for x, u in zip(out, self.funcs_units)]
-        # print("result", out)
-        return out
+    def lambdified_expression(self, var):
+        r"""Get a lambdified expression for a function or derivative."""
+        if var in self._expressions:
+            return self._expressions[var]
+        expr = None
+        if var in self.sys:
+            expr = self.sys[var]
+        elif var in self.sol:
+            expr = self.sol[var]
+        else:
+            f, arg, deg = _get_function(var)
+            if deg and (f in self.sol):
+                expr = Derivative(self.sol[f], deg)
+            elif deg and (Derivative(f, 1) in self.sys):
+                expr = Derivative(self.sys[Derivative(f, 1)], deg - 1)
+            else:
+                raise ODEError(f"No expression could be found or derived "
+                               f"for '{var}'")
+        self._expressions[var] = self.lambdify(self.args, [expr], [var])
+        return self._expressions[var]
+
+    def evaluate(self, var, iparam, constants=None):
+        r"""Evaluate for a specific function, parameter, variable."""
+        iparam = dict(iparam)
+        if constants:
+            iparam.update(constants)
+        if var in iparam:
+            return iparam[var]
+        elif self.ics and (var in self.ics):
+            return self.ics[var]
+        fexpr = self.lambdified_expression(var)
+        return fexpr(*[iparam.get(k, None) for k in self.order])[0]
+
+    def lambdify(self, args, expr, funcs):
+        r"""Lambdify an expression, adding units to function arguments and
+        return values."""
+        args_units = [self.units.get(a, None) for a in args]
+        funcs_units = [self.units.get(f, None) for f in funcs]
+        fexpr = lambdify(args, expr)
+
+        def flambdified(*iargs):
+            iargs = [unyts.add_units(a, u)
+                     if (u and not unyts.has_units(a) and (a is not None))
+                     else a for a, u in zip(iargs, args_units)]
+            out = fexpr(*iargs)
+            out = [float(x) if isinstance(x, int) else x for x in out]
+            out = [unyts.add_units(x, u)
+                   if (u and not unyts.has_units(x)) else x
+                   for x, u in zip(out, funcs_units)]
+            return out
+
+        return flambdified
 
     @property
     def order(self):
@@ -287,10 +719,9 @@ class LambdifySolution(object):
 
     def get_t0(self):
         r"""Get the independent variable associated with the provided ICs."""
-        from sympy.core.numbers import Number
         t0 = None
         for v in self.ics.keys():
-            _, tv = _get_function(v)
+            _, tv, __ = _get_function(v)
             if t0 is None:
                 t0 = tv
             else:
@@ -301,13 +732,13 @@ class LambdifySolution(object):
             t0_f = np.float64(t0)
         return t0, t0_f
 
-    def _fodeint(self, X, t, args):
-        args = [t] + list(X) + list(args)
+    def _fodeint(self, t, X, args, t0):
+        args = [t0 + t] + list(X) + list(args)
         return self.solution(*args)
 
     def odeint(self, iparam, from_prev=False, **kwargs):
         r"""Wrapper for calling scipy.integrate.odeint."""
-        from scipy.integrate import odeint
+        from scipy.integrate import ode, odeint
         if from_prev and (self.last_state is not None):
             t0_f, X0 = self.last_state
         else:
@@ -315,9 +746,27 @@ class LambdifySolution(object):
             X0 = [self.ics[f.subs(self.t, t0)] for f in self.funcs]
         param = [iparam.get(k, None) for k in self.order]
         NX = len(X0) + 1
-        t = np.array([t0_f, param[0]])
-        out = odeint(self._fodeint, X0, t, args=(param[NX:],), **kwargs)[-1]
-        self.last_state = (t[-1], out)
+        tF = param[0]
+        if tF == t0_f:
+            out = X0
+        elif 'name' in kwargs:
+            x_ode = ode(self._fodeint)
+            x_ode.set_integrator(**kwargs)
+            x_ode.set_f_params(param[NX:], t0_f)
+            x_ode.set_initial_value(X0, 0.0)
+            out = x_ode.integrate(tF - t0_f)
+        else:
+            t = np.array([0.0, tF - t0_f])
+            out = odeint(self._fodeint, X0, t, args=(param[NX:], t0_f),
+                         tfirst=True, **kwargs)[-1]
+            # x_ode = solve_ivp(self._fodeint, (t0_f, tF), X0,
+            #                   args=(param[NX:], 0.0),
+            #                   t_eval=np.array([tF]), **kwargs)
+            # if not x_ode['success']:
+            #     raise ODEError(f"Error in scipy.integrate.solve_ivp: "
+            #                    f"'{x_ode['message']}'")
+            # out = x_ode['y'][-1]
+        self.last_state = (tF, out)
         return out
 
     def _fsolve(self, X, args):
@@ -334,10 +783,9 @@ class LambdifySolution(object):
 
     def flimit(self, iparam, limits={}):
         r"""Compute the value through substitution followed by limit."""
-        from sympy import lambdify, Limit
         out = []
         for f in self.funcs:
-            x = self.eqns[f]
+            x = self.sol[f]
             for k, v in iparam.items():
                 x = x.subs(k, v)
             for k, v in limits.items():
@@ -348,8 +796,8 @@ class LambdifySolution(object):
             if isinstance(x, Limit):
                 raise RetryWithNumeric("Complex limit")
             out.append(x)
-        f = lambdify(tuple([]), out)
-        return [float(x) if isinstance(x, int) else x for x in f()]
+        f = self.lambdify(tuple([]), out, self.funcs)
+        return f()
 
     def __call__(self, param, constants={}):
         iparam = dict(param)
@@ -374,13 +822,14 @@ class ODEModelDriver(DSLModelDriver):
             of a text file containing an equation on each line.
         compute_method (str, optional): Method that should be used to compute
             outputs for received inputs. Valid methods include:
-                integrate: Compute the value(s) of the ODE solution for the
-                    parameters/independent variable values received as input.
+                integrate: [DEFAULT] Compute the value(s) of the ODE solution
+                    for the parameters/independent variable values received as
+                    input.
                 steady_state: Determine the steady state solution to the
                     ODE equations based on parameter values received as
                     input.
         independent_var (list, optional): Name of independent variable.
-            Defaults to 't'.
+            Defaults to 't' if it cannot be inferred from the expression.
         independent_var_units (str, optional): Units of the independent
             variable. If not provided, the independent variable is treated
             as unitless.
@@ -397,18 +846,18 @@ class ODEModelDriver(DSLModelDriver):
             full list of supported sympy assumptions can be found here
             https://docs.sympy.org/latest/modules/core.html#module-sympy.core.
               assumptions
-        odeint_kws (dict, optional): Options that should be passed to the
-            scipy odeint integration routine if numeric integration is used
-            (in the event that sympy cannot find a symbolic solution or
-            use_numeric is True). In addition to the keyword arguments
-            accepted by scipy.integrate.odeint, the following are also
-            supported:
+        odeint_kws (dict, optional): Keyword arguments that should be passed
+            to scipy.integrate.odeint if it is called in integrating the
+            equations numerically. If 'name' in present, scipy.integrate.ode
+            will be used instead and these arguments will be passed to the
+            set_integrator method. In addition, the following keywords are
+            also supported:
               from_prev (bool, optional): If True, the integration should
                   always begin from the previous end state instead of starting
                   from the initial conditions (default behavior).
         fsolve_kws (dict, optional): Options that should be passed to the
             scipy fsolve routine when solving for the steady state solution if
-            numeric integration is used (in the even that sympy cannot find
+            numeric integration is used (in the event that sympy cannot find
             a symbolic solution or use_numeric is True).
         use_numeric (bool, optional): If True, numeric methods will be used to
             find a solution without attempting to find a symbolic solution.
@@ -439,12 +888,6 @@ class ODEModelDriver(DSLModelDriver):
     }
     language = 'ode'
     interface_dependencies = ['sympy']
-    _derivative_regexes = [
-        r'd(?:\^(?P<n_top>\d+))?\s*(?P<f>\w+)\s*'
-        r'(?P<args>\(\s*ARG\s*(?:\,\s*ARG\s*)*\))?\s*/'
-        r'\s*d\s*(?P<t>\w+)(?:\^(?P<n_bottom>\d+))?',
-        r'(?P<f>\w+)\s*(?P<n_tics>\'+)(?:\s*\(\s*(?P<t>ARG)\s*\))?'
-    ]
 
     @classmethod
     def language_version(cls, **kwargs):
@@ -479,111 +922,6 @@ class ODEModelDriver(DSLModelDriver):
         else:
             self.equations = self.args
 
-    @classmethod
-    def extract_derivatives(cls, equation, arg_regex=r'\w+',
-                            match=False):
-        r"""Get information about derivatives contained in the provided
-        equation.
-
-        Args:
-            equation (str): Equation to extract
-            arg_regex (str, optional): Regex used to represent arguments.
-                Defaults to r'\w+'.
-            match (bool, optional): If True, the entire expression will be
-                matched against the regex. Defaults to False.
-
-        Returns:
-            list: Dictionaries of information about the recovered derivatives.
-
-        """
-        def match2dict(m):
-            mdict = m.groupdict()
-            iout = {'name': m.group(0),
-                    'f': m.group('f'),
-                    't': mdict.get('t', 't'),
-                    'n': 1}
-            if mdict.get('n_tics', None):
-                iout['n'] = len(mdict['n_tics'])
-            elif mdict.get('n_top', None) or mdict.get('n_bottom', None):
-                assert(mdict['n_top'] == mdict['n_bottom'])
-                iout['n'] = int(mdict['n_top'])
-            return iout
-            
-        out = []
-        for regex in cls._derivative_regexes:
-            regex = regex.replace('ARG', arg_regex)
-            if match:
-                m = re.match(regex, equation)
-                if m:
-                    return match2dict(m)
-            else:
-                for m in re.finditer(regex, equation):
-                    out.append(match2dict(m))
-        return out
-
-    @classmethod
-    def replace_derivatives(cls, equation, symbols):
-        r"""Replace derivative expressions with versions that sympy can parse.
-
-        Args:
-            equation (str): Equation to extract
-            symbols (dict): Existing dict for tracking variables parsed from
-                the equation.
-
-        Returns:
-            str: Updated version of the equation.
-
-        """
-        out = equation
-        for x in cls.extract_derivatives(equation):
-            if x['t'] is None:
-                x['t'] = 't'
-            args = [f"{x['f']}({x['t']})"] + x['n'] * [x['t']]
-            out = out.replace(x['name'], f"Derivative({', '.join(args)})")
-            if symbols['independent_var'] is None:
-                symbols['independent_var'] = x['t']
-            if (((x['f'] not in symbols['dependent_bases'])
-                 and (x['f'] not in symbols['dependent_funcs']))):
-                symbols['dependent_funcs'].append(x['f'])
-        for f in symbols['dependent_funcs']:
-            func_regex = r'(?<!\w)' + f + r'(?!(?:\w)|(?:\s*\())'
-            for m in reversed(list(re.finditer(func_regex, out))):
-                out = (out[:m.start()]
-                       + f"{f}({symbols['independent_var']})"
-                       + out[m.end():])
-        return out
-
-    @classmethod
-    def normalize_ics(cls, ics, t, local_map, units=None, store_funcs=None):
-        r"""Normalize ICs, adding units as necessary."""
-        from sympy import sympify
-        arg_regex = r'(?:\-|\+)?\d+(?:\.\d+)?(?:(?:e|E)(\-|\+)?\d+?)?'
-        out = {}
-        for k, v in ics.items():
-            m = cls.extract_derivatives(k, arg_regex=arg_regex, match=True)
-            f = None
-            if m:
-                f = local_map[m['f']]
-                arg = float(m['t'])
-                kt = f(t).diff(t, int(m['n']))
-                k0 = kt.subs(t, arg)
-            else:
-                k0 = sympify(k, locals=local_map)
-                f, arg = _get_function(k0)
-                kt = k0
-                if f:
-                    kt = k0.subs(arg, t)
-            if f and units and units.get(t, None):
-                tic = unyts.add_units(float(arg), units[t])
-                k0 = kt.subs(t, tic)
-            if (units is not None) and unyts.has_units(v):
-                units[kt] = unyts.get_units(v)
-            if (store_funcs is not None) and f:
-                store_funcs[k0] = v
-            else:
-                out[k0] = v
-        return out
-
     @property
     def model_wrapper_kwargs(self):
         r"""dict: Keyword arguments for the model wrapper."""
@@ -609,107 +947,14 @@ class ODEModelDriver(DSLModelDriver):
                     dependent_vars=None, parameters=None, assumptions=None,
                     boundary_conditions=None, odeint_kws=None,
                     fsolve_kws=None, use_numeric=False,
-                    input_vars=None, independent_var_units=None):
+                    independent_var_units=None):
         r"""Get ODE solution using Sympy."""
-        import sympy
-        from sympy import sympify, Symbol, Eq, Function
-        if dependent_vars is None:
-            dependent_vars = []
-        symbols = {
-            'independent_var': independent_var,
-            'dependent_bases': [x.split('(', 1)[0] for x in dependent_vars],
-            'dependent_funcs': []}
-        equations = [cls.replace_derivatives(x, symbols) for x in equations]
-        dependent_vars += symbols['dependent_funcs']
-        if parameters is None:
-            parameters = {}
-        if assumptions is None:
-            assumptions = {}
-        if independent_var is None:
-            assert(symbols['independent_var'])
-            independent_var = symbols['independent_var']
-        local_map = {
-            independent_var: Symbol(
-                independent_var, **assumptions.get(independent_var, {}))}
-        for k in parameters.keys():
-            local_map[k] = Symbol(k, **assumptions.get(k, {}))
-
-        def add_function(x):
-            if isinstance(x, str):
-                x_str = x
-                if '(' not in x:
-                    # Assume that function depends on independent var
-                    x_str += f'({independent_var})'
-                x = sympify(x_str, locals=local_map)
-            else:
-                x_str = str(x)
-            xf = x.__class__
-            xfunc, xargs = x_str.split('(', 1)
-            if (str(xf) != xfunc) or (xfunc in assumptions):
-                xa = sympify('f(' + xargs, locals=local_map)
-                xf = Function(xfunc, **assumptions.get(xfunc, {}))
-                x = xf(*xa.args)
-            v = str(x)
-            if xf == getattr(sympy, str(xf), None):
-                return v
-            local_map[str(xf)] = xf
-            local_map[v] = x
-            return x
-
-        def add_vars(x):
-            if isinstance(x, str):
-                x = sympify(x, locals=local_map)
-            v = str(x)
-            if v in local_map:
-                return local_map[v]
-            if x.args:
-                if isinstance(x, Function):
-                    add_function(x)
-                # This is not a stable API, so a new class may need to be
-                # created for future versions of sympy
-                x._args = tuple(add_vars(xx) for xx in x.args)
-            return x
-
-        t = local_map[independent_var]
-        funcs = [add_function(v) for v in dependent_vars]
-        eqns = {}
-        nder = {f: 0 for f in funcs}
-        for x in equations:
-            lhs = add_vars(x.split('=')[0])
-            rhs = add_vars(x.split('=')[1])
-            eqns[lhs] = Eq(lhs, rhs)
-            nder[lhs.expr] = max(nder[lhs.expr], lhs.args[1][1])
-        ics = {}
-        units = None
-        if boundary_conditions:
-            units = {t: independent_var_units}
-            ics = cls.normalize_ics(boundary_conditions, t, local_map,
-                                    units=units)
-        # Use substitutions to make intermediate orders explicit
-        subs = {}
-        for f, nmax in nder.items():
-            for i in range(1, nmax):
-                k = f.diff(t, i)
-                if k not in eqns:
-                    v = Function(f"{f.__class__}_d{i}")(t)
-                    eqns[k] = Eq(k, v)
-                    funcs.append(v)
-                    local_map[str(v)] = v
-                    k2 = f.diff(t, i + 1)
-                    subs[k] = v
-                    if k2 in eqns:
-                        eqns[v.diff(t, 1)] = eqns.pop(k2)
-        for k, v in subs.items():
-            for f in list(eqns.keys()):
-                if f != k:
-                    eqns[f] = eqns[f].subs(k, v)
-            for f in list(ics.keys()):
-                ics[f.subs(k, v).doit()] = ics.pop(f)
-            for f in list(units.keys()):
-                units[f.subs(k, v).doit()] = units.pop(f)
-        return ODEModel(eqns, t, funcs, local_map, ics, parameters,
+        return ODEModel(equations, t=independent_var, funcs=dependent_vars,
+                        ics=boundary_conditions, param=parameters,
+                        assumptions=assumptions,
+                        t_units=independent_var_units,
                         odeint_kws=odeint_kws, fsolve_kws=fsolve_kws,
-                        use_numeric=use_numeric, units=units)
+                        use_numeric=use_numeric)
 
     @classmethod
     def model_wrapper(cls, env=None, working_dir=None, inputs=[],
@@ -721,33 +966,85 @@ class ODEModelDriver(DSLModelDriver):
         # Setup interface objects
         input_map, output_map = cls.setup_interface(
             inputs=inputs, outputs=outputs)
-        input_vars = []
+        input_vars = {}
         for v in input_map.values():
-            input_vars += v['vars']
+            if v['vars']:
+                for k in v['vars']:
+                    input_vars.setdefault(k, [])
+                    input_vars[k].append(v)
+            else:
+                v['vars'] = None
+        multiples = {k: [x['name'] for x in v]
+                     for k, v in input_vars.items() if len(v) > 1}
+        if multiples:  # pragma: debug
+            raise ODEError(
+                f"{len(multiples)} variables are coming from more than one "
+                f"input channel:\n{pprint.pformat(multiples)}")
+
+        def _set_input_vars(value, v):
+            out = []
+            for k in value.keys():
+                if k not in input_vars:
+                    input_vars[k] = [v]
+                    out.append(k)
+            return out
+        
         # Determine symbolic equations via Sympy
-        model = cls.setup_model(input_vars=input_vars, **kwargs)
+        model = cls.setup_model(**kwargs)
+        logger.info(f"MODEL: {model}")
+        default_ovars = model.func_names
+        output_vars = []
+        for v in output_map.values():
+            if not v.get('vars', None):
+                v['vars'] = default_ovars
+            output_vars += v['vars']
+        output_vars = {k: model.sympify(k) for k in set(output_vars)}
+        # Get static inputs
+        input_vals0 = {}
+        for k, v in input_map.items():
+            if not v.get('outside_loop', False):
+                continue
+            flag, value = v['comm'].recv_dict(key_order=v['vars'])
+            if not flag:  # pragma: debug
+                raise RuntimeError(f"Error receiving from static input {k}")
+            if not v['vars']:
+                v['vars'] = _set_input_vars(value, v)
+            for iv in v['vars']:
+                input_vals0[iv] = value[iv]
         # Perform computations for each received input
+        first_loop = True
         while True:
             flag = False
             # Receive input
-            input_vals = {}
+            input_vals = copy.deepcopy(input_vals0)
             for k, v in input_map.items():
+                if v.get('outside_loop', False):
+                    continue
                 flag, value = v['comm'].recv_dict(key_order=v['vars'])
                 if not flag:
+                    if first_loop:
+                        raise RuntimeError(f"Error receiving from {k}")
                     logger.info(f"No more input from {k}")
                     break
+                if not v['vars']:
+                    v['vars'] = _set_input_vars(value, v)
                 for iv in v['vars']:
                     input_vals[iv] = value[iv]
             if not flag:
                 break
             # Compute output
-            output_vals = model(compute_method, input_vals)
+            output_vals = model(compute_method, input_vals,
+                                list(output_vars.values()))
+            for k, v in output_vars.items():
+                if v in output_vals:
+                    output_vals[k] = output_vals[v]
             # Send output
             for k, v in output_map.items():
                 iout = {iv: output_vals[iv] for iv in v['vars']}
                 flag = v['comm'].send_dict(iout, key_order=v['vars'])
                 if not flag:  # pragma: debug
                     raise RuntimeError(f"Error sending to {k}")
+            first_loop = False
 
     @classmethod
     def get_testing_options(cls):

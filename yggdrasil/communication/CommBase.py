@@ -2413,7 +2413,9 @@ class CommBase(tools.YggClass):
             from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
                 JSONObjectMetaschemaType)
             TypeClass = JSONObjectMetaschemaType
-            if self.serializer.typedef['type'] != 'array':
+            if self.serializer.typedef['type'] == 'object':
+                return msg
+            elif self.serializer.typedef['type'] != 'array':
                 return {'f0': msg}
         if key_order is None:
             key_order = metadata.pop('key_order', self.serializer.get_field_names())

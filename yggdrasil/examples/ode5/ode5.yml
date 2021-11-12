@@ -10,18 +10,16 @@ model:
     Rt: 1.0
     km1: 0.05
     km2: 0.05
-    S: 0.0
+    S: 0.0  # Explicit to avoid conflict with SymPy SingletonRegistry
   boundary_conditions:
     Rp(0): 1.0
   inputs:
     - name: input
-      vars: [S]
       default_file:
         name: ./Input/input.txt
         filetype: table
   outputs:
     - name: output
-      vars: [Rp]
       default_file:
         name: ./output.txt
         filetype: table

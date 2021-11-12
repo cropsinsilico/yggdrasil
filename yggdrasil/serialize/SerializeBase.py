@@ -628,7 +628,7 @@ class SerializeBase(tools.YggClass):
                 updated.append(k)  # Won't change anything unless its an attribute
             else:  # pragma: debug
                 raise ValueError(
-                    "Unrecognized table-style specification keyword: '%s'." % k)
+                    f"Unrecognized table-style specification keyword: '{k}'.")
             for rk in used:
                 if rk in self.extra_kwargs:
                     del self.extra_kwargs[rk]

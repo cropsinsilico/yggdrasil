@@ -2,7 +2,7 @@
 History
 =======
 
-1.9.0 (2021-XX-XX) Add support for symbolic ODEs
+1.9.0 (2021-XX-XX) Add support for symbolic ODEs, migrate tests out of package & into pytest fixtures
 ------------------
 
 * Added ODEModelDriver for 'ode' language models that integrate ordinary differential equations (ODEs) symbolically represented in the YAML file using the sympy package
@@ -11,18 +11,7 @@ History
 * Added ode3 example of symbolic ODE model solved symbolically using roots for the steady state solution
 * Added ode4 example of symbolic ODE model solved symbolically for the steady state solution
 * Added ode5 example of symbolic ODE model solved numerically for the steady state solution
-* Remove existing generated constants entries before regeneration
-
-TODO
-~~~~
-
-* Regenerate schema
-* Guess at inputs/outputs if not specified in the YAML?
-* Docs
-
-1.8.2 (2021-XX-XX) Migrate tests out of package & into pytest fixtures
-------------------
-
+* Added ode6 example of symbolic ODE model from Ajmera et al. (2018)
 * Move tests out of package to take advantage of pytest conftest.py structure and reduce the size of the package
 * Refactor tests to use pytest fixtures instead of the unittest setup/teardown structure
 * Remove the yggtest CLI and migrate options into pytest CLI options
