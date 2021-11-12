@@ -2,24 +2,24 @@ model:
   name: ode2
   language: ode
   args:
-    - dP/dt = k1*(E1(t)**3)
-    - dE1/dt = -k1*(E1(t)**3) + k6*(E3(t)**2)
-    - dE2/dt = -k8*E2(t)
-    - dE3/dt = -k6*(E3(t)**2) + k8*E2(t)
-  parameters:
-    k1: 1.0
-    k6: 2.0
-    k8: 3.0
+    - dP/dt = k1*(E1**3)
+    - dE1/dt = -k1*(E1**3) + k6*(E3**2)
+    - dE2/dt = -k8*E2
+    - dE3/dt = -k6*(E3**2) + k8*E2
   boundary_conditions:
     P(0): 0.0
     E1(0): 1.0
     E2(0): 2.0
     E3(0): 3.0
-  # E1(t) must be explicit as sympy has a E1 builtin function
-  dependent_vars: [E1(t)]
+  # E1 must be explicit as sympy has a E1 builtin function
+  dependent_vars: [E1]
   inputs:
+    - name: param
+      outside_loop: true
+      default_file:
+        name: ./Input/param.txt
+        filetype: map
     - name: input
-      vars: [t]
       default_file:
         name: ./Input/input.txt
         filetype: table

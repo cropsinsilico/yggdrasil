@@ -30,6 +30,9 @@ def get_ureg():
                        tex_repr=r"\rm{a}", offset=0.0, prefixable=True)
         _ureg_unyt.add("j", 1.0, dimensions=unyt.dimensions.energy,
                        tex_repr=r"\rm{J}", offset=0.0, prefixable=True)
+        _ureg_unyt.add("M", 1.0, dimensions=(unyt.dimensions.dimensionless
+                                             / unyt.dimensions.volume),
+                       tex_repr=r"\rm{M}", offset=0.0, prefixable=True)
         # _ureg_unyt.add("cel", 1.0, dimensions=unyt.dimensions.temperature,
         #                tex_repr=r"^\circ\rm{C}", offset=-273.15, prefixable=True)
         # _ureg_unyt.add("j", 1.0, dimensions=unyt.dimensions.specific_flux,
@@ -40,6 +43,7 @@ def get_ureg():
         unyt._unit_lookup_table.inv_name_alternatives["are"] = "a"
         unyt._unit_lookup_table.inv_name_alternatives["hectare"] = "ha"
         unyt._unit_lookup_table.inv_name_alternatives["days"] = "day"
+        unyt._unit_lookup_table.inv_name_alternatives["molar"] = "M"
     return _ureg_unyt
 
 

@@ -238,6 +238,25 @@ def write_datatype_table(table_type='all', **kwargs):
     kwargs.setdefault('list_columns', 'required properties')
     lines = dict2table(args, **kwargs)
     return write_table(lines, **kwargs)
+
+
+def write_model_classdocs_tables(**kwargs):
+    r"""Write tables for each model driver class.
+
+    Args:
+        **kwargs: Keyword arguments are passed to calls to write_classdocs_table
+            for each class.
+
+    Returns:
+        list: The names of files created.
+
+    """
+    from yggdrasil import tools, components
+    out = []
+    for lang in tools.get_supported_lang():
+        ldrv = components.import_component('model', lang)
+        out.append(write_classdocs_table(ldrv, **kwargs))
+    return out
     
 
 def write_classdocs_table(class_, table_type='all', **kwargs):
@@ -264,6 +283,7 @@ def write_classdocs_table(class_, table_type='all', **kwargs):
         ValueError: If table_type is not one of the supported values.
 
     """
+    kwargs.setdefault('last_column', 'description')
     table_type2keys = {'args': ['Args:', 'Arguments:'],
                        'attr': ['Attr:', 'Attributes:'],
                        'classattr': ['Class Attr:', 'Class Attributes']}
