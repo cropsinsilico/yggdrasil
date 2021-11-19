@@ -98,4 +98,4 @@ the module directory containing the class being tested. In some cases
 attributes and/or methods are defined (e.g. serialization, communication,
 and connection driver classes).
 
-Tests can be run using the ``yggtest`` command. If no arguments are provided, ``yggtest`` will run all of the tests (excluding the examples). If you only want to run some tests, you can provide the path to file or directory containing the tests you would like to run; these paths can be absolute, relative to the current directory, or relative to the top level directory of the |yggdrasil| source tree. To also run example tests, include the ``--with-examples`` flag.
+Tests can be run using the ``pytest`` command. If no arguments are provided, ``pytest`` will run all of the tests (excluding the examples). If you only want to run some tests, you can provide the path to file or directory containing the tests you would like to run; these paths can be absolute, relative to the current directory, or relative to the top level directory of the |yggdrasil| source tree. To also run example tests, include the ``--suite=examples`` flag.
