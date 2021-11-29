@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import unyt
 from collections import OrderedDict
-from yggdrasil import tools, constants
+from yggdrasil import tools, constants, platform
 _unit_object = unyt.unit_object.Unit
 _unit_quantity = unyt.array.unyt_quantity
 _unit_array = unyt.array.unyt_array
@@ -149,6 +149,8 @@ def convert_unit_string(orig_str, replacements=None):
                 tools.bytes2str(b'\xce\xbcs'),
                 tools.bytes2str(b'\xc2\xb0'),
                 r'(?:100\%)']
+    if platform._is_win:  # pragma: windows
+        regex_mu.append(b'\xb5'.decode("cp1252"))
     regex = (r'(?P<paren>\()?(?P<name>[A-Za-z%s]+)'
              r'(?:(?:(?:\^)|(?:\*\*))?(?P<exp_paren>\()?(?P<exp>-?[0-9]+)'
              r'(?(exp_paren)\)))?'

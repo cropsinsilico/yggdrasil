@@ -258,7 +258,8 @@ class ODEModel(object):
             self.funcs.append(x)
         return x
 
-    def extract_derivatives(self, equation):
+    @classmethod
+    def extract_derivatives(cls, equation):
         r"""Get information about derivatives contained in the provided
         equation.
 
@@ -287,8 +288,8 @@ class ODEModel(object):
             return iout
             
         out = []
-        for regex in self._derivative_regexes:
-            regex = regex.replace('ARG', self._arg_regex)
+        for regex in cls._derivative_regexes:
+            regex = regex.replace('ARG', cls._arg_regex)
             for m in re.finditer(regex, equation):
                 out.append(match2dict(m))
         return out
