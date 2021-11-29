@@ -2413,7 +2413,7 @@ class CommBase(tools.YggClass):
             from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
                 JSONObjectMetaschemaType)
             TypeClass = JSONObjectMetaschemaType
-            if self.serializer.typedef['type'] == 'object':
+            if self.serializer.typedef['type'] in ['object', 'obj', 'ply']:
                 return msg
             elif self.serializer.typedef['type'] != 'array':
                 return {'f0': msg}

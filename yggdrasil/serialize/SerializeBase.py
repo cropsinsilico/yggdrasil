@@ -132,6 +132,8 @@ class SerializeBase(tools.YggClass):
             dict: Dictionary version of the provided object.
 
         """
+        if isinstance(obj, dict):
+            return obj
         return {'f0': obj}
 
     @classmethod
