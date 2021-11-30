@@ -959,7 +959,11 @@ class CModelDriver(CompiledModelDriver):
                     else:
                         path_list.append(x)
             if path_list:
-                env[env_var] = os.pathsep.join(path_list)
+                if platform._is_win:
+                    tools.set_windows_path(env, os.pathsep.join(path_list),
+                                           env_var=env_var)
+                else:
+                    env[env_var] = os.pathsep.join(path_list)
         return env
 
     @classmethod
