@@ -9,4 +9,5 @@ pytest-timeout
 pytest-drop-dup-tests  # [pip]
 pytest-rerunfailures
 pytest-repeat
+pytest-mock
 pytest-mpi

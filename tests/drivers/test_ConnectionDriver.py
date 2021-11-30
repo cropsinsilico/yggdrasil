@@ -297,11 +297,23 @@ class TestConnectionDriver(base_class):
         assert(instance.is_comm_closed)
 
     @pytest.fixture
-    def nmsg_recv(self, icomm_name, testing_options):
+    def nmsg_send(self):
+        r"""Number of messages to send."""
+        return 1
+
+    @pytest.fixture
+    def nmsg_recv(self, icomm_name, testing_options, nmsg_send):
         r"""Expected number of messages."""
         if icomm_name == 'value':
-            return testing_options['kwargs']['count']
-        return 1
+            return testing_options['kwargs']['count'] * nmsg_send
+        return nmsg_send
+
+    @pytest.fixture
+    def after_recv(self):
+        r"""Function to call after receive call are complete."""
+        def after_recv_w():
+            pass
+        return after_recv_w
 
     @pytest.fixture
     def before_instance_started(self, send_comm, recv_comm):
@@ -333,13 +345,14 @@ class TestConnectionDriver(base_class):
 
     @timeout_decorator(timeout=600)
     def test_send_recv(self, started_instance, send_comm, recv_comm,
-                       test_msg, nmsg_recv, timeout, icomm_name,
-                       nested_result):
+                       test_msg, nmsg_recv, nmsg_send, after_recv,
+                       timeout, icomm_name, nested_result):
         r"""Test sending/receiving small message."""
         try:
             if started_instance.icomm._commtype != 'value':
-                flag = send_comm.send(test_msg)
-                assert(flag)
+                for i in range(nmsg_send):
+                    flag = send_comm.send(test_msg)
+                    assert(flag)
             # started_instance.sleep()
             # assert(recv_comm.n_msg == 1)
             for i in range(nmsg_recv):
@@ -348,6 +361,7 @@ class TestConnectionDriver(base_class):
                 assert(msg_recv == nested_result(test_msg))
             if icomm_name != 'value':
                 assert(started_instance.n_msg == 0)
+            after_recv()
         except BaseException:  # pragma: debug
             send_comm.printStatus()
             started_instance.printStatus(verbose=True)
@@ -356,18 +370,20 @@ class TestConnectionDriver(base_class):
 
     @timeout_decorator(timeout=600)
     def test_send_recv_nolimit(self, started_instance, send_comm, recv_comm,
-                               msg_long, maxMsgSize, nmsg_recv, timeout,
-                               nested_result):
+                               msg_long, maxMsgSize, nmsg_recv, nmsg_send,
+                               after_recv, timeout, nested_result):
         r"""Test sending/receiving large message."""
         try:
             if started_instance.icomm._commtype != 'value':
                 assert(len(msg_long) > maxMsgSize)
-                flag = send_comm.send_nolimit(msg_long)
-                assert(flag)
+                for i in range(nmsg_send):
+                    flag = send_comm.send_nolimit(msg_long)
+                    assert(flag)
             for i in range(nmsg_recv):
                 flag, msg_recv = recv_comm.recv_nolimit(timeout=timeout)
                 assert(flag)
                 assert(msg_recv == nested_result(msg_long))
+            after_recv()
         except BaseException:  # pragma: debug
             send_comm.printStatus()
             started_instance.printStatus(verbose=True)
@@ -413,9 +429,9 @@ class TestConnectionDriverFork(TestConnectionDriver):
         return 1
 
     @pytest.fixture(scope="class")
-    def nmsg_recv(self, ncomm_input, ncomm_output):
+    def nmsg_recv(self, ncomm_input, ncomm_output, nmsg_send):
         r"""int: Number of messages expected."""
-        return ncomm_input * ncomm_output
+        return ncomm_input * ncomm_output * nmsg_send
 
     @pytest.fixture
     def inputs(self, ncomm_input):
@@ -455,6 +471,45 @@ class TestConnectionDriverTranslate(TestConnectionDriver):
         def nested_result_w(obj):
             return nested_approx(obj['a'])
         return nested_result_w
+
+
+class TestConnectionDriverCallback(TestConnectionDriver):
+    r"""Test class for the ConnectionDriver class with callbacks."""
+
+    @pytest.fixture
+    def nmsg_send(self):
+        r"""Number of messages to send."""
+        return 3
+
+    @pytest.fixture
+    def callback1(self, mocker):
+        return mocker.Mock()
+
+    @pytest.fixture
+    def callback2(self, mocker):
+        return mocker.Mock()
+    
+    @pytest.fixture
+    def after_recv(self, callback1, callback2, nmsg_send):
+        r"""Function to call after receive call are complete."""
+        import math
+
+        def after_recv_w():
+            assert(callback1.call_count == nmsg_send)
+            assert(callback2.call_count == math.ceil(float(nmsg_send) / 2.0))
+        return after_recv_w
+
+    @pytest.fixture
+    def instance_kwargs(self, testing_options, timeout, working_dir,
+                        polling_interval, namespace, inputs, outputs,
+                        callback1, callback2):
+        r"""Keyword arguments for a new instance of the tested class."""
+        return dict(testing_options.get('kwargs', {}),
+                    yml={'working_dir': working_dir},
+                    timeout=timeout, sleeptime=polling_interval,
+                    namespace=namespace, inputs=inputs, outputs=outputs,
+                    callbacks=[callback1,
+                               {'function': callback2, 'interval': 2}])
     
 
 class TestConnectionDriverIterate(TestConnectionDriver):

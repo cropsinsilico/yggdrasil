@@ -124,6 +124,34 @@ class RemoteTaskLoop(multitasking.YggTaskLoop):
             self.set_break_flag()
 
 
+class MessageCallback(object):
+    r"""Callback triggered for messages.
+
+    Args:
+        function (str, callable): Callback function that takes messages as
+            input.
+        interval (int, optional): Number of messages between function calls.
+            Defaults to 1.
+
+    """
+
+    def __init__(self, function, interval=1):
+        self.function = function
+        self.interval = interval
+        self.iteration = 0
+
+    @classmethod
+    def from_yaml(cls, x):
+        if not isinstance(x, dict):
+            x = {'function': x}
+        return cls(**x)
+
+    def __call__(self, msg):
+        if (self.iteration % self.interval) == 0:
+            self.function(msg)
+        self.iteration += 1
+
+
 class ConnectionDriver(Driver):
     r"""Class that continuously passes messages from one comm to another.
 
@@ -149,6 +177,15 @@ class ConnectionDriver(Driver):
         onexit (str, optional): Class method that should be called when a
             model that the connection interacts with exits, but before the
             connection driver is shut down. Defaults to None.
+        callbacks (list, optional): One or more functions that should be called
+            each time a message is received. The functions should take the
+            message as input. Entries can also be dictionaries with the
+            following fields:
+
+                function (callable): The callback function.
+                interval (int, optional): The number of messages between
+                    calls to the provided function. Defaults to 1.
+
         **kwargs: Additonal keyword arguments are passed to the parent class.
 
     Attributes:
@@ -210,7 +247,16 @@ class ConnectionDriver(Driver):
                        'items': {'oneOf': [
                            {'type': 'function'},
                            {'$ref': '#/definitions/transform'}]}},
-        'onexit': {'type': 'string'}}
+        'onexit': {'type': 'string'},
+        'callbacks': {'type': 'array',
+                      'items': {'oneOf': [
+                          {'type': 'function'},
+                          {'type': 'object',
+                           'properties': {
+                               'function': {'type': 'function'},
+                               'interval': {'type': 'integer',
+                                            'default': 1}},
+                           'required': ['function']}]}}}
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     _disconnect_attr = Driver._disconnect_attr + [
         '_comm_closed', '_skip_after_loop', 'shared', 'task_thread',
@@ -248,9 +294,11 @@ class ConnectionDriver(Driver):
             if not hasattr(t, '__call__'):
                 raise ValueError("Translator %s not callable." % t)
             self.translator.append(t)
+        # Check callbacks
         if (onexit is not None) and (not hasattr(self, onexit)):
             raise ValueError("onexit '%s' is not a class method." % onexit)
         self.onexit = onexit
+        self.callbacks = [MessageCallback.from_yaml(x) for x in self.callbacks]
         # Add comms and print debug info
         self._init_comms(name, **kwargs)
         self.models = models
@@ -860,6 +908,8 @@ class ConnectionDriver(Driver):
             self.update_serializer(msg)
         for t in self.translator:
             msg.args = t(msg.args)
+        for x in self.callbacks:
+            x(msg)
         return msg
 
     def update_serializer(self, msg):

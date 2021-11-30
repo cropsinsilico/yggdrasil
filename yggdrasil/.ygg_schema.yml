@@ -315,6 +315,21 @@ definitions:
         args:
           description: '[DEPRECATED] Arguments that should be provided to the driver.'
           type: string
+        callbacks:
+          description: One or more functions that should be called each time a message
+            is received. The functions should take the message as input.
+          items:
+            oneOf:
+            - type: function
+            - properties:
+                function:
+                  type: function
+                interval:
+                  type: integer
+              required:
+              - function
+              type: object
+          type: array
         connection_type:
           enum:
           - connection
