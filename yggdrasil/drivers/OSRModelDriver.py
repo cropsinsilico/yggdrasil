@@ -156,6 +156,7 @@ class OSRModelDriver(ExecutableModelDriver):
                                 env[k] = v.replace('/', '-').replace('\\', '/')
                     else:  # pragma: debug
                         env.pop('YGG_OSR_TOOL')
+                        toolname = None
                         warnings.warn(
                             "The MSVC compiler is not installed. Be aware "
                             "that the GNU compiler takes a *very* long time "
@@ -168,6 +169,7 @@ class OSRModelDriver(ExecutableModelDriver):
                 for x in cls.base_languages:
                     base_cls = import_component('model', x)
                     base_cls.compile_dependencies(toolname=toolname)
+                    env = base_cls.set_env_class(existing=env)
             elif not os.path.isfile(cls.executable_path):
                 return
             cmd = ['make', target] + flags

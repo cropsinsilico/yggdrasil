@@ -1930,3 +1930,27 @@ class YggClass(ComponentBase):
                 self.info("Timeout for %s at %5.2f/%5.2f s" % (
                     key, t.elapsed, t.max_time))
         del self._timeouts[key]
+        
+
+def set_windows_path(env, val, env_var='PATH'):
+    r"""Set a windows environment variable path, breaking it up as necessary
+    to fit the 256 character limit.
+
+    Args:
+        env (dict): Dictionary of environment variables.
+        val (str): Value for the environment variable.
+        env_var (str, optional): Environment variable to set. Defaults to
+            'PATH'.
+
+    """
+    idx = 0
+    while len(val) >= 256:
+        ikey = f"YGG_{env_var}{idx}"
+        assert(ikey not in env)
+        isplit = val.index(os.pathsep, len(val) - 256)
+        env[ikey] = val[(isplit + 1):]
+        assert(not env[ikey].startswith(f"YGG_{env_var}{idx-1}"))
+        val = val[:isplit] + os.pathsep + f'%{ikey}%'
+        idx += 1
+    env[env_var] = val
+    return env
