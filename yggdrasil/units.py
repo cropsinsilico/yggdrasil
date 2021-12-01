@@ -146,17 +146,19 @@ def convert_unit_string(orig_str, replacements=None):
                         'days': 'day',
                         '100%': 'percent'}
     regex_mu = [tools.bytes2str(b'\xc2\xb5'),
-                tools.bytes2str(b'\xce\xbcs'),
+                tools.bytes2str(b'\xce\xbc'),
                 tools.bytes2str(b'\xc2\xb0'),
                 r'(?:100\%)']
     if platform._is_win:  # pragma: windows
         regex_mu.append(b'\xb5'.decode("cp1252"))
-    regex = (r'(?P<paren>\()?(?P<name>[A-Za-z%s]+)'
+    regex = (r'(?P<paren>\()?'
+             # r'(?P<name>(?:(?:[^\W\d\*\^\)\(\s]+)|(?:100\%)))'
+             r'(?P<name>[A-Za-z%s]+)'
              r'(?:(?:(?:\^)|(?:\*\*))?(?P<exp_paren>\()?(?P<exp>-?[0-9]+)'
              r'(?(exp_paren)\)))?'
              r'(?(paren)\)|)(?P<op> |(?:\*)|(?:\/))?' % ''.join(regex_mu))
     out = ''
-    if re.fullmatch(r'(?:%s)+' % regex, orig_str.strip()):
+    if re.fullmatch(f'(?:{regex})+', orig_str.strip()):
         for x in re.finditer(regex, orig_str.strip()):
             xdict = x.groupdict()
             if xdict['name'] in replacements:
@@ -171,13 +173,14 @@ def convert_unit_string(orig_str, replacements=None):
                 out += xdict['op']
     else:  # pragma: debug
         print(repr(orig_str), type(orig_str))
-        m = re.search(r'(?:%s)+' % regex, orig_str.strip())
+        m = re.search(f'(?:{regex})+', orig_str.strip())
         if m:
             print(repr(m.group(0)), m.groupdict())
         else:
             print('no match')
         for m in re.finditer(regex, orig_str.strip()):
             print(m.group(0), m.groupdict())
+        print(orig_str.encode('utf-8'), orig_str.encode('cp1252'))
         raise Exception("Could not standardize units: %s" % repr(orig_str))
     return out
 
