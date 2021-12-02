@@ -1943,17 +1943,17 @@ def set_windows_path(env, val, env_var='PATH'):
             'PATH'.
 
     """
-    max_len = 1920
-    idx = 0
-    while len(val) >= max_len:
-        ikey = f"YGG_{env_var}{idx}"
-        assert(ikey not in env)
-        isplit = val.index(os.pathsep, len(val) - max_len)
-        env[ikey] = val[(isplit + 1):]
-        print("ADDED", ikey, env[ikey])
-        assert(not env[ikey].startswith(f"YGG_{env_var}{idx-1}"))
-        val = val[:isplit] + os.pathsep + f'%{ikey}%'
-        idx += 1
+    # Chaining of environment variables dosn't appear to work (maybe due to
+    # calling from python subprocess?)
+    # max_len = 1920
+    # idx = 0
+    # while len(val) >= max_len:
+    #     ikey = f"YGG_{env_var}{idx}"
+    #     assert(ikey not in env)
+    #     isplit = val.index(os.pathsep, len(val) - max_len)
+    #     env[ikey] = val[(isplit + 1):]
+    #     assert(not env[ikey].startswith(f"YGG_{env_var}{idx-1}"))
+    #     val = val[:isplit] + os.pathsep + f'%{ikey}%'
+    #     idx += 1
     env[env_var] = val
-    print("ADDED", env_var, val)
     return env
