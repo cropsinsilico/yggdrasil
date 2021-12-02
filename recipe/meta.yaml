@@ -81,8 +81,7 @@ requirements:
     - r-units
     - r-zeallot
     - requests
-    - scipy ==1.7.2  # [linux]
-    - scipy  # [not linux]
+    - scipy
     - six
     - sympy
     - sysv_ipc  # [unix]
