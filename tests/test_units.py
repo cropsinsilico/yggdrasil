@@ -53,6 +53,7 @@ class TestUnits(base_class):
         for v in vars_nounits:
             x = units.add_units(v, 'cm')
             assert(units.has_units(x))
+        assert(units.has_units(units.add_units(1.0, 'μM')))
         assert(units.add_units(1.0, '') == 1.0)
         assert(units.add_units(1.0, 'n/a') == 1.0)
 
