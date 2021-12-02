@@ -1,5 +1,5 @@
 {% set name = "yggdrasil" %}
-{% set version = "1.8.0" %}
+{% set version = "1.8.2" %}
 
 package:
   name: {{ name|lower }}
@@ -38,6 +38,10 @@ build:
     - ygggha = yggdrasil.command_line:generate_gha_workflow
 
 requirements:
+  build:
+    - python                                 # [build_platform != target_platform]
+    - cross-python_{{ target_platform }}     # [build_platform != target_platform]
+    - numpy                                  # [build_platform != target_platform]
   host:
     - czmq
     - pip
@@ -59,7 +63,7 @@ requirements:
     - git
     - GitPython <=3.1.20  # [py==36]
     - GitPython  # [py>36]
-    - jsonschema==3.2.0
+    - jsonschema ==3.2.0
     - matplotlib-base
     - numpy >=1.13.0
     - pandas
