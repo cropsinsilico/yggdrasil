@@ -1943,11 +1943,12 @@ def set_windows_path(env, val, env_var='PATH'):
             'PATH'.
 
     """
+    max_len = 1920
     idx = 0
-    while len(val) >= 256:
+    while len(val) >= max_len:
         ikey = f"YGG_{env_var}{idx}"
         assert(ikey not in env)
-        isplit = val.index(os.pathsep, len(val) - 256)
+        isplit = val.index(os.pathsep, len(val) - max_len)
         env[ikey] = val[(isplit + 1):]
         print("ADDED", ikey, env[ikey])
         assert(not env[ikey].startswith(f"YGG_{env_var}{idx-1}"))
