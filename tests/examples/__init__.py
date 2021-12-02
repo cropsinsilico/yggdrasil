@@ -234,12 +234,12 @@ class TestExample(base_class):
         return os.path.join(yamldir, 'core.*')
 
     @pytest.fixture(scope="class")
-    def read_file(self):
+    def read_file(self, testing_options):
         r"""Read a file."""
         def read_file_w(fname):
             with open(fname, 'r') as fd:
                 return fd.read()
-        return read_file_w
+        return testing_options.get('read_file', read_file_w)
 
     @pytest.fixture
     def results(self, expected_output_files, read_file):
@@ -254,7 +254,8 @@ class TestExample(base_class):
 
     @pytest.fixture
     def check_results(self, results, output_files, check_file_exists,
-                      check_file_size, check_file_contents, testing_options):
+                      check_file_size, check_file_contents, read_file,
+                      testing_options):
         r"""This should be overridden with checks for the result."""
         def check_results_w():
             if testing_options.get('validation_function', False):
@@ -273,8 +274,12 @@ class TestExample(base_class):
                 if isinstance(res, tuple):
                     res[0](fout, *res[1:])
                 else:
-                    check_file_size(fout, res)
-                    check_file_contents(fout, res)
+                    if 'compare_results' in testing_options:
+                        ocont = read_file(fout)
+                        testing_options['compare_results'](ocont, res)
+                    else:
+                        check_file_size(fout, res)
+                        check_file_contents(fout, res)
         return check_results_w
 
     @pytest.fixture
