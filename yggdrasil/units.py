@@ -150,7 +150,9 @@ def convert_unit_string(orig_str, replacements=None):
                 tools.bytes2str(b'\xc2\xb0'),
                 r'(?:100\%)']
     if platform._is_win:  # pragma: windows
-        regex_mu.append(b'\xb5'.decode("cp1252"))
+        regex_mu += [b'\xb5'.decode("cp1252"),
+                     b'\xce\xbc'.decode("cp1252"),
+                     b'\xc3\x8e\xc2\xbc'.decode("utf-8")]
     regex = (r'(?P<paren>\()?'
              # r'(?P<name>(?:(?:[^\W\d\*\^\)\(\s]+)|(?:100\%)))'
              r'(?P<name>[A-Za-z%s]+)'
