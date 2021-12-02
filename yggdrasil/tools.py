@@ -1949,8 +1949,10 @@ def set_windows_path(env, val, env_var='PATH'):
         assert(ikey not in env)
         isplit = val.index(os.pathsep, len(val) - 256)
         env[ikey] = val[(isplit + 1):]
+        print("ADDED", ikey, env[ikey])
         assert(not env[ikey].startswith(f"YGG_{env_var}{idx-1}"))
         val = val[:isplit] + os.pathsep + f'%{ikey}%'
         idx += 1
     env[env_var] = val
+    print("ADDED", env_var, val)
     return env
