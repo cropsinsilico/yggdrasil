@@ -100,7 +100,7 @@ def convert_matlab_unit_string(m_str):  # pragma: matlab
     out = m_str
     replacements = {'h': 'hr'}
     regex_mu = [tools.bytes2str(b'\xc2\xb5'),
-                tools.bytes2str(b'\xce\xbcs')]
+                tools.bytes2str(b'\xce\xbc')]
     regex = r'(?P<name>[A-Za-z%s]+)' % ''.join(regex_mu)
     for x in re.finditer(regex, m_str):
         xdict = x.groupdict()
@@ -145,20 +145,26 @@ def convert_unit_string(orig_str, replacements=None):
                         'hrs': 'hr',
                         'days': 'day',
                         '100%': 'percent'}
-    regex_mu = [tools.bytes2str(b'\xc2\xb5'),
-                tools.bytes2str(b'\xce\xbc'),
-                tools.bytes2str(b'\xc2\xb0'),
-                r'(?:100\%)']
+    regex_utf8 = [b'\xc2\xb5',  # U+00B5, mu
+                  b'\xce\xbc',  # U+03BC, micro
+                  b'\xc2\xb0']  # U+00B0, degree
     if platform._is_win:  # pragma: windows
-        regex_mu += [b'\xb5'.decode("cp1252"),
-                     b'\xce\xbc'.decode("cp1252"),
-                     b'\xc3\x8e\xc2\xbc'.decode("utf-8")]
+        # Check for utf-8 version interpreted as cp1252
+        for x_utf8 in regex_utf8.copy():
+            orig_str = orig_str.replace(x_utf8.decode("cp1252"),
+                                        x_utf8.decode("utf-8"))
+            try:
+                x_cp1251 = x_utf8.decode('utf-8').encode('cp1252')
+                regex_utf8.append(x_cp1251.decode("cp1252"))
+            except UnicodeEncodeError:
+                continue
+    extra_char = [tools.bytes2str(x) for x in regex_utf8] + [r'(?:100\%)']
     regex = (r'(?P<paren>\()?'
              # r'(?P<name>(?:(?:[^\W\d\*\^\)\(\s]+)|(?:100\%)))'
              r'(?P<name>[A-Za-z%s]+)'
              r'(?:(?:(?:\^)|(?:\*\*))?(?P<exp_paren>\()?(?P<exp>-?[0-9]+)'
              r'(?(exp_paren)\)))?'
-             r'(?(paren)\)|)(?P<op> |(?:\*)|(?:\/))?' % ''.join(regex_mu))
+             r'(?(paren)\)|)(?P<op> |(?:\*)|(?:\/))?' % ''.join(extra_char))
     out = ''
     if re.fullmatch(f'(?:{regex})+', orig_str.strip()):
         for x in re.finditer(regex, orig_str.strip()):
