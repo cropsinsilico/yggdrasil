@@ -369,7 +369,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             try:
                 compiler = drv.get_tool('compiler', toolname=toolname)
             except NotImplementedError:
-                if x in [drv.language] + drv.language_aliases:
+                if language in [drv.language] + drv.language_aliases:
                     raise
                 continue
             # archiver = compiler.archiver()
