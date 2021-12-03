@@ -297,7 +297,8 @@ class TestExample(base_class):
     def test_example(self, example_name, language, namespace, yaml,
                      setup_env, expects_error, on_mpi,
                      mpi_rank, check_results, example_cleanup,
-                     adv_global_mpi_tag, optionally_disable_verify_count_fds):
+                     adv_global_mpi_tag, optionally_disable_verify_count_fds,
+                     testing_options):
         r"""This runs an example in the correct language."""
         if example_name.startswith('timesync'):
             # Timesync examples include ploting in the verification script
@@ -310,7 +311,8 @@ class TestExample(base_class):
             mpi_tag_start = adv_global_mpi_tag(1000)
         r = runner.get_runner(yaml, namespace=namespace,
                               production_run=True,
-                              mpi_tag_start=mpi_tag_start)
+                              mpi_tag_start=mpi_tag_start,
+                              **testing_options.get('runner_kwargs', {}))
         try:
             try:
                 r.run()

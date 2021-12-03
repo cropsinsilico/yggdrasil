@@ -231,7 +231,10 @@ class yggrun(SubCommand):
         (('--validate', ),
          {'action': 'store_true',
           'help': ('Validate the run via model validation commands on '
-                   'completion.')})]
+                   'completion.')}),
+        (('--yaml-encoding', ),
+         {'type': str,
+          'help': 'Encoding of the YAML specification files.'})]
 
     @classmethod
     def add_arguments(cls, parser, **kwargs):
@@ -259,7 +262,8 @@ class yggrun(SubCommand):
             runner.run(args.yamlfile, ygg_debug_prefix=prog,
                        production_run=args.production_run,
                        mpi_tag_start=args.mpi_tag_start,
-                       validate=args.validate)
+                       validate=args.validate,
+                       yaml_encoding=args.yaml_encoding)
 
 
 class integration_service_manager(SubCommand):
