@@ -16,3 +16,7 @@ sympy
 sysv_ipc; platform_system != 'Windows'
 unyt
 GitPython
+typing_extensions==4.0.0; platform_system == 'Linux'
+charset-normalizer==2.0.7; platform_system == 'Linux'
+fonttools==4.28.1; platform_system == 'Linux'
+setuptools==59.2.0; platform_system == 'Linux'
