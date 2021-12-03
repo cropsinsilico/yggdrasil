@@ -10,7 +10,8 @@ python-rapidjson
 pyyaml
 pyzmq
 requests
-scipy
+scipy; platform_system != 'Linux'
+scipy==1.7.2; platform_system == 'Linux'
 six
 sympy
 sysv_ipc; platform_system != 'Windows'
