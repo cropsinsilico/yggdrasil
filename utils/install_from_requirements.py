@@ -365,6 +365,8 @@ if __name__ == "__main__":
         elif (not v) and getattr(args, 'install_%s' % k, False):
             new_opts[k] = True
     install_opts.update(new_opts)
+    if args.additional_packages is None:
+        args.additional_packages = []
     install_from_requirements(args.method, args.files, conda_env=args.conda_env,
                               user=args.user, unique_to_method=args.unique_to_method,
                               install_opts=install_opts, verbose=args.verbose,
