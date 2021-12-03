@@ -92,7 +92,8 @@ def clone_github_repo(fname, commit=None, local_directory=None):
     return os.path.realpath(fname)
 
 
-def load_yaml(fname, yaml_param=None, directory_for_clones=None):
+def load_yaml(fname, yaml_param=None, directory_for_clones=None,
+              encoding=None):
     r"""Parse a yaml file defining a run.
 
     Args:
@@ -110,6 +111,8 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None):
         directory_for_clones (str, optional): Directory that git repositories
             should be cloned into. Defaults to None and the current working
             directory will be used.
+        encoding (str, optional): Encoding of the YAML file. Default is
+            platform dependent (locale.getpreferredencoding).
 
     Returns:
         dict: Contents of yaml file.
@@ -128,7 +131,7 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None):
         fname = os.path.realpath(fname)
         if not os.path.isfile(fname):
             raise IOError("Unable locate yaml file %s" % fname)
-        fd = open(fname, 'r')
+        fd = open(fname, 'r', encoding=encoding)
         opened = True
     else:
         fd = fname
@@ -154,7 +157,8 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None):
     return yamlparsed
 
 
-def prep_yaml(files, yaml_param=None, directory_for_clones=None):
+def prep_yaml(files, yaml_param=None, directory_for_clones=None,
+              encoding=None):
     r"""Prepare yaml to be parsed by jsonschema including covering backwards
     compatible options.
 
@@ -168,6 +172,8 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None):
         directory_for_clones (str, optional): Directory that git repositories
             should be cloned into. Defaults to None and the current working
             directory will be used.
+        encoding (str, optional): Encoding of the YAML file. Default is
+            platform dependent (locale.getpreferredencoding).
 
     Returns:
         dict: YAML ready to be parsed using schema.
@@ -178,7 +184,8 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None):
     if not isinstance(files, list):
         files = [files]
     yamls = [load_yaml(f, yaml_param=yaml_param,
-                       directory_for_clones=directory_for_clones)
+                       directory_for_clones=directory_for_clones,
+                       encoding=encoding)
              for f in files]
     # Load files pointed to
     for y in yamls:
@@ -189,7 +196,7 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None):
             for f in new_files:
                 if not os.path.isabs(f):
                     f = os.path.join(y['working_dir'], f)
-                yamls.append(load_yaml(f))
+                yamls.append(load_yaml(f, encoding=encoding))
     # Replace references to services with service descriptions
     for i, y in enumerate(yamls):
         services = y.pop('services', [])
@@ -238,7 +245,7 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None):
 
 def parse_yaml(files, complete_partial=False, partial_commtype=None,
                model_only=False, model_submission=False, yaml_param=None,
-               directory_for_clones=None):
+               directory_for_clones=None, encoding=None):
     r"""Parse list of yaml files.
 
     Args:
@@ -262,6 +269,8 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
         directory_for_clones (str, optional): Directory that git repositories
             should be cloned into. Defaults to None and the current working
             directory will be used.
+        encoding (str, optional): Encoding of the YAML file. Default is
+            platform dependent (locale.getpreferredencoding).
 
     Raises:
         ValueError: If the yml dictionary is missing a required keyword or
@@ -276,7 +285,8 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
     s = get_schema()
     # Parse files using schema
     yml_prep = prep_yaml(files, yaml_param=yaml_param,
-                         directory_for_clones=directory_for_clones)
+                         directory_for_clones=directory_for_clones,
+                         encoding=encoding)
     # print('prepped')
     # pprint.pprint(yml_prep)
     if model_submission:

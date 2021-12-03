@@ -264,6 +264,8 @@ class YggRunner(YggClass):
         yaml_param (dict, optional): Parameters that should be used in
             mustache formatting of YAML files. Defaults to None and is
             ignored.
+        yaml_encoding (str, optional): Encoding of the YAML files. Default is
+            platform dependent (locale.getpreferredencoding).
         validate (bool, optional): If True, the validation scripts for each
             modle (if present), will be run after the integration finishes
             running. Defaults to False.
@@ -286,7 +288,8 @@ class YggRunner(YggClass):
                  ygg_debug_prefix=None, connection_task_method='thread',
                  as_service=False, complete_partial=False,
                  partial_commtype=None, production_run=False,
-                 mpi_tag_start=None, yaml_param=None, validate=False):
+                 mpi_tag_start=None, yaml_param=None, yaml_encoding=None,
+                 validate=False):
         self.mpi_comm = None
         name = 'runner'
         if MPI is not None:
@@ -328,7 +331,8 @@ class YggRunner(YggClass):
         else:
             self.drivers = yamlfile.parse_yaml(
                 modelYmls, complete_partial=complete_partial,
-                partial_commtype=partial_commtype, yaml_param=yaml_param)
+                partial_commtype=partial_commtype, yaml_param=yaml_param,
+                encoding=yaml_encoding)
             self.connectiondrivers = self.drivers['connection']
             self.modeldrivers = self.drivers['model']
             for x in self.modeldrivers.values():
