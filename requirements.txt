@@ -5,6 +5,7 @@ matplotlib
 numpy>=1.13.0
 pandas
 psutil
+pyperf
 python-rapidjson
 pyyaml
 pyzmq
