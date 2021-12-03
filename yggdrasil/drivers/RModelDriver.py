@@ -366,7 +366,12 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         for x in constants.LANGUAGES['compiled']:
             # for x in [language]:
             drv = import_component('model', x)
-            compiler = drv.get_tool('compiler', toolname=toolname)
+            try:
+                compiler = drv.get_tool('compiler', toolname=toolname)
+            except NotImplementedError:
+                if x in [drv.language] + drv.language_aliases:
+                    raise
+                continue
             # archiver = compiler.archiver()
             env = drv.set_env_compiler(existing=env, compiler=compiler)
             cexec = compiler.get_executable(full_path=True)
