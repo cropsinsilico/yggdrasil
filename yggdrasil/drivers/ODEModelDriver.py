@@ -739,7 +739,6 @@ class LambdifySolution(object):
 
     def odeint(self, iparam, from_prev=False, **kwargs):
         r"""Wrapper for calling scipy.integrate.odeint."""
-        from scipy.integrate import ode, odeint
         if from_prev and (self.last_state is not None):
             t0_f, X0 = self.last_state
         else:
@@ -751,12 +750,16 @@ class LambdifySolution(object):
         if tF == t0_f:
             out = X0
         elif 'name' in kwargs:
+            from scipy.integrate import ode
+            kwargs.setdefault('name', 'vode')
             x_ode = ode(self._fodeint)
             x_ode.set_integrator(**kwargs)
             x_ode.set_f_params(param[NX:], t0_f)
             x_ode.set_initial_value(X0, 0.0)
             out = x_ode.integrate(tF - t0_f)
+            assert(x_ode.get_return_code() == 2)
         else:
+            from scipy.integrate import odeint
             t = np.array([0.0, tF - t0_f])
             out = odeint(self._fodeint, X0, t, args=(param[NX:], t0_f),
                          tfirst=True, **kwargs)[-1]
