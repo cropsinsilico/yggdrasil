@@ -63,7 +63,7 @@ model:
     IMC(0): 0.0
     CytoPi(0): 5000.0 μM
   odeint_kws:
-    name: vode
+    name: lsoda
   inputs:
     - name: input
       vars: [t]
