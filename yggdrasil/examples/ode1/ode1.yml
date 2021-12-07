@@ -14,6 +14,7 @@ model:
         filetype: table
   outputs:
     - name: output
+      vars: [f, d^2f/dt^2]
       default_file:
         name: ./output.txt
         filetype: table

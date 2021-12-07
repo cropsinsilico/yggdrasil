@@ -1,16 +1,24 @@
 import os
 import numpy as np
-from yggdrasil import serialize, platform
+from yggdrasil.communication.AsciiTableComm import AsciiTableComm
+from yggdrasil import platform
 
 
 def get_testing_options():
     r"""Get testing parameters for this example."""
     def read_file(fname):
-        with open(fname, 'rb') as fd:
-            return serialize.table_to_array(fd.read(), comment='#')
-        
-    def compare_results(a, b):
-        np.testing.assert_allclose(a, b, rtol=1e-5, atol=1e-8)
+        x = AsciiTableComm(fname, address=fname,
+                           direction='recv', as_array=True)
+        return x.recv_array()[1]
+
+    def compare_results(a, b, rtol=1e-5, atol=1e-8):
+        try:
+            np.testing.assert_allclose(a, b, rtol=rtol, atol=atol)
+        except TypeError:
+            a2 = a.view(np.float).reshape(a.shape + (-1,))
+            b2 = b.view(np.float).reshape(b.shape + (-1,))
+            np.testing.assert_allclose(a2, b2, rtol=rtol, atol=atol)
+
     out = dict(
         input_files='input.txt',
         read_file=read_file,
