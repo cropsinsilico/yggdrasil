@@ -13,8 +13,8 @@ try:
     from sympy.core.numbers import Number
     from sympy.core.function import UndefinedFunction, AppliedUndef, Subs
     from sympy.solvers.ode.systems import dsolve_system
-except ImportError:
-    pass
+except ImportError:  # pragma: debug
+    sympy = None
 logger = logging.getLogger(__name__)
 
 
@@ -127,10 +127,10 @@ class ODEModel(object):
 
     """
     _derivative_regexes = [
-        r'd(?:\^(?P<n_top>\d+))?\s*(?P<f>\w+)\s*'
+        r'd(?:\^(?P<n_top>\d+))?\s*(?P<f>[a-zA-Z]\w*)\s*'
         r'(?:\(\s*(?P<args>ARG\s*(?:\,\s*ARG\s*)*)\))?\s*/'
-        r'\s*d\s*(?P<t>\w+)(?:\^(?P<n_bottom>\d+))?',
-        r'(?P<f>\w+)\s*(?P<n_tics>\'+)(?:\s*\(\s*(?P<t>ARG)\s*\))?'
+        r'\s*d\s*(?P<t>[a-zA-Z]\w*)(?:\^(?P<n_bottom>\d+))?',
+        r'(?P<f>[a-zA-Z]\w*)\s*(?P<n_tics>\'+)(?:\s*\(\s*(?P<t>ARG)\s*\))?'
     ]
     _noarg_function_regex = (
         r'(?<!\w)FUNC(?!(?:\w)|(?:\s*\())'
@@ -225,7 +225,7 @@ class ODEModel(object):
                 self.units[self.t] = self.t_units
         return self.t
 
-    def add_func(self, x):
+    def add_func(self, x: str):
         r"""Add a dependent variable for the set of equations.
 
         Args:
@@ -235,14 +235,11 @@ class ODEModel(object):
             sympy.Symbol: Function symbol.
 
         """
-        if isinstance(x, str):
-            x_str = x
-            if '(' not in x:
-                # Assume that function depends on independent var
-                x_str += f'({self.t})'
-            x = sympify(x_str, locals=self.local_map)
-        else:
-            x_str = str(x)
+        x_str = x
+        if '(' not in x:
+            # Assume that function depends on independent var
+            x_str += f'({self.t})'
+        x = sympify(x_str, locals=self.local_map)
         xf = x.__class__
         xfunc, xargs = x_str.split('(', 1)
         if (str(xf) != xfunc) or (xfunc in self.assumptions):
@@ -250,8 +247,6 @@ class ODEModel(object):
             xf = Function(xfunc, **self.assumptions.get(xfunc, {}))
             x = xf(*xa.args)
         v = str(x)
-        if xf == getattr(sympy, str(xf), None):
-            return v
         if x not in self.funcs:
             self.local_map[str(xf)] = xf
             self.local_map[v] = x
@@ -313,11 +308,13 @@ class ODEModel(object):
                 if isinstance(subs, list) and (len(subs) == 0):
                     subs.append((self.t, t))
                 else:
-                    return False
+                    raise ValueError
             except (TypeError, ValueError):
                 raise ODEError(f"One equation ({eqn}) has a different "
                                f"independent variable ({t}) than "
-                               f"other equations ({self.t})")
+                               f"other equations ({self.t}) and/or "
+                               f"previous substitutions in this equation "
+                               f"({subs})")
         return True
     
     def replace_derivatives(self, eqn, subs=None):
@@ -344,9 +341,8 @@ class ODEModel(object):
             args = [f"{x['f']}({self.t})"] + x['n'] * [str(self.t)]
             replacement = f"Derivative({', '.join(args)})"
             if x['t'] != x['tval']:
-                assert(self.check_t(eqn, x['t']))
-            if not self.check_t(eqn, x['tval'], subs=subs):
-                replacement += f".subs({self.t}, {x['tval']})"
+                self.check_t(eqn, x['t'])
+            self.check_t(eqn, x['tval'], subs=subs)
             out = out.replace(x['name'], replacement)
         return out
 
@@ -528,7 +524,7 @@ class ODEModel(object):
                 except RetryODE as e:
                     temp_solution = temp_solution or e.temp_solution
                 first_attempt = False
-            if not sol:
+            if not sol:  # pragma: debug
                 raise ODEError("No solution could be found")
             if not temp_solution:
                 self.sol = sol
@@ -541,11 +537,11 @@ class ODEModel(object):
             if not e.temp_solution:
                 self.sol = sol
         out = {str(f.__class__): x for f, x in zip(self.funcs, result)}
+        iparam.update({f: x for f, x in zip(self.funcs, result)})
         for v in output_vars:
             if v in self.funcs:
                 continue
             else:
-                iparam.update({f: x for f, x in zip(self.funcs, result)})
                 out[v] = sol.evaluate(v, iparam, constants=self.constants)
         return out
         
@@ -615,6 +611,55 @@ class ODEModel(object):
         return sol
 
 
+class LambdifiedExpression(object):
+    r"""Class for containing lambdified sympy expresssions along side the
+    expected arguments and results.
+
+    Args:
+        fexpr (function): Lambdified expression function.
+        args (list): Arguments expected by fexpr.
+        funcs (list): Variables returned by fexpr.
+        deps (list, optional): Other LambdifiedExpression values that should
+            be solved first during any calls in order to update the input
+            arguments. Defaults to None.
+
+    """
+
+    def __init__(self, fexpr, args, funcs, deps=None):
+        self.args = args
+        self.fexpr = fexpr
+        self.funcs = funcs
+        if deps is None:
+            deps = []
+        self.deps = deps
+
+    def __call__(self, *args):
+        if (len(args) == 1) and isinstance(args[0], dict):
+            iparam = args[0]
+            for x in self.deps:
+                x.add_param(iparam)
+            args = [iparam.get(k, None) for k in self.args]
+        return self.fexpr(*args)
+
+    def add_param(self, iparam):
+        r"""Add parameters produced by calling this expression to a set
+        that will be used by a dependent LambdifiedExpression. Values will
+        only be added if they are not already in iparam.
+
+        Args:
+            iparam (dict): Parameters to add output values to.
+
+        Returns:
+            dict: Update parameter dictionary.
+
+        """
+        if not all(k in iparam for k in self.funcs):
+            vals = self(iparam)
+            for k, v in zip(self.funcs, vals):
+                iparam[k] = v
+        return iparam
+
+
 class LambdifySolution(object):
     r"""Callable solution to an ODE system of equations.
 
@@ -656,30 +701,55 @@ class LambdifySolution(object):
             eqns = [sys[Derivative(f, self.t)] for f in funcs]
         else:
             eqns = [sol[f] for f in funcs]
+        self._sys_parts = None
         self.solution = self.lambdify(args, eqns, funcs)
         self.last_state = None
         self._expressions = {}
 
     def lambdified_expression(self, var):
-        r"""Get a lambdified expression for a function or derivative."""
-        if var in self._expressions:
-            return self._expressions[var]
-        expr = None
-        if var in self.sys:
-            expr = self.sys[var]
-        elif var in self.sol:
-            expr = self.sol[var]
-        else:
-            f, arg, deg = _get_function(var)
-            if deg and (f in self.sol):
-                expr = Derivative(self.sol[f], deg)
-            elif deg and (Derivative(f, 1) in self.sys):
-                expr = Derivative(self.sys[Derivative(f, 1)], deg - 1)
-            else:
+        r"""Get a lambdified expression for a function or derivative.
+
+        Args:
+            var (sympy.Symbol): Sympy variable or expression.
+
+        Returns:
+            LambdifiedExpression: Callable object for accessing the lambdified
+                expression.
+
+        """
+        if not isinstance(var, list):
+            var = [var]
+        kvar = tuple(var)
+        if kvar in self._expressions:
+            return self._expressions[kvar]
+        expr = []
+        deps = []
+        order = self.order
+        for ivar in var:
+            iexpr = None
+            f, t, deg = _get_function(ivar)
+            if f(self.t) in self.sol:
+                iexpr = self.sol[f(self.t)]
+            elif f in self.sys_parts:
+                deg_max = max([x[-1] for x in self.sys_parts[f] if x[-1] <= deg])
+                iexpr = self.sys[Derivative(f(self.t), self.t, deg_max)]
+                deg -= deg_max
+                for i in range(deg):
+                    ideriv = [Derivative(x, self.t, i) for x in self.sys.keys()]
+                    deps.append(self.lambdified_expression(ideriv))
+                    order += [x for x in ideriv if x not in order]
+            else:  # pragma: debug
                 raise ODEError(f"No expression could be found or derived "
-                               f"for '{var}'")
-        self._expressions[var] = self.lambdify(self.args, [expr], [var])
-        return self._expressions[var]
+                               f"for '{ivar}'")
+            if deg:
+                iexpr = Derivative(iexpr, self.t, deg).doit()
+            assert(t == self.t)
+            # if t != self.t:
+            #     iexpr = iexpr.subs(self.t, t)
+            #     raise ODEError(f"CHECK SUBST {self.t} -> {t}: {iexpr}")
+            expr.append(iexpr)
+        self._expressions[kvar] = self.lambdify(order, expr, var, deps=deps)
+        return self._expressions[kvar]
 
     def evaluate(self, var, iparam, constants=None):
         r"""Evaluate for a specific function, parameter, variable."""
@@ -691,9 +761,9 @@ class LambdifySolution(object):
         elif self.ics and (var in self.ics):
             return self.ics[var]
         fexpr = self.lambdified_expression(var)
-        return fexpr(*[iparam.get(k, None) for k in self.order])[0]
+        return fexpr(iparam)[0]
 
-    def lambdify(self, args, expr, funcs):
+    def lambdify(self, args, expr, funcs, **kwargs):
         r"""Lambdify an expression, adding units to function arguments and
         return values."""
         args_units = [self.units.get(a, None) for a in args]
@@ -711,13 +781,25 @@ class LambdifySolution(object):
                    for x, u in zip(out, funcs_units)]
             return out
 
-        return flambdified
+        return LambdifiedExpression(flambdified, args, funcs, **kwargs)
 
     @property
     def order(self):
         r"""list: Order of arguments to the lambda function."""
         return [x for x in self.args]
 
+    @property
+    def sys_parts(self):
+        r"""dict: Mapping between functions and derivatives present in the
+        system of equations."""
+        if self._sys_parts is None:
+            self._sys_parts = {}
+            for k in self.sys.keys():
+                f, t, deg = _get_function(k)
+                self._sys_parts.setdefault(f, [])
+                self._sys_parts[f].append((f, t, deg))
+        return self._sys_parts
+                
     def get_t0(self):
         r"""Get the independent variable associated with the provided ICs."""
         t0 = None
@@ -904,11 +986,9 @@ class ODEModelDriver(DSLModelDriver):
             str: Version of compiler/interpreter for this language.
 
         """
-        try:
-            import sympy
-            return sympy.__version__
-        except ImportError:  # pragma: debug
+        if sympy is None:  # pragma: debug
             raise RuntimeError("sympy not installed.")
+        return sympy.__version__
 
     def parse_arguments(self, args, **kwargs):
         r"""Sort model arguments to determine which one is the executable
@@ -1026,7 +1106,7 @@ class ODEModelDriver(DSLModelDriver):
                     continue
                 flag, value = v['comm'].recv_dict(key_order=v['vars'])
                 if not flag:
-                    if first_loop:
+                    if first_loop:  # pragma: debug
                         raise RuntimeError(f"Error receiving from {k}")
                     logger.info(f"No more input from {k}")
                     break

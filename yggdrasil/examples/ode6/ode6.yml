@@ -72,7 +72,7 @@ model:
         filetype: table
   outputs:
     - name: output
-      vars: [PHO2,IPS1,miR399,dPHO2/dt]
+      vars: [PHO2,IPS1,miR399,dPHO2/dt,d^2PHO2/dt^2,β,CytoPi(0)]
       default_file:
         name: ./output.txt
         filetype: table
