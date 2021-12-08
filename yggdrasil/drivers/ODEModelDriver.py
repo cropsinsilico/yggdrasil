@@ -602,7 +602,7 @@ class ODEModel(object):
             
             dsol = {eqn.lhs: eqn.rhs for eqn in dsol[0]}
             if compute_method == 'steady_state':
-                kws = {'method': 'flimit', 'limits': {self.t: oo}}
+                kws = {'limits': {self.t: oo}}
         if dsol:
             dsol_str = {str(k): str(v) for k, v in dsol.items()}
             logger.info(f'{soltype} SOLUTION:\n{dsol_str}')
@@ -622,16 +622,58 @@ class LambdifiedExpression(object):
         deps (list, optional): Other LambdifiedExpression values that should
             be solved first during any calls in order to update the input
             arguments. Defaults to None.
+        units (dict, optional): Units that should be used for inputs and
+            outputs. Defaults to {}.
+        limits (dict, optional): Limits that should be applied to the
+            expression prior to evaluation.
 
     """
 
-    def __init__(self, fexpr, args, funcs, deps=None):
+    def __init__(self, expr, args, funcs, deps=None, units={}, limits={}):
+        self.expr = expr
         self.args = args
-        self.fexpr = fexpr
         self.funcs = funcs
         if deps is None:
             deps = []
         self.deps = deps
+        self.units = units
+        self.limits = limits
+        self.fexpr = self.lambdified()
+
+    def lambdified(self):
+        r"""Lambdify an expression, adding units to function arguments and
+        return values."""
+        args_units = [self.units.get(a, None) for a in self.args]
+        funcs_units = [self.units.get(f, None) for f in self.funcs]
+        fexpr0 = lambdify(self.args, self.expr)
+
+        def flambdified(*iargs):
+            fexpr = fexpr0
+            iargs = [unyts.add_units(a, u)
+                     if (u and not unyts.has_units(a) and (a is not None))
+                     else a for a, u in zip(iargs, args_units)]
+            if self.limits:
+                expr = []
+                for x in self.expr:
+                    for k, v in zip(self.args, iargs):
+                        x = x.subs(k, v)
+                    for k, v in self.limits.items():
+                        try:
+                            x = x.limit(k, v)
+                        except NotImplementedError:  # pragma: debug
+                            raise RetryWithNumeric("Complex limit")
+                    if isinstance(x, Limit):
+                        raise RetryWithNumeric("Complex limit")
+                    expr.append(x)
+                fexpr = lambdify(self.args, expr)
+            out = fexpr(*iargs)
+            out = [float(x) if isinstance(x, int) else x for x in out]
+            out = [unyts.add_units(x, u)
+                   if (u and not unyts.has_units(x)) else x
+                   for x, u in zip(out, funcs_units)]
+            return out
+
+        return flambdified
 
     def __call__(self, *args):
         if (len(args) == 1) and isinstance(args[0], dict):
@@ -702,7 +744,7 @@ class LambdifySolution(object):
         else:
             eqns = [sol[f] for f in funcs]
         self._sys_parts = None
-        self.solution = self.lambdify(args, eqns, funcs)
+        self.solution = self.lambdify(eqns, args, funcs)
         self.last_state = None
         self._expressions = {}
 
@@ -728,11 +770,13 @@ class LambdifySolution(object):
         for ivar in var:
             iexpr = None
             f, t, deg = _get_function(ivar)
-            if f(self.t) in self.sol:
-                iexpr = self.sol[f(self.t)]
+            ilhs = f(self.t)
+            if ilhs in self.sol:
+                iexpr = self.sol[ilhs]
             elif f in self.sys_parts:
                 deg_max = max([x[-1] for x in self.sys_parts[f] if x[-1] <= deg])
-                iexpr = self.sys[Derivative(f(self.t), self.t, deg_max)]
+                ilhs = Derivative(f(self.t), self.t, deg_max)
+                iexpr = self.sys[ilhs]
                 deg -= deg_max
                 for i in range(deg):
                     ideriv = [Derivative(x, self.t, i) for x in self.sys.keys()]
@@ -742,13 +786,16 @@ class LambdifySolution(object):
                 raise ODEError(f"No expression could be found or derived "
                                f"for '{ivar}'")
             if deg:
+                if self.units.get(ilhs, None):
+                    self.units.setdefault(
+                        ivar, f"{self.units[ilhs]}/({self.t_units}**{deg})")
                 iexpr = Derivative(iexpr, self.t, deg).doit()
             assert(t == self.t)
             # if t != self.t:
             #     iexpr = iexpr.subs(self.t, t)
             #     raise ODEError(f"CHECK SUBST {self.t} -> {t}: {iexpr}")
             expr.append(iexpr)
-        self._expressions[kvar] = self.lambdify(order, expr, var, deps=deps)
+        self._expressions[kvar] = self.lambdify(expr, order, var, deps=deps)
         return self._expressions[kvar]
 
     def evaluate(self, var, iparam, constants=None):
@@ -763,25 +810,12 @@ class LambdifySolution(object):
         fexpr = self.lambdified_expression(var)
         return fexpr(iparam)[0]
 
-    def lambdify(self, args, expr, funcs, **kwargs):
+    def lambdify(self, *args, **kwargs):
         r"""Lambdify an expression, adding units to function arguments and
         return values."""
-        args_units = [self.units.get(a, None) for a in args]
-        funcs_units = [self.units.get(f, None) for f in funcs]
-        fexpr = lambdify(args, expr)
-
-        def flambdified(*iargs):
-            iargs = [unyts.add_units(a, u)
-                     if (u and not unyts.has_units(a) and (a is not None))
-                     else a for a, u in zip(iargs, args_units)]
-            out = fexpr(*iargs)
-            out = [float(x) if isinstance(x, int) else x for x in out]
-            out = [unyts.add_units(x, u)
-                   if (u and not unyts.has_units(x)) else x
-                   for x, u in zip(out, funcs_units)]
-            return out
-
-        return LambdifiedExpression(flambdified, args, funcs, **kwargs)
+        kwargs.setdefault('units', self.units)
+        kwargs.setdefault('limits', self.kws.get('limits', {}))
+        return LambdifiedExpression(*args, **kwargs)
 
     @property
     def order(self):
@@ -866,24 +900,6 @@ class LambdifySolution(object):
         X0 = [t0_f] + [self.ics[f.subs(self.t, t0)] for f in self.funcs]
         param = [iparam.get(k, None) for k in self.order[len(X0):]]
         return fsolve(self._fsolve, X0, args=(param,))[1:]
-
-    def flimit(self, iparam, limits={}):
-        r"""Compute the value through substitution followed by limit."""
-        out = []
-        for f in self.funcs:
-            x = self.sol[f]
-            for k, v in iparam.items():
-                x = x.subs(k, v)
-            for k, v in limits.items():
-                try:
-                    x = x.limit(k, v)
-                except NotImplementedError:  # pragma: debug
-                    raise RetryWithNumeric("Complex limit")
-            if isinstance(x, Limit):
-                raise RetryWithNumeric("Complex limit")
-            out.append(x)
-        f = self.lambdify(tuple([]), out, self.funcs)
-        return f()
 
     def __call__(self, param, constants={}):
         iparam = dict(param)

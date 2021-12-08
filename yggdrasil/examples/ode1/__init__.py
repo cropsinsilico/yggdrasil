@@ -9,7 +9,9 @@ def get_testing_options():
     def read_file(fname):
         x = AsciiTableComm(fname, address=fname,
                            direction='recv', as_array=True)
-        return x.recv_array()[1]
+        out = x.recv_array()[1]
+        x.close()
+        return out
 
     def compare_results(a, b, rtol=1e-5, atol=1e-8):
         try:
