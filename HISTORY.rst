@@ -20,6 +20,11 @@ History
 * Remove 'initial_state' parameter from Transform and Filter schemas as it is unused
 * Remove unused yggdrasil.communication.cleanup_comms method
 
+TODO
+~~~~
+
+* Add support for merging ODEs when there is more than one
+
 1.8.1 (2021-10-15) Minor updates to support model submission form development
 ------------------
 

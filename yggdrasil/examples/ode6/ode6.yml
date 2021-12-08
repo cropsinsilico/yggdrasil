@@ -2,17 +2,8 @@
 model:
   name: ode6
   language: ode
-  args:
-    - dSIZ1/dt = (m1 * (k1**n))/((k1**n) + (CytoPi**n)) - (d1 * SIZ1)
-    - dPHR2/dt = m2 - k2*PHR2*CytoPi - m3*PHR2*SIZ1/(k3 + PHR2) + k4*PHR2S - d2*PHR2
-    - dPHR2S/dt = (m3*PHR2*SIZ1)/(k3 + PHR2) - k4*PHR2S
-    - dmiR399/dt = β/(kCytoPi + CytoPi) + (m4*(PHR2S**n))/(k5**n + PHR2S**n) - k6*miR399*PHO2 - k7*miR399*IPS1 + k8*IMC - d3*miR399
-    - dPHO2/dt = m5 - k6*miR399*PHO2 - d4*PHO2
-    - dPHO1/dt = m6/((kCytoPi + CytoPi)*(1.0 + PHO2)) - d5*PHO1
-    - dPHT/dt = (m7*(PHR2S**n))/((k9**n + PHR2S**n)*(1.0 + PHO2)) - d6*PHT
-    - dIPS1/dt = (m8*(PHR2S**r))/(k10**r + PHR2S**r) - k7*miR399*IPS1 + k8*IMC - d7*IPS1
-    - dIMC/dt = k7*miR399*IPS1 - k8*IMC - d7*IMC
-    - dCytoPi/dt = (k11*PHT*E)/(k12 + E) + (k13*E)/(k14 + E) - (k15*PHO1*CytoPi)/(k16 + CytoPi) - U*CytoPi
+  args: ./equations.txt
+  encoding: utf-8
   parameters:
     m1: 0.422 hr**-1
     m2: 0.2 hr**-1

@@ -1,8 +1,8 @@
 #!/bin/bash
 
 export YGG_DEBUG="INFO"
-export YGG_NAMESPACE="ode4"
+export YGG_NAMESPACE="ode5"
 
-yaml='ode4.yml'
+yaml='ode5.yml'
 
 yggrun $yaml

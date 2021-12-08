@@ -1417,6 +1417,10 @@ definitions:
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
+        encoding:
+          description: Encoding of the file containing equations if one is used. The
+            default is platform dependent and will be set by locale.getpreferredencoding.
+          type: string
         env:
           additional_properties:
             type: string
@@ -1883,6 +1887,11 @@ definitions:
             additional export modules that output at a shorter rate, the existing
             table of values will be extrapolated.
           type: object
+        use_latex:
+          default: false
+          description: If True, the equations and variables are assumed to be in LaTeX
+            notation. Defaults to False.
+          type: boolean
         use_numeric:
           default: false
           description: If True, numeric methods will be used to find a solution without
@@ -2470,6 +2479,10 @@ definitions:
             items:
               type: string
             type: array
+          encoding:
+            description: Encoding of the file containing equations if one is used.
+              The default is platform dependent and will be set by locale.getpreferredencoding.
+            type: string
           fsolve_kws:
             description: Options that should be passed to the scipy fsolve routine
               when solving for the steady state solution if numeric integration is
@@ -2525,6 +2538,11 @@ definitions:
             description: If True, no interpreter will be added to the arguments. This
               should only be used for subclasses that will not be invoking the model
               via the command line. Defaults to False.
+            type: boolean
+          use_latex:
+            default: false
+            description: If True, the equations and variables are assumed to be in
+              LaTeX notation. Defaults to False.
             type: boolean
           use_numeric:
             default: false

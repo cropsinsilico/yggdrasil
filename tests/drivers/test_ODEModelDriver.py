@@ -10,7 +10,16 @@ def test_derivative_regexs():
         ('d^2x/dt^2 = 1 + t',
          [{'name': 'd^2x/dt^2', 't': 't', 'f': 'x', 'n': 2, 'tval': None}]),
         ('y\'\'(x) = x + 5',
-         [{'name': 'y\'\'(x)', 't': 'x', 'f': 'y', 'n': 2, 'tval': 'x'}])]
+         [{'name': 'y\'\'(x)', 't': 'x', 'f': 'y', 'n': 2, 'tval': 'x'}]),
+        ('y^{\\prime\\prime}(x) = x + 5',
+         [{'name': 'y^{\\prime\\prime}(x)', 't': 'x', 'f': 'y', 'n': 2,
+           'tval': 'x'}]),
+        ('\\frac{dx}{dt} = x^{2}',
+         [{'name': '\\frac{dx}{dt}', 't': 't', 'f': 'x', 'n': 1,
+           'tval': None}]),
+        ('\\ddot y(x) = x + 5',
+         [{'name': '\\ddot y(x)', 't': 'x', 'f': 'y', 'n': 2, 'tval': 'x'}]),
+    ]
     for x, y in pairs:
         assert(ODEModel.extract_derivatives(x) == y)
 

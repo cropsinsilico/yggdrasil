@@ -13,6 +13,7 @@ try:
     from sympy.core.numbers import Number
     from sympy.core.function import UndefinedFunction, AppliedUndef, Subs
     from sympy.solvers.ode.systems import dsolve_system
+    from sympy.parsing.latex import parse_latex
 except ImportError:  # pragma: debug
     sympy = None
 logger = logging.getLogger(__name__)
@@ -124,13 +125,34 @@ class ODEModel(object):
         use_numeric (bool, optional): If True, numeric methods will be used to
             find a solution without attempting to find a symbolic solution.
             Defaults to False.
+        use_latex (bool, optional): If True, the equations and variables are
+            assumed to be in LaTeX notation. Defaults to False.
 
     """
     _derivative_regexes = [
+        # Leibniz's notation
         r'd(?:\^(?P<n_top>\d+))?\s*(?P<f>[a-zA-Z]\w*)\s*'
         r'(?:\(\s*(?P<args>ARG\s*(?:\,\s*ARG\s*)*)\))?\s*/'
         r'\s*d\s*(?P<t>[a-zA-Z]\w*)(?:\^(?P<n_bottom>\d+))?',
-        r'(?P<f>[a-zA-Z]\w*)\s*(?P<n_tics>\'+)(?:\s*\(\s*(?P<t>ARG)\s*\))?'
+        # LaTeX version of Leibniz's notation
+        r'\\frac\{d(?:\^(?P<n_top_b>\{\s*)?(?P<n_top>\d+)'
+        r'(?(n_top_b)(?:\s*\})|(?:))?)?'
+        r'\s*(?P<f>[a-zA-Z]\w*(?:\_(?P<f_subk>\{\s*)?'
+        r'(?P<f_sub>\w+)(?(f_subk)(?:\s*\})|(?:)))?)\s*'
+        r'(?:\(\s*(?P<args>ARG\s*(?:\,\s*ARG\s*)*)\))?\s*\}\s*'
+        r'\{\s*d\s*(?P<t>[a-zA-Z]\w*(?:\_(?P<t_subk>\{\s*)?'
+        r'(?P<t_sub>\w+)(?(t_subk)(?:\s*\})|(?:)))?)'
+        r'(?:\^(?P<n_bottom_b>\{\s*)?(?P<n_bottom>\d+)'
+        r'(?(n_bottom_b)(?:\s*\})|(?:))?)?\s*\}',
+        # LaTeX version of Newton's notation
+        r'\\(?P<n_tics>d+)ot\s*(?P<dot_b>\{\s*)?(?P<f>[a-zA-Z]\w*)'
+        r'(?(dot_b)(?:\s*\})|(?:))(?:\(\s*(?P<t>ARG\s*(?:\,\s*ARG\s*)*)\))?',
+        # Lagrange notation
+        r'(?P<f>[a-zA-Z]\w*)\s*(?P<n_tics>\'+)(?:\s*\(\s*(?P<t>ARG)\s*\))?',
+        # LaTeX version of Lagrange notation
+        r'(?P<f>[a-zA-Z]\w*)\s*\^(?P<tic_b>\{\s*)?(?P<n_tics>(?:\\prime)+)'
+        r'(?(tic_b)(?:\s*\})|(?:))'
+        r'(?:\s*\(\s*(?P<t>ARG)\s*\))?',
     ]
     _noarg_function_regex = (
         r'(?<!\w)FUNC(?!(?:\w)|(?:\s*\())'
@@ -138,15 +160,15 @@ class ODEModel(object):
     _function_regex = (
         r'(?<!\w)FUNC\((?P<args>\s*ARG\s*(?:\,\s*ARG\s*)*)\)'
     )
-    _func_regex = r'\w+'
     _arg_regex = (
-        r'(?:(?:\w+)|(?:(?:\-|\+)?\d+(?:\.\d+)?'
+        r'(?:(?:\w+(?:\_\{\w+\})?)|(?:(?:\-|\+)?\d+(?:\.\d+)?'
         r'(?:(?:e|E)(\-|\+)?\d+?)?))'
     )
 
     def __init__(self, eqns, t=None, funcs=None, ics={}, param=None,
                  assumptions=None, units=None, t_units=None,
-                 odeint_kws=None, fsolve_kws=None, use_numeric=False):
+                 odeint_kws=None, fsolve_kws=None, use_numeric=False,
+                 use_latex=False):
         if funcs is None:
             funcs = []
         if param is None:
@@ -164,23 +186,31 @@ class ODEModel(object):
         self.t = None
         self.units = dict(units)
         self.funcs = []
-        self.local_map = {k: Symbol(k, **assumptions.get(k, {}))
-                          for k in param.keys()}
+        self.use_latex = use_latex
         self.ics = {}
+        if self.use_latex:
+            param = {str(self.sympify(k, skip_replace=True)): v
+                     for k, v in param.items()}
         self.param = dict(param)
         self.assumptions = dict(assumptions)
         self.t_units = t_units
+        self.local_map = {k: Symbol(k, **assumptions.get(k, {}))
+                          for k in param.keys()}
         if t is not None:
             self.add_t(t)
         if isinstance(eqns, str):
             eqns = [eqns]
-        eqns = [self.replace_derivatives(eqn) for eqn in eqns]
+        subs = {}
+        eqns = [self.replace_derivatives(eqn, subs=subs) for eqn in eqns]
         for x in funcs:
             self.add_func(x.split('(', 1)[0])
         eqns = [self.replace_functions(eqn) for eqn in eqns]
         for x in eqns:
             lhs = self.sympify(x.split('=')[0])
             rhs = self.sympify(x.split('=')[1])
+            for a, b in subs.items():
+                lhs = lhs.subs(a, b)
+                rhs = rhs.subs(a, b)
             self.eqns[lhs] = Eq(lhs, rhs)
             for k in self.locate_unknown_symbols(self.eqns[lhs]):
                 self.local_map[str(k)] = k
@@ -219,7 +249,8 @@ class ODEModel(object):
 
         """
         if (self.t is None) and (x is not None):
-            self.t = Symbol(x, **self.assumptions.get(x, {}))
+            self.t = self.sympify(x, skip_replace=True,
+                                  assumptions=self.assumptions.get(x, {}))
             self.local_map[x] = self.t
             if self.t_units:
                 self.units[self.t] = self.t_units
@@ -235,15 +266,19 @@ class ODEModel(object):
             sympy.Symbol: Function symbol.
 
         """
+        x_str0 = None
         x_str = x
         if '(' not in x:
             # Assume that function depends on independent var
             x_str += f'({self.t})'
-        x = sympify(x_str, locals=self.local_map)
+        x = self.sympify(x_str, skip_replace=True)
+        if self.use_latex:
+            x_str0 = x_str
+            x_str = str(x)
         xf = x.__class__
         xfunc, xargs = x_str.split('(', 1)
         if (str(xf) != xfunc) or (xfunc in self.assumptions):
-            xa = sympify('f(' + xargs, locals=self.local_map)
+            xa = self.sympify('f(' + xargs, skip_replace=True)
             xf = Function(xfunc, **self.assumptions.get(xfunc, {}))
             x = xf(*xa.args)
         v = str(x)
@@ -251,6 +286,9 @@ class ODEModel(object):
             self.local_map[str(xf)] = xf
             self.local_map[v] = x
             self.funcs.append(x)
+            if x_str0 and (x_str != x_str0):
+                self.local_map[x_str0] = x
+                self.local_map[x_str0.split('(', 1)[0]] = xf
         return x
 
     @classmethod
@@ -272,11 +310,17 @@ class ODEModel(object):
                     'f': m.group('f'),
                     't': mdict.get('t', 't'),
                     'n': 1}
+            if mdict.get('f_sub', None) and (not mdict.get('f_subk', None)):
+                iout['f'] = iout['f'].replace(mdict['f_sub'],
+                                              "{" + mdict['f_sub'] + "}")
             iout['tval'] = mdict.get('args', iout['t'])
             if iout['tval']:
                 iout['tval'] = iout['tval'].strip()
             if mdict.get('n_tics', None):
-                iout['n'] = len(mdict['n_tics'])
+                if '\\prime' in mdict['n_tics']:
+                    iout['n'] = mdict['n_tics'].count('\\prime')
+                else:
+                    iout['n'] = len(mdict['n_tics'])
             elif mdict.get('n_top', None) or mdict.get('n_bottom', None):
                 assert(mdict['n_top'] == mdict['n_bottom'])
                 iout['n'] = int(mdict['n_top'])
@@ -296,7 +340,7 @@ class ODEModel(object):
         Args:
             eqn (str): Equation containing the independent variable being checked.
             t (str): Dependent variable to check against the existing one.
-            subs (list, optional): Existing list that substitutions should be
+            subs (dict, optional): Existing dict that substitutions should be
                 added to for constants.
 
         """
@@ -305,8 +349,8 @@ class ODEModel(object):
                 t = float(t)
                 if self.t in self.units:
                     t = unyts.add_units(t, self.units[self.t])
-                if isinstance(subs, list) and (len(subs) == 0):
-                    subs.append((self.t, t))
+                if isinstance(subs, dict) and (self.t not in subs):
+                    subs[self.t] = t
                 else:
                     raise ValueError
             except (TypeError, ValueError):
@@ -317,19 +361,24 @@ class ODEModel(object):
                                f"({subs})")
         return True
     
-    def replace_derivatives(self, eqn, subs=None):
+    def replace_derivatives(self, eqn, subs=None, use_latex=None):
         r"""Replace derivative expressions with versions that sympy can
         parse.
 
         Args:
             eqn (str): Equation to be modified.
-            subs (list, optional): Existing list that substitutions should be
+            subs (dict, optional): Existing dict that substitutions should be
                 added to for constants.
+            use_latex (bool, optional): If True, the expression will be parsed
+                as LaTeX using Sympy's parse_latex function. Defaults to the
+                object attribute if not provided.
 
         Returns:
             str: Modified equation.
 
         """
+        if use_latex is None:
+            use_latex = self.use_latex
         replace_derivs = []
         for x in self.extract_derivatives(eqn):
             replace_derivs.append(x)
@@ -337,12 +386,19 @@ class ODEModel(object):
         self.add_t('t')  # Fallback
         out = eqn
         for x in replace_derivs:
-            self.add_func(x['f'])
-            args = [f"{x['f']}({self.t})"] + x['n'] * [str(self.t)]
-            replacement = f"Derivative({', '.join(args)})"
+            fx = self.add_func(x['f'])
             if x['t'] != x['tval']:
                 self.check_t(eqn, x['t'])
             self.check_t(eqn, x['tval'], subs=subs)
+            args = [f"{x['f']}({self.t})"] + x['n'] * [str(self.t)]
+            replacement = f"Derivative({', '.join(args)})"
+            if use_latex:
+                i = 0
+                while f"\\ygg_{i}" in subs:
+                    i += 1
+                subs[Symbol(f"ygg_{{{i}}}")] = Derivative(
+                    fx, *[self.t for _ in range(x['n'])])
+                replacement = f"\\ygg_{i}"
             out = out.replace(x['name'], replacement)
         return out
 
@@ -353,7 +409,7 @@ class ODEModel(object):
 
         Args:
             eqn (str): Equation to be modified.
-            subs (list, optional): Existing list that substitutions should be
+            subs (dict, optional): Existing dict that substitutions should be
                 added to for constants.
 
         Returns:
@@ -379,21 +435,39 @@ class ODEModel(object):
                            + out[m.end():])
         return out
 
-    def sympify(self, x):
+    def sympify(self, x, skip_replace=False, assumptions={}, use_latex=None):
         r"""Convert an expression into a Sympy symbolic expression.
 
         Args:
             x (str): Expression.
+            skip_replace (bool, optional): If True, dont replace derivatives
+                or functions in the expression. Defaults to False.
+            assumptions (dict, optional): Assumptions that should be applied
+                to the resulting Symbol. Defaults to {}.
+            use_latex (bool, optional): If True, the expression will be parsed
+                as LaTeX using Sympy's parse_latex function. Defaults to the
+                object attribute if not provided.
 
         Returns:
             sympy.Expression: Symbolic expression.
 
         """
-        subs = []
-        out = self.replace_derivatives(x, subs=subs)
-        out = self.replace_functions(out, subs=subs)
-        out = sympify(out, locals=self.local_map)
-        for a, b in subs:
+        subs = {}
+        out = x
+        if use_latex is None:
+            use_latex = self.use_latex
+        if not skip_replace:
+            out = self.replace_derivatives(out, subs=subs,
+                                           use_latex=use_latex)
+            out = self.replace_functions(out, subs=subs)
+        if use_latex:
+            out = parse_latex(out)
+        else:
+            out = sympify(out, locals=self.local_map)
+        if assumptions:
+            assert(isinstance(out, Symbol))
+            out = Symbol(str(out), **assumptions)
+        for a, b in subs.items():
             out = out.subs(a, b)
         return out
 
@@ -599,7 +673,6 @@ class ODEModel(object):
                 raise MultipleSolutionsError(
                     f"There is more than one symbolic solution, "
                     f"retrying numerically: {dsol}")
-            
             dsol = {eqn.lhs: eqn.rhs for eqn in dsol[0]}
             if compute_method == 'steady_state':
                 kws = {'limits': {self.t: oo}}
@@ -964,6 +1037,11 @@ class ODEModelDriver(DSLModelDriver):
         use_numeric (bool, optional): If True, numeric methods will be used to
             find a solution without attempting to find a symbolic solution.
             Defaults to False.
+        use_latex (bool, optional): If True, the equations and variables are
+            assumed to be in LaTeX notation. Defaults to False.
+        encoding (str, optional): Encoding of the file containing equations if
+            one is used. The default is platform dependent and will be set by
+            locale.getpreferredencoding.
 
     """
     _schema_subtype_description = 'Model is a symbolic ODE model.'
@@ -987,6 +1065,8 @@ class ODEModelDriver(DSLModelDriver):
         'odeint_kws': {'type': 'object'},
         'fsolve_kws': {'type': 'object'},
         'use_numeric': {'type': 'boolean', 'default': False},
+        'use_latex': {'type': 'boolean', 'default': False},
+        'encoding': {'type': 'string'},
     }
     language = 'ode'
     interface_dependencies = ['sympy']
@@ -1018,7 +1098,8 @@ class ODEModelDriver(DSLModelDriver):
         """
         super(ODEModelDriver, self).parse_arguments(args, **kwargs)
         if os.path.isfile(self.model_file):
-            raise NotImplementedError
+            with open(self.model_file, 'r', encoding=self.encoding) as fd:
+                self.equations = fd.readlines()
         else:
             self.equations = self.args
 
@@ -1039,14 +1120,15 @@ class ODEModelDriver(DSLModelDriver):
             compute_method=self.compute_method,
             odeint_kws=self.odeint_kws,
             fsolve_kws=self.fsolve_kws,
-            use_numeric=self.use_numeric)
+            use_numeric=self.use_numeric,
+            use_latex=self.use_latex)
         return out
 
     @classmethod
     def setup_model(cls, equations=None, independent_var=None,
                     dependent_vars=None, parameters=None, assumptions=None,
                     boundary_conditions=None, odeint_kws=None,
-                    fsolve_kws=None, use_numeric=False,
+                    fsolve_kws=None, use_numeric=False, use_latex=False,
                     independent_var_units=None):
         r"""Get ODE solution using Sympy."""
         return ODEModel(equations, t=independent_var, funcs=dependent_vars,
@@ -1054,7 +1136,7 @@ class ODEModelDriver(DSLModelDriver):
                         assumptions=assumptions,
                         t_units=independent_var_units,
                         odeint_kws=odeint_kws, fsolve_kws=fsolve_kws,
-                        use_numeric=use_numeric)
+                        use_numeric=use_numeric, use_latex=use_latex)
 
     @classmethod
     def model_wrapper(cls, env=None, working_dir=None, inputs=[],

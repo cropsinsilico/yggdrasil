@@ -17,8 +17,10 @@ def get_testing_options():
         try:
             np.testing.assert_allclose(a, b, rtol=rtol, atol=atol)
         except TypeError:
-            a2 = a.view(np.float).reshape(a.shape + (-1,))
-            b2 = b.view(np.float).reshape(b.shape + (-1,))
+            atype = a.dtype[0]
+            btype = b.dtype[0]
+            a2 = a.view(atype).reshape(a.shape + (-1,))
+            b2 = b.view(btype).reshape(b.shape + (-1,))
             np.testing.assert_allclose(a2, b2, rtol=rtol, atol=atol)
 
     out = dict(
