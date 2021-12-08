@@ -9,7 +9,7 @@ The model parameters that can be used to control the model behavior are specifie
 
 .. include:: tables/class_table_ODEModelDriver_args.rst
 
-For example, the YAML below defines a model from a system with one ODE equation that can be solved symbolically. The model can take as input ``t`` (the independent variable, units of ``hr``), the parameter ``A`` (units of ``hr**-2``), and/or the initial condition ``f(0)`` (units of ``kg``), and returns as output the value of ``f(t)`` (units of ``kg``) for each set of input parameters (the default behavior). If other variables are desired in the output (e.g. parameters or derivatives), they can be specified via the ``vars`` option for the model output definition.
+For example, the YAML below defines a model from a system with one ODE equation that can be solved symbolically. The model can take as input ``t`` (the independent variable, units of ``hr``), the parameter ``A`` (units of ``hr**-2``), and/or the initial condition ``f(0)`` (units of ``kg``), and returns as output the value of ``f(t)`` (units of ``kg``) and ``d^2f/dt^2`` (units of ``kg/hr``) for each set of input parameters. The ``vars`` option in the model output definition can include independent variables, derivatives of the independent variables, parameters, or initial conditions, but will default to just the independent variable values if not defined.
 
 .. include:: examples/ode1_yml.rst
 
@@ -40,13 +40,29 @@ Units can be attached to any variable in the equations by adding them to the val
 Special Symbols
 ---------------
 
-For the most part, |yggdrasil| can infer which symbols in the equations should be parameters, dependent variables, or the independent variable, but sometimes it is necessary to provide some direction as `some symbols <https://docs.sympy.org/latest/modules/functions/special.html>`_ have a special meaning to SymPy and will be interpreted as such unless otherwise directed. If you would like to use one as a parameter or variable in an equations, be sure to explicitly specify it in the YAML under the ``parameters``, ``independent_var``, or ``dependent_vars`` option as in the :ref:`ode2` example which includes and ``E1`` parameter that conflicts with SymPy's `E1 generalized exponential integral <https://docs.sympy.org/latest/modules/functions/special.html#sympy.functions.special.error_functions.E1>`_.
+For the most part, |yggdrasil| can infer which symbols in the equations should be parameters, dependent variables, or the independent variable, but sometimes it is necessary to provide some direction as `some symbols <https://docs.sympy.org/latest/modules/functions/special.html>`_ have a special meaning to SymPy and will be interpreted as such unless otherwise directed. If you would like to use one as a parameter or variable in an equations, be sure to explicitly specify it in the YAML under the ``parameters``, ``independent_var``, or ``dependent_vars`` option as in the :ref:`ode2` example which includes an ``E1`` parameter that conflicts with SymPy's `E1 generalized exponential integral <https://docs.sympy.org/latest/modules/functions/special.html#sympy.functions.special.error_functions.E1>`_.
 
 Assumptions
 -----------
 
-The ``assumptions`` parameter allows you to place constraints on the variables in the equations that may assist in finding a symbolic solution. For example, the YAML below constrains the equation parameters ``m``, ``k``, & ``b`` to be positive and the dependent variable ``y`` to be a real number. These constraints make in possible for SymPy to solve the equations symbolically.
+The ``assumptions`` parameter allows you to place constraints on the variables in the equations that may assist in finding a symbolic solution. For example, the YAML below constrains the equation parameters ``m``, ``k``, & ``b`` to be positive and the dependent variable ``y`` to be a real number. These constraints make it possible for SymPy to solve the equations symbolically.
 
 .. include:: examples/ode4_yml.rst
 
 A list of supported assumptions can be found `here <https://docs.sympy.org/latest/modules/core.html#module-sympy.core.assumptions>`_.
+
+LaTeX Notation
+--------------
+
+Equations may also be specified in LaTeX notation. For example, the YAML below uses LaTeX notation for its equations and variables
+
+.. include:: examples/ode5_yml.rst
+
+It should be noted that currently (as of Dec. 8 2021), the default treatment is to assume that multiple characters in a LaTeX expression (e.g. ``Rp``) represent implicit multiplication (i.e. ``R*p``). If you want to use multi-character symbols, you will need to preface them with a backslash (i.e. ``\Rp``) in the YAML (note that this does not work for numbers). See `this issue <https://github.com/sympy/sympy/issues/15624>`_ for a discussion of this decision and to track any updates.
+
+Equations File
+--------------
+
+For convenience, equations can also be read from a separate file. For example, the YAML below specifies a file called ``equations.txt`` in the same directory as the YAML that contains the ODE equations. An additional ``encoding`` parameter can also be set to control the encoding used when reading the equations from the file.
+
+.. include:: examples/ode6_yml.rst

@@ -1,3 +1,4 @@
+antlr-python-runtime  # [conda]
 cmake; platform_system != 'Windows'  # [conda,c]
 czmq             # [conda,zmq,c]
 matplotlib       # [conda]

@@ -2,17 +2,18 @@
 model:
   name: ode5
   language: ode
-  args: dRp/dt = (k1*S*(Rt-Rp)/(km1+Rt-Rp)) - k2*Rp/(km2+Rp)
+  args: \frac{dR_p}{dt} = \frac{k_1*S*(R_t-R_p)}{k_{m_1}+R_t-R_p} - \frac{k_2*R_p}{k_{m_2}+R_p}
   compute_method: steady_state
+  use_latex: true
   parameters:
-    k1: 1.0
-    k2: 1.0
-    Rt: 1.0
-    km1: 0.05
-    km2: 0.05
+    k_1: 1.0
+    k_2: 1.0
+    R_t: 1.0
+    k_{m_1}: 0.05
+    k_{m_2}: 0.05
     S: 0.0  # Explicit to avoid conflict with SymPy SingletonRegistry
   boundary_conditions:
-    Rp(0): 1.0
+    R_p(0): 1.0
   inputs:
     - name: input
       default_file:

@@ -55,6 +55,7 @@ requirements:
     - sysv_ipc  # [unix]
     - zeromq
   run:
+    - antlr-python-runtime
     - chevron
     - cmake  # [not win]
     - czmq
