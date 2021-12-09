@@ -316,8 +316,10 @@ definitions:
           description: '[DEPRECATED] Arguments that should be provided to the driver.'
           type: string
         callbacks:
-          description: One or more functions that should be called each time a message
-            is received. The functions should take the message as input.
+          default: []
+          description: 'One or more functions that should be called each time a message
+            is received. The functions should take the message as input. Entries can
+            also be dictionaries with the following fields:'
           items:
             oneOf:
             - type: function
@@ -325,6 +327,7 @@ definitions:
                 function:
                   type: function
                 interval:
+                  default: 1
                   type: integer
               required:
               - function

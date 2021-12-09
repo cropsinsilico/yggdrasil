@@ -296,12 +296,12 @@ class TestConnectionDriver(base_class):
         instance.close_comm()
         assert(instance.is_comm_closed)
 
-    @pytest.fixture
+    @pytest.fixture(scope="class")
     def nmsg_send(self):
         r"""Number of messages to send."""
         return 1
 
-    @pytest.fixture
+    @pytest.fixture(scope="class")
     def nmsg_recv(self, icomm_name, testing_options, nmsg_send):
         r"""Expected number of messages."""
         if icomm_name == 'value':
@@ -476,7 +476,7 @@ class TestConnectionDriverTranslate(TestConnectionDriver):
 class TestConnectionDriverCallback(TestConnectionDriver):
     r"""Test class for the ConnectionDriver class with callbacks."""
 
-    @pytest.fixture
+    @pytest.fixture(scope="class")
     def nmsg_send(self):
         r"""Number of messages to send."""
         return 3

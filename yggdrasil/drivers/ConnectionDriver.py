@@ -248,7 +248,7 @@ class ConnectionDriver(Driver):
                            {'type': 'function'},
                            {'$ref': '#/definitions/transform'}]}},
         'onexit': {'type': 'string'},
-        'callbacks': {'type': 'array',
+        'callbacks': {'type': 'array', 'default': [],
                       'items': {'oneOf': [
                           {'type': 'function'},
                           {'type': 'object',
