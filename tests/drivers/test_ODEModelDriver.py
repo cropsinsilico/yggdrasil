@@ -29,4 +29,4 @@ def test_mistmatched_t():
     with pytest.raises(ODEError):
         ODEModel(['dx/dt = x**2', 'dy/dq = y**2'])
     with pytest.raises(ODEError):
-        ODEModel(['dx(0)/dt = 5.0'])
+        ODEModel(['dx(0)/dt = 5.0', 'dy(1)/dt = 1.0'])
