@@ -63,6 +63,6 @@ It should be noted that currently (as of Dec. 8 2021), the default treatment is 
 Equations File
 --------------
 
-For convenience, equations can also be read from a separate file. For example, the YAML below specifies a file called ``equations.txt`` in the same directory as the YAML that contains the ODE equations. An additional ``encoding`` parameter can also be set to control the encoding used when reading the equations from the file.
+For convenience, equations can also be read from a separate file. For example, the YAML below specifies a file called ``equations.txt`` in the same directory as the YAML that contains the ODE equations. An additional ``encoding`` parameter can also be set to control the encoding used when reading the equations from the file. Currently, equation files are expected to be text files with one equation per line.
 
 .. include:: examples/ode6_yml.rst
