@@ -12,6 +12,6 @@ pyzmq
 requests
 scipy
 six
-sysv_ipc
+sysv_ipc; platform_system != 'Windows'
 unyt
 GitPython
