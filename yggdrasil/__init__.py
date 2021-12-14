@@ -3,7 +3,7 @@ such that they can be run simultaneously, passing input back and forth."""
 import os
 import sys
 import shutil
-from ._version import get_versions
+from . import _version
 from yggdrasil import platform, config
 from yggdrasil.runner import YggFunction
 _test_package_name = None
@@ -50,5 +50,4 @@ def import_as_function(model_yaml, service_address=None, **kwargs):
 
 
 __all__ = []
-__version__ = get_versions()['version']
-del get_versions
+__version__ = _version.get_versions()['version']

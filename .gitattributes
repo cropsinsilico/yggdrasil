@@ -1,1 +1,2 @@
 cis_interface/_version.py export-subst
+yggdrasil/_version.py export-subst
