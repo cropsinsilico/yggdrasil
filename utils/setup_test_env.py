@@ -552,7 +552,8 @@ def itemize_deps(method, for_development=False,
             used.
 
     """
-    from install_from_requirements import get_pip_dependency_version
+    from install_from_requirements import (
+        get_pip_dependency_version, DependencyNotFound)
     out = {'conda': [], 'pip': [], 'os': [], 'skip': [],
            'apt': [], 'brew': [], 'choco': [], 'vcpkg': [],
            'requirements': ['requirements_optional.txt'],
@@ -693,7 +694,7 @@ def itemize_deps(method, for_development=False,
                     "conda if a conda environment is being used to avoid "
                     "inconsistencies)." % new_numpy_ver)
             numpy_ver = new_numpy_ver
-        except (ImportError, ModuleNotFoundError):
+        except (ImportError, ModuleNotFoundError, DependencyNotFound):
             pass
         out['conda'].insert(0, numpy_ver.replace('==', '>='))
         out['skip'].append('libroadrunner')
