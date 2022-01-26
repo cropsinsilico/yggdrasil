@@ -26,11 +26,13 @@ public:
     property names to types.
     @param[in] use_generic bool If true, serialized/deserialized
     objects will be expected to be YggGeneric classes.
+    @param[in] field_names Array of field names associated with the type.
   */
   JSONObjectMetaschemaType(const MetaschemaTypeMap properties,
-			   const bool use_generic=true) :
+			   const bool use_generic=true,
+			   const std::vector<std::string> field_names = {}) :
     // Always generic
-    MetaschemaType("object", true) {
+    MetaschemaType("object", true, field_names) {
     UNUSED(use_generic);
     strncpy(prop_key_, "properties", 100);
     update_properties(properties, true);
@@ -166,7 +168,7 @@ public:
     @brief Create a copy of the type.
     @returns pointer to new JSONObjectMetaschemaType instance with the same data.
    */
-  JSONObjectMetaschemaType* copy() const override { return (new JSONObjectMetaschemaType(properties_, use_generic())); }
+  JSONObjectMetaschemaType* copy() const override { return (new JSONObjectMetaschemaType(properties_, use_generic(), field_names())); }
   /*!
     @brief Print information about the type to stdout.
     @param[in] indent char* Indentation to add to display output.
@@ -270,21 +272,39 @@ public:
     @brief Get number of items in type.
     @returns size_t Number of items in type.
    */
-  size_t nitems() const { return properties_.size(); }
+  size_t nitems() const override { return properties_.size(); }
   /*!
     @brief Get types for properties.
     @returns MetaschemaTypeMap Map from property
     names to types.
    */
-  MetaschemaTypeMap properties() const { return properties_; }
+  MetaschemaTypeMap properties() const override { return properties_; }
+  /*!
+    @brief Get types for items.
+    @returns MetaschemaTypeVector Array item types.
+   */
+  MetaschemaTypeVector items() const override {
+    MetaschemaTypeVector out;
+    const std::vector<std::string> &field_names0 = field_names();
+    if (properties_.size() != field_names0.size())
+      ygglog_throw_error("JSONObjectMetaschemaType::items: The number of field names (%d) does not match the number of properties (%d).", field_names0.size(), properties_.size());
+    for (auto it = field_names0.begin(); it != field_names0.end(); it++)
+      out.push_back(properties_.at(*it)->copy());
+    return out;
+  }
   /*!
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
    */
   void update(const MetaschemaType* new_info) override {
-    MetaschemaType::update(new_info);
-    JSONObjectMetaschemaType* new_info_obj = (JSONObjectMetaschemaType*)new_info;
-    update_properties(new_info_obj->properties());
+    if ((strcmp("array", new_info->type()) == 0) && (new_info->field_names().size() > 0)) {
+      update_field_names(new_info->field_names());
+      update_properties(new_info->properties());
+    } else {
+      MetaschemaType::update(new_info);
+      JSONObjectMetaschemaType* new_info_obj = (JSONObjectMetaschemaType*)new_info;
+      update_properties(new_info_obj->properties());
+    }
   }
   /*!
     @brief Update the type associated with a key.
@@ -312,6 +332,8 @@ public:
     if (force) {
       free_properties();
     }
+    if ((field_names().size() > 0) && (field_names().size() != new_properties.size()))
+      ygglog_throw_error("JSONArrayMetaschemaType::update_properties: There are %d field names, but only %d properties.", field_names().size(), new_properties.size());
     if (properties_.size() > 0) {
       if (properties_.size() != new_properties.size()) {
 	ygglog_throw_error("JSONObjectMetaschemaType::update_properties: Cannot update object with %ld elements from an object with %ld elements.",
@@ -364,6 +386,15 @@ public:
 	}
       }
     }
+  }
+  /*!
+    @brief Update the instance's field_names attribute.
+    @param[in] new_field_names Vector of new field names.
+   */
+  void update_field_names(const std::vector<std::string> new_field_names) override {
+    if ((properties_.size() != 0) && (new_field_names.size() != properties_.size()))
+      ygglog_throw_error("JSONObjectMetaschemaType::update_field_names: There are %d properties, but only %d field names.", properties_.size(), new_field_names.size());
+    MetaschemaType::update_field_names(new_field_names);
   }
   /*!
     @brief Get the type associated with a property.
@@ -691,39 +722,50 @@ public:
       ygglog_error("JSONObjectMetaschemaType::decode_data: Generic object is NULL.");
       return false;
     }
+    bool to_array = (strcmp(x->get_type()->type(), "array") == 0);
+    YggGenericMap* arg;
+    if (to_array) {
+      arg = new YggGenericMap();
+      YggGenericVector* argm = (YggGenericVector*)(x->init_generic_vector(items()));
+      const std::vector<std::string> &field_names0 = field_names();
+      for (size_t i = 0; i < argm->size(); i++)
+	(*arg)[field_names0[i]] = (*argm)[i];
+    } else {
+      arg = (YggGenericMap*)(x->init_generic_map(properties_));
+    }
     MetaschemaTypeMap::const_iterator it;
-    YggGenericMap** arg = (YggGenericMap**)(x->get_data_pointer());
-    if (arg == NULL) {
-      ygglog_error("JSONObjectMetaschemaType::decode_data: Data pointer is NULL.");
-      return false;
-    }
-    if (arg[0] == NULL) {
-      arg[0] = new YggGenericMap();
-      for (it = properties_.begin(); it != properties_.end(); it++) {
-	(**arg)[it->first] = (new YggGeneric(it->second, NULL, 0));
-      }
-    } else if ((arg[0])->size() == 0) {
-      for (it = properties_.begin(); it != properties_.end(); it++) {
-	(**arg)[it->first] = (new YggGeneric(it->second, NULL, 0));
-      }
-    }
     for (it = properties_.begin(); it != properties_.end(); it++) {
       if (!(data.HasMember(it->first.c_str()))) {
 	ygglog_error("JSONObjectMetaschemaType::decode_data: Data doesn't have member '%s'.",
 		     it->first.c_str());
 	return false;
       }
-      YggGenericMap::iterator iarg = (*arg)->find(it->first);
-      if (iarg == (*arg)->end()) {
+      YggGenericMap::iterator iarg = arg->find(it->first);
+      if (iarg == arg->end()) {
 	ygglog_error("JSONObjectMetaschemaType::decode_data: Destination dosn't have member '%s'.", it->first.c_str());
 	return false;
       }
       if (!(it->second->decode_data(data[it->first.c_str()], iarg->second)))
 	return false;
     }
+    if (to_array)
+      delete arg;
     return true;
   }
 
+  /*!
+    @brief Check if this type is capable of receiving data of this type.
+    @param[in] other Type to check.
+   */
+  bool is_compatible(const MetaschemaType* other) const override {
+    if (!(MetaschemaType::is_compatible(other))) {
+      if ((strcmp(other->type(), "array") == 0) && (other->field_names().size() > 0) && ((field_names().size() == 0) || (other->field_names() == field_names())) && ((nitems() == 0) || compare_vectors(other->items(), items())))
+	return true;
+      return false;
+    }
+    return true;
+  }
+  
 private:
   char prop_key_[100];
   MetaschemaTypeMap properties_;

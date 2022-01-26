@@ -27,13 +27,16 @@ public:
     @param[in] type const character pointer to the name of the type.
     @param[in] use_generic bool If true, serialized/deserialized
     objects will be expected to be YggGeneric classes.
+    @param[in] field_names Array of field names associated with the type.
     @param[in] always_generic bool If true, the datatype will always be
     assumed to expect YggGeneric instances.
    */
   MetaschemaType(const char* type, const bool use_generic=false,
+		 const std::vector<std::string> field_names = {},
 		 const bool always_generic=false) :
     type_((const char*)malloc(STRBUFF)), type_code_(-1), updated_(false),
-    nbytes_(0), use_generic_(use_generic), always_generic_(always_generic) {
+    nbytes_(0), use_generic_(use_generic), field_names_(field_names),
+    always_generic_(always_generic) {
     if (always_generic_)
       update_use_generic(true);
     update_type(type);
@@ -90,7 +93,8 @@ public:
     @param[in] other MetaschemaType* Instance to copy.
    */
   MetaschemaType(const MetaschemaType &other) :
-    MetaschemaType(other.type(), other.use_generic()) {}
+    MetaschemaType(other.type(), other.use_generic(), other.field_names()) {
+  }
   /*!
     @brief Destructor for MetaschemaType.
     Free the type string malloc'd during constructor.
@@ -133,7 +137,7 @@ public:
     @returns pointer to new MetaschemaType instance with the same data.
    */
   virtual MetaschemaType* copy() const {
-    return (new MetaschemaType(type_, use_generic_));
+    return (new MetaschemaType(type_, use_generic_, field_names_));
   }
   /*!
     @brief Print information about the type to stdout.
@@ -143,6 +147,12 @@ public:
     printf("%s%-15s = %s\n", indent, "type", type_);
     printf("%s%-15s = %d\n", indent, "type_code", type_code_);
     printf("%s%-15s = %d\n", indent, "use_generic", use_generic_);
+    if (field_names_.size() > 0) {
+      printf("%s%-15s = [\"%s\"", indent, "field_names", field_names_[0].c_str());
+      for (size_t i = 1; i < field_names_.size(); i++)
+	printf(", \"%s\"", field_names_[i].c_str());
+      printf("]\n");
+    }
   }
   /*!
     @brief Get type information as a Python dictionary.
@@ -268,6 +278,40 @@ public:
    */
   const bool use_generic() const { return use_generic_; }
   /*!
+    @brief Get number of items in type.
+    @returns size_t Number of items in type.
+   */
+  virtual size_t nitems() const { return 1; }
+  /*!
+    @brief Get types for items.
+    @returns MetaschemaTypeVector Array item types.
+   */
+  virtual std::vector<MetaschemaType*> items() const {
+    std::vector<MetaschemaType*> out;
+    out.push_back(this->copy());
+    return out;
+  }
+  /*!
+    @brief Get types for properties.
+    @returns MetaschemaTypeMap Map from property
+    names to types.
+   */
+  virtual std::map<std::string, MetaschemaType*> properties() const {
+    std::map<std::string, MetaschemaType*> out;
+    const std::vector<std::string> &field_names0 = field_names();
+    const std::vector<MetaschemaType*> items0 = items();
+    if (items0.size() != field_names0.size())
+      ygglog_throw_error("MetaschemaType::properties: The number of field names (%d) does not match the number of items (%d).", field_names0.size(), items0.size());
+    for (size_t i = 0; i < items0.size(); i++)
+      out[field_names0[i]] = items0[i]->copy();
+    return out;
+  }
+  /*!
+    @brief Get the value of class attribute field_names.
+    @returns Vector fo field names.
+   */
+  const std::vector<std::string> field_names() const { return field_names_; }
+  /*!
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
    */
@@ -283,6 +327,7 @@ public:
       ygglog_throw_error("MetaschemaType::update: Cannot update type %s to type %s.",
 			 type_, new_info->type());
     }
+    update_field_names(new_info->field_names_);
     updated_ = true;
   }
   /*!
@@ -412,6 +457,17 @@ public:
       *use_generic_modifier = true;
     else
       *use_generic_modifier = new_use_generic;
+  }
+  /*!
+    @brief Update the instance's field_names attribute.
+    @param[in] new_field_names Vector of new field names.
+   */
+  virtual void update_field_names(const std::vector<std::string> new_field_names) {
+    if (new_field_names.size() > 0) {
+      field_names_.clear(); // TODO: Check for existing field names?
+      for (auto it = new_field_names.begin(); it != new_field_names.end(); it++)
+	field_names_.push_back(*it);
+    }
   }
   /*!
     @brief Set the type length.
@@ -1465,7 +1521,7 @@ public:
 			 "The type associated with the generic "
 			 "object is NULL.");
     }
-    if (*(x->get_type()) != (*this)) {
+    if (!(x->get_type()->is_compatible(this))) {
       printf("Generic object's type:\n");
       x->get_type()->display();
       printf("Deserializing type:\n");
@@ -1491,6 +1547,14 @@ public:
     return 0;
   }
 
+  /*!
+    @brief Check if this type is capable of receiving data of this type.
+    @param[in] other Type to check.
+   */
+  virtual bool is_compatible(const MetaschemaType* other) const {
+    return (*this == *other);
+  }
+
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 private:
   const char *type_;
@@ -1500,6 +1564,7 @@ protected:
 private:
   const int nbytes_;
   const bool use_generic_;
+  std::vector<std::string> field_names_;
 protected:
   bool always_generic_;
   std::vector<size_t> skip_before_;
@@ -1741,7 +1806,6 @@ size_t YggGeneric::get_data_map_size() const {
   return map->size();
 };
 bool YggGeneric::has_data_map_key(char* key) const {
-  size_t i;
   if (type->type_code() != T_OBJECT) {
     ygglog_throw_error("YggGeneric::get_data_map_keys: Object is not a map.");
   }
@@ -1880,9 +1944,77 @@ void YggGeneric::set_data_map_item(const char *key,
   (*map)[key] = value->copy();
 };
 
+void* YggGeneric::init_generic_map(const std::map<std::string, MetaschemaType*> properties, const bool allow_other_type) {
+  YggGenericMap* arg0 = NULL;
+  YggGenericMap** arg = NULL;
+  if (strcmp(get_type()->type(), "object") == 0)
+    arg = (YggGenericMap**)(&data);
+  else if (allow_other_type)
+    arg = &arg0;
+  else
+    ygglog_throw_error("YggGeneric::init_generic_map: Data is not an object.");
+  if (arg == NULL)
+    ygglog_throw_error("YggGeneric::init_generic_map: Data pointer is NULL.");
+  if (arg[0] == NULL)
+    arg[0] = new YggGenericMap();
+  if ((arg[0])->size() == 0) {
+    for (auto it = properties.begin(); it != properties.end(); it++)
+      (**arg)[it->first] = (new YggGeneric(it->second, NULL, 0));
+  }
+  if (strcmp(get_type()->type(), "object") != 0)
+    return (void*)arg0;
+  return get_data();
+};
+void* YggGeneric::init_generic_vector(const std::vector<MetaschemaType*> items, const bool allow_other_type) {
+  YggGenericVector* arg0 = NULL;
+  YggGenericVector** arg = NULL;
+  if (strcmp(get_type()->type(), "array") == 0)
+    arg = (YggGenericVector**)(&data);
+  else if (allow_other_type)
+    arg = &arg0;
+  else
+    ygglog_throw_error("YggGeneric::init_generic_vector: Data is not an array.");
+  if (arg == NULL)
+    ygglog_throw_error("YggGeneric::init_generic_vector: Data pointer is NULL.");
+  if (arg[0] == NULL)
+    arg[0] = new YggGenericVector();
+  if ((arg[0])->size() == 0) {
+    for (auto it = items.begin(); it != items.end(); it++)
+      (arg[0])->push_back((new YggGeneric(*it, NULL, 0)));
+  }
+  if (strcmp(get_type()->type(), "array") != 0)
+    return (void*)arg0;
+  return get_data();
+};
 
 typedef std::map<std::string, MetaschemaType*> MetaschemaTypeMap;
 typedef std::vector<MetaschemaType*> MetaschemaTypeVector;
+
+
+bool compare_maps(const MetaschemaTypeMap& a, const MetaschemaTypeMap& b) {
+  if (a.size() != b.size())
+    return false;
+  MetaschemaTypeMap::const_iterator bit;
+  for (auto ait = a.begin(); ait != a.end(); ait++) {
+    bit = b.find(ait->first);
+    if (bit == b.end())
+      return false;
+    if (*(ait->second) != *(bit->second))
+      return false;
+  }
+  return true;
+};
+
+
+bool compare_vectors(const MetaschemaTypeVector& a, const MetaschemaTypeVector& b) {
+  if (a.size() != b.size())
+    return false;
+  for (auto ait = a.begin(), bit = b.begin(); ait != a.end(); ait++, bit++) {
+    if (**ait != **bit)
+      return false;
+  }
+  return true;
+};
 
 #endif /*METASCHEMA_TYPE_H_*/
 // Local Variables:

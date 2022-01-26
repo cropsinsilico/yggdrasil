@@ -107,7 +107,19 @@ MetaschemaType* type_from_header_doc(const rapidjson::Value &header_doc,
     ygglog_throw_error("type_from_header_doc: Parsed header dosn't contain a 'datatype' entry.");
   if (!(header_doc["datatype"].IsObject()))
     ygglog_throw_error("type_from_header_doc: Parsed datatype is not an object.");
-  return type_from_doc(header_doc["datatype"], use_generic, &header_doc);
+  MetaschemaType* out = type_from_doc(header_doc["datatype"], use_generic, &header_doc);
+  if (header_doc.HasMember("field_names")) {
+    if (!(header_doc["field_names"].IsArray()))
+      ygglog_throw_error("type_from_header_doc: field_names must be an array.");
+    std::vector<std::string> field_names;
+    for (size_t i = 0; i < header_doc["field_names"].Size(); i++) {
+      if (!(header_doc["field_names"][i].IsString()))
+	ygglog_throw_error("type_from_header_doc: Field name %d is not a string.", i);
+      field_names.push_back(header_doc["field_names"][i].GetString());
+    }
+    out->update_field_names(field_names);
+  }
+  return out;
 };
 
 
@@ -1590,48 +1602,34 @@ extern "C" {
     }
     return out;
   }
-  int8_t generic_map_get_int8(generic_t x, const char* key) {
-    return ((int8_t*)generic_map_get_scalar(x, key, "int", 8*sizeof(int8_t)))[0];
-  }
-  int16_t generic_map_get_int16(generic_t x, const char* key) {
-    return ((int16_t*)generic_map_get_scalar(x, key, "int", 8*sizeof(int16_t)))[0];
-  }
-  int32_t generic_map_get_int32(generic_t x, const char* key) {
-    return ((int32_t*)generic_map_get_scalar(x, key, "int", 8*sizeof(int32_t)))[0];
-  }
-  int64_t generic_map_get_int64(generic_t x, const char* key) {
-    return ((int64_t*)generic_map_get_scalar(x, key, "int", 8*sizeof(int64_t)))[0];
-  }
-  uint8_t generic_map_get_uint8(generic_t x, const char* key) {
-    return ((uint8_t*)generic_map_get_scalar(x, key, "uint", 8*sizeof(uint8_t)))[0];
-  }
-  uint16_t generic_map_get_uint16(generic_t x, const char* key) {
-    return ((uint16_t*)generic_map_get_scalar(x, key, "uint", 8*sizeof(uint16_t)))[0];
-  }
-  uint32_t generic_map_get_uint32(generic_t x, const char* key) {
-    return ((uint32_t*)generic_map_get_scalar(x, key, "uint", 8*sizeof(uint32_t)))[0];
-  }
-  uint64_t generic_map_get_uint64(generic_t x, const char* key) {
-    return ((uint64_t*)generic_map_get_scalar(x, key, "uint", 8*sizeof(uint64_t)))[0];
-  }
-  float generic_map_get_float(generic_t x, const char* key) {
-    return ((float*)generic_map_get_scalar(x, key, "float", 8*sizeof(float)))[0];
-  }
-  double generic_map_get_double(generic_t x, const char* key) {
-    return ((double*)generic_map_get_scalar(x, key, "float", 8*sizeof(double)))[0];
-  }
-  long double generic_map_get_long_double(generic_t x, const char* key) {
-    return ((long double*)generic_map_get_scalar(x, key, "float", 8*sizeof(long double)))[0];
-  }
-  complex_float_t generic_map_get_complex_float(generic_t x, const char* key) {
-    return ((complex_float_t*)generic_map_get_scalar(x, key, "complex", 8*sizeof(complex_float_t)))[0];
-  }
-  complex_double_t generic_map_get_complex_double(generic_t x, const char* key) {
-    return ((complex_double_t*)generic_map_get_scalar(x, key, "complex", 8*sizeof(complex_double_t)))[0];
-  }
-  complex_long_double_t generic_map_get_complex_long_double(generic_t x, const char* key) {
-    return ((complex_long_double_t*)generic_map_get_scalar(x, key, "complex", 8*sizeof(complex_long_double_t)))[0];
-  }
+
+#define GENERIC_MAP_GET(subtype, dtype, name) \
+  dtype generic_map_get_ ## name(generic_t x, const char* key) { \
+  dtype* ptr = (dtype*)(generic_map_get_scalar(x, key, #subtype, 8*sizeof(dtype))); \
+  dtype out;								\
+  memcpy(&out, ptr, sizeof(dtype));					\
+  return out; }
+#define GENERIC_MAP_GET_I(subtype, precision)				\
+  GENERIC_MAP_GET(subtype, subtype ## precision ## _t, subtype ## precision)
+  
+  GENERIC_MAP_GET_I(int, 8);
+  GENERIC_MAP_GET_I(int, 16);
+  GENERIC_MAP_GET_I(int, 32);
+  GENERIC_MAP_GET_I(int, 64);
+  GENERIC_MAP_GET_I(uint, 8);
+  GENERIC_MAP_GET_I(uint, 16);
+  GENERIC_MAP_GET_I(uint, 32);
+  GENERIC_MAP_GET_I(uint, 64);
+  GENERIC_MAP_GET(float, float, float);
+  GENERIC_MAP_GET(float, double, double);
+  GENERIC_MAP_GET(float, long double, long_double);
+  GENERIC_MAP_GET(complex, complex_float_t, complex_float);
+  GENERIC_MAP_GET(complex, complex_double_t, complex_double);
+  GENERIC_MAP_GET(complex, complex_long_double_t, complex_long_double);
+  
+#undef GENERIC_MAP_GET_I
+#undef GENERIC_MAP_GET
+
   char* generic_map_get_bytes(generic_t x, const char* key) {
     return ((char**)generic_map_get_scalar(x, key, "bytes", 0))[0];
   }
@@ -3262,7 +3260,23 @@ extern "C" {
       } else {
 	MetaschemaType *type1 = dtype2class(dtype1);
 	MetaschemaType *type2 = dtype2class(dtype2);
-	type1->update(type2);
+	if ((strcmp(type1->type(), "object") == 0) &&
+	    (strcmp(type2->type(), "array") == 0) &&
+	    (type2->field_names().size() > 0)) {
+	  JSONObjectMetaschemaType* type1_obj = (JSONObjectMetaschemaType*)type1;
+	  JSONArrayMetaschemaType* type2_arr = (JSONArrayMetaschemaType*)type2;
+	  MetaschemaTypeMap properties = type2_arr->properties();
+	  type1_obj->update_properties(properties);
+	} else if ((strcmp(type1->type(), "array") == 0) &&
+		   (strcmp(type2->type(), "object") == 0) &&
+		   (type2->field_names().size() > 0)) {
+	  JSONArrayMetaschemaType* type1_arr = (JSONArrayMetaschemaType*)type1;
+	  JSONObjectMetaschemaType* type2_obj = (JSONObjectMetaschemaType*)type2;
+	  MetaschemaTypeVector items = type2_obj->items();
+	  type1_arr->update_items(items);
+	} else {
+	  type1->update(type2);
+	}
 	strcpy(dtype1->type, type1->type());
       }
     } catch (...) {

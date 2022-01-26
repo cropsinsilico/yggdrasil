@@ -28,11 +28,13 @@ public:
     item types. Defaults to empty string.
     @param[in] use_generic bool If true, serialized/deserialized
     objects will be expected to be YggGeneric classes.
+    @param[in] field_names Array of field names associated with the type.
   */
   JSONArrayMetaschemaType(const MetaschemaTypeVector items,
 			  const char *format_str = "",
-			  const bool use_generic=true) :
-    MetaschemaType("array", use_generic) {
+			  const bool use_generic=true,
+			  const std::vector<std::string> field_names = {}) :
+    MetaschemaType("array", use_generic, field_names) {
     if ((items.size() == 0) && (strlen(format_str) == 0)){
       update_use_generic(true);
     }
@@ -64,11 +66,17 @@ public:
       ygglog_throw_error("JSONArrayMetaschemaType: Items must be an array.");
     rapidjson::SizeType i;
     MetaschemaTypeVector items;
+    std::vector<std::string> new_field_names;
     for (i = 0; i < type_doc[item_key_].Size(); i++) {
       MetaschemaType* iitem = (MetaschemaType*)type_from_doc_c(&(type_doc[item_key_][i]), MetaschemaType::use_generic());
       if (iitem == NULL)
 	ygglog_throw_error("JSONArrayMetaschemaType: Error reconstructing item %lu from JSON document.", i);
       items.push_back(iitem);
+      if (type_doc[item_key_][i].HasMember("title")) {
+	if (!(type_doc[item_key_][i]["title"].IsString()))
+	  ygglog_throw_error("JSONArrayMetaschemaType: Title for element %lu is not a string.", i);
+	new_field_names.push_back(type_doc[item_key_][i]["title"].GetString());
+      }
     }
     update_items(items, true);
     for (i = 0; i < items.size(); i++) {
@@ -76,6 +84,7 @@ public:
       items[i] = NULL;
     }
     items.clear();
+    update_field_names(new_field_names);
   }
   /*!
     @brief Constructor for JSONArrayMetaschemaType from Python dictionary.
@@ -169,7 +178,7 @@ public:
     @brief Create a copy of the type.
     @returns pointer to new JSONArrayMetaschemaType instance with the same data.
    */
-  JSONArrayMetaschemaType* copy() const override { return (new JSONArrayMetaschemaType(items_, format_str_, use_generic())); }
+  JSONArrayMetaschemaType* copy() const override { return (new JSONArrayMetaschemaType(items_, format_str_, use_generic(), field_names())); }
   /*!
     @brief Print information about the type to stdout.
     @param[in] indent char* Indentation to add to display output.
@@ -279,12 +288,12 @@ public:
     @brief Get number of items in type.
     @returns size_t Number of items in type.
    */
-  size_t nitems() const { return items_.size(); }
+  size_t nitems() const override { return items_.size(); }
   /*!
     @brief Get types for items.
     @returns MetaschemaTypeVector Array item types.
    */
-  MetaschemaTypeVector items() const { return items_; }
+  MetaschemaTypeVector items() const override { return items_; }
   /*!
     @brief Get format string.
     @returns char* Format string.
@@ -350,6 +359,8 @@ public:
     if (force) {
       free_items();
     }
+    if ((field_names().size() > 0) && (field_names().size() != new_items.size()))
+      ygglog_throw_error("JSONArrayMetaschemaType::update_items: There are %d field names, but only %d items.", field_names().size(), new_items.size());
     if (items_.size() > 0) {
       if (items_.size() != new_items.size()) {
 	ygglog_throw_error("JSONArrayMetaschemaType::update_items: Cannot update array with %ld elements from an array with %ld elements.",
@@ -401,6 +412,15 @@ public:
 	}
       }
     }
+  }
+  /*!
+    @brief Update the instance's field_names attribute.
+    @param[in] new_field_names Vector of new field names.
+   */
+  void update_field_names(const std::vector<std::string> new_field_names) override {
+    if ((items_.size() != 0) && (new_field_names.size() != items_.size()))
+      ygglog_throw_error("JSONArrayMetaschemaType::update_field_names: There are %d items, but only %d field names.", items_.size(), new_field_names.size());
+    MetaschemaType::update_field_names(new_field_names);
   }
   /*!
     @brief Get the type associated with an item.
@@ -777,29 +797,43 @@ public:
 		   items_.size(), data.Size());
       return false;
     }
-    YggGenericVector** arg = (YggGenericVector**)(x->get_data_pointer());
-    if (arg[0] == NULL) {
-      arg[0] = new YggGenericVector();
-      for (i = 0; i < (size_t)(items_.size()); i++) {
-	arg[0]->push_back((new YggGeneric(items_[i], NULL, 0)));
-      }
-    } else if ((arg[0])->size() == 0) {
-      for (i = 0; i < (size_t)(items_.size()); i++) {
-	arg[0]->push_back((new YggGeneric(items_[i], NULL, 0)));
-      }
+    bool to_object = (strcmp(x->get_type()->type(), "object") == 0);
+    YggGenericVector* arg;
+    if (to_object) {
+      arg = new YggGenericVector();
+      YggGenericMap* argm = (YggGenericMap*)(x->init_generic_map(properties()));
+      for (auto itm = argm->begin(); itm != argm->end(); itm++)
+	arg->push_back(itm->second);
+    } else {
+      arg = (YggGenericVector*)(x->init_generic_vector(items_));
     }
-    if (items_.size() != (arg[0])->size()) {
+    if (items_.size() != arg->size()) {
       ygglog_error("JSONArrayMetaschemaType::decode_data: %lu items found, but destination has %lu.",
-		   items_.size(), (arg[0])->size());
+		   items_.size(), arg->size());
       return false;
     }
     for (i = 0; i < (size_t)(items_.size()); i++) {
-      if (!(items_[i]->decode_data(data[(rapidjson::SizeType)i], (**arg)[i])))
+      if (!(items_[i]->decode_data(data[(rapidjson::SizeType)i], (*arg)[i])))
 	return false;
     }
+    if (to_object)
+      delete arg;
     return true;
   }
 
+  /*!
+    @brief Check if this type is capable of receiving data of this type.
+    @param[in] other Type to check.
+   */
+  bool is_compatible(const MetaschemaType* other) const override {
+    if (!(MetaschemaType::is_compatible(other))) {
+      if ((strcmp(other->type(), "object") == 0) && (field_names().size() > 0) && (compare_maps(other->properties(), properties())))
+	return true;
+      return false;
+    }
+    return true;
+  }
+  
 private:
   char item_key_[100];
   MetaschemaTypeVector items_;

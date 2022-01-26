@@ -85,7 +85,6 @@ typedef struct comm_head_t {
   // These should be removed once JSON fully implemented
   int serializer_type; //!< Code indicating the type of serializer.
   char format_str[COMMBUFFSIZ]; //!< Format string for serializer.
-  char field_names[COMMBUFFSIZ]; //!< String containing field names.
   char field_units[COMMBUFFSIZ]; //!< String containing field units.
   //
   dtype_t* dtype; //!< Type structure.

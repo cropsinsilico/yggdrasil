@@ -463,6 +463,29 @@ public:
     should be set to.
    */
   void set_data_map_item(const char *key, const YggGeneric* value);
+
+  /*!
+    @brief Initialize ta YggGenericMap object in the data based on a type map.
+    @param[in] properties Map between properties and types to initialize
+    the data from.
+    @param[in] allow_other_type Set to true if types other than 'object'
+    should be allowed. In such cases the data will need to be manually freed
+    as it will not be stored inside this YggGeneric object.
+    @returns Data pointer.
+  */
+  void* init_generic_map(const std::map<std::string, MetaschemaType*> properties,
+			 const bool allow_other_type = false);
+  /*!
+    @brief Initialize ta YggGenericVector object in the data based on a type
+    vector.
+    @param[in] items Array of types to initialize the data from.
+    @param[in] allow_other_type Set to true if types other than 'array'
+    should be allowed. In such cases the data will need to be manually freed
+    as it will not be stored inside this YggGeneric object.
+    @returns Data pointer.
+  */
+  void* init_generic_vector(const std::vector<MetaschemaType*> items,
+			    const bool allow_other_type = false);
   
 };
 

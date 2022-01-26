@@ -21,10 +21,12 @@ public:
     objects will be expected to be YggGeneric classes.
     @param[in] temp_type const MetaschemaType* Type that should be used for
     the next message.
+    @param[in] field_names Array of field names associated with the type.
    */
   AnyMetaschemaType(const bool use_generic=true,
-		    const MetaschemaType* temp_type=NULL) :
-    MetaschemaType("any", true, use_generic), temp_type_(NULL) {
+		    const MetaschemaType* temp_type=NULL,
+		    const std::vector<std::string> field_names = {}) :
+    MetaschemaType("any", true, field_names, use_generic), temp_type_(NULL) {
     if (temp_type != NULL)
       temp_type_ = temp_type->copy();
   }
@@ -116,7 +118,8 @@ public:
    */
   AnyMetaschemaType* copy() const override {
     return (new AnyMetaschemaType(use_generic(),
-				  temp_type()));
+				  temp_type(),
+				  field_names()));
   }
   /*!
     @brief Print information about the type to stdout.
