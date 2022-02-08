@@ -23,6 +23,29 @@ def test_deserialize_nofmt():
         inst.deserialize(test_msg)
 
 
+def test_discover_header_no_header(tmpdir):
+    r"""Test discover_header with single line, two columns, no header and
+    non-default delimiter."""
+    fd0 = tmpdir.join("temp_table.txt")
+    fd0.write(b"13 berlin", 'wb')
+    fd = fd0.open('rb')
+    inst = AsciiTableSerialize.AsciiTableSerialize(delimiter=b' ')
+    inst.deserialize_file_header(fd)
+    assert(inst.format_str == b'%ld %6s\n')
+    assert(inst.field_names == ('f0', 'f1'))
+
+
+def test_discover_header_one_element(tmpdir):
+    r"""Test discover_header with single line, single column, no header."""
+    fd0 = tmpdir.join("temp_table.txt")
+    fd0.write(b"berlin", 'wb')
+    fd = fd0.open('rb')
+    inst = AsciiTableSerialize.AsciiTableSerialize(delimiter=b' ')
+    inst.deserialize_file_header(fd)
+    assert(inst.format_str == b'%6s\n')
+    assert(inst.field_names == ('f0',))
+
+
 _options = [
     {},
     {'explicit_testing_options': {
