@@ -877,7 +877,7 @@ def install_deps(method, return_commands=False, verbose=False,
         pip_flags = '--no-dependencies'
         if verbose:
             pip_flags += ' --verbose'
-        cmds.append('%s -m pip install %s libroadrunner<2.0.7'
+        cmds.append('%s -m pip install %s \"libroadrunner<2.0.7\"'
                     % (python_cmd, pip_flags))
     if install_opts['lpy']:
         if verbose:
