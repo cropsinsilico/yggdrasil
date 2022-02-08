@@ -682,9 +682,9 @@ def itemize_deps(method, for_development=False,
         # sbml will need to be installed separately without deps in order
         # to work in a conda env
         numpy_ver = 'numpy==1.19.3'
+        sbml_ver = 'libroadrunner<2.0.7'
         try:
-            new_numpy_ver = get_pip_dependency_version(
-                'libroadrunner', 'numpy')
+            new_numpy_ver = get_pip_dependency_version(sbml_ver, 'numpy')
             if new_numpy_ver != numpy_ver:
                 warnings.warn(
                     "libroadrunner has updated it's numpy requirement. "
