@@ -261,8 +261,8 @@ class MetaschemaType(object):
             typedef = {}
         if not is_validated:
             if not cls.validate(obj):
-                raise MetaschemaTypeError(("Object could not be encoded as "
-                                           "'%s' type.") % cls.name)
+                raise MetaschemaTypeError(f"Object could not be encoded as "
+                                          f"'{cls.name}' type.")
         out = copy.deepcopy(kwargs)
         for x in cls.properties:
             itypedef = typedef.get(x, out.get(x, None))

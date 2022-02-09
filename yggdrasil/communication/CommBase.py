@@ -544,8 +544,15 @@ class CommBase(tools.YggClass):
              'items': {'anyOf': [
                  {'$ref': '#/definitions/transform'},
                  {'type': ['function', 'string']}]}}]},
-        'vars': {'type': 'array',
-                 'items': {'type': 'string'}},
+        'vars': {
+            'type': 'array',
+            'items': {'anyOf': [
+                {'type': 'string'},
+                {'type': 'object',
+                 'properties': {
+                     'name': {'type': 'string'},
+                     'datatype': {'type': 'schema',
+                                  'default': {'type': 'bytes'}}}}]}},
         'length_map': {
             'type': 'object',
             'additionalProperties': {'type': 'string'}},

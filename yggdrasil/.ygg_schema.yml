@@ -177,7 +177,16 @@ definitions:
           description: Names of variables to be sent/received by this comm. Defaults
             to [].
           items:
-            type: string
+            anyOf:
+            - type: string
+            - properties:
+                datatype:
+                  default:
+                    type: bytes
+                  type: schema
+                name:
+                  type: string
+              type: object
           type: array
       required:
       - commtype
@@ -683,7 +692,16 @@ definitions:
           description: Names of variables to be sent/received by this comm. Defaults
             to [].
           items:
-            type: string
+            anyOf:
+            - type: string
+            - properties:
+                datatype:
+                  default:
+                    type: bytes
+                  type: schema
+                name:
+                  type: string
+              type: object
           type: array
         version:
           default: 1
