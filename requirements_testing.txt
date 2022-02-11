@@ -5,7 +5,8 @@ flaky
 nose
 pytest<7.0.0  # Required by pytest-cov, but not resolved by pip on linux
 pytest-cov
-pytest-timeout
+pytest-timeout<=2.0.2
+pytest-mpi<=0.5
 pytest-drop-dup-tests  # [pip]
 pytest-rerunfailures
 pytest-repeat
