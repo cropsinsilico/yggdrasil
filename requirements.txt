@@ -9,7 +9,7 @@ psutil
 python-rapidjson
 pyyaml
 pyzmq
-requests
+requests<2.27.0
 scipy
 six
 sysv_ipc; platform_system != 'Windows'
