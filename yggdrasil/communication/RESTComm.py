@@ -180,7 +180,6 @@ class RESTComm(CommBase.CommBase):
             r.raise_for_status()
             return int(r.content)
         except requests.exceptions.RequestException as e:  # pragma: debug
-            print(f'n_msg_recv: RequestException({e})')
             self.info(f'n_msg_recv: RequestException({e})')
             return 0
 
