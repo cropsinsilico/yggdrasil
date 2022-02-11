@@ -9,9 +9,7 @@ psutil
 python-rapidjson
 pyyaml
 pyzmq
-requests<=2.26.0
-urllib3<=1.26.7
-charset-normalizer<=2.0.9
+requests
 scipy
 six
 sysv_ipc; platform_system != 'Windows'
