@@ -178,6 +178,7 @@ class RESTComm(CommBase.CommBase):
                 params=self.params,
                 cookies=self.cookies)
             r.raise_for_status()
+            self.info(f"n_msg_recv: \'{r.content}\', {int(r.content)}")
             return int(r.content)
         except requests.exceptions.RequestException as e:  # pragma: debug
             self.info(f'n_msg_recv: RequestException({e})')
