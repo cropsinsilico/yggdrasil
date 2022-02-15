@@ -1,5 +1,5 @@
 chevron
-flask
+flask==2.0.2
 jsonschema==3.2.0
 matplotlib
 numpy>=1.13.0
