@@ -55,7 +55,7 @@ requirements:
     - cmake  # [not win]
     - czmq
     - flaky
-    - flask==3.2.0
+    - flask
     - git
     - GitPython <=3.1.20  # [py==36]
     - GitPython  # [py>36]

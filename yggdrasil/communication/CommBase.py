@@ -1269,9 +1269,7 @@ class CommBase(tools.YggClass):
         r"""bool: True if all received messages have been confirmed."""
         for v in list(self._work_comms.values()):
             if (v.direction == 'recv') and not v.is_confirmed_recv:  # pragma: debug
-                v.info(f"is_confirmed_recv: worker is not confirmed, {v.n_msg_recv}")
                 return False
-        self.info(f"is_confirmed_recv: messages waiting: {self.n_msg_recv}")
         return (self.n_msg_recv == 0)
 
     @property
