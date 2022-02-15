@@ -74,8 +74,7 @@ class RESTComm(CommBase.CommBase):
         'cookies': {'type': 'object'},
         'host': {'type': 'string', 'default': 'http://localhost:{port}'},
         'port': {'type': 'int'}}
-    # _maxMsgSize = 2048  # Based on limit for GET requests on most servers
-    _maxMsgSize = 1000
+    _maxMsgSize = 2048  # Based on limit for GET requests on most servers
 
     def __init__(self, *args, **kwargs):
         self._is_open = False
