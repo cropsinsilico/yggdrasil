@@ -30,19 +30,20 @@ env:
   BUILDDOCS: 0
   YGG_GHA_JOB_ID_SUFFIX: null
   TMPDIR: /tmp/
+  OS_VERSIONS: '{"ubuntu": "latest", "macos": "latest", "windows": "2019"}'
 jobs:
   test_pip:
-    name: Test (${{ matrix.python-version }}, ${{ runner.os }}, ${{ matrix.install-method
+    name: Test (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
       }}, ${{ matrix.test-flags1 }}, ${{ matrix.test-flags2 }}), Install C = ${{ matrix.install-c
       }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os-base }}-${{ fromJSON(env.OS_VERSIONS)[matrix.os-base] }}
     strategy:
       max-parallel: 20
       matrix:
-        os:
-        - ubuntu-latest
-        - macos-latest
-        - windows-2019
+        os-base:
+        - ubuntu
+        - macos
+        - windows
         python-version:
         - 3.7
         install-method:
@@ -59,7 +60,7 @@ jobs:
         install-mpi:
         - true
         include:
-        - os: windows-2019
+        - os-base: windows
           python-version: 3.7
           install-method: pip
           test-flags1: --long-running
@@ -316,17 +317,17 @@ jobs:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: new_environment_log.txt
   test_conda:
-    name: Test (${{ matrix.python-version }}, ${{ runner.os }}, ${{ matrix.install-method
+    name: Test (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
       }}, ${{ matrix.test-flags1 }}, ${{ matrix.test-flags2 }}), Install C = ${{ matrix.install-c
       }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os-base }}-${{ fromJSON(env.OS_VERSIONS)[matrix.os-base] }}
     strategy:
       max-parallel: 20
       matrix:
-        os:
-        - ubuntu-latest
-        - macos-latest
-        - windows-2019
+        os-base:
+        - ubuntu
+        - macos
+        - windows
         python-version:
         - 3.7
         install-method:
@@ -340,28 +341,28 @@ jobs:
         install-mpi:
         - true
         include:
-        - os: ubuntu-latest
+        - os-base: ubuntu
           python-version: 3.6
           install-method: conda
           test-flags1: --long-running
           test-flags2: ''
           install-c: true
           install-mpi: false
-        - os: ubuntu-latest
+        - os-base: ubuntu
           python-version: 3.8
           install-method: conda
           test-flags1: --long-running
           test-flags2: ''
           install-c: true
           install-mpi: false
-        - os: ubuntu-latest
+        - os-base: ubuntu
           python-version: 3.9
           install-method: conda
           test-flags1: --long-running
           test-flags2: ''
           install-c: true
           install-mpi: false
-        - os: macos-latest
+        - os-base: macos
           python-version: 3.8
           install-method: conda
           test-flags1: --suites examples top --parametrize-example-name=rpc_lesson3
@@ -621,9 +622,9 @@ jobs:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: new_environment_log.txt
   test_rmq_pip:
-    name: Test RMQ (${{ matrix.python-version }}, ${{ runner.os }}, ${{ matrix.install-method
+    name: Test RMQ (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
       }})
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os-base }}-${{ fromJSON(env.OS_VERSIONS)[matrix.os-base] }}
     env:
       INSTALLRMQ: 1
       INSTALLAPY: 1
@@ -631,8 +632,8 @@ jobs:
       YGG_DEFAULT_COMM: IPCComm
     strategy:
       matrix:
-        os:
-        - ubuntu-latest
+        os-base:
+        - ubuntu
         python-version:
         - 3.7
         install-method:
@@ -902,17 +903,17 @@ jobs:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: new_environment_log.txt
   test_rmq_conda:
-    name: Test RMQ (${{ matrix.python-version }}, ${{ runner.os }}, ${{ matrix.install-method
+    name: Test RMQ (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
       }})
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os-base }}-${{ fromJSON(env.OS_VERSIONS)[matrix.os-base] }}
     env:
       INSTALLRMQ: 1
       INSTALLAPY: 1
       USEVIRTUALENV: 1
     strategy:
       matrix:
-        os:
-        - ubuntu-latest
+        os-base:
+        - ubuntu
         python-version:
         - 3.7
         install-method:
@@ -1185,9 +1186,9 @@ jobs:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: new_environment_log.txt
   test_stripped:
-    name: Test stripped install (${{ matrix.python-version }}, ${{ runner.os }}, ${{
-      matrix.install-method }})
-    runs-on: ${{ matrix.os }}
+    name: Test stripped install (${{ matrix.python-version }}, ${{ matrix.os-base
+      }}, ${{ matrix.install-method }})
+    runs-on: ${{ matrix.os-base }}-${{ fromJSON(env.OS_VERSIONS)[matrix.os-base] }}
     env:
       INSTALLR: 0
       INSTALLC: 0
@@ -1201,10 +1202,10 @@ jobs:
       YGG_GHA_JOB_ID_SUFFIX: -stripped
     strategy:
       matrix:
-        os:
-        - ubuntu-latest
-        - macos-latest
-        - windows-2019
+        os-base:
+        - ubuntu
+        - macos
+        - windows
         python-version:
         - 3.7
         install-method:
