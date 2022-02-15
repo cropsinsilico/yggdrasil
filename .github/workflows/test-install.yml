@@ -30,13 +30,23 @@ env:
   BUILDDOCS: 0
   YGG_GHA_JOB_ID_SUFFIX: null
   TMPDIR: /tmp/
-  OS_VERSIONS: '{"ubuntu": "latest", "macos": "latest", "windows": "2019"}'
 jobs:
+  params:
+    name: Prepare test parameters
+    runs-on: ubuntu-latest
+    outputs:
+      os-versions: ${{ steps.set-os-versions.outputs.versions }}
+    steps:
+      id: set-os-versions
+      run: echo "::set-output name=versions::{\"ubuntu\":\"latest\", \"macos\":\"latest\",
+        \"windows\":\"2019\"}"
   test_pip:
+    needs: params
     name: Test (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
       }}, ${{ matrix.test-flags1 }}, ${{ matrix.test-flags2 }}), Install C = ${{ matrix.install-c
       }}
-    runs-on: ${{ matrix.os-base }}-${{ fromJSON(env.OS_VERSIONS)[matrix.os-base] }}
+    runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
+      }}
     strategy:
       max-parallel: 20
       matrix:
@@ -317,10 +327,12 @@ jobs:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: new_environment_log.txt
   test_conda:
+    needs: params
     name: Test (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
       }}, ${{ matrix.test-flags1 }}, ${{ matrix.test-flags2 }}), Install C = ${{ matrix.install-c
       }}
-    runs-on: ${{ matrix.os-base }}-${{ fromJSON(env.OS_VERSIONS)[matrix.os-base] }}
+    runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
+      }}
     strategy:
       max-parallel: 20
       matrix:
@@ -622,9 +634,11 @@ jobs:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: new_environment_log.txt
   test_rmq_pip:
+    needs: params
     name: Test RMQ (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
       }})
-    runs-on: ${{ matrix.os-base }}-${{ fromJSON(env.OS_VERSIONS)[matrix.os-base] }}
+    runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
+      }}
     env:
       INSTALLRMQ: 1
       INSTALLAPY: 1
@@ -903,9 +917,11 @@ jobs:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: new_environment_log.txt
   test_rmq_conda:
+    needs: params
     name: Test RMQ (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
       }})
-    runs-on: ${{ matrix.os-base }}-${{ fromJSON(env.OS_VERSIONS)[matrix.os-base] }}
+    runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
+      }}
     env:
       INSTALLRMQ: 1
       INSTALLAPY: 1
@@ -1186,9 +1202,11 @@ jobs:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: new_environment_log.txt
   test_stripped:
+    needs: params
     name: Test stripped install (${{ matrix.python-version }}, ${{ matrix.os-base
       }}, ${{ matrix.install-method }})
-    runs-on: ${{ matrix.os-base }}-${{ fromJSON(env.OS_VERSIONS)[matrix.os-base] }}
+    runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
+      }}
     env:
       INSTALLR: 0
       INSTALLC: 0
