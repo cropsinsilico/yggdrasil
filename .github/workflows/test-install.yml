@@ -37,7 +37,7 @@ jobs:
     outputs:
       os-versions: ${{ steps.set-os-versions.outputs.versions }}
     steps:
-      id: set-os-versions
+    - id: set-os-versions
       run: echo "::set-output name=versions::{\"ubuntu\":\"latest\", \"macos\":\"latest\",
         \"windows\":\"2019\"}"
   test_pip:
