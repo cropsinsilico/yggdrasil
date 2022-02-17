@@ -135,6 +135,22 @@ class ConnectionDriver(Driver):
         outputs (list, optional): One or more dictionaries containing keyword
             arguments for constructing output communicators. Defaults to an
             empty dictionary if not provided.
+        input_pattern (str, optional): The communication pattern that should
+            be used to handle incoming messages when there is more than one
+            input communicators present. Defaults to 'cycle'. Options
+            include:
+              'cycle': Receive from the next available input communicator.
+              'gather': Receive lists of messages with one element from each
+                  communicator where a message is only returned when there is
+                  a message from each.
+        output_pattern (str, optional): The communication pattern that should
+            be used to handling outgoing messages when there is more than one
+            output communicator present. Defaults to 'broadcast'. Options
+            include:
+              'cycle': Rotate through output comms, sending one message to
+                  each.
+              'broadcast': Send the same message to each comm.
+              'scatter': Send part of message (must be a list) to each comm.
         translator (str, func, optional): Function or string specifying function
             that should be used to translate messages from the input communicator
             before passing them to the output communicator. If a string, the
@@ -206,6 +222,12 @@ class ConnectionDriver(Driver):
                         'A full description of file entries and the '
                         'available options can be found :ref:`here<'
                         'yaml_file_options>`.')},
+        'input_pattern': {'type': 'string',
+                          'enum': ['cycle', 'gather'],
+                          'default': 'cycle'},
+        'output_pattern': {'type': 'string',
+                           'enum': ['cycle', 'broadcast', 'scatter'],
+                           'default': 'broadcast'},
         'translator': {'type': 'array',
                        'items': {'oneOf': [
                            {'type': 'function'},
@@ -287,6 +309,8 @@ class ConnectionDriver(Driver):
         comm_kws['reverse_names'] = True
         comm_kws['use_async'] = True
         comm_kws['name'] = self.name
+        if len(comm_list) > 0:
+            comm_kws['pattern'] = getattr(self, f'{io}_pattern')
         for i, x in enumerate(comm_list):
             if x is None:
                 comm_list[i] = dict()
@@ -864,13 +888,9 @@ class ConnectionDriver(Driver):
 
     def update_serializer(self, msg):
         r"""Update the serializer for the output comm based on input."""
-        self.debug('Before update:\n'
-                   + '  icomm:\n    sinfo:\n%s\n    typedef:\n%s\n'
-                   + '  ocomm:\n    sinfo:\n%s\n    typedef:\n%s',
-                   self.pprint(self.icomm.serializer.serializer_info, 2),
-                   self.pprint(self.icomm.serializer.typedef, 2),
-                   self.pprint(self.ocomm.serializer.serializer_info, 2),
-                   self.pprint(self.ocomm.serializer.typedef, 2))
+        self.debug('Before update:\n  icomm:%s\n  ocomm:%s\n'
+                   % ("\n".join(self.icomm.get_status_message(nindent=1)[0][1:]),
+                      "\n".join(self.ocomm.get_status_message(nindent=1)[0][1:])))
         for t in self.translator:
             if isinstance_component(t, 'transform'):
                 t.set_original_datatype(msg.stype)
@@ -885,13 +905,9 @@ class ConnectionDriver(Driver):
             #      and (self.ocomm.serializer.typedef['type'] != 'array')
             #      and (len(self.icomm.serializer.typedef['items']) == 1))):
             self.translator.insert(0, _translate_list2element)
-        self.debug('After update:\n'
-                   + '  icomm:\n    sinfo:\n%s\n    typedef:\n%s\n'
-                   + '  ocomm:\n    sinfo:\n%s\n    typedef:\n%s',
-                   self.pprint(self.icomm.serializer.serializer_info, 2),
-                   self.pprint(self.icomm.serializer.typedef, 2),
-                   self.pprint(self.ocomm.serializer.serializer_info, 2),
-                   self.pprint(self.ocomm.serializer.typedef, 2))
+        self.debug('After update:\n  icomm:\n%s\n  ocomm:\n%s\n'
+                   % ("\n".join(self.icomm.get_status_message(nindent=1)[0][1:]),
+                      "\n".join(self.ocomm.get_status_message(nindent=1)[0][1:])))
 
     def _send_message(self, *args, **kwargs):
         r"""Send a single message.

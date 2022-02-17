@@ -165,6 +165,40 @@ class SerializeBase(tools.YggClass):
         """
         return objects
 
+    def get_status_message(self, nindent=0, extra_lines_before=None,
+                           extra_lines_after=None):
+        r"""Return lines composing a status message.
+        
+        Args:
+            nindent (int, optional): Number of tabs that should be used to
+                indent each line. Defaults to 0.
+            extra_lines_before (list, optional): Additional lines that should
+                be added to the beginning of the default print message.
+                Defaults to empty list if not provided.
+            extra_lines_after (list, optional): Additional lines that should
+                be added to the end of the default print message. Defaults to
+                empty list if not provided.
+                
+        Returns:
+            tuple(list, prefix): Lines composing the status message and the
+                prefix string used for the last message.
+
+        """
+        if extra_lines_before is None:
+            extra_lines_before = []
+        if extra_lines_after is None:
+            extra_lines_after = []
+        prefix = nindent * '\t'
+        lines = ['%s%s' % (prefix, x) for x in extra_lines_before]
+        lines += ['%s%-15s:' % (prefix, 'sinfo')]
+        lines += [prefix + '\t' + x for x in
+                  self.pprint(self.serializer_info).splitlines()]
+        lines += ['%s%-15s:' % (prefix, 'typedef')]
+        lines += [prefix + '\t' + x for x in
+                  self.pprint(self.typedef).splitlines()]
+        lines += ['%s%s' % (prefix, x) for x in extra_lines_after]
+        return lines, prefix
+
     @classmethod
     def get_testing_options(cls, table_example=False, array_columns=False,
                             include_oldkws=False, table_string_type='bytes'):
