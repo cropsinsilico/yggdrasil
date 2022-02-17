@@ -1,0 +1,43 @@
+models:
+  - name: cpp_modelA
+    language: cpp
+    args: ./src/split_and_merge_modelA.cpp
+    function: modelA_function
+    outputs: cpp_modelA:output
+
+  - name: cpp_modelB
+    language: cpp
+    args: ./src/split_and_merge_modelB.cpp
+    function: modelB_function
+    outputs: cpp_modelB:output
+
+  - name: cpp_modelC
+    language: cpp
+    args: ./src/split_and_merge_modelC.cpp
+    function: modelC_function
+    outputs: cpp_modelC:output
+
+  - name: cpp_modelD
+    language: cpp
+    args: ./src/split_and_merge_modelD.cpp
+    function: modelD_function
+    outputs: cpp_modelD:output
+
+connections:
+  - input: ./Input/input.txt
+    output: cpp_modelA:input
+    filetype: table
+  - input: cpp_modelA:output
+    outputs:
+      - cpp_modelB:input
+      - cpp_modelC:input
+    output_pattern: scatter
+  - inputs:
+      - cpp_modelB:output
+      - cpp_modelC:output
+    output: cpp_modelD:input
+    input_pattern: gather
+  - input: cpp_modelD:output
+    output: ./outputD.txt
+    filetype: table
+    field_units: g/s,g/s,g/s

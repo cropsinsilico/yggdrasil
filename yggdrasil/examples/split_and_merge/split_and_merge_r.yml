@@ -1,0 +1,38 @@
+models:
+  - name: R_modelA
+    language: R
+    args: ./src/split_and_merge_modelA.R
+    function: modelA_function
+
+  - name: R_modelB
+    language: R
+    args: ./src/split_and_merge_modelB.R
+    function: modelB_function
+
+  - name: R_modelC
+    language: R
+    args: ./src/split_and_merge_modelC.R
+    function: modelC_function
+
+  - name: R_modelD
+    language: R
+    args: ./src/split_and_merge_modelD.R
+    function: modelD_function
+
+connections:
+  - input: ./Input/input.txt
+    output: R_modelA:input
+    filetype: table
+  - input: R_modelA:output
+    outputs:
+      - R_modelB:input
+      - R_modelC:input
+    output_pattern: scatter
+  - inputs:
+      - R_modelB:output
+      - R_modelC:output
+    output: R_modelD:input
+    input_pattern: gather
+  - input: R_modelD:output
+    output: ./outputD.txt
+    filetype: table

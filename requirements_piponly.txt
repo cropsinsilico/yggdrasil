@@ -1,2 +1,2 @@
 antlr4-python3-runtime  # [pip]
-libroadrunner  # [pip,sbml]
+libroadrunner<2.0.7  # [pip,sbml]
