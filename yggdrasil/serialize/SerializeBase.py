@@ -361,9 +361,9 @@ class SerializeBase(tools.YggClass):
                 out[k] = copy.deepcopy(v)
         for k in out.keys():
             v = out[k]
-            if isinstance(v, (bytes, list, tuple)):
+            try:
                 out[k] = tools.bytes2str(v, recurse=True)
-            else:
+            except TypeError:
                 out[k] = v
         return out
 
