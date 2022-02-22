@@ -100,15 +100,14 @@ class ForkComm(CommBase.CommBase):
         self.curr_comm_index = 0
         self.eof_recv = []
         self.eof_send = []
-        if pattern is None:
-            if kwargs.get('direction', 'send') == 'recv':
-                pattern = 'cycle'
-            else:
-                pattern = 'broadcast'
         self.pattern = pattern
         if kwargs.get('direction', 'send') == 'recv':
+            # if self.pattern is None:
+            #     self.pattern = 'cycle'
             assert(self.pattern in ['cycle', 'gather'])
         else:
+            if self.pattern is None:
+                self.pattern = 'broadcast'
             assert(self.pattern in ['cycle', 'scatter', 'broadcast'])
         address = kwargs.pop('address', None)
         if comm_list is None:
