@@ -29,9 +29,12 @@ class ValidArgsClass1(object):
         if not isinstance(solf, self.__class__):  # pragma: debug
             return False
         print(self._input_args, solf._input_args,
-              (self._input_args == solf._input_args))
+              (self._input_args == solf._input_args),
+              [a == b for a, b in zip(self._input_args, solf._input_args)])
         print(self._input_kwargs, solf._input_kwargs,
-              (self._input_kwargs == solf._input_kwargs))
+              (self._input_kwargs == solf._input_kwargs),
+              {k: (self._input_kwargs[k] == solf._input_kwargs.get(k, None))
+               for k in self._input_kwargs.keys()})
         return ((self._input_args == solf._input_args)
                 and (self._input_kwargs == solf._input_kwargs))
 
