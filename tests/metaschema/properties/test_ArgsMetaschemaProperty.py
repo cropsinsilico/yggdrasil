@@ -25,8 +25,13 @@ class ValidArgsClass1(object):
         self._input_kwargs = {'c': c, 'd': weakref.ref(d)}
         
     def __eq__(self, solf):
+        print("in __eq__", isinstance(solf, self.__class__))
         if not isinstance(solf, self.__class__):  # pragma: debug
             return False
+        print(self._input_args, solf._input_args,
+              (self._input_args == solf._input_args))
+        print(self._input_kwargs, solf._input_kwargs,
+              (self._input_kwargs == solf._input_kwargs))
         return ((self._input_args == solf._input_args)
                 and (self._input_kwargs == solf._input_kwargs))
 
