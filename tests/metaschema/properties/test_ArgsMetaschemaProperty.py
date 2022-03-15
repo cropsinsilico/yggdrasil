@@ -18,7 +18,7 @@ class Dummy(metaclass=DummyMeta):  # pragma: debug
     pass
 
 
-class ValidArgsClass1(object):
+class ValidArgsClass1(metaclass=DummyMeta):
     test_args = tuple([int(0), Dummy])
     test_kwargs = dict(c=int(1), d=Dummy)
     valid_args = [{'type': 'int'}, {'type': 'class'}]
