@@ -13,6 +13,10 @@ class DummyMeta(type):  # pragma: debug
         print(f"Dummy __eq__\n    a = {a_str}\n    b = {b_str}")
         return a_str == b_str
 
+    def __hash__(self):
+        import inspect
+        return hash(f"{self.__module__}.{self.__name__}[{inspect.getfile(self)}]")
+
 
 class Dummy(metaclass=DummyMeta):  # pragma: debug
     pass
