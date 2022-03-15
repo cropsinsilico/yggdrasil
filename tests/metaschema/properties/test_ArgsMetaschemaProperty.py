@@ -4,7 +4,17 @@ from tests.metaschema.properties.test_MetaschemaProperty import (
 import weakref
 
 
-class Dummy(object):  # pragma: debug
+class DummyMeta(type):  # pragma: debug
+    
+    def __eq__(self, solf):
+        import inspect
+        a_str = f"{self.__module__}.{self.__name__}[{inspect.getfile(self)}]"
+        b_str = f"{solf.__module__}.{solf.__name__}[{inspect.getfile(solf)}]"
+        print(f"Dummy __eq__\n    a = {a_str}\n    b = {b_str}")
+        return a_str == b_str
+
+
+class Dummy(metaclass=DummyMeta):  # pragma: debug
     pass
 
 
@@ -25,16 +35,11 @@ class ValidArgsClass1(object):
         self._input_kwargs = {'c': c, 'd': weakref.ref(d)}
         
     def __eq__(self, solf):
-        import inspect
-        print("in __eq__", isinstance(solf, self.__class__))
         if not isinstance(solf, self.__class__):  # pragma: debug
             return False
         print(self._input_args, solf._input_args,
               (self._input_args == solf._input_args),
               [a == b for a, b in zip(self._input_args, solf._input_args)])
-        for a, b in zip(self._input_args, solf._input_args):
-            if isinstance(a, type) and isinstance(b, type):
-                print(inspect.getfile(a), inspect.getfile(b))
         print(self._input_kwargs, solf._input_kwargs,
               (self._input_kwargs == solf._input_kwargs),
               {k: (self._input_kwargs[k] == solf._input_kwargs.get(k, None))
