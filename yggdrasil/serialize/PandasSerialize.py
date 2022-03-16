@@ -189,7 +189,7 @@ class PandasSerialize(AsciiTableSerialize):
             else:
                 dtype_names = np_dtype.names
             for n in dtype_names:
-                if np_dtype[n].char == 'U':
+                if np_dtype[n].char in ['U', 'S']:
                     dtype[n] = object
                 else:
                     dtype[n] = np_dtype[n]

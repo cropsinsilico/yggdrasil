@@ -1,0 +1,52 @@
+models:
+  - name: fortran_modelA
+    language: fortran
+    args: ./src/split_and_merge_modelA.f90
+    function: modelA_function
+    outputs:
+      - name: fortran_modelA:output
+        vars:
+          - out_val1
+          - out_val2
+
+  - name: fortran_modelB
+    language: fortran
+    args: ./src/split_and_merge_modelB.f90
+    function: modelB_function
+    outputs: fortran_modelB:output
+
+  - name: fortran_modelC
+    language: fortran
+    args: ./src/split_and_merge_modelC.f90
+    function: modelC_function
+    outputs: fortran_modelC:output
+
+  - name: fortran_modelD
+    language: fortran
+    args: ./src/split_and_merge_modelD.f90
+    function: modelD_function
+    outputs:
+      - name: fortran_modelD:output
+        vars:
+          - in_val1_copy
+          - in_val2_copy
+          - out_val
+
+connections:
+  - input: ./Input/input.txt
+    output: fortran_modelA:input
+    filetype: table
+  - input: fortran_modelA:output
+    outputs:
+      - fortran_modelB:input
+      - fortran_modelC:input
+    output_pattern: scatter
+  - inputs:
+      - fortran_modelB:output
+      - fortran_modelC:output
+    output: fortran_modelD:input
+    input_pattern: gather
+  - input: fortran_modelD:output
+    output: ./outputD.txt
+    filetype: table
+    field_units: g/s,g/s,g/s

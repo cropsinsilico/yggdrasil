@@ -2376,8 +2376,11 @@ class ModelDriver(Driver):
                 x['channel'] = (x['name'].split(':', 1)[-1]
                                 + '_%s_channel' % io[:-1])
                 for i, v in enumerate(x.get('vars', [])):
-                    if v in info_map[io]:
-                        x['vars'][i] = info_map[io][v]
+                    if isinstance(v, str):
+                        v = {'name': v}
+                    if v['name'] in info_map[io]:
+                        info_map[io][v['name']].update(v)
+                        x['vars'][i] = info_map[io][v['name']]
             if (len(io_var) == 1) and info_map.get(io, False):
                 io_var[0].setdefault('vars', list(info_map[io].values()))
             for x in io_var:
@@ -2401,31 +2404,31 @@ class ModelDriver(Driver):
                         else:
                             v[k + '_var'] = False
             # Update datatypes
-            if cls.is_typed:
-                for x in io_var:
-                    non_length = []
-                    for v in x['vars']:
-                        if not v.get('is_length_var', False):
-                            non_length.append(v)
-                    if ((x.get('datatype', None)
-                         and (not is_default_typedef(x['datatype'])))):
-                        if (len(non_length) == 1):
-                            non_length[0]['datatype'] = x['datatype']
-                        else:
-                            # TODO: Remove types associated with length?
-                            assert(x['datatype']['type'] == 'array')
-                            assert(len(x['datatype']['items'])
-                                   == len(non_length))
-                            for v, t in zip(non_length, x['datatype']['items']):
-                                v['datatype'] = t
+            for x in io_var:
+                non_length = []
+                for v in x['vars']:
+                    if not v.get('is_length_var', False):
+                        non_length.append(v)
+                if ((x.get('datatype', None)
+                     and (not is_default_typedef(x['datatype'])))):
+                    if (len(non_length) == 1):
+                        non_length[0]['datatype'] = x['datatype']
                     else:
-                        if (len(non_length) == 1):
-                            x['datatype'] = non_length[0]['datatype']
-                        else:
-                            x['datatype'] = {
-                                'type': 'array',
-                                'items': [v['datatype'] for v in non_length]}
-                        x['datatype']['from_function'] = True
+                        # TODO: Remove types associated with length?
+                        assert(x['datatype']['type'] == 'array')
+                        assert(len(x['datatype']['items'])
+                               == len(non_length))
+                        for v, t in zip(non_length, x['datatype']['items']):
+                            v['datatype'] = t
+                elif any('datatype' in x for x in non_length):
+                    if (len(non_length) == 1):
+                        x['datatype'] = non_length[0]['datatype']
+                    else:
+                        x['datatype'] = {
+                            'type': 'array',
+                            'items': [v['datatype'] for v in non_length]}
+                    x['datatype']['from_function'] = cls.is_typed
+                if cls.is_typed:
                     for v in x['vars']:
                         if 'native_type' not in v:
                             v['native_type'] = cls.get_native_type(**v)

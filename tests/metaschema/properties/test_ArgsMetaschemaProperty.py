@@ -4,11 +4,24 @@ from tests.metaschema.properties.test_MetaschemaProperty import (
 import weakref
 
 
-class Dummy(object):  # pragma: debug
+class DummyMeta(type):  # pragma: debug
+    
+    def __eq__(self, solf):
+        import inspect
+        a_str = f"{self.__module__}.{self.__name__}[{inspect.getfile(self)}]"
+        b_str = f"{solf.__module__}.{solf.__name__}[{inspect.getfile(solf)}]"
+        return a_str == b_str
+
+    def __hash__(self):
+        import inspect
+        return hash(f"{self.__module__}.{self.__name__}[{inspect.getfile(self)}]")
+
+
+class Dummy(metaclass=DummyMeta):  # pragma: debug
     pass
 
 
-class ValidArgsClass1(object):
+class ValidArgsClass1(metaclass=DummyMeta):
     test_args = tuple([int(0), Dummy])
     test_kwargs = dict(c=int(1), d=Dummy)
     valid_args = [{'type': 'int'}, {'type': 'class'}]
@@ -25,7 +38,7 @@ class ValidArgsClass1(object):
         self._input_kwargs = {'c': c, 'd': weakref.ref(d)}
         
     def __eq__(self, solf):
-        if not isinstance(solf, self.__class__):  # pragma: debug
+        if solf.__class__ != self.__class__:  # pragma: debug
             return False
         return ((self._input_args == solf._input_args)
                 and (self._input_kwargs == solf._input_kwargs))
