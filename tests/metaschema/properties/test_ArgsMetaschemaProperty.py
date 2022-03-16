@@ -10,7 +10,7 @@ class DummyMeta(type):  # pragma: debug
         import inspect
         a_str = f"{self.__module__}.{self.__name__}[{inspect.getfile(self)}]"
         b_str = f"{solf.__module__}.{solf.__name__}[{inspect.getfile(solf)}]"
-        print(f"Dummy __eq__\n    a = {a_str}\n    b = {b_str}")
+        print(f"Dummy __eq__ = {a_str == b_str}\n    a = {a_str}\n    b = {b_str}")
         return a_str == b_str
 
     def __hash__(self):
@@ -39,7 +39,7 @@ class ValidArgsClass1(metaclass=DummyMeta):
         self._input_kwargs = {'c': c, 'd': weakref.ref(d)}
         
     def __eq__(self, solf):
-        if not isinstance(solf, self.__class__):  # pragma: debug
+        if solf.__class__ != self.__class__:  # pragma: debug
             return False
         print(self._input_args, solf._input_args,
               (self._input_args == solf._input_args),
