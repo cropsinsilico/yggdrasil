@@ -3,9 +3,10 @@ coverage
 flake8
 flaky
 nose
-pytest>=4.6  # Required by pytest-cov, but not resolved by pip on linux
+pytest
 pytest-cov
 pytest-timeout
+pytest-mpi
 pytest-drop-dup-tests  # [pip]
 pytest-rerunfailures
 pytest-repeat

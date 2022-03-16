@@ -984,6 +984,7 @@ def discover_header(fd, serializer, newline=constants.DEFAULT_NEWLINE,
         header_lines.append(sline)
     # Parse header & set serializer attributes
     header = parse_header(header_lines, newline=newline,
+                          delimiter=delimiter, comment=comment,
                           lineno_format=lineno_format,
                           lineno_names=lineno_names,
                           lineno_units=lineno_units)
@@ -1007,6 +1008,9 @@ def discover_header(fd, serializer, newline=constants.DEFAULT_NEWLINE,
                              comment=comment,
                              delimiter=delimiter,
                              use_astropy=use_astropy)
+        if arr.dtype.names is None:
+            dtype2 = {'names': ['f0'], 'formats': [arr.dtype]}
+            arr = arr.copy().view(dtype2)
         header['field_names'] = arr.dtype.names
         # Get format from array
         if header['format_str'] is None:
@@ -1029,14 +1033,21 @@ def discover_header(fd, serializer, newline=constants.DEFAULT_NEWLINE,
     fd.seek(prev_pos + header_size)
 
 
-def parse_header(header, newline=constants.DEFAULT_NEWLINE, lineno_format=None,
-                 lineno_names=None, lineno_units=None):
+def parse_header(header, newline=constants.DEFAULT_NEWLINE,
+                 delimiter=constants.DEFAULT_DELIMITER,
+                 comment=constants.DEFAULT_COMMENT,
+                 lineno_format=None, lineno_names=None, lineno_units=None):
+                 
     r"""Parse an ASCII table header to get information about the table.
 
     Args:
         header (list, str): Header lines that should be parsed.
         newline (str, optional): Newline character that should be used to split
             header if it is not already a list. Defaults to constants.DEFAULT_NEWLINE.
+        delimiter (str, optional): Character that should be used to split
+            format string. Defaults to constants.DEFAULT_DELIMITER.
+        comment (str, optional): Character that should be used to check for
+            comments. Defaults to constants.DEFAULT_COMMENT.
         lineno_format (int, optional): Line number where formats are located.
             If not provided, an attempt will be made to locate one.
         lineno_names (int, optional): Line number where field names are located.
@@ -1067,9 +1078,9 @@ def parse_header(header, newline=constants.DEFAULT_NEWLINE, lineno_format=None,
         out['format_str'] = header[lineno_format].split(info['comment'])[-1]
     else:
         ncol = 0
-        out.update(delimiter=constants.DEFAULT_DELIMITER,
-                   comment=constants.DEFAULT_COMMENT,
-                   fmts=[])
+        out.update(fmts=[])
+    out.setdefault('delimiter', delimiter)
+    out.setdefault('comment', comment)
     out.setdefault('newline', newline)
     # Use explicit lines for names & units
     if lineno_names is not None:

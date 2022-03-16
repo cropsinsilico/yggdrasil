@@ -100,15 +100,14 @@ class ForkComm(CommBase.CommBase):
         self.curr_comm_index = 0
         self.eof_recv = []
         self.eof_send = []
-        if pattern is None:
-            if kwargs.get('direction', 'send') == 'recv':
-                pattern = 'cycle'
-            else:
-                pattern = 'broadcast'
         self.pattern = pattern
         if kwargs.get('direction', 'send') == 'recv':
+            # if self.pattern is None:
+            #     self.pattern = 'cycle'
             assert(self.pattern in ['cycle', 'gather'])
         else:
+            if self.pattern is None:
+                self.pattern = 'broadcast'
             assert(self.pattern in ['cycle', 'scatter', 'broadcast'])
         address = kwargs.pop('address', None)
         if comm_list is None:
@@ -409,6 +408,17 @@ class ForkComm(CommBase.CommBase):
         """
         if msg.stype is not None:
             msg.stype = self.apply_transform_to_type(msg.stype)
+            if (self.direction == 'send') and (self.pattern == 'scatter'):
+                if msg.stype['type'] != 'array':  # pragma: debug
+                    raise RuntimeError("Only 'array' type messages can be "
+                                       "scattered.")
+                for i, x in enumerate(self.comm_list):
+                    imsg = copy.deepcopy(msg)
+                    imsg.header = {}
+                    imsg.stype = msg.stype['items'][i]
+                    imsg.args = msg.args[i]
+                    x.update_serializer_from_message(imsg)
+                return
         for x in self.comm_list:
             x.update_serializer_from_message(msg)
         
