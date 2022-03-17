@@ -1,6 +1,6 @@
-[submodule "cis_interface/rapidjson"]
+[submodule "yggdrasil/rapidjson"]
 	path = yggdrasil/rapidjson
-	url = https://github.com/Tencent/rapidjson/
+	url = https://github.com/cropsinsilico/rapidjson
 [submodule "yggdrasil/FSPM2020_yggdrasil_workshop"]
 	path = yggdrasil/demos/fspm2020
 	url = https://github.com/cropsinsilico/FSPM2020_yggdrasil_workshop
