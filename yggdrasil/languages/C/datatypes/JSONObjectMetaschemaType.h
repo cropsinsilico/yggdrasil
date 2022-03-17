@@ -392,7 +392,7 @@ public:
     @param[in] new_field_names Vector of new field names.
    */
   void update_field_names(const std::vector<std::string> new_field_names) override {
-    if ((properties_.size() != 0) && (new_field_names.size() != properties_.size()))
+    if ((new_field_names.size() > 0) && (properties_.size() != 0) && (new_field_names.size() != properties_.size()))
       ygglog_throw_error("JSONObjectMetaschemaType::update_field_names: There are %d properties, but only %d field names.", properties_.size(), new_field_names.size());
     MetaschemaType::update_field_names(new_field_names);
   }
