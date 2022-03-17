@@ -418,7 +418,7 @@ public:
     @param[in] new_field_names Vector of new field names.
    */
   void update_field_names(const std::vector<std::string> new_field_names) override {
-    if ((items_.size() != 0) && (new_field_names.size() != items_.size()))
+    if ((new_field_names.size() > 0) && (items_.size() != 0) && (new_field_names.size() != items_.size()))
       ygglog_throw_error("JSONArrayMetaschemaType::update_field_names: There are %d items, but only %d field names.", items_.size(), new_field_names.size());
     MetaschemaType::update_field_names(new_field_names);
   }
