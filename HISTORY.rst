@@ -2,7 +2,7 @@
 History
 =======
 
-1.8.2 (2021-03-16) Migrate tests out of package into pytest fixtures & various bug fixes
+1.8.2 (2021-03-18) Migrate tests out of package into pytest fixtures & various bug fixes
 ------------------
 
 * Move tests out of package to take advantage of pytest conftest.py structure and reduce the size of the package
