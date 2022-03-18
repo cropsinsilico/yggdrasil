@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rpcFib &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>rpcFib &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -28,7 +28,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -244,49 +244,49 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCli</span>
-<span class="linenos"> 5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
-<span class="linenos"> 6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos"> 7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCli.py</span>
-<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span>   <span class="c1"># env_var passed as argument for number of loops</span>
-<span class="linenos"> 9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>  <span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCli</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCli.py</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">   </span><span class="c1"># env_var passed as argument for number of loops</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w">  </span><span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span><span class="w"></span>
 <span class="linenos">10</span>
-<span class="linenos">11</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">12</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log</span>
-<span class="linenos">13</span>      <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span>
-<span class="linenos">14</span>      <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">fibCli.txt</span>
-<span class="linenos">15</span>      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">11</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">      </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fibCli.txt</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
 <span class="linenos">16</span>
-<span class="linenos">17</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos">18</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yaml_in</span>
-<span class="linenos">19</span>      <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span>
-<span class="linenos">20</span>      <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCli_python.yml</span>
+<span class="linenos">17</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yaml_in</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">      </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCli_python.yml</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCliPar</span>
-<span class="linenos"> 5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MatlabModelDriver</span>
-<span class="linenos"> 6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos"> 7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCliPar.m</span>
-<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span>
-<span class="linenos"> 9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>  <span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span>
-<span class="linenos">10</span> 
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCliPar</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MatlabModelDriver</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCliPar.m</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w">  </span><span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span><span class="w"></span>
+<span class="linenos">10</span><span class="w"> </span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>
-<span class="linenos">5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos">7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibSrv.c</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="s">&#39;{{</span><span class="nv"> </span><span class="s">FIB_SERVER_SLEEP_SECONDS</span><span class="nv"> </span><span class="s">}}&#39;</span>    <span class="c1"># env var - time to sleep before returning</span>
-<span class="linenos">9</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC queue called $name</span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibSrv.c</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;{{</span><span class="nv"> </span><span class="s">FIB_SERVER_SLEEP_SECONDS</span><span class="nv"> </span><span class="s">}}&#39;</span><span class="w">    </span><span class="c1"># env var - time to sleep before returning</span><span class="w"></span>
+<span class="linenos">9</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC queue called $name</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -434,48 +434,48 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCli</span>
-<span class="linenos"> 5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
-<span class="linenos"> 6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos"> 7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCli.py</span>
-<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span>   <span class="c1"># env_var passed as argument for number of loops</span>
-<span class="linenos"> 9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>  <span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCli</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCli.py</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">   </span><span class="c1"># env_var passed as argument for number of loops</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w">  </span><span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span><span class="w"></span>
 <span class="linenos">10</span>
-<span class="linenos">11</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">12</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log</span>
-<span class="linenos">13</span>      <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span>
-<span class="linenos">14</span>      <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">fibCli.txt</span>
-<span class="linenos">15</span>      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">11</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">      </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fibCli.txt</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
 <span class="linenos">16</span>
-<span class="linenos">17</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos">18</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yaml_in</span>
-<span class="linenos">19</span>      <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span>
-<span class="linenos">20</span>      <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCli_python.yml</span>
+<span class="linenos">17</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yaml_in</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">      </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCli_python.yml</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCliPar</span>
-<span class="linenos">5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos">7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCliPar.cpp</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span>   <span class="c1"># env_var for number of loops</span>
-<span class="linenos">9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>  <span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCliPar</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCliPar.cpp</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">   </span><span class="c1"># env_var for number of loops</span><span class="w"></span>
+<span class="linenos">9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w">  </span><span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>
-<span class="linenos">5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos">7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibSrv.c</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="s">&#39;{{</span><span class="nv"> </span><span class="s">FIB_SERVER_SLEEP_SECONDS</span><span class="nv"> </span><span class="s">}}&#39;</span>    <span class="c1"># env var - time to sleep before returning</span>
-<span class="linenos">9</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC queue called $name</span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibSrv.c</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;{{</span><span class="nv"> </span><span class="s">FIB_SERVER_SLEEP_SECONDS</span><span class="nv"> </span><span class="s">}}&#39;</span><span class="w">    </span><span class="c1"># env var - time to sleep before returning</span><span class="w"></span>
+<span class="linenos">9</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC queue called $name</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -655,48 +655,48 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCli</span>
-<span class="linenos"> 5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span>
-<span class="linenos"> 6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos"> 7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCli.c</span>
-<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span>   <span class="c1"># env_var passed as argument for number of loops</span>
-<span class="linenos"> 9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>  <span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCli</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCli.c</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">   </span><span class="c1"># env_var passed as argument for number of loops</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w">  </span><span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span><span class="w"></span>
 <span class="linenos">10</span>
-<span class="linenos">11</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">12</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log</span>
-<span class="linenos">13</span>      <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span>
-<span class="linenos">14</span>      <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">fibCli.txt</span>
-<span class="linenos">15</span>      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">11</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">      </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fibCli.txt</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
 <span class="linenos">16</span>
-<span class="linenos">17</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos">18</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yaml_in</span>
-<span class="linenos">19</span>      <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span>
-<span class="linenos">20</span>      <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCli_c.yml</span>
+<span class="linenos">17</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yaml_in</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">      </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCli_c.yml</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCliPar</span>
-<span class="linenos">5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos">7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCliPar.c</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span>   <span class="c1"># env_var for number of loops</span>
-<span class="linenos">9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>  <span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCliPar</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCliPar.c</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">   </span><span class="c1"># env_var for number of loops</span><span class="w"></span>
+<span class="linenos">9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w">  </span><span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>
-<span class="linenos">5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos">7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibSrv.c</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="s">&#39;{{</span><span class="nv"> </span><span class="s">FIB_SERVER_SLEEP_SECONDS</span><span class="nv"> </span><span class="s">}}&#39;</span>    <span class="c1"># env var - time to sleep before returning</span>
-<span class="linenos">9</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC queue called $name</span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibSrv.c</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;{{</span><span class="nv"> </span><span class="s">FIB_SERVER_SLEEP_SECONDS</span><span class="nv"> </span><span class="s">}}&#39;</span><span class="w">    </span><span class="c1"># env var - time to sleep before returning</span><span class="w"></span>
+<span class="linenos">9</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC queue called $name</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -863,48 +863,48 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCli</span>
-<span class="linenos"> 5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span>
-<span class="linenos"> 6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos"> 7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCli.cpp</span>
-<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span>   <span class="c1"># env_var passed as argument for number of loops</span>
-<span class="linenos"> 9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>  <span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCli</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCli.cpp</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">   </span><span class="c1"># env_var passed as argument for number of loops</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w">  </span><span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span><span class="w"></span>
 <span class="linenos">10</span>
-<span class="linenos">11</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">12</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log</span>
-<span class="linenos">13</span>      <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span>
-<span class="linenos">14</span>      <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">fibCli.txt</span>
-<span class="linenos">15</span>      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">11</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">      </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fibCli.txt</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
 <span class="linenos">16</span>
-<span class="linenos">17</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos">18</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yaml_in</span>
-<span class="linenos">19</span>      <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span>
-<span class="linenos">20</span>      <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCli_cpp.yml</span>
+<span class="linenos">17</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yaml_in</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">      </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCli_cpp.yml</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCliPar</span>
-<span class="linenos">5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos">7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCliPar.cpp</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span>   <span class="c1"># env_var for number of loops</span>
-<span class="linenos">9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>  <span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCliPar</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCliPar.cpp</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">   </span><span class="c1"># env_var for number of loops</span><span class="w"></span>
+<span class="linenos">9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w">  </span><span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>
-<span class="linenos">5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos">7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibSrv.cpp</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="s">&#39;{{</span><span class="nv"> </span><span class="s">FIB_SERVER_SLEEP_SECONDS</span><span class="nv"> </span><span class="s">}}&#39;</span>    <span class="c1"># env var - time to sleep before returning</span>
-<span class="linenos">9</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC queue called $name</span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibSrv.cpp</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;{{</span><span class="nv"> </span><span class="s">FIB_SERVER_SLEEP_SECONDS</span><span class="nv"> </span><span class="s">}}&#39;</span><span class="w">    </span><span class="c1"># env var - time to sleep before returning</span><span class="w"></span>
+<span class="linenos">9</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC queue called $name</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -1101,48 +1101,48 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCli</span>
-<span class="linenos"> 5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FortranModelDriver</span>
-<span class="linenos"> 6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos"> 7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCli.f90</span>
-<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span>   <span class="c1"># env_var passed as argument for number of loops</span>
-<span class="linenos"> 9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>  <span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCli</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FortranModelDriver</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCli.f90</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">   </span><span class="c1"># env_var passed as argument for number of loops</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w">  </span><span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span><span class="w"></span>
 <span class="linenos">10</span>
-<span class="linenos">11</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">12</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log</span>
-<span class="linenos">13</span>      <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span>
-<span class="linenos">14</span>      <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">fibCli.txt</span>
-<span class="linenos">15</span>      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">11</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">      </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fibCli.txt</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
 <span class="linenos">16</span>
-<span class="linenos">17</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos">18</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yaml_in</span>
-<span class="linenos">19</span>      <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span>
-<span class="linenos">20</span>      <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCli_fortran.yml</span>
+<span class="linenos">17</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yaml_in</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">      </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCli_fortran.yml</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCliPar</span>
-<span class="linenos">5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FortranModelDriver</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos">7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCliPar.f90</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span>   <span class="c1"># env_var for number of loops</span>
-<span class="linenos">9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>  <span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCliPar</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FortranModelDriver</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCliPar.f90</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">   </span><span class="c1"># env_var for number of loops</span><span class="w"></span>
+<span class="linenos">9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w">  </span><span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>
-<span class="linenos">5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FortranModelDriver</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos">7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibSrv.f90</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_SERVER_SLEEP_SECONDS</span><span class="nv"> </span><span class="s">}}&quot;</span>    <span class="c1"># env var - time to sleep before returning</span>
-<span class="linenos">9</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC queue called $name</span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FortranModelDriver</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibSrv.f90</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_SERVER_SLEEP_SECONDS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">    </span><span class="c1"># env var - time to sleep before returning</span><span class="w"></span>
+<span class="linenos">9</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC queue called $name</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -1270,49 +1270,49 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCli</span>
-<span class="linenos"> 5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MatlabModelDriver</span>
-<span class="linenos"> 6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos"> 7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCli.m</span>
-<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span>   <span class="c1"># env_var passed as argument for number of loops</span>
-<span class="linenos"> 9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>  <span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCli</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MatlabModelDriver</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCli.m</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">   </span><span class="c1"># env_var passed as argument for number of loops</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w">  </span><span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span><span class="w"></span>
 <span class="linenos">10</span>
-<span class="linenos">11</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">12</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log</span>
-<span class="linenos">13</span>      <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span>
-<span class="linenos">14</span>      <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">fibCli.txt</span>
-<span class="linenos">15</span>      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">11</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">      </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fibCli.txt</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
 <span class="linenos">16</span>
-<span class="linenos">17</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos">18</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yaml_in</span>
-<span class="linenos">19</span>      <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span>
-<span class="linenos">20</span>      <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCli_matlab.yml</span>
+<span class="linenos">17</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yaml_in</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">      </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCli_matlab.yml</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCliPar</span>
-<span class="linenos"> 5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MatlabModelDriver</span>
-<span class="linenos"> 6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos"> 7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCliPar.m</span>
-<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span>
-<span class="linenos"> 9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>  <span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span>
-<span class="linenos">10</span> 
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCliPar</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MatlabModelDriver</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCliPar.m</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w">  </span><span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span><span class="w"></span>
+<span class="linenos">10</span><span class="w"> </span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>
-<span class="linenos">5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MatlabModelDriver</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos">7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibSrv.m</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_SERVER_SLEEP_SECONDS</span><span class="nv"> </span><span class="s">}}&quot;</span>    <span class="c1"># env var - time to sleep before returning</span>
-<span class="linenos">9</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC queue called $name</span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MatlabModelDriver</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibSrv.m</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_SERVER_SLEEP_SECONDS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">    </span><span class="c1"># env var - time to sleep before returning</span><span class="w"></span>
+<span class="linenos">9</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC queue called $name</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -1453,48 +1453,48 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCli</span>
-<span class="linenos"> 5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
-<span class="linenos"> 6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos"> 7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCli.py</span>
-<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span>   <span class="c1"># env_var passed as argument for number of loops</span>
-<span class="linenos"> 9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>  <span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCli</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCli.py</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">   </span><span class="c1"># env_var passed as argument for number of loops</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w">  </span><span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span><span class="w"></span>
 <span class="linenos">10</span>
-<span class="linenos">11</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">12</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log</span>
-<span class="linenos">13</span>      <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span>
-<span class="linenos">14</span>      <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">fibCli.txt</span>
-<span class="linenos">15</span>      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">11</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">      </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fibCli.txt</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
 <span class="linenos">16</span>
-<span class="linenos">17</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos">18</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yaml_in</span>
-<span class="linenos">19</span>      <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span>
-<span class="linenos">20</span>      <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCli_python.yml</span>
+<span class="linenos">17</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yaml_in</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">      </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCli_python.yml</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCliPar</span>
-<span class="linenos">5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos">7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCliPar.py</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span>   <span class="c1"># env_var for number of loops</span>
-<span class="linenos">9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>  <span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCliPar</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCliPar.py</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">   </span><span class="c1"># env_var for number of loops</span><span class="w"></span>
+<span class="linenos">9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w">  </span><span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>
-<span class="linenos">5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos">7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibSrv.py</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_SERVER_SLEEP_SECONDS</span><span class="nv"> </span><span class="s">}}&quot;</span>    <span class="c1"># env var - time to sleep before returning</span>
-<span class="linenos">9</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC queue called $name</span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibSrv.py</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_SERVER_SLEEP_SECONDS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">    </span><span class="c1"># env var - time to sleep before returning</span><span class="w"></span>
+<span class="linenos">9</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC queue called $name</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -1638,48 +1638,48 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCli</span>
-<span class="linenos"> 5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">RModelDriver</span>
-<span class="linenos"> 6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos"> 7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCli.R</span>
-<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span>   <span class="c1"># env_var passed as argument for number of loops</span>
-<span class="linenos"> 9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>  <span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCli</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">RModelDriver</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCli.R</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">   </span><span class="c1"># env_var passed as argument for number of loops</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w">  </span><span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span><span class="w"></span>
 <span class="linenos">10</span>
-<span class="linenos">11</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">12</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log</span>
-<span class="linenos">13</span>      <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span>
-<span class="linenos">14</span>      <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">fibCli.txt</span>
-<span class="linenos">15</span>      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">11</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">      </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fibCli.txt</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
 <span class="linenos">16</span>
-<span class="linenos">17</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos">18</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yaml_in</span>
-<span class="linenos">19</span>      <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span>
-<span class="linenos">20</span>      <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCli_r.yml</span>
+<span class="linenos">17</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yaml_in</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">      </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCli_r.yml</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibCliPar</span>
-<span class="linenos">5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">RModelDriver</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos">7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCliPar.R</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span>   <span class="c1"># env_var for number of loops</span>
-<span class="linenos">9</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>  <span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibCliPar</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">RModelDriver</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibCliPar.R</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_ITERATIONS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">   </span><span class="c1"># env_var for number of loops</span><span class="w"></span>
+<span class="linenos">9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w">  </span><span class="c1"># Creates an RPC client queue $(client_of)_$(name)</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">4</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span>
-<span class="linenos">5</span>  <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">RModelDriver</span>
-<span class="linenos">6</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos">7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/rpcFibSrv.R</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_SERVER_SLEEP_SECONDS</span><span class="nv"> </span><span class="s">}}&quot;</span>    <span class="c1"># env var - time to sleep before returning</span>
-<span class="linenos">9</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC queue called $name</span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rpcFibSrv</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">RModelDriver</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/rpcFibSrv.R</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">FIB_SERVER_SLEEP_SECONDS</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w">    </span><span class="c1"># env var - time to sleep before returning</span><span class="w"></span>
+<span class="linenos">9</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC queue called $name</span><span class="w"></span>
 </pre></div>
 </div>
 </section>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema.datatypes.MultiMetaschemaType &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.MultiMetaschemaType &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -369,7 +369,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_generate_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_generate_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
 
 <span class="sd">        Args:</span>
@@ -384,7 +384,7 @@
         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">type_classes</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">generate_data</span><span class="p">(</span>
-                    <span class="nb">dict</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">t</span><span class="p">))</span>
+                    <span class="nb">dict</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">t</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
                 <span class="k">pass</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># pragma: debug</span></div>

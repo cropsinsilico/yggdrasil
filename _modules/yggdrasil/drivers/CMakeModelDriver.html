@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.CMakeModelDriver &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.drivers.CMakeModelDriver &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -846,12 +846,6 @@
     <span class="n">use_env_vars</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">buildfile_base</span> <span class="o">=</span> <span class="s1">&#39;CMakeLists.txt&#39;</span>
 
-<div class="viewcode-block" id="CMakeModelDriver.mpi_partner_init"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.mpi_partner_init">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">mpi_partner_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions initializing an MPIPartnerModel.&quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CMakeModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">mpi_partner_init</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">partner_buildfile_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
-        
 <div class="viewcode-block" id="CMakeModelDriver.parse_arguments"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort arguments based on their syntax to determine if an argument</span>
 <span class="sd">        is a source file, compilation flag, or runtime option/flag that should</span>
@@ -1133,6 +1127,7 @@
                                     <span class="n">allow_error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">buildfile_locked</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dry_run&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dont_lock_buildfile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">default_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>
                                   <span class="n">sourcedir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">,</span>
                                   <span class="n">builddir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">,</span>

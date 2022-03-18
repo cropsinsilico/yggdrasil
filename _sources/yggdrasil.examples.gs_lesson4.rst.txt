@@ -1,0 +1,10 @@
+yggdrasil.examples.gs\_lesson4 package
+======================================
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.examples.gs_lesson4
+   :members:
+   :undoc-members:
+   :show-inheritance:

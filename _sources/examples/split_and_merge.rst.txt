@@ -1,0 +1,190 @@
+.. _split_and_merge_rst:
+
+split_and_merge
+=========================================
+
+Four models, A, B, C, & D, pass messages between them, splitting and joining variables in the messages between them.  Model A receives input from a tab delimited table and sends two output variables which are split between models B & C according to the `output_pattern: 'scatter'` YAML parameter. The outputs from Models B & C are then merged and sent to model D according to the `input_pattern: 'gather'` YAML parameter. The output from model D is then sent to a table.
+
+
+.. contents:: :local:
+
+C Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelA.c
+   :language: c
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelB.c
+   :language: c
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelC.c
+   :language: c
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelD.c
+   :language: c
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/split_and_merge_c.yml
+   :language: yaml
+   :linenos:
+
+
+
+C++ Version
+-----------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelA.cpp
+   :language: c++
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelB.cpp
+   :language: c++
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelC.cpp
+   :language: c++
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelD.cpp
+   :language: c++
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/split_and_merge_cpp.yml
+   :language: yaml
+   :linenos:
+
+
+
+Fortran Version
+---------------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelA.f90
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelB.f90
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelC.f90
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelD.f90
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/split_and_merge_fortran.yml
+   :language: yaml
+   :linenos:
+
+
+
+Matlab Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelA.m
+   :language: matlab
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelB.m
+   :language: matlab
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelC.m
+   :language: matlab
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelD.m
+   :language: matlab
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/split_and_merge_matlab.yml
+   :language: yaml
+   :linenos:
+
+
+
+Python Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelA.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelB.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelC.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelD.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/split_and_merge_python.yml
+   :language: yaml
+   :linenos:
+
+
+
+R Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelA.R
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelB.R
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelC.R
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/src/split_and_merge_modelD.R
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/split_and_merge/split_and_merge_r.yml
+   :language: yaml
+   :linenos:
+
+
+

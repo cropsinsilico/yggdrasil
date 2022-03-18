@@ -1,0 +1,10 @@
+yggdrasil.examples.model\_error package
+=======================================
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.examples.model_error
+   :members:
+   :undoc-members:
+   :show-inheritance:

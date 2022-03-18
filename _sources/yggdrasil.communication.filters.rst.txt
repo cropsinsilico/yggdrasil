@@ -1,14 +1,6 @@
 yggdrasil.communication.filters package
 =======================================
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   yggdrasil.communication.filters.tests
-
 Submodules
 ----------
 

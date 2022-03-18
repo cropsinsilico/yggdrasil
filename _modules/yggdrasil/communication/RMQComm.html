@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.RMQComm &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.communication.RMQComm &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -114,6 +114,7 @@
 
 
 <span class="n">_rmq_param_sep</span> <span class="o">=</span> <span class="s1">&#39;_RMQPARAM_&#39;</span>
+<span class="n">_localhost</span> <span class="o">=</span> <span class="s1">&#39;127.0.0.1&#39;</span>
 
 
 <div class="viewcode-block" id="get_rmq_parameters"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.get_rmq_parameters">[docs]</a><span class="k">def</span> <span class="nf">get_rmq_parameters</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -134,8 +135,8 @@
 <span class="sd">            config option &#39;password&#39; in section &#39;rmq&#39; if it exists and</span>
 <span class="sd">            &#39;guest&#39; if it does not.</span>
 <span class="sd">        host (str, optional): RabbitMQ server host. Defaults to config option</span>
-<span class="sd">            &#39;host&#39; in section &#39;rmq&#39; if it exists and &#39;localhost&#39; if it</span>
-<span class="sd">            does not. If &#39;localhost&#39;, the output of socket.gethostname()</span>
+<span class="sd">            &#39;host&#39; in section &#39;rmq&#39; if it exists and _localhost if it</span>
+<span class="sd">            does not. If _localhost, the output of socket.gethostname()</span>
 <span class="sd">            is used.</span>
 <span class="sd">        virtual_host (str, optional): RabbitMQ server virtual host. Defaults</span>
 <span class="sd">            to config option &#39;vhost&#39; in section &#39;rmq&#39; if it exists and &#39;/&#39;</span>
@@ -161,7 +162,7 @@
         <span class="k">if</span> <span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">password</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;guest&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">host</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">host</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="n">_localhost</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">virtual_host</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">virtual_host</span> <span class="o">=</span> <span class="n">vhost</span> <span class="ow">or</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;vhost&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">virtual_host</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
@@ -204,7 +205,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">username</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;guest&#39;</span><span class="p">))</span>
         <span class="n">password</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;guest&#39;</span><span class="p">))</span>
-        <span class="n">host</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;localhost&#39;</span><span class="p">))</span>
+        <span class="n">host</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="n">_localhost</span><span class="p">))</span>
         <span class="n">port</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;port&#39;</span><span class="p">,</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;port&#39;</span><span class="p">,</span> <span class="s1">&#39;5672&#39;</span><span class="p">))</span>
         <span class="n">vhost</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;vhost&#39;</span><span class="p">,</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;vhost&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">))</span>
         <span class="n">credentials</span> <span class="o">=</span> <span class="n">pika</span><span class="o">.</span><span class="n">PlainCredentials</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
@@ -214,10 +215,14 @@
     <span class="c1"># Try to establish connection</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;pika&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">connection</span> <span class="o">=</span> <span class="n">pika</span><span class="o">.</span><span class="n">BlockingConnection</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span>
+        <span class="k">with</span> <span class="n">tools</span><span class="o">.</span><span class="n">track_fds</span><span class="p">(</span><span class="s2">&quot;pika test connection: &quot;</span><span class="p">):</span>
+            <span class="n">connection</span> <span class="o">=</span> <span class="n">pika</span><span class="o">.</span><span class="n">BlockingConnection</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">connection</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">del</span> <span class="n">connection</span>
             <span class="k">raise</span> <span class="ne">BaseException</span><span class="p">(</span><span class="s2">&quot;Connection was not opened.&quot;</span><span class="p">)</span>
         <span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">connection</span>
     <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error when attempting to connect to the RabbitMQ server: &quot;</span>
               <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
@@ -229,8 +234,12 @@
 <div class="viewcode-block" id="RMQServer"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQServer">[docs]</a><span class="k">class</span> <span class="nc">RMQServer</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommServer</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;RMQ server object for cleaning up server connections.&quot;&quot;&quot;</span>
 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comm_cls</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comm_cls&#39;</span><span class="p">,</span> <span class="n">RMQComm</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RMQServer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
 <div class="viewcode-block" id="RMQServer.terminate"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQServer.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">RMQComm</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srv_address</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comm_cls</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srv_address</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RMQServer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">terminate</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 
@@ -277,6 +286,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">ProcessEvent</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">ProcessEvent</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_server_class</span> <span class="o">=</span> <span class="n">RMQServer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_server_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;comm_cls&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">}</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_init_before_open</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -309,8 +319,8 @@
 <span class="sd">                config option &#39;password&#39; in section &#39;rmq&#39; if it exists and</span>
 <span class="sd">                &#39;guest&#39; if it does not.</span>
 <span class="sd">            host (str, optional): RabbitMQ server host. Defaults to config option</span>
-<span class="sd">                &#39;host&#39; in section &#39;rmq&#39; if it exists and &#39;localhost&#39; if it</span>
-<span class="sd">                does not. If &#39;localhost&#39;, the output of socket.gethostname()</span>
+<span class="sd">                &#39;host&#39; in section &#39;rmq&#39; if it exists and _localhost if it</span>
+<span class="sd">                does not. If _localhost, the output of socket.gethostname()</span>
 <span class="sd">                is used.</span>
 <span class="sd">            virtual_host (str, optional): RabbitMQ server virtual host. Defaults</span>
 <span class="sd">                to config option &#39;vhost&#39; in section &#39;rmq&#39; if it exists and &#39;/&#39;</span>
@@ -407,6 +417,8 @@
 
 <div class="viewcode-block" id="RMQComm.close_queue"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm.close_queue">[docs]</a>    <span class="k">def</span> <span class="nf">close_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skip_unbind</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the queue if the channel exists.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">!=</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
+            <span class="k">return</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_client</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -428,15 +440,25 @@
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Closing the channel&#39;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">except</span> <span class="p">(</span><span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ChannelWrongStateError</span><span class="p">,</span>
+                        <span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">StreamLostError</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+                    <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="RMQComm.close_connection"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm.close_connection">[docs]</a>    <span class="k">def</span> <span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RMQComm.close_connection"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm.close_connection">[docs]</a>    <span class="k">def</span> <span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the connection.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Closing connection&#39;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="RMQComm.atexit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close operations.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">linger</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">atexit</span><span class="p">()</span></div>
+        
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection and channel are open.&quot;&quot;&quot;</span>
@@ -558,10 +580,11 @@
 
 <div class="viewcode-block" id="RMQComm.purge"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove all messages from the associated queue.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
-            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_purge</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">has_started</span><span class="p">():</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_purge</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span></div></div>
 </pre></div>
 

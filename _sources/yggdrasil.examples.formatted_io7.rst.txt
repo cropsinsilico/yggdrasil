@@ -1,0 +1,10 @@
+yggdrasil.examples.formatted\_io7 package
+=========================================
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.examples.formatted_io7
+   :members:
+   :undoc-members:
+   :show-inheritance:

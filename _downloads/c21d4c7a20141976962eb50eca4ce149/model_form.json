@@ -58,7 +58,22 @@
                 "vars": {
                     "description": "Names of variables to be sent/received by this comm. Defaults to [].",
                     "items": {
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "properties": {
+                                    "datatype": {
+                                        "$ref": "#/definitions/schema"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        ]
                     },
                     "type": "array"
                 },
@@ -159,7 +174,22 @@
                 "vars": {
                     "description": "Names of variables to be sent/received by this comm. Defaults to [].",
                     "items": {
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "properties": {
+                                    "datatype": {
+                                        "$ref": "#/definitions/schema"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        ]
                     },
                     "type": "array"
                 },
@@ -386,10 +416,6 @@
                         "function",
                         "statement"
                     ]
-                },
-                "initial_state": {
-                    "description": "Dictionary of initial state variables that should be set when the filter is created.",
-                    "type": "object"
                 },
                 "function": {
                     "description": "The handle for a callable Python object (e.g. function) that should be used to determine if a message should be filtered or a string of the form \"<function file>:<function name>\" identifying a function where \"<function file>\" is the module or Python file containing the function and \"<function name>\" is the name of the function. The function should take the message as input and return a boolean, True if the message should pass through the filter, False if it should not.",
@@ -659,10 +685,6 @@
                 ]
             },
             "properties": {
-                "initial_state": {
-                    "description": "Dictionary of initial state variables that should be set when the transform is created.",
-                    "type": "object"
-                },
                 "original_datatype": {
                     "$ref": "#/definitions/schema"
                 },
@@ -960,7 +982,22 @@
                 "vars": {
                     "description": "Names of variables to be sent/received by this comm. Defaults to [].",
                     "items": {
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "properties": {
+                                    "datatype": {
+                                        "$ref": "#/definitions/schema"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        ]
                     },
                     "type": "array"
                 },
@@ -1050,7 +1087,22 @@
                 "vars": {
                     "description": "Names of variables to be sent/received by this comm. Defaults to [].",
                     "items": {
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "properties": {
+                                    "datatype": {
+                                        "$ref": "#/definitions/schema"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        ]
                     },
                     "type": "array"
                 },

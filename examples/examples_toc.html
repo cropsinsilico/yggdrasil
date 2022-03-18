@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Examples &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>Examples &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -216,23 +216,23 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="sbml3.html#sbml3-rst"><span class="std std-ref">sbml3</span></a></p></td>
 <td><p>A single SBML model runs with input from a files and output to a file. This example demonstrates the use of the <cite>only_output_final_step</cite> model parameter to only get the final output of the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="timed_pipe.html#timed-pipe-rst"><span class="std std-ref">timed_pipe</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="split_and_merge.html#split-and-merge-rst"><span class="std std-ref">split_and_merge</span></a></p></td>
+<td><p>Four models, A, B, C, &amp; D, pass messages between them, splitting and joining variables in the messages between them.  Model A receives input from a tab delimited table and sends two output variables which are split between models B &amp; C according to the <cite>output_pattern: ‘scatter’</cite> YAML parameter. The outputs from Models B &amp; C are then merged and sent to model D according to the <cite>input_pattern: ‘gather’</cite> YAML parameter. The output from model D is then sent to a table.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="timed_pipe.html#timed-pipe-rst"><span class="std std-ref">timed_pipe</span></a></p></td>
 <td><p>This example is used for gathering performance information about communication between model in yggdrasil integrations and should only be run as part of the timing module.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="timesync1.html#timesync1-rst"><span class="std std-ref">timesync1</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="timesync1.html#timesync1-rst"><span class="std std-ref">timesync1</span></a></p></td>
 <td><p>Two models, A &amp; B, run simulations over time and exchange data via a timestep synchronization communication pattern. Both models compute the same variables (<cite>x</cite> and <cite>y</cite>) via the same source code and output data at each time step to a file, but they have different time steps.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="timesync2.html#timesync2-rst"><span class="std std-ref">timesync2</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="timesync2.html#timesync2-rst"><span class="std std-ref">timesync2</span></a></p></td>
 <td><p>Two models, A &amp; B, run simulations over time and exchange data via a timestep synchronization communication pattern. The timesync model <cite>statesync</cite> is explicit in the YAML and allows for specific control of the synchronization (e.g. relationship between variables, interpolation, aggregation). The models compute different variables, have different timesteps, and output data at each time step to a file. This example demonstrates more advanced use of the timesync communication pattern and YAML parameters.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../transformed_io.html#transformed-io-rst"><span class="std std-ref">Transformed I/O</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../transformed_io.html#transformed-io-rst"><span class="std std-ref">Transformed I/O</span></a></p></td>
 <td><p>Three models, A, B, &amp; C, pass messages which are transformed based on YAML parameters. Model A receives input from a tab delimited table and sends output to both models B &amp; C. The output to each model is transformed in different ways controlled by the <cite>transform</cite> comm model parameter. Models B &amp; C both send output to tables.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="transforms.html#transforms-rst"><span class="std std-ref">transforms</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="transforms.html#transforms-rst"><span class="std std-ref">transforms</span></a></p></td>
 <td><p>This example is used by yggdrasil to test the support transformations in each of the supported languages and should not be used outside of the tests.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="types.html#types-rst"><span class="std std-ref">types</span></a></p></td>
-<td><p>This example is used by yggdrasil to test the serialization/deserialization of the supported types between the supported languages and should not be used outside of the <cite>types</cite> test suite (run via <cite>yggtest –test-suite=types</cite>).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="wofost.html#wofost-rst"><span class="std std-ref">wofost</span></a></p></td>
 <td><p>A single model receives input from a WOFOST-style parameter file and sends output to a file. This example demonstrates how to interact with generic data structures containing maps in the compiled languages.</p></td>

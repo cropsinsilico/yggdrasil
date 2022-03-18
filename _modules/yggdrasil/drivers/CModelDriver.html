@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.CModelDriver &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.drivers.CModelDriver &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -827,6 +827,7 @@
     <span class="n">include_channel_obj</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">is_typed</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">brackets</span> <span class="o">=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;{&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;}&#39;</span><span class="p">)</span>
+    <span class="n">locked_buildfile</span> <span class="o">=</span> <span class="s1">&#39;datatypes.o&#39;</span>
 
 <div class="viewcode-block" id="CModelDriver.after_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.after_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -2027,6 +2028,80 @@
         <span class="n">out</span> <span class="o">+=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_assign_to_output</span><span class="p">(</span>
             <span class="n">dst_var</span><span class="p">,</span> <span class="n">src_var</span><span class="p">,</span> <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="n">outputs_in_inputs</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="CModelDriver.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Dictionary of variables to use for testing. Key/value pairs:</span>
+<span class="sd">                kwargs (dict): Keyword arguments for driver instance.</span>
+<span class="sd">                deps (list): Dependencies to install.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># Test types</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;replacement_code_types&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">type_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+                <span class="n">knew</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">}</span>
+                <span class="n">vnew</span> <span class="o">=</span> <span class="s1">&#39;float*&#39;</span>
+                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;replacement_code_types&#39;</span><span class="p">][(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">knew</span><span class="p">,</span> <span class="n">vnew</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="s1">&#39;X&#39;</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                <span class="n">knew</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">}</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;complex&#39;</span><span class="p">:</span>
+                    <span class="n">vnew</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">vnew</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;64&#39;</span><span class="p">)</span>
+                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;replacement_code_types&#39;</span><span class="p">][(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">knew</span><span class="p">,</span> <span class="n">vnew</span><span class="p">)</span>
+        <span class="c1"># Code composition parameters</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;write_function_def_params&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;write_function_def_params&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span>
+            <span class="c1"># Single output</span>
+            <span class="p">{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                         <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                                      <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">}}],</span>
+             <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                                       <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">}}],</span>
+             <span class="s1">&#39;outputs_in_inputs&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="s1">&#39;dont_add_lengths&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+            <span class="c1"># No output</span>
+            <span class="p">{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                         <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                                      <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">}}],</span>
+             <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[],</span>
+             <span class="s1">&#39;outputs_in_inputs&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+            <span class="c1"># No length variable</span>
+            <span class="p">{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="s1">&#39;&quot;hello&quot;&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;length_var&#39;</span><span class="p">:</span> <span class="s1">&#39;length_x&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+                                      <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}},</span>
+                        <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;length_x&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+                         <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;uint&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">},</span>
+                         <span class="s1">&#39;is_length_var&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}],</span>
+             <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;length_var&#39;</span><span class="p">:</span> <span class="s1">&#39;length_y&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+                                       <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}},</span>
+                         <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;length_y&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;uint&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">},</span>
+                          <span class="s1">&#39;is_length_var&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}],</span>
+             <span class="s1">&#39;dont_add_lengths&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+        <span class="p">]</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 

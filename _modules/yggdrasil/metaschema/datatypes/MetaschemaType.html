@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema.datatypes.MetaschemaType &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.MetaschemaType &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -98,7 +98,6 @@
 <span></span><span class="kn">import</span> <span class="nn">six</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">jsonschema</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">constants</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_metaschema</span><span class="p">,</span> <span class="n">get_validator</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span>
@@ -359,8 +358,8 @@
             <span class="n">typedef</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_validated</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">MetaschemaTypeError</span><span class="p">((</span><span class="s2">&quot;Object could not be encoded as &quot;</span>
-                                           <span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; type.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">MetaschemaTypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Object could not be encoded as &quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; type.&quot;</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">properties</span><span class="p">:</span>
             <span class="n">itypedef</span> <span class="o">=</span> <span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
@@ -861,7 +860,7 @@
 
     <span class="c1"># TESTING METHODS</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_generate_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_generate_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
 
 <span class="sd">        Args:</span>
@@ -874,7 +873,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># pragma: debug</span>
     
 <div class="viewcode-block" id="MetaschemaType.generate_data"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.generate_data">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
 
 <span class="sd">        Args:</span>
@@ -888,39 +887,14 @@
         <span class="n">typedef</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">normalize_definition</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;example_data&#39;</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">example_data</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_generate_data</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="MetaschemaType.import_test_class"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.import_test_class">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">import_test_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import the test class for this class.</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_generate_data</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            class: Test class for this class.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">tmod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_test_module</span><span class="p">())</span>
-        <span class="n">tcls</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_test_class</span><span class="p">()</span>
-        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">tmod</span><span class="p">,</span> <span class="n">tcls</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="MetaschemaType.get_test_class"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.get_test_class">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_test_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the test class for the class.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            str: Name of the test class for this class.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s1">&#39;Test</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span></div>
-    
-<div class="viewcode-block" id="MetaschemaType.get_test_module"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.get_test_module">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_test_module</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the test module for the class.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            str: Full Python &quot;path&quot; to module containing the test class.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.tests.test_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__module__</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span></div></div>
+<div class="viewcode-block" id="MetaschemaType.get_test_data"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.get_test_data">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_test_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;object: Test data.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">typedef</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">typedef</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">name</span><span class="p">}</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">generate_data</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

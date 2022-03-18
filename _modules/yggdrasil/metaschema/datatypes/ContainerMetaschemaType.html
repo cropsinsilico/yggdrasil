@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema.datatypes.ContainerMetaschemaType &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.ContainerMetaschemaType &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -382,7 +382,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_generate_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_generate_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
 
 <span class="sd">        Args:</span>
@@ -395,7 +395,7 @@
         <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_container_type</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_iterate</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">_json_property</span><span class="p">]):</span>
             <span class="n">vcls</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">_assign</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">vcls</span><span class="o">.</span><span class="n">generate_data</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_assign</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">vcls</span><span class="o">.</span><span class="n">generate_data</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">out</span></div>
 </pre></div>
 

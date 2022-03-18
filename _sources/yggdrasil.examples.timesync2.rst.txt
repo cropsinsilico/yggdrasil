@@ -1,0 +1,10 @@
+yggdrasil.examples.timesync2 package
+====================================
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.examples.timesync2
+   :members:
+   :undoc-members:
+   :show-inheritance:

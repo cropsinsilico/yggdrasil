@@ -1,0 +1,10 @@
+yggdrasil.examples.split\_and\_merge package
+============================================
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.examples.split_and_merge
+   :members:
+   :undoc-members:
+   :show-inheritance:

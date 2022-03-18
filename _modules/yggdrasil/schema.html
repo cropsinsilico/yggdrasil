@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.schema &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.schema &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -362,9 +362,11 @@
     <span class="n">lang2ext</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;yaml&#39;</span><span class="p">:</span> <span class="s1">&#39;.yml&#39;</span><span class="p">,</span> <span class="s1">&#39;executable&#39;</span><span class="p">:</span> <span class="s1">&#39;.exe&#39;</span><span class="p">}</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">language_cat</span><span class="p">}</span>
     <span class="n">languages_with_aliases</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">language_cat</span><span class="p">}</span>
+    <span class="n">language_properties</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">compiler_env_vars</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">compilation_tool_vars</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">complete</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">aliased_languages</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">drv</span> <span class="ow">in</span> <span class="n">drivers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">drv</span><span class="o">.</span><span class="n">language</span> <span class="ow">in</span> <span class="n">complete</span><span class="p">:</span>
             <span class="k">continue</span>
@@ -381,6 +383,12 @@
         <span class="n">languages_with_aliases</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">drv_type</span><span class="p">,</span> <span class="p">[])</span>
         <span class="n">languages_with_aliases</span><span class="p">[</span><span class="n">drv_type</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
         <span class="n">languages_with_aliases</span><span class="p">[</span><span class="n">drv_type</span><span class="p">]</span> <span class="o">+=</span> <span class="n">drv</span><span class="o">.</span><span class="n">language_aliases</span>
+        <span class="k">if</span> <span class="n">drv</span><span class="o">.</span><span class="n">language_aliases</span><span class="p">:</span>
+            <span class="n">aliased_languages</span><span class="p">[</span><span class="n">drv</span><span class="o">.</span><span class="n">language</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">drv</span><span class="o">.</span><span class="n">language</span><span class="p">]</span> <span class="o">+</span> <span class="n">drv</span><span class="o">.</span><span class="n">language_aliases</span>
+        <span class="n">language_properties</span><span class="p">[</span><span class="n">drv</span><span class="o">.</span><span class="n">language</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;executable_type&#39;</span><span class="p">:</span> <span class="n">drv_type</span><span class="p">,</span>
+            <span class="s1">&#39;is_typed&#39;</span><span class="p">:</span> <span class="n">drv</span><span class="o">.</span><span class="n">is_typed</span><span class="p">,</span>
+            <span class="s1">&#39;full_language&#39;</span><span class="p">:</span> <span class="n">drv</span><span class="o">.</span><span class="n">full_language</span><span class="p">}</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">languages</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="n">languages_with_aliases</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span>
                               <span class="n">languages_with_aliases</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
@@ -424,8 +432,12 @@
               <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">language_cat</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
     <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;)&quot;</span>
     <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
+        <span class="s2">&quot;ALIASED_LANGUAGES = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">as_lines</span><span class="p">(</span><span class="n">aliased_languages</span><span class="p">)]</span>
+    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
         <span class="s2">&quot;COMPILER_ENV_VARS = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">as_lines</span><span class="p">(</span><span class="n">compiler_env_vars</span><span class="p">),</span>
         <span class="s2">&quot;COMPILATION_TOOL_VARS = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">as_lines</span><span class="p">(</span><span class="n">compilation_tool_vars</span><span class="p">)]</span>
+    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
+        <span class="s2">&quot;LANGUAGE_PROPERTIES = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">as_lines</span><span class="p">(</span><span class="n">language_properties</span><span class="p">)]</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
         <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
 

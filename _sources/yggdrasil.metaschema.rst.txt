@@ -9,7 +9,6 @@ Subpackages
 
    yggdrasil.metaschema.datatypes
    yggdrasil.metaschema.properties
-   yggdrasil.metaschema.tests
 
 Submodules
 ----------

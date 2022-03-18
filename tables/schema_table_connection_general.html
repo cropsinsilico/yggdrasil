@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -28,7 +28,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -137,11 +137,29 @@ and the available options can be found <a class="reference internal" href="../ya
 <td></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>onexit</p></td>
+<tr class="row-odd"><td><p>input_pattern</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>The communication pattern that should be used to handle incoming messages when
+there is more than one input communicators present. Defaults to ‘cycle’. Options
+include: ‘cycle’: Receive from the next available input communicator. ‘gather’:
+Receive lists of messages with one element from each communicator where a
+message is only returned when there is a message from each.</p></td>
+</tr>
+<tr class="row-even"><td><p>onexit</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>Class method that should be called when a model that the connection interacts
 with exits, but before the connection driver is shut down. Defaults to None.</p></td>
+</tr>
+<tr class="row-odd"><td><p>output_pattern</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>The communication pattern that should be used to handling outgoing messages when
+there is more than one output communicator present. Defaults to ‘broadcast’.
+Options include: ‘cycle’: Rotate through output comms, sending one message to
+each. ‘broadcast’: Send the same message to each comm. ‘scatter’: Send part of
+message (must be a list) to each comm.</p></td>
 </tr>
 <tr class="row-even"><td><p>translator</p></td>
 <td><p>array</p></td>

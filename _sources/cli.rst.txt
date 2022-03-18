@@ -154,14 +154,6 @@ Alias for ``yggdrasil run``
 Alias for ``yggdrasil schema``
 
 
-.. _cli_yggtest_rst:
-
-``yggtest`` Command
-*******************
-
-Alias for ``yggdrasil test``
-
-
 .. _cli_yggvalidate_rst:
 
 ``yggvalidate`` Command

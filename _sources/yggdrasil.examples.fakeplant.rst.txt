@@ -1,0 +1,10 @@
+yggdrasil.examples.fakeplant package
+====================================
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.examples.fakeplant
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema.datatypes &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.metaschema.datatypes &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -659,18 +659,20 @@
         <span class="k">yield</span> <span class="n">e</span></div>
 
 
-<div class="viewcode-block" id="generate_data"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.generate_data">[docs]</a><span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="n">typedef</span><span class="p">):</span>
+<div class="viewcode-block" id="generate_data"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.generate_data">[docs]</a><span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        typedef (dict): Type definition.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to the generating</span>
+<span class="sd">            class&#39;s generate_data method.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        object: Python object of the specified type.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">type_cls</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">type_cls</span><span class="o">.</span><span class="n">generate_data</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">type_cls</span><span class="o">.</span><span class="n">generate_data</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

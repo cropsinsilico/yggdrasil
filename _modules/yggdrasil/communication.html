@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.communication &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -257,9 +257,6 @@
             <span class="n">commtype</span> <span class="o">=</span> <span class="s1">&#39;fork&#39;</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">commtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;filetype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">commtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;filetype&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">commtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ErrorComm&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">]:</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;commtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">commtype</span>
-        <span class="n">commtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;base_commtype&#39;</span><span class="p">]</span>
     <span class="n">comm_cls</span> <span class="o">=</span> <span class="n">import_comm</span><span class="p">(</span><span class="n">commtype</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_interface&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
         <span class="n">use_async</span> <span class="o">=</span> <span class="kc">False</span>
@@ -292,20 +289,6 @@
     <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dont_create&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">return</span> <span class="n">new_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
     
-
-<div class="viewcode-block" id="cleanup_comms"><a class="viewcode-back" href="../../yggdrasil.communication.html#yggdrasil.communication.cleanup_comms">[docs]</a><span class="k">def</span> <span class="nf">cleanup_comms</span><span class="p">(</span><span class="n">commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call cleanup_comms for the appropriate communicator class.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        commtype (str, optional): Name of communicator class. Defaults to</span>
-<span class="sd">            &#39;default&#39; if not provided.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        int: Number of comms closed.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">import_comm</span><span class="p">(</span><span class="n">commtype</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup_comms</span><span class="p">()</span></div>
-
 
 <span class="nd">@contextmanager</span>
 <span class="k">def</span> <span class="nf">open_file_comm</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s1">&#39;binary&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -357,7 +340,7 @@
     <span class="k">return</span> <span class="n">nprocs</span>
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;new_comm&#39;</span><span class="p">,</span> <span class="s1">&#39;get_comm&#39;</span><span class="p">,</span> <span class="s1">&#39;cleanup_comms&#39;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;new_comm&#39;</span><span class="p">,</span> <span class="s1">&#39;get_comm&#39;</span><span class="p">]</span>
 </pre></div>
 
            </div>

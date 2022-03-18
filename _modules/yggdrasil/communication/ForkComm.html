@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.ForkComm &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.communication.ForkComm &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -196,15 +196,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">curr_comm_index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eof_recv</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eof_send</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">pattern</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;direction&#39;</span><span class="p">,</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
-                <span class="n">pattern</span> <span class="o">=</span> <span class="s1">&#39;cycle&#39;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">pattern</span> <span class="o">=</span> <span class="s1">&#39;broadcast&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">=</span> <span class="n">pattern</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;direction&#39;</span><span class="p">,</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
+            <span class="c1"># if self.pattern is None:</span>
+            <span class="c1">#     self.pattern = &#39;cycle&#39;</span>
             <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;cycle&#39;</span><span class="p">,</span> <span class="s1">&#39;gather&#39;</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">=</span> <span class="s1">&#39;broadcast&#39;</span>
             <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;cycle&#39;</span><span class="p">,</span> <span class="s1">&#39;scatter&#39;</span><span class="p">,</span> <span class="s1">&#39;broadcast&#39;</span><span class="p">])</span>
         <span class="n">address</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">comm_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -444,6 +443,28 @@
         <span class="k">return</span> <span class="kc">True</span></div>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_msg_direct_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages currently being routed in recv.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">==</span> <span class="s1">&#39;gather&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">min</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">n_msg_direct_recv</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">n_msg_direct_recv</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">])</span>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_msg_direct_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages currently being routed in send.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;broadcast&#39;</span><span class="p">,</span> <span class="s1">&#39;scatter&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="nb">max</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">n_msg_direct_send</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">n_msg_direct_send</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_msg_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages currently being routed.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_send</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_recv</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of incoming messages in the connection.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">==</span> <span class="s1">&#39;gather&#39;</span><span class="p">:</span>
@@ -483,6 +504,17 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">stype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">msg</span><span class="o">.</span><span class="n">stype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_transform_to_type</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">stype</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">==</span> <span class="s1">&#39;scatter&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">stype</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;array&#39;</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Only &#39;array&#39; type messages can be &quot;</span>
+                                       <span class="s2">&quot;scattered.&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">):</span>
+                    <span class="n">imsg</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="n">imsg</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">imsg</span><span class="o">.</span><span class="n">stype</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">stype</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">imsg</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">x</span><span class="o">.</span><span class="n">update_serializer_from_message</span><span class="p">(</span><span class="n">imsg</span><span class="p">)</span>
+                <span class="k">return</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">:</span>
             <span class="n">x</span><span class="o">.</span><span class="n">update_serializer_from_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
         

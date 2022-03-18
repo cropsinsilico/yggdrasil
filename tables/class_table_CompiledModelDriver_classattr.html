@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -28,7 +28,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -108,23 +108,30 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>default_compiler</p></td>
+<tr class="row-even"><td><p>allow_parallel_build</p></td>
+<td><p>If True, a file can be compiled by two processes simultaneously. If False, it
+cannot and an MPI barrier will be used to prevent simultaneous compilation.
+Defaults to False.</p></td>
+<td></td>
+<td><p>bool</p></td>
+</tr>
+<tr class="row-odd"><td><p>default_compiler</p></td>
 <td><p>Name of compiler that will be used if not set explictly by instance or config
 file.</p></td>
 <td></td>
 <td><p>str</p></td>
 </tr>
-<tr class="row-odd"><td><p>default_compiler_flags</p></td>
+<tr class="row-even"><td><p>default_compiler_flags</p></td>
 <td><p>Flags that should be passed to the compiler by default for this language.</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>default_linker</p></td>
+<tr class="row-odd"><td><p>default_linker</p></td>
 <td><p>Name of linker that will be used if not set explictly by instance or config file</p></td>
 <td></td>
 <td><p>str</p></td>
 </tr>
-<tr class="row-odd"><td><p>default_linker_flags</p></td>
+<tr class="row-even"><td><p>default_linker_flags</p></td>
 <td><p>Flags that should be passed to the linker by default for this language.</p></td>
 <td></td>
 <td><p>list</p></td>

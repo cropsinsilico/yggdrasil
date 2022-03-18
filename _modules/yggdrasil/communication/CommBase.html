@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.CommBase &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.communication.CommBase &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -640,8 +640,15 @@
              <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;anyOf&#39;</span><span class="p">:</span> <span class="p">[</span>
                  <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/transform&#39;</span><span class="p">},</span>
                  <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">]}]}}]},</span>
-        <span class="s1">&#39;vars&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}},</span>
+        <span class="s1">&#39;vars&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;anyOf&#39;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+                <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+                     <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;schema&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">}}}}]}},</span>
         <span class="s1">&#39;length_map&#39;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
             <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}},</span>
@@ -800,10 +807,14 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interface</span><span class="p">:</span>
             <span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atexit</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_before_open</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">dont_open</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dont_open</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">_instance_name</span> <span class="o">+=</span> <span class="p">(</span>
             <span class="s1">&#39;=&gt;</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%%</span><span class="s1">&#39;</span><span class="p">),</span>
                           <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
@@ -932,6 +943,9 @@
                <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="n">out_seri</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">],</span>
                <span class="s1">&#39;objects&#39;</span><span class="p">:</span> <span class="n">out_seri</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]}</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;recv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;send&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;recv&#39;</span><span class="p">])):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;recv&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;recv&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;recv&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;dict&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">seri_cls</span><span class="o">.</span><span class="n">object2dict</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">])</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">out_seri</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;exact_contents&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;exact_contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
@@ -979,6 +993,8 @@
                   <span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;open&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">),</span>
                   <span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nsent&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_sent</span><span class="p">),</span>
                   <span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nrecv&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_recv</span><span class="p">)]</span>
+        <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;serializer&#39;</span><span class="p">)]</span>
+        <span class="n">lines</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">get_status_message</span><span class="p">(</span><span class="n">nindent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">extra_lines_after</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">lines</span><span class="p">,</span> <span class="n">prefix</span></div>
 
@@ -1088,6 +1104,8 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of underlying communication class.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_commtype</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;fork&#39;</span><span class="p">]:</span>
             <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_commtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;client&#39;</span><span class="p">,</span> <span class="s1">&#39;server&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">import_comm</span><span class="p">()</span><span class="o">.</span><span class="n">underlying_comm_class</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_commtype</span></div>
 
 <div class="viewcode-block" id="CommBase.close_registry_entry"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.close_registry_entry">[docs]</a>    <span class="nd">@classmethod</span>
@@ -1152,14 +1170,10 @@
         <span class="k">for</span> <span class="n">ienv</span> <span class="ow">in</span> <span class="p">[</span><span class="n">env</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ienv</span><span class="p">:</span>
                 <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="n">ienv</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
-        <span class="n">new_commtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;commtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dont_create</span><span class="p">:</span>
             <span class="n">args</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">name</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">new_comm_kwargs</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">new_commtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">new_cls</span> <span class="o">=</span> <span class="n">import_comm</span><span class="p">(</span><span class="n">new_commtype</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">new_cls</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
@@ -1313,7 +1327,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">drain_messages</span><span class="p">(</span><span class="n">variable</span><span class="o">=</span><span class="s1">&#39;n_msg_send&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wait_for_confirm</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_timeout_drain</span><span class="p">,</span>
                                   <span class="n">active_confirm</span><span class="o">=</span><span class="n">active_confirm</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Finished (timeout_drain = </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_timeout_drain</span><span class="p">))</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Finished (timeout_drain = {str(self._timeout_drain)})&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.language_atexit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.language_atexit">[docs]</a>    <span class="k">def</span> <span class="nf">language_atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close operations specific to the language.&quot;&quot;&quot;</span>
@@ -1322,19 +1336,18 @@
 
 <div class="viewcode-block" id="CommBase.atexit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close operations.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;atexit begins (n_msg=</span><span class="si">%d</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;atexit begins (n_msg=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">language_atexit</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;atexit after language_atexit, but before close&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-            <span class="s1">&#39;atexit finished: closed=</span><span class="si">%s</span><span class="s1">, n_msg=</span><span class="si">%d</span><span class="s1">, close_alive=</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">is_closed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())</span></div>
+            <span class="sa">f</span><span class="s1">&#39;atexit finished: closed=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">is_closed</span><span class="si">}</span><span class="s1">, n_msg=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg</span><span class="si">}</span><span class="s1">, &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;close_alive=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection is open.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># pragma: debug</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_closed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1434,7 +1447,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_send</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">n_msg_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">n_msg_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of incoming messages in the connection.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">0</span>
 
@@ -1494,7 +1507,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">sinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">stype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">msg</span><span class="o">.</span><span class="n">stype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_transform_to_type</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">stype</span><span class="p">)</span>
         <span class="n">msg</span><span class="o">.</span><span class="n">sinfo</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;seritype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;format_str&#39;</span><span class="p">,</span> <span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">]:</span>
@@ -1611,8 +1623,13 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">assert_equal</span>
-            <span class="n">assert_equal</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">emsg</span><span class="p">)</span>
+            <span class="kn">import</span> <span class="nn">pandas</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">emsg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+                <span class="n">pandas</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_frame_equal</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">emsg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span><span class="p">(</span><span class="n">msg</span> <span class="o">==</span> <span class="n">emsg</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span></div>
@@ -1733,7 +1750,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">get_work_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for an existing work comm.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_commtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_commtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">raise</span> <span class="n">IncompleteBaseComm</span><span class="p">(</span>
                 <span class="s2">&quot;Base comm class &#39;</span><span class="si">%s</span><span class="s2">&#39; cannot create work comm.&quot;</span>
                 <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
@@ -1750,7 +1767,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">create_work_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for a new work comm.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_commtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_commtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">raise</span> <span class="n">IncompleteBaseComm</span><span class="p">(</span>
                 <span class="s2">&quot;Base comm class &#39;</span><span class="si">%s</span><span class="s2">&#39; cannot create work comm.&quot;</span>
                 <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>

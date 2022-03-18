@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Line Interface (CLI) &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>Command Line Interface (CLI) &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -71,7 +71,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#schema">schema</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#model-form-schema">model-form-schema</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#dev-update">dev-update</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#test">test</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#timing">timing</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#gha">gha</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#integration-service-manager">integration-service-manager</a></li>
@@ -107,7 +106,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#yggmodelform-command"><code class="docutils literal notranslate"><span class="pre">yggmodelform</span></code> Command</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#yggrun-command"><code class="docutils literal notranslate"><span class="pre">yggrun</span></code> Command</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#yggschema-command"><code class="docutils literal notranslate"><span class="pre">yggschema</span></code> Command</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#yggtest-command"><code class="docutils literal notranslate"><span class="pre">yggtest</span></code> Command</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#yggvalidate-command"><code class="docutils literal notranslate"><span class="pre">yggvalidate</span></code> Command</a></li>
 </ul>
 </li>
@@ -156,7 +154,7 @@
 <section id="yggdrasil-command">
 <span id="cli-yggdrasil-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggdrasil</span></code> Command<a class="headerlink" href="#yggdrasil-command" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggdrasil</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">version</span><span class="p">]</span>
-                 <span class="p">{</span><span class="n">run</span><span class="p">,</span><span class="n">info</span><span class="p">,</span><span class="n">validate</span><span class="p">,</span><span class="nb">compile</span><span class="p">,</span><span class="nb">compile</span><span class="o">-</span><span class="n">deps</span><span class="p">,</span><span class="n">clean</span><span class="p">,</span><span class="n">install</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">metaschema</span><span class="p">,</span><span class="n">schema</span><span class="p">,</span><span class="n">model</span><span class="o">-</span><span class="n">form</span><span class="o">-</span><span class="n">schema</span><span class="p">,</span><span class="n">dev</span><span class="o">-</span><span class="n">update</span><span class="p">,</span><span class="n">test</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span><span class="n">gha</span><span class="p">,</span><span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span><span class="p">}</span>
+                 <span class="p">{</span><span class="n">run</span><span class="p">,</span><span class="n">info</span><span class="p">,</span><span class="n">validate</span><span class="p">,</span><span class="nb">compile</span><span class="p">,</span><span class="nb">compile</span><span class="o">-</span><span class="n">deps</span><span class="p">,</span><span class="n">clean</span><span class="p">,</span><span class="n">install</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">metaschema</span><span class="p">,</span><span class="n">schema</span><span class="p">,</span><span class="n">model</span><span class="o">-</span><span class="n">form</span><span class="o">-</span><span class="n">schema</span><span class="p">,</span><span class="n">dev</span><span class="o">-</span><span class="n">update</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span><span class="n">gha</span><span class="p">,</span><span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span><span class="p">}</span>
                  <span class="o">...</span>
 </pre></div>
 </div>
@@ -172,7 +170,7 @@
 <h3>subcommands<a class="headerlink" href="#subcommands" title="Permalink to this headline">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>subcommand</kbd></dt>
-<dd><p>Possible choices: run, info, validate, compile, compile-deps, clean, install, config, metaschema, schema, model-form-schema, dev-update, test, timing, gha, integration-service-manager</p>
+<dd><p>Possible choices: run, info, validate, compile, compile-deps, clean, install, config, metaschema, schema, model-form-schema, dev-update, timing, gha, integration-service-manager</p>
 </dd>
 </dl>
 </section>
@@ -659,167 +657,6 @@
 </pre></div>
 </div>
 </section>
-<section id="test">
-<h4>test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h4>
-<p>Run yggdrasil tests.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">test</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">withcoverage</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">nocapture</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">stop</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">nologcapture</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">noflaky</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">ci</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">test</span><span class="o">-</span><span class="n">suite</span> <span class="p">{</span><span class="nb">all</span><span class="p">,</span><span class="n">top</span><span class="p">,</span><span class="n">examples</span><span class="p">,</span><span class="n">examples_part1</span><span class="p">,</span><span class="n">examples_part2</span><span class="p">,</span><span class="n">demos</span><span class="p">,</span><span class="n">types</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span><span class="n">connections</span><span class="p">,</span><span class="n">models</span><span class="p">,</span><span class="n">mpi</span><span class="p">}</span> <span class="p">[{</span><span class="nb">all</span><span class="p">,</span><span class="n">top</span><span class="p">,</span><span class="n">examples</span><span class="p">,</span><span class="n">examples_part1</span><span class="p">,</span><span class="n">examples_part2</span><span class="p">,</span><span class="n">demos</span><span class="p">,</span><span class="n">types</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span><span class="n">connections</span><span class="p">,</span><span class="n">models</span><span class="p">,</span><span class="n">mpi</span><span class="p">}</span> <span class="o">...</span><span class="p">]]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">pytest</span><span class="o">-</span><span class="n">config</span> <span class="n">PYTEST_CONFIG</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cov</span><span class="o">-</span><span class="n">config</span> <span class="n">COV_CONFIG</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">ignore</span> <span class="n">IGNORE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">rootdir</span> <span class="n">ROOTDIR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">count</span> <span class="n">COUNT</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">additional</span><span class="o">-</span><span class="n">info</span> <span class="n">ADDITIONAL_INFO</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">mpi</span> <span class="n">WITH_MPI</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">write</span><span class="o">-</span><span class="n">script</span> <span class="n">WRITE_SCRIPT</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">separate</span><span class="o">-</span><span class="n">test</span> <span class="n">SEPARATE_TESTS</span> <span class="p">[</span><span class="n">SEPARATE_TESTS</span> <span class="o">...</span><span class="p">]]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">loglevel</span> <span class="n">LOGLEVEL</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">rmq</span><span class="o">-</span><span class="n">loglevel</span> <span class="n">RMQ_LOGLEVEL</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">client</span><span class="o">-</span><span class="n">loglevel</span> <span class="n">CLIENT_LOGLEVEL</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">validate</span><span class="o">-</span><span class="n">components</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">validate</span><span class="o">-</span><span class="n">messages</span> <span class="p">{</span><span class="kc">False</span><span class="p">,</span><span class="kc">True</span><span class="p">,</span><span class="n">First</span><span class="p">}]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">namespace</span> <span class="n">NAMESPACE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">host</span> <span class="n">HOST</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">vhost</span> <span class="n">VHOST</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">user</span> <span class="n">USER</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">password</span> <span class="n">PASSWORD</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cluster</span> <span class="n">CLUSTER</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">examples</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">demos</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">language</span> <span class="n">LANGUAGE</span> <span class="p">[</span><span class="n">LANGUAGE</span> <span class="o">...</span><span class="p">]]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">skip</span><span class="o">-</span><span class="n">language</span> <span class="n">SKIP_LANGUAGE</span> <span class="p">[</span><span class="n">SKIP_LANGUAGE</span> <span class="o">...</span><span class="p">]]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">long</span><span class="o">-</span><span class="n">running</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">production</span><span class="o">-</span><span class="n">runs</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">default</span><span class="o">-</span><span class="n">comm</span> <span class="n">DEFAULT_COMM</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">production</span><span class="o">-</span><span class="n">run</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span>
-</pre></div>
-</div>
-<section id="Named Arguments_repeat12">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat12" title="Permalink to this headline">¶</a></h5>
-<dl class="option-list">
-<dt><kbd>--withcoverage, --with-coverage</kbd></dt>
-<dd><p>Record coverage during tests.</p>
-<p>Default: False</p>
-</dd>
-<dt><kbd>--verbose, -v</kbd></dt>
-<dd><p>Increase verbosity of output from the test runner</p>
-<p>Default: False</p>
-</dd>
-<dt><kbd>--nocapture, -s</kbd></dt>
-<dd><p>Don’t capture output from tests.</p>
-<p>Default: False</p>
-</dd>
-<dt><kbd>--stop, -x</kbd></dt>
-<dd><p>Stop after first test failure.</p>
-<p>Default: False</p>
-</dd>
-<dt><kbd>--nologcapture</kbd></dt>
-<dd><p>Don’t capture output from log messages generated during tests.</p>
-<p>Default: False</p>
-</dd>
-<dt><kbd>--noflaky, --no-flaky</kbd></dt>
-<dd><p>Don’t re-run flaky tests.</p>
-<p>Default: False</p>
-</dd>
-<dt><kbd>--ci</kbd></dt>
-<dd><p>Perform addition operations required for testing on continuous integration services.</p>
-<p>Default: False</p>
-</dd>
-<dt><kbd>--test-suite, --test-suites</kbd></dt>
-<dd><p>Possible choices: all, top, examples, examples_part1, examples_part2, demos, types, timing, connections, models, mpi</p>
-<p>Test suite(s) that should be run.</p>
-</dd>
-<dt><kbd>--pytest-config, -c</kbd></dt>
-<dd><p>Pytest configuration file that should be used instead of the defaults.</p>
-</dd>
-<dt><kbd>--cov-config</kbd></dt>
-<dd><p>Config file for coverage. Default: .coveragerc</p>
-</dd>
-<dt><kbd>--ignore</kbd></dt>
-<dd><p>Ignore path during collection.</p>
-</dd>
-<dt><kbd>--rootdir</kbd></dt>
-<dd><p>Define root directory for tests.</p>
-</dd>
-<dt><kbd>--count</kbd></dt>
-<dd><p>Number of times to repeat a test.</p>
-<p>Default: 1</p>
-</dd>
-<dt><kbd>--additional-info, -r</kbd></dt>
-<dd><p>Display additional info for test results.</p>
-<p>Default: “”</p>
-</dd>
-<dt><kbd>--with-mpi, --mpi-nproc</kbd></dt>
-<dd><p>Number of MPI processes to run tests on.</p>
-<p>Default: 1</p>
-</dd>
-<dt><kbd>--write-script</kbd></dt>
-<dd><p>Name of script that should be created to run tests.</p>
-</dd>
-<dt><kbd>--separate-test, --separate-tests</kbd></dt>
-<dd><p>Flags defining tests that should be run separately.</p>
-</dd>
-<dt><kbd>--loglevel</kbd></dt>
-<dd><p>Logging level for yggdrasil operations.</p>
-</dd>
-<dt><kbd>--rmq-loglevel, --rmqloglevel</kbd></dt>
-<dd><p>Logging level for RabbitMQ operations.</p>
-</dd>
-<dt><kbd>--client-loglevel, --clientloglevel</kbd></dt>
-<dd><p>Logging level for yggdrasil operations on model processes.</p>
-</dd>
-<dt><kbd>--validate-components, --validatecomponents</kbd></dt>
-<dd><p>Validate components on creation using their JSON schema (Decreases performance).</p>
-<p>Default: False</p>
-</dd>
-<dt><kbd>--validate-messages, --validatemessages</kbd></dt>
-<dd><p>Possible choices: False, True, First</p>
-<p>Which messages should be validated during communication. ‘True’: all messages (decreases performance), ‘False’: no messages, or ‘First’: only the first message a comm sends/receives.</p>
-</dd>
-<dt><kbd>--namespace</kbd></dt>
-<dd><p>RabbitMQ namespace.</p>
-</dd>
-<dt><kbd>--host</kbd></dt>
-<dd><p>RabbitMQ host address.</p>
-</dd>
-<dt><kbd>--vhost</kbd></dt>
-<dd><p>RabbitMQ virtual host address.</p>
-</dd>
-<dt><kbd>--user</kbd></dt>
-<dd><p>RabbitMQ username.</p>
-</dd>
-<dt><kbd>--password</kbd></dt>
-<dd><p>RabbitMQ password.</p>
-</dd>
-<dt><kbd>--cluster</kbd></dt>
-<dd><p>Cluster that should be used.</p>
-</dd>
-<dt><kbd>--with-examples, --enable-examples, --withexamples, --enableexamples</kbd></dt>
-<dd><p>Run example tests when encountered.</p>
-<p>Default: False</p>
-</dd>
-<dt><kbd>--with-demos, --enable-demos, --withdemos, --enabledemos</kbd></dt>
-<dd><p>Run demo tests when encountered.</p>
-<p>Default: False</p>
-</dd>
-<dt><kbd>--language, --languages</kbd></dt>
-<dd><p>Language(s) that sould not be tested.</p>
-<p>Default: []</p>
-</dd>
-<dt><kbd>--skip-language, --skip-languages, --skiplanguage, --skiplanguages</kbd></dt>
-<dd><p>Language(s) that sould not be tested.</p>
-<p>Default: []</p>
-</dd>
-<dt><kbd>--long-running, --enable-long, --longrunning, --enablelong</kbd></dt>
-<dd><p>Run long tests when encounterd.</p>
-<p>Default: False</p>
-</dd>
-<dt><kbd>--enable-production-runs, --enableproductionruns</kbd></dt>
-<dd><p>Run production level tests when encountered.</p>
-<p>Default: False</p>
-</dd>
-<dt><kbd>--default-comm, --defaultcomm</kbd></dt>
-<dd><p>Comm type that should be used by default.</p>
-</dd>
-<dt><kbd>--production-run</kbd></dt>
-<dd><p>Turn off safe guards in order to improve performance. This is equivalent to ‘–validate-components –validate-messages=True’</p>
-<p>Default: False</p>
-</dd>
-<dt><kbd>--debug</kbd></dt>
-<dd><p>Turn on debugging utilties including increased logging and validation. This is equivalent to ‘–loglevel=DEBUG –client-loglevel=DEBUG –validate-components=False –validate-messages=False’</p>
-<p>Default: False</p>
-</dd>
-</dl>
-</section>
-</section>
 <section id="timing">
 <h4>timing<a class="headerlink" href="#timing" title="Permalink to this headline">¶</a></h4>
 <p>Create performance plots using timing results.</p>
@@ -880,8 +717,8 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">gha</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">base</span> <span class="n">BASE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dest</span> <span class="n">DEST</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat13">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat13" title="Permalink to this headline">¶</a></h5>
+<section id="Named Arguments_repeat12">
+<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat12" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--base, --base-file</kbd></dt>
 <dd><p>Version of GHA workflow yaml that contains anchors.</p>
@@ -907,8 +744,8 @@
                                       <span class="o">...</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat14">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat14" title="Permalink to this headline">¶</a></h5>
+<section id="Named Arguments_repeat13">
+<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat13" title="Permalink to this headline">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--manager-name</kbd></dt>
 <dd><p>Name that will be used to identify the service manager.</p>
@@ -950,8 +787,8 @@
                                             <span class="p">[</span><span class="o">--</span><span class="n">log</span><span class="o">-</span><span class="n">level</span> <span class="n">LOG_LEVEL</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat15">
-<h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat15" title="Permalink to this headline">¶</a></h7>
+<section id="Named Arguments_repeat14">
+<h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat14" title="Permalink to this headline">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>--remote-url</kbd></dt>
 <dd><p>URL that will be used to access the service manager and running integrations by remote requests. If not provided, the environment variable YGGDRASIL_SERVICE_HOST_URL will be used if it is set. If it is not set, the local <code class="docutils literal notranslate"><span class="pre">address</span></code> will be used under the assumption that the service manager and integration services will only be connected to by local integrations.</p>
@@ -982,8 +819,8 @@
                                            <span class="p">[</span><span class="o">--</span><span class="n">integration</span><span class="o">-</span><span class="n">name</span> <span class="n">INTEGRATION_NAME</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat16">
-<h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat16" title="Permalink to this headline">¶</a></h7>
+<section id="Named Arguments_repeat15">
+<h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat15" title="Permalink to this headline">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>--integration-name</kbd></dt>
 <dd><p>Name of integration to stop. If not provided, the service manager will be stopped as will all of the running services.</p>
@@ -1158,10 +995,6 @@
 <section id="yggschema-command">
 <span id="cli-yggschema-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggschema</span></code> Command<a class="headerlink" href="#yggschema-command" title="Permalink to this headline">¶</a></h2>
 <p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">schema</span></code></p>
-</section>
-<section id="yggtest-command">
-<span id="cli-yggtest-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggtest</span></code> Command<a class="headerlink" href="#yggtest-command" title="Permalink to this headline">¶</a></h2>
-<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">test</span></code></p>
 </section>
 <section id="yggvalidate-command">
 <span id="cli-yggvalidate-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggvalidate</span></code> Command<a class="headerlink" href="#yggvalidate-command" title="Permalink to this headline">¶</a></h2>

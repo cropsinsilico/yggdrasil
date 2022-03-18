@@ -1,0 +1,10 @@
+yggdrasil.examples.root\_to\_shoot package
+==========================================
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.examples.root_to_shoot
+   :members:
+   :undoc-members:
+   :show-inheritance:

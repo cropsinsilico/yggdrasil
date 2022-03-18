@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.transforms.TransformBase &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.communication.transforms.TransformBase &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -103,8 +103,6 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for message transforms.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        initial_state (dict, optional): Dictionary of initial state variables</span>
-<span class="sd">            that should be set when the transform is created.</span>
 <span class="sd">        original_datatype (dict, optional): Datatype associated with expected</span>
 <span class="sd">            messages. Defaults to None.</span>
 
@@ -113,14 +111,11 @@
     <span class="n">_transformtype</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_schema_type</span> <span class="o">=</span> <span class="s1">&#39;transform&#39;</span>
     <span class="n">_schema_subtype_key</span> <span class="o">=</span> <span class="s1">&#39;transformtype&#39;</span>
-    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;initial_state&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">},</span>
-                          <span class="s1">&#39;original_datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;schema&#39;</span><span class="p">}}</span>
+    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;original_datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;schema&#39;</span><span class="p">}}</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TransformBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_state</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transformed_datatype</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_datatype</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_original_datatype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_datatype</span><span class="p">)</span>
@@ -169,7 +164,7 @@
                     <span class="k">if</span> <span class="s1">&#39;title&#39;</span> <span class="ow">in</span> <span class="n">y</span><span class="p">:</span>
                         <span class="n">x</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="n">y</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">])</span>
             <span class="k">return</span> <span class="n">out</span>
-        <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">return</span> <span class="n">datatype</span></div>
 
 <div class="viewcode-block" id="TransformBase.evaluate_transform"><a class="viewcode-back" href="../../../../yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.TransformBase.TransformBase.evaluate_transform">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">no_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -185,7 +180,7 @@
 <span class="sd">            object: The transformed message.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># pragma: debug</span></div>
 
 <div class="viewcode-block" id="TransformBase.__call__"><a class="viewcode-back" href="../../../../yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.TransformBase.TransformBase.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">no_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_init</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call transform on the provided message.</span>
@@ -214,22 +209,7 @@
             <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_datatype</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">no_init</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">set_original_datatype</span><span class="p">(</span><span class="n">encode_type</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_transform</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">no_copy</span><span class="o">=</span><span class="n">no_copy</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span></div>
-
-<div class="viewcode-block" id="TransformBase.get_testing_options"><a class="viewcode-back" href="../../../../yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.TransformBase.TransformBase.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get testing options for the transform class.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            list: Multiple dictionaries of keywords and messages before/after</span>
-<span class="sd">                pairs that will result from the transform created by the provided</span>
-<span class="sd">                keywords.</span>
-<span class="sd">        </span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[{</span><span class="s1">&#39;in/out&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">)],</span>
-                 <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;initial_state&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-                            <span class="s1">&#39;original_datatype&#39;</span><span class="p">:</span> <span class="p">{</span>
-                                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">}}}]</span></div></div>
+        <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 
            </div>

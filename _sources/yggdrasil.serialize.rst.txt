@@ -1,14 +1,6 @@
 yggdrasil.serialize package
 ===========================
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   yggdrasil.serialize.tests
-
 Submodules
 ----------
 

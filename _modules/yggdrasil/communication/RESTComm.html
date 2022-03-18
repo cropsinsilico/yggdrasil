@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.RESTComm &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.communication.RESTComm &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -176,6 +176,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RESTComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
+<div class="viewcode-block" id="RESTComm.atexit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RESTComm.RESTComm.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close operations.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">linger</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RESTComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">atexit</span><span class="p">()</span></div>
+        
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection is open.&quot;&quot;&quot;</span>

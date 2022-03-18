@@ -1,14 +1,6 @@
 yggdrasil.drivers package
 =========================
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   yggdrasil.drivers.tests
-
 Submodules
 ----------
 

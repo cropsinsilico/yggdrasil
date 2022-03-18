@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Docker Containers &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>Docker Containers &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -160,19 +160,19 @@
 <span id="service-docker-rst"></span><h2>Service Images<a class="headerlink" href="#service-images" title="Permalink to this headline">¶</a></h2>
 <p>yggdrasil also provides images that run yggdrasil’s <a class="reference internal" href="remote.html#remote-rst"><span class="std std-ref">integration service manager</span></a> as a web application. As the service images do not contain any services by default, these images are best used as bases for building your own Docker image that copies in a file containing a mapping of integrations that should be exposed as services and those directories containing models.</p>
 <p>For example, if you have a services file <code class="docutils literal notranslate"><span class="pre">services.yml</span></code> that defines two integrations.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">foo</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">foo/model.yml</span>
-<span class="nt">bar</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">bar/modelA.yml</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">oth/modelB.yml</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">foo</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">foo/model.yml</span><span class="w"></span>
+<span class="nt">bar</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bar/modelA.yml</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">oth/modelB.yml</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Then the Dockerfile that will be able to run those services is</p>
-<div class="highlight-docker notranslate"><div class="highlight"><pre><span></span><span class="k">FROM</span> <span class="s">cropsinsilico/yggdrasil-service:v1.8.0</span>
-<span class="k">COPY</span> services.yml .
-<span class="k">COPY</span> foo ./foo
-<span class="k">COPY</span> bar ./bar
-<span class="k">COPY</span> oth ./oth
+<div class="highlight-docker notranslate"><div class="highlight"><pre><span></span><span class="k">FROM</span><span class="w"> </span><span class="s">cropsinsilico/yggdrasil-service:v1.8.0</span>
+<span class="k">COPY</span><span class="w"> </span>services.yml .
+<span class="k">COPY</span><span class="w"> </span>foo ./foo
+<span class="k">COPY</span><span class="w"> </span>bar ./bar
+<span class="k">COPY</span><span class="w"> </span>oth ./oth
 </pre></div>
 </div>
 <p>After building, the new Docker image (e.g. <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">build</span> <span class="pre">-t</span> <span class="pre">my-yggdrasil-service</span> <span class="pre">.</span></code>), the app is started by running the image, taking care to set the port that will be used by the app via an environment variable:</p>

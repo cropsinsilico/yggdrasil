@@ -1,8 +1,0 @@
-Model YAML:
-
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/types/types.yml
-   :language: yaml
-   :linenos:
-
-
-(`Example in other languages <examples/types.html>`__)

@@ -3,6 +3,9 @@
 ======================   ================================================================================   ========   ====
 Option                   Description                                                                        Required   Type
 ======================   ================================================================================   ========   ====
+allow_parallel_build     If True, a file can be compiled by two processes simultaneously. If False, it                 bool
+                         cannot and an MPI barrier will be used to prevent simultaneous compilation.                       
+                         Defaults to False.                                                                                
 default_compiler         Name of compiler that will be used if not set explictly by instance or config                 str 
                          file.                                                                                             
 default_compiler_flags   Flags that should be passed to the compiler by default for this language.                     list

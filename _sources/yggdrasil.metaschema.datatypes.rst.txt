@@ -1,14 +1,6 @@
 yggdrasil.metaschema.datatypes package
 ======================================
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   yggdrasil.metaschema.datatypes.tests
-
 Submodules
 ----------
 

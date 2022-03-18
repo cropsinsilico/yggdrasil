@@ -195,7 +195,22 @@
                         "vars": {
                             "description": "Names of variables to be sent/received by this comm. Defaults to [].",
                             "items": {
-                                "type": "string"
+                                "anyOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "properties": {
+                                            "datatype": {
+                                                "$ref": "#/definitions/schema"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                ]
                             },
                             "type": "array"
                         },
@@ -435,6 +450,15 @@
                             "description": "[DEPRECATED] Name of driver class that should be used.",
                             "type": "string"
                         },
+                        "input_pattern": {
+                            "default": "cycle",
+                            "description": "The communication pattern that should be used to handle incoming messages when there is more than one input communicators present. Defaults to 'cycle'. Options include: 'cycle': Receive from the next available input communicator. 'gather': Receive lists of messages with one element from each communicator where a message is only returned when there is a message from each.",
+                            "enum": [
+                                "cycle",
+                                "gather"
+                            ],
+                            "type": "string"
+                        },
                         "inputs": {
                             "default": [
                                 {}
@@ -455,6 +479,16 @@
                         },
                         "onexit": {
                             "description": "Class method that should be called when a model that the connection interacts with exits, but before the connection driver is shut down. Defaults to None.",
+                            "type": "string"
+                        },
+                        "output_pattern": {
+                            "default": "broadcast",
+                            "description": "The communication pattern that should be used to handling outgoing messages when there is more than one output communicator present. Defaults to 'broadcast'. Options include: 'cycle': Rotate through output comms, sending one message to each. 'broadcast': Send the same message to each comm. 'scatter': Send part of message (must be a list) to each comm.",
+                            "enum": [
+                                "cycle",
+                                "broadcast",
+                                "scatter"
+                            ],
                             "type": "string"
                         },
                         "outputs": {
@@ -786,7 +820,22 @@
                         "vars": {
                             "description": "Names of variables to be sent/received by this comm. Defaults to [].",
                             "items": {
-                                "type": "string"
+                                "anyOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "properties": {
+                                            "datatype": {
+                                                "$ref": "#/definitions/schema"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                ]
                             },
                             "type": "array"
                         },
@@ -1415,10 +1464,6 @@
                                 "function",
                                 "statement"
                             ]
-                        },
-                        "initial_state": {
-                            "description": "Dictionary of initial state variables that should be set when the filter is created.",
-                            "type": "object"
                         },
                         "function": {
                             "description": "The handle for a callable Python object (e.g. function) that should be used to determine if a message should be filtered or a string of the form \"<function file>:<function name>\" identifying a function where \"<function file>\" is the module or Python file containing the function and \"<function name>\" is the name of the function. The function should take the message as input and return a boolean, True if the message should pass through the filter, False if it should not.",
@@ -3551,10 +3596,6 @@
                     },
                     "description": "Base schema for all subtypes of transform components.",
                     "properties": {
-                        "initial_state": {
-                            "description": "Dictionary of initial state variables that should be set when the transform is created.",
-                            "type": "object"
-                        },
                         "original_datatype": {
                             "$ref": "#/definitions/schema"
                         },

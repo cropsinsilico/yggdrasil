@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -28,7 +28,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -95,23 +95,23 @@
              
   <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">pprint_encoded</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">get_test_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">src</span><span class="p">():</span>
-<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">get_test_data</span><span class="p">()</span>
+<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">get_test_data</span><span class="p">()</span>
 <span class="linenos">7</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SENDING&#39;</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="n">pprint_encoded</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span> <span class="n">test_data</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span> <span class="nn">os</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">check_received_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">dst</span><span class="p">(</span><span class="n">received_data</span><span class="p">):</span>
 <span class="linenos">6</span>    <span class="n">transform</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TEST_TRANSFORM&#39;</span><span class="p">]</span>
-<span class="linenos">7</span>    <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
+<span class="linenos">7</span>    <span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;CONFIRMED&#39;</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span>
 </pre></div>

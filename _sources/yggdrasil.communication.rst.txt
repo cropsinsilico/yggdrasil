@@ -8,7 +8,6 @@ Subpackages
    :maxdepth: 4
 
    yggdrasil.communication.filters
-   yggdrasil.communication.tests
    yggdrasil.communication.transforms
 
 Submodules
@@ -74,14 +73,6 @@ yggdrasil.communication.DefaultComm module
 ------------------------------------------
 
 .. automodule:: yggdrasil.communication.DefaultComm
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-yggdrasil.communication.ErrorComm module
-----------------------------------------
-
-.. automodule:: yggdrasil.communication.ErrorComm
    :members:
    :undoc-members:
    :show-inheritance:

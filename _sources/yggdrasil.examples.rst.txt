@@ -7,7 +7,38 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   yggdrasil.examples.tests
+   yggdrasil.examples.backwards
+   yggdrasil.examples.conditional_io
+   yggdrasil.examples.fakeplant
+   yggdrasil.examples.formatted_io1
+   yggdrasil.examples.formatted_io2
+   yggdrasil.examples.formatted_io3
+   yggdrasil.examples.formatted_io4
+   yggdrasil.examples.formatted_io5
+   yggdrasil.examples.formatted_io6
+   yggdrasil.examples.formatted_io7
+   yggdrasil.examples.formatted_io8
+   yggdrasil.examples.formatted_io9
+   yggdrasil.examples.gs_lesson3
+   yggdrasil.examples.gs_lesson4
+   yggdrasil.examples.gs_lesson4b
+   yggdrasil.examples.hello
+   yggdrasil.examples.model_error
+   yggdrasil.examples.model_error_with_io
+   yggdrasil.examples.model_function
+   yggdrasil.examples.model_function2
+   yggdrasil.examples.osr
+   yggdrasil.examples.root_to_shoot
+   yggdrasil.examples.rpc_lesson3
+   yggdrasil.examples.rpc_lesson3b
+   yggdrasil.examples.sbml1
+   yggdrasil.examples.sbml2
+   yggdrasil.examples.split_and_merge
+   yggdrasil.examples.timesync1
+   yggdrasil.examples.timesync2
+   yggdrasil.examples.transformed_io
+   yggdrasil.examples.transforms
+   yggdrasil.examples.wofost
 
 Module contents
 ---------------

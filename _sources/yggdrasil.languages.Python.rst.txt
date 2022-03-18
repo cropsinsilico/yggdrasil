@@ -20,22 +20,6 @@ yggdrasil.languages.Python.YggInterface module
    :undoc-members:
    :show-inheritance:
 
-yggdrasil.languages.Python.test\_CisInterface module
-----------------------------------------------------
-
-.. automodule:: yggdrasil.languages.Python.test_CisInterface
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-yggdrasil.languages.Python.test\_YggInterface module
-----------------------------------------------------
-
-.. automodule:: yggdrasil.languages.Python.test_YggInterface
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

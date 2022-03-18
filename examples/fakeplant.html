@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>fakeplant &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>fakeplant &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -28,7 +28,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -415,102 +415,102 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">CanopyModel</span>
-<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
-<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/canopy.cpp</span>
-<span class="linenos"> 5</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 6</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">plant_layout</span>
-<span class="linenos"> 7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">init_canopy_structure</span>
-<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">growth_rate</span>
-<span class="linenos"> 9</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">time</span>
-<span class="linenos">10</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">11</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">canopy_structure</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CanopyModel</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c++</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/canopy.cpp</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">plant_layout</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">init_canopy_structure</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">growth_rate</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canopy_structure</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">LightModel</span>
-<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos"> 5</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/light.c</span>
-<span class="linenos"> 6</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">-lm</span>
-<span class="linenos"> 7</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ambient_light</span>
-<span class="linenos"> 9</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">canopy_structure</span>
-<span class="linenos">10</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">11</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">light_intensity</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LightModel</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/light.c</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-lm</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ambient_light</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canopy_structure</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">light_intensity</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PhotosynthesisModel</span>
-<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/photosynthesis.py</span>
-<span class="linenos"> 5</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 6</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">light_intensity</span>
-<span class="linenos"> 7</span>      <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos"> 8</span>        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/light_intensity.txt</span>
-<span class="linenos"> 9</span>        <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">10</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">temperature</span>
-<span class="linenos">11</span>      <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">12</span>        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/temperature.txt</span>
-<span class="linenos">13</span>        <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">14</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">co2</span>
-<span class="linenos">15</span>      <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">16</span>        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/co2.txt</span>
-<span class="linenos">17</span>        <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">18</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">19</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span>
-<span class="linenos">20</span>      <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">21</span>        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Output/photosynthesis_rate.txt</span>
-<span class="linenos">22</span>        <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">23</span>        <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PhotosynthesisModel</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/photosynthesis.py</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">light_intensity</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/light_intensity.txt</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">temperature</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/temperature.txt</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">co2</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/co2.txt</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Output/photosynthesis_rate.txt</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">        </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">growth_rate</span>
-<span class="linenos"> 3</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">growth_rate</span>
-<span class="linenos"> 4</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">growth_rate</span>
-<span class="linenos"> 5</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span>
-<span class="linenos"> 6</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span>
-<span class="linenos"> 7</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span>
-<span class="linenos"> 8</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">canopy_structure</span>
-<span class="linenos"> 9</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">canopy_structure</span>
-<span class="linenos">10</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">x1,y1,z1,x2,y2,z2,x3,y3,z3</span>
-<span class="linenos">11</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">light_intensity</span>
-<span class="linenos">12</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">light_intensity</span>
-<span class="linenos">13</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">light_intensity</span>
-<span class="linenos">14</span>  <span class="c1"># Canopy file input</span>
-<span class="linenos">15</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/plant_layout.txt</span>
-<span class="linenos">16</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">plant_layout</span>
-<span class="linenos">17</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">18</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/canopy_structure.txt</span>
-<span class="linenos">19</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_canopy_structure</span>
-<span class="linenos">20</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">21</span>    <span class="nt">as_array</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-<span class="linenos">22</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/time.txt</span>
-<span class="linenos">23</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">time</span>
-<span class="linenos">24</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">25</span>  <span class="c1"># Light file input</span>
-<span class="linenos">26</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/ambient_light.txt</span>
-<span class="linenos">27</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ambient_light</span>
-<span class="linenos">28</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">29</span>  <span class="c1"># Photosynthesis file input</span>
-<span class="linenos">30</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/temperature.txt</span>
-<span class="linenos">31</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">temperature</span>
-<span class="linenos">32</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">33</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/co2.txt</span>
-<span class="linenos">34</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">co2</span>
-<span class="linenos">35</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">growth_rate</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">growth_rate</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">growth_rate</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canopy_structure</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canopy_structure</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">x1,y1,z1,x2,y2,z2,x3,y3,z3</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">light_intensity</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">light_intensity</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">light_intensity</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">  </span><span class="c1"># Canopy file input</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/plant_layout.txt</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">plant_layout</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/canopy_structure.txt</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">init_canopy_structure</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">    </span><span class="nt">as_array</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/time.txt</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">  </span><span class="c1"># Light file input</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/ambient_light.txt</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ambient_light</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">29</span><span class="w">  </span><span class="c1"># Photosynthesis file input</span><span class="w"></span>
+<span class="linenos">30</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/temperature.txt</span><span class="w"></span>
+<span class="linenos">31</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">temperature</span><span class="w"></span>
+<span class="linenos">32</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">33</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/co2.txt</span><span class="w"></span>
+<span class="linenos">34</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">co2</span><span class="w"></span>
+<span class="linenos">35</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GrowthModel</span>
-<span class="linenos">3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
-<span class="linenos">4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/growth.m</span>
-<span class="linenos">5</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos">6</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span>
-<span class="linenos">7</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">growth_rate</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GrowthModel</span><span class="w"></span>
+<span class="linenos">3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/growth.m</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">growth_rate</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -837,102 +837,102 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">CanopyModel</span>
-<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
-<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/canopy.cpp</span>
-<span class="linenos"> 5</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 6</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">plant_layout</span>
-<span class="linenos"> 7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">init_canopy_structure</span>
-<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">growth_rate</span>
-<span class="linenos"> 9</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">time</span>
-<span class="linenos">10</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">11</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">canopy_structure</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CanopyModel</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c++</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/canopy.cpp</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">plant_layout</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">init_canopy_structure</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">growth_rate</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canopy_structure</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">LightModel</span>
-<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos"> 5</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/light.c</span>
-<span class="linenos"> 6</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">-lm</span>
-<span class="linenos"> 7</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ambient_light</span>
-<span class="linenos"> 9</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">canopy_structure</span>
-<span class="linenos">10</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">11</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">light_intensity</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LightModel</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/light.c</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-lm</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ambient_light</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canopy_structure</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">light_intensity</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PhotosynthesisModel</span>
-<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/photosynthesis.py</span>
-<span class="linenos"> 5</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 6</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">light_intensity</span>
-<span class="linenos"> 7</span>      <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos"> 8</span>        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/light_intensity.txt</span>
-<span class="linenos"> 9</span>        <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">10</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">temperature</span>
-<span class="linenos">11</span>      <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">12</span>        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/temperature.txt</span>
-<span class="linenos">13</span>        <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">14</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">co2</span>
-<span class="linenos">15</span>      <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">16</span>        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/co2.txt</span>
-<span class="linenos">17</span>        <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">18</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">19</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span>
-<span class="linenos">20</span>      <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">21</span>        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Output/photosynthesis_rate.txt</span>
-<span class="linenos">22</span>        <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">23</span>        <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PhotosynthesisModel</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/photosynthesis.py</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">light_intensity</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/light_intensity.txt</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">temperature</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/temperature.txt</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">co2</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/co2.txt</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Output/photosynthesis_rate.txt</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">        </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">growth_rate</span>
-<span class="linenos"> 3</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">growth_rate</span>
-<span class="linenos"> 4</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">growth_rate</span>
-<span class="linenos"> 5</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span>
-<span class="linenos"> 6</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span>
-<span class="linenos"> 7</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span>
-<span class="linenos"> 8</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">canopy_structure</span>
-<span class="linenos"> 9</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">canopy_structure</span>
-<span class="linenos">10</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">x1,y1,z1,x2,y2,z2,x3,y3,z3</span>
-<span class="linenos">11</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">light_intensity</span>
-<span class="linenos">12</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">light_intensity</span>
-<span class="linenos">13</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">light_intensity</span>
-<span class="linenos">14</span>  <span class="c1"># Canopy file input</span>
-<span class="linenos">15</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/plant_layout.txt</span>
-<span class="linenos">16</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">plant_layout</span>
-<span class="linenos">17</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">18</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/canopy_structure.txt</span>
-<span class="linenos">19</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_canopy_structure</span>
-<span class="linenos">20</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">21</span>    <span class="nt">as_array</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-<span class="linenos">22</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/time.txt</span>
-<span class="linenos">23</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">time</span>
-<span class="linenos">24</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">25</span>  <span class="c1"># Light file input</span>
-<span class="linenos">26</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/ambient_light.txt</span>
-<span class="linenos">27</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ambient_light</span>
-<span class="linenos">28</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">29</span>  <span class="c1"># Photosynthesis file input</span>
-<span class="linenos">30</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/temperature.txt</span>
-<span class="linenos">31</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">temperature</span>
-<span class="linenos">32</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">33</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/co2.txt</span>
-<span class="linenos">34</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">co2</span>
-<span class="linenos">35</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">growth_rate</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">growth_rate</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">growth_rate</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canopy_structure</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canopy_structure</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">x1,y1,z1,x2,y2,z2,x3,y3,z3</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">light_intensity</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">light_intensity</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">light_intensity</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">  </span><span class="c1"># Canopy file input</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/plant_layout.txt</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">plant_layout</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/canopy_structure.txt</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">init_canopy_structure</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">    </span><span class="nt">as_array</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/time.txt</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">  </span><span class="c1"># Light file input</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/ambient_light.txt</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ambient_light</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">29</span><span class="w">  </span><span class="c1"># Photosynthesis file input</span><span class="w"></span>
+<span class="linenos">30</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/temperature.txt</span><span class="w"></span>
+<span class="linenos">31</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">temperature</span><span class="w"></span>
+<span class="linenos">32</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">33</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/co2.txt</span><span class="w"></span>
+<span class="linenos">34</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">co2</span><span class="w"></span>
+<span class="linenos">35</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GrowthModel</span>
-<span class="linenos">3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/growth.py</span>
-<span class="linenos">5</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos">6</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span>
-<span class="linenos">7</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">growth_rate</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GrowthModel</span><span class="w"></span>
+<span class="linenos">3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/growth.py</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">growth_rate</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -1030,31 +1030,31 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">LightModel</span>
-<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span>
-<span class="linenos"> 5</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/light.c</span>
-<span class="linenos"> 6</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">-lm</span>
-<span class="linenos"> 7</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ambient_light</span>
-<span class="linenos"> 9</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">canopy_structure</span>
-<span class="linenos">10</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">11</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">light_intensity</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LightModel</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/light.c</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-lm</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ambient_light</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canopy_structure</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">light_intensity</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/ambient_light.txt</span>
-<span class="linenos"> 3</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ambient_light</span>
-<span class="linenos"> 4</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos"> 5</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/canopy_structure.txt</span>
-<span class="linenos"> 6</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">canopy_structure</span>
-<span class="linenos"> 7</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos"> 8</span>    <span class="nt">as_array</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-<span class="linenos"> 9</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">light_intensity</span>
-<span class="linenos">10</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Output/light_intensity.txt</span>
-<span class="linenos">11</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">12</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">light_intensity</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/ambient_light.txt</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ambient_light</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/canopy_structure.txt</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canopy_structure</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">as_array</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">light_intensity</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Output/light_intensity.txt</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">light_intensity</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -1207,38 +1207,38 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">CanopyModel</span>
-<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
-<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/canopy.cpp</span>
-<span class="linenos"> 5</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 6</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">plant_layout</span>
-<span class="linenos"> 7</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">init_canopy_structure</span>
-<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">growth_rate</span>
-<span class="linenos"> 9</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">time</span>
-<span class="linenos">10</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">11</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">canopy_structure</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CanopyModel</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c++</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/canopy.cpp</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">plant_layout</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">init_canopy_structure</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">growth_rate</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canopy_structure</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/plant_layout.txt</span>
-<span class="linenos"> 3</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">plant_layout</span>
-<span class="linenos"> 4</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos"> 5</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/canopy_structure.txt</span>
-<span class="linenos"> 6</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_canopy_structure</span>
-<span class="linenos"> 7</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos"> 8</span>    <span class="nt">as_array</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-<span class="linenos"> 9</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/time.txt</span>
-<span class="linenos">10</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">time</span>
-<span class="linenos">11</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">12</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/growth_rate.txt</span>
-<span class="linenos">13</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">growth_rate</span>
-<span class="linenos">14</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">15</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">canopy_structure</span>
-<span class="linenos">16</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Output/canopy_structure.txt</span>
-<span class="linenos">17</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">18</span>    <span class="nt">as_array</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-<span class="linenos">19</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">x1,y1,z1,x2,y2,z2,x3,y3,z3</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/plant_layout.txt</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">plant_layout</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/canopy_structure.txt</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">init_canopy_structure</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">as_array</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/time.txt</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/growth_rate.txt</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">growth_rate</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canopy_structure</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Output/canopy_structure.txt</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="nt">as_array</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">x1,y1,z1,x2,y2,z2,x3,y3,z3</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -1265,24 +1265,24 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GrowthModel</span>
-<span class="linenos">3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
-<span class="linenos">4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/growth.m</span>
-<span class="linenos">5</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos">6</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span>
-<span class="linenos">7</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">8</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">growth_rate</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GrowthModel</span><span class="w"></span>
+<span class="linenos">3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/growth.m</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">growth_rate</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">2</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/photosynthesis_rate.txt</span>
-<span class="linenos">3</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span>
-<span class="linenos">4</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">5</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">growth_rate</span>
-<span class="linenos">6</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Output/growth_rate.txt</span>
-<span class="linenos">7</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">8</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">growth_rate</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/photosynthesis_rate.txt</span><span class="w"></span>
+<span class="linenos">3</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">5</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">growth_rate</span><span class="w"></span>
+<span class="linenos">6</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Output/growth_rate.txt</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">growth_rate</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -1341,29 +1341,29 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PhotosynthesisModel</span>
-<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/photosynthesis.py</span>
-<span class="linenos"> 5</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 6</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">light_intensity</span>
-<span class="linenos"> 7</span>      <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos"> 8</span>        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/light_intensity.txt</span>
-<span class="linenos"> 9</span>        <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">10</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">temperature</span>
-<span class="linenos">11</span>      <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">12</span>        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/temperature.txt</span>
-<span class="linenos">13</span>        <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">14</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">co2</span>
-<span class="linenos">15</span>      <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">16</span>        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/co2.txt</span>
-<span class="linenos">17</span>        <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">18</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">19</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span>
-<span class="linenos">20</span>      <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">21</span>        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Output/photosynthesis_rate.txt</span>
-<span class="linenos">22</span>        <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">23</span>        <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PhotosynthesisModel</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/photosynthesis.py</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">light_intensity</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/light_intensity.txt</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">temperature</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/temperature.txt</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">co2</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/co2.txt</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Output/photosynthesis_rate.txt</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">        </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis_rate</span><span class="w"></span>
 </pre></div>
 </div>
 </section>

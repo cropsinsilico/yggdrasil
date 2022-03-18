@@ -12,8 +12,18 @@ outputs           array    X          One or more name(s) of model input channel
 args              string              [DEPRECATED] Arguments that should be provided to the driver.                   
 connection_type   string               (Options described :ref:`here <schema_table_connection_subtype_rst>`)          
 driver            string              [DEPRECATED] Name of driver class that should be used.                          
+input_pattern     string              The communication pattern that should be used to handle incoming messages when  
+                                      there is more than one input communicators present. Defaults to 'cycle'. Options
+                                      include: 'cycle': Receive from the next available input communicator. 'gather': 
+                                      Receive lists of messages with one element from each communicator where a       
+                                      message is only returned when there is a message from each.                     
 onexit            string              Class method that should be called when a model that the connection interacts   
                                       with exits, but before the connection driver is shut down. Defaults to None.    
+output_pattern    string              The communication pattern that should be used to handling outgoing messages when
+                                      there is more than one output communicator present. Defaults to 'broadcast'.    
+                                      Options include: 'cycle': Rotate through output comms, sending one message to   
+                                      each. 'broadcast': Send the same message to each comm. 'scatter': Send part of  
+                                      message (must be a list) to each comm.                                          
 translator        array               Function or string specifying function that should be used to translate messages
                                       from the input communicator before passing them to the output communicator. If a
                                       string, the format should be "<package.module>:<function>" so that <function>   

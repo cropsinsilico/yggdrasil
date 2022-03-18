@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>yggdrasil.examples.timesync1.plot_timesync &mdash; yggdrasil v1.8.2 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> yggdrasil
+          </a>
+              <div class="version">
+                v1.8.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../timesync_io.html">Timestep Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command Line Interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docker.html">Docker Containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">yggdrasil</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../timesync1.html">yggdrasil.examples.timesync1</a> &raquo;</li>
+      <li>yggdrasil.examples.timesync1.plot_timesync</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for yggdrasil.examples.timesync1.plot_timesync</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication.AsciiTableComm</span> <span class="kn">import</span> <span class="n">AsciiTableComm</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../yggdrasil.examples.timesync1.html#yggdrasil.examples.timesync1.plot_timesync.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">fileA</span><span class="p">,</span> <span class="n">fileB</span><span class="p">,</span> <span class="n">example_name</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to plot comparison of two results.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">example_name</span> <span class="o">==</span> <span class="s1">&#39;timesync2&#39;</span><span class="p">:</span>
+        <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mf">10.8</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">)</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+        <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
+        <span class="n">ax3</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
+        <span class="n">axs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">ax3</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">figsize</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+        <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">axs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax1</span><span class="p">]</span>
+    <span class="n">dataA</span> <span class="o">=</span> <span class="n">AsciiTableComm</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="n">fileA</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;recv&#39;</span><span class="p">,</span>
+                           <span class="n">as_array</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">recv_dict</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">dataB</span> <span class="o">=</span> <span class="n">AsciiTableComm</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="n">fileB</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;recv&#39;</span><span class="p">,</span>
+                           <span class="n">as_array</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">recv_dict</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">xtrue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">))</span>
+    <span class="n">ytrue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">))</span>
+    <span class="n">ztrue</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">))</span>
+    <span class="n">atrue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">))</span>
+    <span class="n">btrue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">example_name</span> <span class="o">==</span> <span class="s1">&#39;timesync2&#39;</span><span class="p">:</span>
+        <span class="n">ytrue</span> <span class="o">*=</span> <span class="mf">2.0</span>
+        <span class="n">dataB</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">dataB</span><span class="p">[</span><span class="s1">&#39;xvar&#39;</span><span class="p">]</span>
+        <span class="n">dataB</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataB</span><span class="p">[</span><span class="s1">&#39;yvar&#39;</span><span class="p">]</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">xtrue</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">ytrue</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="s1">&#39;b-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;x (model A)&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;y (model A)&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataB</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="p">),</span> <span class="n">dataB</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+             <span class="s1">&#39;b--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;x (model B)&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataB</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="p">),</span> <span class="n">dataB</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span>
+             <span class="s1">&#39;r--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;y (model B)&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;State Value&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper center&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.15</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">example_name</span> <span class="o">==</span> <span class="s1">&#39;timesync2&#39;</span><span class="p">:</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">ztrue</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;z1&#39;</span><span class="p">],</span> <span class="s1">&#39;o-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;z1 (model A)&#39;</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;z2&#39;</span><span class="p">],</span> <span class="s1">&#39;o-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;z2 (model A)&#39;</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataB</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="p">),</span> <span class="n">dataB</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">],</span>
+                 <span class="s1">&#39;o--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;z (model B)&#39;</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper center&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.15</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">atrue</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">)</span>
+        <span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">btrue</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">)</span>
+        <span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="s1">&#39;c-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;a (model A)&#39;</span><span class="p">)</span>
+        <span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">],</span> <span class="s1">&#39;m-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;b (model A)&#39;</span><span class="p">)</span>
+        <span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataB</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="p">),</span> <span class="n">dataB</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span>
+                 <span class="s1">&#39;c--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;a (model B)&#39;</span><span class="p">)</span>
+        <span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataB</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dataA</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="p">),</span> <span class="n">dataB</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">],</span>
+                 <span class="s1">&#39;m--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;b (model B)&#39;</span><span class="p">)</span>
+        <span class="n">ax3</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper center&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.15</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.075</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mf">0.45</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1"># Take time step from the first argument</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="n">example_name</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">example_name</span> <span class="o">=</span> <span class="s1">&#39;timesync1&#39;</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">main</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">example_name</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

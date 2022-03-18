@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.CPPModelDriver &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.drivers.CPPModelDriver &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -606,6 +606,37 @@
                                  <span class="o">%</span> <span class="p">(</span><span class="n">native_type</span><span class="p">,</span> <span class="n">out</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CPPModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_json_type</span><span class="p">(</span><span class="n">native_type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="CPPModelDriver.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Dictionary of variables to use for testing. Key/value pairs:</span>
+<span class="sd">                kwargs (dict): Keyword arguments for driver instance.</span>
+<span class="sd">                deps (list): Dependencies to install.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CPPModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;deps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;cmake&quot;</span><span class="p">,</span>
+                       <span class="p">{</span><span class="s2">&quot;package_manager&quot;</span><span class="p">:</span> <span class="s2">&quot;pip&quot;</span><span class="p">,</span> <span class="s2">&quot;package&quot;</span><span class="p">:</span> <span class="s2">&quot;pyyaml&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="s2">&quot;-v&quot;</span><span class="p">},</span>
+                       <span class="p">{</span><span class="s2">&quot;package&quot;</span><span class="p">:</span> <span class="s2">&quot;cmake&quot;</span><span class="p">,</span> <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="s2">&quot;-v&quot;</span><span class="p">}]</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_conda_prefix</span><span class="p">():</span>
+                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;deps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;package_manager&quot;</span><span class="p">:</span> <span class="s2">&quot;vcpkg&quot;</span><span class="p">,</span>
+                                    <span class="s2">&quot;package&quot;</span><span class="p">:</span> <span class="s2">&quot;czmq&quot;</span><span class="p">})</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;deps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;doxygen&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;write_try_except_kwargs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;error_type&#39;</span><span class="p">:</span> <span class="s1">&#39;...&#39;</span><span class="p">}</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;compiler_flags&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;compiler_flags&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-std=c++11&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema.datatypes.ScalarMetaschemaType &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.ScalarMetaschemaType &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -410,7 +410,7 @@
         <span class="k">return</span> <span class="n">obj</span></div>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_generate_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_generate_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">,</span> <span class="n">numeric_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
 
 <span class="sd">        Args:</span>
@@ -421,14 +421,42 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">definition2dtype</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1darray&#39;</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ndarray&#39;</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">subtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bytes&#39;</span><span class="p">,</span> <span class="s1">&#39;unicode&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">subtype</span> <span class="o">==</span> <span class="s1">&#39;bytes&#39;</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;x&#39;</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;x&#39;</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">32</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">numeric_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">numeric_value</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">if</span> <span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1darray&#39;</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">value</span><span class="p">],</span> <span class="n">dtype</span><span class="p">),</span>
+                            <span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ndarray&#39;</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">value</span><span class="p">],</span> <span class="n">dtype</span><span class="p">),</span>
+                          <span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">value</span><span class="p">],</span> <span class="n">dtype</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;units&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">out</span></div>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="ScalarMetaschemaType.get_test_data"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ScalarMetaschemaType.ScalarMetaschemaType.get_test_data">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_test_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;object: Test data.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">typedef</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">typedef</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">name</span><span class="p">}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;fixed_properties&#39;</span><span class="p">):</span>
+            <span class="n">typedef</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">)</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">subtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bytes&#39;</span><span class="p">,</span> <span class="s1">&#39;unicode&#39;</span><span class="p">]:</span>
+            <span class="n">typedef</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">32</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">subtype</span> <span class="o">==</span> <span class="s1">&#39;complex&#39;</span><span class="p">:</span>
+            <span class="n">typedef</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">typedef</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ScalarMetaschemaType</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_test_data</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span></div></div>
 
 
 <span class="c1"># Dynamically create explicity scalar classes for shorthand</span>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.MakeModelDriver &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.drivers.MakeModelDriver &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -295,11 +295,12 @@
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">default_compiler</span> <span class="o">=</span> <span class="s1">&#39;nmake&#39;</span></div>
         
-<div class="viewcode-block" id="MakeModelDriver.mpi_partner_cleanup"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MakeModelDriver.MakeModelDriver.mpi_partner_cleanup">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">mpi_partner_cleanup</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions cleaning up an MPIPartnerModel.&quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">MakeModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">mpi_partner_cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">partner_buildfile_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+<div class="viewcode-block" id="MakeModelDriver.get_buildfile_lock"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MakeModelDriver.MakeModelDriver.get_buildfile_lock">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_buildfile_lock</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a lock for a buildfile to prevent simultaneous access,</span>
+<span class="sd">        creating one as necessary.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;when_to_lock&#39;</span><span class="p">,</span> <span class="s1">&#39;cleanup&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">MakeModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_buildfile_lock</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="MakeModelDriver.parse_arguments"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MakeModelDriver.MakeModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort arguments based on their syntax to determine if an argument</span>
@@ -366,7 +367,8 @@
                                   <span class="c1"># source_files=[],  # Unknown source files, use target</span>
                                   <span class="n">for_model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># flags are in environment</span>
                                   <span class="n">working_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">makedir</span><span class="p">,</span>
-                                  <span class="n">makefile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">buildfile</span><span class="p">)</span>
+                                  <span class="n">makefile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">buildfile</span><span class="p">,</span>
+                                  <span class="n">dont_lock_buildfile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">default_kwargs</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">target</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">default_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>

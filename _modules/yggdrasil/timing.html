@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.timing &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.timing &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -105,6 +105,7 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">contextlib</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -112,7 +113,7 @@
 <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">runner</span><span class="p">,</span> <span class="n">examples</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">config</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span> <span class="k">as</span> <span class="n">ygg_platform</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">YggTestBase</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.multitasking</span> <span class="kn">import</span> <span class="n">wait_on_function</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="kn">import</span> <span class="n">MatlabModelDriver</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DISPLAY&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
@@ -249,25 +250,27 @@
     <span class="n">ttot</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">range_it</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">loops</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">range_it</span><span class="p">:</span>
-        <span class="n">run_uuid</span> <span class="o">=</span> <span class="n">timer</span><span class="o">.</span><span class="n">before_run</span><span class="p">(</span><span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">)</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">nerrors</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">while</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">t0</span> <span class="o">=</span> <span class="n">pyperf</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-                <span class="n">timer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_uuid</span><span class="p">,</span> <span class="n">timer</span><span class="o">=</span><span class="n">pyperf</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">)</span>
-                <span class="n">t1</span> <span class="o">=</span> <span class="n">pyperf</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-                <span class="n">tdif</span> <span class="o">=</span> <span class="n">t1</span> <span class="o">-</span> <span class="n">t0</span>
-                <span class="n">timer</span><span class="o">.</span><span class="n">after_run</span><span class="p">(</span><span class="n">run_uuid</span><span class="p">,</span> <span class="n">tdif</span><span class="p">)</span>
-                <span class="n">ttot</span> <span class="o">+=</span> <span class="n">tdif</span>
-                <span class="n">flag</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="n">nerrors</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">if</span> <span class="n">nerrors</span> <span class="o">&gt;=</span> <span class="n">max_errors</span><span class="p">:</span>
-                    <span class="k">raise</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Error </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">. Trying again. (error = &#39;</span><span class="si">%s</span><span class="s2">&#39;)&quot;</span>
-                                  <span class="o">%</span> <span class="p">(</span><span class="n">nerrors</span><span class="p">,</span> <span class="n">max_errors</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">change_default_comm</span><span class="p">(</span><span class="n">timer</span><span class="o">.</span><span class="n">comm_type</span><span class="p">):</span>
+            <span class="n">run_uuid</span> <span class="o">=</span> <span class="n">timer</span><span class="o">.</span><span class="n">before_run</span><span class="p">(</span><span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">)</span>
+            <span class="n">flag</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">nerrors</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">t0</span> <span class="o">=</span> <span class="n">pyperf</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+                    <span class="n">timer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_uuid</span><span class="p">,</span> <span class="n">timer</span><span class="o">=</span><span class="n">pyperf</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">)</span>
+                    <span class="n">t1</span> <span class="o">=</span> <span class="n">pyperf</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+                    <span class="n">tdif</span> <span class="o">=</span> <span class="n">t1</span> <span class="o">-</span> <span class="n">t0</span>
+                    <span class="n">timer</span><span class="o">.</span><span class="n">after_run</span><span class="p">(</span><span class="n">run_uuid</span><span class="p">,</span> <span class="n">tdif</span><span class="p">)</span>
+                    <span class="n">ttot</span> <span class="o">+=</span> <span class="n">tdif</span>
+                    <span class="n">flag</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="n">nerrors</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">nerrors</span> <span class="o">&gt;=</span> <span class="n">max_errors</span><span class="p">:</span>
+                        <span class="k">raise</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Error </span><span class="si">{</span><span class="n">nerrors</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">max_errors</span><span class="si">}</span><span class="s2">. Trying again. &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;(error = &#39;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&#39;)&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ttot</span></div>
 
 
@@ -289,7 +292,34 @@
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="TimedRun"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun">[docs]</a><span class="k">class</span> <span class="nc">TimedRun</span><span class="p">(</span><span class="n">YggTestBase</span><span class="p">,</span> <span class="n">tools</span><span class="o">.</span><span class="n">YggClass</span><span class="p">):</span>
+<div class="viewcode-block" id="change_default_comm"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.change_default_comm">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+<span class="k">def</span> <span class="nf">change_default_comm</span><span class="p">(</span><span class="n">default_comm</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.communication.DefaultComm</span> <span class="kn">import</span> <span class="n">DefaultComm</span>
+    <span class="n">old_default_comm</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;YGG_DEFAULT_COMM&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">default_comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;YGG_DEFAULT_COMM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_comm</span>
+    <span class="n">DefaultComm</span><span class="o">.</span><span class="n">_reset_alias</span><span class="p">()</span>
+    <span class="k">yield</span>
+    <span class="k">del</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;YGG_DEFAULT_COMM&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">old_default_comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;YGG_DEFAULT_COMM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_default_comm</span>
+    <span class="n">DefaultComm</span><span class="o">.</span><span class="n">_reset_alias</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="debug_log"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.debug_log">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+<span class="k">def</span> <span class="nf">debug_log</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the log level to debug.&quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="kn">import</span> <span class="n">ygg_cfg</span><span class="p">,</span> <span class="n">cfg_logging</span>
+    <span class="n">loglevel</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">)</span>
+    <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">,</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">)</span>
+    <span class="n">cfg_logging</span><span class="p">()</span>
+    <span class="k">yield</span>
+    <span class="k">if</span> <span class="n">loglevel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">,</span> <span class="n">loglevel</span><span class="p">)</span>
+        <span class="n">cfg_logging</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TimedRun"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun">[docs]</a><span class="k">class</span> <span class="nc">TimedRun</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">YggClass</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to time sending messages from one language to another.</span>
 
 <span class="sd">    Args:</span>
@@ -361,8 +391,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_lang_list</span> <span class="o">=</span> <span class="n">get_lang_list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_comm_list</span> <span class="o">=</span> <span class="n">get_comm_list</span><span class="p">()</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_name</span><span class="p">,</span> <span class="n">lang_src</span><span class="p">,</span> <span class="n">lang_dst</span><span class="p">)</span>
-        <span class="n">tools</span><span class="o">.</span><span class="n">YggClass</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TimedRun</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">skip_unittest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TimedRun</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lang_src</span> <span class="o">=</span> <span class="n">lang_src</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lang_dst</span> <span class="o">=</span> <span class="n">lang_dst</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="kc">None</span>
@@ -525,11 +554,23 @@
 <span class="sd">        Args:</span>
 <span class="sd">            fout (str): The file that should be checked.</span>
 <span class="sd">            nmsg (int): The number of messages that will be sent.</span>
-<span class="sd">            msg_sizze (int): The size of the the messages that will be sent.</span>
+<span class="sd">            msg_size (int): The size of the the messages that will be sent.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">fres</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_content</span><span class="p">(</span><span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">check_file</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">fres</span><span class="p">)</span></div>
+        <span class="n">wait_on_function</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fout</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+                         <span class="n">on_timeout</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">fout</span><span class="si">}</span><span class="s2">&#39; does not exist&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">on_timeout</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">fres</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fres</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">200</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected:</span><span class="se">\n</span><span class="si">{</span><span class="n">fres</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                      <span class="sa">f</span><span class="s2">&quot;Actual:</span><span class="se">\n</span><span class="si">{</span><span class="nb">open</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File size (</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">fout</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span><span class="si">}</span><span class="s2">), &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;dosn&#39;t match expected size (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fres</span><span class="p">)</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
+        <span class="n">wait_on_function</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">fout</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">fres</span><span class="p">),</span>
+                         <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">on_timeout</span><span class="o">=</span><span class="n">on_timeout</span><span class="p">)</span>
+        <span class="n">ocont</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">ocont</span> <span class="o">==</span> <span class="n">fres</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TimedRun.cleanup_output"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.cleanup_output">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fout</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup the output file.</span>
@@ -635,8 +676,6 @@
                <span class="s1">&#39;PIPE_MSG_SIZE&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">msg_size</span><span class="p">),</span>
                <span class="s1">&#39;PIPE_OUT_FILE&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">foutput</span><span class="p">[</span><span class="n">run_uuid</span><span class="p">]}</span>
         <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
-        <span class="c1"># self.debug_log()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_default_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comm_type</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_output</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">foutput</span><span class="p">[</span><span class="n">run_uuid</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting </span><span class="si">%s</span><span class="s2">...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_name</span><span class="p">(</span><span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">run_uuid</span></div>
@@ -655,8 +694,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished </span><span class="si">%s</span><span class="s2">: </span><span class="si">%f</span><span class="s2"> s&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_name</span><span class="p">(</span><span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">),</span> <span class="n">result</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_output</span><span class="p">(</span><span class="n">fout</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reset_log</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reset_default_comm</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matlab_running</span> <span class="o">==</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">is_matlab_running</span><span class="p">())</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">run_uuid</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fyaml</span><span class="p">[</span><span class="n">run_uuid</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">foutput</span><span class="p">[</span><span class="n">run_uuid</span><span class="p">]</span></div>
 
@@ -681,6 +718,7 @@
                               <span class="n">namespace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="n">run_uuid</span><span class="p">)</span>
         <span class="n">times</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">timer</span><span class="o">=</span><span class="n">timer</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">r</span><span class="o">.</span><span class="n">error_flag</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">r</span>
         <span class="k">return</span> <span class="n">times</span></div>
 
 <div class="viewcode-block" id="TimedRun.time_run"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.time_run">[docs]</a>    <span class="k">def</span> <span class="nf">time_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">,</span> <span class="n">nrep</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -776,12 +814,13 @@
         <span class="n">old_reps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entry</span><span class="p">(</span><span class="n">entry_name</span><span class="p">)</span>
         <span class="n">new_reps</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nrep</span><span class="p">):</span>
-            <span class="n">run_uuid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">before_run</span><span class="p">(</span><span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">)</span>
-            <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_uuid</span><span class="p">,</span> <span class="n">timer</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
-            <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-            <span class="n">new_reps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t1</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">after_run</span><span class="p">(</span><span class="n">run_uuid</span><span class="p">,</span> <span class="n">new_reps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">with</span> <span class="n">change_default_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comm_type</span><span class="p">):</span>
+                <span class="n">run_uuid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">before_run</span><span class="p">(</span><span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">)</span>
+                <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_uuid</span><span class="p">,</span> <span class="n">timer</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+                <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="n">new_reps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t1</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">after_run</span><span class="p">(</span><span class="n">run_uuid</span><span class="p">,</span> <span class="n">new_reps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">entry_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">old_reps</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">new_reps</span><span class="p">))</span>

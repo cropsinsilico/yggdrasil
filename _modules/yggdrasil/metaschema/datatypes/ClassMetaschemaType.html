@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema.datatypes.ClassMetaschemaType &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.ClassMetaschemaType &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -100,6 +100,19 @@
 <span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.MetaschemaType</span> <span class="kn">import</span> <span class="n">MetaschemaType</span>
+
+
+<div class="viewcode-block" id="ExampleClass"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ClassMetaschemaType.ExampleClass">[docs]</a><span class="k">class</span> <span class="nc">ExampleClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_input_args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_input_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+        
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solf</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">solf</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_input_args</span> <span class="o">==</span> <span class="n">solf</span><span class="o">.</span><span class="n">_input_args</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_input_kwargs</span> <span class="o">==</span> <span class="n">solf</span><span class="o">.</span><span class="n">_input_kwargs</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="ClassMetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ClassMetaschemaType.ClassMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">ClassMetaschemaType</span><span class="p">(</span><span class="n">MetaschemaType</span><span class="p">):</span>
@@ -203,7 +216,7 @@
 <span class="sd">            object: Python object of the specified type.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">ClassMetaschemaType</span></div>
+        <span class="k">return</span> <span class="n">ExampleClass</span></div>
 </pre></div>
 
            </div>

@@ -1,0 +1,10 @@
+yggdrasil.examples.hello package
+================================
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.examples.hello
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.AsyncComm &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.communication.AsyncComm &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -206,7 +206,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="o">=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommTaskLoop</span><span class="p">(</span>
                     <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_backlog_recv</span><span class="p">,</span>
-                    <span class="n">deamon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">daemon</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;RecvBacklog&#39;</span><span class="p">)</span>
+                    <span class="n">daemon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">daemon</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;RecvBacklog&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span>
 
     <span class="nd">@property</span>
@@ -565,7 +565,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AsyncComm.recv_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_message">[docs]</a>    <span class="k">def</span> <span class="nf">recv_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.recv_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_message">[docs]</a>    <span class="k">def</span> <span class="nf">recv_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message.</span>
 
 <span class="sd">        Args:</span>
@@ -577,32 +577,6 @@
 <span class="sd">            CommMessage: Received message.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># This is required so that call to recv_message for work comms</span>
-        <span class="c1"># in CommBase.recv_message will retrieve messages from the backlog</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;return_message_object&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dont_finalize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-        
-<div class="viewcode-block" id="AsyncComm.recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_message_object</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dont_finalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            *args: All arguments are passed to comm _recv method.</span>
-<span class="sd">            return_message_object (bool, optional): If True, the full wrapped</span>
-<span class="sd">                CommMessage message object is returned instead of the tuple.</span>
-<span class="sd">                Defaults to False.</span>
-<span class="sd">            dont_finalize (bool, optional): If True, finalize_message will not</span>
-<span class="sd">                be called even if async_recv_method is &#39;recv_message&#39;. Defaults</span>
-<span class="sd">                to False.</span>
-<span class="sd">            **kwargs: All keywords arguments are passed to comm _recv method.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            tuple (bool, obj): Success or failure of receive and received</span>
-<span class="sd">                message.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">precheck</span><span class="p">(</span><span class="s1">&#39;recv&#39;</span><span class="p">)</span>
         <span class="c1"># Sleep until there is a message</span>
         <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">timeout</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;timeout&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_timeout</span><span class="p">)</span>
@@ -631,18 +605,56 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Returning backlogged received message&#39;</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop_backlog</span><span class="p">()</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">dont_finalize</span><span class="p">:</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_EOF</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_on_eof_recv</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-                    <span class="n">out</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_FAILURE</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_used</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+        
+<div class="viewcode-block" id="AsyncComm.finalize_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.finalize_message">[docs]</a>    <span class="k">def</span> <span class="nf">finalize_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform actions to decipher a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (CommMessage): Initial message object to be finalized.</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to the request comm&#39;s</span>
+<span class="sd">                finalize_message method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            CommMessage: Deserialized and annotated message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">orig_flag</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_EOF</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_on_eof_recv</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_FAILURE</span>
+        <span class="k">if</span> <span class="n">orig_flag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_FAILURE</span><span class="p">,</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_EMPTY</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_used</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">async_recv_method</span> <span class="o">!=</span> <span class="s1">&#39;recv_message&#39;</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">finalized</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;skip_processing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">finalize_message</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="AsyncComm.recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_message_object</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dont_finalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: All arguments are passed to comm _recv method.</span>
+<span class="sd">            return_message_object (bool, optional): If True, the full wrapped</span>
+<span class="sd">                CommMessage message object is returned instead of the tuple.</span>
+<span class="sd">                Defaults to False.</span>
+<span class="sd">            dont_finalize (bool, optional): If True, finalize_message will not</span>
+<span class="sd">                be called even if async_recv_method is &#39;recv_message&#39;. Defaults</span>
+<span class="sd">                to False.</span>
+<span class="sd">            **kwargs: All keywords arguments are passed to comm _recv method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple (bool, obj): Success or failure of receive and received</span>
+<span class="sd">                message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">precheck</span><span class="p">(</span><span class="s1">&#39;recv&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_message</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">dont_finalize</span><span class="p">:</span>
             <span class="n">kws_finalize</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_message_kws</span>
                             <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">}</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">async_recv_method</span> <span class="o">!=</span> <span class="s1">&#39;recv_message&#39;</span><span class="p">:</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">finalized</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="n">kws_finalize</span><span class="p">[</span><span class="s1">&#39;skip_processing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">finalize_message</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="o">**</span><span class="n">kws_finalize</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">finalize_message</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="o">**</span><span class="n">kws_finalize</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">return_message_object</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">flag</span><span class="p">),</span> <span class="n">out</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
@@ -677,12 +689,7 @@
 
 <div class="viewcode-block" id="AsyncComm.recv_dict"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_dict">[docs]</a>    <span class="k">def</span> <span class="nf">recv_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for recv_dict on wrapped comm.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">recv_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="AsyncComm.drain_server_signon_messages"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.drain_server_signon_messages">[docs]</a>    <span class="k">def</span> <span class="nf">drain_server_signon_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Drain server signon messages. This should only be used</span>
-<span class="sd">        for testing purposes.&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div></div>
+        <span class="k">return</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">recv_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

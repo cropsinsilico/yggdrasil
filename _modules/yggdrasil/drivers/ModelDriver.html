@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.ModelDriver &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.drivers.ModelDriver &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -158,7 +158,7 @@
     <span class="n">tools</span><span class="o">.</span><span class="n">remove_path</span><span class="p">(</span><span class="n">product</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
 
-<div class="viewcode-block" id="remove_products"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.remove_products">[docs]</a><span class="k">def</span> <span class="nf">remove_products</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">source_products</span><span class="p">,</span> <span class="n">timer_class</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="remove_products"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.remove_products">[docs]</a><span class="k">def</span> <span class="nf">remove_products</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">source_products</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Delete products produced during the process of running the model.</span>
 
 <span class="sd">    Args:</span>
@@ -169,9 +169,9 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">source_products</span><span class="p">:</span>
-        <span class="n">remove_product</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">timer_class</span><span class="o">=</span><span class="n">timer_class</span><span class="p">)</span>
+        <span class="n">remove_product</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
-        <span class="n">remove_product</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">timer_class</span><span class="o">=</span><span class="n">timer_class</span><span class="p">,</span> <span class="n">check_for_source</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        <span class="n">remove_product</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">check_for_source</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver">[docs]</a><span class="k">class</span> <span class="nc">ModelDriver</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
@@ -592,7 +592,8 @@
     <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="p">(</span><span class="n">Driver</span><span class="o">.</span><span class="n">_disconnect_attr</span>
                         <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;queue&#39;</span><span class="p">,</span> <span class="s1">&#39;queue_thread&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;event_process_kill_called&#39;</span><span class="p">,</span>
-                           <span class="s1">&#39;event_process_kill_complete&#39;</span><span class="p">])</span>
+                           <span class="s1">&#39;event_process_kill_complete&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;model_process&#39;</span><span class="p">])</span>
     <span class="n">_mpi_tags</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ENV&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
                  <span class="s1">&#39;START&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
                  <span class="s1">&#39;STOP_RANK0&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>  <span class="c1"># Stopped by partner</span>
@@ -1986,7 +1987,7 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Delete products produced during the process of running the model.&quot;&quot;&quot;</span>
         <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span>
         <span class="n">source_products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_products</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrapper_products</span>
-        <span class="n">remove_products</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">source_products</span><span class="p">,</span> <span class="n">timer_class</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="n">remove_products</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">source_products</span><span class="p">)</span></div>
             
 <div class="viewcode-block" id="ModelDriver.cleanup_dependencies"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.cleanup_dependencies">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">cleanup_dependencies</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">products</span><span class="o">=</span><span class="p">[],</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -2469,8 +2470,11 @@
                 <span class="n">x</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
                                 <span class="o">+</span> <span class="s1">&#39;_</span><span class="si">%s</span><span class="s1">_channel&#39;</span> <span class="o">%</span> <span class="n">io</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;vars&#39;</span><span class="p">,</span> <span class="p">[])):</span>
-                    <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">info_map</span><span class="p">[</span><span class="n">io</span><span class="p">]:</span>
-                        <span class="n">x</span><span class="p">[</span><span class="s1">&#39;vars&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">info_map</span><span class="p">[</span><span class="n">io</span><span class="p">][</span><span class="n">v</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="n">v</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">v</span><span class="p">}</span>
+                    <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">info_map</span><span class="p">[</span><span class="n">io</span><span class="p">]:</span>
+                        <span class="n">info_map</span><span class="p">[</span><span class="n">io</span><span class="p">][</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                        <span class="n">x</span><span class="p">[</span><span class="s1">&#39;vars&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">info_map</span><span class="p">[</span><span class="n">io</span><span class="p">][</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span>
             <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">io_var</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">info_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="n">io_var</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;vars&#39;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">info_map</span><span class="p">[</span><span class="n">io</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">io_var</span><span class="p">:</span>
@@ -2494,31 +2498,31 @@
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">v</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s1">&#39;_var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="c1"># Update datatypes</span>
-            <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_typed</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">io_var</span><span class="p">:</span>
-                    <span class="n">non_length</span> <span class="o">=</span> <span class="p">[]</span>
-                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;vars&#39;</span><span class="p">]:</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_length_var&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-                            <span class="n">non_length</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                         <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_default_typedef</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">])))):</span>
-                        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">non_length</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
-                            <span class="n">non_length</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="c1"># TODO: Remove types associated with length?</span>
-                            <span class="k">assert</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;array&#39;</span><span class="p">)</span>
-                            <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;items&#39;</span><span class="p">])</span>
-                                   <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_length</span><span class="p">))</span>
-                            <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">non_length</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;items&#39;</span><span class="p">]):</span>
-                                <span class="n">v</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">io_var</span><span class="p">:</span>
+                <span class="n">non_length</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;vars&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_length_var&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                        <span class="n">non_length</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                     <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_default_typedef</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">])))):</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">non_length</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+                        <span class="n">non_length</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">non_length</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
-                            <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">non_length</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">non_length</span><span class="p">]}</span>
-                        <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;from_function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="c1"># TODO: Remove types associated with length?</span>
+                        <span class="k">assert</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;array&#39;</span><span class="p">)</span>
+                        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;items&#39;</span><span class="p">])</span>
+                               <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_length</span><span class="p">))</span>
+                        <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">non_length</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;items&#39;</span><span class="p">]):</span>
+                            <span class="n">v</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span>
+                <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span> <span class="ow">in</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">non_length</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">non_length</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+                        <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">non_length</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">non_length</span><span class="p">]}</span>
+                    <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;from_function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_typed</span>
+                <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_typed</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;vars&#39;</span><span class="p">]:</span>
                         <span class="k">if</span> <span class="s1">&#39;native_type&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
                             <span class="n">v</span><span class="p">[</span><span class="s1">&#39;native_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_native_type</span><span class="p">(</span><span class="o">**</span><span class="n">v</span><span class="p">)</span>
@@ -4127,7 +4131,7 @@
             <span class="k">return</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">format_function_param</span><span class="p">(</span><span class="s1">&#39;assign&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="ModelDriver.write_expand_single_element"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.write_expand_single_element">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">write_expand_single_element</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">output_var</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">write_expand_single_element</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">output_var</span><span class="p">,</span> <span class="n">add_cond</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write lines allowing extraction of the only element from a single</span>
 <span class="sd">        element array as a stand-alone variable if the variable is an array</span>
 <span class="sd">        and only has one element.</span>
@@ -4135,6 +4139,9 @@
 <span class="sd">        Args:</span>
 <span class="sd">            output_var (str): Name of the variable that should be conditionally</span>
 <span class="sd">                expanded.</span>
+<span class="sd">            add_cond (list, optional): Additional conditions that must be</span>
+<span class="sd">                satisfied for the array element to be extracted. Defaults to</span>
+<span class="sd">                False and is ignored.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            list: Lines added the conditional expansion of single element</span>
@@ -4143,15 +4150,19 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;istype&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span>
+        <span class="n">cond</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">) </span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> 1)&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">format_function_param</span><span class="p">(</span><span class="s1">&#39;istype&#39;</span><span class="p">,</span>
+                                      <span class="n">variable</span><span class="o">=</span><span class="n">output_var</span><span class="p">,</span>
+                                      <span class="nb">type</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">type_map</span><span class="p">[</span><span class="s1">&#39;array&#39;</span><span class="p">]),</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="s1">&#39;&amp;&amp;&#39;</span><span class="p">),</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">format_function_param</span><span class="p">(</span><span class="s1">&#39;len&#39;</span><span class="p">,</span>
+                                      <span class="n">variable</span><span class="o">=</span><span class="n">output_var</span><span class="p">),</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;equ&#39;</span><span class="p">,</span> <span class="s1">&#39;==&#39;</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">add_cond</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">add_cond</span><span class="p">:</span>
+                <span class="n">cond</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="s1">&#39;&amp;&amp;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">write_if_block</span><span class="p">(</span>
-            <span class="p">(</span><span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">) </span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> 1)&#39;</span> <span class="o">%</span> <span class="p">(</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">format_function_param</span><span class="p">(</span><span class="s1">&#39;istype&#39;</span><span class="p">,</span>
-                                          <span class="n">variable</span><span class="o">=</span><span class="n">output_var</span><span class="p">,</span>
-                                          <span class="nb">type</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">type_map</span><span class="p">[</span><span class="s1">&#39;array&#39;</span><span class="p">]),</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="s1">&#39;&amp;&amp;&#39;</span><span class="p">),</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">format_function_param</span><span class="p">(</span><span class="s1">&#39;len&#39;</span><span class="p">,</span>
-                                          <span class="n">variable</span><span class="o">=</span><span class="n">output_var</span><span class="p">),</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;equ&#39;</span><span class="p">,</span> <span class="s1">&#39;==&#39;</span><span class="p">))),</span>
+            <span class="n">cond</span><span class="p">,</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">format_function_param</span><span class="p">(</span>
                 <span class="s1">&#39;assign&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">output_var</span><span class="p">,</span>
                 <span class="n">value</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">format_function_param</span><span class="p">(</span>
@@ -4436,6 +4447,33 @@
         <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;try_end&#39;</span><span class="p">,</span>
                                           <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
                                               <span class="s1">&#39;block_end&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="ModelDriver.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Dictionary of variables to use for testing. Key/value pairs:</span>
+<span class="sd">                kwargs (dict): Keyword arguments for driver instance.</span>
+<span class="sd">                deps (list): Dependencies to install.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="n">deps</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">write_function_def_params</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                             <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                                          <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">}}],</span>
+                 <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
+                                           <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                                           <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">}}]}],</span>
+            <span class="n">split_lines</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;abcdef&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;length&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;force_split&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+                          <span class="p">[</span><span class="s1">&#39;abc&#39;</span><span class="p">,</span> <span class="s1">&#39;def&#39;</span><span class="p">]),</span>
+                         <span class="p">(</span><span class="s1">&#39;    abc&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;length&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;force_split&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+                          <span class="p">[</span><span class="s1">&#39;    abc&#39;</span><span class="p">])])</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 

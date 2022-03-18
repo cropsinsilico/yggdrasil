@@ -1,14 +1,6 @@
 yggdrasil.communication.transforms package
 ==========================================
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   yggdrasil.communication.transforms.tests
-
 Submodules
 ----------
 

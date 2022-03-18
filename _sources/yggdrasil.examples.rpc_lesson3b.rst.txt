@@ -1,0 +1,10 @@
+yggdrasil.examples.rpc\_lesson3b package
+========================================
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.examples.rpc_lesson3b
+   :members:
+   :undoc-members:
+   :show-inheritance:

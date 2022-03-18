@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.ClientComm &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.communication.ClientComm &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -178,7 +178,8 @@
         <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;request comm&#39;</span><span class="p">))</span>
         <span class="n">lines</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">get_status_message</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="p">(</span><span class="n">nindent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;response comms&#39;</span><span class="p">))</span>
-        <span class="n">lines</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">get_status_message</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="p">(</span><span class="n">nindent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">get_status_message</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="p">(</span><span class="n">nindent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">lines</span><span class="p">,</span> <span class="n">prefix</span></div>
     
 <div class="viewcode-block" id="ClientComm.is_installed"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
@@ -202,16 +203,6 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Maximum size of a single message that should be sent.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">maxMsgSize</span>
         
-<div class="viewcode-block" id="ClientComm.underlying_comm_class"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.underlying_comm_class">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">underlying_comm_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of underlying communication class.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">import_comm</span><span class="p">()</span><span class="o">.</span><span class="n">underlying_comm_class</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="ClientComm.comm_count"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.comm_count">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">comm_count</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of communication connections.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">import_comm</span><span class="p">()</span><span class="o">.</span><span class="n">comm_count</span><span class="p">()</span></div>
-
 <div class="viewcode-block" id="ClientComm.new_comm_kwargs"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.new_comm_kwargs">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">new_comm_kwargs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">request_commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize communication with new comms.</span>
@@ -293,6 +284,11 @@
     <span class="k">def</span> <span class="nf">n_msg_send_drain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of outgoing messages in the connection to drain.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">n_msg_send_drain</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_msg_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages currently being routed.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">n_msg_direct</span>
 
 <div class="viewcode-block" id="ClientComm.atexit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close operations.&quot;&quot;&quot;</span>
@@ -435,7 +431,26 @@
 <div class="viewcode-block" id="ClientComm.drain_messages"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.drain_messages">[docs]</a>    <span class="k">def</span> <span class="nf">drain_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sleep while waiting for messages to be drained.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">drain_messages</span><span class="p">(</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">drain_messages</span><span class="p">(</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ClientComm.disconnect"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect the comm.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;ocomm&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;icomm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ClientComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div>
+
+    <span class="c1"># ALIASED PROPERTIES WITH SETTERS</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;FilterBase: filter for the communicator.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">filter</span>
+
+    <span class="nd">@filter</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the filter.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">filter</span> <span class="o">=</span> <span class="n">x</span></div>
 </pre></div>
 
            </div>

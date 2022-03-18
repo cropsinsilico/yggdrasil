@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.ZMQComm &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.communication.ZMQComm &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -378,8 +378,8 @@
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cli_socket</span><span class="o">.</span><span class="n">recv_multipart</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">server_signon_msg</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">((</span><span class="s2">&quot;A server has signed on after </span><span class="si">%d</span><span class="s2"> attempts, &quot;</span>
-                            <span class="s2">&quot;activating proxy.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsignon</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;A server has signed on after </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nsignon</span><span class="si">}</span><span class="s2"> &quot;</span>
+                           <span class="sa">f</span><span class="s2">&quot;attempts, activating proxy.&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">server_active</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">return</span> <span class="kc">None</span>
             <span class="c1"># if msg[1].startswith(self.server_signoff_msg):</span>
@@ -840,9 +840,10 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Unbound socket&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ZMQComm.disconnect"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dont_close</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="ZMQComm.disconnect_socket"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.disconnect_socket">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect_socket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dont_close</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from address.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;socket_lock&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;socket_lock&#39;</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+            <span class="c1"># Only occurs if there is an error in the class set up</span>
             <span class="k">return</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket_lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_connected&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
@@ -1027,10 +1028,12 @@
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_send</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_send</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># self.zmq_sleeptime)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_send</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="s2">&quot;REPLY_SEND_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_address</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">socket</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_recv</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">socket</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="s2">&quot;REPLY_RECV_&quot;</span> <span class="o">+</span> <span class="n">k</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_recv</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the connection.</span>
@@ -1060,7 +1063,7 @@
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">unbind</span><span class="p">()</span>
                 <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">disconnect_socket</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
                 <span class="c1"># if self.protocol == &#39;ipc&#39;:</span>
                 <span class="c1">#     print(self.host, os.path.isfile(self.host))</span>
@@ -1357,19 +1360,24 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span>
                 <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_server</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">allow_multiple_comms</span><span class="p">)):</span>
             <span class="k">return</span>
+        <span class="c1"># Wait for messages to be drained by the async thread</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_async</span><span class="p">:</span>
+            <span class="n">multitasking</span><span class="o">.</span><span class="n">wait_on_function</span><span class="p">(</span>
+                <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cli_address</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+            <span class="n">multitasking</span><span class="o">.</span><span class="n">wait_on_function</span><span class="p">(</span>
+                <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+            <span class="k">return</span>
         <span class="c1"># Wait for signon message</span>
-        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
-        <span class="k">while</span> <span class="p">((</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)):</span>  <span class="c1"># pragma: debug</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span>
+        <span class="n">multitasking</span><span class="o">.</span><span class="n">wait_on_function</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+
         <span class="c1"># Drain signon messages</span>
-        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
-        <span class="k">while</span> <span class="p">((</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)):</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">def</span> <span class="nf">drain_signon</span><span class="p">():</span>
             <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
             <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_empty_recv</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span></div>
+            <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">multitasking</span><span class="o">.</span><span class="n">wait_on_function</span><span class="p">(</span><span class="n">drain_signon</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="ZMQComm.confirm_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.confirm_send">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noblock</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that sent message was received.&quot;&quot;&quot;</span>

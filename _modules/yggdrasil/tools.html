@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.tools &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.tools &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -351,12 +351,27 @@
     <span class="nb">print</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
     
 
-<div class="viewcode-block" id="get_fds"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.get_fds">[docs]</a><span class="k">def</span> <span class="nf">get_fds</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+<div class="viewcode-block" id="get_fds"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.get_fds">[docs]</a><span class="k">def</span> <span class="nf">get_fds</span><span class="p">(</span><span class="n">by_column</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of open file descriptors.&quot;&quot;&quot;</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span>
         <span class="s1">&#39;lsof -p </span><span class="si">{}</span><span class="s1"> | grep -v txt&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()),</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span></div>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">if</span> <span class="n">by_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="n">by_column</span><span class="p">]:</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">out</span></div>
 
+
+<div class="viewcode-block" id="track_fds"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.track_fds">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+<span class="k">def</span> <span class="nf">track_fds</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+    <span class="n">fds0</span> <span class="o">=</span> <span class="n">get_fds</span><span class="p">(</span><span class="n">by_column</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">yield</span>
+    <span class="n">fds1</span> <span class="o">=</span> <span class="n">get_fds</span><span class="p">(</span><span class="n">by_column</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">new_fds</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">fds1</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">fds0</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="p">[</span><span class="n">fds1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">new_fds</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">diff</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="nb">len</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span><span class="si">}</span><span class="s1"> fds</span><span class="se">\n\t</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">diff</span><span class="p">]))</span></div>
+    
 
 <div class="viewcode-block" id="get_shell"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.get_shell">[docs]</a><span class="k">def</span> <span class="nf">get_shell</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the type of shell that yggdrasil was called from.</span>
@@ -744,28 +759,21 @@
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="remove_path"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.remove_path">[docs]</a><span class="k">def</span> <span class="nf">remove_path</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">timer_class</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="remove_path"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.remove_path">[docs]</a><span class="k">def</span> <span class="nf">remove_path</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">60.0</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Delete a single file.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fpath (str): Full path to a file or directory that should be</span>
 <span class="sd">            removed.</span>
-<span class="sd">        timer_class (YggClass, optional): Class that should be used to</span>
-<span class="sd">            generate a timer that is used to wait for file to be removed.</span>
-<span class="sd">            Defaults to None and a new class instance will be created.</span>
 <span class="sd">        timeout (float, optional): Time (in seconds) that should be</span>
 <span class="sd">            waited before raising an error that a file cannot be removed.</span>
-<span class="sd">            Defaults to None and will be set by the timer_class.</span>
+<span class="sd">            Defaults to 60.0.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        RuntimeError: If the product cannot be removed.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">multitasking</span>
-    <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">timer_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">timer_class</span> <span class="o">=</span> <span class="n">YggClass</span><span class="p">()</span>
-        <span class="n">timeout</span> <span class="o">=</span> <span class="n">timer_class</span><span class="o">.</span><span class="n">timeout</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
         <span class="n">ftype</span> <span class="o">=</span> <span class="s1">&#39;directory&#39;</span>
         <span class="n">fcheck</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span>
@@ -821,6 +829,33 @@
     <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">_supported_platforms</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="is_language_alias"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.is_language_alias">[docs]</a><span class="k">def</span> <span class="nf">is_language_alias</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">language</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if a string is an alias for a language.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (str): String to check.</span>
+<span class="sd">        language (str, list): One or more language to check aliases of.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str, bool: Returns the version of the language in the provided set if</span>
+<span class="sd">            x is an alias and False otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">language</span> <span class="o">=</span> <span class="p">[</span><span class="n">language</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">xx</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">upper</span><span class="p">()]:</span>
+        <span class="k">if</span> <span class="n">xx</span> <span class="ow">in</span> <span class="n">language</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">xx</span>
+    <span class="n">aliases</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">ALIASED_LANGUAGES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+            <span class="n">aliases</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">aliases</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">language</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">v</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
 <div class="viewcode-block" id="get_supported_lang"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.get_supported_lang">[docs]</a><span class="k">def</span> <span class="nf">get_supported_lang</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of the model programming languages that are supported</span>
 <span class="sd">    by yggdrasil.</span>
@@ -829,11 +864,6 @@
 <span class="sd">        list: The names of programming languages supported by yggdrasil.</span>
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># from yggdrasil import schema</span>
-    <span class="c1"># s = schema.get_schema()</span>
-    <span class="c1"># out = s[&#39;model&#39;].subtypes</span>
-    <span class="c1"># if &#39;r&#39; in out:</span>
-    <span class="c1">#     out[out.index(&#39;r&#39;)] = &#39;R&#39;</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">LANGUAGES</span><span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">if</span> <span class="s1">&#39;c++&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
         <span class="n">out</span><span class="p">[</span><span class="n">out</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;c++&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s1">&#39;cpp&#39;</span>
@@ -862,12 +892,11 @@
 <span class="sd">        list: The names of communication mechanisms supported by yggdrasil.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">schema</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">constants</span>
     <span class="n">excl_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CommBase&#39;</span><span class="p">,</span> <span class="s1">&#39;DefaultComm&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">dont_include_value</span><span class="p">:</span>
         <span class="n">excl_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;ValueComm&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">]</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">get_schema</span><span class="p">()</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">subtypes</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">COMPONENT_REGISTRY</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">][</span><span class="s1">&#39;subtypes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">excl_list</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
@@ -984,9 +1013,9 @@
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Could not locate an installed comm.&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">_default_comm</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Comm&#39;</span><span class="p">):</span>
         <span class="n">_default_comm</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="n">_default_comm</span><span class="p">)</span><span class="o">.</span><span class="n">_commtype</span>
-    <span class="k">if</span> <span class="n">_default_comm</span> <span class="o">==</span> <span class="s1">&#39;rmq&#39;</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;RMQ cannot be the default comm because &#39;</span>
-                                  <span class="o">+</span> <span class="s1">&#39;there is not an RMQ C interface.&#39;</span><span class="p">)</span>
+    <span class="c1"># if _default_comm == &#39;rmq&#39;:  # pragma: debug</span>
+    <span class="c1">#     raise NotImplementedError(&#39;RMQ cannot be the default comm because &#39;</span>
+    <span class="c1">#                               + &#39;there is not an RMQ C interface.&#39;)</span>
     <span class="k">return</span> <span class="n">_default_comm</span></div>
 
 
@@ -1272,13 +1301,25 @@
                     <span class="c1"># - https://stackoverflow.com/questions/30139401/</span>
                     <span class="c1">#       filter-out-command-that-needs-a-terminal-in-python-</span>
                     <span class="c1">#       subprocess-module</span>
-                    <span class="n">master_fd</span><span class="p">,</span> <span class="n">slave_fd</span> <span class="o">=</span> <span class="n">pty</span><span class="o">.</span><span class="n">openpty</span><span class="p">()</span>
-                    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;stdin&#39;</span><span class="p">,</span> <span class="n">slave_fd</span><span class="p">)</span>
+                    <span class="n">parent_fd</span><span class="p">,</span> <span class="n">child_fd</span> <span class="o">=</span> <span class="n">pty</span><span class="o">.</span><span class="n">openpty</span><span class="p">()</span>
+                    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;stdin&#39;</span><span class="p">,</span> <span class="n">child_fd</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">pty</span> <span class="o">=</span> <span class="p">(</span><span class="n">parent_fd</span><span class="p">,</span> <span class="n">child_fd</span><span class="p">)</span>
 
                 <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;preexec_fn&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">setpgrp</span><span class="p">)</span>
         <span class="c1"># if platform._is_win:  # pragma: windows</span>
         <span class="c1">#     kwargs.setdefault(&#39;universal_newlines&#39;, True)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggPopen</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">cmd_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="YggPopen.disconnect"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.YggPopen.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect objects using resources.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;pty&#39;</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pty</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pty</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">pty</span></div>
+
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">YggPopen</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__del__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="YggPopen.kill"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.YggPopen.kill">[docs]</a>    <span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;On windows using CTRL_BREAK_EVENT to kill the process.&quot;&quot;&quot;</span>

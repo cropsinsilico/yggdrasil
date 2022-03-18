@@ -1,0 +1,21 @@
+yggdrasil.examples.timesync1 package
+====================================
+
+Submodules
+----------
+
+yggdrasil.examples.timesync1.plot\_timesync module
+--------------------------------------------------
+
+.. automodule:: yggdrasil.examples.timesync1.plot_timesync
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.examples.timesync1
+   :members:
+   :undoc-members:
+   :show-inheritance:

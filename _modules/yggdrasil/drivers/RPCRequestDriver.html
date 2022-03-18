@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.RPCRequestDriver &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.drivers.RPCRequestDriver &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -323,19 +323,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">prune_response_drivers</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="RPCRequestDriver.prune_response_drivers"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RPCRequestDriver.RPCRequestDriver.prune_response_drivers">[docs]</a>    <span class="k">def</span> <span class="nf">prune_response_drivers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove response drivers that are no longer being used.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Promote errors from response drivers.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="c1"># remove_idx = []</span>
-            <span class="c1"># for i, x in enumerate(self.response_drivers):</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">+=</span> <span class="n">x</span><span class="o">.</span><span class="n">errors</span></div></div>
-            <span class="c1">#     if (((not x.is_alive())</span>
-            <span class="c1">#          and x.icomm.is_confirmed_recv</span>
-            <span class="c1">#          and x.ocomm.is_confirmed_send)):</span>
-            <span class="c1">#         x.cleanup()</span>
-            <span class="c1">#         remove_idx.append(i)</span>
-            <span class="c1"># for i in remove_idx[::-1]:</span>
-            <span class="c1">#     self.response_drivers.pop(i)</span>
 </pre></div>
 
            </div>

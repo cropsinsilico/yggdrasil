@@ -1,0 +1,10 @@
+yggdrasil.examples.sbml2 package
+================================
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.examples.sbml2
+   :members:
+   :undoc-members:
+   :show-inheritance:

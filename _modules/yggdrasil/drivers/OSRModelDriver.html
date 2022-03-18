@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.OSRModelDriver &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.drivers.OSRModelDriver &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -471,7 +471,26 @@
     <span class="k">def</span> <span class="nf">cleanup_dependencies</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup dependencies.&quot;&quot;&quot;</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="s1">&#39;cleanygg&#39;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">OSRModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup_dependencies</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">OSRModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup_dependencies</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OSRModelDriver.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Dictionary of variables to use for testing. Key/value pairs:</span>
+<span class="sd">                kwargs (dict): Keyword arguments for driver instance.</span>
+<span class="sd">                deps (list): Dependencies to install.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">OSRModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">()</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">timesync</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;timesync&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;carbonAllocation2Roots&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;carbonAllocation2Roots&#39;</span><span class="p">]},</span>
+            <span class="n">copy_xml_to_osr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;requires_partner&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 
            </div>

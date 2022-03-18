@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>YAML Files &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>YAML Files &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -631,7 +631,7 @@ be relative to working_dir or absolute.</p></td>
 provided, the compiler will be determined based on configuration options for the
 language (if present) and the registered compilers that are available on the
 current operating system.</p></td>
-<td><p>[‘c’, ‘fortran’, ‘make’, ‘cpp’, ‘c++’, ‘cxx’, ‘cmake’]</p></td>
+<td><p>[‘c++’, ‘c’, ‘cxx’, ‘fortran’, ‘make’, ‘cpp’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>compiler_flags</p></td>
 <td><p>array</p></td>
@@ -639,7 +639,7 @@ current operating system.</p></td>
 the compiler flags will be determined based on configuration options for the
 language (if present), the compiler defaults, and the default_compiler_flags
 class attribute.</p></td>
-<td><p>[‘c’, ‘fortran’, ‘make’, ‘cpp’, ‘c++’, ‘cxx’, ‘cmake’]</p></td>
+<td><p>[‘c++’, ‘c’, ‘cxx’, ‘fortran’, ‘make’, ‘cpp’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-even"><td><p>configuration</p></td>
 <td><p>string</p></td>
@@ -703,14 +703,14 @@ be determined by the target language driver.</p></td>
 <td><p>Name or path of interpreter executable that should be used to run the model. If
 not provided, the interpreter will be determined based on configuration options
 for the language (if present) and the default_interpreter class attribute.</p></td>
-<td><p>[‘matlab’, ‘sbml’, ‘timesync’, ‘python’, ‘r’, ‘lpy’, ‘dummy’, ‘R’]</p></td>
+<td><p>[‘sbml’, ‘dummy’, ‘timesync’, ‘python’, ‘R’, ‘matlab’, ‘lpy’, ‘r’]</p></td>
 </tr>
 <tr class="row-even"><td><p>interpreter_flags</p></td>
 <td><p>array</p></td>
 <td><p>Flags that should be passed to the interpreter when running the model. If not
 provided, the flags are determined based on configuration options for the
 language (if present) and the default_interpreter_flags class attribute.</p></td>
-<td><p>[‘matlab’, ‘sbml’, ‘timesync’, ‘python’, ‘r’, ‘lpy’, ‘dummy’, ‘R’]</p></td>
+<td><p>[‘sbml’, ‘dummy’, ‘timesync’, ‘python’, ‘R’, ‘matlab’, ‘lpy’, ‘r’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>linker</p></td>
 <td><p>string</p></td>
@@ -718,7 +718,7 @@ language (if present) and the default_interpreter_flags class attribute.</p></td
 provided, the linker will be determined based on configuration options for the
 language (if present) and the registered linkers that are available on the
 current operating system</p></td>
-<td><p>[‘c’, ‘fortran’, ‘make’, ‘cpp’, ‘c++’, ‘cxx’, ‘cmake’]</p></td>
+<td><p>[‘c++’, ‘c’, ‘cxx’, ‘fortran’, ‘make’, ‘cpp’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-even"><td><p>linker_flags</p></td>
 <td><p>array</p></td>
@@ -726,7 +726,7 @@ current operating system</p></td>
 the linker flags will be determined based on configuration options for the
 language (if present), the linker defaults, and the default_linker_flags class
 attribute.</p></td>
-<td><p>[‘c’, ‘fortran’, ‘make’, ‘cpp’, ‘c++’, ‘cxx’, ‘cmake’]</p></td>
+<td><p>[‘c++’, ‘c’, ‘cxx’, ‘fortran’, ‘make’, ‘cpp’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>makedir</p></td>
 <td><p>string</p></td>
@@ -763,7 +763,7 @@ selections will be returned.</p></td>
 <td><p>If True, no interpreter will be added to the arguments. This should only be used
 for subclasses that will not be invoking the model via the command line.
 Defaults to False.</p></td>
-<td><p>[‘matlab’, ‘sbml’, ‘timesync’, ‘python’, ‘r’, ‘lpy’, ‘dummy’, ‘R’]</p></td>
+<td><p>[‘sbml’, ‘dummy’, ‘timesync’, ‘python’, ‘R’, ‘matlab’, ‘lpy’, ‘r’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>skip_start_time</p></td>
 <td><p>boolean</p></td>
@@ -776,7 +776,7 @@ False. This option is ignored if only_output_final_step is True.</p></td>
 <td><p>Source files that should be compiled into an executable. Defaults to an empty
 list and the driver will search for a source file based on the model executable
 (the first model argument).</p></td>
-<td><p>[‘c’, ‘fortran’, ‘make’, ‘cpp’, ‘c++’, ‘cxx’, ‘cmake’]</p></td>
+<td><p>[‘c++’, ‘c’, ‘cxx’, ‘fortran’, ‘make’, ‘cpp’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>sourcedir</p></td>
 <td><p>string</p></td>
@@ -1300,13 +1300,13 @@ for 3D structures.</p></td>
 <tr class="row-even"><td><p>comment</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
-<td><p>[‘table’, ‘mat’, ‘netcdf’, ‘json’, ‘pickle’, ‘obj’, ‘pandas’, ‘wofost’, ‘ascii’, ‘yaml’, ‘ply’, ‘map’]</p></td>
+<td><p>[‘map’, ‘yaml’, ‘pickle’, ‘table’, ‘ply’, ‘mat’, ‘wofost’, ‘pandas’, ‘obj’, ‘netcdf’, ‘json’, ‘ascii’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>datatype</p></td>
 <td><p>schema</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
-<td><p>[‘table’, ‘mat’, ‘netcdf’, ‘json’, ‘pickle’, ‘obj’, ‘pandas’, ‘wofost’, ‘ascii’, ‘yaml’, ‘ply’, ‘map’]</p></td>
+<td><p>[‘map’, ‘yaml’, ‘pickle’, ‘table’, ‘ply’, ‘mat’, ‘wofost’, ‘pandas’, ‘obj’, ‘netcdf’, ‘json’, ‘ascii’]</p></td>
 </tr>
 <tr class="row-even"><td><p>default_flow_style</p></td>
 <td><p>boolean</p></td>
@@ -1318,7 +1318,7 @@ they will always be serialized in the flow style. See <a class="reference extern
 <td><p>string</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘table’, ‘pandas’, ‘wofost’, ‘map’]</p></td>
+<td><p>[‘map’, ‘pandas’, ‘wofost’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>encoding</p></td>
 <td><p>string</p></td>
@@ -1329,12 +1329,12 @@ to t.</p></td>
 <td><p>[‘string’, ‘int’]</p></td>
 <td><p>String or number of spaces that should be used to indent each level within the
 seiralized structure. Defaults to ‘t’.</p></td>
-<td><p>[‘yaml’, ‘json’]</p></td>
+<td><p>[‘json’, ‘yaml’]</p></td>
 </tr>
 <tr class="row-even"><td><p>newline</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
-<td><p>[‘table’, ‘mat’, ‘netcdf’, ‘json’, ‘pickle’, ‘obj’, ‘pandas’, ‘wofost’, ‘ascii’, ‘yaml’, ‘ply’, ‘map’]</p></td>
+<td><p>[‘map’, ‘yaml’, ‘pickle’, ‘table’, ‘ply’, ‘mat’, ‘wofost’, ‘pandas’, ‘obj’, ‘netcdf’, ‘json’, ‘ascii’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>no_header</p></td>
 <td><p>boolean</p></td>
@@ -1375,7 +1375,7 @@ to True.</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
-<td><p>[‘table’, ‘pandas’]</p></td>
+<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>variables</p></td>
 <td><p>array</p></td>
@@ -1440,11 +1440,29 @@ and the available options can be found <a class="reference internal" href="#yaml
 <td></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>onexit</p></td>
+<tr class="row-odd"><td><p>input_pattern</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>The communication pattern that should be used to handle incoming messages when
+there is more than one input communicators present. Defaults to ‘cycle’. Options
+include: ‘cycle’: Receive from the next available input communicator. ‘gather’:
+Receive lists of messages with one element from each communicator where a
+message is only returned when there is a message from each.</p></td>
+</tr>
+<tr class="row-even"><td><p>onexit</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>Class method that should be called when a model that the connection interacts
 with exits, but before the connection driver is shut down. Defaults to None.</p></td>
+</tr>
+<tr class="row-odd"><td><p>output_pattern</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>The communication pattern that should be used to handling outgoing messages when
+there is more than one output communicator present. Defaults to ‘broadcast’.
+Options include: ‘cycle’: Rotate through output comms, sending one message to
+each. ‘broadcast’: Send the same message to each comm. ‘scatter’: Send part of
+message (must be a list) to each comm.</p></td>
 </tr>
 <tr class="row-even"><td><p>translator</p></td>
 <td><p>array</p></td>

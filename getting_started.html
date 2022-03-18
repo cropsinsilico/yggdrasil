@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting started &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>Getting started &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -125,10 +125,10 @@ single line of output to stdout:</p>
 <p>(<a class="reference external" href="examples/gs_lesson1.html">Example in other languages</a>)</p>
 <p>The YAML file to run this model would then be:</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos">2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_model</span>
-<span class="linenos">3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>  <span class="c1"># Runs the python script using default Python</span>
-<span class="linenos">4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson1.py</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_model</span><span class="w"></span>
+<span class="linenos">3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w">  </span><span class="c1"># Runs the python script using default Python</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson1.py</span><span class="w"></span>
 </pre></div>
 </div>
 <p>(<a class="reference external" href="examples/gs_lesson1.html">Example in other languages</a>)</p>
@@ -156,14 +156,14 @@ commandline entry point <cite>yggrun</cite> followed by the path to the YAML.:</
 </div>
 <p>or including multiple models in a single YAML file.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos">2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_model1</span>
-<span class="linenos">3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>  <span class="c1"># Runs the python script using default Python</span>
-<span class="linenos">4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson2.py</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_model1</span><span class="w"></span>
+<span class="linenos">3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w">  </span><span class="c1"># Runs the python script using default Python</span><span class="w"></span>
+<span class="linenos">4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson2.py</span><span class="w"></span>
 <span class="linenos">5</span>
-<span class="linenos">6</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_model2</span>
-<span class="linenos">7</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">8</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson2.py</span>
+<span class="linenos">6</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_model2</span><span class="w"></span>
+<span class="linenos">7</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos">8</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson2.py</span><span class="w"></span>
 </pre></div>
 </div>
 <p>(<a class="reference external" href="examples/gs_lesson2.html">Example in other languages</a>)</p>
@@ -231,20 +231,20 @@ begin passed through the channel.</p>
 definition and then linked to files by entries in the <code class="docutils literal notranslate"><span class="pre">connections</span></code> section
 of the YAML.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_model</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>  <span class="c1"># Runs the python script using default Python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson3.py</span>
-<span class="linenos"> 5</span>    <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 6</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span>
-<span class="linenos"> 7</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos"> 8</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">output</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_model</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w">  </span><span class="c1"># Runs the python script using default Python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson3.py</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output</span><span class="w"></span>
 <span class="linenos"> 9</span>
-<span class="linenos">10</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">11</span>  <span class="p p-Indicator">-</span> <span class="nt">input_file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
-<span class="linenos">12</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">input</span>
-<span class="linenos">13</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output</span>
-<span class="linenos">14</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<span class="linenos">10</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./output.txt</span><span class="w"></span>
 </pre></div>
 </div>
 <p>(<a class="reference external" href="examples/gs_lesson3.html">Example in other languages</a>)</p>
@@ -364,26 +364,26 @@ a channel named ‘outputA’, while model B receives input from a channel named
 ‘inputB’, and ‘outputB’ is connected to a local file in the <code class="docutils literal notranslate"><span class="pre">connections</span></code>
 section of the YAML.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson4_modelA.py</span>
-<span class="linenos"> 5</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-<span class="linenos"> 6</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_modelA</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson4_modelA.py</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputA</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outputA</span><span class="w"></span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
-<span class="linenos"> 9</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">10</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson4_modelB.py</span>
-<span class="linenos">11</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-<span class="linenos">12</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_modelB</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson4_modelB.py</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputB</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outputB</span><span class="w"></span>
 <span class="linenos">13</span>
-<span class="linenos">14</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">15</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-<span class="linenos">16</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-<span class="linenos">17</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-<span class="linenos">18</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
-<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<span class="linenos">14</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outputA</span><span class="w">  </span><span class="c1"># Connection between model A output &amp; model B input</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputB</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w">  </span><span class="c1"># Connection between file and model A input</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputA</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outputB</span><span class="w">  </span><span class="c1"># Connection between model B output and file</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./output.txt</span><span class="w"></span>
 </pre></div>
 </div>
 <p>(<a class="reference external" href="examples/gs_lesson4.html">Example in other languages</a>)</p>
@@ -395,34 +395,34 @@ the underlying drivers without an explicit <code class="docutils literal notrans
 exact same models from the previous example can be connected using the
 following YAML.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson4b_modelA.py</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_modelA</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson4b_modelA.py</span><span class="w"></span>
 <span class="linenos"> 5</span>
-<span class="linenos"> 6</span>    <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 7</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-<span class="linenos"> 8</span>        <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span>
-<span class="linenos"> 9</span>        <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputA</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">        </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">        </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w"></span>
 <span class="linenos">10</span>
-<span class="linenos">11</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">12</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
-<span class="linenos">13</span>        <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">OutputDriver</span>  <span class="c1"># Output to another channel</span>
-<span class="linenos">14</span>        <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A_to_B</span>  <span class="c1"># Connection to inputB</span>
+<span class="linenos">11</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outputA</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">        </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">OutputDriver</span><span class="w">  </span><span class="c1"># Output to another channel</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">        </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A_to_B</span><span class="w">  </span><span class="c1"># Connection to inputB</span><span class="w"></span>
 <span class="linenos">15</span>
-<span class="linenos">16</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
-<span class="linenos">17</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">18</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson4b_modelB.py</span>
+<span class="linenos">16</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_modelB</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson4b_modelB.py</span><span class="w"></span>
 <span class="linenos">19</span>
-<span class="linenos">20</span>    <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos">21</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-<span class="linenos">22</span>        <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputDriver</span>  <span class="c1"># Input from another channel</span>
-<span class="linenos">23</span>        <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A_to_B</span>  <span class="c1"># Conneciton to inputA</span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputB</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">        </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InputDriver</span><span class="w">  </span><span class="c1"># Input from another channel</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">        </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A_to_B</span><span class="w">  </span><span class="c1"># Conneciton to inputA</span><span class="w"></span>
 <span class="linenos">24</span>
-<span class="linenos">25</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">26</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
-<span class="linenos">27</span>        <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span>
-<span class="linenos">28</span>        <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<span class="linenos">25</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outputB</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">        </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">        </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./output.txt</span><span class="w"></span>
 </pre></div>
 </div>
 <p>(<a class="reference external" href="examples/gs_lesson4b.html">Example in other languages</a>)</p>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.RMQAsyncComm &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.communication.RMQAsyncComm &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -95,10 +95,28 @@
              
   <h1>Source code for yggdrasil.communication.RMQAsyncComm</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">weakref</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">multitasking</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">RMQComm</span><span class="p">,</span> <span class="n">NoMessages</span><span class="p">,</span> <span class="n">TemporaryCommunicationError</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication.RMQComm</span> <span class="kn">import</span> <span class="n">pika</span>
+
+
+<div class="viewcode-block" id="RMQTaskLoop"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQTaskLoop">[docs]</a><span class="k">class</span> <span class="nc">RMQTaskLoop</span><span class="p">(</span><span class="n">multitasking</span><span class="o">.</span><span class="n">YggTaskLoop</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Task loop for RMQ consumer.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">proxy</span><span class="p">(</span><span class="n">comm</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RMQTaskLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="RMQTaskLoop.atexit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQTaskLoop.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">is_interface</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">send_eof</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">linger</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RMQTaskLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">atexit</span><span class="p">()</span></div></div>
 
 
 <div class="viewcode-block" id="RMQAsyncComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm">[docs]</a><span class="k">class</span> <span class="nc">RMQAsyncComm</span><span class="p">(</span><span class="n">RMQComm</span><span class="o">.</span><span class="n">RMQComm</span><span class="p">):</span>
@@ -122,7 +140,9 @@
     <span class="n">_commtype</span> <span class="o">=</span> <span class="s1">&#39;rmq_async&#39;</span>
     <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Asynchronous RabbitMQ connection.&#39;</span><span class="p">)</span>
     <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="p">(</span><span class="n">RMQComm</span><span class="o">.</span><span class="n">RMQComm</span><span class="o">.</span><span class="n">_disconnect_attr</span>
-                        <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;_rmq_thread&#39;</span><span class="p">,</span> <span class="s1">&#39;_consuming&#39;</span><span class="p">,</span> <span class="s1">&#39;_reconnecting&#39;</span><span class="p">])</span>
+                        <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;rmq_thread&#39;</span><span class="p">,</span> <span class="s1">&#39;_consuming&#39;</span><span class="p">,</span> <span class="s1">&#39;_reconnecting&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;_buffered_messages&#39;</span><span class="p">,</span> <span class="s1">&#39;_deliveries&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;_external_close&#39;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize null variables and RMQ async thread.&quot;&quot;&quot;</span>
@@ -130,12 +150,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">times_connected</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rmq_thread_count</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rmq_thread</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_run_thread</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_consuming</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">ProcessEvent</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_reconnecting</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">ProcessEvent</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_consuming</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">ProcessEvent</span><span class="p">(</span><span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;thread&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reconnecting</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">ProcessEvent</span><span class="p">(</span><span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;thread&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reconnect_delay</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_prefetch_count</span> <span class="o">=</span> <span class="mi">2</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_buffered_messages</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_deliveries</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">LockedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_buffered_messages</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">Queue</span><span class="p">(</span><span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;thread&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_deliveries</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">LockedDict</span><span class="p">(</span><span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;thread&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_external_close</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;thread&#39;</span><span class="p">)</span>
         <span class="c1"># self._publish_interval = 0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_acked</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nacked</span> <span class="o">=</span> <span class="mi">0</span>
@@ -153,9 +174,10 @@
         <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rmq_thread_count</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">YggTask</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.RMQThread</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_thread_count</span><span class="p">,</span>
-            <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_thread</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">RMQTaskLoop</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">.RMQThread</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rmq_thread_count</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_thread</span><span class="p">,</span> <span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;thread&#39;</span><span class="p">,</span>
+            <span class="n">daemon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">is_interface</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RMQAsyncComm.reset_for_reconnection"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.reset_for_reconnection">[docs]</a>    <span class="k">def</span> <span class="nf">reset_for_reconnection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Reset variables in preparation for reconnection.&quot;&quot;&quot;</span>
@@ -173,35 +195,58 @@
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_deliveries</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_deliveries</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="RMQAsyncComm.check_for_close"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.check_for_close">[docs]</a>    <span class="k">def</span> <span class="nf">check_for_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Check if close has been called from the main process.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_external_close</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reconnecting</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_reconnecting</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">ioloop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
 <div class="viewcode-block" id="RMQAsyncComm.run_thread"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.run_thread">[docs]</a>    <span class="k">def</span> <span class="nf">run_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Connect to the connection and begin the IO loop.&quot;&quot;&quot;</span>
-        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">has_started</span><span class="p">():</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">ioloop</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;returning&quot;</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error in RMQ thread </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">e</span><span class="p">)</span>
+        <span class="k">class</span> <span class="nc">BreakLoop</span><span class="p">(</span><span class="n">multitasking</span><span class="o">.</span><span class="n">BreakLoopException</span><span class="p">):</span>
+            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="n">solf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
-                <span class="k">break</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reconnecting</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consuming</span><span class="o">.</span><span class="n">has_started</span><span class="p">():</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_reconnect_delay</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_reconnect_delay</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_reconnect_delay</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reconnect_delay</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Reconnecting after </span><span class="si">%d</span><span class="s1"> seconds&#39;</span><span class="p">,</span>
-                          <span class="bp">self</span><span class="o">.</span><span class="n">_reconnect_delay</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reconnect_delay</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">reset_for_reconnection</span><span class="p">()</span></div>
+                <span class="nb">super</span><span class="p">(</span><span class="n">BreakLoop</span><span class="p">,</span> <span class="n">solf</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">has_started</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">BreakLoop</span><span class="p">(</span><span class="s2">&quot;closing&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">ioloop</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_consuming</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;returning&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error in RMQ thread </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">BreakLoop</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_queue</span><span class="p">(</span><span class="n">skip_unbind</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_channel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">has_started</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reconnecting</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consuming</span><span class="o">.</span><span class="n">has_started</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_reconnect_delay</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_reconnect_delay</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reconnect_delay</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reconnect_delay</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Reconnecting after </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_reconnect_delay</span><span class="si">}</span><span class="s1"> seconds&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_external_close</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reconnect_delay</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_external_close</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_reconnecting</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="n">BreakLoop</span><span class="p">(</span><span class="s2">&quot;external close&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reset_for_reconnection</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="RMQAsyncComm.start_run_thread"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.start_run_thread">[docs]</a>    <span class="k">def</span> <span class="nf">start_run_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start the run thread and wait for it to finish.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_thread</span><span class="o">.</span><span class="n">was_started</span><span class="p">:</span>
                 <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rmq_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="c1"># Wait for connection to be established</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
@@ -217,13 +262,15 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Declare queue to get random new queue.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span><span class="o">.</span><span class="n">has_started</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">has_started</span><span class="p">():</span>
             <span class="k">return</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_run_thread</span><span class="p">()</span>  <span class="c1"># Start ioloop in a new thread</span>
         <span class="c1"># Register queue</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Queue was not initialized.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">))</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">RMQComm</span><span class="o">.</span><span class="n">RMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RMQComm</span><span class="o">.</span><span class="n">RMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span>
+        <span class="n">multitasking</span><span class="o">.</span><span class="n">wait_on_function</span><span class="p">(</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span><span class="o">.</span><span class="n">has_stopped</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">has_started</span><span class="p">(),</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span></div>
     
     <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the connection.</span>
@@ -238,7 +285,8 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">has_stopped</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">ioloop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Closing has not completed&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Closing has not completed, resources may be leaked&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_client</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
@@ -251,6 +299,10 @@
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="s2">&quot;Thread still running.&quot;</span><span class="p">,</span> <span class="p">{})[</span><span class="mi">0</span><span class="p">])</span>
 
+<div class="viewcode-block" id="RMQAsyncComm.atexit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close operations.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RMQComm</span><span class="o">.</span><span class="n">RMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">atexit</span><span class="p">()</span></div>
+        
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection and channel are open.&quot;&quot;&quot;</span>
@@ -309,11 +361,12 @@
 <div class="viewcode-block" id="RMQAsyncComm.close_channel"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.close_channel">[docs]</a>    <span class="k">def</span> <span class="nf">close_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the channel if it exists.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close_queue</span><span class="p">(</span><span class="n">skip_unbind</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">on_channel_closeok</span><span class="p">,</span> <span class="p">[</span><span class="n">pika</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">Channel</span><span class="o">.</span><span class="n">CloseOk</span><span class="p">])</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RMQAsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">close_channel</span><span class="p">()</span></div>
         
-<div class="viewcode-block" id="RMQAsyncComm.close_connection"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.close_connection">[docs]</a>    <span class="k">def</span> <span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RMQAsyncComm.close_connection"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.close_connection">[docs]</a>    <span class="k">def</span> <span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the connection.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_consuming</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
@@ -321,7 +374,7 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">is_closing</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">is_closed</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Connection is closing or already closed&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="nb">super</span><span class="p">(</span><span class="n">RMQAsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span></div>
+                <span class="nb">super</span><span class="p">(</span><span class="n">RMQAsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">close_connection</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
     <span class="c1"># CONNECTION</span>
 <div class="viewcode-block" id="RMQAsyncComm.connect"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -341,40 +394,53 @@
 
 <div class="viewcode-block" id="RMQAsyncComm.on_connection_open_error"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.on_connection_open_error">[docs]</a>    <span class="k">def</span> <span class="nf">on_connection_open_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unused_connection</span><span class="p">,</span> <span class="n">err</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions that must be taken when the connection fails to open.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Connection open failed: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reconnect</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Connection open failed: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_external_close</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reconnect</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="RMQAsyncComm.on_connection_closed"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.on_connection_closed">[docs]</a>    <span class="k">def</span> <span class="nf">on_connection_closed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">reason</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions that must be taken when the connection is closed. Set the</span>
 <span class="sd">        channel to None. If the connection is meant to be closing, stop the</span>
 <span class="sd">        IO loop. Otherwise, wait 5 seconds and try to reconnect.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close_queue</span><span class="p">(</span><span class="n">skip_unbind</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">has_started</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">has_started</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_external_close</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Connection closed&#39;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">ioloop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Connection closed, reconnect necessary: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">reason</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">reconnect</span><span class="p">()</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Connection closed, reconnecting: </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reconnect</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">ioloop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="RMQAsyncComm.stop"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">call_on_thread</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop the ioloop.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">call_on_thread</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+                <span class="c1"># Ensure that shutdown is not prevented by flags</span>
+                <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">has_stopped</span><span class="p">())</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_external_close</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reconnecting</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_reconnecting</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
+                <span class="k">return</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">ioloop</span><span class="o">.</span><span class="n">add_callback_threadsafe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">has_started</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Stopping&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Stopping </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consuming</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">stop_consuming</span><span class="p">()</span>
                     <span class="c1"># Not called here because KeyboardInterrupt is not used</span>
                     <span class="c1"># to stop the loop</span>
                     <span class="c1"># self.connection.ioloop.start()</span>
-                <span class="k">else</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">ioloop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">close_channel</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Stopped&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">close_channel</span><span class="p">()</span>
@@ -386,24 +452,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_queue</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Cannot reconnect to a queue with a generated name.&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">ioloop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reconnecting</span><span class="o">.</span><span class="n">started</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reconnecting</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reconnecting</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>  <span class="c1"># stopped by re-opening</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">ioloop</span><span class="o">.</span><span class="n">call_later</span><span class="p">(</span>
-                <span class="mi">5</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">ioloop</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
 
     <span class="c1"># CHANNEL</span>
 <div class="viewcode-block" id="RMQAsyncComm.open_channel"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.open_channel">[docs]</a>    <span class="k">def</span> <span class="nf">open_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open a RabbitMQ channel.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating a new channel&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_for_close</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">channel</span><span class="p">(</span><span class="n">on_open_callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">on_channel_open</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RMQAsyncComm.on_channel_open"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.on_channel_open">[docs]</a>    <span class="k">def</span> <span class="nf">on_channel_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
@@ -412,6 +472,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Channel opened&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="n">channel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_on_channel_close_callback</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_for_close</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setup_exchange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RMQAsyncComm.add_on_channel_close_callback"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.add_on_channel_close_callback">[docs]</a>    <span class="k">def</span> <span class="nf">add_on_channel_close_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -423,14 +485,16 @@
 <div class="viewcode-block" id="RMQAsyncComm.on_channel_closed"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.on_channel_closed">[docs]</a>    <span class="k">def</span> <span class="nf">on_channel_closed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">reason</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform when the channel is closed. Close the</span>
 <span class="sd">        connection.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Channel </span><span class="si">%i</span><span class="s1"> was closed: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">reason</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">has_started</span><span class="p">():</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span></div>
-                <span class="c1"># self.connection.close()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Channel </span><span class="si">{</span><span class="n">channel</span><span class="si">}</span><span class="s1"> was closed: </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">reason</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_queue</span><span class="p">(</span><span class="n">skip_unbind</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reason</span><span class="p">,</span> <span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ChannelClosedByBroker</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_consuming</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;reply_code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reason</span><span class="o">.</span><span class="n">reply_code</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;reply_text&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reason</span><span class="o">.</span><span class="n">reply_text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_connection</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     <span class="c1"># EXCHANGE</span>
 <div class="viewcode-block" id="RMQAsyncComm.setup_exchange"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.setup_exchange">[docs]</a>    <span class="k">def</span> <span class="nf">setup_exchange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exchange_name</span><span class="p">):</span>
@@ -447,6 +511,8 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform once an exchange is succesfully declared.</span>
 <span class="sd">        Set up the queue.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Exchange declared: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">userdata</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_for_close</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setup_queue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span></div>
 
     <span class="c1"># QUEUE</span>
@@ -455,7 +521,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_queue</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">original_queue</span> <span class="o">=</span> <span class="n">queue_name</span>
         <span class="n">passive</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_queue</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;amq.&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Declaring queue </span><span class="si">%s</span><span class="s1"> (passive=</span><span class="si">%s</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="n">queue_name</span><span class="p">,</span> <span class="n">passive</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Declaring queue </span><span class="si">{</span><span class="n">queue_name</span><span class="si">}</span><span class="s1"> (passive=</span><span class="si">{</span><span class="n">passive</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
         <span class="n">cb</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_queue_declareok</span><span class="p">,</span> <span class="n">userdata</span><span class="o">=</span><span class="n">queue_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="n">queue_name</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">cb</span><span class="p">,</span>
                                    <span class="n">exclusive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">passive</span><span class="o">=</span><span class="n">passive</span><span class="p">)</span></div>
@@ -464,10 +530,12 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform once the queue is succesfully declared. Bind</span>
 <span class="sd">        the queue.&quot;&quot;&quot;</span>
         <span class="n">queue_name</span> <span class="o">=</span> <span class="n">userdata</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Binding </span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="p">,</span> <span class="n">queue_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Binding </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="n">queue_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">+=</span> <span class="n">method_frame</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">queue</span>
         <span class="n">cb</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_bindok</span><span class="p">,</span> <span class="n">userdata</span><span class="o">=</span><span class="n">queue_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_for_close</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_bind</span><span class="p">(</span>
             <span class="n">queue_name</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="p">,</span>
@@ -477,6 +545,8 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform once the queue is succesfully bound. Start</span>
 <span class="sd">        consuming messages.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Queue bound&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_for_close</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">return</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_qos</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
@@ -492,6 +562,8 @@
 <div class="viewcode-block" id="RMQAsyncComm.on_basic_qos_ok"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.on_basic_qos_ok">[docs]</a>    <span class="k">def</span> <span class="nf">on_basic_qos_ok</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unused_frame</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform one the qos is set.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;QOS set to: </span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_for_close</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_consuming</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="RMQAsyncComm.start_consuming"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.start_consuming">[docs]</a>    <span class="k">def</span> <span class="nf">start_consuming</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

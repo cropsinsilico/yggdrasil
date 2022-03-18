@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.ConnectionDriver &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>yggdrasil.drivers.ConnectionDriver &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -148,6 +148,7 @@
             <span class="n">task_context</span><span class="o">=</span><span class="n">connection</span><span class="o">.</span><span class="n">process_instance</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RemoteTaskLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># Overwrite break flag with process safe Event</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span>
             <span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;process&#39;</span><span class="p">,</span>
             <span class="n">task_context</span><span class="o">=</span><span class="n">connection</span><span class="o">.</span><span class="n">process_instance</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
@@ -230,6 +231,22 @@
 <span class="sd">        outputs (list, optional): One or more dictionaries containing keyword</span>
 <span class="sd">            arguments for constructing output communicators. Defaults to an</span>
 <span class="sd">            empty dictionary if not provided.</span>
+<span class="sd">        input_pattern (str, optional): The communication pattern that should</span>
+<span class="sd">            be used to handle incoming messages when there is more than one</span>
+<span class="sd">            input communicators present. Defaults to &#39;cycle&#39;. Options</span>
+<span class="sd">            include:</span>
+<span class="sd">              &#39;cycle&#39;: Receive from the next available input communicator.</span>
+<span class="sd">              &#39;gather&#39;: Receive lists of messages with one element from each</span>
+<span class="sd">                  communicator where a message is only returned when there is</span>
+<span class="sd">                  a message from each.</span>
+<span class="sd">        output_pattern (str, optional): The communication pattern that should</span>
+<span class="sd">            be used to handling outgoing messages when there is more than one</span>
+<span class="sd">            output communicator present. Defaults to &#39;broadcast&#39;. Options</span>
+<span class="sd">            include:</span>
+<span class="sd">              &#39;cycle&#39;: Rotate through output comms, sending one message to</span>
+<span class="sd">                  each.</span>
+<span class="sd">              &#39;broadcast&#39;: Send the same message to each comm.</span>
+<span class="sd">              &#39;scatter&#39;: Send part of message (must be a list) to each comm.</span>
 <span class="sd">        translator (str, func, optional): Function or string specifying function</span>
 <span class="sd">            that should be used to translate messages from the input communicator</span>
 <span class="sd">            before passing them to the output communicator. If a string, the</span>
@@ -301,6 +318,12 @@
                         <span class="s1">&#39;A full description of file entries and the &#39;</span>
                         <span class="s1">&#39;available options can be found :ref:`here&lt;&#39;</span>
                         <span class="s1">&#39;yaml_file_options&gt;`.&#39;</span><span class="p">)},</span>
+        <span class="s1">&#39;input_pattern&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;cycle&#39;</span><span class="p">,</span> <span class="s1">&#39;gather&#39;</span><span class="p">],</span>
+                          <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;cycle&#39;</span><span class="p">},</span>
+        <span class="s1">&#39;output_pattern&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;cycle&#39;</span><span class="p">,</span> <span class="s1">&#39;broadcast&#39;</span><span class="p">,</span> <span class="s1">&#39;scatter&#39;</span><span class="p">],</span>
+                           <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;broadcast&#39;</span><span class="p">},</span>
         <span class="s1">&#39;translator&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
                        <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;oneOf&#39;</span><span class="p">:</span> <span class="p">[</span>
                            <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;function&#39;</span><span class="p">},</span>
@@ -308,7 +331,8 @@
         <span class="s1">&#39;onexit&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}}</span>
     <span class="n">_schema_excluded_from_class_validation</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">]</span>
     <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="n">Driver</span><span class="o">.</span><span class="n">_disconnect_attr</span> <span class="o">+</span> <span class="p">[</span>
-        <span class="s1">&#39;_comm_closed&#39;</span><span class="p">,</span> <span class="s1">&#39;_skip_after_loop&#39;</span><span class="p">,</span> <span class="s1">&#39;shared&#39;</span><span class="p">,</span> <span class="s1">&#39;task_thread&#39;</span><span class="p">]</span>
+        <span class="s1">&#39;_comm_closed&#39;</span><span class="p">,</span> <span class="s1">&#39;_skip_after_loop&#39;</span><span class="p">,</span> <span class="s1">&#39;shared&#39;</span><span class="p">,</span> <span class="s1">&#39;task_thread&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;icomm&#39;</span><span class="p">,</span> <span class="s1">&#39;ocomm&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">translator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">single_use</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">onexit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">models</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -381,6 +405,8 @@
         <span class="n">comm_kws</span><span class="p">[</span><span class="s1">&#39;reverse_names&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">comm_kws</span><span class="p">[</span><span class="s1">&#39;use_async&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">comm_kws</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">comm_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">comm_kws</span><span class="p">[</span><span class="s1">&#39;pattern&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">io</span><span class="si">}</span><span class="s1">_pattern&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">comm_list</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">comm_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -422,6 +448,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_init_single_comm</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
             <span class="k">raise</span>
         <span class="c1"># Apply keywords dependent on comms</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">any_files</span><span class="p">:</span>
@@ -592,11 +619,13 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;icomm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
             <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">ie</span> <span class="o">=</span> <span class="n">e</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;ocomm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
             <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">oe</span> <span class="o">=</span> <span class="n">e</span>
             <span class="k">if</span> <span class="n">ie</span><span class="p">:</span>
@@ -955,13 +984,9 @@
 
 <div class="viewcode-block" id="ConnectionDriver.update_serializer"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.update_serializer">[docs]</a>    <span class="k">def</span> <span class="nf">update_serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update the serializer for the output comm based on input.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Before update:</span><span class="se">\n</span><span class="s1">&#39;</span>
-                   <span class="o">+</span> <span class="s1">&#39;  icomm:</span><span class="se">\n</span><span class="s1">    sinfo:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s1">    typedef:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
-                   <span class="o">+</span> <span class="s1">&#39;  ocomm:</span><span class="se">\n</span><span class="s1">    sinfo:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s1">    typedef:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
-                   <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">serializer_info</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-                   <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">typedef</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-                   <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">serializer_info</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-                   <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">typedef</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Before update:</span><span class="se">\n</span><span class="s1">  icomm:</span><span class="si">%s</span><span class="se">\n</span><span class="s1">  ocomm:</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
+                   <span class="o">%</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">get_status_message</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:]),</span>
+                      <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">get_status_message</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:])))</span>
         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">translator</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">isinstance_component</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;transform&#39;</span><span class="p">):</span>
                 <span class="n">t</span><span class="o">.</span><span class="n">set_original_datatype</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">stype</span><span class="p">)</span>
@@ -976,13 +1001,9 @@
             <span class="c1">#      and (self.ocomm.serializer.typedef[&#39;type&#39;] != &#39;array&#39;)</span>
             <span class="c1">#      and (len(self.icomm.serializer.typedef[&#39;items&#39;]) == 1))):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">translator</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_translate_list2element</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;After update:</span><span class="se">\n</span><span class="s1">&#39;</span>
-                   <span class="o">+</span> <span class="s1">&#39;  icomm:</span><span class="se">\n</span><span class="s1">    sinfo:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s1">    typedef:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
-                   <span class="o">+</span> <span class="s1">&#39;  ocomm:</span><span class="se">\n</span><span class="s1">    sinfo:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s1">    typedef:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
-                   <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">serializer_info</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-                   <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">typedef</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-                   <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">serializer_info</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-                   <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">typedef</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;After update:</span><span class="se">\n</span><span class="s1">  icomm:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s1">  ocomm:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
+                   <span class="o">%</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">get_status_message</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:]),</span>
+                      <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">get_status_message</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:])))</span></div>
 
     <span class="k">def</span> <span class="nf">_send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a single message.</span>

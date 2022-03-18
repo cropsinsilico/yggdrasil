@@ -1,0 +1,10 @@
+yggdrasil.examples.osr package
+==============================
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.examples.osr
+   :members:
+   :undoc-members:
+   :show-inheritance:

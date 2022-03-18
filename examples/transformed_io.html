@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>transformed_io &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>transformed_io &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -28,7 +28,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -140,60 +140,60 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelA</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.c</span>
-<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA_function</span>
-<span class="linenos"> 6</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos"> 7</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelA:output</span>
-<span class="linenos"> 8</span>        <span class="nt">vars</span><span class="p">:</span>
-<span class="linenos"> 9</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c_modelA</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.c</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modelA_function</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c_modelA:output</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">        </span><span class="nt">vars</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">out_val</span><span class="w"></span>
 <span class="linenos">10</span>
-<span class="linenos">11</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelB</span>
-<span class="linenos">12</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-<span class="linenos">13</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.c</span>
-<span class="linenos">14</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelB_function</span>
-<span class="linenos">15</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">16</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelB:output</span>
-<span class="linenos">17</span>        <span class="nt">vars</span><span class="p">:</span>
-<span class="linenos">18</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">in_val_copy</span>
-<span class="linenos">19</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
+<span class="linenos">11</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c_modelB</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.c</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modelB_function</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c_modelB:output</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">        </span><span class="nt">vars</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">in_val_copy</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">out_val</span><span class="w"></span>
 <span class="linenos">20</span>
-<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelC</span>
-<span class="linenos">22</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-<span class="linenos">23</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.c</span>
-<span class="linenos">24</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelC_function</span>
-<span class="linenos">25</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">26</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelC:output</span>
-<span class="linenos">27</span>        <span class="nt">vars</span><span class="p">:</span>
-<span class="linenos">28</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">in_val_copy</span>
-<span class="linenos">29</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
+<span class="linenos">21</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c_modelC</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.c</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modelC_function</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c_modelC:output</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">        </span><span class="nt">vars</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">in_val_copy</span><span class="w"></span>
+<span class="linenos">29</span><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">out_val</span><span class="w"></span>
 <span class="linenos">30</span>
-<span class="linenos">31</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">32</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-<span class="linenos">33</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelA:input</span>
-<span class="linenos">34</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">35</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-<span class="linenos">36</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">37</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelB:input</span>
-<span class="linenos">38</span>        <span class="nt">transform</span><span class="p">:</span>
-<span class="linenos">39</span>          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
-<span class="linenos">40</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelC:input</span>
-<span class="linenos">41</span>        <span class="nt">transform</span><span class="p">:</span>
-<span class="linenos">42</span>          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
-<span class="linenos">43</span>  <span class="p p-Indicator">-</span> <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelB:output</span>  <span class="c1"># Connection between model B output and file</span>
-<span class="linenos">44</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
-<span class="linenos">45</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">46</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
-<span class="linenos">47</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
-<span class="linenos">48</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
-<span class="linenos">49</span>  <span class="p p-Indicator">-</span> <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelC:output</span>  <span class="c1"># Connection between model C output and file</span>
-<span class="linenos">50</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
-<span class="linenos">51</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">52</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
-<span class="linenos">53</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/(s*(cm**2)),g/(s*(cm**2))</span>
-<span class="linenos">54</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<span class="linenos">31</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">32</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w">  </span><span class="c1"># Connection between file and model A input</span><span class="w"></span>
+<span class="linenos">33</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c_modelA:input</span><span class="w"></span>
+<span class="linenos">34</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">35</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c_modelA:output</span><span class="w">  </span><span class="c1"># Connection between model A output &amp; model B input</span><span class="w"></span>
+<span class="linenos">36</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">37</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c_modelB:input</span><span class="w"></span>
+<span class="linenos">38</span><span class="w">        </span><span class="nt">transform</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">39</span><span class="w">          </span><span class="nt">statement</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;%x%*5&quot;</span><span class="w"></span>
+<span class="linenos">40</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c_modelC:input</span><span class="w"></span>
+<span class="linenos">41</span><span class="w">        </span><span class="nt">transform</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">42</span><span class="w">          </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span><span class="w"></span>
+<span class="linenos">43</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">inputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c_modelB:output</span><span class="w">  </span><span class="c1"># Connection between model B output and file</span><span class="w"></span>
+<span class="linenos">44</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span><span class="w"></span>
+<span class="linenos">45</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">46</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span><span class="w"></span>
+<span class="linenos">47</span><span class="w">    </span><span class="nt">field_units</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span><span class="w"></span>
+<span class="linenos">48</span><span class="w">    </span><span class="nt">format_str</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;%.1lf\t%.1lf\n&quot;</span><span class="w"></span>
+<span class="linenos">49</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">inputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c_modelC:output</span><span class="w">  </span><span class="c1"># Connection between model C output and file</span><span class="w"></span>
+<span class="linenos">50</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span><span class="w"></span>
+<span class="linenos">51</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">52</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span><span class="w"></span>
+<span class="linenos">53</span><span class="w">    </span><span class="nt">field_units</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">g/(s*(cm**2)),g/(s*(cm**2))</span><span class="w"></span>
+<span class="linenos">54</span><span class="w">    </span><span class="nt">format_str</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;%.1lf\t%.1lf\n&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -232,60 +232,60 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelA</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.cpp</span>
-<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA_function</span>
-<span class="linenos"> 6</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos"> 7</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelA:output</span>
-<span class="linenos"> 8</span>        <span class="nt">vars</span><span class="p">:</span>
-<span class="linenos"> 9</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpp_modelA</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpp</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.cpp</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modelA_function</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpp_modelA:output</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">        </span><span class="nt">vars</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">out_val</span><span class="w"></span>
 <span class="linenos">10</span>
-<span class="linenos">11</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelB</span>
-<span class="linenos">12</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp</span>
-<span class="linenos">13</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.cpp</span>
-<span class="linenos">14</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelB_function</span>
-<span class="linenos">15</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">16</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelB:output</span>
-<span class="linenos">17</span>        <span class="nt">vars</span><span class="p">:</span>
-<span class="linenos">18</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">in_val_copy</span>
-<span class="linenos">19</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
+<span class="linenos">11</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpp_modelB</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpp</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.cpp</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modelB_function</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpp_modelB:output</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">        </span><span class="nt">vars</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">in_val_copy</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">out_val</span><span class="w"></span>
 <span class="linenos">20</span>
-<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelC</span>
-<span class="linenos">22</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp</span>
-<span class="linenos">23</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.cpp</span>
-<span class="linenos">24</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelC_function</span>
-<span class="linenos">25</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">26</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelC:output</span>
-<span class="linenos">27</span>        <span class="nt">vars</span><span class="p">:</span>
-<span class="linenos">28</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">in_val_copy</span>
-<span class="linenos">29</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
+<span class="linenos">21</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpp_modelC</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpp</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.cpp</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modelC_function</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpp_modelC:output</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">        </span><span class="nt">vars</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">in_val_copy</span><span class="w"></span>
+<span class="linenos">29</span><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">out_val</span><span class="w"></span>
 <span class="linenos">30</span>
-<span class="linenos">31</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">32</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-<span class="linenos">33</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelA:input</span>
-<span class="linenos">34</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">35</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-<span class="linenos">36</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">37</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelB:input</span>
-<span class="linenos">38</span>        <span class="nt">transform</span><span class="p">:</span>
-<span class="linenos">39</span>          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
-<span class="linenos">40</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelC:input</span>
-<span class="linenos">41</span>        <span class="nt">transform</span><span class="p">:</span>
-<span class="linenos">42</span>          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
-<span class="linenos">43</span>  <span class="p p-Indicator">-</span> <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelB:output</span>  <span class="c1"># Connection between model B output and file</span>
-<span class="linenos">44</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
-<span class="linenos">45</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">46</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
-<span class="linenos">47</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
-<span class="linenos">48</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
-<span class="linenos">49</span>  <span class="p p-Indicator">-</span> <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelC:output</span>  <span class="c1"># Connection between model C output and file</span>
-<span class="linenos">50</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
-<span class="linenos">51</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">52</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
-<span class="linenos">53</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/(s*(cm**2)),g/(s*(cm**2))</span>
-<span class="linenos">54</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<span class="linenos">31</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">32</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w">  </span><span class="c1"># Connection between file and model A input</span><span class="w"></span>
+<span class="linenos">33</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpp_modelA:input</span><span class="w"></span>
+<span class="linenos">34</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">35</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpp_modelA:output</span><span class="w">  </span><span class="c1"># Connection between model A output &amp; model B input</span><span class="w"></span>
+<span class="linenos">36</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">37</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpp_modelB:input</span><span class="w"></span>
+<span class="linenos">38</span><span class="w">        </span><span class="nt">transform</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">39</span><span class="w">          </span><span class="nt">statement</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;%x%*5&quot;</span><span class="w"></span>
+<span class="linenos">40</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpp_modelC:input</span><span class="w"></span>
+<span class="linenos">41</span><span class="w">        </span><span class="nt">transform</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">42</span><span class="w">          </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span><span class="w"></span>
+<span class="linenos">43</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">inputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpp_modelB:output</span><span class="w">  </span><span class="c1"># Connection between model B output and file</span><span class="w"></span>
+<span class="linenos">44</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span><span class="w"></span>
+<span class="linenos">45</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">46</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span><span class="w"></span>
+<span class="linenos">47</span><span class="w">    </span><span class="nt">field_units</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span><span class="w"></span>
+<span class="linenos">48</span><span class="w">    </span><span class="nt">format_str</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;%.1lf\t%.1lf\n&quot;</span><span class="w"></span>
+<span class="linenos">49</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">inputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpp_modelC:output</span><span class="w">  </span><span class="c1"># Connection between model C output and file</span><span class="w"></span>
+<span class="linenos">50</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span><span class="w"></span>
+<span class="linenos">51</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">52</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span><span class="w"></span>
+<span class="linenos">53</span><span class="w">    </span><span class="nt">field_units</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">g/(s*(cm**2)),g/(s*(cm**2))</span><span class="w"></span>
+<span class="linenos">54</span><span class="w">    </span><span class="nt">format_str</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;%.1lf\t%.1lf\n&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -311,46 +311,46 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelA</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.m</span>
-<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">transformed_io_modelA</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab_modelA</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.m</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">transformed_io_modelA</span><span class="w"></span>
 <span class="linenos"> 6</span>
-<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelB</span>
-<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
-<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.m</span>
-<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">transformed_io_modelB</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab_modelB</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.m</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">transformed_io_modelB</span><span class="w"></span>
 <span class="linenos">11</span>
-<span class="linenos">12</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelC</span>
-<span class="linenos">13</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
-<span class="linenos">14</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.m</span>
-<span class="linenos">15</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">transformed_io_modelC</span>
+<span class="linenos">12</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab_modelC</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.m</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">transformed_io_modelC</span><span class="w"></span>
 <span class="linenos">16</span>
-<span class="linenos">17</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">18</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-<span class="linenos">19</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelA:input</span>
-<span class="linenos">20</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-<span class="linenos">22</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">23</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelB:input</span>
-<span class="linenos">24</span>        <span class="nt">transform</span><span class="p">:</span>
-<span class="linenos">25</span>          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
-<span class="linenos">26</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelC:input</span>
-<span class="linenos">27</span>        <span class="nt">transform</span><span class="p">:</span>
-<span class="linenos">28</span>          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
-<span class="linenos">29</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelB:output</span>  <span class="c1"># Connection between model B, function 1 output and file</span>
-<span class="linenos">30</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
-<span class="linenos">31</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">32</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
-<span class="linenos">33</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
-<span class="linenos">34</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
-<span class="linenos">35</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelC:output</span>  <span class="c1"># Connection between model C, function 1 output and file</span>
-<span class="linenos">36</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
-<span class="linenos">37</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">38</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
-<span class="linenos">39</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/(s*(cm**2)),g/(s*(cm**2))</span>
-<span class="linenos">40</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<span class="linenos">17</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w">  </span><span class="c1"># Connection between file and model A input</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab_modelA:input</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab_modelA:output</span><span class="w">  </span><span class="c1"># Connection between model A output &amp; model B input</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab_modelB:input</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">        </span><span class="nt">transform</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">          </span><span class="nt">statement</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;%x%*5&quot;</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab_modelC:input</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">        </span><span class="nt">transform</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">          </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span><span class="w"></span>
+<span class="linenos">29</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab_modelB:output</span><span class="w">  </span><span class="c1"># Connection between model B, function 1 output and file</span><span class="w"></span>
+<span class="linenos">30</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span><span class="w"></span>
+<span class="linenos">31</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">32</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span><span class="w"></span>
+<span class="linenos">33</span><span class="w">    </span><span class="nt">field_units</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span><span class="w"></span>
+<span class="linenos">34</span><span class="w">    </span><span class="nt">format_str</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;%.1lf\t%.1lf\n&quot;</span><span class="w"></span>
+<span class="linenos">35</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab_modelC:output</span><span class="w">  </span><span class="c1"># Connection between model C, function 1 output and file</span><span class="w"></span>
+<span class="linenos">36</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span><span class="w"></span>
+<span class="linenos">37</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">38</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span><span class="w"></span>
+<span class="linenos">39</span><span class="w">    </span><span class="nt">field_units</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">g/(s*(cm**2)),g/(s*(cm**2))</span><span class="w"></span>
+<span class="linenos">40</span><span class="w">    </span><span class="nt">format_str</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;%.1lf\t%.1lf\n&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -383,46 +383,46 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.py</span>
-<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA_function</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_modelA</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.py</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modelA_function</span><span class="w"></span>
 <span class="linenos"> 6</span>
-<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
-<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.py</span>
-<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelB_function</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_modelB</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.py</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modelB_function</span><span class="w"></span>
 <span class="linenos">11</span>
-<span class="linenos">12</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelC</span>
-<span class="linenos">13</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">14</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py</span>
-<span class="linenos">15</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelC_function</span>
+<span class="linenos">12</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_modelC</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modelC_function</span><span class="w"></span>
 <span class="linenos">16</span>
-<span class="linenos">17</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">18</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-<span class="linenos">19</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA:input</span>
-<span class="linenos">20</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-<span class="linenos">22</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">23</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB:input</span>
-<span class="linenos">24</span>        <span class="nt">transform</span><span class="p">:</span>
-<span class="linenos">25</span>          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
-<span class="linenos">26</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelC:input</span>
-<span class="linenos">27</span>        <span class="nt">transform</span><span class="p">:</span>
-<span class="linenos">28</span>          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
-<span class="linenos">29</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB:output</span>  <span class="c1"># Connection between model B, function 1 output and file</span>
-<span class="linenos">30</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
-<span class="linenos">31</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">32</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
-<span class="linenos">33</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
-<span class="linenos">34</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
-<span class="linenos">35</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelC:output</span>  <span class="c1"># Connection between model C, function 1 output and file</span>
-<span class="linenos">36</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
-<span class="linenos">37</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">38</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
-<span class="linenos">39</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/(s*(cm**2)),g/(s*(cm**2))</span>
-<span class="linenos">40</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<span class="linenos">17</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w">  </span><span class="c1"># Connection between file and model A input</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_modelA:input</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_modelA:output</span><span class="w">  </span><span class="c1"># Connection between model A output &amp; model B input</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_modelB:input</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">        </span><span class="nt">transform</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">          </span><span class="nt">statement</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;%x%*5&quot;</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_modelC:input</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">        </span><span class="nt">transform</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">          </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span><span class="w"></span>
+<span class="linenos">29</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_modelB:output</span><span class="w">  </span><span class="c1"># Connection between model B, function 1 output and file</span><span class="w"></span>
+<span class="linenos">30</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span><span class="w"></span>
+<span class="linenos">31</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">32</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span><span class="w"></span>
+<span class="linenos">33</span><span class="w">    </span><span class="nt">field_units</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span><span class="w"></span>
+<span class="linenos">34</span><span class="w">    </span><span class="nt">format_str</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;%.1lf\t%.1lf\n&quot;</span><span class="w"></span>
+<span class="linenos">35</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_modelC:output</span><span class="w">  </span><span class="c1"># Connection between model C, function 1 output and file</span><span class="w"></span>
+<span class="linenos">36</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span><span class="w"></span>
+<span class="linenos">37</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">38</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span><span class="w"></span>
+<span class="linenos">39</span><span class="w">    </span><span class="nt">field_units</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">g/(s*(cm**2)),g/(s*(cm**2))</span><span class="w"></span>
+<span class="linenos">40</span><span class="w">    </span><span class="nt">format_str</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;%.1lf\t%.1lf\n&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -451,46 +451,46 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelA</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.R</span>
-<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA_function</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R_modelA</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.R</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modelA_function</span><span class="w"></span>
 <span class="linenos"> 6</span>
-<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelB</span>
-<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
-<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.R</span>
-<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelB_function</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R_modelB</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.R</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modelB_function</span><span class="w"></span>
 <span class="linenos">11</span>
-<span class="linenos">12</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelC</span>
-<span class="linenos">13</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
-<span class="linenos">14</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.R</span>
-<span class="linenos">15</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelC_function</span>
+<span class="linenos">12</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R_modelC</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.R</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modelC_function</span><span class="w"></span>
 <span class="linenos">16</span>
-<span class="linenos">17</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">18</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-<span class="linenos">19</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelA:input</span>
-<span class="linenos">20</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-<span class="linenos">22</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">23</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelB:input</span>
-<span class="linenos">24</span>        <span class="nt">transform</span><span class="p">:</span>
-<span class="linenos">25</span>          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
-<span class="linenos">26</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelC:input</span>
-<span class="linenos">27</span>        <span class="nt">transform</span><span class="p">:</span>
-<span class="linenos">28</span>          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
-<span class="linenos">29</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelB:output</span>  <span class="c1"># Connection between model B, function 1 output and file</span>
-<span class="linenos">30</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
-<span class="linenos">31</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">32</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
-<span class="linenos">33</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
-<span class="linenos">34</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
-<span class="linenos">35</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelC:output</span>  <span class="c1"># Connection between model C, function 1 output and file</span>
-<span class="linenos">36</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
-<span class="linenos">37</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-<span class="linenos">38</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
-<span class="linenos">39</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/(s*(cm**2)),g/(s*(cm**2))</span>
-<span class="linenos">40</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<span class="linenos">17</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w">  </span><span class="c1"># Connection between file and model A input</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R_modelA:input</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R_modelA:output</span><span class="w">  </span><span class="c1"># Connection between model A output &amp; model B input</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R_modelB:input</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">        </span><span class="nt">transform</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">          </span><span class="nt">statement</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;%x%*5&quot;</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R_modelC:input</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">        </span><span class="nt">transform</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">          </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span><span class="w"></span>
+<span class="linenos">29</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R_modelB:output</span><span class="w">  </span><span class="c1"># Connection between model B, function 1 output and file</span><span class="w"></span>
+<span class="linenos">30</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span><span class="w"></span>
+<span class="linenos">31</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">32</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span><span class="w"></span>
+<span class="linenos">33</span><span class="w">    </span><span class="nt">field_units</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span><span class="w"></span>
+<span class="linenos">34</span><span class="w">    </span><span class="nt">format_str</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;%.1lf\t%.1lf\n&quot;</span><span class="w"></span>
+<span class="linenos">35</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R_modelC:output</span><span class="w">  </span><span class="c1"># Connection between model C, function 1 output and file</span><span class="w"></span>
+<span class="linenos">36</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span><span class="w"></span>
+<span class="linenos">37</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<span class="linenos">38</span><span class="w">    </span><span class="nt">field_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span><span class="w"></span>
+<span class="linenos">39</span><span class="w">    </span><span class="nt">field_units</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">g/(s*(cm**2)),g/(s*(cm**2))</span><span class="w"></span>
+<span class="linenos">40</span><span class="w">    </span><span class="nt">format_str</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;%.1lf\t%.1lf\n&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </section>

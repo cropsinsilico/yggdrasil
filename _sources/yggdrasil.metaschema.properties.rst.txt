@@ -1,14 +1,6 @@
 yggdrasil.metaschema.properties package
 =======================================
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   yggdrasil.metaschema.properties.tests
-
 Submodules
 ----------
 

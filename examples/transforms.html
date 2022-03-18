@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>transforms &mdash; yggdrasil v1.8.1 documentation</title>
+  <title>transforms &mdash; yggdrasil v1.8.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -28,7 +28,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.1
+                v1.8.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -114,56 +114,56 @@
 <h2><a class="toc-backref" href="#id2">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">pprint_encoded</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">get_test_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">src</span><span class="p">():</span>
-<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">get_test_data</span><span class="p">()</span>
+<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">get_test_data</span><span class="p">()</span>
 <span class="linenos">7</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SENDING&#39;</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="n">pprint_encoded</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span> <span class="n">test_data</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span> <span class="nn">os</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">check_received_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">dst</span><span class="p">(</span><span class="n">received_data</span><span class="p">):</span>
 <span class="linenos">6</span>    <span class="n">transform</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TEST_TRANSFORM&#39;</span><span class="p">]</span>
-<span class="linenos">7</span>    <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
+<span class="linenos">7</span>    <span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;CONFIRMED&#39;</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/src.py</span>
-<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">src</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/src.py</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">src</span><span class="w"></span>
 <span class="linenos"> 6</span>
-<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span>
-<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span>
-<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span>
-<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model</span>
-<span class="linenos">11</span>    <span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span><span class="w"></span>
 <span class="linenos">12</span>
-<span class="linenos">13</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination</span>
-<span class="linenos">14</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">15</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span>
-<span class="linenos">16</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dst</span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dst</span><span class="w"></span>
 <span class="linenos">17</span>
-<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source:output</span>
-<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">21</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span>
-<span class="linenos">22</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">23</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span>
-<span class="linenos">24</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span>
-<span class="linenos">25</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">26</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">27</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination:input</span>
-<span class="linenos">28</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
+<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source:output</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination:input</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -171,56 +171,56 @@
 <h2><a class="toc-backref" href="#id3">C Version</a><a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">pprint_encoded</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">get_test_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">src</span><span class="p">():</span>
-<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">get_test_data</span><span class="p">()</span>
+<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">get_test_data</span><span class="p">()</span>
 <span class="linenos">7</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SENDING&#39;</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="n">pprint_encoded</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span> <span class="n">test_data</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span> <span class="nn">os</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">check_received_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">dst</span><span class="p">(</span><span class="n">received_data</span><span class="p">):</span>
 <span class="linenos">6</span>    <span class="n">transform</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TEST_TRANSFORM&#39;</span><span class="p">]</span>
-<span class="linenos">7</span>    <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
+<span class="linenos">7</span>    <span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;CONFIRMED&#39;</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/src.py</span>
-<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">src</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/src.py</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">src</span><span class="w"></span>
 <span class="linenos"> 6</span>
-<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span>
-<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span>
-<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span>
-<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model</span>
-<span class="linenos">11</span>    <span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span><span class="w"></span>
 <span class="linenos">12</span>
-<span class="linenos">13</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination</span>
-<span class="linenos">14</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">15</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span>
-<span class="linenos">16</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dst</span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dst</span><span class="w"></span>
 <span class="linenos">17</span>
-<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source:output</span>
-<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">21</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span>
-<span class="linenos">22</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">23</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span>
-<span class="linenos">24</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span>
-<span class="linenos">25</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">26</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">27</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination:input</span>
-<span class="linenos">28</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
+<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source:output</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination:input</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -228,56 +228,56 @@
 <h2><a class="toc-backref" href="#id4">C++ Version</a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">pprint_encoded</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">get_test_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">src</span><span class="p">():</span>
-<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">get_test_data</span><span class="p">()</span>
+<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">get_test_data</span><span class="p">()</span>
 <span class="linenos">7</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SENDING&#39;</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="n">pprint_encoded</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span> <span class="n">test_data</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span> <span class="nn">os</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">check_received_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">dst</span><span class="p">(</span><span class="n">received_data</span><span class="p">):</span>
 <span class="linenos">6</span>    <span class="n">transform</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TEST_TRANSFORM&#39;</span><span class="p">]</span>
-<span class="linenos">7</span>    <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
+<span class="linenos">7</span>    <span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;CONFIRMED&#39;</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/src.py</span>
-<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">src</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/src.py</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">src</span><span class="w"></span>
 <span class="linenos"> 6</span>
-<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span>
-<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span>
-<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span>
-<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model</span>
-<span class="linenos">11</span>    <span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span><span class="w"></span>
 <span class="linenos">12</span>
-<span class="linenos">13</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination</span>
-<span class="linenos">14</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">15</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span>
-<span class="linenos">16</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dst</span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dst</span><span class="w"></span>
 <span class="linenos">17</span>
-<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source:output</span>
-<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">21</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span>
-<span class="linenos">22</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">23</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span>
-<span class="linenos">24</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span>
-<span class="linenos">25</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">26</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">27</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination:input</span>
-<span class="linenos">28</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
+<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source:output</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination:input</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -285,56 +285,56 @@
 <h2><a class="toc-backref" href="#id5">Dummy Version</a><a class="headerlink" href="#dummy-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">pprint_encoded</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">get_test_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">src</span><span class="p">():</span>
-<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">get_test_data</span><span class="p">()</span>
+<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">get_test_data</span><span class="p">()</span>
 <span class="linenos">7</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SENDING&#39;</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="n">pprint_encoded</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span> <span class="n">test_data</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span> <span class="nn">os</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">check_received_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">dst</span><span class="p">(</span><span class="n">received_data</span><span class="p">):</span>
 <span class="linenos">6</span>    <span class="n">transform</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TEST_TRANSFORM&#39;</span><span class="p">]</span>
-<span class="linenos">7</span>    <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
+<span class="linenos">7</span>    <span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;CONFIRMED&#39;</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/src.py</span>
-<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">src</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/src.py</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">src</span><span class="w"></span>
 <span class="linenos"> 6</span>
-<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span>
-<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span>
-<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span>
-<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model</span>
-<span class="linenos">11</span>    <span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span><span class="w"></span>
 <span class="linenos">12</span>
-<span class="linenos">13</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination</span>
-<span class="linenos">14</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">15</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span>
-<span class="linenos">16</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dst</span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dst</span><span class="w"></span>
 <span class="linenos">17</span>
-<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source:output</span>
-<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">21</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span>
-<span class="linenos">22</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">23</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span>
-<span class="linenos">24</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span>
-<span class="linenos">25</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">26</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">27</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination:input</span>
-<span class="linenos">28</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
+<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source:output</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination:input</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -342,56 +342,56 @@
 <h2><a class="toc-backref" href="#id6">Fortran Version</a><a class="headerlink" href="#fortran-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">pprint_encoded</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">get_test_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">src</span><span class="p">():</span>
-<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">get_test_data</span><span class="p">()</span>
+<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">get_test_data</span><span class="p">()</span>
 <span class="linenos">7</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SENDING&#39;</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="n">pprint_encoded</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span> <span class="n">test_data</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span> <span class="nn">os</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">check_received_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">dst</span><span class="p">(</span><span class="n">received_data</span><span class="p">):</span>
 <span class="linenos">6</span>    <span class="n">transform</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TEST_TRANSFORM&#39;</span><span class="p">]</span>
-<span class="linenos">7</span>    <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
+<span class="linenos">7</span>    <span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;CONFIRMED&#39;</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/src.py</span>
-<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">src</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/src.py</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">src</span><span class="w"></span>
 <span class="linenos"> 6</span>
-<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span>
-<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span>
-<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span>
-<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model</span>
-<span class="linenos">11</span>    <span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span><span class="w"></span>
 <span class="linenos">12</span>
-<span class="linenos">13</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination</span>
-<span class="linenos">14</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">15</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span>
-<span class="linenos">16</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dst</span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dst</span><span class="w"></span>
 <span class="linenos">17</span>
-<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source:output</span>
-<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">21</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span>
-<span class="linenos">22</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">23</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span>
-<span class="linenos">24</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span>
-<span class="linenos">25</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">26</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">27</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination:input</span>
-<span class="linenos">28</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
+<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source:output</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination:input</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -399,56 +399,56 @@
 <h2><a class="toc-backref" href="#id7">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">pprint_encoded</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">get_test_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">src</span><span class="p">():</span>
-<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">get_test_data</span><span class="p">()</span>
+<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">get_test_data</span><span class="p">()</span>
 <span class="linenos">7</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SENDING&#39;</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="n">pprint_encoded</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span> <span class="n">test_data</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span> <span class="nn">os</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">check_received_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">dst</span><span class="p">(</span><span class="n">received_data</span><span class="p">):</span>
 <span class="linenos">6</span>    <span class="n">transform</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TEST_TRANSFORM&#39;</span><span class="p">]</span>
-<span class="linenos">7</span>    <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
+<span class="linenos">7</span>    <span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;CONFIRMED&#39;</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/src.py</span>
-<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">src</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/src.py</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">src</span><span class="w"></span>
 <span class="linenos"> 6</span>
-<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span>
-<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span>
-<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span>
-<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model</span>
-<span class="linenos">11</span>    <span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span><span class="w"></span>
 <span class="linenos">12</span>
-<span class="linenos">13</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination</span>
-<span class="linenos">14</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">15</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span>
-<span class="linenos">16</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dst</span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dst</span><span class="w"></span>
 <span class="linenos">17</span>
-<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source:output</span>
-<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">21</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span>
-<span class="linenos">22</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">23</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span>
-<span class="linenos">24</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span>
-<span class="linenos">25</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">26</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">27</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination:input</span>
-<span class="linenos">28</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
+<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source:output</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination:input</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -456,56 +456,56 @@
 <h2><a class="toc-backref" href="#id8">OpenSimRoot Version</a><a class="headerlink" href="#opensimroot-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">pprint_encoded</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">get_test_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">src</span><span class="p">():</span>
-<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">get_test_data</span><span class="p">()</span>
+<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">get_test_data</span><span class="p">()</span>
 <span class="linenos">7</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SENDING&#39;</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="n">pprint_encoded</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span> <span class="n">test_data</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span> <span class="nn">os</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">check_received_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">dst</span><span class="p">(</span><span class="n">received_data</span><span class="p">):</span>
 <span class="linenos">6</span>    <span class="n">transform</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TEST_TRANSFORM&#39;</span><span class="p">]</span>
-<span class="linenos">7</span>    <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
+<span class="linenos">7</span>    <span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;CONFIRMED&#39;</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/src.py</span>
-<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">src</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/src.py</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">src</span><span class="w"></span>
 <span class="linenos"> 6</span>
-<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span>
-<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span>
-<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span>
-<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model</span>
-<span class="linenos">11</span>    <span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span><span class="w"></span>
 <span class="linenos">12</span>
-<span class="linenos">13</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination</span>
-<span class="linenos">14</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">15</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span>
-<span class="linenos">16</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dst</span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dst</span><span class="w"></span>
 <span class="linenos">17</span>
-<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source:output</span>
-<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">21</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span>
-<span class="linenos">22</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">23</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span>
-<span class="linenos">24</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span>
-<span class="linenos">25</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">26</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">27</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination:input</span>
-<span class="linenos">28</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
+<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source:output</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination:input</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -513,56 +513,56 @@
 <h2><a class="toc-backref" href="#id9">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">pprint_encoded</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">get_test_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">src</span><span class="p">():</span>
-<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">get_test_data</span><span class="p">()</span>
+<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">get_test_data</span><span class="p">()</span>
 <span class="linenos">7</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SENDING&#39;</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="n">pprint_encoded</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span> <span class="n">test_data</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span> <span class="nn">os</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">check_received_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">dst</span><span class="p">(</span><span class="n">received_data</span><span class="p">):</span>
 <span class="linenos">6</span>    <span class="n">transform</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TEST_TRANSFORM&#39;</span><span class="p">]</span>
-<span class="linenos">7</span>    <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
+<span class="linenos">7</span>    <span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;CONFIRMED&#39;</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/src.py</span>
-<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">src</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/src.py</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">src</span><span class="w"></span>
 <span class="linenos"> 6</span>
-<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span>
-<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span>
-<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span>
-<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model</span>
-<span class="linenos">11</span>    <span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span><span class="w"></span>
 <span class="linenos">12</span>
-<span class="linenos">13</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination</span>
-<span class="linenos">14</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">15</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span>
-<span class="linenos">16</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dst</span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dst</span><span class="w"></span>
 <span class="linenos">17</span>
-<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source:output</span>
-<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">21</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span>
-<span class="linenos">22</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">23</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span>
-<span class="linenos">24</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span>
-<span class="linenos">25</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">26</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">27</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination:input</span>
-<span class="linenos">28</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
+<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source:output</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination:input</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -570,56 +570,56 @@
 <h2><a class="toc-backref" href="#id10">SBML Version</a><a class="headerlink" href="#sbml-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">pprint_encoded</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">get_test_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">src</span><span class="p">():</span>
-<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">get_test_data</span><span class="p">()</span>
+<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">get_test_data</span><span class="p">()</span>
 <span class="linenos">7</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SENDING&#39;</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="n">pprint_encoded</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span> <span class="n">test_data</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span> <span class="nn">os</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">check_received_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">dst</span><span class="p">(</span><span class="n">received_data</span><span class="p">):</span>
 <span class="linenos">6</span>    <span class="n">transform</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TEST_TRANSFORM&#39;</span><span class="p">]</span>
-<span class="linenos">7</span>    <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
+<span class="linenos">7</span>    <span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;CONFIRMED&#39;</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/src.py</span>
-<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">src</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/src.py</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">src</span><span class="w"></span>
 <span class="linenos"> 6</span>
-<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span>
-<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span>
-<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span>
-<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model</span>
-<span class="linenos">11</span>    <span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span><span class="w"></span>
 <span class="linenos">12</span>
-<span class="linenos">13</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination</span>
-<span class="linenos">14</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">15</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span>
-<span class="linenos">16</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dst</span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dst</span><span class="w"></span>
 <span class="linenos">17</span>
-<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source:output</span>
-<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">21</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span>
-<span class="linenos">22</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">23</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span>
-<span class="linenos">24</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span>
-<span class="linenos">25</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">26</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">27</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination:input</span>
-<span class="linenos">28</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
+<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source:output</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination:input</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -627,56 +627,56 @@
 <h2><a class="toc-backref" href="#id11">Timesync Version</a><a class="headerlink" href="#timesync-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">pprint_encoded</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">get_test_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">src</span><span class="p">():</span>
-<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">get_test_data</span><span class="p">()</span>
+<span class="linenos">6</span>    <span class="n">test_data</span> <span class="o">=</span> <span class="n">get_test_data</span><span class="p">()</span>
 <span class="linenos">7</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SENDING&#39;</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="n">pprint_encoded</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span> <span class="n">test_data</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span> <span class="nn">os</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.tests.test_transforms</span> <span class="kn">import</span> <span class="n">TestExampleTransforms</span>
+<span class="linenos">2</span><span class="kn">from</span> <span class="nn">yggdrasil.examples.transforms</span> <span class="kn">import</span> <span class="n">check_received_data</span>
 <span class="linenos">3</span>
 <span class="linenos">4</span>
 <span class="linenos">5</span><span class="k">def</span> <span class="nf">dst</span><span class="p">(</span><span class="n">received_data</span><span class="p">):</span>
 <span class="linenos">6</span>    <span class="n">transform</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TEST_TRANSFORM&#39;</span><span class="p">]</span>
-<span class="linenos">7</span>    <span class="n">TestExampleTransforms</span><span class="o">.</span><span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
+<span class="linenos">7</span>    <span class="n">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">received_data</span><span class="p">)</span>
 <span class="linenos">8</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;CONFIRMED&#39;</span><span class="p">)</span>
 <span class="linenos">9</span>    <span class="k">return</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/src.py</span>
-<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">src</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/src.py</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">src</span><span class="w"></span>
 <span class="linenos"> 6</span>
-<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span>
-<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span>
-<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span>
-<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model</span>
-<span class="linenos">11</span>    <span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/model{{TEST_LANGUAGE_EXT}}</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">{{{</span><span class="nv">TEST_MODEL_IO</span><span class="p p-Indicator">}}}</span><span class="w"></span>
 <span class="linenos">12</span>
-<span class="linenos">13</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination</span>
-<span class="linenos">14</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">15</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span>
-<span class="linenos">16</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dst</span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/dst.py</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dst</span><span class="w"></span>
 <span class="linenos">17</span>
-<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source:output</span>
-<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">21</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span>
-<span class="linenos">22</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">23</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span>
-<span class="linenos">24</span>      <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span>
-<span class="linenos">25</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
-<span class="linenos">26</span>    <span class="nt">output</span><span class="p">:</span>
-<span class="linenos">27</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">destination:input</span>
-<span class="linenos">28</span>      <span class="nt">transform</span><span class="p">:</span> <span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span>
+<span class="linenos">18</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source:output</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">21</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:input</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_LANGUAGE</span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">_model:output</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination:input</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">transform</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">TEST_TRANSFORM</span><span class="p p-Indicator">}}</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
