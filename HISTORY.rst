@@ -3,7 +3,7 @@ History
 =======
 
 1.9.0 (2021-XX-XX) Add support for symbolic ODEs
-=======
+------------------
 
 * Added ODEModelDriver for 'ode' language models that integrate ordinary differential equations (ODEs) symbolically represented in the YAML file using the sympy package
 * Added ode1 example of symbolic ODE model solved symbolically and integrated
@@ -18,8 +18,8 @@ TODO
 
 * Add support for merging ODEs when there is more than one
 
-1.8.2 (2021-03-16) Migrate tests out of package into pytest fixtures & various bug fixes
-=======
+1.8.2 (2021-03-18) Migrate tests out of package into pytest fixtures & various bug fixes
+------------------
 
 * Move tests out of package to take advantage of pytest conftest.py structure and reduce the size of the package
 * Refactor tests to use pytest fixtures instead of the unittest setup/teardown structure
