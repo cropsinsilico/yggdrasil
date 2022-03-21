@@ -268,6 +268,11 @@ public:
    */
   const char* type() const { return type_; }
   /*!
+    @brief Get the temporary type string.
+    @returns const char pointer to the type string.
+   */
+  virtual const char* temp_typename() const { return type(); }
+  /*!
     @brief Get the type code.
     @returns int Type code associated with the curent type.
    */
@@ -1947,7 +1952,8 @@ void YggGeneric::set_data_map_item(const char *key,
 void* YggGeneric::init_generic_map(const std::map<std::string, MetaschemaType*> properties, const bool allow_other_type) {
   YggGenericMap* arg0 = NULL;
   YggGenericMap** arg = NULL;
-  if (strcmp(get_type()->type(), "object") == 0)
+  bool local_data = (strcmp(get_type()->temp_typename(), "object") == 0);
+  if (local_data)
     arg = (YggGenericMap**)(&data);
   else if (allow_other_type)
     arg = &arg0;
@@ -1961,19 +1967,20 @@ void* YggGeneric::init_generic_map(const std::map<std::string, MetaschemaType*> 
     for (auto it = properties.begin(); it != properties.end(); it++)
       (**arg)[it->first] = (new YggGeneric(it->second, NULL, 0));
   }
-  if (strcmp(get_type()->type(), "object") != 0)
+  if (!local_data)
     return (void*)arg0;
   return get_data();
 };
 void* YggGeneric::init_generic_vector(const std::vector<MetaschemaType*> items, const bool allow_other_type) {
   YggGenericVector* arg0 = NULL;
   YggGenericVector** arg = NULL;
-  if (strcmp(get_type()->type(), "array") == 0)
+  bool local_data = (strcmp(get_type()->temp_typename(), "array") == 0);
+  if (local_data)
     arg = (YggGenericVector**)(&data);
   else if (allow_other_type)
     arg = &arg0;
   else
-    ygglog_throw_error("YggGeneric::init_generic_vector: Data is not an array.");
+    ygglog_throw_error("YggGeneric::init_generic_vector: Data is not an array. (type = %s)", get_type()->type());
   if (arg == NULL)
     ygglog_throw_error("YggGeneric::init_generic_vector: Data pointer is NULL.");
   if (arg[0] == NULL)
@@ -1982,7 +1989,7 @@ void* YggGeneric::init_generic_vector(const std::vector<MetaschemaType*> items, 
     for (auto it = items.begin(); it != items.end(); it++)
       (arg[0])->push_back((new YggGeneric(*it, NULL, 0)));
   }
-  if (strcmp(get_type()->type(), "array") != 0)
+  if (!local_data)
     return (void*)arg0;
   return get_data();
 };

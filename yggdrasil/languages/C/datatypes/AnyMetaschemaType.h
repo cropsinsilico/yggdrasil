@@ -82,14 +82,14 @@ public:
     if (!(MetaschemaType::operator==(Ref)))
       return false;
     const AnyMetaschemaType* pRef = dynamic_cast<const AnyMetaschemaType*>(&Ref);
-    if (pRef->temp_type() == NULL) {
+    if (pRef->temp_type_ == NULL) {
       if (temp_type_ != NULL)
 	return false;
     } else if (temp_type_ == NULL) {
-      if (pRef->temp_type() != NULL)
+      if (pRef->temp_type_ != NULL)
 	return false;
     } else {
-      if ((*(pRef->temp_type())) != (*temp_type_))
+      if ((*(pRef->temp_type_)) != (*temp_type_))
 	return false;
     }
     return true;
@@ -113,12 +113,17 @@ public:
     return temp_type_;
   }
   /*!
+    @brief Get the temporary type string.
+    @returns const char pointer to the type string.
+   */
+  const char* temp_typename() const override { return temp_type_->temp_typename(); }
+  /*!
     @brief Create a copy of the type.
     @returns AnyMetaschemaType* Pointer to new AnyMetaschemaType instance with the same data.
    */
   AnyMetaschemaType* copy() const override {
     return (new AnyMetaschemaType(use_generic(),
-				  temp_type(),
+				  temp_type_,
 				  field_names()));
   }
   /*!
@@ -192,7 +197,7 @@ public:
     }
     MetaschemaType::update(new_info);
     const AnyMetaschemaType* new_info_any = dynamic_cast<const AnyMetaschemaType*>(new_info);
-    temp_type_ = new_info_any->temp_type()->copy();
+    temp_type_ = new_info_any->temp_type_->copy();
   }
   /*!
     @brief Update the type object with info from provided variable arguments for serialization.
