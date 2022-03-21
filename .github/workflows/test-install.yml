@@ -1608,4 +1608,5 @@ jobs:
     - name: Verify installation
       run: python utils/setup_test_env.py verify
     - name: Update the form
-      run: python utils/update_form_schema.py
+      run: python utils/update_form_schema.py --token=${{ secrets.YGGDRASIL_UPDATE_TOKEN
+        }}
