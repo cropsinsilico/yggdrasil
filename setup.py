@@ -34,7 +34,8 @@ try:
     import pyrj_setup
     pyrj_ext = pyrj_setup.extension_options
     pyrj_ext.update(
-        sources=[os.path.join(PYRJ_PATH, 'rapidjson.cpp')])
+        sources=[os.path.relpath(os.path.join(PYRJ_PATH, 'rapidjson.cpp'),
+                                 start=ROOT_PATH)])
 finally:
     sys.path.pop(0)
     os.chdir(pwd)
