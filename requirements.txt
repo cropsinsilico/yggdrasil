@@ -6,7 +6,6 @@ numpy>=1.13.0
 pandas
 pyperf
 psutil
-python-rapidjson
 pyyaml
 pyzmq
 requests

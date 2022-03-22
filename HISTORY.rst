@@ -2,6 +2,19 @@
 History
 =======
 
+1.X.X (2022-XX-XX) Migrate to using extended version of rapidjson/python-rapidjson
+------------------
+
+* Drop support for Python 3.5
+* Changed rapidjson submodule to extended version
+* Vendoring the python-rapidjson extension
+
+TODO:
+~~~~~
+
+* Update yggdrasil to use the vendored rapidjson
+* Remove jsonschema requirement
+
 1.8.2 (2021-03-16) Migrate tests out of package into pytest fixtures & various bug fixes
 ------------------
 

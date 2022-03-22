@@ -2,13 +2,14 @@ import os
 import sys
 import logging
 import warnings
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Extension
 from distutils.sysconfig import get_python_lib
 import versioneer
 import create_coveragerc
 ygg_ver = versioneer.get_version()
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
 LANG_PATH = os.path.join(ROOT_PATH, 'yggdrasil', 'languages')
+PYRJ_PATH = os.path.join(ROOT_PATH, '_vendor', 'python_rapidjson')
 
 
 # Import script from inside package
@@ -21,7 +22,23 @@ finally:
 
 print("In setup.py", sys.argv)
 logging.critical("In setup.py: %s" % sys.argv)
-        
+
+
+# Get extension options for the vendored python-rapidjson
+rj_include_dir = os.path.join(ROOT_PATH, 'yggdrasil', 'rapidjson', 'include')
+sys.path.insert(0, PYRJ_PATH)
+sys.argv.append(f"--rj-include-dir={rj_include_dir}")
+pwd = os.getcwd()
+os.chdir(PYRJ_PATH)
+try:
+    import pyrj_setup
+    pyrj_ext = pyrj_setup.extension_options
+    pyrj_ext.update(
+        sources=[os.path.join(PYRJ_PATH, 'rapidjson.cpp')])
+finally:
+    sys.path.pop(0)
+    os.chdir(pwd)
+
 
 # Don't do coverage or installation of packages for use with other languages
 # when building a source distribution
@@ -85,6 +102,8 @@ setup(
     download_url=(
         "https://github.com/cropsinsilico/yggdrasil/archive/%s.tar.gz" % ygg_ver),
     keywords=["plants", "simulation", "models", "framework"],
+    ext_modules=[Extension('yggdrasil.rapidjson', **pyrj_ext)],
+    setup_requires=['numpy'],
     install_requires=requirements,
     tests_require=test_requirements,
     classifiers=[
@@ -93,7 +112,6 @@ setup(
         "Programming Language :: ML",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
@@ -108,5 +126,5 @@ setup(
         'console_scripts': console_scripts,
     },
     license="BSD",
-    python_requires='>=3.5',
+    python_requires='>=3.6',
 )
