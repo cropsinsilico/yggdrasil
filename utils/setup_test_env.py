@@ -435,7 +435,7 @@ def build_pkg(method, python=None, return_commands=False,
             cmds += [
                 f"{CONDA_CMD} config --add channels conda-forge",
                 f"{CONDA_CMD} update -q conda",
-                f"{CONDA_CMD} install -q -n mamba"
+                f"{CONDA_CMD} install -q -n base mamba"
             ]
             global CONDA_INSTALL_CMD
             CONDA_INSTALL_CMD = "mamba"
