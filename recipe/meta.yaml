@@ -67,7 +67,6 @@ requirements:
     - pint  # [py2k]
     - psutil
     - python
-    - python-rapidjson  # [not py2k]
     - pyyaml
     - pyzmq
     - r-base

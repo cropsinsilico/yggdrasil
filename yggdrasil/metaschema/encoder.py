@@ -1,7 +1,7 @@
 import importlib
 import json as stdjson
 import yaml
-import rapidjson as json
+from yggdrasil import rapidjson as json
 from yggdrasil import tools
 _json_encoder = json.Encoder
 _json_decoder = json.Decoder
