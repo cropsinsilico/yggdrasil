@@ -27,10 +27,12 @@ CONDA_INDEX = None
 CONDA_ROOT = None
 try:
     CONDA_CMD_WHICH = shutil.which('conda')
+    MAMBA_CMD_WHICH = shutil.which('mamba')
     YGG_CMD_WHICH = shutil.which('yggdrasil')
 except AttributeError:
     if _is_win:
         CONDA_CMD_WHICH = None
+        MAMBA_CMD_WHICH = None
         YGG_CMD_WHICH = None
     else:
         try:
@@ -38,6 +40,11 @@ except AttributeError:
                 ['which', 'conda']).strip().decode('utf-8')
         except subprocess.CalledProcessError:
             CONDA_CMD_WHICH = None
+        try:
+            MAMBA_CMD_WHICH = subprocess.check_output(
+                ['which', 'mamba']).strip().decode('utf-8')
+        except subprocess.CalledProcessError:
+            MAMBA_CMD_WHICH = None
         try:
             YGG_CMD_WHICH = subprocess.check_output(
                 ['which', 'yggdrasil']).strip().decode('utf-8')
@@ -67,21 +74,25 @@ if CONDA_CMD_WHICH:
     CONDA_ROOT = os.path.dirname(os.path.dirname(CONDA_CMD_WHICH))
 elif os.environ.get('CONDA', None):
     if _is_win:
-        CONDA_CMD = 'call %s' % os.path.join(os.environ['CONDA'],
-                                             'condabin', 'conda.bat')
+        CONDA_CMD = 'call ' + os.path.join(os.environ['CONDA'],
+                                           'condabin', 'conda.bat')
     else:
         CONDA_CMD = os.path.join(os.environ['CONDA'], 'bin', 'conda')
     CONDA_ROOT = os.environ['CONDA']
 else:
     CONDA_CMD = None
+if MAMBA_CMD_WHICH:
+    CONDA_INSTALL_CMD = MAMBA_CMD_WHICH
+else:
+    CONDA_INSTALL_CMD = CONDA_CMD
 PYTHON_CMD = sys.executable
-SUMMARY_CMDS = ["%s --version" % PYTHON_CMD,
-                "%s -m pip list" % PYTHON_CMD]
+SUMMARY_CMDS = [f"{PYTHON_CMD} --version",
+                f"{PYTHON_CMD} -m pip list"]
 if CONDA_ENV:
-    SUMMARY_CMDS += ["echo 'CONDA_PREFIX=%s'" % CONDA_PREFIX,
-                     "%s info" % CONDA_CMD,
-                     "%s list" % CONDA_CMD,
-                     "%s config --show-sources" % CONDA_CMD]
+    SUMMARY_CMDS += [f"echo 'CONDA_PREFIX={CONDA_PREFIX}'",
+                     f"{CONDA_CMD} info",
+                     f"{CONDA_CMD} list",
+                     f"{CONDA_CMD} config --show-sources"]
 
 
 def call_conda_command(args, **kwargs):
@@ -138,7 +149,7 @@ def call_script(lines, force_bash=False):
             error_check = 'set -e'
             if error_check not in lines:
                 lines.insert(1, error_check)
-        fname = 'ci_script_%s%s' % (str(uuid.uuid4()), script_ext)
+        fname = f'ci_script_{uuid.uuid4()}{script_ext}'
         try:
             pprint.pprint(lines)
             with open(fname, 'w') as fd:
@@ -148,7 +159,7 @@ def call_script(lines, force_bash=False):
             if _is_win:  # pragma: windows
                 call_cmd = [os.environ['COMSPEC'], '/c', 'call', fname]
             else:
-                call_cmd = ['./%s' % fname]
+                call_cmd = [f'./{fname}']
                 os.chmod(fname, 0o755)
             subprocess.check_call(call_cmd, **call_kws)
         except subprocess.CalledProcessError:
@@ -298,12 +309,11 @@ def add_install_opts_args(parser):
             continue
         if v:
             parser.add_argument(
-                '--dont-install-%s' % k, action='store_true',
-                help=("Don't install %s" % k))
+                f'--dont-install-{k}', action='store_true',
+                help=f"Don't install {k}")
         else:
             parser.add_argument(
-                '--install-%s' % k, action='store_true',
-                help=("Install %s" % k))
+                f'--install-{k}', action='store_true', help=f"Install {k}")
 
 
 def create_env(method, python, name=None, packages=None, init=_on_ci):
@@ -328,10 +338,10 @@ def create_env(method, python, name=None, packages=None, init=_on_ci):
         ValueError: If method is not 'conda' or 'pip'.
 
     """
-    cmds = ["echo Creating test environment using %s..." % method]
+    cmds = [f"echo Creating test environment using {method}..."]
     major, minor = [int(x) for x in python.split('.')][:2]
     if name is None:
-        name = '%s%s' % (method, python.replace('.', ''))
+        name = method + python.replace('.', '')
     if packages is None:
         packages = []
     if 'requests' not in packages:
@@ -340,21 +350,20 @@ def create_env(method, python, name=None, packages=None, init=_on_ci):
         packages.append('requests')
     if method == 'conda':
         if conda_env_exists(name):
-            print("Conda env with name '%s' already exists." % name)
+            print(f"Conda env with name '{name}' already exists.")
             return
         if init:
             cmds += [
                 # Configure conda
-                "%s config --set always_yes yes --set changeps1 no" % CONDA_CMD,
-                "%s config --set channel_priority strict" % CONDA_CMD,
-                "%s config --add channels conda-forge" % CONDA_CMD,
-                "%s update -q conda" % CONDA_CMD,
-                # "%s config --set allow_conda_downgrades true" % CONDA_CMD,
-                # "%s install -n root conda=4.9" % CONDA_CMD,
+                f"{CONDA_CMD} config --set always_yes yes --set changeps1 no",
+                f"{CONDA_CMD} config --set channel_priority strict",
+                f"{CONDA_CMD} config --add channels conda-forge",
+                f"{CONDA_CMD} update -q conda",
+                # f"{CONDA_CMD} config --set allow_conda_downgrades true",
+                # f"{CONDA_CMD} install -n root conda=4.9",
             ]
         cmds += [
-            "%s create -q -n %s python=%s %s" % (CONDA_CMD, name, python,
-                                                 ' '.join(packages))
+            f"{CONDA_CMD} create -q -n {name} python={python} " + ' '.join(packages)
         ]
     elif method == 'virtualenv':
         python_cmd = PYTHON_CMD
@@ -369,19 +378,20 @@ def create_env(method, python, name=None, packages=None, init=_on_ci):
                 except AttributeError:
                     python_cmd = 'python%d' % major
             else:  # pragma: debug
-                raise RuntimeError(("The version of Python (%d.%d) does not match the "
-                                    "desired version (%s) and virtualenv cannot create "
-                                    "an environment with a different version of Python.")
-                                   % (sys.version_info[0], sys.version_info[1], python))
+                raise RuntimeError(
+                    ("The version of Python (%d.%d) does not match the "
+                     "desired version (%s) and virtualenv cannot create "
+                     "an environment with a different version of Python.")
+                    % (sys.version_info[0], sys.version_info[1], python))
         cmds += [
-            "%s -m pip install --upgrade pip virtualenv" % python_cmd,
-            "virtualenv -p %s %s" % (python_cmd, name)
+            f"{python_cmd} -m pip install --upgrade pip virtualenv",
+            f"virtualenv -p {python_cmd} {name}"
         ]
         if packages:
-            cmds.append("%s -m pip install %s" % (python_cmd, ' '.join(packages)))
+            cmds.append(f"{python_cmd} -m pip install " + ' '.join(packages))
     else:  # pragma: debug
-        raise ValueError("Unsupport environment management method: '%s'"
-                         % method)
+        raise ValueError(
+            f"Unsupported environment management method: '{method}'")
     call_script(cmds)
 
 
@@ -409,7 +419,7 @@ def build_pkg(method, python=None, return_commands=False,
     upgrade_pkgs = ['wheel', 'setuptools']
     if not _is_win:
         upgrade_pkgs.insert(0, 'pip')
-    # cmds += ["%s -m pip install --upgrade %s" % (PYTHON_CMD, ' '.join(upgrade_pkgs))]
+    # cmds += [f"{PYTHON_CMD} -m pip install --upgrade " + " ".join(upgrade_pkgs)]
     if method == 'conda':
         if verbose:
             build_flags = ''
@@ -423,26 +433,27 @@ def build_pkg(method, python=None, return_commands=False,
         assert(CONDA_INDEX)
         if _on_gha:
             cmds += [
-                "%s config --add channels conda-forge" % CONDA_CMD,
-                "%s update -q conda" % CONDA_CMD,
+                f"{CONDA_CMD} config --add channels conda-forge",
+                f"{CONDA_CMD} update -q conda",
+                f"{CONDA_CMD} install -q -n mamba"
             ]
+            global CONDA_INSTALL_CMD
+            CONDA_INSTALL_CMD = "mamba"
         if _is_win and _on_gha:
             # The tests issue a command that is too long for the
             # windows command prompt which is used to build the conda
             # package on Github Actions
             build_flags += ' --no-test'
-        cmds += [
-            "%s clean --all" % CONDA_CMD]  # Might invalidate cache
+        cmds += [f"{CONDA_CMD} clean --all"]  # Might invalidate cache
         if not (_is_win and _on_gha):
             cmds += [
-                # "%s deactivate" % CONDA_CMD,
-                "%s update --all" % CONDA_CMD]
+                # f"{CONDA_INSTALL_CMD} deactivate",
+                f"{CONDA_INSTALL_CMD} update --all"]
         cmds += [
-            "%s install -q -n base conda-build conda-verify" % CONDA_CMD,
-            "%s build %s --python %s %s" % (
-                CONDA_CMD, 'recipe', python, build_flags),
-            "%s index %s" % (CONDA_CMD, CONDA_INDEX),
-            # "%s activate %s" % (CONDA_CMD, CONDA_ENV),
+            f"{CONDA_CMD} install -q -n base conda-build conda-verify",
+            f"{CONDA_CMD} build recipe --python {python} {build_flags}",
+            f"{CONDA_CMD} index {CONDA_INDEX}",
+            # f"{CONDA_CMD} activate {CONDA_ENV}",
         ]
     elif method == 'pip':
         if verbose:
@@ -450,11 +461,11 @@ def build_pkg(method, python=None, return_commands=False,
         else:
             build_flags = '--quiet'
         # Install from source dist
-        cmds += ["%s -m pip install --upgrade %s" % (PYTHON_CMD, ' '.join(upgrade_pkgs))]
-        cmds += ["%s setup.py %s sdist" % (PYTHON_CMD, build_flags)]
+        cmds += [f"{PYTHON_CMD} -m pip install --upgrade "
+                 + " ".join(upgrade_pkgs)]
+        cmds += [f"{PYTHON_CMD} setup.py {build_flags} sdist"]
     else:  # pragma: debug
-        raise ValueError("Method must be 'conda' or 'pip', not '%s'"
-                         % method)
+        raise ValueError(f"Method must be 'conda' or 'pip', not '{method}'")
     if return_commands:
         return cmds
     cmds = SUMMARY_CMDS + cmds + SUMMARY_CMDS
@@ -569,8 +580,7 @@ def itemize_deps(method, for_development=False,
     elif method == 'pip':
         out['default'] = out['pip']
     else:  # pragma: debug
-        raise ValueError("Method must be 'conda' or 'pip', not '%s'"
-                         % method)
+        raise ValueError(f"Method must be 'conda' or 'pip', not '{method}'")
     # In the case of a development environment install requirements that
     # would be missed when installing in development mode
     if for_development:
@@ -715,8 +725,8 @@ def itemize_deps(method, for_development=False,
         elif windows_package_manager == 'vcpkg':
             out['vcpkg'] += out['os']
         else:
-            raise NotImplementedError("Invalid package manager: '%s'"
-                                      % windows_package_manager)
+            raise NotImplementedError(
+                f"Invalid package manager: '{windows_package_manager}'")
     out.pop('os')
     return out
 
@@ -755,7 +765,7 @@ def install_deps(method, return_commands=False, verbose=False,
     conda_flags = ''
     if conda_env:
         python_cmd = locate_conda_exe(conda_env, 'python')
-        conda_flags += ' --name %s' % conda_env
+        conda_flags += f' --name {conda_env}'
     if always_yes:
         conda_flags += ' -y'
     # Determine if conda should be used for base dependencies
@@ -769,19 +779,19 @@ def install_deps(method, return_commands=False, verbose=False,
     pprint.pprint(pkgs)
     # Uninstall default numpy and matplotlib to allow installation
     # of specific versions
-    cmds = ["%s -m pip uninstall -y numpy matplotlib" % python_cmd]
+    cmds = [f"{python_cmd} -m pip uninstall -y numpy matplotlib"]
     # Refresh channel
     # https://github.com/conda/conda/issues/8051
     if fallback_to_conda and _on_gha:
         cmds += [
-            "%s config --set channel_priority strict" % CONDA_CMD,
-            # "%s install -n root conda=4.9" % CONDA_CMD,
-            # "%s config --set allow_conda_downgrades true" % CONDA_CMD,
-            "%s config --remove channels conda-forge" % CONDA_CMD,
-            "%s config --add channels conda-forge" % CONDA_CMD,
+            f"{CONDA_CMD} config --set channel_priority strict",
+            # f"{CONDA_CMD} install -n root conda=4.9",
+            # f"{CONDA_CMD} config --set allow_conda_downgrades true",
+            f"{CONDA_CMD} config --remove channels conda-forge",
+            f"{CONDA_CMD} config --add channels conda-forge",
         ]
     if fallback_to_conda:
-        cmds.append("%s update --all" % CONDA_CMD)
+        cmds.append(f"{CONDA_INSTALL_CMD} update --all")
     if install_opts['R'] and (not fallback_to_conda) and (not only_python):
         # TODO: Test split installation where r-base is installed from
         # conda and the R dependencies are installed from CRAN?
@@ -817,19 +827,19 @@ def install_deps(method, return_commands=False, verbose=False,
         # Do both to ensure that the path is set for the installation
         # and in following steps
         cmds += [
-            "export LD_LIBRARY_PATH=%s/lib:$LD_LIBRARY_PATH" % conda_prefix,
+            f"export LD_LIBRARY_PATH={conda_prefix}/lib:$LD_LIBRARY_PATH",
             "echo -n \"LD_LIBRARY_PATH=\" >> $GITHUB_ENV",
-            "echo %s/lib:$LD_LIBRARY_PATH >> $GITHUB_ENV" % conda_prefix
+            f"echo {conda_prefix}/lib:$LD_LIBRARY_PATH >> $GITHUB_ENV"
         ]
     # Install dependencies using package manager(s)
     if not only_python:
         if pkgs['apt']:
             if install_opts['no_sudo']:
                 cmds += ["apt -y update"]
-                cmds += ["apt-get -y install %s" % ' '.join(pkgs['apt'])]
+                cmds += ["apt-get -y install " + ' '.join(pkgs['apt'])]
             else:
                 cmds += ["sudo apt update"]
-                cmds += ["sudo apt-get install %s" % ' '.join(pkgs['apt'])]
+                cmds += ["sudo apt-get install " + ' '.join(pkgs['apt'])]
         if pkgs['brew']:
             if 'gcc' in pkgs['brew']:
                 cmds += ["brew reinstall gcc"]
@@ -846,16 +856,16 @@ def install_deps(method, return_commands=False, verbose=False,
                         pkgs_from_src.append(k)
                         pkgs['brew'].remove(k)
             if pkgs_from_src:
-                cmds += ["brew install --build-from-source %s" % ' '.join(pkgs_from_src)]
+                cmds += ["brew install --build-from-source " + ' '.join(pkgs_from_src)]
             if pkgs['brew']:
-                cmds += ["brew install %s" % ' '.join(pkgs['brew'])]
+                cmds += ["brew install " + ' '.join(pkgs['brew'])]
         if pkgs['choco']:
-            # cmds += ["choco install %s" % ' '.join(pkgs['choco'])]
+            # cmds += ["choco install " + ' '.join(pkgs['choco'])]
             for x in pkgs['choco']:
-                cmds.append("choco install %s --force" % x)
+                cmds.append(f"choco install {x} --force")
         if pkgs['vcpkg']:
-            cmds += ["%s install %s --triplet x64-windows"
-                     % ('vcpkg.exe', ' '.join(pkgs['vcpkg']))]
+            cmds += ["vcpkg.exe install %s --triplet x64-windows"
+                     % ' '.join(pkgs['vcpkg'])]
     # Install via requirements
     req_kwargs = dict(conda_env=conda_env, python_cmd=python_cmd,
                       install_opts=install_opts, append_cmds=cmds,
@@ -876,8 +886,8 @@ def install_deps(method, return_commands=False, verbose=False,
         pip_flags = '--no-dependencies'
         if verbose:
             pip_flags += ' --verbose'
-        cmds.append('%s -m pip install %s \"libroadrunner<2.0.7\"'
-                    % (python_cmd, pip_flags))
+        cmds.append(
+            f'{python_cmd} -m pip install {pip_flags} \"libroadrunner<2.0.7\"')
     if install_opts['lpy']:
         if verbose:
             install_flags = '-vvv'
@@ -885,8 +895,8 @@ def install_deps(method, return_commands=False, verbose=False,
             install_flags = '-q'
         install_flags += conda_flags
         if fallback_to_conda:
-            cmds += ["%s install %s openalea.lpy boost=1.66.0 -c openalea"
-                     % (CONDA_CMD, install_flags)]
+            cmds += [f"{CONDA_INSTALL_CMD} install {install_flags} "
+                     f"openalea.lpy boost=1.66.0 -c openalea"]
         else:  # pragma: debug
             raise RuntimeError("Could not detect conda environment. "
                                "Cannot proceed with a conda deployment "
@@ -902,7 +912,7 @@ def install_deps(method, return_commands=False, verbose=False,
     #     # an error message when called inside a Python subprocess. This seems
     #     # to occur during cleanup for the installation process as the mpi4py
     #     # installation is functional. Possibly triggered by the activation script?
-    #     cmds += ["%s install %s mpi4py # [ALLOW FAIL]" % (CONDA_CMD, install_flags)]
+    #     cmds += [f"{CONDA_INSTALL_CMD} install {install_flags} mpi4py # [ALLOW FAIL]"]
     if return_commands:
         return cmds
     cmds = SUMMARY_CMDS + cmds + SUMMARY_CMDS
@@ -961,7 +971,7 @@ def install_pkg(method, python=None, without_build=False,
     conda_flags = ''
     if conda_env:
         python_cmd = locate_conda_exe(conda_env, 'python')
-        conda_flags += ' --name %s' % conda_env
+        conda_flags += f' --name {conda_env}'
     if always_yes:
         conda_flags += ' -y'
     cmds = []
@@ -1001,19 +1011,19 @@ def install_pkg(method, python=None, without_build=False,
         if _is_win:
             index_channel = CONDA_INDEX
         else:
-            index_channel = "file:/%s" % CONDA_INDEX
+            index_channel = f"file:/{CONDA_INDEX}"
         cmds += [
-            "%s config --add channels %s" % (CONDA_CMD, index_channel),
+            f"{CONDA_CMD} config --add channels {index_channel}",
             # Related issues if this stops working again
             # https://github.com/conda/conda/issues/466#issuecomment-378050252
-            "%s install %s --update-deps -c %s yggdrasil" % (
-                CONDA_CMD, install_flags, index_channel)
+            f"{CONDA_INSTALL_CMD} install {install_flags} --update-deps"
+            f" -c {index_channel} yggdrasil",
             # Required for non-strict channel priority
             # https://github.com/conda-forge/conda-forge.github.io/pull/670
             # https://conda.io/projects/conda/en/latest/user-guide/concepts/ ...
             #    packages.html?highlight=openblas#installing-numpy-with-blas-variants
-            # "%s install %s --update-deps -c %s yggdrasil \"blas=*=openblas\"" % (
-            #     CONDA_CMD, install_flags, index_channel)
+            # f"{index_channel} install {install_flags} --update-deps "
+            # f" -c {index_channel} yggdrasil \"blas=*=openblas\""
         ]
         if install_opts['mpi']:
             cmds[-1] = cmds[-1] + ' mpi4py # [ALLOW FAIL]'
@@ -1031,15 +1041,15 @@ def install_pkg(method, python=None, without_build=False,
         else:
             sdist = "dist/*.tar.gz"
         cmds += [
-            "%s -m pip install %s %s" % (python_cmd, install_flags, sdist),
-            "%s create_coveragerc.py" % python_cmd
+            f"{python_cmd} -m pip install {install_flags} {sdist}",
+            f"{python_cmd} create_coveragerc.py"
         ]
     elif method.endswith('-dev'):
         # Call setup.py in separate process from the package directory
-        # cmds += ["%s setup.py develop" % python_cmd]
+        # cmds += [f"{python_cmd} setup.py develop"]
         pass
     else:  # pragma: debug
-        raise ValueError("Invalid method: '%s'" % method)
+        raise ValueError(f"Invalid method: '{method}'")
     # Print summary of what was installed
     if not YGG_CMD_WHICH:
         cmds = SUMMARY_CMDS + cmds + SUMMARY_CMDS
@@ -1100,10 +1110,10 @@ def verify_pkg(install_opts=None):
          "'import yggdrasil; print(yggdrasil.__version__)'"],
         cwd=os.path.dirname(src_dir))
     if src_version != bld_version:
-        raise RuntimeError("Installed version does not match the version of "
-                           "this source code.\n"
-                           "\tSource version: %s\n\tBuild  version: %s"
-                           % (src_version, bld_version))
+        raise RuntimeError(f"Installed version does not match the version "
+                           f"of this source code.\n"
+                           f"\tSource version: {src_version}\n"
+                           f"\tBuild  version: {bld_version}")
     if install_opts['R']:
         assert(shutil.which("R"))
         assert(shutil.which("Rscript"))
@@ -1123,8 +1133,7 @@ def verify_pkg(install_opts=None):
     for name in ['c', 'R', 'fortran', 'sbml', 'lpy']:
         flag = install_opts[name]
         if flag and (not is_lang_installed(name)):
-            errors.append("Language '%s' should be installed, but is not."
-                          % name)
+            errors.append(f"Language '{name}' should be installed, but is not.")
         elif (not flag) and is_lang_installed(name):
             if name in ['R']:
                 # Allow R to be installed even if the settings is not as
@@ -1132,8 +1141,7 @@ def verify_pkg(install_opts=None):
                 # error which can occur when a new release of a dependency
                 # comes out but there are not yet binaries available
                 continue
-            errors.append("Language '%s' should NOT be installed, but is."
-                          % name)
+            errors.append(f"Language '{name}' should NOT be installed, but is.")
     for name in ['zmq', 'rmq']:
         flag = install_opts[name]
         if name == 'rmq':
@@ -1141,12 +1149,12 @@ def verify_pkg(install_opts=None):
         else:
             language = None
         if flag and (not is_comm_installed(name, language=language)):
-            errors.append("Comm '%s' should be installed, but is not." % name)
+            errors.append(f"Comm '{name}' should be installed, but is not.")
         elif (not flag) and is_comm_installed(name, language=language):
-            errors.append("Comm '%s' should NOT be installed, but is." % name)
+            errors.append(f"Comm '{name}' should NOT be installed, but is.")
     if errors:
         raise AssertionError("One or more languages was not installed as "
-                             "expected\n\t%s" % "\n\t".join(errors))
+                             "expected\n\t" + "\n\t".join(errors))
     if _is_win:  # pragma: windows
         if os.environ.get('HOMEDRIVE', None):
             assert(os.path.expanduser('~').startswith(os.environ['HOMEDRIVE']))
@@ -1169,17 +1177,16 @@ def log_environment(new_filename='new_environment_log.txt',
     """
     if os.path.isfile(new_filename):
         if os.path.isfile(old_filename):
-            raise RuntimeError("Package list already exists: '%s'"
-                               % new_filename)
+            raise RuntimeError(f"Package list already exists: '{new_filename}'")
         else:
             shutil.move(new_filename, old_filename)
     now = datetime.now()
     cmds = ["echo \"%s\" >> %s" % (now.strftime("%Y/%m/%d %H:%M:%S"),
                                    new_filename),
-            "%s --version >> %s" % (PYTHON_CMD, new_filename),
-            "%s -m pip list >> %s" % (PYTHON_CMD, new_filename)]
+            f"{PYTHON_CMD} --version >> {new_filename}",
+            f"{PYTHON_CMD} -m pip list >> {new_filename}"]
     if shutil.which('conda'):
-        cmds.append("%s list >> %s" % (CONDA_CMD, new_filename))
+        cmds.append(f"{CONDA_CMD} list >> {new_filename}")
     call_script(cmds)
     assert(os.path.isfile(new_filename))
     if os.path.isfile(old_filename):
@@ -1360,9 +1367,9 @@ if __name__ == "__main__":
         for k, v in install_opts.items():
             if k == 'no_sudo':
                 new_opts[k] = bool(getattr(args, k, False))
-            elif v and getattr(args, 'dont_install_%s' % k, False):
+            elif v and getattr(args, f'dont_install_{k}', False):
                 new_opts[k] = False
-            elif (not v) and getattr(args, 'install_%s' % k, False):
+            elif (not v) and getattr(args, f'install_{k}', False):
                 new_opts[k] = True
         install_opts.update(new_opts)
     if args.operation in ['env', 'setup']:

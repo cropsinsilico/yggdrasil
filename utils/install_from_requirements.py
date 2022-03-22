@@ -8,7 +8,7 @@ import pprint
 import argparse
 from setup_test_env import (
     call_conda_command, locate_conda_exe, get_install_opts,
-    PYTHON_CMD, CONDA_CMD, _is_win)
+    PYTHON_CMD, CONDA_INSTALL_CMD, _is_win)
 
 
 class DependencyNotFound(BaseException):
@@ -278,8 +278,8 @@ def install_from_requirements(method, fname_in, conda_env=None,
                       skip_packages=skip_packages)
     try:
         if method == 'conda':
-            assert(CONDA_CMD)
-            args = [CONDA_CMD, 'install', '-y']
+            assert(CONDA_INSTALL_CMD)
+            args = [CONDA_INSTALL_CMD, 'install', '-y']
             if verbose:
                 args.append('-vvv')
             else:
