@@ -622,10 +622,9 @@ def itemize_deps(method, for_development=False,
             out['os'].append('openmpi')
         elif install_opts['os'] == 'win':
             pass
-    elif ((install_opts['os'] == 'win') and install_opts['mpi']
-          and (method == 'conda')):
-        # Force mpi4py to be installed last on Windows to avoid
-        # conflicts
+    elif (install_opts['mpi'] and (method == 'conda')):
+        # Force mpi4py to be installed last to avoid
+        # conflicts and speed up installation
         out['skip'].append('mpi4py')
     if install_opts['fortran'] and (not fallback_to_conda):
         # Fortran is not installed via conda on linux/macos
@@ -1016,7 +1015,7 @@ def install_pkg(method, python=None, without_build=False,
             # "%s install %s --update-deps -c %s yggdrasil \"blas=*=openblas\"" % (
             #     CONDA_CMD, install_flags, index_channel)
         ]
-        if _is_win and install_opts['mpi']:
+        if install_opts['mpi']:
             cmds[-1] = cmds[-1] + ' mpi4py # [ALLOW FAIL]'
     elif method == 'pip':
         if verbose:
