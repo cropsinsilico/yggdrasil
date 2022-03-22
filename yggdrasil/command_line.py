@@ -19,14 +19,16 @@ package_dir = os.path.dirname(os.path.abspath(__file__))
 def githook():
     r"""Git hook to determine if the Github workflow need to be
     re-generated."""
-    try:
-        files = subprocess.check_output(
-            ["git", "diff-index", "--cached", "--name-only",
-             "--diff-filter=ACMRTUXB", "HEAD"],
-            stderr=subprocess.PIPE).decode('utf-8').splitlines()
-    except subprocess.CalledProcessError:
-        return 1
-    regen = (os.path.join('utils', 'test-install-base.yml') in files)
+    # This check is not required when using pre-commit package
+    # try:
+    #     files = subprocess.check_output(
+    #         ["git", "diff-index", "--cached", "--name-only",
+    #          "--diff-filter=ACMRTUXB", "HEAD"],
+    #         stderr=subprocess.PIPE).decode('utf-8').splitlines()
+    # except subprocess.CalledProcessError:
+    #     return 1
+    # regen = (os.path.join('utils', 'test-install-base.yml') in files)
+    regen = True
     if regen:
         try:
             gitdir = subprocess.check_output(
