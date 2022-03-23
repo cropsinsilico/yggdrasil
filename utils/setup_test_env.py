@@ -1012,11 +1012,13 @@ def install_pkg(method, python=None, without_build=False,
             index_channel = CONDA_INDEX
         else:
             index_channel = f"file:/{CONDA_INDEX}"
+        if 'mamba' not in CONDA_INSTALL_CMD:
+            install_flags += ' --update-deps'
         cmds += [
             f"{CONDA_CMD} config --add channels {index_channel}",
             # Related issues if this stops working again
             # https://github.com/conda/conda/issues/466#issuecomment-378050252
-            f"{CONDA_INSTALL_CMD} install {install_flags} --update-deps"
+            f"{CONDA_INSTALL_CMD} install {install_flags} "
             f" -c {index_channel} yggdrasil",
             # Required for non-strict channel priority
             # https://github.com/conda-forge/conda-forge.github.io/pull/670
