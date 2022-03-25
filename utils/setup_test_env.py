@@ -1016,7 +1016,12 @@ def install_pkg(method, python=None, without_build=False,
             install_flags += ' --update-deps'
         install_flags += ' -v'
         cmds += [
-            f"{CONDA_CMD} config --add channels {index_channel}",
+            f"{CONDA_CMD} config --add channels {index_channel}"]
+        if 'mamba' in CONDA_INSTALL_CMD:
+            cmds += [
+                f"{CONDA_INSTALL_CMD} install -c {index_channel} --only-deps"
+                f" -v yggdrasil"]
+        cmds += [
             # Related issues if this stops working again
             # https://github.com/conda/conda/issues/466#issuecomment-378050252
             f"{CONDA_INSTALL_CMD} install {install_flags} "
