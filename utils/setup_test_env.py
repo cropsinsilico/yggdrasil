@@ -789,6 +789,7 @@ def install_deps(method, return_commands=False, verbose=False,
             # f"{CONDA_CMD} config --set allow_conda_downgrades true",
             f"{CONDA_CMD} config --remove channels conda-forge",
             f"{CONDA_CMD} config --add channels conda-forge",
+            f"{CONDA_CMD} config --remove channels defaults"
         ]
     if fallback_to_conda:
         cmds.append(f"{CONDA_INSTALL_CMD} update --all")
