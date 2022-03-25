@@ -1004,6 +1004,7 @@ def install_pkg(method, python=None, without_build=False,
         assert(CONDA_INDEX and os.path.isdir(CONDA_INDEX))
         # Install from conda build
         # Assumes that the target environment is active
+        verbose = True
         if verbose:
             install_flags = '-vvv'
         else:
@@ -1015,7 +1016,6 @@ def install_pkg(method, python=None, without_build=False,
             index_channel = f"file:/{CONDA_INDEX}"
         if 'mamba' not in CONDA_INSTALL_CMD:
             install_flags += ' --update-deps'
-        install_flags += ' -v'
         cmds += [
             f"{CONDA_CMD} clean --all",
             f"{CONDA_CMD} config --add channels {index_channel}"]
