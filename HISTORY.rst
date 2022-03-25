@@ -14,6 +14,8 @@ TODO:
 
 * Update yggdrasil to use the vendored rapidjson
 * Remove jsonschema requirement
+* Add check_schema class method to validator/normalizer
+* Add validate alias for calling validator on an object
 
 1.8.2 (2021-03-18) Migrate tests out of package into pytest fixtures & various bug fixes
 ------------------

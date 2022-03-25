@@ -343,6 +343,8 @@ class ModelDriver(Driver):
                  'items': {'type': 'string', 'minLength': 1}},
         'inputs': {'type': 'array', 'default': [],
                    'items': {'$ref': '#/definitions/comm'},
+                   'allowSingular': True,
+                   'aliases': ['input'],
                    'description': (
                        'Zero or more channels carrying input to the model. '
                        'A full description of channel entries and the '
@@ -350,6 +352,8 @@ class ModelDriver(Driver):
                        ':ref:`here<yaml_comm_options>`.')},
         'outputs': {'type': 'array', 'default': [],
                     'items': {'$ref': '#/definitions/comm'},
+                    'allowSingular': True,
+                    'aliases': ['output'],
                     'description': (
                         'Zero or more channels carrying output from the '
                         'model. A full description of channel entries and '
@@ -376,37 +380,24 @@ class ModelDriver(Driver):
         'client_of': {'type': 'array', 'items': {'type': 'string'},
                       'default': []},
         'timesync': {
-            'anyOf': [
-                {'type': 'boolean'}, {'type': 'string'},
-                {'type': 'object',
-                 'required': ['name'],
-                 'properties': {
-                     'name': {'type': 'string', 'default': 'timesync'},
-                     'inputs': {'anyOf': [
-                         {'type': 'string'},
-                         {'type': 'array',
-                          'items': {'type': 'string'}}]},
-                     'outputs': {'anyOf': [
-                         {'type': 'string'},
-                         {'type': 'array',
-                          'items': {'type': 'string'}}]}}},
-                {'type': 'array',
-                 'items': {
-                     'anyOf': [
-                         {'type': 'string'},
-                         {'type': 'object',
-                          'required': ['name'],
-                          'properties': {
-                              'name': {'type': 'string',
-                                       'default': 'timesync'},
-                              'inputs': {'anyOf': [
-                                  {'type': 'string'},
-                                  {'type': 'array',
-                                   'items': {'type': 'string'}}]},
-                              'outputs': {'anyOf': [
-                                  {'type': 'string'},
-                                  {'type': 'array',
-                                   'items': {'type': 'string'}}]}}}]}}],
+            'type': 'array',
+            'allowSingular': True,
+            'items': {
+                'anyOf': [
+                    {'type': 'string'},
+                    {'type': 'object',
+                     'required': ['name'],
+                     'properties': {
+                         'name': {'type': 'string',
+                                  'default': 'timesync'},
+                         'inputs': {'type': 'array',
+                                    'allowSingular': True,
+                                    'aliases': ['input'],
+                                    'items': {'type': 'string'}},
+                         'outputs': {'type': 'array',
+                                     'allowSingular': True,
+                                     'aliases': ['output'],
+                                     'items': {'type': 'string'}}}}]},
             'default': False},
         'with_strace': {'type': 'boolean', 'default': False},
         'strace_flags': {'type': 'array',
