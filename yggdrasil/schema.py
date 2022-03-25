@@ -920,10 +920,14 @@ class SchemaRegistry(object):
                    'properties': SchemaDict(
                        [('models', {'type': 'array',
                                     'items': {'$ref': '#/definitions/model'},
-                                    'minItems': 1}),
+                                    'minItems': 1,
+                                    'allowSingular': True,
+                                    'aliases': ['model']}),
                         ('connections',
                          {'type': 'array',
-                          'items': {'$ref': '#/definitions/connection'}})])}
+                          'items': {'$ref': '#/definitions/connection'},
+                          'allowSingular': True,
+                          'aliases': ['connection']})])}
             self._cache[cache_key] = out
         return copy.deepcopy(self._cache[cache_key])
 

@@ -204,6 +204,8 @@ class ConnectionDriver(Driver):
                    'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                        {'$ref': '#/definitions/file'}]},
                    'default': [{}],
+                   'allowSingular': True,
+                   'aliases': ['input', 'from'],
                    'description': (
                        'One or more name(s) of model output channel(s) '
                        'and/or new channel/file objects that the '
@@ -215,6 +217,8 @@ class ConnectionDriver(Driver):
                     'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                         {'$ref': '#/definitions/file'}]},
                     'default': [{}],
+                    'allowSingular': True,
+                    'aliases': ['output', 'to'],
                     'description': (
                         'One or more name(s) of model input channel(s) '
                         'and/or new channel/file objects that the '
@@ -231,7 +235,9 @@ class ConnectionDriver(Driver):
         'translator': {'type': 'array',
                        'items': {'oneOf': [
                            {'type': 'function'},
-                           {'$ref': '#/definitions/transform'}]}},
+                           {'$ref': '#/definitions/transform'}]},
+                       'allowSingular': True,
+                       'aliases': ['translators']},
         'onexit': {'type': 'string'}}
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     _disconnect_attr = Driver._disconnect_attr + [
