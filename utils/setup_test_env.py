@@ -1019,6 +1019,7 @@ def install_pkg(method, python=None, without_build=False,
         if _is_win and install_opts['mpi']:
             cmds[-1] = cmds[-1] + ' mpi4py # [ALLOW FAIL]'
     elif method == 'pip':
+        verbose = True
         if verbose:
             install_flags = '--verbose'
         else:
