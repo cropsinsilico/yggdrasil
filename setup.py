@@ -4,12 +4,14 @@ import logging
 import warnings
 from setuptools import setup, find_packages, Extension
 from distutils.sysconfig import get_python_lib
-import versioneer
-import create_coveragerc
-ygg_ver = versioneer.get_version()
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
 LANG_PATH = os.path.join(ROOT_PATH, 'yggdrasil', 'languages')
 PYRJ_PATH = os.path.join(ROOT_PATH, '_vendor', 'python_rapidjson')
+
+sys.path.insert(0, ROOT_PATH)
+import versioneer  # noqa: E402
+import create_coveragerc  # noqa: E402
+ygg_ver = versioneer.get_version()
 
 
 # Import script from inside package
