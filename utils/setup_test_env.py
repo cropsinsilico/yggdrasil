@@ -447,8 +447,8 @@ def build_pkg(method, python=None, return_commands=False,
         cmds += [f"{CONDA_CMD} clean --all"]  # Might invalidate cache
         if not (_is_win and _on_gha):
             cmds += [
-                # f"{CONDA_INSTALL_CMD} deactivate",
-                f"{CONDA_INSTALL_CMD} update --all"]
+                # f"{CONDA_CMD} deactivate",
+                f"{CONDA_CMD} update --all"]
         cmds += [
             f"{CONDA_CMD} install -q -n base conda-build conda-verify",
             f"{CONDA_CMD} build recipe --python {python} {build_flags}",
@@ -1016,6 +1016,7 @@ def install_pkg(method, python=None, without_build=False,
             install_flags += ' --update-deps'
         install_flags += ' -v'
         cmds += [
+            f"{CONDA_CMD} clean --all",
             f"{CONDA_CMD} config --add channels {index_channel}"]
         if 'mamba' in CONDA_INSTALL_CMD:
             cmds += [
