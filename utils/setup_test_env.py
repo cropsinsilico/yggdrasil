@@ -1014,6 +1014,7 @@ def install_pkg(method, python=None, without_build=False,
             index_channel = f"file:/{CONDA_INDEX}"
         if 'mamba' not in CONDA_INSTALL_CMD:
             install_flags += ' --update-deps'
+        install_flags += ' -v'
         cmds += [
             f"{CONDA_CMD} config --add channels {index_channel}",
             # Related issues if this stops working again
