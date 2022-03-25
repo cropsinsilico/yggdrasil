@@ -51,7 +51,6 @@ requirements:
     - r-r6
     - r-reticulate
     - r-units
-    - r-zeallot
     - sysv_ipc  # [unix]
     - zeromq
   run:
