@@ -3,8 +3,12 @@ import json as stdjson
 import yaml
 from yggdrasil import rapidjson as json
 from yggdrasil import tools
-_json_encoder = json.Encoder
-_json_decoder = json.Decoder
+try:
+    _json_encoder = json.Encoder
+    _json_decoder = json.Decoder
+except AttributeError:
+    print('RAPIDJSON:', dir(json))
+    print(json.__file__)
 
 
 def indent_char2int(indent):
