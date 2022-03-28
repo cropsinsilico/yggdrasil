@@ -3,8 +3,6 @@ import json as stdjson
 import yaml
 from yggdrasil import rapidjson as json
 from yggdrasil import tools
-print('RAPIDJSON:', dir(json))
-print(json.__file__)
 _json_encoder = json.Encoder
 _json_decoder = json.Decoder
 
