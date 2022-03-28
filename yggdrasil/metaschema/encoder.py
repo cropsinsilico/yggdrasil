@@ -8,7 +8,8 @@ try:
     _json_decoder = json.Decoder
 except AttributeError:
     print('RAPIDJSON:', dir(json))
-    print(json.__file__)
+    print('RAPIDJSON FILE:', json.__file__)
+    raise
 
 
 def indent_char2int(indent):
