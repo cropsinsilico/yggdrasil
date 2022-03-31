@@ -3,8 +3,8 @@ import shutil
 import argparse
 
 
-VENDOR_DIR = os.path.join(
-    os.path.dirname(os.path.abspath(os.path.dirname(__file__))), '_vendor')
+ROOT_DIR = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+VENDOR_DIR = os.path.join(ROOT_DIR, '_vendor')
 PYRJ_DIR = os.path.join(VENDOR_DIR, 'python_rapidjson')
 
 
@@ -22,6 +22,9 @@ def vendor(srcdir):
     ]
     for x in files_to_copy:
         shutil.copy2(os.path.join(srcdir, x), os.path.join(PYRJ_DIR, x))
+        if x.endswith('.cpp'):
+            shutil.copy2(os.path.join(srcdir, x),
+                         os.path.join(ROOT_DIR, 'yggdrasil', x))
 
     setup_lines = open(os.path.join(srcdir, 'setup.py'), 'r').read().split(
         '\nsetup(')[0]
