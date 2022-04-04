@@ -44,7 +44,8 @@ finally:
 
 # Don't do coverage or installation of packages for use with other languages
 # when building a source distribution
-if 'sdist' not in sys.argv:
+if ((('sdist' not in sys.argv) and ('egg_info' not in sys.argv)
+     and ('dist_info' not in sys.argv))):
     # Attempt to install languages
     installed_languages = install_languages.install_all_languages(from_setup=True)
     # Set coverage options in .coveragerc

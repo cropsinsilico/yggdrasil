@@ -253,17 +253,18 @@ jobs:
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
       id: test1
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }} --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run generated test script (1st)
       if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
       id: test1_script
@@ -275,12 +276,13 @@ jobs:
     - name: Run tests (2nd)
       if: ${{ matrix.test-flags2 != '' }}
       id: test2
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }}
       continue-on-error: true
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }} --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run generated test script (2nd)
       if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
         }}
@@ -560,17 +562,18 @@ jobs:
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
       id: test1
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }} --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run generated test script (1st)
       if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
       id: test1_script
@@ -582,12 +585,13 @@ jobs:
     - name: Run tests (2nd)
       if: ${{ matrix.test-flags2 != '' }}
       id: test2
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }}
       continue-on-error: true
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }} --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run generated test script (2nd)
       if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
         }}
@@ -843,17 +847,18 @@ jobs:
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
       id: test1
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }} --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run generated test script (1st)
       if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
       id: test1_script
@@ -865,12 +870,13 @@ jobs:
     - name: Run tests (2nd)
       if: ${{ matrix.test-flags2 != '' }}
       id: test2
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }}
       continue-on-error: true
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }} --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run generated test script (2nd)
       if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
         }}
@@ -1128,17 +1134,18 @@ jobs:
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
       id: test1
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }} --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run generated test script (1st)
       if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
       id: test1_script
@@ -1150,12 +1157,13 @@ jobs:
     - name: Run tests (2nd)
       if: ${{ matrix.test-flags2 != '' }}
       id: test2
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }}
       continue-on-error: true
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }} --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run generated test script (2nd)
       if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
         }}
@@ -1412,17 +1420,18 @@ jobs:
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
       id: test1
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }} --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run generated test script (1st)
       if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
       id: test1_script
@@ -1434,12 +1443,13 @@ jobs:
     - name: Run tests (2nd)
       if: ${{ matrix.test-flags2 != '' }}
       id: test2
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }}
       continue-on-error: true
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-        --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }} --last-failed --last-failed-no-failures=none --second-attempt
     - name: Run generated test script (2nd)
       if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
         }}
