@@ -50,6 +50,9 @@ requirements:
     - r-zeallot
     - sysv_ipc  # [unix]
     - zeromq
+    - numpy
+  build:
+    - numpy
   run:
     - chevron
     - cmake  # [not win]
