@@ -4,6 +4,10 @@
 // :License:   BSD License
 //
 
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
+
 #include <Python.h>
 
 #include "rapidjson/units.h"

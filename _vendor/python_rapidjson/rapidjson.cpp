@@ -6,6 +6,10 @@
 // :Copyright: © 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022 Lele Gaifax
 //
 
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
+
 #include <locale.h>
 
 #include <Python.h>
@@ -13,9 +17,6 @@
 #include <structmember.h>
 
 #include <algorithm>
-#ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
-#endif
 #include <cmath>
 #include <string>
 #include <vector>
