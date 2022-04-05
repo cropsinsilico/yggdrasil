@@ -23,6 +23,7 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/error/en.h"
+#include "units.cpp"
 
 
 using namespace rapidjson;
@@ -43,6 +44,7 @@ using namespace rapidjson;
 #endif
 
 
+static PyObject* units_submodule = NULL;
 static PyObject* decimal_type = NULL;
 static PyObject* timezone_type = NULL;
 static PyObject* timezone_utc = NULL;
@@ -5126,6 +5128,45 @@ static PyObject* normalizer_check_schema(PyObject* cls, PyObject* args, PyObject
 // Module //
 ////////////
 
+static PyObject*
+add_submodule(PyObject* m, const char* cname, PyModuleDef* module_def) {
+    PyObject *name = PyUnicode_FromString(cname);
+    if (name == NULL)
+	return NULL;
+    // Mock a ModuleSpec object just good enough for PyModule_FromDefAndSpec():
+    // an object with just a name attribute.
+    //
+    // _imp.__spec__ is overridden by importlib._bootstrap._instal() anyway.
+    PyObject *attrs = Py_BuildValue("{sO}", "name", name);
+    if (attrs == NULL)
+	return NULL;
+    PyObject *spec = _PyNamespace_New(attrs);
+    Py_DECREF(attrs);
+    if (spec == NULL)
+	return NULL;
+    PyObject* submodule = PyModule_FromDefAndSpec(module_def, spec);
+    Py_DECREF(spec);
+    if (submodule == NULL)
+	return NULL;
+    if (PyModule_ExecDef(submodule, module_def) < 0)
+	return NULL;
+    Py_INCREF(submodule);
+    if (PyModule_AddObject(m, cname, submodule) < 0) {
+	Py_DECREF(submodule);
+	return NULL;
+    }
+    PyObject *moduleDict = PyImport_GetModuleDict();
+    if (moduleDict == NULL)
+	return NULL;
+    char fullname[200] = "";
+    int n = snprintf(fullname, 200, "rapidjson.%s", cname);
+    if ((n < 0) || (n > 200))
+	return NULL;
+    if (PyDict_SetItemString(moduleDict, fullname, submodule) < 0)
+	return NULL;
+    return submodule;
+}
+
 
 static PyMethodDef functions[] = {
     {"loads", (PyCFunction) loads, METH_VARARGS | METH_KEYWORDS,
@@ -5385,6 +5426,15 @@ module_exec(PyObject* m)
     if (PyModule_AddObject(m, "JSONDecodeError", decode_error) < 0) {
         Py_DECREF(decode_error);
         return -1;
+    }
+
+    PyObject* units_submodule_def = PyInit_units();
+    if (units_submodule_def == NULL)
+	return -1;
+    units_submodule = add_submodule(m, "units", (PyModuleDef*)units_submodule_def);
+    if (units_submodule == NULL) {
+	Py_DECREF(units_submodule_def);
+	return -1;
     }
 
     return 0;
