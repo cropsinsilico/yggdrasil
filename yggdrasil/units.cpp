@@ -270,7 +270,7 @@ enum QuantitySubType {
     kInt32QuantitySubType,
     kInt64QuantitySubType,
     kComplexFloatQuantitySubType,
-    kComplexDoubleQuantitySubType,
+    kComplexDoubleQuantitySubType
 };
 
 
@@ -836,7 +836,7 @@ enum BinaryOps {
     binaryOpMultiply,
     binaryOpDivide,
     binaryOpModulo,
-    binaryOpFloorDivide,
+    binaryOpFloorDivide
 };
 
 
