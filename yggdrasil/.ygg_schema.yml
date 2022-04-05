@@ -350,6 +350,10 @@ definitions:
           - gather
           type: string
         inputs:
+          aliases:
+          - input
+          - from
+          allowSingular: true
           default:
           - {}
           description: One or more name(s) of model output channel(s) and/or new channel/file
@@ -380,6 +384,10 @@ definitions:
           - scatter
           type: string
         outputs:
+          aliases:
+          - output
+          - to
+          allowSingular: true
           default:
           - {}
           description: One or more name(s) of model input channel(s) and/or new channel/file
@@ -392,6 +400,9 @@ definitions:
           minItems: 1
           type: array
         translator:
+          aliases:
+          - translators
+          allowSingular: true
           description: Function or string specifying function that should be used
             to translate messages from the input communicator before passing them
             to the output communicator. If a string, the format should be "<package.module>:<function>"
@@ -1461,6 +1472,9 @@ definitions:
             model must contain it's own calls to the |yggdrasil| interface.
           type: string
         inputs:
+          aliases:
+          - input
+          allowSingular: true
           default: []
           description: Zero or more channels carrying input to the model. A full description
             of channel entries and the options available for channels can be found
@@ -1608,6 +1622,9 @@ definitions:
           description: If True, only the final timestep is output. Defaults to False.
           type: boolean
         outputs:
+          aliases:
+          - output
+          allowSingular: true
           default: []
           description: Zero or more channels carrying output from the model. A full
             description of channel entries and the options available for channels
@@ -1801,51 +1818,7 @@ definitions:
             type: string
           type: array
         timesync:
-          anyOf:
-          - type: boolean
-          - type: string
-          - properties:
-              inputs:
-                anyOf:
-                - type: string
-                - items:
-                    type: string
-                  type: array
-              name:
-                default: timesync
-                type: string
-              outputs:
-                anyOf:
-                - type: string
-                - items:
-                    type: string
-                  type: array
-            required:
-            - name
-            type: object
-          - items:
-              anyOf:
-              - type: string
-              - properties:
-                  inputs:
-                    anyOf:
-                    - type: string
-                    - items:
-                        type: string
-                      type: array
-                  name:
-                    default: timesync
-                    type: string
-                  outputs:
-                    anyOf:
-                    - type: string
-                    - items:
-                        type: string
-                      type: array
-                required:
-                - name
-                type: object
-            type: array
+          allowSingular: true
           default: false
           description: If set, the model is assumed to call a send then receive of
             the state at each timestep for syncronization with other models that are
@@ -1853,6 +1826,31 @@ definitions:
             the name of the server that will handle timestep synchronization. If a
             boolean is provided, the name of the server will be assumed to be 'timestep'.
             Defaults to False.
+          items:
+            anyOf:
+            - type: string
+            - properties:
+                inputs:
+                  aliases:
+                  - input
+                  allowSingular: true
+                  items:
+                    type: string
+                  type: array
+                name:
+                  default: timesync
+                  type: string
+                outputs:
+                  aliases:
+                  - output
+                  allowSingular: true
+                  items:
+                    type: string
+                  type: array
+              required:
+              - name
+              type: object
+          type: array
         update_interval:
           additionalProperties:
             type: float
@@ -3302,11 +3300,17 @@ definitions:
 description: Schema for yggdrasil YAML input files.
 properties:
   models:
+    aliases:
+    - model
+    allowSingular: true
     items:
       $ref: '#/definitions/model'
     minItems: 1
     type: array
   connections:
+    aliases:
+    - connection
+    allowSingular: true
     items:
       $ref: '#/definitions/connection'
     type: array
