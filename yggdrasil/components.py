@@ -539,7 +539,7 @@ class ComponentBase(ComponentBaseUnregistered):
             subtype = getattr(self, self._schema_subtype_key,
                               getattr(self, '_%s' % self._schema_subtype_key, None))
         # Fall back to some simple parsing/normalization to save time on
-        # full jsonschema normalization
+        # full rapidjson normalization
         self._defaults_set = []
         for k, v in self._schema_properties.items():
             if k in self._schema_excluded_from_class:

@@ -1,8 +1,7 @@
 import six
 import copy
 import uuid
-import jsonschema
-from yggdrasil import constants
+from yggdrasil import constants, rapidjson
 from yggdrasil.metaschema import (get_metaschema, get_validator, encoder,
                                   validate_instance, MetaschemaTypeError)
 from yggdrasil.metaschema.datatypes import (
@@ -187,20 +186,6 @@ class MetaschemaType(object):
         if isinstance(t, list):
             return (cls.name in t)
         return (cls.name == t)
-
-    @classmethod
-    def jsonschema_type_checker(cls, checker, instance):
-        r"""Type checker for use with jsonschema >= 3.0.0.
-
-        Args:
-            checker (jsonschema.TypeChecker): Type checker class.
-            instance (object): Object being checked.
-
-        Returns:
-            bool: True if instance could be of this type, False otherwise.
-
-        """
-        return cls.validate(instance)
 
     @classmethod
     def validate(cls, obj, raise_errors=False):
@@ -391,8 +376,6 @@ class MetaschemaType(object):
             type_cls = get_type_class(obj['type'])
             if type_cls.is_fixed and type_cls.issubtype(cls.name):
                 obj = type_cls.typedef_fixed2base(obj)
-        # jsonschema.validate(obj, cls.metaschema(), cls=cls.validator())
-        # jsonschema.validate(obj, cls.metadata_schema(), cls=cls.validator())
         return validate_instance(obj, cls.metadata_schema(), **kwargs)
 
     @classmethod
@@ -404,8 +387,6 @@ class MetaschemaType(object):
             **kwargs: Additional keyword arguments are passed to the validator.
 
         """
-        # jsonschema.validate(obj, cls.metaschema(), cls=cls.validator())
-        # jsonschema.validate(obj, cls.definition_schema(), cls=cls.validator())
         return validate_instance(obj, cls.definition_schema(), **kwargs)
 
     @classmethod
@@ -418,8 +399,6 @@ class MetaschemaType(object):
             **kwargs: Additional keyword arguments are passed to the validator.
 
         """
-        # cls.validate_definition(typedef)
-        # jsonschema.validate(obj, typedef, cls=cls.validator())
         return validate_instance(obj, typedef, **kwargs)
 
     @classmethod
@@ -469,7 +448,7 @@ class MetaschemaType(object):
         if not metadata_validated:
             try:
                 cls.validate_metadata(metadata)
-            except jsonschema.exceptions.ValidationError:
+            except rapidjson.ValidationError:
                 if raise_errors:
                     raise
                 return False
@@ -477,7 +456,7 @@ class MetaschemaType(object):
             if not typedef_validated:
                 try:
                     cls.validate_definition(typedef)
-                except jsonschema.exceptions.ValidationError:
+                except rapidjson.ValidationError:
                     if raise_errors:
                         raise
                     return False
@@ -519,14 +498,14 @@ class MetaschemaType(object):
         if not typedef_validated:
             try:
                 cls.validate_definition(typedef)
-            except jsonschema.exceptions.ValidationError:
+            except rapidjson.ValidationError:
                 if raise_errors:
                     raise
                 return False
         # Validate instance against definition
         try:
             cls.validate_instance(obj, typedef)
-        except jsonschema.exceptions.ValidationError:
+        except rapidjson.ValidationError:
             if raise_errors:
                 raise
             return False

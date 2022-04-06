@@ -1261,22 +1261,6 @@ class update_config(SubCommand):
             lang_kwargs=lang_kwargs)
 
 
-class regen_metaschema(SubCommand):
-    r"""Regenerate the yggdrasil metaschema."""
-
-    name = "metaschema"
-    help = "Regenerate the yggdrasil metaschema."
-
-    @classmethod
-    def func(cls, args):
-        from yggdrasil import metaschema
-        if os.path.isfile(metaschema._metaschema_fname):
-            os.remove(metaschema._metaschema_fname)
-        metaschema._metaschema = None
-        metaschema._validator = None
-        metaschema.get_metaschema()
-
-
 class regen_schema(SubCommand):
     r"""Regenerate the yggdrasil schema."""
 
@@ -1493,8 +1477,7 @@ class main(SubCommand):
     arguments = []
     subcommands = [yggrun, ygginfo, validate_yaml,
                    yggcc, yggcompile, yggclean,
-                   ygginstall, update_config,
-                   regen_metaschema, regen_schema,
+                   ygginstall, update_config, regen_schema,
                    yggmodelform, yggdevup,
                    timing_plots, generate_gha_workflow,
                    integration_service_manager]

@@ -1,5 +1,5 @@
 import copy
-import jsonschema
+from yggdrasil import rapidjson
 from yggdrasil.metaschema.datatypes import get_type_class, _type_registry
 from yggdrasil.metaschema.properties import get_metaschema_property
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
@@ -144,8 +144,8 @@ class SchemaMetaschemaType(JSONObjectMetaschemaType):
             if 'type' not in x['required']:
                 x['required'].append('type')
             x['additionalProperties'] = False
-            jsonschema.validate(obj, x, cls=cls.validator())
-        except jsonschema.exceptions.ValidationError:
+            rapidjson.validate(obj, x)
+        except rapidjson.ValidationError:
             if raise_errors:
                 raise
             return False

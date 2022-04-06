@@ -27,9 +27,10 @@ logging.critical("In setup.py: %s" % sys.argv)
 
 
 # Get extension options for the vendored python-rapidjson
-rj_include_dir = os.path.join('yggdrasil', 'rapidjson', 'include')
 sys.path.insert(0, PYRJ_PATH)
-sys.argv.append(f"--rj-include-dir={rj_include_dir}")
+if not any(x.startswith("--rj-include-dir") for x in sys.argv):
+    rj_include_dir = os.path.join('yggdrasil', 'rapidjson', 'include')
+    sys.argv.append(f"--rj-include-dir={rj_include_dir}")
 pwd = os.getcwd()
 os.chdir(PYRJ_PATH)
 try:

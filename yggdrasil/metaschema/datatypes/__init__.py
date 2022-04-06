@@ -2,15 +2,13 @@ import os
 import glob
 import jsonschema
 import copy
-from yggdrasil import constants
+from yggdrasil import constants, rapidjson
 from yggdrasil.components import ClassRegistry
 from yggdrasil.metaschema.encoder import decode_json
 from yggdrasil.metaschema.properties import get_metaschema_property
 
 
 _schema_dir = os.path.join(os.path.dirname(__file__), 'schemas')
-# _base_validator = jsonschema.validators.validator_for({"$schema": ""})
-_base_validator = jsonschema.validators._LATEST_VERSION
 _property_attributes = ['properties', 'definition_properties',
                         'metadata_properties', 'extract_properties']
 
@@ -71,11 +69,6 @@ def register_type(type_class):
     type_name = type_class.name
     if _type_registry.has_entry(type_name):
         raise ValueError("Type '%s' already registered." % type_name)
-    if (not type_class._replaces_existing):  # pragma: debug
-        exist_flag = (type_name in _base_validator.TYPE_CHECKER._type_checkers)
-        if exist_flag:
-            raise ValueError(("Type '%s' is a JSON default type "
-                              "which cannot be replaced.") % type_name)
     # Check properties
     for p in type_class.properties:
         prop_class = get_metaschema_property(p)
@@ -173,8 +166,8 @@ def add_type_from_schema(path_to_schema, **kwargs):
                          + "'%s'" % path_to_schema)
     with open(path_to_schema, 'r') as fd:
         out = decode_json(fd)
-    jsonschema.validate(out, {'type': 'object',
-                              'required': ['title', 'description', 'type']})
+    rapidjson.validate(out, {'type': 'object',
+                             'required': ['title', 'description', 'type']})
     name = out['title']
     if _type_registry.has_entry(name):
         assert kwargs['target_globals'] is not None
@@ -321,7 +314,8 @@ def guess_type_from_obj(obj):
 
     """
     type_encoder = get_metaschema_property('type')
-    cls = get_type_class(type_encoder.encode(obj))
+    x = type_encoder.encode(obj)
+    cls = get_type_class(x)
     return cls
 
 
@@ -457,7 +451,7 @@ def decode(msg):
     return obj
 
 
-def resolve_schema_references(schema, resolver=None):
+def resolve_schema_references(schema, top_level=None):
     r"""Resolve references within a schema.
 
     Args:
@@ -468,21 +462,28 @@ def resolve_schema_references(schema, resolver=None):
         dict: Schema with references replaced with internal references.
 
     """
-    if resolver is None:
+    if top_level is None:
         out = copy.deepcopy(schema)
-        resolver = jsonschema.RefResolver.from_schema(out)
+        top_level = out
     else:
         out = schema
     if isinstance(out, dict):
         if (len(out) == 1) and ('$ref' in out):
-            scope, resolved = resolver.resolve(out['$ref'])
-            out = resolved
+            assert(out['$ref'].startswith('#'))
+            parts = out['$ref'].split('/')
+            for k in parts:
+                if k == '#':
+                    out = top_level
+                elif k.isdigit():
+                    out = out[int(k)]
+                else:
+                    out = out[k]
         else:
             for k, v in out.items():
-                out[k] = resolve_schema_references(v, resolver=resolver)
+                out[k] = resolve_schema_references(v, top_level=top_level)
     elif isinstance(out, (list, tuple)):
         for i in range(len(out)):
-            out[i] = resolve_schema_references(out[i], resolver=resolver)
+            out[i] = resolve_schema_references(out[i], top_level=top_level)
     return out
 
 

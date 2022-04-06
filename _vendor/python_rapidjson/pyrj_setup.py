@@ -93,5 +93,6 @@ if cxx and 'g++' in cxx:
 
 # Ensure rapidjson is compiled with yggdrasil
 extension_options.setdefault('extra_compile_args', [])
-extension_options['extra_compile_args'].append('-DRAPIDJSON_YGGDRASIL')
+extension_options['extra_compile_args'] += ['-DRAPIDJSON_YGGDRASIL',
+                                            '-DRAPIDJSON_YGGDRASIL_PYTHON']
 

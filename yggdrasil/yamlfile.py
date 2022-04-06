@@ -155,7 +155,7 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None):
 
 
 def prep_yaml(files, yaml_param=None, directory_for_clones=None):
-    r"""Prepare yaml to be parsed by jsonschema including covering backwards
+    r"""Prepare yaml to be parsed by rapidjson including covering backwards
     compatible options.
 
     Args:

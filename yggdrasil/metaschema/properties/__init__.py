@@ -22,22 +22,11 @@ def register_metaschema_property(prop_class):
             metaschema.
 
     """
-    from yggdrasil.metaschema import _metaschema, _base_validator
+    from yggdrasil.metaschema import _metaschema
     global _metaschema_properties
     prop_name = prop_class.name
     if _metaschema_properties.has_entry(prop_name):
         raise ValueError("Property '%s' already registered." % prop_name)
-    if prop_name in _base_validator.VALIDATORS:
-        if (prop_class.schema is not None):
-            raise ValueError("Replacement property '%s' modifies the default schema."
-                             % prop_name)
-        if (((prop_class._validate not in [None, False])
-             or ('validate' in prop_class.__dict__))):
-            raise ValueError("Replacement property '%s' modifies the default validator."
-                             % prop_name)
-        prop_class._validate = False
-    # prop_class.types = []  # To ensure base class not modified by all
-    # prop_class.python_types = []
     # Check metaschema if it exists
     if _metaschema is not None:
         if prop_name not in _metaschema['properties']:

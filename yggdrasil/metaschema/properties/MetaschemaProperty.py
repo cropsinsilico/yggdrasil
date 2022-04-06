@@ -1,5 +1,5 @@
 import six
-import jsonschema
+from yggdrasil import rapidjson
 from yggdrasil.metaschema.properties import MetaschemaPropertyMeta
 
 
@@ -56,7 +56,7 @@ class MetaschemaProperty(object):
         value using cls.compare.
 
         Args:
-            validator (jsonschmea.Validator): JSON schema validator.
+            validator (yggdrasil.rapidjson.Validator): JSON schema validator.
             value (object): Value of the property in the schema.
             instance (object): Instance to validate.
             schema (dict): Schema that instance should be validated against.
@@ -160,7 +160,7 @@ class MetaschemaProperty(object):
             errors = cls.validate(validator, value, instance, schema) or ()
             for e in errors:
                 failed = True
-                yield jsonschema.ValidationError(e)
+                yield rapidjson.ValidationError(e)
             if (((not failed) and (not cls._skip_existing_validator)
                  and (cls.name in validator._base_validator.VALIDATORS))):
                 errors = validator._base_validator.VALIDATORS[cls.name](
@@ -185,7 +185,7 @@ def create_property(name, schema, encode, validate=None, compare=None,
             the value of the property for that instance.
         validate (function, optional): Function to determine if an instance
             is valid under the contraint of this property. The function must
-            take as input a jsonschema validator, a property value, an
+            take as input a rapidjson schema validator, a property value, an
             instance to evaluate, and the schema. The function must return
             a boolean: True if the instance is valid, False otherwise. See
             cls.validate for additional information and default behavior.

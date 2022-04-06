@@ -1,4 +1,3 @@
-from yggdrasil.metaschema import normalizer as normalizer_mod
 from yggdrasil.metaschema.datatypes import encode_type, compare_schema
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
@@ -27,23 +26,3 @@ class PropertiesMetaschemaProperty(MetaschemaProperty):
                 continue
             for e in compare_schema(prop1[k], prop2[k], root1=root1, root2=root2):
                 yield e
-
-    @classmethod
-    def normalize(cls, validator, value, instance, schema):
-        r"""Normalization method for 'properties' container property."""
-        if not isinstance(instance, dict):
-            return instance
-        for property, subschema in value.items():
-            if property not in instance:
-                instance[property] = normalizer_mod.UndefinedProperty()
-        return instance
-
-    @classmethod
-    def post_validate(cls, validator, value, instance, schema):
-        r"""Actions performed after validation if normalizing."""
-        if not isinstance(instance, dict):
-            return
-        norm_keys = list(validator._normalized.keys())
-        for k in norm_keys:
-            if isinstance(validator._normalized[k], normalizer_mod.UndefinedProperty):
-                del validator._normalized[k]

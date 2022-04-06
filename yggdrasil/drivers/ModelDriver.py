@@ -385,6 +385,7 @@ class ModelDriver(Driver):
             'items': {
                 'anyOf': [
                     {'type': 'string'},
+                    {'type': 'boolean'},
                     {'type': 'object',
                      'required': ['name'],
                      'properties': {
@@ -398,7 +399,7 @@ class ModelDriver(Driver):
                                      'allowSingular': True,
                                      'aliases': ['output'],
                                      'items': {'type': 'string'}}}}]},
-            'default': False},
+            'default': [False]},
         'with_strace': {'type': 'boolean', 'default': False},
         'strace_flags': {'type': 'array',
                          'default': ['-e', 'trace=memory'],

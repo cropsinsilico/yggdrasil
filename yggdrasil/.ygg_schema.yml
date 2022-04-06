@@ -1819,7 +1819,8 @@ definitions:
           type: array
         timesync:
           allowSingular: true
-          default: false
+          default:
+          - false
           description: If set, the model is assumed to call a send then receive of
             the state at each timestep for syncronization with other models that are
             also integrating in time. If a string is provided, it is assumed to be
@@ -1829,6 +1830,7 @@ definitions:
           items:
             anyOf:
             - type: string
+            - type: boolean
             - properties:
                 inputs:
                   aliases:

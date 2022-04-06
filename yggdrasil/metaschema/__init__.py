@@ -1,35 +1,8 @@
-import os
 import copy
-import pprint
-import jsonschema
 import numpy as np
-import yggdrasil
-from yggdrasil import constants, units
-from yggdrasil.metaschema.encoder import encode_json, decode_json
-from yggdrasil.metaschema.properties import get_registered_properties
-from yggdrasil.metaschema.datatypes import get_registered_types
+from yggdrasil import constants, units, rapidjson
 
 
-_metaschema_fbase = '.ygg_metaschema.json'
-_metaschema_fname = os.path.abspath(os.path.join(
-    os.path.dirname(yggdrasil.__file__), _metaschema_fbase))
-_metaschema = None
-_validator = None
-_base_schema = {u'$schema': u'http://json-schema.org/draft-04/schema'}
-
-
-if os.path.isfile(_metaschema_fname):
-    with open(_metaschema_fname, 'r') as fd:
-        _metaschema = decode_json(fd)
-    schema_id = _metaschema.get('id', _metaschema.get('$id', None))
-    assert schema_id is not None
-    _metaschema.setdefault('$schema', schema_id)
-    _base_schema['$schema'] = _metaschema.get('$schema', schema_id)
-
-        
-_base_validator = jsonschema.validators.validator_for(_base_schema)
-
-        
 class MetaschemaTypeError(TypeError):
     r"""Error that should be raised when a class encounters a type it cannot handle."""
     pass
@@ -52,30 +25,7 @@ def create_metaschema(overwrite=False):
         RuntimeError: If the file already exists and overwrite is False.
 
     """
-    if (not overwrite) and os.path.isfile(_metaschema_fname):
-        raise RuntimeError("Metaschema file already exists.")
-    out = copy.deepcopy(_base_validator.META_SCHEMA)
-    out['title'] = "Ygg meta-schema for data type schemas"
-    # TODO: Replace schema with a link to the metaschema in the documentation
-    # del out['$schema']
-    # Add properties
-    for k, v in get_registered_properties().items():
-        if v.schema is not None:
-            assert k not in out['properties']
-            out['properties'][k] = v.schema
-    # Add types
-    for k, v in sorted(get_registered_types().items()):
-        if k not in out['definitions']['simpleTypes']['enum']:
-            out['definitions']['simpleTypes']['enum'].append(k)
-        for p in v.properties:
-            assert p in out['properties']
-    # Print
-    print('Created metaschema')
-    pprint.pprint(out)
-    # Save it to a file
-    with open(_metaschema_fname, 'w') as fd:
-        encode_json(out, fd)
-    return out
+    return rapidjson.get_metaschema()
 
 
 def get_metaschema():
@@ -107,37 +57,13 @@ def get_validator(overwrite=False, normalizers=None, **kwargs):
         **kwargs: Additional keyword arguments are passed to normalizer.create.
 
     Returns:
-        jsonschema.IValidator: JSON schema validator.
+        yggdrasil.rapidjson.Normalizer: JSON schema normalizer.
 
     """
-    from yggdrasil.metaschema import normalizer
+    # from yggdrasil.metaschema import normalizer
     global _validator
     if (_validator is None) or overwrite:
-        metaschema = get_metaschema()
-        # Get set of validators
-        all_validators = copy.deepcopy(_base_validator.VALIDATORS)
-        for k, v in get_registered_properties().items():
-            if (not v._replaces_existing):
-                assert k not in all_validators
-            all_validators[k] = v.wrapped_validate
-        # Get set of datatypes
-        type_checker = copy.deepcopy(_base_validator.TYPE_CHECKER)
-        new_type_checkers = {}
-        for k, v in get_registered_types().items():
-            if (not v._replaces_existing):
-                # Error raised on registration
-                assert k not in type_checker._type_checkers
-            new_type_checkers[k] = v.jsonschema_type_checker
-        kwargs['type_checker'] = type_checker.redefine_many(
-            new_type_checkers)
-        # Get set of normalizers
-        if normalizers is None:
-            normalizers = {}
-        # Use default base and update validators
-        _validator = normalizer.create(meta_schema=metaschema,
-                                       validators=all_validators,
-                                       normalizers=normalizers, **kwargs)
-        _validator._base_validator = _base_validator
+        _validator = rapidjson.Normalizer
     return _validator
 
 
@@ -155,20 +81,6 @@ def validate_schema(obj):
     cls.check_schema(obj)
 
 
-# def normalize_schema(obj):
-#     r"""Normalize a schema against the metaschema.
-
-#     Args:
-#         obj (dict): Schema to be normalized.
-
-#     Returns:
-#         dict: Normalized schema.
-
-#     """
-#     cls = get_validator()
-#     return cls.normalize_schema(obj)
-
-
 def validate_instance(obj, schema, **kwargs):
     r"""Validate an instance against a schema.
 
@@ -183,7 +95,8 @@ def validate_instance(obj, schema, **kwargs):
     """
     cls = get_validator()
     cls.check_schema(schema)
-    return cls(schema).validate(obj, **kwargs)
+    print('validate_instance', kwargs)
+    return cls(schema).validate(obj)
 
 
 def normalize_instance(obj, schema, **kwargs):
@@ -200,7 +113,8 @@ def normalize_instance(obj, schema, **kwargs):
     """
     cls = get_validator()
     cls.check_schema(schema)
-    return cls(schema).normalize(obj, **kwargs)
+    print('normalize_instance', kwargs)
+    return cls(schema).normalize(obj)
 
 
 def data2dtype(data):

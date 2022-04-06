@@ -1,5 +1,5 @@
-import jsonschema
 import copy
+from yggdrasil import rapidjson
 from yggdrasil.metaschema.datatypes import (
     compare_schema, generate_data, resolve_schema_references)
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
@@ -183,9 +183,8 @@ class FixedMetaschemaType(MetaschemaType):
             return False
         try:
             obj = cls.coerce_type(obj)
-            jsonschema.validate(obj, cls.updated_fixed_properties(obj),
-                                cls=cls.validator())
-        except (jsonschema.exceptions.ValidationError, AssertionError):
+            rapidjson.validate(obj, cls.updated_fixed_properties(obj))
+        except (rapidjson.ValidationError, AssertionError):
             if raise_errors:
                 raise
             return False

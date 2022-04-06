@@ -5,8 +5,7 @@ import yaml
 import json
 import importlib
 from collections import OrderedDict
-from jsonschema.exceptions import ValidationError
-from yggdrasil import metaschema
+from yggdrasil import metaschema, rapidjson
 
 
 _schema_fname = os.path.abspath(os.path.join(
@@ -399,7 +398,7 @@ class ComponentSchema(object):
             try:
                 metaschema.validate_instance(doc, subtype_schema)
                 return subtype
-            except ValidationError:
+            except rapidjson.ValidationError:
                 pass
         raise ValueError("Could not determine subtype "
                          "for document: %s" % doc)  # pragma: debug
@@ -1199,8 +1198,7 @@ class SchemaRegistry(object):
             **kwargs: Additional keyword arguments are ignored.
 
         """
-        import jsonschema
-        jsonschema.validate(obj, self.model_form_schema)
+        rapidjson.validate(obj, self.model_form_schema)
         return obj
 
     def validate_component(self, comp_name, obj, **kwargs):
@@ -1245,7 +1243,7 @@ class SchemaRegistry(object):
     #     """
     #     try:
     #         self.validate(obj)
-    #     except ValidationError:
+    #     except rapidjson.ValidationError:
     #         return False
     #     return True
 
@@ -1262,7 +1260,7 @@ class SchemaRegistry(object):
         """
         try:
             self.validate_component(comp_name, obj)
-        except ValidationError:
+        except rapidjson.ValidationError:
             return False
         return True
 
