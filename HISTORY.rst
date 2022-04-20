@@ -2,16 +2,25 @@
 History
 =======
 
-1.8.2 (2021-XX-XX) Migrate tests out of package & into pytest fixtures
+1.8.2 (2021-03-18) Migrate tests out of package into pytest fixtures & various bug fixes
 ------------------
 
 * Move tests out of package to take advantage of pytest conftest.py structure and reduce the size of the package
 * Refactor tests to use pytest fixtures instead of the unittest setup/teardown structure
 * Remove the yggtest CLI and migrate options into pytest CLI options
-* Update the GHA workflow to use the new pytest based CLI
+* Updated the GHA workflow to use the new pytest based CLI and test parameters so that changing the image used won't change the name of the test required to merge pull requests
 * Use lock to prevent parallel compilation for all compiled languages
 * Remove 'initial_state' parameter from Transform and Filter schemas as it is unused
 * Remove unused yggdrasil.communication.cleanup_comms method
+* Updated requirements (pinned libroadrunner to < 2.0.7 and unpinned pytest)
+* Updated tests to allow comparison of class objects imported in different ways
+* Updated the connection and comm schemas to allow for inputs & vars to include datatypes, fixing a bug where turning on debugging caused the validation of connection parameters to fail
+* Updated the connections to allow the input and output patterns to be passed directly
+* Added a method for displaying information about serializers and added that information to comm info displays
+* Fixed a bug in updating the serializer from messages for ForkComms with a scatter communication pattern
+* Added the split_and_merge example of using communication patterns to split and merge messages between multiple inputs/outputs
+* Fixed a bug in pandas serializer where strings are now stored as objects by default
+* Fixed a bug in table serializer where table parameters were not being passed to the header discovery function, resulting in them being ignored in some cases
 
 1.8.1 (2021-10-15) Minor updates to support model submission form development
 ------------------

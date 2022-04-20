@@ -544,11 +544,15 @@ class CommBase(tools.YggClass):
              'items': {'anyOf': [
                  {'$ref': '#/definitions/transform'},
                  {'type': ['function', 'string']}]}}]},
-        'vars': {'type': 'array',
-                 'items': {'anyOf': [
-                     {'type': 'string'},
-                     {'type': 'object',
-                      'properties': {'name': {'type': 'string'}}}]}},
+        'vars': {
+            'type': 'array',
+            'items': {'anyOf': [
+                {'type': 'string'},
+                {'type': 'object',
+                 'properties': {
+                     'name': {'type': 'string'},
+                     'datatype': {'type': 'schema',
+                                  'default': {'type': 'bytes'}}}}]}},
         'length_map': {
             'type': 'object',
             'additionalProperties': {'type': 'string'}},
@@ -893,6 +897,8 @@ class CommBase(tools.YggClass):
                   '%s%-15s: %s' % (prefix, 'open', self.is_open),
                   '%s%-15s: %s' % (prefix, 'nsent', self._n_sent),
                   '%s%-15s: %s' % (prefix, 'nrecv', self._n_recv)]
+        lines += ['%s%-15s:' % (prefix, 'serializer')]
+        lines += self.serializer.get_status_message(nindent + 1)[0]
         lines += ['%s%s' % (prefix, x) for x in extra_lines_after]
         return lines, prefix
 
@@ -1405,7 +1411,6 @@ class CommBase(tools.YggClass):
         """
         if msg.sinfo is None:
             return
-        assert(msg.stype is not None)
         msg.stype = self.apply_transform_to_type(msg.stype)
         msg.sinfo.pop('seritype', None)
         for k in ['format_str', 'field_names', 'field_units']:

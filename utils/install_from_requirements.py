@@ -11,6 +11,11 @@ from setup_test_env import (
     PYTHON_CMD, CONDA_CMD, _is_win)
 
 
+class DependencyNotFound(BaseException):
+    r"""Exception raised when a dependency cannot be located."""
+    pass
+
+
 def isolate_package_name(entry):
     r"""Get the package name without any constraints or conditions.
 
@@ -65,7 +70,7 @@ def get_pip_dependency_version(pkg, dep):
             if m.group('ver'):
                 ver = m.group('ver').strip()
             return dep + ver
-    raise RuntimeError(
+    raise DependencyNotFound(
         ("Could not locate the dependency '%s' "
          "in the list of requirements for package '%s': %s")
         % (dep, pkg, reqs))

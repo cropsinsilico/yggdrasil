@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
 from yggdrasil.serialize import AsciiTableSerialize
+from yggdrasil import platform
 from tests.serialize.test_DefaultSerialize import (
     TestDefaultSerialize as base_class)
 
@@ -21,6 +22,32 @@ def test_deserialize_nofmt():
     test_msg = inst.encoded_datatype.serialize(test_msg, metadata={})
     with pytest.raises(RuntimeError):
         inst.deserialize(test_msg)
+
+
+def test_discover_header_no_header(tmpdir):
+    r"""Test discover_header with single line, two columns, no header and
+    non-default delimiter."""
+    fd0 = tmpdir.join("temp_table.txt")
+    fd0.write(b"13 berlin", 'wb')
+    fd = fd0.open('rb')
+    inst = AsciiTableSerialize.AsciiTableSerialize(delimiter=b' ')
+    inst.deserialize_file_header(fd)
+    if platform._is_win:  # pragma: windows
+        assert(inst.format_str == b'%d %6s\n')
+    else:
+        assert(inst.format_str == b'%ld %6s\n')
+    assert(inst.field_names == ('f0', 'f1'))
+
+
+def test_discover_header_one_element(tmpdir):
+    r"""Test discover_header with single line, single column, no header."""
+    fd0 = tmpdir.join("temp_table.txt")
+    fd0.write(b"berlin", 'wb')
+    fd = fd0.open('rb')
+    inst = AsciiTableSerialize.AsciiTableSerialize(delimiter=b' ')
+    inst.deserialize_file_header(fd)
+    assert(inst.format_str == b'%6s\n')
+    assert(inst.field_names == ('f0',))
 
 
 _options = [
