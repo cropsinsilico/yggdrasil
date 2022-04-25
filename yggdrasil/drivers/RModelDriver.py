@@ -390,6 +390,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             lflags = drv.get_linker_flags(for_model=True, toolname=toolname,
                                           dry_run=True, libtype='shared',
                                           disable_python=disable_python)
+            drv.compile_dependencies(toolname=toolname,
+                                     disable_python=disable_python)
             # Remove flags that are unnecessary
             cflags = []
             stdflags = []
