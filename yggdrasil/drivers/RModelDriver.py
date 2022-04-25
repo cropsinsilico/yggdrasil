@@ -419,6 +419,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         try:
             if os.path.isfile(makevar):
                 shutil.move(makevar, makevar_copy)
+            if not os.path.isdir(os.path.dirname(makevar)):
+                os.mkdir(os.path.dirname(makevar))
             with open(makevar, 'w') as fd:
                 for k, v in new_env.items():
                     if k.startswith('PKG_'):
