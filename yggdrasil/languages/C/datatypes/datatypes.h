@@ -60,7 +60,11 @@ typedef python_t python_function_t;
 typedef generic_t python_instance_t;
 
 /*! @brief Macro wrapping call to PyObject_CallFunction. */
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+#define call_python(x, format, ...) NULL
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
 #define call_python(x, format, ...) PyObject_CallFunction(x.obj, format, __VA_ARGS__)
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
 
 /*! @brief Aliases to allow differentiation in parsing model definition. */
 typedef char* unicode_t;

@@ -324,7 +324,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     @classmethod
     def call_compiler(cls, package_dir, toolname=None, flags=None,
                       language='c++', verbose=False,
-                      use_ccache=False):  # pragma: no cover
+                      use_ccache=False, disable_python=False):  # pragma: no cover
         r"""Build an R package w/ the yggdrasil compilers.
 
         Args:
@@ -339,6 +339,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 process will be displayed. Defaults to False.
             use_ccache (bool, optional): If True, ccache will be added to
                 the compilation executable. Defaults to False.
+            disable_python (bool, optional): If True, the Python C API will
+                be disabled. Defaults to False.
 
         """
         import shutil
@@ -383,9 +385,11 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 kws['skip_standard_flag'] = True
             cflags0 = drv.get_compiler_flags(for_model=True, toolname=toolname,
                                              dry_run=True, compiler=compiler,
+                                             disable_python=disable_python,
                                              dont_link=True, **kws)
             lflags = drv.get_linker_flags(for_model=True, toolname=toolname,
-                                          dry_run=True, libtype='shared')
+                                          dry_run=True, libtype='shared',
+                                          disable_python=disable_python)
             # Remove flags that are unnecessary
             cflags = []
             stdflags = []

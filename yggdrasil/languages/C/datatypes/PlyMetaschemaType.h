@@ -156,6 +156,10 @@ public:
     @returns YggGeneric* Pointer to C object.
    */
   YggGeneric* python2c(PyObject *pyobj) const override {
+    YggGeneric *cobj = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("PlyMetaschemaType::python2c: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     if (!(PyDict_Check(pyobj))) {
       ygglog_throw_error("PlyMetaschemaType::python2c: Python object must be a dict.");
     }
@@ -321,7 +325,8 @@ public:
       }
     }
     // Construct class
-    YggGeneric *cobj = new YggGeneric(this, arg);
+    cobj = new YggGeneric(this, arg);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return cobj;
   }
   /*!
@@ -331,6 +336,10 @@ public:
    */
   PyObject* c2python(YggGeneric *cobj) const override {
     initialize_python("PlyMetaschemaType::c2python: ");
+    PyObject *pyobj = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("PlyMetaschemaType::c2python: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     PyObject *py_args = PyTuple_New(0);
     PyObject *py_kwargs = PyDict_New();
     ply_t arg;
@@ -417,10 +426,11 @@ public:
     // Create class
     PyObject *py_class = import_python_class("yggdrasil.metaschema.datatypes.PlyMetaschemaType",
 					     "PlyDict");
-    PyObject *pyobj = PyObject_Call(py_class, py_args, py_kwargs);
+    pyobj = PyObject_Call(py_class, py_args, py_kwargs);
     if (pyobj == NULL) {
       ygglog_throw_error("PlyMetaschemaType::c2python: Failed to create PlyDict.");
     }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return pyobj;
   }
 

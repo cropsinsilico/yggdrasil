@@ -1,5 +1,6 @@
 #include "python_wrapper.h"
 
+#ifndef YGGDRASIL_DISABLE_PYTHON_C_API
 int PyObject_Print_STDOUT(PyObject* x) {
 #if defined(_WIN32) && !defined(_MSC_VER)
   printf("This function was called from outside the MSVC CRT and will be"
@@ -14,3 +15,4 @@ int PyObject_Print_STDOUT(PyObject* x) {
   return PyObject_Print(x, stdout, 0);
 #endif
 }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API

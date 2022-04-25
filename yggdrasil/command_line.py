@@ -484,7 +484,10 @@ class ygginfo(SubCommand):
                            ' pass to the tool when it is called.')}),
                 (('--fullpath', ),
                  {'action': 'store_true',
-                  'help': 'Get the full path to the tool exectuable.'})],
+                  'help': 'Get the full path to the tool exectuable.'}),
+                (('--disable-python', ),
+                 {'action': 'store_true',
+                  'help': 'Disable access to the Python C API from yggdrasil.'})],
             parsers=[
                 ArgumentParser(
                     name='compiler',
@@ -510,7 +513,8 @@ class ygginfo(SubCommand):
                 if args.tool == 'compiler':
                     flags = drv.get_compiler_flags(
                         for_model=True, toolname=args.toolname,
-                        dry_run=True, dont_link=True)
+                        dry_run=True, dont_link=True,
+                        disable_python=args.disable_python)
                     if '/link' in flags:  # pragma: windows
                         flags = flags[:flags.index('/link')]
                     for k in ['-c']:
@@ -525,7 +529,8 @@ class ygginfo(SubCommand):
                         libtype = 'object'
                     flags = drv.get_linker_flags(
                         for_model=True, toolname=args.toolname,
-                        dry_run=True, libtype=libtype)
+                        dry_run=True, libtype=libtype,
+                        disable_python=args.disable_python)
                 out = ' '.join(flags)
                 if platform._is_win:  # pragma: windows:
                     out = out.replace('/', '-')
@@ -895,7 +900,10 @@ class yggcc(SubCommand):
          {'action': 'store_true', 'help': "Run compilation with ccache."}),
         (('--Rpkg-language', ),
          {'help': ("Language that R package is written in "
-                   "(only used if the specified language is R).")})]
+                   "(only used if the specified language is R).")}),
+        (('--disable-python', ),
+         {'action': 'store_true',
+          'help': 'Disable access to the Python C API from yggdrasil.'})]
 
     @classmethod
     def func(cls, args):
@@ -909,7 +917,8 @@ class yggcc(SubCommand):
                 args.language = EXT2LANG[os.path.splitext(args.source[0])[-1]]
         drv = import_component('model', args.language)
         kws = {'toolname': args.toolname, 'flags': args.flags,
-               'use_ccache': args.use_ccache}
+               'use_ccache': args.use_ccache,
+               'disable_python': args.disable_python}
         if (args.language in ['r', 'R']) and args.Rpkg_language:
             kws['language'] = args.Rpkg_language
         print("executable: %s" % drv.call_compiler(args.source, **kws))
@@ -929,7 +938,10 @@ class yggcompile(SubCommand):
           'help': ("One or more languages to compile dependencies "
                    "for.")}),
         (('--toolname', ),
-         {'help': "Name of compilation tool that should be used"})]
+         {'help': "Name of compilation tool that should be used"}),
+        (('--disable-python', ),
+         {'action': 'store_true',
+          'help': 'Disable access to the Python C API from yggdrasil.'})]
 
     @classmethod
     def func(cls, args):
@@ -938,12 +950,14 @@ class yggcompile(SubCommand):
         error_on_missing = (not getattr(args, 'all_languages', False))
         missing = []
         for lang in args.language:
-            import_component('model', lang).cleanup_dependencies()
+            import_component('model', lang).cleanup_dependencies(
+                disable_python=args.disable_python)
             drv = import_component('model', lang)
             if ((hasattr(drv, 'compile_dependencies')
                  and (not getattr(drv, 'is_build_tool', False)))):
                 if drv.is_installed():
-                    drv.compile_dependencies(toolname=args.toolname)
+                    drv.compile_dependencies(toolname=args.toolname,
+                                             disable_python=args.disable_python)
                 else:
                     missing.append(lang)
         if error_on_missing and missing:  # pragma: debug
@@ -1038,7 +1052,10 @@ class cc_flags(cc_toolname):
           'help': 'Get the compilation flags used for C++ programs.'}),
         (('--toolname', ),
          {'default': None,
-          'help': 'Name of the tool that associated flags be returned for.'})]
+          'help': 'Name of the tool that associated flags be returned for.'}),
+        (('--disable-python', ),
+         {'action': 'store_true',
+          'help': 'Disable access to the Python C API from yggdrasil.'})]
 
     @classmethod
     def parse_args(cls, *args, **kwargs):
@@ -1059,7 +1076,10 @@ class ld_flags(cc_toolname):
           'help': 'Get the compilation flags used for C++ programs.'}),
         (('--toolname', ),
          {'default': None,
-          'help': 'Name of the tool that associated flags be returned for.'})]
+          'help': 'Name of the tool that associated flags be returned for.'}),
+        (('--disable-python', ),
+         {'action': 'store_true',
+          'help': 'Disable access to the Python C API from yggdrasil.'})]
 
     @classmethod
     def parse_args(cls, *args, **kwargs):

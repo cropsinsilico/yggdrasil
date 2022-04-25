@@ -88,6 +88,9 @@ public:
 			  const char item_key[100]="items") :
     // Always generic
     MetaschemaType(pyobj, use_generic) {
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    UNUSED(item_key);
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     item_key_[0] = '\0';
     strncpy(item_key_, item_key, 100);
     PyObject* pyitems = get_item_python_dict(pyobj, item_key_,
@@ -109,6 +112,7 @@ public:
       items.push_back(iitem);
     }
     update_items(items, true);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   }
   /*!
     @brief Copy constructor.
@@ -198,7 +202,10 @@ public:
    */
   PyObject* as_python_dict() const override {
     PyObject* out = MetaschemaType::as_python_dict();
-    PyObject* pyitems = PyList_New(nitems());
+    PyObject* pyitems = NULL;
+#ifndef YGGDRASIL_DISABLE_PYTHON_C_API
+    pyitems = PyList_New(nitems());
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     rapidjson::SizeType i;
     for (i = 0; i < nitems(); i++) {
       PyObject* ipyitem = items_[i]->as_python_dict();
@@ -593,6 +600,10 @@ public:
     @returns YggGeneric* Pointer to C object.
    */
   YggGeneric* python2c(PyObject* pyobj) const override {
+    YggGeneric* cobj = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("JSONArrayMetaschemaType::python2c: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     if (!(PyList_Check(pyobj))) {
       ygglog_throw_error("JSONArrayMetaschemaType::python2c: Python object must be a list.");
     }
@@ -610,7 +621,8 @@ public:
       YggGeneric *ic_item = items_[i]->python2c(ipy_item);
       citems->push_back(ic_item);
     }
-    YggGeneric* cobj = new YggGeneric(this, citems);
+    cobj = new YggGeneric(this, citems);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return cobj;
   }
   /*!
@@ -620,7 +632,11 @@ public:
    */
   PyObject* c2python(YggGeneric* cobj) const override {
     initialize_python("JSONArrayMetaschemaType::c2python: ");
-    PyObject *pyobj = PyList_New((Py_ssize_t)(nitems()));
+    PyObject *pyobj = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("JSONArrayMetaschemaType::c2python: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
+    pyobj = PyList_New((Py_ssize_t)(nitems()));
     if (pyobj == NULL) {
       ygglog_throw_error("JSONArrayMetaschemaType::c2python: Failed to create new Python list.");
     }
@@ -636,6 +652,7 @@ public:
 	ygglog_throw_error("JSONArrayMetaschemaType::c2python: Error setting item %lu in the Python list.", i);
       }
     }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return pyobj;
   }
 
