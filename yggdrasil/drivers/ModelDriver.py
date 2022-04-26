@@ -1894,7 +1894,7 @@ class ModelDriver(Driver):
         remove_products(products, source_products)
             
     @classmethod
-    def cleanup_dependencies(cls, products=[], verbose=False):
+    def cleanup_dependencies(cls, products=[], verbose=False, **kws):
         r"""Cleanup dependencies."""
         for x in products:
             if os.path.isfile(x):
