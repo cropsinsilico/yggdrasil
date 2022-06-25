@@ -523,63 +523,66 @@ class CommBase(tools.YggClass):
     _schema_subtype_key = 'commtype'
     _schema_required = ['name', 'commtype', 'datatype']
     _schema_properties = {
-        'name': {'type': 'string'},
+        'name': {'type': 'string',
+                 'pattern': ('^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+'
+                             '(::[A-Za-z0-9-_]+)?$')},
         'address': {'type': 'string'},
         'commtype': {'type': 'string', 'default': 'default',
                      'description': ('Communication mechanism '
                                      'that should be used.')},
         'datatype': {'type': 'schema',
                      'default': {'type': 'bytes'}},
-        'recv_converter': {'anyOf': [
-            {'$ref': '#/definitions/transform'},
-            {'type': ['function', 'string']},
-            {'type': 'array',
-             'items': {'anyOf': [
-                 {'$ref': '#/definitions/transform'},
-                 {'type': ['function', 'string']}]}}]},
-        'send_converter': {'anyOf': [
-            {'$ref': '#/definitions/transform'},
-            {'type': ['function', 'string']},
-            {'type': 'array',
-             'items': {'anyOf': [
-                 {'$ref': '#/definitions/transform'},
-                 {'type': ['function', 'string']}]}}]},
         'vars': {
             'type': 'array',
-            'items': {'anyOf': [
-                {'type': 'string'},
-                {'type': 'object',
-                 'properties': {
-                     'name': {'type': 'string'},
-                     'datatype': {'type': 'schema',
-                                  'default': {'type': 'bytes'}}}}]}},
+            'items': {'type': 'object',
+                      'properties': {
+                          'name': {'type': 'string'},
+                          'datatype': {'type': 'schema',
+                                       'default': {'type': 'bytes'}}},
+                      'allowSingular': True}},
         'length_map': {
             'type': 'object',
             'additionalProperties': {'type': 'string'}},
         'format_str': {'type': 'string'},
         'field_names': {'type': 'array',
-                        'items': {'type': 'string'}},
+                        'items': {'type': 'string'},
+                        'aliases': ['column_names'],
+                        'allowSingular': True},
         'field_units': {'type': 'array',
-                        'items': {'type': 'string'}},
+                        'items': {'type': 'string'},
+                        'aliases': ['column_units'],
+                        'allowSingular': True},
         'as_array': {'type': 'boolean', 'default': False},
         'filter': {'$ref': '#/definitions/filter'},
-        'transform': {'anyOf': [
-            {'$ref': '#/definitions/transform'},
-            {'type': ['function', 'string']},
-            {'type': 'array',
-             'items': {'anyOf': [
-                 {'$ref': '#/definitions/transform'},
-                 {'type': ['function', 'string']}]}}]},
+        'transform': {
+            'type': 'array',
+            'items': {'anyOf': [
+                {'$ref': '#/definitions/transform'},
+                {'type': ['function', 'string']}]},
+            'allowSingular': True,
+            'aliases': ['recv_converter', 'send_converter', 'transforms',
+                        'translator', 'translators']},
         'is_default': {'type': 'boolean', 'default': False},
         'outside_loop': {'type': 'boolean',
                          'default': False},
         'dont_copy': {'type': 'boolean', 'default': False},
         'default_file': {'$ref': '#/definitions/file'},
         'default_value': {'type': 'any'},
-        'for_service': {'type': 'boolean', 'default': False}}
+        'for_service': {'type': 'boolean', 'default': False},
+        'working_dir': {'type': 'string'},
+        'driver': {'type': 'string', 'deprecated': True,
+                   'description': ('[DEPRECATED] Name of driver'
+                                   ' class that should be used.')},
+        'onexit': {'type': 'string', 'deprecated': True,
+                   'description': ('[DEPRECATED] Method of input/output '
+                                   'driver to call when the connection '
+                                   'closes')}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _schema_excluded_from_class_validation = ['datatype']
+    _schema_additional_kwargs = {'allowSingular': 'name',
+                                 'pushProperties': {
+                                     '$properties/datatype': True}}
     is_file = False
     _maxMsgSize = 0
     address_description = None
@@ -767,13 +770,8 @@ class CommBase(tools.YggClass):
             self.debug('seri_kws = %.100s', str(seri_kws))
             self.serializer = seri_cls(**seri_kws)
         # Set send/recv converter based on the serializer
-        dir_conv = '%s_converter' % self.direction
-        if getattr(self, 'transform', []):
-            assert not getattr(self, dir_conv, [])
-            # setattr(self, dir_conv, self.transform)
-        elif getattr(self, dir_conv, []):
-            self.transform = getattr(self, dir_conv)
-        else:
+        dir_conv = f'{self.direction}_converter'
+        if not getattr(self, 'transform', []):
             self.transform = getattr(self.serializer, dir_conv, [])
         if self.transform:
             if not isinstance(self.transform, list):

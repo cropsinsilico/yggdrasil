@@ -3,8 +3,7 @@ import os
 import pprint
 import tempfile
 import subprocess
-from jsonschema import ValidationError
-from yggdrasil import schema, components
+from yggdrasil import schema, components, rapidjson
 
 
 def filter_func_ex():  # pragma: no cover
@@ -33,7 +32,7 @@ def normalize_objects(patch_equality, functions_equality):
           'connections': [{
               'inputs': 'outputA',
               'outputs': 'fileA.txt',
-              'seritype': 'direct',
+              'seritype': 'ply',
               'working_dir': os.getcwd()}]},
          {'models': [{
              'name': 'modelA',
@@ -42,27 +41,27 @@ def normalize_objects(patch_equality, functions_equality):
              'inputs': [{'commtype': 'default',
                          'datatype': {'type': 'bytes'},
                          'is_default': True,
-                         'name': 'modelA:input'}],
-             'outputs': [{'name': 'modelA:outputA',
+                         'name': 'input'}],
+             'outputs': [{'name': 'outputA',
                           'commtype': 'default',
                           'datatype': {'type': 'bytes'},
                           'filter': {
-                              'function': filter_func_ex2}}],
+                              'function': filter_func_ex2},
+                          'field_names': ['a', 'b'],
+                          'field_units': ['cm', 'g']}],
              'working_dir': os.getcwd()}],
           'connections': [{
               'inputs': [
-                  {'name': 'modelA:outputA',
+                  {'name': 'outputA',
                    'datatype': {'type': 'bytes'},
                    'commtype': 'default',
-                   'filter': {
-                       'function': filter_func_ex2}}],
+                   'working_dir': os.getcwd()}],
               'outputs': [
                   {'name': 'fileA.txt',
                    'filetype': 'binary',
                    'working_dir': os.getcwd(),
-                   'serializer': {'seritype': 'direct'},
-                   'field_names': ['a', 'b'],
-                   'field_units': ['cm', 'g']}]}]})]
+                   'serializer': {'seritype': 'ply'}}],
+              'working_dir': os.getcwd()}]})]
 
 
 def test_get_json_schema():
@@ -150,32 +149,18 @@ def test_save_load_schema():
     os.remove(fname)
 
 
-def test_cdriver2filetype_error():
-    r"""Test errors in cdriver2filetype."""
-    with pytest.raises(ValueError):
-        schema.cdriver2filetype('invalid')
-
-
-def test_standardize():
-    r"""Test standardize."""
-    vals = [(False, ['inputs', 'outputs'], ['_file'],
-             {'input': 'inputA', 'output_file': 'outputA'},
-             {'inputs': [{'name': 'inputA'}],
-              'outputs': [{'name': 'outputA'}]}),
-            (True, ['input', 'output'], ['_file'],
-             {'inputs': 'inputA', 'output_files': 'outputA'},
-             {'input': [{'name': 'inputA'}],
-              'output': [{'name': 'outputA'}]})]
-    for is_singular, keys, suffixes, x, y in vals:
-        schema.standardize(x, keys, suffixes=suffixes, is_singular=is_singular)
-        assert(x == y)
-
-
 def test_normalize(normalize_objects):
     r"""Test normalization of legacy formats."""
     s = schema.get_schema()
     for x, y in normalize_objects:
-        a = s.normalize(x, backwards_compat=True)  # , show_errors=True)
+        try:
+            a = s.normalize(x)
+        except (rapidjson.ValidationError, rapidjson.NormalizationError):  # pragma: debug
+            print("A:")
+            pprint.pprint(x)
+            print("\nB:")
+            pprint.pprint(y)
+            raise
         try:
             assert(a == y)
         except BaseException:  # pragma: debug
@@ -184,12 +169,6 @@ def test_normalize(normalize_objects):
             print('\nB:')
             pprint.pprint(y)
             raise
-
-
-def test_cdriver2commtype_error():
-    r"""Test error when invalid driver supplied."""
-    with pytest.raises(ValueError):
-        schema.cdriver2commtype('invalid')
 
 
 def test_get_schema_subtype():
@@ -203,10 +182,10 @@ def test_get_schema_subtype():
     kwargs = {'subtype': subtype, 'allow_instance': True}
     s.validate_component(component, doc, **kwargs)
     s.validate_component(component, valid, **kwargs)
-    with pytest.raises(ValidationError):
+    with pytest.raises(rapidjson.ValidationError):
         s.validate_component(component, invalid, **kwargs)
     s.validate_component(component, doc, subtype=subtype)
-    with pytest.raises(ValidationError):
+    with pytest.raises(rapidjson.ValidationError):
         s.validate_component(component, valid, subtype=subtype)
     # Test for base
     s.validate_component(component, valid, subtype='base',

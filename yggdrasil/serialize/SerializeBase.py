@@ -49,7 +49,7 @@ class SerializeBase(tools.YggClass):
     _seritype = None
     _schema_type = 'serializer'
     _schema_subtype_key = 'seritype'
-    _schema_requried = ['seritype']
+    _schema_required = ['seritype']
     _schema_properties = {
         'seritype': {'type': 'string',
                      'default': 'default',

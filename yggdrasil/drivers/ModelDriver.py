@@ -330,7 +330,8 @@ class ModelDriver(Driver):
 
     _schema_type = 'model'
     _schema_subtype_key = 'language'
-    _schema_required = ['name', 'language', 'args', 'working_dir']
+    _schema_required = ['name', 'language', 'args', 'working_dir',
+                        'inputs', 'outputs']
     _schema_properties = {
         'name': {'type': 'string'},
         'language': {'type': 'string', 'default': 'executable',
@@ -340,20 +341,29 @@ class ModelDriver(Driver):
                          'languages can be found :ref:`here <'
                          'schema_table_model_subtype_rst>`.')},
         'args': {'type': 'array',
-                 'items': {'type': 'string', 'minLength': 1}},
-        'inputs': {'type': 'array', 'default': [],
+                 'items': {'type': 'string', 'minLength': 1},
+                 'allowSingular': True},
+        'inputs': {'type': 'array',
+                   'default': [{'name': 'input',
+                                'commtype': 'default',
+                                'datatype': {'type': 'bytes'},
+                                'is_default': True}],
                    'items': {'$ref': '#/definitions/comm'},
                    'allowSingular': True,
-                   'aliases': ['input'],
+                   'aliases': ['input', 'input_file', 'input_files'],
                    'description': (
                        'Zero or more channels carrying input to the model. '
                        'A full description of channel entries and the '
                        'options available for channels can be found '
                        ':ref:`here<yaml_comm_options>`.')},
-        'outputs': {'type': 'array', 'default': [],
+        'outputs': {'type': 'array',
+                    'default': [{'name': 'output',
+                                 'commtype': 'default',
+                                 'datatype': {'type': 'bytes'},
+                                 'is_default': True}],
                     'items': {'$ref': '#/definitions/comm'},
                     'allowSingular': True,
-                    'aliases': ['output'],
+                    'aliases': ['output', 'output_file', 'output_files'],
                     'description': (
                         'Zero or more channels carrying output from the '
                         'model. A full description of channel entries and '
@@ -378,7 +388,7 @@ class ModelDriver(Driver):
                                  'additionalProperties': False}],
                       'default': False},
         'client_of': {'type': 'array', 'items': {'type': 'string'},
-                      'default': []},
+                      'default': [], 'allowSingular': True},
         'timesync': {
             'type': 'array',
             'allowSingular': True,

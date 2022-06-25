@@ -347,6 +347,7 @@ class ComponentMeta(type):
     r"""Meta class for registering schema components."""
     
     def __new__(meta, name, bases, class_dict):
+        class_dict.setdefault('_schema_additional_kwargs_no_inherit', {})
         cls = type.__new__(meta, name, bases, class_dict)
         # Determine subtype
         subtype = None
@@ -497,6 +498,9 @@ class ComponentBase(ComponentBaseUnregistered):
     _schema_excluded_from_inherit = []
     _schema_excluded_from_class_validation = []
     _schema_inherit = True
+    _schema_additional_kwargs = {}
+    _schema_additional_kwargs_base = {}
+    _schema_additional_kwargs_no_inherit = {}
     _dont_register = False
 
     def __new__(cls, *args, **kwargs):

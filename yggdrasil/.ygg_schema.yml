@@ -3,6 +3,7 @@ definitions:
   comm:
     allOf:
     - additionalProperties: false
+      allowSingular: name
       dependencies:
         driver:
         - args
@@ -13,6 +14,7 @@ definitions:
             the environment variable.
           type: string
         args:
+          deprecated: true
           description: '[DEPRECATED] Arguments that should be provided to the driver.'
           type: string
         as_array:
@@ -69,9 +71,13 @@ definitions:
             that a model is a RPC input to a model server.
           type: boolean
         driver:
+          deprecated: true
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
         field_names:
+          aliases:
+          - column_names
+          allowSingular: true
           description: '[DEPRECATED] Field names that should be used to label fields
             in sent/received tables. This keyword is only valid for table-like datatypes.
             If not provided, field names are created based on the field order.'
@@ -79,6 +85,9 @@ definitions:
             type: string
           type: array
         field_units:
+          aliases:
+          - column_units
+          allowSingular: true
           description: '[DEPRECATED] Field units that should be used to convert fields
             in sent/received tables. This keyword is only valid for table-like datatypes.
             If not provided, all fields are assumed to be unitless.'
@@ -115,6 +124,12 @@ definitions:
           type: object
         name:
           description: Name used for component in log messages.
+          pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+          type: string
+        onexit:
+          deprecated: true
+          description: '[DEPRECATED] Method of input/output driver to call when the
+            connection closes'
           type: string
         outside_loop:
           default: false
@@ -128,66 +143,43 @@ definitions:
           type: object
         port:
           type: int
-        recv_converter:
-          anyOf:
-          - $ref: '#/definitions/transform'
-          - type:
-            - function
-            - string
-          - items:
-              anyOf:
-              - $ref: '#/definitions/transform'
-              - type:
-                - function
-                - string
-            type: array
-          description: Converter that should be used on received objects. Defaults
-            to None.
-        send_converter:
-          anyOf:
-          - $ref: '#/definitions/transform'
-          - type:
-            - function
-            - string
-          - items:
-              anyOf:
-              - $ref: '#/definitions/transform'
-              - type:
-                - function
-                - string
-            type: array
-          description: Converter that should be used on sent objects. Defaults to
-            None.
         transform:
-          anyOf:
-          - $ref: '#/definitions/transform'
-          - type:
-            - function
-            - string
-          - items:
-              anyOf:
-              - $ref: '#/definitions/transform'
-              - type:
-                - function
-                - string
-            type: array
+          aliases:
+          - recv_converter
+          - send_converter
+          - transforms
+          - translator
+          - translators
+          allowSingular: true
           description: One or more transformations that will be applied to messages
             that are sent/received. Ignored if not provided.
+          items:
+            anyOf:
+            - $ref: '#/definitions/transform'
+            - type:
+              - function
+              - string
+          type: array
         vars:
           description: Names of variables to be sent/received by this comm. Defaults
             to [].
           items:
-            anyOf:
-            - type: string
-            - properties:
-                datatype:
-                  default:
-                    type: bytes
-                  type: schema
-                name:
-                  type: string
-              type: object
+            allowSingular: true
+            properties:
+              datatype:
+                default:
+                  type: bytes
+                type: schema
+              name:
+                type: string
+            type: object
           type: array
+        working_dir:
+          description: Working directory. If not provided, the current working directory
+            is used.
+          type: string
+      pushProperties:
+        $properties/datatype: true
       required:
       - commtype
       - datatype
@@ -196,17 +188,7 @@ definitions:
       type: object
     - anyOf:
       - additionalProperties: true
-        description: Schema for comm component ['buffer'] subtype.
-        properties:
-          commtype:
-            default: default
-            description: Communication mechanism that should be used.
-            enum:
-            - buffer
-            type: string
-        title: yggdrasil.communication.BufferComm.BufferComm
-        type: object
-      - additionalProperties: true
+        allowSingular: name
         description: Schema for comm component ['default'] subtype.
         properties:
           commtype:
@@ -215,9 +197,30 @@ definitions:
             enum:
             - default
             type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+            type: string
         title: yggdrasil.communication.DefaultComm.DefaultComm
         type: object
       - additionalProperties: true
+        allowSingular: name
+        description: Schema for comm component ['buffer'] subtype.
+        properties:
+          commtype:
+            default: default
+            description: Communication mechanism that should be used.
+            enum:
+            - buffer
+            type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+            type: string
+        title: yggdrasil.communication.BufferComm.BufferComm
+        type: object
+      - additionalProperties: true
+        allowSingular: name
         description: Schema for comm component ['ipc'] subtype.
         properties:
           commtype:
@@ -226,9 +229,14 @@ definitions:
             enum:
             - ipc
             type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+            type: string
         title: yggdrasil.communication.IPCComm.IPCComm
         type: object
       - additionalProperties: true
+        allowSingular: name
         description: Schema for comm component ['mpi'] subtype.
         properties:
           commtype:
@@ -237,9 +245,14 @@ definitions:
             enum:
             - mpi
             type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+            type: string
         title: yggdrasil.communication.MPIComm.MPIComm
         type: object
       - additionalProperties: true
+        allowSingular: name
         description: Schema for comm component ['rest'] subtype.
         properties:
           client_id:
@@ -256,6 +269,10 @@ definitions:
           host:
             default: http://localhost:{port}
             type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+            type: string
           params:
             description: Parameters that should be passed via URL. Defaults to None
               and is ignored.
@@ -265,6 +282,7 @@ definitions:
         title: yggdrasil.communication.RESTComm.RESTComm
         type: object
       - additionalProperties: true
+        allowSingular: name
         description: Schema for comm component ['rmq_async'] subtype.
         properties:
           commtype:
@@ -273,9 +291,14 @@ definitions:
             enum:
             - rmq_async
             type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+            type: string
         title: yggdrasil.communication.RMQAsyncComm.RMQAsyncComm
         type: object
       - additionalProperties: true
+        allowSingular: name
         description: Schema for comm component ['rmq'] subtype.
         properties:
           commtype:
@@ -284,9 +307,14 @@ definitions:
             enum:
             - rmq
             type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+            type: string
         title: yggdrasil.communication.RMQComm.RMQComm
         type: object
       - additionalProperties: true
+        allowSingular: name
         description: Schema for comm component ['value'] subtype.
         properties:
           commtype:
@@ -298,9 +326,14 @@ definitions:
           count:
             default: 1
             type: integer
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+            type: string
         title: yggdrasil.communication.ValueComm.ValueComm
         type: object
       - additionalProperties: true
+        allowSingular: name
         description: Schema for comm component ['zmq'] subtype.
         properties:
           commtype:
@@ -308,6 +341,10 @@ definitions:
             description: ZeroMQ socket.
             enum:
             - zmq
+            type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
         title: yggdrasil.communication.ZMQComm.ZMQComm
         type: object
@@ -322,6 +359,7 @@ definitions:
       description: Base schema for all subtypes of connection components.
       properties:
         args:
+          deprecated: true
           description: '[DEPRECATED] Arguments that should be provided to the driver.'
           type: string
         connection_type:
@@ -335,6 +373,7 @@ definitions:
           - rpc_response
           type: string
         driver:
+          deprecated: true
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
         input_pattern:
@@ -353,9 +392,9 @@ definitions:
           aliases:
           - input
           - from
+          - input_file
+          - input_files
           allowSingular: true
-          default:
-          - {}
           description: One or more name(s) of model output channel(s) and/or new channel/file
             objects that the connection should receive messages from. A full description
             of file entries and the available options can be found :ref:`here<yaml_file_options>`.
@@ -387,9 +426,9 @@ definitions:
           aliases:
           - output
           - to
+          - output_file
+          - output_files
           allowSingular: true
-          default:
-          - {}
           description: One or more name(s) of model input channel(s) and/or new channel/file
             objects that the connection should send messages to. A full description
             of file entries and the available options can be found :ref:`here<yaml_file_options>`.
@@ -399,8 +438,30 @@ definitions:
             - $ref: '#/definitions/file'
           minItems: 1
           type: array
-        translator:
+        read_meth:
+          deprecated: true
+          enum:
+          - all
+          - line
+          - table_array
+          - ascii
+          - binary
+          - json
+          - map
+          - mat
+          - netcdf
+          - obj
+          - pandas
+          - pickle
+          - ply
+          - table
+          - wofost
+          - yaml
+          type: string
+        transform:
           aliases:
+          - transforms
+          - translator
           - translators
           allowSingular: true
           description: Function or string specifying function that should be used
@@ -414,6 +475,43 @@ definitions:
             - type: function
             - $ref: '#/definitions/transform'
           type: array
+        working_dir:
+          description: Working directory. If not provided, the current working directory
+            is used.
+          type: string
+        write_meth:
+          deprecated: true
+          enum:
+          - all
+          - line
+          - table_array
+          - ascii
+          - binary
+          - json
+          - map
+          - mat
+          - netcdf
+          - obj
+          - pandas
+          - pickle
+          - ply
+          - table
+          - wofost
+          - yaml
+          type: string
+      pushProperties:
+        '!$properties/inputs/items':
+        - transform
+        - onexit
+        - read_meth
+        - write_meth
+        '!$properties/outputs/items/anyOf/1':
+        - transform
+        - onexit
+        - read_meth
+        - write_meth
+        $properties/inputs/items/anyOf/1/allOf/1/anyOf/0/properties/serializer/oneOf/0: true
+        $properties/outputs/items/anyOf/1/allOf/1/anyOf/0/properties/serializer/oneOf/0: true
       required:
       - inputs
       - outputs
@@ -498,6 +596,7 @@ definitions:
   file:
     allOf:
     - additionalProperties: false
+      allowSingular: name
       dependencies:
         driver:
         - args
@@ -515,6 +614,7 @@ definitions:
             to False.
           type: boolean
         args:
+          deprecated: true
           description: '[DEPRECATED] Arguments that should be provided to the driver.'
           type: string
         as_array:
@@ -544,6 +644,7 @@ definitions:
             in the map. Defaults to \t.
           type: string
         driver:
+          deprecated: true
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
         encoding:
@@ -552,6 +653,9 @@ definitions:
             to 'utf-8'.
           type: string
         field_names:
+          aliases:
+          - column_names
+          allowSingular: true
           description: '[DEPRECATED] Field names that should be used to label fields
             in sent/received tables. This keyword is only valid for table-like datatypes.
             If not provided, field names are created based on the field order.'
@@ -559,6 +663,9 @@ definitions:
             type: string
           type: array
         field_units:
+          aliases:
+          - column_units
+          allowSingular: true
           description: '[DEPRECATED] Field units that should be used to convert fields
             in sent/received tables. This keyword is only valid for table-like datatypes.
             If not provided, all fields are assumed to be unitless.'
@@ -623,6 +730,7 @@ definitions:
           type: object
         name:
           description: Name used for component in log messages.
+          pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
           type: string
         newline:
           default: '
@@ -635,6 +743,11 @@ definitions:
           description: If True, headers will not be read or serialized from/to tables.
             Defaults to False.
           type: boolean
+        onexit:
+          deprecated: true
+          description: '[DEPRECATED] Method of input/output driver to call when the
+            connection closes'
+          type: string
         read_attributes:
           default: false
           description: If True, the attributes are read in as well as the variables.
@@ -642,52 +755,21 @@ definitions:
           type: boolean
         read_meth:
           default: read
+          deprecated: true
           description: Method that should be used to read data from the file. Defaults
             to 'read'. Ignored if direction is 'send'.
           enum:
           - read
           - readline
           type: string
-        recv_converter:
-          anyOf:
-          - $ref: '#/definitions/transform'
-          - type:
-            - function
-            - string
-          - items:
-              anyOf:
-              - $ref: '#/definitions/transform'
-              - type:
-                - function
-                - string
-            type: array
-          description: Converter that should be used on received objects. Defaults
-            to None.
-        send_converter:
-          anyOf:
-          - $ref: '#/definitions/transform'
-          - type:
-            - function
-            - string
-          - items:
-              anyOf:
-              - $ref: '#/definitions/transform'
-              - type:
-                - function
-                - string
-            type: array
-          description: Converter that should be used on sent objects. Defaults to
-            None.
         serializer:
-          default:
-            seritype: direct
+          default: {}
           description: Class with serialize and deserialize methods that should be
             used to process sent and received messages. Defaults to None and is constructed
             using provided 'serializer_kwargs'.
           oneOf:
           - $ref: '#/definitions/serializer'
-          - class: yggdrasil.serialize.SerializeBase:SerializeBase
-            type: instance
+          - type: instance
         sort_keys:
           default: true
           description: If True, the serialization of dictionaries will be in key sorted
@@ -699,20 +781,22 @@ definitions:
             False.
           type: boolean
         transform:
-          anyOf:
-          - $ref: '#/definitions/transform'
-          - type:
-            - function
-            - string
-          - items:
-              anyOf:
-              - $ref: '#/definitions/transform'
-              - type:
-                - function
-                - string
-            type: array
+          aliases:
+          - recv_converter
+          - send_converter
+          - transforms
+          - translator
+          - translators
+          allowSingular: true
           description: One or more transformations that will be applied to messages
             that are sent/received. Ignored if not provided.
+          items:
+            anyOf:
+            - $ref: '#/definitions/transform'
+            - type:
+              - function
+              - string
+          type: array
         use_astropy:
           default: false
           description: If True, the astropy package will be used to serialize/deserialize
@@ -728,16 +812,15 @@ definitions:
           description: Names of variables to be sent/received by this comm. Defaults
             to [].
           items:
-            anyOf:
-            - type: string
-            - properties:
-                datatype:
-                  default:
-                    type: bytes
-                  type: schema
-                name:
-                  type: string
-              type: object
+            allowSingular: true
+            properties:
+              datatype:
+                default:
+                  type: bytes
+                type: schema
+              name:
+                type: string
+            type: object
           type: array
         version:
           default: 1
@@ -752,19 +835,57 @@ definitions:
           description: Time (in seconds) that should be waited before opening for
             the file to be created if it dosn't exist. Defaults to 0 s and file will
             attempt to be opened immediately.
-          type: float
+          type: number
         working_dir:
           description: Working directory. If not provided, the current working directory
             is used.
           type: string
       required:
       - filetype
-      - name
       - working_dir
       title: file_base
       type: object
     - anyOf:
       - additionalProperties: true
+        allowSingular: name
+        description: Schema for file component ['binary'] subtype.
+        properties:
+          filetype:
+            default: binary
+            description: The entire file is read/written all at once as bytes.
+            enum:
+            - binary
+            type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+            type: string
+          read_meth:
+            default: read
+            deprecated: true
+            description: Method that should be used to read data from the file. Defaults
+              to 'read'. Ignored if direction is 'send'.
+            enum:
+            - read
+            - readline
+            type: string
+          serializer:
+            default: {}
+            description: Class with serialize and deserialize methods that should
+              be used to process sent and received messages. Defaults to None and
+              is constructed using provided 'serializer_kwargs'.
+            oneOf:
+            - $ref: '#/definitions/serializer'
+            - type: instance
+        pushProperties:
+          $properties/serializer/oneOf/0: true
+        required:
+        - name
+        - serializer
+        title: yggdrasil.communication.FileComm.FileComm
+        type: object
+      - additionalProperties: true
+        allowSingular: name
         description: Schema for file component ['ascii'] subtype.
         properties:
           comment:
@@ -792,6 +913,7 @@ definitions:
         title: yggdrasil.communication.AsciiFileComm.AsciiFileComm
         type: object
       - additionalProperties: true
+        allowSingular: name
         description: Schema for file component ['map'] subtype.
         properties:
           comment:
@@ -825,6 +947,7 @@ definitions:
         title: yggdrasil.communication.AsciiMapComm.AsciiMapComm
         type: object
       - additionalProperties: true
+        allowSingular: name
         description: Schema for file component ['table'] subtype.
         properties:
           comment:
@@ -837,6 +960,8 @@ definitions:
               will be used to serialize/deserialize. Defaults to default_datatype.
             type: schema
           delimiter:
+            aliases:
+            - column
             default: "\t"
             description: Character(s) that should be used to separate columns. Defaults
               to '\t'.
@@ -864,37 +989,7 @@ definitions:
         title: yggdrasil.communication.AsciiTableComm.AsciiTableComm
         type: object
       - additionalProperties: true
-        description: Schema for file component ['binary'] subtype.
-        properties:
-          filetype:
-            default: binary
-            description: The entire file is read/written all at once as bytes.
-            enum:
-            - binary
-            type: string
-          read_meth:
-            default: read
-            description: Method that should be used to read data from the file. Defaults
-              to 'read'. Ignored if direction is 'send'.
-            enum:
-            - read
-            - readline
-            type: string
-          serializer:
-            default:
-              seritype: direct
-            description: Class with serialize and deserialize methods that should
-              be used to process sent and received messages. Defaults to None and
-              is constructed using provided 'serializer_kwargs'.
-            oneOf:
-            - $ref: '#/definitions/serializer'
-            - class: yggdrasil.serialize.SerializeBase:SerializeBase
-              type: instance
-        required:
-        - serializer
-        title: yggdrasil.communication.FileComm.FileComm
-        type: object
-      - additionalProperties: true
+        allowSingular: name
         description: Schema for file component ['json'] subtype.
         properties:
           comment:
@@ -934,6 +1029,7 @@ definitions:
         title: yggdrasil.communication.JSONFileComm.JSONFileComm
         type: object
       - additionalProperties: true
+        allowSingular: name
         description: Schema for file component ['mat'] subtype.
         properties:
           comment:
@@ -962,6 +1058,7 @@ definitions:
         title: yggdrasil.communication.MatFileComm.MatFileComm
         type: object
       - additionalProperties: true
+        allowSingular: name
         description: Schema for file component ['netcdf'] subtype.
         properties:
           comment:
@@ -1008,6 +1105,7 @@ definitions:
         title: yggdrasil.communication.NetCDFFileComm.NetCDFFileComm
         type: object
       - additionalProperties: true
+        allowSingular: name
         description: Schema for file component ['obj'] subtype.
         properties:
           comment:
@@ -1036,6 +1134,7 @@ definitions:
         title: yggdrasil.communication.ObjFileComm.ObjFileComm
         type: object
       - additionalProperties: true
+        allowSingular: name
         description: Schema for file component ['pandas'] subtype.
         properties:
           comment:
@@ -1048,6 +1147,8 @@ definitions:
               will be used to serialize/deserialize. Defaults to default_datatype.
             type: schema
           delimiter:
+            aliases:
+            - column
             default: "\t"
             description: Character(s) that should be used to separate columns. Defaults
               to '\t'.
@@ -1083,6 +1184,7 @@ definitions:
         title: yggdrasil.communication.PandasFileComm.PandasFileComm
         type: object
       - additionalProperties: true
+        allowSingular: name
         description: Schema for file component ['pickle'] subtype.
         properties:
           comment:
@@ -1110,6 +1212,7 @@ definitions:
         title: yggdrasil.communication.PickleFileComm.PickleFileComm
         type: object
       - additionalProperties: true
+        allowSingular: name
         description: Schema for file component ['ply'] subtype.
         properties:
           comment:
@@ -1138,6 +1241,7 @@ definitions:
         title: yggdrasil.communication.PlyFileComm.PlyFileComm
         type: object
       - additionalProperties: true
+        allowSingular: name
         description: Schema for file component ['wofost'] subtype.
         properties:
           comment:
@@ -1170,6 +1274,7 @@ definitions:
         title: yggdrasil.communication.WOFOSTParamFileComm.WOFOSTParamFileComm
         type: object
       - additionalProperties: true
+        allowSingular: name
         description: Schema for file component ['yaml'] subtype.
         properties:
           comment:
@@ -1345,6 +1450,7 @@ definitions:
             comms can be used by more than one thread. Defaults to False.
           type: boolean
         args:
+          allowSingular: true
           description: The path to the file containing the model program that will
             be run by the driver for the model's language and/or a list of arguments
             that should be passed as input to the model program or language executable
@@ -1360,6 +1466,7 @@ definitions:
         buildfile:
           type: string
         client_of:
+          allowSingular: true
           default: []
           description: The names of one or more models that this model will call as
             a server. If there are more than one, this should be specified as a sequence
@@ -1436,6 +1543,7 @@ definitions:
             model repository or when providing the model as a service.
           type: string
         driver:
+          deprecated: true
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
         env:
@@ -1474,8 +1582,15 @@ definitions:
         inputs:
           aliases:
           - input
+          - input_file
+          - input_files
           allowSingular: true
-          default: []
+          default:
+          - commtype: default
+            datatype:
+              type: bytes
+            is_default: true
+            name: input
           description: Zero or more channels carrying input to the model. A full description
             of channel entries and the options available for channels can be found
             :ref:`here<yaml_comm_options>`.
@@ -1624,8 +1739,15 @@ definitions:
         outputs:
           aliases:
           - output
+          - output_file
+          - output_files
           allowSingular: true
-          default: []
+          default:
+          - commtype: default
+            datatype:
+              type: bytes
+            is_default: true
+            name: output
           description: Zero or more channels carrying output from the model. A full
             description of channel entries and the options available for channels
             can be found :ref:`here<yaml_comm_options>`.
@@ -1896,12 +2018,25 @@ definitions:
           type: string
       required:
       - args
+      - inputs
       - language
       - name
+      - outputs
       - working_dir
       title: model_base
       type: object
     - anyOf:
+      - additionalProperties: true
+        description: Schema for model component ['executable'] subtype.
+        properties:
+          language:
+            default: executable
+            description: Model is an executable.
+            enum:
+            - executable
+            type: string
+        title: yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver
+        type: object
       - additionalProperties: true
         description: Schema for model component ['cmake'] subtype.
         properties:
@@ -2148,17 +2283,6 @@ definitions:
               via the command line. Defaults to False.
             type: boolean
         title: yggdrasil.drivers.DummyModelDriver.DummyModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['executable'] subtype.
-        properties:
-          language:
-            default: executable
-            description: Model is an executable.
-            enum:
-            - executable
-            type: string
-        title: yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['fortran'] subtype.
@@ -2743,12 +2867,18 @@ definitions:
             to 'utf-8'.
           type: string
         field_names:
+          aliases:
+          - column_names
+          allowSingular: true
           description: The names of fields in the format string. If not provided,
             names are set based on the order of the fields in the format string.
           items:
             type: string
           type: array
         field_units:
+          aliases:
+          - column_units
+          allowSingular: true
           description: The units of fields in the format string. If not provided,
             all fields are assumed to be dimensionless.
           items:
@@ -2821,9 +2951,24 @@ definitions:
           description: If True, the astropy package will be used to serialize/deserialize
             table. Defaults to False.
           type: boolean
+      required:
+      - seritype
       title: serializer_base
       type: object
     - anyOf:
+      - additionalProperties: true
+        description: Schema for serializer component ['default'] subtype.
+        properties:
+          seritype:
+            default: default
+            description: Default serializer that uses |yggdrasil|'s extended JSON
+              serialization based on a provided type definition (See discussion :ref:`here
+              <serialization_rst>`).
+            enum:
+            - default
+            type: string
+        title: yggdrasil.serialize.DefaultSerialize.DefaultSerialize
+        type: object
       - additionalProperties: true
         description: Schema for serializer component ['map'] subtype.
         properties:
@@ -2851,17 +2996,25 @@ definitions:
               order. Otherwise, each argument should be a scalar. Defaults to False.
             type: boolean
           delimiter:
+            aliases:
+            - column
             default: "\t"
             description: Character(s) that should be used to separate columns. Defaults
               to '\t'.
             type: string
           field_names:
+            aliases:
+            - column_names
+            allowSingular: true
             description: The names of fields in the format string. If not provided,
               names are set based on the order of the fields in the format string.
             items:
               type: string
             type: array
           field_units:
+            aliases:
+            - column_units
+            allowSingular: true
             description: The units of fields in the format string. If not provided,
               all fields are assumed to be dimensionless.
             items:
@@ -2885,19 +3038,6 @@ definitions:
               table. Defaults to False.
             type: boolean
         title: yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize
-        type: object
-      - additionalProperties: true
-        description: Schema for serializer component ['default'] subtype.
-        properties:
-          seritype:
-            default: default
-            description: Default serializer that uses |yggdrasil|'s extended JSON
-              serialization based on a provided type definition (See discussion :ref:`here
-              <serialization_rst>`).
-            enum:
-            - default
-            type: string
-        title: yggdrasil.serialize.DefaultSerialize.DefaultSerialize
         type: object
       - additionalProperties: true
         description: Schema for serializer component ['direct'] subtype.
@@ -2987,17 +3127,25 @@ definitions:
         description: Schema for serializer component ['pandas'] subtype.
         properties:
           delimiter:
+            aliases:
+            - column
             default: "\t"
             description: Character(s) that should be used to separate columns. Defaults
               to '\t'.
             type: string
           field_names:
+            aliases:
+            - column_names
+            allowSingular: true
             description: The names of fields in the format string. If not provided,
               names are set based on the order of the fields in the format string.
             items:
               type: string
             type: array
           field_units:
+            aliases:
+            - column_units
+            allowSingular: true
             description: The units of fields in the format string. If not provided,
               all fields are assumed to be dimensionless.
             items:
@@ -3313,10 +3461,19 @@ properties:
     aliases:
     - connection
     allowSingular: true
+    default: []
     items:
       $ref: '#/definitions/connection'
     type: array
+  working_dir:
+    type: string
+pushProperties:
+  $properties/connections/items:
+  - working_dir
+  $properties/models/items:
+  - working_dir
 required:
 - models
+- connections
 title: YAML Schema
 type: object

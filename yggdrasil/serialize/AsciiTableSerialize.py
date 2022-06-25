@@ -45,11 +45,18 @@ class AsciiTableSerialize(DefaultSerialize):
     _schema_subtype_description = ('ASCII tab (or otherwise) delimited table.')
     _schema_properties = {
         'format_str': {'type': 'string'},
-        'field_names': {'type': 'array', 'items': {'type': 'string'}},
-        'field_units': {'type': 'array', 'items': {'type': 'string'}},
+        'field_names': {'type': 'array',
+                        'items': {'type': 'string'},
+                        'aliases': ['column_names'],
+                        'allowSingular': True},
+        'field_units': {'type': 'array',
+                        'items': {'type': 'string'},
+                        'aliases': ['column_units'],
+                        'allowSingular': True},
         'as_array': {'type': 'boolean', 'default': False},
         'delimiter': {'type': 'string',
-                      'default': constants.DEFAULT_DELIMITER_STR},
+                      'default': constants.DEFAULT_DELIMITER_STR,
+                      'aliases': ['column']},
         'use_astropy': {'type': 'boolean', 'default': False}}
     _attr_conv = DefaultSerialize._attr_conv + ['format_str', 'delimiter']
     has_header = True

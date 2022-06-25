@@ -2,7 +2,6 @@ import os
 import copy
 import tempfile
 from yggdrasil import platform, tools
-from yggdrasil.serialize.SerializeBase import SerializeBase
 from yggdrasil.communication import CommBase
 from yggdrasil.components import import_component
 
@@ -66,25 +65,33 @@ class FileComm(CommBase.CommBase):
                                    'once as bytes.')
     _schema_required = ['name', 'filetype', 'working_dir', 'serializer']
     _schema_properties = {
+        'name': {'type': 'string',
+                 'pattern': (r'^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+'
+                             r'\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$')},
         'working_dir': {'type': 'string'},
         'filetype': {'type': 'string', 'default': _filetype,
                      'description': ('The type of file that will be read from '
                                      'or written to.')},
         'read_meth': {'type': 'string', 'default': 'read',
-                      'enum': ['read', 'readline']},
+                      'enum': ['read', 'readline'],
+                      'deprecated': True},
         'append': {'type': 'boolean', 'default': False},
         'in_temp': {'type': 'boolean', 'default': False},
         'is_series': {'type': 'boolean', 'default': False},
-        'wait_for_creation': {'type': 'float', 'default': 0.0},
-        'serializer': {'oneOf': [{'$ref': '#/definitions/serializer'},
-                                 {'type': 'instance',
-                                  'class': SerializeBase}],
-                       'default': {'seritype': 'direct'}}}
+        'wait_for_creation': {'type': 'number', 'default': 0.0},
+        'serializer': {
+            'oneOf': [
+                {'$ref': '#/definitions/serializer'},
+                {'type': 'instance'}],
+            'default': {}}}
     _schema_excluded_from_inherit = (
-        ['commtype', 'datatype', 'read_meth', 'serializer']
+        ['name', 'commtype', 'datatype', 'read_meth', 'serializer']
         + CommBase.CommBase._model_schema_prop)
     _schema_excluded_from_class_validation = ['serializer']
     _schema_base_class = None
+    _schema_additional_kwargs = {'allowSingular': 'name'}
+    _schema_additional_kwargs_no_inherit = {
+        'pushProperties': {'$properties/serializer/oneOf/0': True}}
     _default_serializer = 'direct'
     _default_extension = '.txt'
     is_file = True

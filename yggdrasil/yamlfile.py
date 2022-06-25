@@ -6,7 +6,8 @@ import yaml
 import json
 import git
 import io as sio
-from yggdrasil.schema import standardize, get_schema
+from yggdrasil import constants
+from yggdrasil.schema import get_schema
 from urllib.parse import urlparse
 from yaml.constructor import (
     ConstructorError, BaseConstructor, Constructor, SafeConstructor)
@@ -92,7 +93,8 @@ def clone_github_repo(fname, commit=None, local_directory=None):
     return os.path.realpath(fname)
 
 
-def load_yaml(fname, yaml_param=None, directory_for_clones=None):
+def load_yaml(fname, yaml_param=None, directory_for_clones=None,
+              model_submission=False):
     r"""Parse a yaml file defining a run.
 
     Args:
@@ -110,16 +112,19 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None):
         directory_for_clones (str, optional): Directory that git repositories
             should be cloned into. Defaults to None and the current working
             directory will be used.
+        model_submission (bool, optional): If True, the YAML will be evaluated
+            as a submission to the yggdrasil model repository and model_only
+            will be set to True. Defaults to False.
 
     Returns:
         dict: Contents of yaml file.
 
     """
     opened = False
+    yamlparsed = None
     if isinstance(fname, dict):
         yamlparsed = copy.deepcopy(fname)
         yamlparsed.setdefault('working_dir', os.getcwd())
-        return yamlparsed
     elif isinstance(fname, str):
         # pull foreign file
         if fname.startswith('git:'):
@@ -137,24 +142,49 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None):
         else:
             fname = os.path.join(os.getcwd(), 'stream')
     # Mustache replace vars
-    if yaml_param is None:
-        yaml_param = {}
-    yamlparsed = fd.read()
-    yamlparsed = chevron.render(
-        sio.StringIO(yamlparsed).getvalue(), dict(os.environ, **yaml_param))
-    if fname.endswith('.json'):
-        yamlparsed = json.loads(yamlparsed)
-    else:
-        yamlparsed = yaml.safe_load(yamlparsed)
-    if not isinstance(yamlparsed, dict):  # pragma: debug
-        raise YAMLSpecificationError("Loaded yaml is not a dictionary.")
-    yamlparsed['working_dir'] = os.path.dirname(fname)
+    if not isinstance(yamlparsed, dict):
+        if yaml_param is None:
+            yaml_param = {}
+        yamlparsed = fd.read()
+        yamlparsed = chevron.render(
+            sio.StringIO(yamlparsed).getvalue(),
+            dict(os.environ, **yaml_param))
+        if fname.endswith('.json'):
+            yamlparsed = json.loads(yamlparsed)
+        else:
+            yamlparsed = yaml.safe_load(yamlparsed)
+        if not isinstance(yamlparsed, dict):  # pragma: debug
+            raise YAMLSpecificationError("Loaded yaml is not a dictionary.")
+        yamlparsed.setdefault('working_dir', os.path.dirname(fname))
     if opened:
         fd.close()
-    return yamlparsed
+    # Standardize models/model as list so that working directory can be set
+    # from the repository URL
+    yamlparsed.setdefault('models', yamlparsed.pop('model', []))
+    if not isinstance(yamlparsed['models'], list):
+        yamlparsed['models'] = [yamlparsed['models']]
+    for x in yamlparsed['models']:
+        if isinstance(x, dict) and 'repository_url' in x and 'working_dir' not in x:
+            repo_dir = clone_github_repo(
+                x['repository_url'],
+                commit=x.get('repository_commit', None),
+                local_directory=directory_for_clones)
+            x.setdefault('working_dir', repo_dir)
+    s = get_schema()
+    # TODO: Add support for turning off defaults?
+    if model_submission:
+        yamlparsed['connections'] = []
+        return yamlparsed
+    # print('un-normalized')
+    # pprint.pprint(yamlparsed)
+    yml_norm = s.normalize(yamlparsed, partial=True)
+    # print('normalized')
+    # pprint.pprint(yml_norm)
+    return yml_norm
 
 
-def prep_yaml(files, yaml_param=None, directory_for_clones=None):
+def prep_yaml(files, yaml_param=None, directory_for_clones=None,
+              model_submission=False):
     r"""Prepare yaml to be parsed by rapidjson including covering backwards
     compatible options.
 
@@ -168,6 +198,9 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None):
         directory_for_clones (str, optional): Directory that git repositories
             should be cloned into. Defaults to None and the current working
             directory will be used.
+        model_submission (bool, optional): If True, the YAML will be evaluated
+            as a submission to the yggdrasil model repository and model_only
+            will be set to True. Defaults to False.
 
     Returns:
         dict: YAML ready to be parsed using schema.
@@ -178,27 +211,32 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None):
     if not isinstance(files, list):
         files = [files]
     yamls = [load_yaml(f, yaml_param=yaml_param,
-                       directory_for_clones=directory_for_clones)
+                       directory_for_clones=directory_for_clones,
+                       model_submission=model_submission)
              for f in files]
     # Load files pointed to
-    for y in yamls:
-        if 'include' in y:
-            new_files = y.pop('include')
-            if not isinstance(new_files, list):
-                new_files = [new_files]
-            for f in new_files:
-                if not os.path.isabs(f):
-                    f = os.path.join(y['working_dir'], f)
-                yamls.append(load_yaml(f))
+    first = True
+    files = []
+    while first or files:
+        for f in files:
+            yamls.append(load_yaml(f, yaml_param,
+                                   directory_for_clones=directory_for_clones))
+        first = False
+        files = []
+        for y in yamls:
+            if 'include' in y:
+                new_files = y.pop('include')
+                if not isinstance(new_files, list):
+                    new_files = [new_files]
+                for f in new_files:
+                    if not os.path.isabs(f):
+                        f = os.path.join(y['working_dir'], f)
+                    files.append(f)
     # Replace references to services with service descriptions
     for i, y in enumerate(yamls):
         services = y.pop('services', [])
         if 'service' in y:
             services.append(y.pop('service'))
-        if services:
-            y.setdefault('models', [])
-            if 'model' in y:
-                y['models'].append(y.pop('model'))
         for x in services:
             request = {'action': 'start'}
             for k in ['name', 'yamls', 'yaml_param']:
@@ -211,28 +249,11 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None):
             response = cli.send_request(**request)
             assert response.pop('status') == 'complete'
             y['models'].append(response)
-    # Standardize format of models and connections to be lists and
-    # add working_dir to each
-    comp_keys = ['models', 'connections']
-    for yml in yamls:
-        standardize(yml, comp_keys)
-        for k in comp_keys:
-            for x in yml[k]:
-                if isinstance(x, dict):
-                    if (k == 'models') and ('repository_url' in x):
-                        repo_dir = clone_github_repo(
-                            x['repository_url'],
-                            commit=x.get('repository_commit', None),
-                            local_directory=directory_for_clones)
-                        x.setdefault('working_dir', repo_dir)
-                    else:
-                        x.setdefault('working_dir', yml['working_dir'])
     # Combine models & connections
-    yml_all = {}
-    for k in comp_keys:
-        yml_all[k] = []
-        for yml in yamls:
-            yml_all[k] += yml[k]
+    yml_all = {'models': [], 'connections': []}
+    for yml in yamls:
+        yml_all['models'] += yml['models']
+        yml_all['connections'] += yml['connections']
     return yml_all
 
 
@@ -275,24 +296,23 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
     """
     s = get_schema()
     # Parse files using schema
-    yml_prep = prep_yaml(files, yaml_param=yaml_param,
-                         directory_for_clones=directory_for_clones)
+    # TODO: only run backward_compat if deprecation warnings raised
+    run_backwards_compat = True
+    yml_norm = prep_yaml(files, yaml_param=yaml_param,
+                         directory_for_clones=directory_for_clones,
+                         model_submission=model_submission)
     # print('prepped')
-    # pprint.pprint(yml_prep)
+    # pprint.pprint(yml_norm)
     if model_submission:
         models = []
-        for yml in yml_prep['models']:
+        for yml in yml_norm['models']:
             wd = yml.pop('working_dir', None)
             x = s.validate_model_submission(yml)
             if wd:
                 x['working_dir'] = wd
             models.append(x)
-        yml_prep['models'] = models
+        yml_norm['models'] = models
         model_only = True
-    yml_norm = s.validate(yml_prep, normalize=True,
-                          no_defaults=True, required_defaults=True)
-    # print('normalized')
-    # pprint.pprint(yml_norm)
     # Determine if any of the models require synchronization
     timesync_names = []
     for yml in yml_norm['models']:
@@ -323,10 +343,18 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
                                        'inputs': [],
                                        'outputs': []})
     # Parse models, then connections to ensure connections can be processed
-    existing = None
-    for k in ['models', 'connections']:
-        for yml in yml_norm[k]:
-            existing = parse_component(yml, k[:-1], existing=existing)
+    existing = {k: {} for k in
+                ['input', 'output', 'model', 'connection', 'server']}
+    existing['aliases'] = {'inputs': {}, 'outputs': {}}
+    existing['pairs'] = []
+    existing['input_drivers'] = []
+    existing['output_drivers'] = []
+    existing['backward'] = run_backwards_compat
+    for yml in yml_norm['models']:
+        existing = parse_component(yml, 'model', existing=existing)
+    backward_compat(yml_norm, existing)
+    for yml in yml_norm['connections']:
+        existing = parse_component(yml, 'connection', existing=existing)
     # Exit early
     if model_only:
         return yml_norm
@@ -378,6 +406,8 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
         remove = []
         for k in list(existing[io].keys()):
             v = existing[io][k]
+            if v.get('__connection_count', 0) > 0:
+                continue
             if 'driver' not in v:
                 if v.get('is_default', False):
                     remove.append(k)
@@ -444,7 +474,8 @@ def complete_partial_integration(existing, name, partial_commtype=None):
     for io in dir2opp.keys():
         miss[io] = [k for k in existing[io].keys()
                     if not (((io == 'input') and (k in existing['server']))
-                            or existing[io][k].get('is_default', False))]
+                            or existing[io][k].get('is_default', False)
+                            or existing[io][k].get('__connection_count', 0) > 0)]
     for srv_info in existing['server'].values():
         if not srv_info['clients']:
             new_model.setdefault('client_of', [])
@@ -484,8 +515,7 @@ def parse_component(yml, ctype, existing=None):
         yml (dict): YAML dictionary for a component.
         ctype (str): Component type. This can be 'input', 'output',
             'model', or 'connection'.
-        existing (dict, optional): Dictionary of existing components.
-            Defaults to empty dict.
+        existing (dict): Dictionary of existing components.
 
     Raises:
         TypeError: If yml is not a dictionary.
@@ -497,29 +527,14 @@ def parse_component(yml, ctype, existing=None):
         dict: All components identified.
 
     """
-    # s = get_schema()
+    assert existing
     if not isinstance(yml, dict):
         raise YAMLSpecificationError("Component entry in yml must be a dictionary.")
-    ctype_list = ['input', 'output', 'model', 'connection', 'server']
-    if existing is None:
-        existing = {k: {} for k in ctype_list}
-    if ctype not in ctype_list:
-        raise YAMLSpecificationError("'%s' is not a recognized component.")
     # Parse based on type
     if ctype == 'model':
         existing = parse_model(yml, existing)
     elif ctype == 'connection':
         existing = parse_connection(yml, existing)
-    # elif ctype in ['input', 'output']:
-    #     for k in ['inputs', 'outputs']:
-    #         if k not in yml:
-    #             continue
-    #         for x in yml[k]:
-    #             if 'commtype' not in x:
-    #                 if 'filetype' in x:
-    #                     x['commtype'] = s['file'].subtype2class[x['filetype']]
-    #                 elif 'commtype' in x:
-    #                     x['commtype'] = s['comm'].subtype2class[x['commtype']]
     # Ensure component dosn't already exist
     if yml['name'] in existing[ctype]:
         pprint.pprint(existing)
@@ -541,9 +556,9 @@ def parse_model(yml, existing):
         dict: Updated log of all entries.
 
     """
-    _lang2driver = get_schema()['model'].subtype2class
+    yml = backward_compat_models(yml, existing)
     language = yml.pop('language')
-    yml['driver'] = _lang2driver[language]
+    yml['driver'] = constants.COMPONENT_REGISTRY['model']['subtypes'][language]
     # Add server input
     if yml.get('is_server', False):
         srv = {'name': '%s:%s' % (yml['name'], yml['name']),
@@ -601,7 +616,7 @@ def parse_model(yml, existing):
     # Add client output
     if yml.get('client_of', []):
         for srv in yml['client_of']:
-            srv_name = '%s:%s' % (srv, srv)
+            srv_name = f'{srv}:{srv}'
             if srv in timesync:
                 cli_name = '%s:%s' % (yml['name'], srv)
             else:
@@ -614,6 +629,7 @@ def parse_model(yml, existing):
             existing['server'][srv_name]['clients'].append(cli_name)
     # Model index and I/O channels
     yml['model_index'] = len(existing['model'])
+    prefix = yml['name'] + ':'
     for io in ['inputs', 'outputs']:
         for x in yml[io]:
             if ((yml.get('function', False) and (not x.get('outside_loop', False))
@@ -629,6 +645,13 @@ def parse_model(yml, existing):
             if yml.get('copies', 1) > 1:
                 x['partner_copies'] = yml['copies']
             x['partner_language'] = language
+            if not x['name'].startswith(prefix):
+                new_name = prefix + x['name']
+                existing['aliases'][io][x['name']] = new_name
+                if x.get('is_default', False):
+                    existing['aliases'][io][yml['name']] = new_name
+                x['name'] = new_name
+            backward_compat_model_io(io[:-1], x, existing, yml)
             existing = parse_component(x, io[:-1], existing=existing)
     for k in yml.get('env', {}).keys():
         if not isinstance(yml['env'][k], str):
@@ -652,12 +675,12 @@ def parse_connection(yml, existing):
         dict: Updated log of all entries.
 
     """
-    schema = get_schema()
+    backward_compat_connections(yml, existing)
     # File input
     is_file = {'inputs': [], 'outputs': []}
     iname_list = []
     for x in yml['inputs']:
-        is_file['inputs'].append(schema.is_valid_component('file', x))
+        is_file['inputs'].append('filetype' in x)
         if is_file['inputs'][-1]:
             fname = os.path.expanduser(x['name'])
             if not os.path.isabs(fname):
@@ -665,17 +688,26 @@ def parse_connection(yml, existing):
             fname = os.path.normpath(fname)
             if (not os.path.isfile(fname)) and (not x.get('wait_for_creation', False)):
                 raise YAMLSpecificationError(
-                    ("Input '%s' not found in any of the registered "
-                     + "model outputs and is not a file.") % x['name'])
+                    f"Input file does not exist: \"{x['name']}\"")
             x['address'] = fname
         elif 'default_value' in x:
             x['address'] = x['default_value']
         else:
+            if '::' in x['name']:
+                x['name'], var = x['name'].split('::')
+                assert 'vars' not in x
+                x['vars'] = [{'name': var}]
+            if x['name'] in existing['aliases']['outputs']:
+                x['name'] = existing['aliases']['outputs'][x['name']]
+            if x['name'] not in existing['output']:
+                raise YAMLSpecificationError(
+                    f"Input '{x['name']}' does not match a corresponding "
+                    f"output.")
             iname_list.append(x['name'])
     # File output
     oname_list = []
     for x in yml['outputs']:
-        is_file['outputs'].append(schema.is_valid_component('file', x))
+        is_file['outputs'].append('filetype' in x)
         if is_file['outputs'][-1]:
             fname = os.path.expanduser(x['name'])
             if not x.get('in_temp', False):
@@ -684,6 +716,16 @@ def parse_connection(yml, existing):
                 fname = os.path.normpath(fname)
             x['address'] = fname
         else:
+            if '::' in x['name']:
+                x['name'], var = x['name'].split('::')
+                assert 'vars' not in x
+                x['vars'] = [{'name': var}]
+            if x['name'] in existing['aliases']['inputs']:
+                x['name'] = existing['aliases']['inputs'][x['name']]
+            if x['name'] not in existing['input']:
+                raise YAMLSpecificationError(
+                    f"Output '{x['name']}' does not match a corresponding "
+                    f"input.")
             oname_list.append(x['name'])
     iname = ','.join(iname_list)
     oname = ','.join(oname_list)
@@ -694,6 +736,10 @@ def parse_connection(yml, existing):
     else:
         args = '%s_to_%s' % (iname, oname)
     name = args
+    if all(is_file['inputs']) and all(is_file['outputs']):
+        raise YAMLSpecificationError(
+            f"Both the input and output fro this connection appear to be "
+            f"files:\n{pprint.pformat(yml)}")
     # Connection
     xx = {'src_models': [], 'dst_models': [],
           'inputs': [], 'outputs': []}
@@ -705,7 +751,8 @@ def parse_connection(yml, existing):
             new.update(y)
             xx['inputs'].append(new)
             xx['src_models'] += existing['output'][y['name']]['model_driver']
-            del existing['output'][y['name']]
+            new.setdefault('__connection_count', 0)
+            new['__connection_count'] += 1
     for i, y in enumerate(yml['outputs']):
         if is_file['outputs'][i]:
             xx['outputs'].append(y)
@@ -714,7 +761,10 @@ def parse_connection(yml, existing):
             new.update(y)
             xx['outputs'].append(new)
             xx['dst_models'] += existing['input'][y['name']]['model_driver']
-            del existing['input'][y['name']]
+            new.setdefault('__connection_count', 0)
+            new['__connection_count'] += 1
+    # TODO: Combine inputs/outputs that access variables from the same
+    # comm connection
     # TODO: Split comms if models are not co-located and the main
     # process needs access to the message passed
     yml.update(xx)
@@ -744,3 +794,247 @@ def link_model_io(existing):
         for m in io['dst_models']:
             existing['model'][m]['input_drivers'].append(io)
     return existing
+
+
+# The following are function add to allow backwards compatability of older
+# yaml schemas
+def rwmeth2filetype(rw_meth):
+    r"""Get the alternate properties that corresponding to the old
+    read_meth/write_meth keywords.
+
+    Args:
+        rw_meth (str): Read/write method name.
+
+    Returns:
+        dict: Property values equivalent to provided read/write method.
+
+    """
+    out = {}
+    if rw_meth == 'all':
+        out['filetype'] = 'binary'
+    elif rw_meth == 'line':
+        out['filetype'] = 'ascii'
+    elif rw_meth == 'table_array':
+        out['filetype'] = 'table'
+        out['as_array'] = True
+    else:
+        out['filetype'] = rw_meth
+    return out
+
+
+def cdriver2commtype(driver):
+    r"""Convert a connection driver to a file type.
+
+    Args:
+        driver (str): The name of the connection driver.
+
+    Returns:
+        str: The corresponding file type for the driver.
+
+    """
+    _legacy = {'InputDriver': 'default',
+               'OutputDriver': 'default',
+               'ZMQInputDriver': 'zmq',
+               'ZMQOutputDriver': 'zmq',
+               'IPCInputDriver': 'ipc',
+               'IPCOutputDriver': 'ipc',
+               'RMQInputDriver': 'rmq',
+               'RMQOutputDriver': 'rmq',
+               'RMQAsyncInputDriver': 'rmq_async',
+               'RMQAsyncOutputDriver': 'rmq_async'}
+    if driver in _legacy:
+        return _legacy[driver]
+    raise ValueError("Unknown driver: '%s'" % driver)
+
+    
+def cdriver2filetype(driver):
+    r"""Convert a connection driver to a file type.
+
+    Args:
+        driver (str): The name of the connection driver.
+
+    Returns:
+        str: The corresponding file type for the driver.
+
+    """
+    _legacy = {'FileInputDriver': 'binary',
+               'FileOutputDriver': 'binary',
+               'AsciiMapInputDriver': 'map',
+               'AsciiMapOutputDriver': 'map',
+               'AsciiFileInputDriver': 'ascii',
+               'AsciiFileOutputDriver': 'ascii',
+               'AsciiTableInputDriver': 'table',
+               'AsciiTableOutputDriver': 'table',
+               'PandasFileInputDriver': 'pandas',
+               'PandasFileOutputDriver': 'pandas',
+               'PickleFileInputDriver': 'pickle',
+               'PickleFileOutputDriver': 'pickle',
+               'PlyFileInputDriver': 'ply',
+               'PlyFileOutputDriver': 'ply',
+               'ObjFileInputDriver': 'obj',
+               'ObjFileOutputDriver': 'obj',
+               'MatInputDriver': 'mat',
+               'MatOutputDriver': 'mat'}
+    if driver in _legacy:
+        return _legacy[driver]
+    raise ValueError("%s is not a registered connection driver." % driver)
+
+
+def migrate_keys(from_dict, to_dict, exclude_key_list=None, include_key_list=None):
+    r"""Migrate keys from one component to another that are not in a list
+    of predefined keys.
+
+    Args:
+         from_dict (dict): Component dictionary to migrate keys from.
+         to_dict (list): List of component dictionaries to migrate keys to. If
+             this is an empty list, keys will not be migrated.
+         exclude_key_list (list, optional): List of keys in from_dict that
+             should not be migrated to to_dict. All keys in include_key_list
+             that are not in this list are moved. Defaults to None and no keys
+             are excluded.
+         include_key_list (list, optional): List of keys that should be migrated
+             from from_dict to to_dict dictionaries. If not provided, all keys
+             in from_dict that are not in exclude_key_list are moved. Defaults
+             to None and all keys in from_dict are included.
+
+    """
+    assert(isinstance(to_dict, list))
+    if len(to_dict) == 0:
+        return
+    if exclude_key_list is None:
+        exclude_key_list = []
+    if include_key_list is None:
+        include_key_list = list(from_dict.keys())
+    for k in include_key_list:
+        if (k not in from_dict) or (k in exclude_key_list):
+            continue
+        v = from_dict.pop(k)
+        for d in to_dict:
+            d.setdefault(k, v)
+
+
+def backward_compat_model_io(io, instance, iodict, model):
+    if not iodict['backward']:
+        return instance
+    # Match deprecated driver options
+    if ('driver' in instance) and ('args' in instance):
+        instance['working_dir'] = model['working_dir']
+        opp_map = {'input': 'output', 'output': 'input'}
+        for i, (opp_arg, opp_name) in enumerate(iodict[f'{opp_map[io]}_drivers']):
+            if instance['args'] == opp_arg:
+                if io == 'input':
+                    iodict['pairs'].append(
+                        (iodict[f'{opp_map[io]}_drivers'].pop(i)[1],
+                         instance['name']))
+                else:  # pragma: debug
+                    # This won't be called because inputs are processed first
+                    # but this code is here for symmetries sake
+                    iodict['pairs'].append(
+                        (instance['name'],
+                         iodict[f'{opp_map[io]}_drivers'].pop(i)[1]))
+                break
+        else:
+            iodict[f'{io}_drivers'].append((instance['args'], instance['name']))
+    return instance
+
+
+def backward_compat_models(instance, iodict):
+    if not iodict['backward']:
+        return instance
+    if ('language' not in instance) and ('driver' in instance):
+        # TODO: Fix this properly, checking the extension to
+        # distinguish between C and C++
+        driver = instance['driver']
+        if driver == 'GCCModelDriver':
+            args_ext = os.path.splitext(instance['args'][0])[-1]
+            instance['language'] = constants.EXT2LANG[args_ext]
+        else:
+            for k, v in constants.COMPONENT_REGISTRY['model'].subtypes.items():
+                if driver == v:
+                    instance['language'] = k
+                    break
+            else:
+                raise YAMLSpecificationError('Invalid driver \'{driver}\'.')
+    return instance
+    
+
+def backward_compat_connections(instance, iodict):
+    if not iodict['backward']:
+        return instance
+    files = [x for x in instance['inputs'] if 'filetype' in x]
+    files += [x for x in instance['outputs'] if 'filetype' in x]
+    # Replace old read/write methd with filetype
+    for k in ['read_meth', 'write_meth']:
+        val = instance.pop(k, None)
+        if val is None:
+            continue
+        ftype = rwmeth2filetype(val)
+        if files:
+            for x in files:
+                if x['filetype'] == 'binary':
+                    x.update(ftype)
+        else:
+            raise YAMLSpecificationError("Deprecated connection parameters "
+                                         "'write_meth' and 'read_meth' are "
+                                         "only valid for connections to files.")
+    return instance
+
+
+def backward_compat(instance, iodict):
+    r"""Normalize a yggdrasil input file for use with backward compatible
+    features after it has been normalized via rapidjson.
+
+    Args:
+        instance (dict): JSON document pre-normalized via rapidjson.
+        iodict (dict): Utility dictionary tracking processed elements.
+
+    Returns:
+        dict: Backward compatible instance.
+
+    """
+    if not iodict['backward']:
+        return instance
+    new_connections = []
+    # Create direct connections from output to input
+    for (oname, iname) in iodict['pairs']:
+        oyml = iodict['output'][oname]
+        iyml = iodict['input'][iname]
+        conn = dict(inputs=[{'name': oname}], outputs=[{'name': iname}])
+        new_connections.append(([oyml, iyml], conn))
+        oyml['commtype'] = cdriver2commtype(oyml['driver'])
+        iyml['commtype'] = cdriver2commtype(iyml['driver'])
+        oyml.pop('working_dir', None)
+        iyml.pop('working_dir', None)
+    # File input
+    for k, v in iodict['input_drivers']:
+        iyml = iodict['input'][v]
+        fyml = dict(name=k, filetype=cdriver2filetype(iyml['driver']),
+                    working_dir=iyml['working_dir'])
+        if iyml.get('as_array', False):
+            # TODO: This should not be an exception
+            fyml['as_array'] = True
+        conn = dict(inputs=[fyml], outputs=[{'name': v}],
+                    working_dir=iyml['working_dir'])
+        iyml.pop('commtype', None)
+        new_connections.append(([iyml], conn))
+    # File output
+    for k, v in iodict['output_drivers']:
+        oyml = iodict['output'][v]
+        fyml = dict(name=k, filetype=cdriver2filetype(oyml['driver']),
+                    working_dir=oyml['working_dir'])
+        if oyml.get('as_array', False):
+            # TODO: This should not be an exception
+            fyml['as_array'] = True
+        conn = dict(outputs=[fyml], inputs=[{'name': v}],
+                    working_dir=oyml['working_dir'])
+        oyml.pop('commtype', None)
+        new_connections.append(([oyml], conn))
+    # Transfer keyword arguments from input/output to connection
+    for ymls, conn in new_connections:
+        for y in ymls:
+            del y['driver'], y['args']
+        instance['connections'].append(conn)
+    # Empty registry of orphan input/output drivers
+    for k in ['input_drivers', 'output_drivers', 'pairs']:
+        iodict[k] = []
+    return instance

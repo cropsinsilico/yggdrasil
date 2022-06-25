@@ -1,5 +1,5 @@
 import pytest
-from yggdrasil.metaschema import properties, get_metaschema, _base_validator
+from yggdrasil.metaschema import properties, get_metaschema
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 
@@ -8,14 +8,6 @@ non_existant = 'invalid_xyz123'
 existing_class = list(existing.keys())[0]
 existing_validator = non_existant
 assert(non_existant not in existing)
-assert(non_existant not in _base_validator.VALIDATORS)
-for k, v in _base_validator.VALIDATORS.items():
-    if k not in existing:
-        existing_validator = k
-        break
-else:  # pragma: debug
-    # Not sure how this would happen, but guarantee it dosn't do it silently
-    raise Exception('Could not locate unregistered jsonschema property.')
 
 
 def test_register_metaschema_property():

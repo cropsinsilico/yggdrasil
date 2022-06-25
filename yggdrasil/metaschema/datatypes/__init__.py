@@ -21,7 +21,8 @@ def import_schema_types():
     for f in schema_files:
         names.append(add_type_from_schema(f))
     # TODO: Need to make sure metaschema updated if it was already loaded
-    from yggdrasil.metaschema import _metaschema
+    from yggdrasil.metaschema import get_metaschema
+    _metaschema = get_metaschema()
     if _metaschema is not None:
         reload_ygg = False
         curr = _metaschema
@@ -69,12 +70,6 @@ def register_type(type_class):
     type_name = type_class.name
     if _type_registry.has_entry(type_name):
         raise ValueError("Type '%s' already registered." % type_name)
-    # Check properties
-    for p in type_class.properties:
-        prop_class = get_metaschema_property(p)
-        if prop_class.name != p:
-            raise ValueError("Type '%s' has unregistered property '%s'."
-                             % (type_name, p))
     # Update property class with this type's info
     for p in type_class.properties:
         prop_class = get_metaschema_property(p)
@@ -313,8 +308,7 @@ def guess_type_from_obj(obj):
         ValueError: If a type class cannot be determined.
 
     """
-    type_encoder = get_metaschema_property('type')
-    x = type_encoder.encode(obj)
+    x = rapidjson.encode_schema(obj)['type']
     cls = get_type_class(x)
     return cls
 

@@ -192,7 +192,7 @@ static PyObject* units_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
     if (!PyArg_ParseTuple(args, "O:Units", &exprObject))
 	return NULL;
 
-    const char* exprStr;
+    const char* exprStr = 0;
     const UnitsObject* other;
 
     if (PyBytes_Check(exprObject)) {
@@ -238,6 +238,7 @@ static PyObject* units_str(PyObject* self) {
 static PyObject* units_is_compatible(PyObject* self, PyObject* args, PyObject* kwargs) {
     PyObject* otherObject;
     const UnitsObject* other;
+    bool created = false;
     
     if (!PyArg_ParseTuple(args, "O", &otherObject))
 	return NULL;
@@ -245,12 +246,16 @@ static PyObject* units_is_compatible(PyObject* self, PyObject* args, PyObject* k
     if (PyObject_IsInstance(otherObject, (PyObject*)&Units_Type)) {
 	other = (UnitsObject*)otherObject;
     } else {
-        PyErr_SetString(PyExc_TypeError, "Expected a units instance");
-        return NULL;
+	other = (UnitsObject*)PyObject_Call((PyObject*)&Units_Type, args, NULL);
+	created = true;
     }
+    if (other == NULL)
+        return NULL;
     
     UnitsObject* v = (UnitsObject*) self;
     bool result = v->units->is_compatible(*other->units);
+    if (created)
+	Py_DECREF(other);
     if (result)
 	return Py_True;
     return Py_False;
@@ -699,8 +704,10 @@ static PyObject* quantity_units_get(PyObject* self, void*) {
     if (vu == NULL)
         return NULL;
     vu->units = new Units();
+    bool vEmpty = false;
+    SWITCH_QUANTITY_SUBTYPE(v, vEmpty = , ->units().is_empty());
     SWITCH_QUANTITY_SUBTYPE(v, *(vu->units) = , ->units());
-    if (vu->units->is_empty()) {
+    if (!vEmpty && vu->units->is_empty()) {
 	PyObject* error = Py_BuildValue("s", "Failed to parse units.");
 	PyErr_SetObject(units_error, error);
 	Py_XDECREF(error);
@@ -763,14 +770,18 @@ static int quantity_value_set(PyObject* self, PyObject* value, void*) {
 static PyObject* quantity_is_compatible(PyObject* self, PyObject* args, PyObject* kwargs) {
     PyObject* otherObject;
     const UnitsObject* other;
+    bool created = false;
     
     if (!PyArg_ParseTuple(args, "O", &otherObject))
 	return NULL;
 
     if (PyObject_IsInstance(otherObject, (PyObject*)&Quantity_Type)) {
 	other = (UnitsObject*)quantity_units_get(otherObject, NULL);
+    } else if (PyObject_IsInstance(otherObject, (PyObject*)&Units_Type)) {
+	other = (UnitsObject*)otherObject;
     } else {
 	other = (UnitsObject*)PyObject_Call((PyObject*)&Units_Type, args, NULL);
+	created = true;
     }
     if (other == NULL)
         return NULL;
@@ -778,7 +789,8 @@ static PyObject* quantity_is_compatible(PyObject* self, PyObject* args, PyObject
     QuantityObject* v = (QuantityObject*) self;
     bool result = false;
     SWITCH_QUANTITY_SUBTYPE(v, result = , ->is_compatible(*other->units));
-    Py_DECREF(other);
+    if (created)
+	Py_DECREF(other);
     if (result)
 	return Py_True;
     return Py_False;
@@ -1428,8 +1440,10 @@ static PyObject* quantity_array_units_get(PyObject* self, void*) {
     if (vu == NULL)
         return NULL;
     vu->units = new Units();
+    bool vEmpty = false;
+    SWITCH_QUANTITY_SUBTYPE(v, vEmpty = , ->units().is_empty());
     SWITCH_QUANTITY_ARRAY_SUBTYPE(v, *(vu->units) = , ->units());
-    if (vu->units->is_empty()) {
+    if (!vEmpty && vu->units->is_empty()) {
 	PyObject* error = Py_BuildValue("s", "Failed to parse units.");
 	PyErr_SetObject(units_error, error);
 	Py_XDECREF(error);
@@ -1521,14 +1535,18 @@ static int quantity_array_value_set(PyObject* self, PyObject* value, void*) {
 static PyObject* quantity_array_is_compatible(PyObject* self, PyObject* args, PyObject* kwargs) {
     PyObject* otherObject;
     const UnitsObject* other;
+    bool created = false;
     
     if (!PyArg_ParseTuple(args, "O", &otherObject))
 	return NULL;
 
     if (PyObject_IsInstance(otherObject, (PyObject*)&QuantityArray_Type)) {
 	other = (UnitsObject*)quantity_array_units_get(otherObject, NULL);
+    } else if (PyObject_IsInstance(otherObject, (PyObject*)&Units_Type)) {
+	other = (UnitsObject*)otherObject;
     } else {
 	other = (UnitsObject*)PyObject_Call((PyObject*)&Units_Type, args, NULL);
+	created = true;
     }
     if (other == NULL)
         return NULL;
@@ -1536,7 +1554,8 @@ static PyObject* quantity_array_is_compatible(PyObject* self, PyObject* args, Py
     QuantityArrayObject* v = (QuantityArrayObject*) self;
     bool result = false;
     SWITCH_QUANTITY_ARRAY_SUBTYPE(v, result = , ->is_compatible(*other->units));
-    Py_DECREF(other);
+    if (created)
+	Py_DECREF(other);
     if (result) {
 	Py_INCREF(Py_True);
 	return Py_True;

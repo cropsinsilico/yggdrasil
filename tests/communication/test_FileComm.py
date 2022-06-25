@@ -1,7 +1,6 @@
 import pytest
 import os
-import jsonschema
-from yggdrasil import schema
+from yggdrasil import schema, rapidjson
 from yggdrasil.communication import new_comm
 from tests.communication.test_CommBase import TestComm as base_class
 
@@ -165,7 +164,7 @@ class TestFileComm(base_class):
         kws = self.get_send_comm_kwargs(
             commtype, use_async, testing_options, read_meth='invalid',
             skip_component_schema_normalization=False)
-        with pytest.raises(jsonschema.ValidationError):
+        with pytest.raises(rapidjson.ValidationError):
             new_comm(name, **kws)
 
     def test_append(self, uuid, commtype, use_async, testing_options,

@@ -1,7 +1,6 @@
 import pytest
 import copy
-import jsonschema
-from yggdrasil import constants
+from yggdrasil import constants, rapidjson
 from yggdrasil.metaschema import MetaschemaTypeError
 from tests import TestClassBase as base_class
 
@@ -161,14 +160,12 @@ class TestMetaschemaType(base_class):
     def test_definition_schema(self, python_class):
         r"""Test definition schema."""
         s = python_class.definition_schema()
-        # jsonschema.Draft3Validator.check_schema(s)
-        jsonschema.Draft4Validator.check_schema(s)
+        rapidjson.Validator.check_schema(s, json_standard=True)
 
     def test_metadata_schema(self, python_class):
         r"""Test metadata schema."""
         s = python_class.metadata_schema()
-        # jsonschema.Draft3Validator.check_schema(s)
-        jsonschema.Draft4Validator.check_schema(s)
+        rapidjson.Validator.check_schema(s, json_standard=True)
 
     def test_encode_data(self, python_class, valid_decoded, typedef,
                          encode_type_kwargs, encode_data_kwargs,
@@ -247,15 +244,13 @@ class TestMetaschemaType(base_class):
                     python_class.encode(invalid_validate[0], typedef)
         else:
             if invalid_validate:
-                with pytest.raises((ValueError,
-                                    jsonschema.exceptions.ValidationError)):
+                with pytest.raises((ValueError, rapidjson.ValidationError)):
                     python_class.encode(invalid_validate[0], typedef)
 
     def test_decode_errors(self, python_class, invalid_encoded, typedef):
         r"""Test error on decode."""
         if invalid_encoded:
-            with pytest.raises((ValueError,
-                                jsonschema.exceptions.ValidationError)):
+            with pytest.raises((ValueError, rapidjson.ValidationError)):
                 python_class.decode(invalid_encoded[0], typedef)
 
     def test_transform_type(self, python_class, compatible_objects,

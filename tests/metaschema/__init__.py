@@ -1,10 +1,5 @@
 import pytest
-import os
-import pprint
 import numpy as np
-import shutil
-import tempfile
-import warnings
 from yggdrasil import metaschema, constants
 from yggdrasil.metaschema.datatypes.FunctionMetaschemaType import example_func
 
@@ -76,48 +71,6 @@ _normalize_objects = [
     ({'type': 'schema'}, {'units': 'g'},
      {'type': 'scalar', 'units': 'g', 'subtype': 'float', 'precision': int(64)}),
     ({'type': 'any', 'temptype': {'type': 'float'}}, '1', float(1))]
-
-
-def test_create_metaschema():
-    r"""Test errors in create_metaschema."""
-    assert(metaschema.get_metaschema())
-    with pytest.raises(RuntimeError):
-        metaschema.create_metaschema(overwrite=False)
-
-
-def test_get_metaschema():
-    r"""Test get_metaschema and ensure the metaschema is current."""
-    temp = os.path.join(tempfile.gettempdir(), metaschema._metaschema_fbase)
-    old_metaschema = metaschema.get_metaschema()
-    try:
-        shutil.move(metaschema._metaschema_fname, temp)
-        metaschema._metaschema = None
-        new_metaschema = metaschema.get_metaschema()
-        new_id = new_metaschema.get('$id', new_metaschema.get('id', None))
-        old_id = old_metaschema.get('$id', old_metaschema.get('id', None))
-        assert(new_id is not None)
-        assert(old_id is not None)
-        if new_id != old_id:  # pragma: debug
-            warnings.warn(("The locally generated metaschema would have a different "
-                           "id than the default (%s vs. %s). Check that your "
-                           "installation of jsonschema is up to date.") % (
-                               new_id, old_id))
-        else:
-            try:
-                assert(new_metaschema == old_metaschema)
-            except AssertionError:  # pragma: debug
-                print("Old:\n%s" % pprint.pformat(old_metaschema))
-                print("New:\n%s" % pprint.pformat(new_metaschema))
-                raise
-    except BaseException:  # pragma: debug
-        shutil.move(temp, metaschema._metaschema_fname)
-        raise
-    shutil.move(temp, metaschema._metaschema_fname)
-
-
-def test_get_validator():
-    r"""Test get_validator."""
-    metaschema.get_validator()
 
 
 def test_validate_instance():

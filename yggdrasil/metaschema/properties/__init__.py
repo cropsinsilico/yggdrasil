@@ -22,16 +22,10 @@ def register_metaschema_property(prop_class):
             metaschema.
 
     """
-    from yggdrasil.metaschema import _metaschema
     global _metaschema_properties
     prop_name = prop_class.name
     if _metaschema_properties.has_entry(prop_name):
         raise ValueError("Property '%s' already registered." % prop_name)
-    # Check metaschema if it exists
-    if _metaschema is not None:
-        if prop_name not in _metaschema['properties']:
-            raise ValueError("Property '%s' not in pre-loaded metaschema." % prop_name)
-    _metaschema_properties[prop_name] = prop_class
     return prop_class
 
 

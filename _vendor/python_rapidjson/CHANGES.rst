@@ -1,6 +1,28 @@
 Changes
 -------
 
+1.8 (2022-07-07)
+~~~~~~~~~~~~~~~~
+
+* Fix `problem on macOS`__ explicitly requiring C++11, thanks to agate-pris (`issue
+  #166`__)
+
+  __ https://github.com/Tencent/rapidjson/commit/9965ab37f6cfae3d58a0a6e34c76112866ace0b1#commitcomment-77875054
+  __ https://github.com/python-rapidjson/python-rapidjson/issues/166
+
+
+1.7 (2022-07-06)
+~~~~~~~~~~~~~~~~
+
+* Use `current master`__ version of rapidjson
+
+  __ https://github.com/Tencent/rapidjson/commit/232389d4f1012dddec4ef84861face2d2ba85709
+
+* Update the test suite to work on Pyston, thanks to Kevin Modzelewski (`PR #161`__)
+
+  __ https://github.com/python-rapidjson/python-rapidjson/pull/161
+
+
 1.6 (2022-02-19)
 ~~~~~~~~~~~~~~~~
 

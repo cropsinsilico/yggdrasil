@@ -4,8 +4,7 @@ import os
 import yaml
 import flaky
 import io as sio
-from jsonschema.exceptions import ValidationError
-from yggdrasil import yamlfile
+from yggdrasil import yamlfile, rapidjson
 from yaml.constructor import ConstructorError
 from tests import TestBase as base_class
 _yaml_env = 'TEST_YAML_FILE'
@@ -22,6 +21,8 @@ def test_load_yaml():
     fname = os.path.join(cwd, 'test_load_yaml.yml')
     dict_write = {'test': 'hello'}
     dict_read = {'test': 'hello',
+                 'models': [],
+                 'connections': [],
                  'working_dir': cwd}
     contents = yaml.dump(dict_write)
     with open(fname, 'w') as fd:
@@ -52,12 +53,16 @@ def test_load_yaml_error():
         yamlfile.load_yaml('invalid')
 
 
-def test_parse_component_error():
-    r"""Test errors in parse_component."""
-    with pytest.raises(yamlfile.YAMLSpecificationError):
-        yamlfile.parse_component(1, 'invalid', 'invalid')
-    with pytest.raises(yamlfile.YAMLSpecificationError):
-        yamlfile.parse_component({}, 'invalid', 'invalid')
+def test_cdriver2filetype_error():
+    r"""Test errors in cdriver2filetype."""
+    with pytest.raises(ValueError):
+        yamlfile.cdriver2filetype('invalid')
+
+
+def test_cdriver2commtype_error():
+    r"""Test error when invalid driver supplied."""
+    with pytest.raises(ValueError):
+        yamlfile.cdriver2commtype('invalid')
 
 
 @flaky.flaky(max_runs=3)
@@ -67,9 +72,9 @@ def test_load_yaml_git():
     yml = "https://github.com/cropsinsilico/example-fakemodel/fakemodel.yml"
     with pytest.raises(Exception):
         yamlfile.load_yaml(yml)
-    assert('model' in yamlfile.load_yaml('git:' + yml))
+    assert('models' in yamlfile.load_yaml('git:' + yml))
     yml = "cropsinsilico/example-fakemodel/fakemodel.yml"
-    assert('model' in yamlfile.load_yaml('git:' + yml))
+    assert('models' in yamlfile.load_yaml('git:' + yml))
     git.rmtree("cropsinsilico")
     
 
@@ -781,7 +786,7 @@ class TestYamlServerDictNoOutput(YamlTestBaseError):
 
 class TestYamlComponentError(YamlTestBaseError):
     r"""Test error for non-dictionary component."""
-    _error = ValidationError
+    _error = rapidjson.NormalizationError
     _contents = (['models: error'],)
 
 
@@ -865,7 +870,7 @@ class TestYamlConnectionError_forkin(YamlTestBaseError):
 
 class TestYamlConnectionError_readmeth(YamlTestBaseError):
     r"""Test error when read_meth is specified for non-file."""
-    _error = ValidationError
+    _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -887,7 +892,7 @@ class TestYamlConnectionError_readmeth(YamlTestBaseError):
 
 class TestYamlConnectionError_writemeth(YamlTestBaseError):
     r"""Test error when write_meth is specified for non-file."""
-    _error = ValidationError
+    _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -909,7 +914,7 @@ class TestYamlConnectionError_writemeth(YamlTestBaseError):
 
 class TestYamlMissingModelArgsError(YamlTestBaseError):
     r"""Test error when there is a missing arguments to a model."""
-    _error = ValidationError
+    _error = rapidjson.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    inputs:',
@@ -920,7 +925,7 @@ class TestYamlMissingModelArgsError(YamlTestBaseError):
 
 class TestYamlMissingIOArgsError_input(YamlTestBaseError):
     r"""Test error when there is a missing arguments to an input driver."""
-    _error = ValidationError
+    _error = rapidjson.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -932,7 +937,7 @@ class TestYamlMissingIOArgsError_input(YamlTestBaseError):
 
 class TestYamlMissingIOArgsError_output(YamlTestBaseError):
     r"""Test error when there is a missing arguments to an output driver."""
-    _error = ValidationError
+    _error = rapidjson.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -944,7 +949,7 @@ class TestYamlMissingIOArgsError_output(YamlTestBaseError):
 
 class TestYamlMissingConnArgsError(YamlTestBaseError):
     r"""Test error when there is a missing arguments to a connection."""
-    _error = ValidationError
+    _error = rapidjson.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -964,7 +969,7 @@ class TestYamlMissingConnArgsError(YamlTestBaseError):
 
 class TestYamlMissingConnInputError(YamlTestBaseError):
     r"""Test error when there is no model output matching connection input."""
-    _error = RuntimeError
+    _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -983,7 +988,7 @@ class TestYamlMissingConnInputError(YamlTestBaseError):
 
 class TestYamlMissingConnInputFileError(YamlTestBaseError):
     r"""Test error when there is no file for missing connection input."""
-    _error = ValidationError
+    _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -1000,7 +1005,7 @@ class TestYamlMissingConnInputFileError(YamlTestBaseError):
 
 class TestYamlMissingConnIOError(YamlTestBaseError):
     r"""Test error when there is no model input/output matching connection."""
-    _error = ValidationError
+    _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -1013,7 +1018,7 @@ class TestYamlMissingConnIOError(YamlTestBaseError):
 
 class TestYamlConnectionInputFileReadMethError(YamlTestBaseError):
     r"""Test error for invalid read_meth."""
-    _error = ValidationError
+    _error = rapidjson.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -1033,7 +1038,7 @@ class TestYamlConnectionInputFileReadMethError(YamlTestBaseError):
 
 class TestYamlConnectionInputFileWriteMethError(YamlTestBaseError):
     r"""Test error for invalid write_meth."""
-    _error = ValidationError
+    _error = rapidjson.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',

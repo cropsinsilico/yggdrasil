@@ -41,10 +41,7 @@ def get_metaschema():
               all of the necessary modules have been loaded.
 
     """
-    global _metaschema
-    if (_metaschema is None):
-        _metaschema = create_metaschema()
-    return copy.deepcopy(_metaschema)
+    return copy.deepcopy(create_metaschema())
 
 
 def get_validator(overwrite=False, normalizers=None, **kwargs):
@@ -60,11 +57,7 @@ def get_validator(overwrite=False, normalizers=None, **kwargs):
         yggdrasil.rapidjson.Normalizer: JSON schema normalizer.
 
     """
-    # from yggdrasil.metaschema import normalizer
-    global _validator
-    if (_validator is None) or overwrite:
-        _validator = rapidjson.Normalizer
-    return _validator
+    return rapidjson.Normalizer
 
 
 def validate_schema(obj):
@@ -95,17 +88,15 @@ def validate_instance(obj, schema, **kwargs):
     """
     cls = get_validator()
     cls.check_schema(schema)
-    print('validate_instance', kwargs)
     return cls(schema).validate(obj)
 
 
-def normalize_instance(obj, schema, **kwargs):
+def normalize_instance(obj, schema):
     r"""Normalize an object using the provided schema.
 
     Args:
         obj (object): Object to be normalized using the provided schema.
         schema (dict): Schema to use to normalize the provided object.
-        **kwargs: Additional keyword arguments are passed to normalize.
     
     Returns:
         object: Normalized instance.
@@ -113,7 +104,6 @@ def normalize_instance(obj, schema, **kwargs):
     """
     cls = get_validator()
     cls.check_schema(schema)
-    print('normalize_instance', kwargs)
     return cls(schema).normalize(obj)
 
 
