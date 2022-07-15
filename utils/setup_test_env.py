@@ -783,22 +783,22 @@ def install_deps(method, return_commands=False, verbose=False,
         ]
     if fallback_to_conda:
         cmds.append("%s update --all" % CONDA_CMD)
-    if install_opts['R'] and (not fallback_to_conda) and (not only_python):
-        # TODO: Test split installation where r-base is installed from
-        # conda and the R dependencies are installed from CRAN?
-        if _is_linux:
-            if install_opts['no_sudo']:
-                cmds += [
-                    ("add-apt-repository 'deb https://cloud"
-                     ".r-project.org/bin/linux/ubuntu xenial-cran35/'"),
-                    ("apt-key adv --keyserver keyserver.ubuntu.com "
-                     "--recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9")]
-            else:
-                cmds += [
-                    ("sudo add-apt-repository 'deb https://cloud"
-                     ".r-project.org/bin/linux/ubuntu xenial-cran35/'"),
-                    ("sudo apt-key adv --keyserver keyserver.ubuntu.com "
-                     "--recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9")]
+    # if install_opts['R'] and (not fallback_to_conda) and (not only_python):
+    #     # TODO: Test split installation where r-base is installed from
+    #     # conda and the R dependencies are installed from CRAN?
+    #     if _is_linux:
+    #         if install_opts['no_sudo']:
+    #             cmds += [
+    #                 ("add-apt-repository 'deb https://cloud"
+    #                  ".r-project.org/bin/linux/ubuntu xenial-cran35/'"),
+    #                 ("apt-key adv --keyserver keyserver.ubuntu.com "
+    #                  "--recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9")]
+    #         else:
+    #             cmds += [
+    #                 ("sudo add-apt-repository 'deb https://cloud"
+    #                  ".r-project.org/bin/linux/ubuntu xenial-cran35/'"),
+    #                 ("sudo apt-key adv --keyserver keyserver.ubuntu.com "
+    #                  "--recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9")]
     # if install_opts['zmq'] and (not fallback_to_conda):
     #     cmds.append("echo Installing ZeroMQ...")
     #     if _is_linux:

@@ -1,0 +1,12 @@
+-   repo: https://github.com/pycqa/flake8
+    rev: '4.0.1'
+    hooks:
+    -   id: flake8
+-   repo: local
+    hooks:
+    -   id: generate-workflow
+        name: generate-workflow
+        entry: python -c "from yggdrasil.command_line import githook; import sys; sys.exit(githook())"
+        language: system
+        types: [file]
+        files: test\-install\-base\.yml
