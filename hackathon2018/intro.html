@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Introduction &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -30,7 +31,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -114,22 +115,22 @@
            <div itemprop="articleBody">
              
   <section id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h1>
 <section id="parallel-processing">
-<h2>Parallel Processing<a class="headerlink" href="#parallel-processing" title="Permalink to this headline">¶</a></h2>
+<h2>Parallel Processing<a class="headerlink" href="#parallel-processing" title="Permalink to this heading">¶</a></h2>
 <img alt="../_images/intro_parallel.png" src="../_images/intro_parallel.png" />
 </section>
 <section id="communication">
-<h2>Communication<a class="headerlink" href="#communication" title="Permalink to this headline">¶</a></h2>
+<h2>Communication<a class="headerlink" href="#communication" title="Permalink to this heading">¶</a></h2>
 <img alt="../_images/intro_communication.png" src="../_images/intro_communication.png" />
 </section>
 <section id="model-api">
-<h2>Model API<a class="headerlink" href="#model-api" title="Permalink to this headline">¶</a></h2>
+<h2>Model API<a class="headerlink" href="#model-api" title="Permalink to this heading">¶</a></h2>
 <p>The API classes/functions in each language provide the models
 with methods of sending and receiving messages to and from files and other
 models.</p>
 <section id="python-api">
-<h3>Python API<a class="headerlink" href="#python-api" title="Permalink to this headline">¶</a></h3>
+<h3>Python API<a class="headerlink" href="#python-api" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
 
 <span class="nb">input</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;input_name&#39;</span><span class="p">)</span>
@@ -141,7 +142,7 @@ models.</p>
 </div>
 </section>
 <section id="matlab-api">
-<h3>Matlab API<a class="headerlink" href="#matlab-api" title="Permalink to this headline">¶</a></h3>
+<h3>Matlab API<a class="headerlink" href="#matlab-api" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">input</span> <span class="o">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s1">&#39;YggInput&#39;</span><span class="p">,</span> <span class="s1">&#39;input_name&#39;</span><span class="p">);</span>
 <span class="n">output</span> <span class="o">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s1">&#39;YggOutput&#39;</span><span class="p">,</span> <span class="s1">&#39;output_name&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%f</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">);</span>
 
@@ -151,7 +152,7 @@ models.</p>
 </div>
 </section>
 <section id="c-api">
-<h3>C API<a class="headerlink" href="#c-api" title="Permalink to this headline">¶</a></h3>
+<h3>C API<a class="headerlink" href="#c-api" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &quot;YggInterface.h&quot;</span>
 
 <span class="n">yggInput_t</span> <span class="nb">input</span> <span class="o">=</span> <span class="n">yggInput</span><span class="p">(</span><span class="s2">&quot;input_name&quot;</span><span class="p">);</span>
@@ -166,7 +167,7 @@ models.</p>
 </div>
 </section>
 <section id="id1">
-<h3>C++ API<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<h3>C++ API<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &quot;YggInterface.hpp&quot;</span>
 
 <span class="n">YggInput</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;input_name&quot;</span><span class="p">);</span>

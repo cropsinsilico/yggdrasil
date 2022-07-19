@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Installation &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -30,7 +31,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -115,9 +116,9 @@
            <div itemprop="articleBody">
              
   <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h1>
 <section id="first-steps-with-windows">
-<h2>First Steps with Windows<a class="headerlink" href="#first-steps-with-windows" title="Permalink to this headline">¶</a></h2>
+<h2>First Steps with Windows<a class="headerlink" href="#first-steps-with-windows" title="Permalink to this heading">¶</a></h2>
 <p>If you are running Windows, you will first need to install Microsoft
 Visual Studio. If you do not already have a copy, the free community
 edition will work and can be downloaded
@@ -126,7 +127,7 @@ can be installed in parallel with conda, just be sure to finish installing
 VS before moving on to installing yggdrasil.</p>
 </section>
 <section id="setting-up-your-conda-environment">
-<h2>Setting up your Conda environment<a class="headerlink" href="#setting-up-your-conda-environment" title="Permalink to this headline">¶</a></h2>
+<h2>Setting up your Conda environment<a class="headerlink" href="#setting-up-your-conda-environment" title="Permalink to this heading">¶</a></h2>
 <p>For the purpose of the hackathon, we recommend using a conda environment
 with Python 3.6 installed. Conda allows you to have multile development
 environments with different versions of Python and/or software packages
@@ -156,7 +157,7 @@ prompt:</p>
 </div>
 </section>
 <section id="installing-yggdrasil">
-<h2>Installing yggdrasil<a class="headerlink" href="#installing-yggdrasil" title="Permalink to this headline">¶</a></h2>
+<h2>Installing yggdrasil<a class="headerlink" href="#installing-yggdrasil" title="Permalink to this heading">¶</a></h2>
 <p>Directions for installing the yggdrasil package and its dependencies
 can be found <a class="reference internal" href="../install.html#install-rst"><span class="std std-ref">here</span></a>. We recommend installing via
 conda and/or pip for the purpose of the hackathon via:</p>
@@ -175,7 +176,7 @@ it does not, you can try one of the steps listed
 <a class="reference external" href="https://www.anaconda.com/understanding-and-improving-condas-performance/">here</a>.</p>
 </section>
 <section id="get-hackathon-materials">
-<h2>Get Hackathon Materials<a class="headerlink" href="#get-hackathon-materials" title="Permalink to this headline">¶</a></h2>
+<h2>Get Hackathon Materials<a class="headerlink" href="#get-hackathon-materials" title="Permalink to this heading">¶</a></h2>
 <p>To get started, we will walk through transforming an example model and
 connecting it to other models. To make sure we are all on the same page,
 create a <code class="docutils literal notranslate"><span class="pre">ygg_home</span></code> directory somewhere that you will remember and can
@@ -191,7 +192,7 @@ in a git repository on GitHub called
 <a class="reference external" href="https://github.com/cropsinsilico/hackathon2019">hackathon2019</a>.</p>
 <img alt="../_images/setup_github1.png" src="../_images/setup_github1.png" />
 <section id="using-git">
-<h3>Using Git<a class="headerlink" href="#using-git" title="Permalink to this headline">¶</a></h3>
+<h3>Using Git<a class="headerlink" href="#using-git" title="Permalink to this heading">¶</a></h3>
 <p>If you have a GitHub account, are familiar with git, and would like to
 save changes you make to the hackathon materials for future reference,
 you can fork the hackathon2019 repository (Fork button in the upper right)</p>
@@ -202,7 +203,7 @@ you can fork the hackathon2019 repository (Fork button in the upper right)</p>
 </div>
 </section>
 <section id="via-download">
-<h3>Via Download<a class="headerlink" href="#via-download" title="Permalink to this headline">¶</a></h3>
+<h3>Via Download<a class="headerlink" href="#via-download" title="Permalink to this heading">¶</a></h3>
 <p>If you don’t have a GitHub account or don’t know git, you can download the
 repository as a .zip or .tar.gz archive from the GitHub page by clicking
 <cite>Download ZIP</cite> in the box that drops down when you click the green
@@ -213,7 +214,7 @@ repository as a .zip or .tar.gz archive from the GitHub page by clicking
 <p>Once downloaded, extract the repository into the <code class="docutils literal notranslate"><span class="pre">ygg_home</span></code> directory.</p>
 </section>
 <section id="running-tests">
-<h3>Running Tests<a class="headerlink" href="#running-tests" title="Permalink to this headline">¶</a></h3>
+<h3>Running Tests<a class="headerlink" href="#running-tests" title="Permalink to this heading">¶</a></h3>
 <p>From the <code class="docutils literal notranslate"><span class="pre">hackathon2019</span></code> directory, run the tests to ensure that everything
 is working:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd hackathon2019

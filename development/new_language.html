@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Adding Support for a New Language &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Adding Support for a New Language &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -30,7 +31,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -117,12 +118,12 @@
            <div itemprop="articleBody">
              
   <section id="adding-support-for-a-new-language">
-<h1>Adding Support for a New Language<a class="headerlink" href="#adding-support-for-a-new-language" title="Permalink to this headline">¶</a></h1>
+<h1>Adding Support for a New Language<a class="headerlink" href="#adding-support-for-a-new-language" title="Permalink to this heading">¶</a></h1>
 <p>The yggdrasil package has been redesigned to make adding support for a new language
 as easy as possible, but developers will need some Python programming knowledge and
 a descent familiarity with the language being added.</p>
 <section id="write-the-language-driver">
-<h2>Write the Language Driver<a class="headerlink" href="#write-the-language-driver" title="Permalink to this headline">¶</a></h2>
+<h2>Write the Language Driver<a class="headerlink" href="#write-the-language-driver" title="Permalink to this heading">¶</a></h2>
 <p>The first step in adding language support is to write a driver for the language.
 Model drivers take care of things like writting any necessary wrappers, compiling
 the code (if necessary), and running the code. Generally, new languages will fall
@@ -139,14 +140,14 @@ dependencies are installed.</p>
 <p>Model drivers should go in the <code class="docutils literal notranslate"><span class="pre">yggdrasil/drivers</span></code> directory and tests should
 go in the <code class="docutils literal notranslate"><span class="pre">yggdrasil/drivers/tests</span></code> directory.</p>
 <section id="interpreted-languages">
-<h3>Interpreted Languages<a class="headerlink" href="#interpreted-languages" title="Permalink to this headline">¶</a></h3>
+<h3>Interpreted Languages<a class="headerlink" href="#interpreted-languages" title="Permalink to this heading">¶</a></h3>
 <p>Additional class attributes specific to interpreted model drivers include:</p>
 </section>
 <section id="compiled-languages">
-<h3>Compiled Languages<a class="headerlink" href="#compiled-languages" title="Permalink to this headline">¶</a></h3>
+<h3>Compiled Languages<a class="headerlink" href="#compiled-languages" title="Permalink to this heading">¶</a></h3>
 <p>Additional class attributes specific to compiled model drivers include:</p>
 <section id="compilation-tools">
-<h4>Compilation Tools<a class="headerlink" href="#compilation-tools" title="Permalink to this headline">¶</a></h4>
+<h4>Compilation Tools<a class="headerlink" href="#compilation-tools" title="Permalink to this heading">¶</a></h4>
 <p>For compiled languages, yggdrasil allows multiple compilation tools to be defined for
 the same language, particularly when different tools are required on different
 operating systems. In these cases, developers should create classes for the
@@ -171,7 +172,7 @@ The behavior of the archiver is defined by these class attributes:</p>
 </section>
 </section>
 <section id="write-the-language-communication-interface">
-<h2>Write the Language Communication Interface<a class="headerlink" href="#write-the-language-communication-interface" title="Permalink to this headline">¶</a></h2>
+<h2>Write the Language Communication Interface<a class="headerlink" href="#write-the-language-communication-interface" title="Permalink to this heading">¶</a></h2>
 <p>The second phase of adding support for a new language is to write the language
 interface. This step is more involved than writing the model driver for the
 language, but the majority of the required development will be in the language
@@ -188,7 +189,7 @@ already supports (e.g. the R interface uses the
 call the Python interface from R). If such a tool exists, then the developers task is
 must easier.</p>
 <section id="from-an-interface-in-a-supported-language-recommnded">
-<h3>From an Interface in a Supported Language (Recommnded)<a class="headerlink" href="#from-an-interface-in-a-supported-language-recommnded" title="Permalink to this headline">¶</a></h3>
+<h3>From an Interface in a Supported Language (Recommnded)<a class="headerlink" href="#from-an-interface-in-a-supported-language-recommnded" title="Permalink to this heading">¶</a></h3>
 <p>If there is an existing tool for accessing code written in one of the supporting
 languages, the developer will use that tool to wrap the interface from the already
 supported language. Examples of this can be found in the Matlab and R interface
@@ -217,9 +218,9 @@ inconsistencies.</p></li>
 </ol>
 </section>
 <section id="from-scratch">
-<h3>From Scratch<a class="headerlink" href="#from-scratch" title="Permalink to this headline">¶</a></h3>
+<h3>From Scratch<a class="headerlink" href="#from-scratch" title="Permalink to this heading">¶</a></h3>
 <section id="create-comm-class-object">
-<h4>Create “Comm” Class/Object<a class="headerlink" href="#create-comm-class-object" title="Permalink to this headline">¶</a></h4>
+<h4>Create “Comm” Class/Object<a class="headerlink" href="#create-comm-class-object" title="Permalink to this heading">¶</a></h4>
 <p>For a language to added,
 there must be an interface to at least one of the supported communication
 mechanisms. Because it is widely supported in different programming languages,
@@ -235,7 +236,7 @@ handling output from the model. The exact content of the environment variable
 depends on the communication mechanisms as shown in the table below.</p>
 </section>
 <section id="required-methods-functions">
-<h4>Required Methods/Functions<a class="headerlink" href="#required-methods-functions" title="Permalink to this headline">¶</a></h4>
+<h4>Required Methods/Functions<a class="headerlink" href="#required-methods-functions" title="Permalink to this heading">¶</a></h4>
 <p>The interface must also provide methods/functions for accesing the underlying
 communication class’s methods for sending and receiving messages. This is
 usually straight forward (assuming serialization is implemented), but there
@@ -317,7 +318,7 @@ under the key ‘zmq_reply_worker’.</p></td>
 </table>
 </section>
 <section id="implement-serialization">
-<h4>Implement Serialization<a class="headerlink" href="#implement-serialization" title="Permalink to this headline">¶</a></h4>
+<h4>Implement Serialization<a class="headerlink" href="#implement-serialization" title="Permalink to this heading">¶</a></h4>
 <p>The most involved part of writing the interface will be writing the
 serialization and deserialization routines. The specific serialization protocol
 used by yggdrasil is described in detail here <a class="reference internal" href="../advanced/serialization.html#serialization-rst"><span class="std std-ref">here</span></a>.
@@ -326,7 +327,7 @@ serialization of all of the datatypes listed in
 <a class="reference internal" href="../tables/datatype_mapping_table.html#datatype-mapping-table-rst"><span class="std std-ref">this table</span></a>.</p>
 </section>
 <section id="sending-large-messages">
-<h4>Sending Large Messages<a class="headerlink" href="#sending-large-messages" title="Permalink to this headline">¶</a></h4>
+<h4>Sending Large Messages<a class="headerlink" href="#sending-large-messages" title="Permalink to this heading">¶</a></h4>
 <p>Most communication mechanisms have limits on the sizes of messages that can be
 sent as single messages (e.g. 2048 for IPC on MacOS). To overcome this yggdrasil
 splits up serialized messages that are larger than the limit (including the
@@ -356,7 +357,7 @@ behavior.</p>
 </section>
 </section>
 <section id="installation-script-optional">
-<h2>Installation Script [OPTIONAL]<a class="headerlink" href="#installation-script-optional" title="Permalink to this headline">¶</a></h2>
+<h2>Installation Script [OPTIONAL]<a class="headerlink" href="#installation-script-optional" title="Permalink to this heading">¶</a></h2>
 <p>If there are additional steps that should be taken during the installation of
 yggdrasil to allow a language to be supported (e.g. installing dependencies
 that are not covered by a Python package manager), developers can add these

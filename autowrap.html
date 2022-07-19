@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Autowrapping Model Functions &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Autowrapping Model Functions &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -99,7 +100,7 @@
            <div itemprop="articleBody">
              
   <section id="autowrapping-model-functions">
-<span id="autowrap-rst"></span><h1>Autowrapping Model Functions<a class="headerlink" href="#autowrapping-model-functions" title="Permalink to this headline">¶</a></h1>
+<span id="autowrap-rst"></span><h1>Autowrapping Model Functions<a class="headerlink" href="#autowrapping-model-functions" title="Permalink to this heading">¶</a></h1>
 <p>If your model can be expressed as a function in one of the supported languages, yggdrasil can automatically create the wrapper to make calls to the interface. In the example below, the two models being connected are just functions with one input and one output.</p>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
@@ -143,7 +144,7 @@
 </div>
 <p>(<a class="reference external" href="examples/model_function.html">Example in other languages</a>)</p>
 <section id="notes-on-autowrapping-c-c-model-functions">
-<h2>Notes on Autowrapping C/C++ Model Functions<a class="headerlink" href="#notes-on-autowrapping-c-c-model-functions" title="Permalink to this headline">¶</a></h2>
+<h2>Notes on Autowrapping C/C++ Model Functions<a class="headerlink" href="#notes-on-autowrapping-c-c-model-functions" title="Permalink to this heading">¶</a></h2>
 <p>The autowrapping of C/C++ models differs from other languages in several respects.</p>
 <ol class="arabic simple">
 <li><p>The output variables are expected to be assigned by pointers as inputs (or references in the case of C++). yggdrasil assumes that no input variables come after the output variables.</p></li>

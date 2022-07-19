@@ -8,11 +8,11 @@ aggregation                                                                     
 builddir                 string    Directory where the build should be saved. Defaults to <sourcedir>/build. It can   ['cmake', 'make']                                                 
                                    be relative to working_dir or absolute.                                                                                                              
 buildfile                string                                                                                       ['cmake', 'make']                                                 
-compiler                 string    Command or path to executable that should be used to compile the model. If not     ['c++', 'c', 'cxx', 'fortran', 'make', 'cpp', 'cmake']            
+compiler                 string    Command or path to executable that should be used to compile the model. If not     ['cmake', 'make', 'fortran', 'c++', 'cxx', 'cpp', 'c']            
                                    provided, the compiler will be determined based on configuration options for the                                                                     
                                    language (if present) and the registered compilers that are available on the                                                                         
                                    current operating system.                                                                                                                            
-compiler_flags           array     Flags that should be passed to the compiler during compilation. If nto provided,   ['c++', 'c', 'cxx', 'fortran', 'make', 'cpp', 'cmake']            
+compiler_flags           array     Flags that should be passed to the compiler during compilation. If nto provided,   ['cmake', 'make', 'fortran', 'c++', 'cxx', 'cpp', 'c']            
                                    the compiler flags will be determined based on configuration options for the                                                                         
                                    language (if present), the compiler defaults, and the default_compiler_flags                                                                         
                                    class attribute.                                                                                                                                     
@@ -37,17 +37,17 @@ integrator               string    Name of integrator that should be used. Valid
                                    'gillespie', 'rk4', 'rk45']. Defaults to 'cvode'.                                                                                                    
 integrator_settings      object    Settings for the integrator. Defaults to empty dict.                               ['sbml']                                                          
 interpolation                                                                                                         ['timesync']                                                      
-interpreter              string    Name or path of interpreter executable that should be used to run the model. If    ['sbml', 'dummy', 'timesync', 'python', 'R', 'matlab', 'lpy', 'r']
+interpreter              string    Name or path of interpreter executable that should be used to run the model. If    ['lpy', 'python', 'dummy', 'R', 'sbml', 'r', 'matlab', 'timesync']
                                    not provided, the interpreter will be determined based on configuration options                                                                      
                                    for the language (if present) and the default_interpreter class attribute.                                                                           
-interpreter_flags        array     Flags that should be passed to the interpreter when running the model. If not      ['sbml', 'dummy', 'timesync', 'python', 'R', 'matlab', 'lpy', 'r']
+interpreter_flags        array     Flags that should be passed to the interpreter when running the model. If not      ['lpy', 'python', 'dummy', 'R', 'sbml', 'r', 'matlab', 'timesync']
                                    provided, the flags are determined based on configuration options for the                                                                            
                                    language (if present) and the default_interpreter_flags class attribute.                                                                             
-linker                   string    Command or path to executable that should be used to link the model. If not        ['c++', 'c', 'cxx', 'fortran', 'make', 'cpp', 'cmake']            
+linker                   string    Command or path to executable that should be used to link the model. If not        ['cmake', 'make', 'fortran', 'c++', 'cxx', 'cpp', 'c']            
                                    provided, the linker will be determined based on configuration options for the                                                                       
                                    language (if present) and the registered linkers that are available on the                                                                           
                                    current operating system                                                                                                                             
-linker_flags             array     Flags that should be passed to the linker during compilation. If nto provided,     ['c++', 'c', 'cxx', 'fortran', 'make', 'cpp', 'cmake']            
+linker_flags             array     Flags that should be passed to the linker during compilation. If nto provided,     ['cmake', 'make', 'fortran', 'c++', 'cxx', 'cpp', 'c']            
                                    the linker flags will be determined based on configuration options for the                                                                           
                                    language (if present), the linker defaults, and the default_linker_flags class                                                                       
                                    attribute.                                                                                                                                           
@@ -61,12 +61,12 @@ reset                    boolean   If True, the simulation will be reset to it's
                                    (including the start time). Defaults to False.                                                                                                       
 selections               array     Variables to include in the output. Defaults to None and the time/floating         ['sbml']                                                          
                                    selections will be returned.                                                                                                                         
-skip_interpreter         boolean   If True, no interpreter will be added to the arguments. This should only be used   ['sbml', 'dummy', 'timesync', 'python', 'R', 'matlab', 'lpy', 'r']
+skip_interpreter         boolean   If True, no interpreter will be added to the arguments. This should only be used   ['lpy', 'python', 'dummy', 'R', 'sbml', 'r', 'matlab', 'timesync']
                                    for subclasses that will not be invoking the model via the command line.                                                                             
                                    Defaults to False.                                                                                                                                   
 skip_start_time          boolean   If True, the results for the initial time step will not be output. Defaults to     ['sbml']                                                          
                                    False. This option is ignored if only_output_final_step is True.                                                                                     
-source_files             array     Source files that should be compiled into an executable. Defaults to an empty      ['c++', 'c', 'cxx', 'fortran', 'make', 'cpp', 'cmake']            
+source_files             array     Source files that should be compiled into an executable. Defaults to an empty      ['cmake', 'make', 'fortran', 'c++', 'cxx', 'cpp', 'c']            
                                    list and the driver will search for a source file based on the model executable                                                                      
                                    (the first model argument).                                                                                                                          
 sourcedir                string    Source directory to call cmake on. If not provided it is set to working_dir.       ['cmake']                                                         

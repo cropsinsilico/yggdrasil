@@ -1,6 +1,6 @@
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/sbml3/sbml3.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/yggdrasil/examples/sbml3/sbml3.yml
    :language: yaml
    :linenos:
 

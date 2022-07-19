@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Formatted I/O &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Formatted I/O &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -107,11 +108,11 @@
            <div itemprop="articleBody">
              
   <section id="formatted-i-o">
-<span id="formatted-io-rst"></span><h1>Formatted I/O<a class="headerlink" href="#formatted-i-o" title="Permalink to this headline">¶</a></h1>
+<span id="formatted-io-rst"></span><h1>Formatted I/O<a class="headerlink" href="#formatted-i-o" title="Permalink to this heading">¶</a></h1>
 <p>In addition to passing raw strings, the yggdrasil framework also has
 support for formatting/processing messages from/to language native objects.</p>
 <section id="scalars">
-<h2>Scalars<a class="headerlink" href="#scalars" title="Permalink to this headline">¶</a></h2>
+<h2>Scalars<a class="headerlink" href="#scalars" title="Permalink to this heading">¶</a></h2>
 <p>The format of messages containing scalar variables (strings, integers, and
 floating point numbers) can be specified using a C-style format string
 (See <a class="reference internal" href="c_format_strings.html#c-style-format-strings-rst"><span class="std std-ref">C-Style Format Strings</span></a> for details). In
@@ -207,7 +208,7 @@ rather than all at once:</p>
 <p>(<a class="reference external" href="examples/formatted_io1.html">Example in other languages</a>)</p>
 </section>
 <section id="tables-by-row">
-<h2>Tables by Row<a class="headerlink" href="#tables-by-row" title="Permalink to this headline">¶</a></h2>
+<h2>Tables by Row<a class="headerlink" href="#tables-by-row" title="Permalink to this heading">¶</a></h2>
 <p>Tables can also be passed in a similar manner. For input from a table, the format
 string does not need to be provided and will be determined by the source of the
 table. There are different API classes/functions for I/O from/to table channels
@@ -304,7 +305,7 @@ row-by-row including verification that each row conforms with the table.</p>
 <p>(<a class="reference external" href="examples/formatted_io2.html">Example in other languages</a>)</p>
 </section>
 <section id="tables-as-arrays">
-<h2>Tables as Arrays<a class="headerlink" href="#tables-as-arrays" title="Permalink to this headline">¶</a></h2>
+<h2>Tables as Arrays<a class="headerlink" href="#tables-as-arrays" title="Permalink to this heading">¶</a></h2>
 <p>Tables can also be passed as arrays. In Python and Matlab, this is done using
 separate classes/functions. In C and C++, this is done by passing 1 to the <code class="docutils literal notranslate"><span class="pre">as_array</span></code>
 arguments of the table API classes/functions.</p>
@@ -407,7 +408,7 @@ should be read/written in their entirety as arrays.</p>
 <p>(<a class="reference external" href="examples/formatted_io3.html">Example in other languages</a>)</p>
 </section>
 <section id="tables-as-pandas-data-frames">
-<h2>Tables as Pandas Data Frames<a class="headerlink" href="#tables-as-pandas-data-frames" title="Permalink to this headline">¶</a></h2>
+<h2>Tables as Pandas Data Frames<a class="headerlink" href="#tables-as-pandas-data-frames" title="Permalink to this heading">¶</a></h2>
 <p>In Python, tables can also be passed as <a class="reference external" href="https://pandas.pydata.org/">Pandas</a>
 data frames.</p>
 <p>Model Code:</p>
@@ -514,7 +515,7 @@ receive any array sent by another model (whether or not it is Python)
 as a Pandas data frame.</p>
 </section>
 <section id="d-structures-as-ply-obj">
-<h2>3D Structures as Ply/Obj<a class="headerlink" href="#d-structures-as-ply-obj" title="Permalink to this headline">¶</a></h2>
+<h2>3D Structures as Ply/Obj<a class="headerlink" href="#d-structures-as-ply-obj" title="Permalink to this heading">¶</a></h2>
 <p>3D structures can be passed around in <a class="reference external" href="http://paulbourke.net/dataformats/ply/">Ply</a>
 or <a class="reference external" href="http://paulbourke.net/dataformats/obj/">Obj</a> formats.</p>
 <p>Model Code:</p>
@@ -614,7 +615,7 @@ Ply/Obj file formats.</p>
 C/C++ it is returned as a structure (<code class="xref c c-type docutils literal notranslate"><span class="pre">ply_t</span></code> or <code class="xref c c-type docutils literal notranslate"><span class="pre">obj_t</span></code>).</p>
 </section>
 <section id="id1">
-<h2>Tables as Pandas Data Frames<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<h2>Tables as Pandas Data Frames<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
 <p>In Python, tables can also be passed as <a class="reference external" href="https://pandas.pydata.org/">Pandas</a>
 data frames.</p>
 <p>Model Code:</p>
@@ -721,7 +722,7 @@ receive any array sent by another model (whether or not it is Python)
 as a Pandas data frame.</p>
 </section>
 <section id="config-style-mappings">
-<h2>Config style Mappings<a class="headerlink" href="#config-style-mappings" title="Permalink to this headline">¶</a></h2>
+<h2>Config style Mappings<a class="headerlink" href="#config-style-mappings" title="Permalink to this heading">¶</a></h2>
 <p>Simple mapping (key/value) data can be passed around in a colon/tab
 delimited format.</p>
 <p>Model Code:</p>
@@ -822,7 +823,7 @@ delimiter and then a value.</p>
 line in the file.</p>
 </section>
 <section id="json-files">
-<h2>JSON Files<a class="headerlink" href="#json-files" title="Permalink to this headline">¶</a></h2>
+<h2>JSON Files<a class="headerlink" href="#json-files" title="Permalink to this heading">¶</a></h2>
 <p>More complex nested structures can be passed around using JSON serialization.</p>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># Import classes for input/output channels</span>
@@ -921,7 +922,7 @@ JSON files.</p>
 <a class="reference external" href="https://docs.python.org/3/library/json.html">json</a> package.</p>
 </section>
 <section id="yaml-files">
-<h2>YAML Files<a class="headerlink" href="#yaml-files" title="Permalink to this headline">¶</a></h2>
+<h2>YAML Files<a class="headerlink" href="#yaml-files" title="Permalink to this heading">¶</a></h2>
 <p>More complex nested structures can also be represented using the YAML syntax.</p>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># Import classes for input/output channels</span>

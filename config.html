@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Configuration Files &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Configuration Files &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -107,7 +108,7 @@
            <div itemprop="articleBody">
              
   <section id="configuration-files">
-<span id="config-rst"></span><h1>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h1>
+<span id="config-rst"></span><h1>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this heading">¶</a></h1>
 <p>Many components of the yggdrasil framework’s behavior can be controlled by options in the configuration file. When installed yggdrasil creates a user config file called ‘.yggdrasil.cfg’ in your home directory or the direcotry associated with your conda or virtual environment (if you are using a conda or virtual environment). By editting the options in the user config file, you can customize the behavior of your framework runs. The exact location of your config file can be found by running:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggconfig --show-file
 </pre></div>
@@ -115,7 +116,7 @@
 <p>Further customization for specific runs can be achieved by creating a local config file called ‘.yggdrasil.cfg’ in the directory where the interface will be run. Any options not found in the local will be filled in with values from the user config file. Any options not found in the user config file will be filled in with default package values.</p>
 <p>There are also several options you can provide to the <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> CLI to modify the configuration file. To see the options available, run <code class="docutils literal notranslate"><span class="pre">yggconfig</span> <span class="pre">-h</span></code>.</p>
 <section id="updating-the-compilation-tools">
-<h2>Updating the Compilation Tools<a class="headerlink" href="#updating-the-compilation-tools" title="Permalink to this headline">¶</a></h2>
+<h2>Updating the Compilation Tools<a class="headerlink" href="#updating-the-compilation-tools" title="Permalink to this heading">¶</a></h2>
 <p>To update the compilation tools that yggdrasil uses when building models of a certain language against the yggdrasil interface, you can use the <code class="docutils literal notranslate"><span class="pre">--XXX-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">--XXX-linker</span></code>, and <code class="docutils literal notranslate"><span class="pre">--XXX-archiver</span></code> options (where <code class="docutils literal notranslate"><span class="pre">XXX</span></code> is the language). For example, to configure yggdrasil to use the clang++ compiler tools for C++ models (if they are not the default), you would run:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggconfig --c++-compiler=clang++ --c++-linker=clang++ --c++-archiver=libtool
 </pre></div>
@@ -127,7 +128,7 @@
 <p>Make sure that the tools you select are compatible with each other or you may get linking errors. You can run <code class="docutils literal notranslate"><span class="pre">ygginfo</span></code> to verify that yggdrasil is using the specified tools.</p>
 </section>
 <section id="debug-options">
-<h2>Debug Options<a class="headerlink" href="#debug-options" title="Permalink to this headline">¶</a></h2>
+<h2>Debug Options<a class="headerlink" href="#debug-options" title="Permalink to this heading">¶</a></h2>
 <p>Options for controlling the level of information printed during a run can be controlled by options in the ‘[debug]’ section of the config files. Each one can have any of the valid
 <a class="reference external" href="https://docs.python.org/2/library/logging.html#levels">logging levels</a>. These include:</p>
 <ul class="simple">
@@ -171,7 +172,7 @@ yggdrasil calls from the models.</p></td>
 </table>
 </section>
 <section id="language-options">
-<h2>Language Options<a class="headerlink" href="#language-options" title="Permalink to this headline">¶</a></h2>
+<h2>Language Options<a class="headerlink" href="#language-options" title="Permalink to this heading">¶</a></h2>
 <p>Each supported language has a dedicated section in the config file with options that control how models of that language will be handled. The following options are available to all languages:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -265,7 +266,7 @@ interpreter.</p></td>
 <p>In addition to these general options, some languages also have specific
 options related to their treatment of models or dependencies.</p>
 <section id="c-options">
-<h3>C Options<a class="headerlink" href="#c-options" title="Permalink to this headline">¶</a></h3>
+<h3>C Options<a class="headerlink" href="#c-options" title="Permalink to this heading">¶</a></h3>
 <p>If they are not installed in a standard location or you would like to
 use an alternate version than the one identified by yggdrasil, it may
 be necessary for you to manually specify the location of dependency
@@ -334,7 +335,7 @@ dynamic/shared object library.</p></td>
 </table>
 </section>
 <section id="matlab-options">
-<h3>Matlab Options<a class="headerlink" href="#matlab-options" title="Permalink to this headline">¶</a></h3>
+<h3>Matlab Options<a class="headerlink" href="#matlab-options" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 26%" />
@@ -372,7 +373,7 @@ used to speedup reporting of the version.</p></td>
 </section>
 </section>
 <section id="rabbitmq-options">
-<h2>RabbitMQ Options<a class="headerlink" href="#rabbitmq-options" title="Permalink to this headline">¶</a></h2>
+<h2>RabbitMQ Options<a class="headerlink" href="#rabbitmq-options" title="Permalink to this heading">¶</a></h2>
 <p>Options in the ‘[RMQ]’ section control the behavior of RabbitMQ connections.
 If the option is left blank, the default RabbitMQ option is used.
 These include:</p>
@@ -413,7 +414,7 @@ These include:</p>
 </table>
 </section>
 <section id="parallel-options">
-<h2>Parallel Options<a class="headerlink" href="#parallel-options" title="Permalink to this headline">¶</a></h2>
+<h2>Parallel Options<a class="headerlink" href="#parallel-options" title="Permalink to this heading">¶</a></h2>
 <p>Options in the ‘[parallel]’ section control the behavior of parallelization.
 Although, not supported in the current version of yggdrasil, these
 include:</p>

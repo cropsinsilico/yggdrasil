@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Server/Client I/O &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Server/Client I/O &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -103,7 +104,7 @@
            <div itemprop="articleBody">
              
   <section id="server-client-i-o">
-<span id="server-client-io-rst"></span><h1>Server/Client I/O<a class="headerlink" href="#server-client-i-o" title="Permalink to this headline">¶</a></h1>
+<span id="server-client-io-rst"></span><h1>Server/Client I/O<a class="headerlink" href="#server-client-i-o" title="Permalink to this heading">¶</a></h1>
 <p>Often you will want to call one model from another like a functions. This
 would required sending the input variable(s) to the model being called and
 then sending the output variables(s) back to the calling model. We refer to
@@ -111,7 +112,7 @@ this as a Remote Procedure Call (RPC). The model being called can be considered
 a server providing its calculations as a service to the client (the calling model).
 The yggdrasil provides options for treating models as server and clients.</p>
 <section id="one-server-one-client">
-<h2>One Server, One Client<a class="headerlink" href="#one-server-one-client" title="Permalink to this headline">¶</a></h2>
+<h2>One Server, One Client<a class="headerlink" href="#one-server-one-client" title="Permalink to this heading">¶</a></h2>
 <p>In the example below, the “server” model computes the nth number in the
 Fibonacci sequence and the “client” model calls the server to get a certain
 portion of the Fibonacci sequences and then writes it to a log. The server
@@ -289,7 +290,7 @@ in this example, such a comm could be used to initialize a model with
 parameters and/or initial conditions.</p>
 </section>
 <section id="using-existing-inputs-outputs">
-<h2>Using Existing Inputs/Outputs<a class="headerlink" href="#using-existing-inputs-outputs" title="Permalink to this headline">¶</a></h2>
+<h2>Using Existing Inputs/Outputs<a class="headerlink" href="#using-existing-inputs-outputs" title="Permalink to this heading">¶</a></h2>
 <p>Models that have already been integrated via yggdrasil can also be turned
 into servers without modifying the code. Instead of passing a boolean to
 the <code class="docutils literal notranslate"><span class="pre">is_server</span></code> parameter, such models can provide a mapping with <code class="docutils literal notranslate"><span class="pre">input</span></code>
@@ -303,7 +304,7 @@ interface comm.</p>
 </div>
 </section>
 <section id="one-server-two-clients">
-<h2>One Server, Two Clients<a class="headerlink" href="#one-server-two-clients" title="Permalink to this headline">¶</a></h2>
+<h2>One Server, Two Clients<a class="headerlink" href="#one-server-two-clients" title="Permalink to this heading">¶</a></h2>
 <p>There is no limit on the number of clients that can connect to a single
 server. In the example below, the server is the same as above. The client
 code is also essentially the same except that it has been modified to take
@@ -481,7 +482,7 @@ source code.</p>
 server model which will process the requests in the order they are received.</p>
 </section>
 <section id="two-servers-two-clients">
-<h2>Two Servers, Two Clients<a class="headerlink" href="#two-servers-two-clients" title="Permalink to this headline">¶</a></h2>
+<h2>Two Servers, Two Clients<a class="headerlink" href="#two-servers-two-clients" title="Permalink to this heading">¶</a></h2>
 <p>There is also no limit on the number of copies of a server model that can be
 used to responsd to RPC requests from the clients. In the example below, the
 server and clients are the same as above, but 2 copies of the server model
@@ -538,7 +539,7 @@ to be sure that the same server model is responding to its requests and only
 its requests.</p>
 </section>
 <section id="wrapped-function-server">
-<h2>Wrapped Function Server<a class="headerlink" href="#wrapped-function-server" title="Permalink to this headline">¶</a></h2>
+<h2>Wrapped Function Server<a class="headerlink" href="#wrapped-function-server" title="Permalink to this heading">¶</a></h2>
 <p>Models that are created by letting yggdrasil automatically
 <a class="reference internal" href="autowrap.html#autowrap-rst"><span class="std std-ref">wrap a function</span></a> can also act as servers and/or clients.
 In the example below, the model acting as a server

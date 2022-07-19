@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Python Code &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Python Code &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -30,7 +31,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -141,7 +142,7 @@
            <div itemprop="articleBody">
              
   <section id="python-code">
-<h1>Python Code<a class="headerlink" href="#python-code" title="Permalink to this headline">¶</a></h1>
+<h1>Python Code<a class="headerlink" href="#python-code" title="Permalink to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="yggdrasil_code.html">yggdrasil.languages.Python package</a></li>
@@ -153,10 +154,10 @@
 </ul>
 </div>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-yggdrasil.command_line">
-<span id="yggdrasil-command-line-module"></span><h2>yggdrasil.command_line module<a class="headerlink" href="#module-yggdrasil.command_line" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-command-line-module"></span><h2>yggdrasil.command_line module<a class="headerlink" href="#module-yggdrasil.command_line" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.ArgumentBase">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">ArgumentBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conditions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#ArgumentBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.ArgumentBase" title="Permalink to this definition">¶</a></dt>
@@ -166,19 +167,19 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.ArgumentGroup">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">ArgumentGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclusive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#ArgumentGroup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.ArgumentGroup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.ArgumentBase" title="yggdrasil.command_line.ArgumentBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.ArgumentBase</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.ArgumentBase" title="yggdrasil.command_line.ArgumentBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ArgumentBase</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.ArgumentParser">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">ArgumentParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conditions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#ArgumentParser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.ArgumentParser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.ArgumentBase" title="yggdrasil.command_line.ArgumentBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.ArgumentBase</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.ArgumentBase" title="yggdrasil.command_line.ArgumentBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ArgumentBase</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.ArgumentSubparser">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">ArgumentSubparser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#ArgumentSubparser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.ArgumentSubparser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.ArgumentBase" title="yggdrasil.command_line.ArgumentBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.ArgumentBase</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.ArgumentBase" title="yggdrasil.command_line.ArgumentBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ArgumentBase</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
@@ -190,7 +191,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.ConditionalArgumentTuple">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">ConditionalArgumentTuple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conditions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#ConditionalArgumentTuple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.ConditionalArgumentTuple" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.ArgumentTuple" title="yggdrasil.command_line.ArgumentTuple"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.ArgumentTuple</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.ArgumentTuple" title="yggdrasil.command_line.ArgumentTuple"><code class="xref py py-class docutils literal notranslate"><span class="pre">ArgumentTuple</span></code></a></p>
 </dd></dl>
 
 <dl class="py function">
@@ -271,7 +272,7 @@ as subcommands or individually.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.cc_flags">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">cc_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#cc_flags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.cc_flags" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.cc_toolname" title="yggdrasil.command_line.cc_toolname"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.cc_toolname</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.cc_toolname" title="yggdrasil.command_line.cc_toolname"><code class="xref py py-class docutils literal notranslate"><span class="pre">cc_toolname</span></code></a></p>
 <p>Get the compiler flags necessary for including the interface
 library in a C or C++ program.</p>
 <dl class="py attribute">
@@ -299,7 +300,7 @@ library in a C or C++ program.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.cc_toolname">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">cc_toolname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#cc_toolname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.cc_toolname" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Output the name of the compiler used to compile C or C++ programs.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.cc_toolname.arguments">
@@ -331,7 +332,7 @@ library in a C or C++ program.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.generate_gha_workflow">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">generate_gha_workflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#generate_gha_workflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.generate_gha_workflow" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Re-generate the Github actions workflow yaml.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.generate_gha_workflow.arguments">
@@ -365,7 +366,7 @@ re-generated.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.integration_service_manager">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">integration_service_manager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#integration_service_manager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.integration_service_manager" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Start or manage the yggdrasil service manager.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.integration_service_manager.arguments">
@@ -392,7 +393,7 @@ re-generated.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.ld_flags">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">ld_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#ld_flags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.ld_flags" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.cc_toolname" title="yggdrasil.command_line.cc_toolname"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.cc_toolname</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.cc_toolname" title="yggdrasil.command_line.cc_toolname"><code class="xref py py-class docutils literal notranslate"><span class="pre">cc_toolname</span></code></a></p>
 <p>Get the linker flags necessary for including the interface
 library in a C or C++ program.</p>
 <dl class="py attribute">
@@ -420,7 +421,7 @@ library in a C or C++ program.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.ld_toolname">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">ld_toolname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#ld_toolname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.ld_toolname" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.cc_toolname" title="yggdrasil.command_line.cc_toolname"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.cc_toolname</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.cc_toolname" title="yggdrasil.command_line.cc_toolname"><code class="xref py py-class docutils literal notranslate"><span class="pre">cc_toolname</span></code></a></p>
 <p>Output the name of the linker used to compile C or C++ programs.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.ld_toolname.arguments">
@@ -447,7 +448,7 @@ library in a C or C++ program.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.main">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Runner for yggdrasil CLI.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.main.arguments">
@@ -495,7 +496,7 @@ library in a C or C++ program.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.regen_metaschema">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">regen_metaschema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#regen_metaschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.regen_metaschema" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Regenerate the yggdrasil metaschema.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.command_line.regen_metaschema.func">
@@ -517,7 +518,7 @@ library in a C or C++ program.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.regen_schema">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">regen_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#regen_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.regen_schema" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Regenerate the yggdrasil schema.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.regen_schema.arguments">
@@ -544,7 +545,7 @@ library in a C or C++ program.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.timing_plots">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">timing_plots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#timing_plots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.timing_plots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Create performance plots using timing results.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.timing_plots.arguments">
@@ -571,7 +572,7 @@ library in a C or C++ program.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.update_config">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">update_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#update_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.update_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Update the user config file for yggdrasil.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.command_line.update_config.add_arguments">
@@ -613,7 +614,7 @@ library in a C or C++ program.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.validate_yaml">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">validate_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#validate_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.validate_yaml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Validate a set of or or more YAMLs defining an integration.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.validate_yaml.arguments">
@@ -640,7 +641,7 @@ library in a C or C++ program.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.yggcc">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">yggcc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#yggcc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.yggcc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Compile a program.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.yggcc.arguments">
@@ -667,7 +668,7 @@ library in a C or C++ program.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.yggclean">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">yggclean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#yggclean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.yggclean" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Cleanup dependency files.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.yggclean.arguments">
@@ -694,7 +695,7 @@ library in a C or C++ program.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.yggcompile">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">yggcompile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#yggcompile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.yggcompile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Compile interface library/libraries.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.yggcompile.arguments">
@@ -721,7 +722,7 @@ library in a C or C++ program.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.yggdevup">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">yggdevup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#yggdevup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.yggdevup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Cleanup old libraries, re-install languages, and re-compile
 interface libraries following an update to the code (when doing
 development).</p>
@@ -745,7 +746,7 @@ development).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.ygginfo">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">ygginfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#ygginfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.ygginfo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Print information about yggdrasil installation.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.ygginfo.arguments">
@@ -772,7 +773,7 @@ development).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.ygginstall">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">ygginstall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#ygginstall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.ygginstall" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Call installation script.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.command_line.ygginstall.func">
@@ -799,7 +800,7 @@ development).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.yggmodelform">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">yggmodelform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#yggmodelform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.yggmodelform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Save/print a JSON schema that can be used for generating a
 form for composing a model specification files.</p>
 <dl class="py attribute">
@@ -827,7 +828,7 @@ form for composing a model specification files.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.yggrun">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">yggrun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#yggrun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.yggrun" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.command_line.SubCommand</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Start a run.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.command_line.yggrun.add_arguments">
@@ -888,11 +889,11 @@ form for composing a model specification files.</p>
 
 </section>
 <section id="module-yggdrasil.components">
-<span id="yggdrasil-components-module"></span><h2>yggdrasil.components module<a class="headerlink" href="#module-yggdrasil.components" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-components-module"></span><h2>yggdrasil.components module<a class="headerlink" href="#module-yggdrasil.components" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.components.ClassRegistry">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.components.</span></span><span class="sig-name descname"><span class="pre">ClassRegistry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">import_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/components.html#ClassRegistry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.components.ClassRegistry" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a></p>
 <p>Class for registering classes.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.components.ClassRegistry.get">
@@ -931,7 +932,7 @@ form for composing a model specification files.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.components.ComponentBase">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.components.</span></span><span class="sig-name descname"><span class="pre">ComponentBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/components.html#ComponentBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.components.ComponentBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.components.ComponentBaseUnregistered" title="yggdrasil.components.ComponentBaseUnregistered"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.components.ComponentBaseUnregistered</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.components.ComponentBaseUnregistered" title="yggdrasil.components.ComponentBaseUnregistered"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentBaseUnregistered</span></code></a></p>
 <p>Base class for schema components.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1234,7 +1235,7 @@ subtype if it is None.</p></li>
 
 </section>
 <section id="module-yggdrasil.config">
-<span id="yggdrasil-config-module"></span><h2>yggdrasil.config module<a class="headerlink" href="#module-yggdrasil.config" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-config-module"></span><h2>yggdrasil.config module<a class="headerlink" href="#module-yggdrasil.config" title="Permalink to this heading">¶</a></h2>
 <p>This module imports the configuration for yggdrasil.</p>
 <div class="admonition-todo admonition" id="id1">
 <p class="admonition-title">Todo</p>
@@ -1256,7 +1257,7 @@ subtype if it is None.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.config.YggConfigParser">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.config.</span></span><span class="sig-name descname"><span class="pre">YggConfigParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/config.html#YggConfigParser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.config.YggConfigParser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/configparser.html#configparser.ConfigParser" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">configparser.ConfigParser</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/configparser.html#configparser.ConfigParser" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigParser</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Config parser that returns None if option not provided on get.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.config.YggConfigParser.backwards_str2val">
@@ -1602,11 +1603,11 @@ specific keyword arguments. Defaults to {}.</p></li>
 
 </section>
 <section id="module-yggdrasil.constants">
-<span id="yggdrasil-constants-module"></span><h2>yggdrasil.constants module<a class="headerlink" href="#module-yggdrasil.constants" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-constants-module"></span><h2>yggdrasil.constants module<a class="headerlink" href="#module-yggdrasil.constants" title="Permalink to this heading">¶</a></h2>
 <p>Constants used by yggdrasil.</p>
 </section>
 <section id="module-yggdrasil.doctools">
-<span id="yggdrasil-doctools-module"></span><h2>yggdrasil.doctools module<a class="headerlink" href="#module-yggdrasil.doctools" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-doctools-module"></span><h2>yggdrasil.doctools module<a class="headerlink" href="#module-yggdrasil.doctools" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.doctools.component2table">
 <span class="sig-prename descclassname"><span class="pre">yggdrasil.doctools.</span></span><span class="sig-name descname"><span class="pre">component2table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_required</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtype_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/doctools.html#component2table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.doctools.component2table" title="Permalink to this definition">¶</a></dt>
@@ -1981,7 +1982,7 @@ out in addition to the file. Defaults to False.</p></li>
 
 </section>
 <section id="module-yggdrasil.multitasking">
-<span id="yggdrasil-multitasking-module"></span><h2>yggdrasil.multitasking module<a class="headerlink" href="#module-yggdrasil.multitasking" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-multitasking-module"></span><h2>yggdrasil.multitasking module<a class="headerlink" href="#module-yggdrasil.multitasking" title="Permalink to this heading">¶</a></h2>
 <dl class="py exception">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.AliasDisconnectError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">AliasDisconnectError</span></span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#AliasDisconnectError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.AliasDisconnectError" title="Permalink to this definition">¶</a></dt>
@@ -2037,7 +2038,7 @@ base class.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.BreakLoopError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">BreakLoopError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#BreakLoopError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.BreakLoopError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.BreakLoopException" title="yggdrasil.multitasking.BreakLoopException"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.BreakLoopException</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.BreakLoopException" title="yggdrasil.multitasking.BreakLoopException"><code class="xref py py-class docutils literal notranslate"><span class="pre">BreakLoopException</span></code></a></p>
 <p>Version of BreakLoopException that sets an error message.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.BreakLoopError.break_stack">
@@ -2062,7 +2063,7 @@ for a loop in order to break the loop.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.Context">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">Context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'thread'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dont_initialize_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#Context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.Context" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.MultiObject" title="yggdrasil.multitasking.MultiObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.MultiObject</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.MultiObject" title="yggdrasil.multitasking.MultiObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiObject</span></code></a></p>
 <p>Context for managing threads/processes.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.Context.Dict">
@@ -2121,7 +2122,7 @@ for a loop in order to break the loop.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.ContextObject">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">ContextObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'threading'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#ContextObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.ContextObject" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.MultiObject" title="yggdrasil.multitasking.MultiObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.MultiObject</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.MultiObject" title="yggdrasil.multitasking.MultiObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiObject</span></code></a></p>
 <p>Base class for object intialized in a context.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.ContextObject.context">
@@ -2152,7 +2153,7 @@ a dummy object.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.Dict">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">Dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'threading'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#Dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.Dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.ContextObject" title="yggdrasil.multitasking.ContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.ContextObject</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.ContextObject" title="yggdrasil.multitasking.ContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContextObject</span></code></a></p>
 <p>Multiprocessing/threading shared dictionary.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.Dict.clear">
@@ -2238,7 +2239,7 @@ a dummy object.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.DummyEvent">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">DummyEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#DummyEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.DummyEvent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.DummyContextObject" title="yggdrasil.multitasking.DummyContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.DummyContextObject</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.DummyContextObject" title="yggdrasil.multitasking.DummyContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">DummyContextObject</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.DummyEvent.clear">
 <span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#DummyEvent.clear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.DummyEvent.clear" title="Permalink to this definition">¶</a></dt>
@@ -2264,7 +2265,7 @@ a dummy object.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.DummyQueue">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">DummyQueue</span></span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#DummyQueue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.DummyQueue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.DummyContextObject" title="yggdrasil.multitasking.DummyContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.DummyContextObject</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.DummyContextObject" title="yggdrasil.multitasking.DummyContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">DummyContextObject</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.DummyQueue.close">
 <span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#DummyQueue.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.DummyQueue.close" title="Permalink to this definition">¶</a></dt>
@@ -2320,7 +2321,7 @@ a dummy object.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.DummyRLock">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">DummyRLock</span></span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#DummyRLock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.DummyRLock" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.DummyContextObject" title="yggdrasil.multitasking.DummyContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.DummyContextObject</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.DummyContextObject" title="yggdrasil.multitasking.DummyContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">DummyContextObject</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.DummyRLock.acquire">
 <span class="sig-name descname"><span class="pre">acquire</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#DummyRLock.acquire"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.DummyRLock.acquire" title="Permalink to this definition">¶</a></dt>
@@ -2336,7 +2337,7 @@ a dummy object.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.DummyTask">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">DummyTask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exitcode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daemon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#DummyTask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.DummyTask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.DummyContextObject" title="yggdrasil.multitasking.DummyContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.DummyContextObject</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.DummyContextObject" title="yggdrasil.multitasking.DummyContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">DummyContextObject</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.DummyTask.daemon">
 <span class="sig-name descname"><span class="pre">daemon</span></span><a class="headerlink" href="#yggdrasil.multitasking.DummyTask.daemon" title="Permalink to this definition">¶</a></dt>
@@ -2377,7 +2378,7 @@ a dummy object.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.Event">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">Event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#Event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.Event" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.ContextObject" title="yggdrasil.multitasking.ContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.ContextObject</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.ContextObject" title="yggdrasil.multitasking.ContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContextObject</span></code></a></p>
 <p>Multiprocessing/threading event.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.Event.add_callback">
@@ -2437,7 +2438,7 @@ a dummy object.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.LockedDict">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">LockedDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'process'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#LockedDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.LockedDict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.LockedObject" title="yggdrasil.multitasking.LockedObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.LockedObject</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.LockedObject" title="yggdrasil.multitasking.LockedObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">LockedObject</span></code></a></p>
 <p>Dictionary that can be shared between threads.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.LockedDict.add_subdict">
@@ -2506,7 +2507,7 @@ a dummy object.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.LockedObject">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">LockedObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'process'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#LockedObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.LockedObject" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.AliasObject" title="yggdrasil.multitasking.AliasObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.AliasObject</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.AliasObject" title="yggdrasil.multitasking.AliasObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">AliasObject</span></code></a></p>
 <p>Container that provides a lock that is acquired before accessing
 the object.</p>
 <dl class="py method">
@@ -2601,7 +2602,7 @@ to be raised, the sync will abort. Defaults to False.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.MPIRequestWrapper">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">MPIRequestWrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#MPIRequestWrapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.MPIRequestWrapper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.WaitableFunction" title="yggdrasil.multitasking.WaitableFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.WaitableFunction</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.WaitableFunction" title="yggdrasil.multitasking.WaitableFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">WaitableFunction</span></code></a></p>
 <p>Wrapper for an MPI request.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.MPIRequestWrapper.cancel">
@@ -2674,7 +2675,7 @@ timeout error. Defaults to False.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.MultiObject">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">MultiObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'threading'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#MultiObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.MultiObject" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.AliasObject" title="yggdrasil.multitasking.AliasObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.AliasObject</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.AliasObject" title="yggdrasil.multitasking.AliasObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">AliasObject</span></code></a></p>
 <p>Concurrent/parallel processing object using either threads
 or processes.</p>
 <dl class="py attribute">
@@ -2740,7 +2741,7 @@ a discreet start and end.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.Queue">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">Queue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'threading'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#Queue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.Queue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.ContextObject" title="yggdrasil.multitasking.ContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.ContextObject</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.ContextObject" title="yggdrasil.multitasking.ContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContextObject</span></code></a></p>
 <p>Multiprocessing/threading queue.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.Queue.disconnect">
@@ -2811,7 +2812,7 @@ a dummy object.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.RLock">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">RLock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'threading'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#RLock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.RLock" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.ContextObject" title="yggdrasil.multitasking.ContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.ContextObject</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.ContextObject" title="yggdrasil.multitasking.ContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContextObject</span></code></a></p>
 <p>Recursive lock. Acquiring the lock after disconnect is called
 through use as a context will not raise an error, but will not
 do anything.</p>
@@ -2836,7 +2837,7 @@ do anything.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.SafeThread">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">SafeThread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#SafeThread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.SafeThread" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/threading.html#threading.Thread" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">threading.Thread</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/threading.html#threading.Thread" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></a></p>
 <p>Thread that sets Event on error.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.SafeThread.exitcode">
@@ -2870,7 +2871,7 @@ from the args and kwargs arguments, respectively.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.Task">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">Task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#Task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.Task" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.ContextObject" title="yggdrasil.multitasking.ContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.ContextObject</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.ContextObject" title="yggdrasil.multitasking.ContextObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContextObject</span></code></a></p>
 <p>Multiprocessing/threading process.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.Task.authkey">
@@ -2990,7 +2991,7 @@ a dummy object.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.TaskLoop">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">TaskLoop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#TaskLoop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.TaskLoop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.Task" title="yggdrasil.multitasking.Task"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.Task</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.Task" title="yggdrasil.multitasking.Task"><code class="xref py py-class docutils literal notranslate"><span class="pre">Task</span></code></a></p>
 <p>Class for looping over a task.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.TaskLoop.break_flag">
@@ -3037,14 +3038,14 @@ a dummy object.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.TimeoutError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">TimeoutError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#TimeoutError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.TimeoutError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">asyncio.exceptions.TimeoutError</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TimeoutError</span></code></p>
 <p>Error to raise when a wait times out.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.ValueEvent">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">ValueEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#ValueEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.ValueEvent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.Event" title="yggdrasil.multitasking.Event"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.Event</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.Event" title="yggdrasil.multitasking.Event"><code class="xref py py-class docutils literal notranslate"><span class="pre">Event</span></code></a></p>
 <p>Class for handling storing a value that also triggers an event.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.ValueEvent.clear">
@@ -3123,7 +3124,7 @@ timeout error. Defaults to False.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.YggTask">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">YggTask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#YggTask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.YggTask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tools.YggClass" title="yggdrasil.tools.YggClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggClass</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tools.YggClass" title="yggdrasil.tools.YggClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">YggClass</span></code></a></p>
 <p>Class for managing Ygg thread/process.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.YggTask.atexit">
@@ -3378,7 +3379,7 @@ Defaults to None and is set based on the stack trace.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.YggTaskLoop">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.multitasking.</span></span><span class="sig-name descname"><span class="pre">YggTaskLoop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/multitasking.html#YggTaskLoop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.multitasking.YggTaskLoop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.YggTask" title="yggdrasil.multitasking.YggTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.YggTask</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.multitasking.YggTask" title="yggdrasil.multitasking.YggTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">YggTask</span></code></a></p>
 <p>Class to run a loop inside a thread/process.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.multitasking.YggTaskLoop.after_loop">
@@ -3618,11 +3619,11 @@ waited in between function calls. Defaults to 0.1 seconds.</p></li>
 
 </section>
 <section id="module-yggdrasil.platform">
-<span id="yggdrasil-platform-module"></span><h2>yggdrasil.platform module<a class="headerlink" href="#module-yggdrasil.platform" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-platform-module"></span><h2>yggdrasil.platform module<a class="headerlink" href="#module-yggdrasil.platform" title="Permalink to this heading">¶</a></h2>
 <p>This module handle platform compatibility issues.</p>
 </section>
 <section id="module-yggdrasil.runner">
-<span id="yggdrasil-runner-module"></span><h2>yggdrasil.runner module<a class="headerlink" href="#module-yggdrasil.runner" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-runner-module"></span><h2>yggdrasil.runner module<a class="headerlink" href="#module-yggdrasil.runner" title="Permalink to this heading">¶</a></h2>
 <p>This module provides tools for running models using yggdrasil.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="yggdrasil.runner.IntegrationError">
@@ -3634,7 +3635,7 @@ waited in between function calls. Defaults to 0.1 seconds.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.runner.YggFunction">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.runner.</span></span><span class="sig-name descname"><span class="pre">YggFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/runner.html#YggFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.runner.YggFunction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tools.YggClass" title="yggdrasil.tools.YggClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggClass</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tools.YggClass" title="yggdrasil.tools.YggClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">YggClass</span></code></a></p>
 <p>This class wraps function-like behavior around a model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -3731,7 +3732,7 @@ variables for the model.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.runner.YggRunner">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.runner.</span></span><span class="sig-name descname"><span class="pre">YggRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/runner.html#YggRunner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.runner.YggRunner" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tools.YggClass" title="yggdrasil.tools.YggClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggClass</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tools.YggClass" title="yggdrasil.tools.YggClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">YggClass</span></code></a></p>
 <p>This class handles the orchestration of starting the model and
 IO drivers, monitoring their progress, and cleaning up on exit.</p>
 <dl class="field-list simple">
@@ -4151,7 +4152,7 @@ that should be run.</p></li>
 
 </section>
 <section id="module-yggdrasil.scanf">
-<span id="yggdrasil-scanf-module"></span><h2>yggdrasil.scanf module<a class="headerlink" href="#module-yggdrasil.scanf" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-scanf-module"></span><h2>yggdrasil.scanf module<a class="headerlink" href="#module-yggdrasil.scanf" title="Permalink to this heading">¶</a></h2>
 <p>Small scanf implementation.</p>
 <p>Python has powerful regular expressions but sometimes they are totally overkill
 when you just want to parse a simple-formatted string.
@@ -4264,7 +4265,7 @@ or None if the format does not match.</p>
 
 </section>
 <section id="module-yggdrasil.schema">
-<span id="yggdrasil-schema-module"></span><h2>yggdrasil.schema module<a class="headerlink" href="#module-yggdrasil.schema" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-schema-module"></span><h2>yggdrasil.schema module<a class="headerlink" href="#module-yggdrasil.schema" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.schema.</span></span><span class="sig-name descname"><span class="pre">ComponentSchema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtype_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_registry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_subtypes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema" title="Permalink to this definition">¶</a></dt>
@@ -4555,7 +4556,7 @@ against the schemas for the different subtypes.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.schema.SchemaDict">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.schema.</span></span><span class="sig-name descname"><span class="pre">SchemaDict</span></span><a class="reference internal" href="../_modules/yggdrasil/schema.html#SchemaDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.SchemaDict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a></p>
 <p>OrderedDict subclass for ordering schemas on read in Python 2.</p>
 </dd></dl>
 
@@ -5192,7 +5193,7 @@ ignored.</p></li>
 
 </section>
 <section id="module-yggdrasil.services">
-<span id="yggdrasil-services-module"></span><h2>yggdrasil.services module<a class="headerlink" href="#module-yggdrasil.services" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-services-module"></span><h2>yggdrasil.services module<a class="headerlink" href="#module-yggdrasil.services" title="Permalink to this heading">¶</a></h2>
 <dl class="py exception">
 <dt class="sig sig-object py" id="yggdrasil.services.ClientError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.services.</span></span><span class="sig-name descname"><span class="pre">ClientError</span></span><a class="reference internal" href="../_modules/yggdrasil/services.html#ClientError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.services.ClientError" title="Permalink to this definition">¶</a></dt>
@@ -5203,7 +5204,7 @@ ignored.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.services.FlaskService">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.services.</span></span><span class="sig-name descname"><span class="pre">FlaskService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/services.html#FlaskService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.services.FlaskService" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.services.ServiceBase" title="yggdrasil.services.ServiceBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.services.ServiceBase</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.services.ServiceBase" title="yggdrasil.services.ServiceBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceBase</span></code></a></p>
 <p>Flask based service.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.services.FlaskService.call">
@@ -5499,7 +5500,7 @@ should be removed from the registry.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.services.RMQService">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.services.</span></span><span class="sig-name descname"><span class="pre">RMQService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/services.html#RMQService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.services.RMQService" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.services.ServiceBase" title="yggdrasil.services.ServiceBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.services.ServiceBase</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.services.ServiceBase" title="yggdrasil.services.ServiceBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceBase</span></code></a></p>
 <p>RabbitMQ based service.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.services.RMQService.call">
@@ -5611,7 +5612,7 @@ connections via _init_rmq.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.services.ServiceBase">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.services.</span></span><span class="sig-name descname"><span class="pre">ServiceBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/services.html#ServiceBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.services.ServiceBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tools.YggClass" title="yggdrasil.tools.YggClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggClass</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tools.YggClass" title="yggdrasil.tools.YggClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">YggClass</span></code></a></p>
 <p>Base class for sending/responding to service requests.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -5912,11 +5913,11 @@ each of the YAML files.</p>
 
 </section>
 <section id="module-yggdrasil.timing">
-<span id="yggdrasil-timing-module"></span><h2>yggdrasil.timing module<a class="headerlink" href="#module-yggdrasil.timing" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-timing-module"></span><h2>yggdrasil.timing module<a class="headerlink" href="#module-yggdrasil.timing" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.timing.TimedRun">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.timing.</span></span><span class="sig-name descname"><span class="pre">TimedRun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/timing.html#TimedRun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.timing.TimedRun" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tools.YggClass" title="yggdrasil.tools.YggClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggClass</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tools.YggClass" title="yggdrasil.tools.YggClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">YggClass</span></code></a></p>
 <p>Class to time sending messages from one language to another.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -6947,7 +6948,7 @@ Defaults to False.</p></li>
 
 </section>
 <section id="module-yggdrasil.tools">
-<span id="yggdrasil-tools-module"></span><h2>yggdrasil.tools module<a class="headerlink" href="#module-yggdrasil.tools" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-tools-module"></span><h2>yggdrasil.tools module<a class="headerlink" href="#module-yggdrasil.tools" title="Permalink to this heading">¶</a></h2>
 <p>This modules offers various tools.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.tools.ProxyMeta">
@@ -7045,7 +7046,7 @@ to None.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.tools.YggClass">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.tools.</span></span><span class="sig-name descname"><span class="pre">YggClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/tools.html#YggClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tools.YggClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.components.ComponentBase" title="yggdrasil.components.ComponentBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.components.ComponentBase</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.components.ComponentBase" title="yggdrasil.components.ComponentBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentBase</span></code></a></p>
 <p>Base class for Ygg classes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -7554,7 +7555,7 @@ will be debug log. Defaults to False.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.tools.YggLoggerAdapter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.tools.</span></span><span class="sig-name descname"><span class="pre">YggLoggerAdapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance_name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/tools.html#YggLoggerAdapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tools.YggLoggerAdapter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.LoggerAdapter" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">logging.LoggerAdapter</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.LoggerAdapter" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">LoggerAdapter</span></code></a></p>
 <p>Logger adapter for use with YggClass.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.tools.YggLoggerAdapter.as_str">
@@ -7584,7 +7585,7 @@ will be debug log. Defaults to False.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.tools.YggPopen">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.tools.</span></span><span class="sig-name descname"><span class="pre">YggPopen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_signals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_matlab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/tools.html#YggPopen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.tools.YggPopen" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/subprocess.html#subprocess.Popen" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">subprocess.Popen</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/subprocess.html#subprocess.Popen" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Popen</span></code></a></p>
 <p>Uses Popen to open a process without a buffer. If not already set,
 the keyword arguments ‘bufsize’, ‘stdout’, and ‘stderr’ are set to
 0, subprocess.PIPE, and subprocess.STDOUT respectively. This sets the
@@ -8421,7 +8422,7 @@ on msg_format to create the log message.</p></li>
 
 </section>
 <section id="module-yggdrasil.units">
-<span id="yggdrasil-units-module"></span><h2>yggdrasil.units module<a class="headerlink" href="#module-yggdrasil.units" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-units-module"></span><h2>yggdrasil.units module<a class="headerlink" href="#module-yggdrasil.units" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.units.add_units">
 <span class="sig-prename descclassname"><span class="pre">yggdrasil.units.</span></span><span class="sig-name descname"><span class="pre">add_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/units.html#add_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.units.add_units" title="Permalink to this definition">¶</a></dt>
@@ -8723,7 +8724,7 @@ dimensionless units will return True.</p></li>
 
 </section>
 <section id="module-yggdrasil.yamlfile">
-<span id="yggdrasil-yamlfile-module"></span><h2>yggdrasil.yamlfile module<a class="headerlink" href="#module-yggdrasil.yamlfile" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-yamlfile-module"></span><h2>yggdrasil.yamlfile module<a class="headerlink" href="#module-yggdrasil.yamlfile" title="Permalink to this heading">¶</a></h2>
 <dl class="py exception">
 <dt class="sig sig-object py" id="yggdrasil.yamlfile.YAMLSpecificationError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.yamlfile.</span></span><span class="sig-name descname"><span class="pre">YAMLSpecificationError</span></span><a class="reference internal" href="../_modules/yggdrasil/yamlfile.html#YAMLSpecificationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.yamlfile.YAMLSpecificationError" title="Permalink to this definition">¶</a></dt>
@@ -8994,7 +8995,7 @@ directory will be used.</p></li>
 
 </section>
 <section id="module-yggdrasil">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil" title="Permalink to this heading">¶</a></h2>
 <p>This package provides a framework for integrating models across languages
 such that they can be run simultaneously, passing input back and forth.</p>
 </section>

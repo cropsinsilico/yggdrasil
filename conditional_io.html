@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Conditional I/O &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Conditional I/O &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -105,10 +106,10 @@
            <div itemprop="articleBody">
              
   <section id="conditional-i-o">
-<span id="conditional-io-rst"></span><h1>Conditional I/O<a class="headerlink" href="#conditional-i-o" title="Permalink to this headline">¶</a></h1>
+<span id="conditional-io-rst"></span><h1>Conditional I/O<a class="headerlink" href="#conditional-i-o" title="Permalink to this heading">¶</a></h1>
 <p>yggdrasil also supports conditional input/output logic within the YAML specification file to allow a model to send/receive output/input to/from different destinations/sources based on the value of an input/output variable. yggdrasil supports both basic logic (e.g. less than, equal to) and more complex methods for evaluating the state implemented via Python functions.</p>
 <section id="conditional-output">
-<h2>Conditional Output<a class="headerlink" href="#conditional-output" title="Permalink to this headline">¶</a></h2>
+<h2>Conditional Output<a class="headerlink" href="#conditional-output" title="Permalink to this heading">¶</a></h2>
 <p>In the example below, the process represented by model B changes depending on the value of the input so that we can represent the relationship as a piecewise set of two functions with each one being valid under different conditions. In this case modelB_function1 is only valid if the input is &lt;=2 and modelB_function2 is only valid if the input is &gt;2.</p>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">modelA_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
@@ -180,9 +181,9 @@
 <p><code class="docutils literal notranslate"><span class="pre">filter</span></code> values are maps with either <code class="docutils literal notranslate"><span class="pre">statement</span></code> or <code class="docutils literal notranslate"><span class="pre">function</span></code> parameters (see <a class="reference internal" href="tables/schema_table_filter_general.html#schema-table-filter-general-rst"><span class="std std-ref">here</span></a>) and any additional filter parameters (see <a class="reference internal" href="tables/schema_table_filter_specific.html#schema-table-filter-specific-rst"><span class="std std-ref">here</span></a>). <code class="docutils literal notranslate"><span class="pre">statement</span></code> filters are simple expressions of equality/inequality (in Python syntax) that reference the connection input as <code class="docutils literal notranslate"><span class="pre">%x%</span></code> (e.g. the filter for <code class="docutils literal notranslate"><span class="pre">python_modelB1:input</span></code> above). Alternatively, you can provide a value for the <code class="docutils literal notranslate"><span class="pre">function</span></code> parameter which encodes a filter using a Python function. <code class="docutils literal notranslate"><span class="pre">function</span></code> values should be of the form <code class="docutils literal notranslate"><span class="pre">&lt;filename&gt;:&lt;function</span> <span class="pre">name&gt;</span></code> where <code class="docutils literal notranslate"><span class="pre">filename</span></code> is the full path to the location of a Python source file containing the desired function that should be used to determine if the condition is satisfied and <code class="docutils literal notranslate"><span class="pre">function</span> <span class="pre">name</span></code> is the name of the desired function (e.g. the filter for <code class="docutils literal notranslate"><span class="pre">python_modelB2:input</span></code> above). Functions used in such cases should take a single argument (the variable or tuple of variables being passed by the connection), and return a boolean (the validity of the condition being represented). The path to the file containing the function can be absolute or relative to the directory containing the yaml file.</p>
 </section>
 <section id="filter-options">
-<h2>Filter Options<a class="headerlink" href="#filter-options" title="Permalink to this headline">¶</a></h2>
+<h2>Filter Options<a class="headerlink" href="#filter-options" title="Permalink to this heading">¶</a></h2>
 <section id="general-filter-options">
-<h3>General Filter Options<a class="headerlink" href="#general-filter-options" title="Permalink to this headline">¶</a></h3>
+<h3>General Filter Options<a class="headerlink" href="#general-filter-options" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default" id="schema-table-filter-general-rst">
 <colgroup>
 <col style="width: 10%" />
@@ -207,7 +208,7 @@
 </table>
 </section>
 <section id="filter-types">
-<h3>Filter Types<a class="headerlink" href="#filter-types" title="Permalink to this headline">¶</a></h3>
+<h3>Filter Types<a class="headerlink" href="#filter-types" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default" id="schema-table-filter-subtype-rst">
 <colgroup>
 <col style="width: 100%" />
@@ -227,7 +228,7 @@
 </table>
 </section>
 <section id="type-specific-filter-options">
-<h3>Type Specific Filter Options<a class="headerlink" href="#type-specific-filter-options" title="Permalink to this headline">¶</a></h3>
+<h3>Type Specific Filter Options<a class="headerlink" href="#type-specific-filter-options" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default" id="schema-table-filter-specific-rst">
 <colgroup>
 <col style="width: 7%" />

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Docker Containers &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Docker Containers &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -103,14 +104,14 @@
            <div itemprop="articleBody">
              
   <section id="docker-containers">
-<span id="docker-rst"></span><h1>Docker Containers<a class="headerlink" href="#docker-containers" title="Permalink to this headline">¶</a></h1>
+<span id="docker-rst"></span><h1>Docker Containers<a class="headerlink" href="#docker-containers" title="Permalink to this heading">¶</a></h1>
 <p>For convenience, yggdrasil provides <a class="reference external" href="https://www.docker.com/">Docker</a> images and tools for building Docker images. To get started using these images, you will need to do a few things first.</p>
 <ol class="arabic simple">
 <li><p><strong>Download and install docker</strong> from <a class="reference external" href="https://docs.docker.com/get-docker/">here</a>.</p></li>
 <li><p><strong>Sign-up for DockerHub</strong> <a class="reference external" href="https://hub.docker.com/">here</a>, start docker, and sign-in using your docker hub credentials (either via the desktop app or the <a class="reference external" href="https://docs.docker.com/engine/reference/commandline/login/">command line</a>).</p></li>
 </ol>
 <section id="release-images">
-<h2>Release Images<a class="headerlink" href="#release-images" title="Permalink to this headline">¶</a></h2>
+<h2>Release Images<a class="headerlink" href="#release-images" title="Permalink to this heading">¶</a></h2>
 <p>For each tagged release of yggdrasil, a Docker image will be published to the <code class="docutils literal notranslate"><span class="pre">cropsinsilico/yggdrasil</span></code> <a class="reference external" href="https://hub.docker.com/repository/docker/cropsinsilico/yggdrasil">DockerHub repository</a>.</p>
 <p>After installing Docker, you can pull the latest release image by running:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ docker pull cropsinsilico/yggdrasil
@@ -136,7 +137,7 @@
 </div>
 </section>
 <section id="executable-images">
-<h2>Executable Images<a class="headerlink" href="#executable-images" title="Permalink to this headline">¶</a></h2>
+<h2>Executable Images<a class="headerlink" href="#executable-images" title="Permalink to this heading">¶</a></h2>
 <p>In addition to release images, an executable image will be published for each tagged release of yggdrasil. Executable images will be published to the <code class="docutils literal notranslate"><span class="pre">cropsinsilico/yggdrasil-executable</span></code> <a class="reference external" href="https://hub.docker.com/repository/docker/cropsinsilico/yggdrasil-executable">DockerHub repository</a> and can be pulled via:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$  docker pull cropsinsilico/yggdrasil-executable
 </pre></div>
@@ -157,7 +158,7 @@
 <p>In addition, this script allows the paths to the YAMLs to be relative rather than absolute and, if passed the <code class="docutils literal notranslate"><span class="pre">--pull-docker-image</span></code> flag, it can pull the latest executable image before running it.</p>
 </section>
 <section id="service-images">
-<span id="service-docker-rst"></span><h2>Service Images<a class="headerlink" href="#service-images" title="Permalink to this headline">¶</a></h2>
+<span id="service-docker-rst"></span><h2>Service Images<a class="headerlink" href="#service-images" title="Permalink to this heading">¶</a></h2>
 <p>yggdrasil also provides images that run yggdrasil’s <a class="reference internal" href="remote.html#remote-rst"><span class="std std-ref">integration service manager</span></a> as a web application. As the service images do not contain any services by default, these images are best used as bases for building your own Docker image that copies in a file containing a mapping of integrations that should be exposed as services and those directories containing models.</p>
 <p>For example, if you have a services file <code class="docutils literal notranslate"><span class="pre">services.yml</span></code> that defines two integrations.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">foo</span><span class="p">:</span><span class="w"></span>
@@ -190,7 +191,7 @@
 </div>
 </section>
 <section id="development-images">
-<h2>Development Images<a class="headerlink" href="#development-images" title="Permalink to this headline">¶</a></h2>
+<h2>Development Images<a class="headerlink" href="#development-images" title="Permalink to this heading">¶</a></h2>
 <p>Occasionally during development it may be necessary for the yggdrasil team to create images for specific commits. These will be published to the <code class="docutils literal notranslate"><span class="pre">cropsinsilico/yggdrasil-dev</span></code> <a class="reference external" href="https://hub.docker.com/repository/docker/cropsinsilico/yggdrasil-dev">DockerHub repository</a>. If you know that such an image exists for a commit with the ID string <code class="docutils literal notranslate"><span class="pre">[COMMIT]</span></code>, you can pull it via:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ docker pull cropsinsilico/yggdrasil-dev:[COMMIT]
 </pre></div>
@@ -198,7 +199,7 @@
 <p>Such images operate in the same fashion as the release images described above and can be run in the same manner.</p>
 </section>
 <section id="building-new-images">
-<h2>Building New Images<a class="headerlink" href="#building-new-images" title="Permalink to this headline">¶</a></h2>
+<h2>Building New Images<a class="headerlink" href="#building-new-images" title="Permalink to this heading">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">utils/build_docker.py</span></code> from the yggdrasil repository can be used to build/push new Docker images.</p>
 <p>To build a new Docker image containing the tagged release, <code class="docutils literal notranslate"><span class="pre">RELEASE</span></code>, run:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python utils/build_docker.py --release RELEASE

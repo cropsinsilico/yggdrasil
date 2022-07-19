@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Defining New Datatypes &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Defining New Datatypes &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -30,7 +31,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -109,14 +110,14 @@
            <div itemprop="articleBody">
              
   <section id="defining-new-datatypes">
-<span id="new-datatype-rst"></span><h1>Defining New Datatypes<a class="headerlink" href="#defining-new-datatypes" title="Permalink to this headline">¶</a></h1>
+<span id="new-datatype-rst"></span><h1>Defining New Datatypes<a class="headerlink" href="#defining-new-datatypes" title="Permalink to this heading">¶</a></h1>
 <p>yggdrasil supports two methods for defining new datatypes, either by
 creating an alias for a complex datatype expressed in terms of the existing
 datatypes (as described <a class="reference internal" href="../advanced/datatypes.html#datatypes-rst"><span class="std std-ref">here</span></a>) or through a Python class.
 Reguardless of the method used, the datatype will automatically be registered
 and added to the metaschema.</p>
 <section id="json-defined-datatypes">
-<h2>JSON Defined Datatypes<a class="headerlink" href="#json-defined-datatypes" title="Permalink to this headline">¶</a></h2>
+<h2>JSON Defined Datatypes<a class="headerlink" href="#json-defined-datatypes" title="Permalink to this heading">¶</a></h2>
 <p>To define a datatype in terms of the existing datatypes, developers can save
 the schema defining the datatype to a .json file in the
 yggdrasil/metaschema/datatypes/schemas directory. yggdrasil automatically
@@ -127,7 +128,7 @@ and ‘type’ metaschema properties and must be a valid schema (i.e. can be
 validated using the <a class="reference internal" href="../advanced/metaschema.html#metaschema-rst"><span class="std std-ref">metaschema</span></a>.</p>
 </section>
 <section id="class-defined-datatypes">
-<h2>Class Defined Datatypes<a class="headerlink" href="#class-defined-datatypes" title="Permalink to this headline">¶</a></h2>
+<h2>Class Defined Datatypes<a class="headerlink" href="#class-defined-datatypes" title="Permalink to this heading">¶</a></h2>
 <p>Class defined data types should subclass the
 <a class="reference internal" href="../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType" title="yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType</span></code></a> base.
 The file containing the class definitions should reside in the
@@ -251,7 +252,7 @@ as a base class. Generally, developers should be able to control the testing of
 their class by specifying values for the following class attributes:</p>
 </section>
 <section id="class-defined-properties">
-<h2>Class Defined Properties<a class="headerlink" href="#class-defined-properties" title="Permalink to this headline">¶</a></h2>
+<h2>Class Defined Properties<a class="headerlink" href="#class-defined-properties" title="Permalink to this heading">¶</a></h2>
 <p>yggdrasil also supports the addition of new metaschema properties by subclassing
 the <a class="reference internal" href="../yggdrasil.metaschema.properties.html#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty" title="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty</span></code></a>
 The file containing the class definitions should reside in the

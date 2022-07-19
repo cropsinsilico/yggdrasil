@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Datatypes &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Datatypes &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -28,7 +29,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -94,7 +95,7 @@
            <div itemprop="articleBody">
              
   <section id="datatypes">
-<span id="datatypes-rst"></span><h1>Datatypes<a class="headerlink" href="#datatypes" title="Permalink to this headline">¶</a></h1>
+<span id="datatypes-rst"></span><h1>Datatypes<a class="headerlink" href="#datatypes" title="Permalink to this heading">¶</a></h1>
 <p>Model input and outputs are described in model YAML files by several
 properties, including type. The type assigned to an input/output determines
 how yggdrasil will <a class="reference internal" href="serialization.html#serialization-rst"><span class="std std-ref">serialize</span></a> data that is
@@ -107,14 +108,14 @@ in the YAML file using a <a class="reference external" href="https://json-schema
 When the YAML specification files are read in these datatypes are validated
 against the yggdrasil <a class="reference internal" href="metaschema.html#metaschema-rst"><span class="std std-ref">metaschema</span></a>.</p>
 <section id="primary-datatypes">
-<h2>Primary Datatypes<a class="headerlink" href="#primary-datatypes" title="Permalink to this headline">¶</a></h2>
+<h2>Primary Datatypes<a class="headerlink" href="#primary-datatypes" title="Permalink to this heading">¶</a></h2>
 <p>yggdrasil supports all of the following basic data types which include the
 core JSON data types, as well as several additional datatypes that yggdrasil
 defines for convenience. Simple datatypes can be specified via strings, while
 collection datatypes require a schema that can be used to validate data being
 passed (dynamic arrays/objects are not yet supported).</p>
 <section id="simple-datatypes">
-<h3>Simple Datatypes<a class="headerlink" href="#simple-datatypes" title="Permalink to this headline">¶</a></h3>
+<h3>Simple Datatypes<a class="headerlink" href="#simple-datatypes" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default" id="datatype-table-simple-rst">
 <colgroup>
 <col style="width: 8%" />
@@ -168,7 +169,7 @@ passed (dynamic arrays/objects are not yet supported).</p>
 </table>
 </section>
 <section id="collection-datatypes">
-<h3>Collection Datatypes<a class="headerlink" href="#collection-datatypes" title="Permalink to this headline">¶</a></h3>
+<h3>Collection Datatypes<a class="headerlink" href="#collection-datatypes" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default" id="datatype-table-container-rst">
 <colgroup>
 <col style="width: 7%" />
@@ -210,7 +211,7 @@ passed (dynamic arrays/objects are not yet supported).</p>
 </table>
 </section>
 <section id="yggdrasil-datatypes">
-<h3>yggdrasil Datatypes<a class="headerlink" href="#yggdrasil-datatypes" title="Permalink to this headline">¶</a></h3>
+<h3>yggdrasil Datatypes<a class="headerlink" href="#yggdrasil-datatypes" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default" id="datatype-table-yggdrasil-rst">
 <colgroup>
 <col style="width: 9%" />

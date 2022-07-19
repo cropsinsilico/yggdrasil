@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Installation &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -121,7 +122,7 @@
            <div itemprop="articleBody">
              
   <section id="installation">
-<span id="install-rst"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<span id="install-rst"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><strong>Windows Users</strong></p>
@@ -143,7 +144,7 @@
 <p>If you will be running C/C++/Fortran models, you will need to install the command line developer tools on Mac which provides several utilities for compilation and code management (e.g. clang, gcc, make, git). <a class="reference external" href="https://cloudtechpoint.medium.com/how-to-install-command-line-tools-homebrew-in-macos-without-xcode-1b910742d923">This</a> article outlines how to check if they are installed and install them if they are not. It also describes how to install the Homebrew package manager, which will be useful for installing non-Python dependencies if you do not plan on using conda to install yggdrasil.</p>
 </div>
 <section id="conda-installation-recommended">
-<h2>Conda Installation (recommended)<a class="headerlink" href="#conda-installation-recommended" title="Permalink to this headline">¶</a></h2>
+<h2>Conda Installation (recommended)<a class="headerlink" href="#conda-installation-recommended" title="Permalink to this heading">¶</a></h2>
 <p>Download and install Miniconda from <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">here</a> (or Anaconda from <a class="reference external" href="https://www.anaconda.com/download/">here</a> if you would like additional Python libraries installed by default). There are conda distributions available for yggdrasil from <a class="reference external" href="https://github.com/conda-forge/yggdrasil-feedstock">conda-forge</a>. You can install yggdrasil from conda-forge by calling:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install -c conda-forge yggdrasil
 </pre></div>
@@ -183,11 +184,11 @@ the terminal (or Anaconda Prompt on Windows).:</p>
 </div>
 </section>
 <section id="development-installation">
-<h2>Development Installation<a class="headerlink" href="#development-installation" title="Permalink to this headline">¶</a></h2>
+<h2>Development Installation<a class="headerlink" href="#development-installation" title="Permalink to this heading">¶</a></h2>
 <p>If you would like to contribute to yggdrasil, instructions on setting up a development environment can be found <a class="reference internal" href="development/general.html#dev-env-rst"><span class="std std-ref">here</span></a>.</p>
 </section>
 <section id="manual-installation">
-<span id="manual-install-rst"></span><h2>Manual Installation<a class="headerlink" href="#manual-installation" title="Permalink to this headline">¶</a></h2>
+<span id="manual-install-rst"></span><h2>Manual Installation<a class="headerlink" href="#manual-installation" title="Permalink to this heading">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Before installing yggdrasil from <code class="docutils literal notranslate"><span class="pre">pip</span></code> or the cloned repository, you
@@ -279,7 +280,7 @@ Windows (&gt;=7), the following command will permanently modify your path:</p>
 <p>The changes will take affect the next time you open the terminal.</p>
 </section>
 <section id="user-defined-rapidjson">
-<h2>User Defined rapidjson<a class="headerlink" href="#user-defined-rapidjson" title="Permalink to this headline">¶</a></h2>
+<h2>User Defined rapidjson<a class="headerlink" href="#user-defined-rapidjson" title="Permalink to this heading">¶</a></h2>
 <p>If you would like to use an existing installation of the
 <a class="reference external" href="http://rapidjson.org/">rapidjson</a>
 header-only library, you can pass the flag
@@ -288,7 +289,7 @@ installation commands from above with the location of the
 existing rapidjson include directory.</p>
 </section>
 <section id="additional-steps-on-windows">
-<h2>Additional Steps on Windows<a class="headerlink" href="#additional-steps-on-windows" title="Permalink to this headline">¶</a></h2>
+<h2>Additional Steps on Windows<a class="headerlink" href="#additional-steps-on-windows" title="Permalink to this heading">¶</a></h2>
 <p>As local communication on Windows is handled by ZeroMQ, running models written
 in C or C++ will require installing the ZeroMQ libraries for C and C++.
 If you install yggdrasil using conda, these will be installed
@@ -305,7 +306,7 @@ overhead. We recommend installing zeromq &amp; czmq via apt on Linux
 on Mac (<code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">czmq</span> <span class="pre">zmq</span></code>) if you do not use conda.</p>
 </div>
 <section id="installing-via-vcpkg">
-<h3>Installing via vcpkg<a class="headerlink" href="#installing-via-vcpkg" title="Permalink to this headline">¶</a></h3>
+<h3>Installing via vcpkg<a class="headerlink" href="#installing-via-vcpkg" title="Permalink to this heading">¶</a></h3>
 <p>You can install the ZeroMQ C and C++ libraries via vcpkg (instructions for
 installing vcpkg found <a class="reference external" href="https://github.com/microsoft/vcpkg">here</a>. To
 do so run the following from your “VS2015 x64 Native Tools Developer Command Prompt”:</p>
@@ -330,7 +331,7 @@ zeromq libraries/headers to your yggdrasil configuration file (See
 <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">Configuration Options</span></a>).</p>
 </section>
 <section id="building-from-source">
-<h3>Building from Source<a class="headerlink" href="#building-from-source" title="Permalink to this headline">¶</a></h3>
+<h3>Building from Source<a class="headerlink" href="#building-from-source" title="Permalink to this heading">¶</a></h3>
 <p>Instructions for installing the ZeroMQ C and C++ libraries can be found
 <a class="reference external" href="https://github.com/zeromq/czmq#building-and-installing">here</a>
 At install (and any time <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> is called), yggdrasil will attempt
@@ -344,7 +345,7 @@ from the command line or by setting the appropriate config options manually.</p>
 </section>
 </section>
 <section id="additional-steps-for-matlab-models">
-<h2>Additional Steps for Matlab Models<a class="headerlink" href="#additional-steps-for-matlab-models" title="Permalink to this headline">¶</a></h2>
+<h2>Additional Steps for Matlab Models<a class="headerlink" href="#additional-steps-for-matlab-models" title="Permalink to this heading">¶</a></h2>
 <p>To run Matlab models, you will need an existing Matlab installation and license and
 the <code class="docutils literal notranslate"><span class="pre">matlab</span></code> executable must be on your path (i.e. you can call <code class="docutils literal notranslate"><span class="pre">matlab</span></code>
 from the command line and a Matlab interpreter will open). If not already available on
@@ -399,17 +400,17 @@ line.</p>
 </div>
 </section>
 <section id="additional-steps-for-r-models">
-<span id="install-r-rst"></span><h2>Additional Steps for R Models<a class="headerlink" href="#additional-steps-for-r-models" title="Permalink to this headline">¶</a></h2>
+<span id="install-r-rst"></span><h2>Additional Steps for R Models<a class="headerlink" href="#additional-steps-for-r-models" title="Permalink to this heading">¶</a></h2>
 <section id="rtools-windows-only">
-<h3>Rtools (Windows only)<a class="headerlink" href="#rtools-windows-only" title="Permalink to this headline">¶</a></h3>
+<h3>Rtools (Windows only)<a class="headerlink" href="#rtools-windows-only" title="Permalink to this heading">¶</a></h3>
 <p>On Windows, if you do not install the R dependencies via conda, you will also need to install Rtools so that the R dependencies with C/C++/Fortran components can be compiled if they need to be installed from source. The Rtools installer and instructions for installing Rtools for R&lt;4.0.0 can be found <a class="reference external" href="https://cran.r-project.org/bin/windows/Rtools/history.html">here</a>. For R&gt;=4.0.0, you will need to install Rtools40 instead (installer/instructions <a class="reference external" href="https://cran.r-project.org/bin/windows/Rtools/">here</a>).</p>
 </section>
 <section id="r-interpreter">
-<h3>R Interpreter<a class="headerlink" href="#r-interpreter" title="Permalink to this headline">¶</a></h3>
+<h3>R Interpreter<a class="headerlink" href="#r-interpreter" title="Permalink to this heading">¶</a></h3>
 <p>To run R models, you will need to install the
 <a class="reference external" href="https://www.r-project.org/">R interpreter</a> (we recommend R &gt;= 3.5). If you installed yggdrasil using conda, this will be installed for you, but if you are not using conda, you will need to install R yourself along with the <a class="reference external" href="https://www.unidata.ucar.edu/software/udunits/">udunits</a> package.</p>
 <section id="mac">
-<h4>Mac<a class="headerlink" href="#mac" title="Permalink to this headline">¶</a></h4>
+<h4>Mac<a class="headerlink" href="#mac" title="Permalink to this heading">¶</a></h4>
 <p>On Mac, this can be done via Homebrew:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ brew install r
 $ brew install udunits
@@ -417,7 +418,7 @@ $ brew install udunits
 </div>
 </section>
 <section id="linux">
-<h4>Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h4>
+<h4>Linux<a class="headerlink" href="#linux" title="Permalink to this heading">¶</a></h4>
 <p>On Linux this can be done via apt. Installing R &gt;= 3.5 (recommended) requires first adding a source entry and key for your OS as shown below for for Xenial distribution of Ubuntu (Details on <a class="reference external" href="https://cloud.r-project.org/bin/linux/ubuntu/README.html">ubuntu</a>, <a class="reference external" href="https://cloud.r-project.org/bin/linux/debian/">debian</a>, <a class="reference external" href="https://cloud.r-project.org/bin/linux/redhat/README">redhat</a> installation):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo add-apt-repository &#39;deb https://cloud.r-project.org/bin/linux/ubuntu xenial-cran35/&#39;
 $ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
@@ -429,12 +430,12 @@ $ sudo apt-get install libudunits2-dev
 <p>If you don’t want the latest version, you can install the default using the last two lines on Ubuntu and Debian.</p>
 </section>
 <section id="windows">
-<h4>Windows<a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h4>
+<h4>Windows<a class="headerlink" href="#windows" title="Permalink to this heading">¶</a></h4>
 <p>On Windows, you will need to download and run the installer. Links to the R 3.6 installer and additoinal information about the installation process on Windows can be found <a class="reference external" href="https://cran.r-project.org/bin/windows/base/">here</a>.</p>
 </section>
 </section>
 <section id="r-dependencies">
-<h3>R Dependencies<a class="headerlink" href="#r-dependencies" title="Permalink to this headline">¶</a></h3>
+<h3>R Dependencies<a class="headerlink" href="#r-dependencies" title="Permalink to this heading">¶</a></h3>
 <p>Even if you install the R interpreter yourself, yggdrasil will attempt to install the R dependencies it needs via <a class="reference external" href="https://cran.r-project.org/">CRAN</a> when it is installed. If this fails, you may need to install these yourself from within the R interpreter. yggdrasil’s R dependencies include <a class="reference external" href="https://blog.rstudio.com/2018/03/26/reticulate-r-interface-to-python/">reticulate</a> for calling Python from R, <a class="reference external" href="https://cran.r-project.org/web/packages/zeallot/index.html">zeallot</a> for allowing assignment of output to multiple variables, <a class="reference external" href="https://cran.r-project.org/web/packages/units/index.html">units</a> for tracking physical units in R, <a class="reference external" href="https://cran.r-project.org/web/packages/bit64/index.html">bit64</a> for 64bit integers, and <a class="reference external" href="https://cran.r-project.org/web/packages/R6/index.html">R6</a> for creating interface classes with teardown methods.</p>
 <p>These packages can by installed from CRAN from the R interpreter.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s2">&quot;reticulate&quot;</span><span class="p">)</span>
@@ -479,7 +480,7 @@ ERROR: sub-architecture &#39;R.dSYM&#39; is not installed
 </section>
 </section>
 <section id="additional-steps-for-rabbitmq-message-passing">
-<h2>Additional Steps for RabbitMQ Message Passing<a class="headerlink" href="#additional-steps-for-rabbitmq-message-passing" title="Permalink to this headline">¶</a></h2>
+<h2>Additional Steps for RabbitMQ Message Passing<a class="headerlink" href="#additional-steps-for-rabbitmq-message-passing" title="Permalink to this heading">¶</a></h2>
 <p>RabbitMQ connections allow messages to be passed between models when the
 models are not running on the same machine. To use these connections,
 the framework you must install the <a class="reference external" href="https://pika.readthedocs.io/en/stable/">pika</a> Python package and have access to a
@@ -495,7 +496,7 @@ for RabbitMQ related properties in the config file are set to the defaults
 for starting a RabbitMQ server.</p>
 </section>
 <section id="additional-steps-for-opensimroot">
-<h2>Additional Steps for OpenSimRoot<a class="headerlink" href="#additional-steps-for-opensimroot" title="Permalink to this headline">¶</a></h2>
+<h2>Additional Steps for OpenSimRoot<a class="headerlink" href="#additional-steps-for-opensimroot" title="Permalink to this heading">¶</a></h2>
 <p>If you would like to use OpenSimRoot, you will need to install GNU make. If you are on Linux/Mac or used conda to install yggdrasil it is likely that it will already be installed (you can run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">--version</span></code> to check). If it is not installed, and you are using a Mac OS, you can install XCode and the command line developer tools to get make and several other GNU tools (see relavent section of <a class="reference external" href="https://cloudtechpoint.medium.com/how-to-install-command-line-tools-homebrew-in-macos-without-xcode-1b910742d923">this article</a>). If you are not on Mac, we recommend installing it via a package manager, e.g.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">make</span></code> on Mac</p></li>

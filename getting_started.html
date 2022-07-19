@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting started &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Getting started &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -104,7 +105,7 @@
            <div itemprop="articleBody">
              
   <section id="getting-started">
-<span id="getting-started-rst"></span><h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<span id="getting-started-rst"></span><h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this heading">¶</a></h1>
 <p>The yggdrasil framework runs user defined models and orchestrates asynchronous
 communication between models using drivers that coordinate the different
 components via threads. Model drivers run the models as seperate processes
@@ -114,7 +115,7 @@ Input/output drivers connect communication channels (comms) between models
 and/or files. On the model side, interface API functions/classes are provided
 in different programming languages to allow models to access these comms.</p>
 <section id="running-a-model">
-<h2>Running a model<a class="headerlink" href="#running-a-model" title="Permalink to this headline">¶</a></h2>
+<h2>Running a model<a class="headerlink" href="#running-a-model" title="Permalink to this heading">¶</a></h2>
 <p>Models are run by creating a YAML file that specifies the location of the model
 code and the type of model. Consider the following model which just prints a
 single line of output to stdout:</p>
@@ -149,7 +150,7 @@ commandline entry point <cite>yggrun</cite> followed by the path to the YAML.:</
 </div>
 </section>
 <section id="running-multiple-models">
-<h2>Running multiple models<a class="headerlink" href="#running-multiple-models" title="Permalink to this headline">¶</a></h2>
+<h2>Running multiple models<a class="headerlink" href="#running-multiple-models" title="Permalink to this heading">¶</a></h2>
 <p>Multiple models can be run by either passing multiple YAML files to <cite>yggrun</cite>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggrun model1.yml model2.yml
 </pre></div>
@@ -169,7 +170,7 @@ commandline entry point <cite>yggrun</cite> followed by the path to the YAML.:</
 <p>(<a class="reference external" href="examples/gs_lesson2.html">Example in other languages</a>)</p>
 </section>
 <section id="running-remote-models">
-<span id="git-models-rst"></span><h2>Running remote models<a class="headerlink" href="#running-remote-models" title="Permalink to this headline">¶</a></h2>
+<span id="git-models-rst"></span><h2>Running remote models<a class="headerlink" href="#running-remote-models" title="Permalink to this heading">¶</a></h2>
 <p>Models stored on remote Git repositories can be run by prepending ‘git:’ to the YAML file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggrun git:http://github.com/foo/bar/yam/remote_model.yml
 </pre></div>
@@ -186,7 +187,7 @@ the command line:</p>
 </div>
 </section>
 <section id="model-file-input-output">
-<h2>Model file input/output<a class="headerlink" href="#model-file-input-output" title="Permalink to this headline">¶</a></h2>
+<h2>Model file input/output<a class="headerlink" href="#model-file-input-output" title="Permalink to this heading">¶</a></h2>
 <p>Models can get input from or send output to files via input and output channels.
 To do so yggdrasil provides several useful functions for interfacing with
 these channels. In the example below, the model receives input from a channel
@@ -299,7 +300,7 @@ with the above file types and input/output options, see
 <a class="reference internal" href="formatted_io.html#formatted-io-rst"><span class="std std-ref">Formatted I/O</span></a>.</p>
 </section>
 <section id="model-to-model-communication-with-connections">
-<h2>Model-to-model communication (with connections)<a class="headerlink" href="#model-to-model-communication-with-connections" title="Permalink to this headline">¶</a></h2>
+<h2>Model-to-model communication (with connections)<a class="headerlink" href="#model-to-model-communication-with-connections" title="Permalink to this heading">¶</a></h2>
 <p>Models can also communicate with each other in the same fashion. In the example
 below, model A receives input from a channel named ‘inputA’ and sends output to
 a channel named ‘outputA’, while model B receives input from a channel named
@@ -389,7 +390,7 @@ section of the YAML.</p>
 <p>(<a class="reference external" href="examples/gs_lesson4.html">Example in other languages</a>)</p>
 </section>
 <section id="model-to-model-communication-with-drivers">
-<h2>Model-to-model communication (with drivers)<a class="headerlink" href="#model-to-model-communication-with-drivers" title="Permalink to this headline">¶</a></h2>
+<h2>Model-to-model communication (with drivers)<a class="headerlink" href="#model-to-model-communication-with-drivers" title="Permalink to this heading">¶</a></h2>
 <p>For backwards compatibility, connections can also be specified in terms of
 the underlying drivers without an explicit <code class="docutils literal notranslate"><span class="pre">connections</span></code> section. The
 exact same models from the previous example can be connected using the

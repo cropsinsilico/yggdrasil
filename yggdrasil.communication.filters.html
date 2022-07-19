@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.filters package &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>yggdrasil.communication.filters package &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -28,7 +29,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -94,16 +95,16 @@
            <div itemprop="articleBody">
              
   <section id="yggdrasil-communication-filters-package">
-<h1>yggdrasil.communication.filters package<a class="headerlink" href="#yggdrasil-communication-filters-package" title="Permalink to this headline">¶</a></h1>
+<h1>yggdrasil.communication.filters package<a class="headerlink" href="#yggdrasil-communication-filters-package" title="Permalink to this heading">¶</a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-yggdrasil.communication.filters.DirectFilter">
-<span id="yggdrasil-communication-filters-directfilter-module"></span><h2>yggdrasil.communication.filters.DirectFilter module<a class="headerlink" href="#module-yggdrasil.communication.filters.DirectFilter" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-communication-filters-directfilter-module"></span><h2>yggdrasil.communication.filters.DirectFilter module<a class="headerlink" href="#module-yggdrasil.communication.filters.DirectFilter" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.filters.DirectFilter.DirectFilter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.filters.DirectFilter.</span></span><span class="sig-name descname"><span class="pre">DirectFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/DirectFilter.html#DirectFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.filters.DirectFilter.DirectFilter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.filters.FilterBase.FilterBase" title="yggdrasil.communication.filters.FilterBase.FilterBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.filters.FilterBase.FilterBase</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.filters.FilterBase.FilterBase" title="yggdrasil.communication.filters.FilterBase.FilterBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">FilterBase</span></code></a></p>
 <p>Class that always passes messages.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.filters.DirectFilter.DirectFilter.evaluate_filter">
@@ -144,11 +145,11 @@
 
 </section>
 <section id="module-yggdrasil.communication.filters.FilterBase">
-<span id="yggdrasil-communication-filters-filterbase-module"></span><h2>yggdrasil.communication.filters.FilterBase module<a class="headerlink" href="#module-yggdrasil.communication.filters.FilterBase" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-communication-filters-filterbase-module"></span><h2>yggdrasil.communication.filters.FilterBase module<a class="headerlink" href="#module-yggdrasil.communication.filters.FilterBase" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.filters.FilterBase.FilterBase">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.filters.FilterBase.</span></span><span class="sig-name descname"><span class="pre">FilterBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/FilterBase.html#FilterBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.filters.FilterBase.FilterBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="advanced/code_python.html#yggdrasil.components.ComponentBase" title="yggdrasil.components.ComponentBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.components.ComponentBase</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="advanced/code_python.html#yggdrasil.components.ComponentBase" title="yggdrasil.components.ComponentBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentBase</span></code></a></p>
 <p>Base class for message filters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -194,11 +195,11 @@ that should be set when the filter is created.</p>
 
 </section>
 <section id="module-yggdrasil.communication.filters.FunctionFilter">
-<span id="yggdrasil-communication-filters-functionfilter-module"></span><h2>yggdrasil.communication.filters.FunctionFilter module<a class="headerlink" href="#module-yggdrasil.communication.filters.FunctionFilter" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-communication-filters-functionfilter-module"></span><h2>yggdrasil.communication.filters.FunctionFilter module<a class="headerlink" href="#module-yggdrasil.communication.filters.FunctionFilter" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.filters.FunctionFilter.FunctionFilter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.filters.FunctionFilter.</span></span><span class="sig-name descname"><span class="pre">FunctionFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/FunctionFilter.html#FunctionFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.filters.FunctionFilter.FunctionFilter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.filters.FilterBase.FilterBase" title="yggdrasil.communication.filters.FilterBase.FilterBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.filters.FilterBase.FilterBase</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.filters.FilterBase.FilterBase" title="yggdrasil.communication.filters.FilterBase.FilterBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">FilterBase</span></code></a></p>
 <p>Class for filtering messages based on a provided function using Python syntax.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -250,11 +251,11 @@ if the message should pass through the filter, False if it should not.</p>
 
 </section>
 <section id="module-yggdrasil.communication.filters.StatementFilter">
-<span id="yggdrasil-communication-filters-statementfilter-module"></span><h2>yggdrasil.communication.filters.StatementFilter module<a class="headerlink" href="#module-yggdrasil.communication.filters.StatementFilter" title="Permalink to this headline">¶</a></h2>
+<span id="yggdrasil-communication-filters-statementfilter-module"></span><h2>yggdrasil.communication.filters.StatementFilter module<a class="headerlink" href="#module-yggdrasil.communication.filters.StatementFilter" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.filters.StatementFilter.StatementFilter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.filters.StatementFilter.</span></span><span class="sig-name descname"><span class="pre">StatementFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/StatementFilter.html#StatementFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.filters.StatementFilter.StatementFilter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.filters.FilterBase.FilterBase" title="yggdrasil.communication.filters.FilterBase.FilterBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.filters.FilterBase.FilterBase</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.filters.FilterBase.FilterBase" title="yggdrasil.communication.filters.FilterBase.FilterBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">FilterBase</span></code></a></p>
 <p>Class for filtering messages based on a provided statement using Python syntax.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -317,7 +318,7 @@ messages should or should not pass the filter.</p>
 
 </section>
 <section id="module-yggdrasil.communication.filters">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil.communication.filters" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil.communication.filters" title="Permalink to this heading">¶</a></h2>
 </section>
 </section>
 

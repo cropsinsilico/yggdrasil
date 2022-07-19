@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Timestep Synchronization &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Timestep Synchronization &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -107,7 +108,7 @@
            <div itemprop="articleBody">
              
   <section id="timestep-synchronization">
-<span id="timesync-io-rst"></span><h1>Timestep Synchronization<a class="headerlink" href="#timestep-synchronization" title="Permalink to this headline">¶</a></h1>
+<span id="timesync-io-rst"></span><h1>Timestep Synchronization<a class="headerlink" href="#timestep-synchronization" title="Permalink to this heading">¶</a></h1>
 <p>Many models are time dependent with variables being updated as the time is incremented. When integrating two (or more) models that have timesteps, care must be taken to ensure that variables are correctly synchonized between the models at each timestep. To aid in this process yggdrasil provides a special timestep synchronization interface and model driver. Synchronizations proceeds as follows:</p>
 <ol class="arabic simple">
 <li><p>A client model <strong>requests</strong> synchronization at a given timestep by calling the synchronization interface with the time of the desired timestep (with units) and any local state variables to the synchronization driver.</p></li>
@@ -118,7 +119,7 @@
 <li><p>The synchronization driver <strong>responds</strong> to the client model that issued the request with the resulting state variables.</p></li>
 </ol>
 <section id="example-using-defaults">
-<h2>Example Using Defaults<a class="headerlink" href="#example-using-defaults" title="Permalink to this headline">¶</a></h2>
+<h2>Example Using Defaults<a class="headerlink" href="#example-using-defaults" title="Permalink to this heading">¶</a></h2>
 <p>In the example below, two model are initialized from the same source code. Both models have two state variables (<code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>) that are calculated as a sine and cosine with periods of 10 days and 5 days respectively; the two models differ only in the size of their timesteps and the units that they use to represent time (the timestep and units for each model are set by input arguments to the model as passed in the yaml).</p>
 <p>In the yaml file below, the models are defined as usual, but they also have the <code class="docutils literal notranslate"><span class="pre">timesync</span></code> parameter set to <code class="docutils literal notranslate"><span class="pre">True</span></code>. Setting the <code class="docutils literal notranslate"><span class="pre">timesync</span></code> parameter tells yggdrasil that the model has time dependent variables that need to be synchonized. The <code class="docutils literal notranslate"><span class="pre">timesync</span></code> parameter can also be set to a string that will be used to group models that should be synchronized; in this way, sets of models can be independently synchronized (e.g. if there are unrelated processes that don’t need to be synced). For each unique value of the <code class="docutils literal notranslate"><span class="pre">timesync</span></code> parameter in the provided yamls, yggdrasil sets up a specialized model with that name to handle synchronization between the models with the same <code class="docutils literal notranslate"><span class="pre">timesync</span></code> parameter value (setting <code class="docutils literal notranslate"><span class="pre">timesync</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code> creates a specialized timestep synchronization model with the name <code class="docutils literal notranslate"><span class="pre">timesync</span></code>).</p>
 <p>Model YAML:</p>
@@ -246,7 +247,7 @@
 <p>Model B has a larger timestep than model A so values for model B are interpolated to get values at the timesteps for model A. The default interpolation method assumes a linear relationship between values and the default aggregation method averages across all models; as a result, the values for the model with the smaller timestep (model A) end up being pulled away from the “True” value when aggregated with the interpolated with the values from the model with the larger timestep (model B). There are ways to control how timesteps are synchronized (as discussed below), but in practice, integrating two models of the same process with the same degree of accuracy that use different timesteps is unlikely to be useful.</p>
 </section>
 <section id="controlling-synchonization">
-<h2>Controlling Synchonization<a class="headerlink" href="#controlling-synchonization" title="Permalink to this headline">¶</a></h2>
+<h2>Controlling Synchonization<a class="headerlink" href="#controlling-synchonization" title="Permalink to this heading">¶</a></h2>
 <p>There are several ways to customize how timesteps are merged between models. In order to set these options, an explicit entry must be added to the yaml for the timestep synchronization model. At a minimum the timestep synchronization model yaml entry should have <code class="docutils literal notranslate"><span class="pre">language:</span> <span class="pre">timesync</span></code> and it’s name should be the same as the <code class="docutils literal notranslate"><span class="pre">timesync</span></code> parameter value for the models it will synchronize (<code class="docutils literal notranslate"><span class="pre">'timesync'</span></code> if the models have <code class="docutils literal notranslate"><span class="pre">timesync:</span> <span class="pre">True</span></code>). Additional parameters in the timestep synchronization model yaml entry will be used to control how timesteps are synchronized.</p>
 <p>In the example below, these parameters are used to modify how the state variables are synchronized. Models A and B are identical except:</p>
 <ul class="simple">
@@ -318,7 +319,7 @@
 <img alt="_images/timesync2_result.png" src="_images/timesync2_result.png" />
 <p>(The source code associated with this model is very similar to the souce code above, but can be found <a class="reference external" href="examples/timesync2.html">here</a> for reference.)</p>
 <section id="synonyms-conversion">
-<h3>Synonyms (Conversion)<a class="headerlink" href="#synonyms-conversion" title="Permalink to this headline">¶</a></h3>
+<h3>Synonyms (Conversion)<a class="headerlink" href="#synonyms-conversion" title="Permalink to this heading">¶</a></h3>
 <p>It is unlikely that variables will match perfectly between models, beit in name or definition. For example, in the model defined above, model A and B use different names to describe the same variable (<code class="docutils literal notranslate"><span class="pre">y</span></code> and <code class="docutils literal notranslate"><span class="pre">yvar</span></code> respectively). Similarly the variables <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">xvar</span></code> used by models A and B respectively are analagous, but <code class="docutils literal notranslate"><span class="pre">xvar</span></code> is defined slightly differently (namely <code class="docutils literal notranslate"><span class="pre">xvar=x/2</span></code>).</p>
 <p>To handle reconcilation between analagous variables, yggdrasil allows users to define relationships between variables in different models using the <code class="docutils literal notranslate"><span class="pre">synonyms</span></code> parameter. The value for the <code class="docutils literal notranslate"><span class="pre">synonyms</span></code> parameter should be a mapping between model names and mapping from base variable names (these should be variables named by one or more models) and the analogous variable that the model uses. If the model just uses a different name for the same concept as the base, this can be just a string (e.g. the <code class="docutils literal notranslate"><span class="pre">synonyms</span></code> entry for <code class="docutils literal notranslate"><span class="pre">y</span></code> in <code class="docutils literal notranslate"><span class="pre">modelB</span></code> above). If additional calculations are required to convert between the variables used in the models, a mapping can be provided (e.g. the <code class="docutils literal notranslate"><span class="pre">synonyms</span></code> entry for <code class="docutils literal notranslate"><span class="pre">x</span></code> in <code class="docutils literal notranslate"><span class="pre">modelB</span></code>). In addition, calculation mapping from one model to another can also involve more than one variable (e.g. the <code class="docutils literal notranslate"><span class="pre">synonyms</span></code> entry for <code class="docutils literal notranslate"><span class="pre">z</span></code> in <code class="docutils literal notranslate"><span class="pre">modelA</span></code>). The keys in the entry should be:</p>
 <ul class="simple">
@@ -332,19 +333,19 @@
 </div>
 </section>
 <section id="additional-variables">
-<h3>Additional Variables<a class="headerlink" href="#additional-variables" title="Permalink to this headline">¶</a></h3>
+<h3>Additional Variables<a class="headerlink" href="#additional-variables" title="Permalink to this heading">¶</a></h3>
 <p>Models can also request state variables from other models that they do not calculate themselves via the <code class="docutils literal notranslate"><span class="pre">additional_variables</span></code> parameter in the yaml. The value for this parameter should be a mapping from model name to a list of external variables that should be returned to the model. For example, in the above yaml, model A requests state variable <code class="docutils literal notranslate"><span class="pre">b</span></code> from model B and model B requests state variable <code class="docutils literal notranslate"><span class="pre">a</span></code> from model A.</p>
 </section>
 <section id="interpolation">
-<h3>Interpolation<a class="headerlink" href="#interpolation" title="Permalink to this headline">¶</a></h3>
+<h3>Interpolation<a class="headerlink" href="#interpolation" title="Permalink to this heading">¶</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">interpolation</span></code> parameter controls how data is obtained for timesteps that are not sampled by the model. This is particularly important for models that have very different timesteps. Values for the <code class="docutils literal notranslate"><span class="pre">interpolation</span></code> parameter can be strings specifying the method that should be used to interpolate or mapping of keyword arguments to <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.interpolate.html">pandas.DataFrame.interpolate</a>. A single <code class="docutils literal notranslate"><span class="pre">interpolation</span></code> parameter can be used for all models or specialed <code class="docutils literal notranslate"><span class="pre">interpolation</span></code> parameters can be specified a model-by-model basis using a mapping as in the example above. Interpolation is done on the data from each model independently after applying the transformations described by the <code class="docutils literal notranslate"><span class="pre">synonyms</span></code> parameter.</p>
 </section>
 <section id="aggregation">
-<h3>Aggregation<a class="headerlink" href="#aggregation" title="Permalink to this headline">¶</a></h3>
+<h3>Aggregation<a class="headerlink" href="#aggregation" title="Permalink to this heading">¶</a></h3>
 <p>After the model data is interpolated to get missing timesteps, the data samples at each timestep are aggregated. By default, the samples from each model are averaged, but there are many ways to aggregate data. In the example above, the data for the <code class="docutils literal notranslate"><span class="pre">x</span></code> variable are aggregated using a function <code class="docutils literal notranslate"><span class="pre">xagg</span></code> from the <code class="docutils literal notranslate"><span class="pre">./src/timesync.py</span></code> file which always returns the largest absolute value. The data for the <code class="docutils literal notranslate"><span class="pre">y</span></code> variable are aggregated by summing as would be the case when two models represent separate processes that modify a cumulative variable (e.g. mass added/subtracted by different processes).</p>
 </section>
 <section id="additional-tips">
-<h3>Additional Tips<a class="headerlink" href="#additional-tips" title="Permalink to this headline">¶</a></h3>
+<h3>Additional Tips<a class="headerlink" href="#additional-tips" title="Permalink to this heading">¶</a></h3>
 <p>In addition to dictionaries mapping from variable to method, a single value can be provided for the <code class="docutils literal notranslate"><span class="pre">aggregation</span></code> and <code class="docutils literal notranslate"><span class="pre">interpolation</span></code> parameter; the same method will the be used for all of the variables e.g.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">statesync</span>
   <span class="n">language</span><span class="p">:</span> <span class="n">timesync</span>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>R Interface &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>R Interface &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -30,7 +31,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -119,25 +120,25 @@
            <div itemprop="articleBody">
              
   <section id="r-interface">
-<span id="id1"></span><h1>R Interface<a class="headerlink" href="#r-interface" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>R Interface<a class="headerlink" href="#r-interface" title="Permalink to this heading">¶</a></h1>
 <section id="ygginterface">
-<h2><code class="docutils literal notranslate"><span class="pre">YggInterface</span></code><a class="headerlink" href="#ygginterface" title="Permalink to this headline">¶</a></h2>
+<h2><code class="docutils literal notranslate"><span class="pre">YggInterface</span></code><a class="headerlink" href="#ygginterface" title="Permalink to this heading">¶</a></h2>
 <p>Create an object for sending/receiving messages to/from an yggdrasil
 channel.</p>
 <section id="description">
-<h3>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h3>
+<h3>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h3>
 <p>This function wraps functions from yggdrasil’s <a class="reference external" href="interface_py.html">Python
 interface</a>, so refer to that documentation for
 additional details.</p>
 </section>
 <section id="usage">
-<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
+<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">YggInterface</span><span class="p">(</span><span class="n">type</span><span class="p">,</span> <span class="kc">...</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="arguments">
-<h3>Arguments<a class="headerlink" href="#arguments" title="Permalink to this headline">¶</a></h3>
+<h3>Arguments<a class="headerlink" href="#arguments" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 45%" />
@@ -166,12 +167,12 @@ to the Python interface function.</p></td>
 </table>
 </section>
 <section id="value">
-<h3>Value<a class="headerlink" href="#value" title="Permalink to this headline">¶</a></h3>
+<h3>Value<a class="headerlink" href="#value" title="Permalink to this heading">¶</a></h3>
 <p>A Python comm that can be used to send/receive messages via send/recv
 methods.</p>
 </section>
 <section id="examples">
-<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">in_channel</span> <span class="o">=</span> <span class="nf">YggInterface</span><span class="p">(</span><span class="s">&#39;YggInput&#39;</span><span class="p">,</span> <span class="s">&#39;input_channel_name&#39;</span><span class="p">)</span>
 <span class="c1"># Use zeallot &#39;%&lt;-%&#39; syntax to expand multiple variables</span>
 <span class="nf">c</span><span class="p">(</span><span class="n">flag</span><span class="p">,</span> <span class="n">input</span><span class="p">)</span> <span class="o">%&lt;-%</span> <span class="n">in_channel</span><span class="o">$</span><span class="nf">recv</span><span class="p">()</span>

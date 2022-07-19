@@ -29,7 +29,7 @@ func_deserialize     function            Callable object that takes objects of a
 func_serialize       function            Callable object that takes Python objects as input and returns a representation    ['functional']                      
                                          that conforms to encoded_datatype. Defaults to None and the default                                                    
                                          serialization for encoded_datatype will be used.                                                                       
-indent               ['string', 'int']   String or number of spaces that should be used to indent each level within the     ['json', 'yaml']                    
+indent               ['string', 'int']   String or number of spaces that should be used to indent each level within the     ['yaml', 'json']                    
                                          seiralized structure. Defaults to '\t'.                                                                                
 no_header            boolean             If True, headers will not be read or serialized from/to tables. Defaults to        ['pandas']                          
                                          False.                                                                                                                 

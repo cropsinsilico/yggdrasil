@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>General Development Notes &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>General Development Notes &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -30,7 +31,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -109,9 +110,9 @@
            <div itemprop="articleBody">
              
   <section id="general-development-notes">
-<span id="general-rst"></span><h1>General Development Notes<a class="headerlink" href="#general-development-notes" title="Permalink to this headline">¶</a></h1>
+<span id="general-rst"></span><h1>General Development Notes<a class="headerlink" href="#general-development-notes" title="Permalink to this heading">¶</a></h1>
 <section id="development-workflow">
-<h2>Development Workflow<a class="headerlink" href="#development-workflow" title="Permalink to this headline">¶</a></h2>
+<h2>Development Workflow<a class="headerlink" href="#development-workflow" title="Permalink to this heading">¶</a></h2>
 <p>Development of yggdrasil should be done on branches and/or forks that
 are then merged in via pull request after passing linting (via
 <a class="reference external" href="http://flake8.pycqa.org/en/latest/">flake8</a>), testing (via
@@ -125,7 +126,7 @@ potential sticking points, features that already exist but are poorly documented
 and features that would break a significant portion of the code.</p>
 </section>
 <section id="setting-up-a-dev-environment">
-<span id="dev-env-rst"></span><h2>Setting Up a Dev Environment<a class="headerlink" href="#setting-up-a-dev-environment" title="Permalink to this headline">¶</a></h2>
+<span id="dev-env-rst"></span><h2>Setting Up a Dev Environment<a class="headerlink" href="#setting-up-a-dev-environment" title="Permalink to this heading">¶</a></h2>
 <p>The following is only one method for setting up a development environment. You are welcome to select another method (e.g. using virtual env), but this is what has worked for me.</p>
 <ol class="arabic">
 <li><p>[WINDOWS ONLY] Download and install Visual Studio Community from <a class="reference external" href="https://visualstudio.microsoft.com/vs/community/">here</a>. During installation, we recommend selecting the components below. If you forget to add something during the initial download, you can always modify the installation via the “Visual Studio Installer” program.</p>
@@ -199,7 +200,7 @@ $ conda activate ygg
 </div>
 </section>
 <section id="testing">
-<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this heading">¶</a></h2>
 <p>All development should be accompanied by tests. yggdrasil aims to
 maintain 100% test coverage, so tests should be provided in pull
 requests including new development. yggdrasil provides base classes to

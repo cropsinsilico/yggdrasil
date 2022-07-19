@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Debugging &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Debugging &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -108,9 +109,9 @@
            <div itemprop="articleBody">
              
   <section id="debugging">
-<span id="debugging-rst"></span><h1>Debugging<a class="headerlink" href="#debugging" title="Permalink to this headline">¶</a></h1>
+<span id="debugging-rst"></span><h1>Debugging<a class="headerlink" href="#debugging" title="Permalink to this heading">¶</a></h1>
 <section id="tips-for-debugging">
-<h2>Tips for Debugging<a class="headerlink" href="#tips-for-debugging" title="Permalink to this headline">¶</a></h2>
+<h2>Tips for Debugging<a class="headerlink" href="#tips-for-debugging" title="Permalink to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p><em>Look at the full output.</em> The final error raised by yggdrasil may not contain all of the informations provided by errors that were raised within a model due to limitations of error forwarding between the different languages. It is important to look at the full output from a failed run. Usually the first error encountered or the error raised within the model’s language will be the most relevant and be the most useful for debugging.</p></li>
 <li><p><em>Check for known errors.</em> The list below includes several errors that have already been encountered by yggdrasil users and the method used to solve the issue.</p></li>
@@ -120,9 +121,9 @@
 </ol>
 </section>
 <section id="possible-errors">
-<h2>Possible Errors<a class="headerlink" href="#possible-errors" title="Permalink to this headline">¶</a></h2>
+<h2>Possible Errors<a class="headerlink" href="#possible-errors" title="Permalink to this heading">¶</a></h2>
 <section id="general-errors">
-<h3>General Errors<a class="headerlink" href="#general-errors" title="Permalink to this headline">¶</a></h3>
+<h3>General Errors<a class="headerlink" href="#general-errors" title="Permalink to this heading">¶</a></h3>
 <ul>
 <li><dl class="simple">
 <dt>You get errors that look like <code class="docutils literal notranslate"><span class="pre">zmq.error.ZMQError:</span> <span class="pre">Too</span> <span class="pre">many</span> <span class="pre">open</span> <span class="pre">files</span></code> when running integrations.</dt><dd><p><strong>Possible Cause:</strong> The limit on the number of file identifiers that can be open is too low (the default on Mac is 256) and yggdrasil is trying to use more than this limit (file identifiers are opened for multiprocessing objects, ZeroMQ sockets, files, etc.).
@@ -148,7 +149,7 @@
 </ul>
 </section>
 <section id="linux-errors">
-<h3>Linux Errors<a class="headerlink" href="#linux-errors" title="Permalink to this headline">¶</a></h3>
+<h3>Linux Errors<a class="headerlink" href="#linux-errors" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><dl class="simple">
 <dt>Importing yggdrasil installed using conda causes <code class="docutils literal notranslate"><span class="pre">ImportError:</span> <span class="pre">/usr/lib/x86_64-linux-gnu/libstdc++.so.6:</span> <span class="pre">version</span> <span class="pre">'GLIBCXX_3.4.22'</span> <span class="pre">not</span> <span class="pre">found</span> <span class="pre">(required</span> <span class="pre">by</span> <span class="pre">&lt;some</span> <span class="pre">python</span> <span class="pre">package&gt;)</span></code></dt><dd><p><strong>Possible Cause:</strong> For some reason (e.g. path modification), the Python package raising the import error is trying to use the system version of libstdc++ rather than the conda version that the package was compiled against.
@@ -163,7 +164,7 @@
 </ul>
 </section>
 <section id="macos-errors">
-<h3>MacOS Errors<a class="headerlink" href="#macos-errors" title="Permalink to this headline">¶</a></h3>
+<h3>MacOS Errors<a class="headerlink" href="#macos-errors" title="Permalink to this heading">¶</a></h3>
 <ul>
 <li><p>You get <code class="docutils literal notranslate"><span class="pre">Undefined</span> <span class="pre">symbol</span></code> errors following a warning similar to:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ld</span><span class="p">:</span> <span class="n">warning</span><span class="p">:</span> <span class="n">ignoring</span> <span class="n">file</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Developer</span><span class="o">/</span><span class="n">CommandLineTools</span><span class="o">/</span><span class="n">SDKs</span><span class="o">/</span><span class="n">MacOSX10</span><span class="mf">.14</span><span class="o">.</span><span class="n">sdk</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">libSystem</span><span class="o">.</span><span class="n">tbd</span><span class="p">,</span> <span class="n">file</span> <span class="n">was</span> <span class="n">built</span> <span class="k">for</span> <span class="n">unsupported</span> <span class="n">file</span> <span class="nb">format</span> <span class="p">(</span> <span class="mh">0x2D</span> <span class="mh">0x2D</span> <span class="mh">0x2D</span> <span class="mh">0x20</span> <span class="mh">0x21</span> <span class="mh">0x74</span> <span class="mh">0x61</span> <span class="mh">0x70</span> <span class="mh">0x69</span> <span class="mh">0x2D</span> <span class="mh">0x74</span> <span class="mh">0x62</span> <span class="mh">0x64</span> <span class="mh">0x2D</span> <span class="mh">0x76</span> <span class="mh">0x33</span> <span class="p">)</span> <span class="n">which</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">the</span> <span class="n">architecture</span> <span class="n">being</span> <span class="n">linked</span> <span class="p">(</span><span class="n">x86_64</span><span class="p">):</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Developer</span><span class="o">/</span><span class="n">CommandLineTools</span><span class="o">/</span><span class="n">SDKs</span><span class="o">/</span><span class="n">MacOSX10</span><span class="mf">.14</span><span class="o">.</span><span class="n">sdk</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">libSystem</span><span class="o">.</span><span class="n">tbd</span>
@@ -199,7 +200,7 @@ $ tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz -C &quot;$(dirname &quot;
 </div></blockquote>
 </section>
 <section id="matlab-errors">
-<h3>Matlab Errors<a class="headerlink" href="#matlab-errors" title="Permalink to this headline">¶</a></h3>
+<h3>Matlab Errors<a class="headerlink" href="#matlab-errors" title="Permalink to this heading">¶</a></h3>
 <ul>
 <li><dl>
 <dt>The MATLAB model hangs for a long time during startup and then times out.</dt><dd><p><strong>Possible Cause:</strong> If MATLAB has trouble accessing the license server, it can hang for a long time during startup. yggdrasil has a config parameter that controls how long it will wait for MATLAB to start. If it takes longer than that amount of time, it will kill the process and report an error.</p>
@@ -216,7 +217,7 @@ $ tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz -C &quot;$(dirname &quot;
 </ul>
 </section>
 <section id="c-errors">
-<h3>C++ Errors<a class="headerlink" href="#c-errors" title="Permalink to this headline">¶</a></h3>
+<h3>C++ Errors<a class="headerlink" href="#c-errors" title="Permalink to this heading">¶</a></h3>
 <ul>
 <li><dl>
 <dt>The received message size is always 0, but the message is not empty.</dt><dd><p><strong>Possible Cause:</strong> Some C++ compilers will incorrectly pass the <code class="docutils literal notranslate"><span class="pre">size_t</span></code> reference such that it is copied and set to zero as it is passed.</p>
@@ -233,7 +234,7 @@ $ tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz -C &quot;$(dirname &quot;
 </ul>
 </section>
 <section id="r-errors">
-<h3>R Errors<a class="headerlink" href="#r-errors" title="Permalink to this headline">¶</a></h3>
+<h3>R Errors<a class="headerlink" href="#r-errors" title="Permalink to this heading">¶</a></h3>
 <ul>
 <li><p>You get an error message along the lines of:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>ImportError: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.20&#39; not found

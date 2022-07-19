@@ -1,10 +1,10 @@
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/server_python.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/server_python.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/client_python.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson1/client_python.yml
    :language: yaml
    :linenos:
 

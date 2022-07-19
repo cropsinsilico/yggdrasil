@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Units &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Units &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -100,7 +101,7 @@
            <div itemprop="articleBody">
              
   <section id="units">
-<span id="units-rst"></span><h1>Units<a class="headerlink" href="#units" title="Permalink to this headline">¶</a></h1>
+<span id="units-rst"></span><h1>Units<a class="headerlink" href="#units" title="Permalink to this heading">¶</a></h1>
 <p>Units are handled via the <a class="reference external" href="https://unyt.readthedocs.io/en/stable/">unyt</a>
 package in Python &gt;=3 and via <a class="reference external" href="https://pint.readthedocs.io/en/0.9/">pint</a>
 in Python 2. In both cases, units are specified via strings
@@ -109,7 +110,7 @@ associated with the units (usually the abbreviation; e.g.
 expressed as composites via symbolic arithmetic (e.g. <code class="docutils literal notranslate"><span class="pre">'km/s'</span></code> for kilometers
 per second or <code class="docutils literal notranslate"><span class="pre">'km**2'</span></code> for square kilometer)</p>
 <section id="schema-datatypes">
-<h2>Schema Datatypes<a class="headerlink" href="#schema-datatypes" title="Permalink to this headline">¶</a></h2>
+<h2>Schema Datatypes<a class="headerlink" href="#schema-datatypes" title="Permalink to this heading">¶</a></h2>
 <p>The primary case where users will encounter units is within types associated
 with model inputs and outputs in model specification YAML files. If a YAML
 specifies a connection between a model output and input that do not have the
@@ -119,7 +120,7 @@ are not compatible, an error will be raised.</p>
 <p>Units can be added to numeric scalars and arrays.</p>
 </section>
 <section id="python-objects">
-<h2>Python Objects<a class="headerlink" href="#python-objects" title="Permalink to this headline">¶</a></h2>
+<h2>Python Objects<a class="headerlink" href="#python-objects" title="Permalink to this heading">¶</a></h2>
 <p>In Python, units can be added to numeric types (or retrieved) using the
 yggdrasil units submodule which wraps the particular behavior of the
 underlying packages. Using unyt:</p>

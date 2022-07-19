@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>YAML Files &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>YAML Files &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -125,7 +126,7 @@
            <div itemprop="articleBody">
              
   <section id="yaml-files">
-<span id="yaml-rst"></span><h1>YAML Files<a class="headerlink" href="#yaml-files" title="Permalink to this headline">¶</a></h1>
+<span id="yaml-rst"></span><h1>YAML Files<a class="headerlink" href="#yaml-files" title="Permalink to this heading">¶</a></h1>
 <p>Models and communication between models during are specified by the user in one
 or more YAML files. YAML files have a human readable structure that can be parsed
 by many different programming languages to recreate data structures. While the
@@ -141,7 +142,7 @@ or a mix of both.</p></li>
 <code class="docutils literal notranslate"><span class="pre">key:</span> <span class="pre">value</span></code> pair. Keys are text and values can be text or a collection.</p></li>
 </ul>
 <section id="models">
-<h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+<h2>Models<a class="headerlink" href="#models" title="Permalink to this heading">¶</a></h2>
 <p>At the root level of a yggdrasil YAML, should be a mapping key <code class="docutils literal notranslate"><span class="pre">model:</span></code>
 or <code class="docutils literal notranslate"><span class="pre">models:</span></code>. This denotes information pertaining to the model(s) that should
 be run. The value for this key can be a single model entry:</p>
@@ -201,7 +202,7 @@ options for communication channels).</p>
 </div>
 </section>
 <section id="connections">
-<h2>Connections<a class="headerlink" href="#connections" title="Permalink to this headline">¶</a></h2>
+<h2>Connections<a class="headerlink" href="#connections" title="Permalink to this heading">¶</a></h2>
 <p>In order to connect models inputs/outputs to files and/or other model
 inputs/outputs, the yaml(s) must all contain a <code class="docutils literal notranslate"><span class="pre">connections</span></code> key/value pair.
 The coordesponding value for the <code class="docutils literal notranslate"><span class="pre">connections</span></code> key should be one or more
@@ -254,7 +255,7 @@ entry will be passed to the input/output driver that is created for the
 connection.</p>
 </section>
 <section id="validation">
-<h2>Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>
+<h2>Validation<a class="headerlink" href="#validation" title="Permalink to this heading">¶</a></h2>
 <p>yggdrasil uses a <a class="reference internal" href="advanced/schema.html#schema-rst"><span class="std std-ref">JSON schema</span></a> to validate the provided
 YAML specification files. If you would like to validate a set of YAML specification
 files without running the integration, this can be done via the <code class="docutils literal notranslate"><span class="pre">yggvalidate</span></code> CLI.:</p>
@@ -263,9 +264,9 @@ files without running the integration, this can be done via the <code class="doc
 </div>
 </section>
 <section id="model-options">
-<span id="yaml-model-options"></span><h2>Model Options<a class="headerlink" href="#model-options" title="Permalink to this headline">¶</a></h2>
+<span id="yaml-model-options"></span><h2>Model Options<a class="headerlink" href="#model-options" title="Permalink to this heading">¶</a></h2>
 <section id="general-model-options">
-<h3>General Model Options<a class="headerlink" href="#general-model-options" title="Permalink to this headline">¶</a></h3>
+<h3>General Model Options<a class="headerlink" href="#general-model-options" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default" id="schema-table-model-general-rst">
 <colgroup>
 <col style="width: 19%" />
@@ -508,7 +509,7 @@ Defaults to False.</p></td>
 </table>
 </section>
 <section id="available-languages">
-<h3>Available Languages<a class="headerlink" href="#available-languages" title="Permalink to this headline">¶</a></h3>
+<h3>Available Languages<a class="headerlink" href="#available-languages" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default" id="schema-table-model-subtype-rst">
 <colgroup>
 <col style="width: 10%" />
@@ -588,7 +589,7 @@ to monitor it on the root process.</p></td>
 </table>
 </section>
 <section id="language-specific-model-options">
-<h3>Language Specific Model Options<a class="headerlink" href="#language-specific-model-options" title="Permalink to this headline">¶</a></h3>
+<h3>Language Specific Model Options<a class="headerlink" href="#language-specific-model-options" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default" id="schema-table-model-specific-rst">
 <colgroup>
 <col style="width: 13%" />
@@ -631,7 +632,7 @@ be relative to working_dir or absolute.</p></td>
 provided, the compiler will be determined based on configuration options for the
 language (if present) and the registered compilers that are available on the
 current operating system.</p></td>
-<td><p>[‘c++’, ‘c’, ‘cxx’, ‘fortran’, ‘make’, ‘cpp’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’, ‘fortran’, ‘c++’, ‘cxx’, ‘cpp’, ‘c’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>compiler_flags</p></td>
 <td><p>array</p></td>
@@ -639,7 +640,7 @@ current operating system.</p></td>
 the compiler flags will be determined based on configuration options for the
 language (if present), the compiler defaults, and the default_compiler_flags
 class attribute.</p></td>
-<td><p>[‘c++’, ‘c’, ‘cxx’, ‘fortran’, ‘make’, ‘cpp’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’, ‘fortran’, ‘c++’, ‘cxx’, ‘cpp’, ‘c’]</p></td>
 </tr>
 <tr class="row-even"><td><p>configuration</p></td>
 <td><p>string</p></td>
@@ -703,14 +704,14 @@ be determined by the target language driver.</p></td>
 <td><p>Name or path of interpreter executable that should be used to run the model. If
 not provided, the interpreter will be determined based on configuration options
 for the language (if present) and the default_interpreter class attribute.</p></td>
-<td><p>[‘sbml’, ‘dummy’, ‘timesync’, ‘python’, ‘R’, ‘matlab’, ‘lpy’, ‘r’]</p></td>
+<td><p>[‘lpy’, ‘python’, ‘dummy’, ‘R’, ‘sbml’, ‘r’, ‘matlab’, ‘timesync’]</p></td>
 </tr>
 <tr class="row-even"><td><p>interpreter_flags</p></td>
 <td><p>array</p></td>
 <td><p>Flags that should be passed to the interpreter when running the model. If not
 provided, the flags are determined based on configuration options for the
 language (if present) and the default_interpreter_flags class attribute.</p></td>
-<td><p>[‘sbml’, ‘dummy’, ‘timesync’, ‘python’, ‘R’, ‘matlab’, ‘lpy’, ‘r’]</p></td>
+<td><p>[‘lpy’, ‘python’, ‘dummy’, ‘R’, ‘sbml’, ‘r’, ‘matlab’, ‘timesync’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>linker</p></td>
 <td><p>string</p></td>
@@ -718,7 +719,7 @@ language (if present) and the default_interpreter_flags class attribute.</p></td
 provided, the linker will be determined based on configuration options for the
 language (if present) and the registered linkers that are available on the
 current operating system</p></td>
-<td><p>[‘c++’, ‘c’, ‘cxx’, ‘fortran’, ‘make’, ‘cpp’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’, ‘fortran’, ‘c++’, ‘cxx’, ‘cpp’, ‘c’]</p></td>
 </tr>
 <tr class="row-even"><td><p>linker_flags</p></td>
 <td><p>array</p></td>
@@ -726,7 +727,7 @@ current operating system</p></td>
 the linker flags will be determined based on configuration options for the
 language (if present), the linker defaults, and the default_linker_flags class
 attribute.</p></td>
-<td><p>[‘c++’, ‘c’, ‘cxx’, ‘fortran’, ‘make’, ‘cpp’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’, ‘fortran’, ‘c++’, ‘cxx’, ‘cpp’, ‘c’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>makedir</p></td>
 <td><p>string</p></td>
@@ -763,7 +764,7 @@ selections will be returned.</p></td>
 <td><p>If True, no interpreter will be added to the arguments. This should only be used
 for subclasses that will not be invoking the model via the command line.
 Defaults to False.</p></td>
-<td><p>[‘sbml’, ‘dummy’, ‘timesync’, ‘python’, ‘R’, ‘matlab’, ‘lpy’, ‘r’]</p></td>
+<td><p>[‘lpy’, ‘python’, ‘dummy’, ‘R’, ‘sbml’, ‘r’, ‘matlab’, ‘timesync’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>skip_start_time</p></td>
 <td><p>boolean</p></td>
@@ -776,7 +777,7 @@ False. This option is ignored if only_output_final_step is True.</p></td>
 <td><p>Source files that should be compiled into an executable. Defaults to an empty
 list and the driver will search for a source file based on the model executable
 (the first model argument).</p></td>
-<td><p>[‘c++’, ‘c’, ‘cxx’, ‘fortran’, ‘make’, ‘cpp’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’, ‘fortran’, ‘c++’, ‘cxx’, ‘cpp’, ‘c’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>sourcedir</p></td>
 <td><p>string</p></td>
@@ -876,9 +877,9 @@ symunit. Defaults to False.</p></td>
 </section>
 </section>
 <section id="input-output-options">
-<span id="yaml-comm-options"></span><h2>Input/Output Options<a class="headerlink" href="#input-output-options" title="Permalink to this headline">¶</a></h2>
+<span id="yaml-comm-options"></span><h2>Input/Output Options<a class="headerlink" href="#input-output-options" title="Permalink to this heading">¶</a></h2>
 <section id="general-input-output-comm-options">
-<h3>General Input/Output Comm Options<a class="headerlink" href="#general-input-output-comm-options" title="Permalink to this headline">¶</a></h3>
+<h3>General Input/Output Comm Options<a class="headerlink" href="#general-input-output-comm-options" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default" id="schema-table-comm-general-rst">
 <colgroup>
 <col style="width: 13%" />
@@ -1031,7 +1032,7 @@ sent/received. Ignored if not provided.</p></td>
 </table>
 </section>
 <section id="available-comm-types">
-<h3>Available Comm Types<a class="headerlink" href="#available-comm-types" title="Permalink to this headline">¶</a></h3>
+<h3>Available Comm Types<a class="headerlink" href="#available-comm-types" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default" id="schema-table-comm-subtype-rst">
 <colgroup>
 <col style="width: 10%" />
@@ -1075,9 +1076,9 @@ sent/received. Ignored if not provided.</p></td>
 </section>
 </section>
 <section id="file-options">
-<span id="yaml-file-options"></span><h2>File Options<a class="headerlink" href="#file-options" title="Permalink to this headline">¶</a></h2>
+<span id="yaml-file-options"></span><h2>File Options<a class="headerlink" href="#file-options" title="Permalink to this heading">¶</a></h2>
 <section id="general-file-options">
-<h3>General File Options<a class="headerlink" href="#general-file-options" title="Permalink to this headline">¶</a></h3>
+<h3>General File Options<a class="headerlink" href="#general-file-options" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default" id="schema-table-file-general-rst">
 <colgroup>
 <col style="width: 15%" />
@@ -1221,7 +1222,7 @@ immediately.</p></td>
 </table>
 </section>
 <section id="available-file-types">
-<h3>Available File Types<a class="headerlink" href="#available-file-types" title="Permalink to this headline">¶</a></h3>
+<h3>Available File Types<a class="headerlink" href="#available-file-types" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default" id="schema-table-file-subtype-rst">
 <colgroup>
 <col style="width: 9%" />
@@ -1281,7 +1282,7 @@ for 3D structures.</p></td>
 </table>
 </section>
 <section id="file-type-specific-options">
-<h3>File Type Specific Options<a class="headerlink" href="#file-type-specific-options" title="Permalink to this headline">¶</a></h3>
+<h3>File Type Specific Options<a class="headerlink" href="#file-type-specific-options" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default" id="schema-table-file-specific-rst">
 <colgroup>
 <col style="width: 8%" />
@@ -1300,13 +1301,13 @@ for 3D structures.</p></td>
 <tr class="row-even"><td><p>comment</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
-<td><p>[‘map’, ‘yaml’, ‘pickle’, ‘table’, ‘ply’, ‘mat’, ‘wofost’, ‘pandas’, ‘obj’, ‘netcdf’, ‘json’, ‘ascii’]</p></td>
+<td><p>[‘ascii’, ‘table’, ‘map’, ‘yaml’, ‘ply’, ‘netcdf’, ‘pandas’, ‘pickle’, ‘obj’, ‘wofost’, ‘json’, ‘mat’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>datatype</p></td>
 <td><p>schema</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
-<td><p>[‘map’, ‘yaml’, ‘pickle’, ‘table’, ‘ply’, ‘mat’, ‘wofost’, ‘pandas’, ‘obj’, ‘netcdf’, ‘json’, ‘ascii’]</p></td>
+<td><p>[‘ascii’, ‘table’, ‘map’, ‘yaml’, ‘ply’, ‘netcdf’, ‘pandas’, ‘pickle’, ‘obj’, ‘wofost’, ‘json’, ‘mat’]</p></td>
 </tr>
 <tr class="row-even"><td><p>default_flow_style</p></td>
 <td><p>boolean</p></td>
@@ -1329,12 +1330,12 @@ to t.</p></td>
 <td><p>[‘string’, ‘int’]</p></td>
 <td><p>String or number of spaces that should be used to indent each level within the
 seiralized structure. Defaults to ‘t’.</p></td>
-<td><p>[‘json’, ‘yaml’]</p></td>
+<td><p>[‘yaml’, ‘json’]</p></td>
 </tr>
 <tr class="row-even"><td><p>newline</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
-<td><p>[‘map’, ‘yaml’, ‘pickle’, ‘table’, ‘ply’, ‘mat’, ‘wofost’, ‘pandas’, ‘obj’, ‘netcdf’, ‘json’, ‘ascii’]</p></td>
+<td><p>[‘ascii’, ‘table’, ‘map’, ‘yaml’, ‘ply’, ‘netcdf’, ‘pandas’, ‘pickle’, ‘obj’, ‘wofost’, ‘json’, ‘mat’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>no_header</p></td>
 <td><p>boolean</p></td>
@@ -1393,9 +1394,9 @@ Defaults to False.</p></td>
 </section>
 </section>
 <section id="connection-options">
-<span id="yaml-conn-options"></span><h2>Connection Options<a class="headerlink" href="#connection-options" title="Permalink to this headline">¶</a></h2>
+<span id="yaml-conn-options"></span><h2>Connection Options<a class="headerlink" href="#connection-options" title="Permalink to this heading">¶</a></h2>
 <section id="general-connection-options">
-<h3>General Connection Options<a class="headerlink" href="#general-connection-options" title="Permalink to this headline">¶</a></h3>
+<h3>General Connection Options<a class="headerlink" href="#general-connection-options" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default" id="schema-table-connection-general-rst">
 <colgroup>
 <col style="width: 14%" />
@@ -1478,7 +1479,7 @@ the messages in the order they are provided.</p></td>
 </table>
 </section>
 <section id="available-connection-types">
-<h3>Available Connection Types<a class="headerlink" href="#available-connection-types" title="Permalink to this headline">¶</a></h3>
+<h3>Available Connection Types<a class="headerlink" href="#available-connection-types" title="Permalink to this heading">¶</a></h3>
 <table class="docutils align-default" id="schema-table-connection-subtype-rst">
 <colgroup>
 <col style="width: 16%" />
@@ -1515,7 +1516,7 @@ the messages in the order they are provided.</p></td>
 </table>
 </section>
 <section id="additional-options">
-<h3>Additional Options<a class="headerlink" href="#additional-options" title="Permalink to this headline">¶</a></h3>
+<h3>Additional Options<a class="headerlink" href="#additional-options" title="Permalink to this heading">¶</a></h3>
 <p>In addition the the options above, there are several comm (channel/file)
 options that are also valid options for connections for convenience (i.e. at
 the level of the connection rather than as part of the connection’s input/output
@@ -1560,7 +1561,7 @@ of available file types.</p></td>
 </section>
 </section>
 <section id="driver-method">
-<h2>Driver Method<a class="headerlink" href="#driver-method" title="Permalink to this headline">¶</a></h2>
+<h2>Driver Method<a class="headerlink" href="#driver-method" title="Permalink to this heading">¶</a></h2>
 <p>For backwards compatibility, yggdrasil also allows connections to be specified
 using drivers. In this scheme, there is no <code class="docutils literal notranslate"><span class="pre">connections</span></code> section in the yaml(s).
 In specifying communication via drivers, each input/output entry for the models

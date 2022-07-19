@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rpc_lesson1 &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>rpc_lesson1 &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -28,7 +29,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -94,7 +95,7 @@
            <div itemprop="articleBody">
              
   <section id="rpc-lesson1">
-<span id="rpc-lesson1-rst"></span><h1>rpc_lesson1<a class="headerlink" href="#rpc-lesson1" title="Permalink to this headline">¶</a></h1>
+<span id="rpc-lesson1-rst"></span><h1>rpc_lesson1<a class="headerlink" href="#rpc-lesson1" title="Permalink to this heading">¶</a></h1>
 <p>Two models run in a client-server, remote procedure call (RPC) communication pattern. The client model <cite>client</cite> sends requests and receives response to/from the server model <cite>server</cite> via the deprecated <cite>call</cite> method. The server model receives requests and send responses. This example demostrates the RPC pattern through the use of the <cite>client_of</cite> and <cite>is_server</cite> model parameters and the RPC interface classes/functions. The <cite>client</cite> model also sends request/response pairs to a file.</p>
 <div class="contents local topic" id="contents">
 <ul class="simple">
@@ -107,7 +108,7 @@
 </ul>
 </div>
 <section id="c-version">
-<h2><a class="toc-backref" href="#id2">C Version</a><a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id2">C Version</a><a class="headerlink" href="#c-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
 <span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
@@ -244,7 +245,7 @@
 </div>
 </section>
 <section id="id1">
-<h2><a class="toc-backref" href="#id3">C++ Version</a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id3">C++ Version</a><a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
 <span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
@@ -379,7 +380,7 @@
 </div>
 </section>
 <section id="fortran-version">
-<h2><a class="toc-backref" href="#id4">Fortran Version</a><a class="headerlink" href="#fortran-version" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">Fortran Version</a><a class="headerlink" href="#fortran-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>program main
 <span class="linenos"> 2</span>  use fygg
@@ -537,7 +538,7 @@
 </div>
 </section>
 <section id="matlab-version">
-<h2><a class="toc-backref" href="#id5">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">function</span><span class="w"> </span><span class="nf">server</span><span class="p">()</span><span class="w"></span>
 <span class="linenos"> 2</span><span class="w">  </span>
@@ -646,7 +647,7 @@
 </div>
 </section>
 <section id="python-version">
-<h2><a class="toc-backref" href="#id6">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id6">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggRpcServer</span>
@@ -797,7 +798,7 @@
 </div>
 </section>
 <section id="r-version">
-<h2><a class="toc-backref" href="#id7">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id7">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>library(yggdrasil)
 <span class="linenos"> 2</span>

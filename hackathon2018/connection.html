@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Connecting Models to Models &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Connecting Models to Models &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -30,7 +31,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -114,7 +115,7 @@
            <div itemprop="articleBody">
              
   <section id="connecting-models-to-models">
-<h1>Connecting Models to Models<a class="headerlink" href="#connecting-models-to-models" title="Permalink to this headline">¶</a></h1>
+<h1>Connecting Models to Models<a class="headerlink" href="#connecting-models-to-models" title="Permalink to this heading">¶</a></h1>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>The user interface referenced below has been deprecated.</p>
@@ -127,7 +128,7 @@ the user interface, load the <code class="docutils literal notranslate"><span cl
 <p>By right clicking on each model, you can get information about the model’s
 inputs and outputs.</p>
 <section id="model-overview">
-<h2>Model Overview<a class="headerlink" href="#model-overview" title="Permalink to this headline">¶</a></h2>
+<h2>Model Overview<a class="headerlink" href="#model-overview" title="Permalink to this heading">¶</a></h2>
 <p>The canopy model takes as input an initial canopy structure, a growth rate,
 a plant layout describing how the plant grows in x, y, and z, and a time step.
 From this information it grows the canopy structure and outputs the updated
@@ -148,17 +149,17 @@ with the one you created.</p>
 <p>You can trace the data as it flows from files and from one model to the next.</p>
 </section>
 <section id="replacing-the-growth-model">
-<h2>Replacing the Growth Model<a class="headerlink" href="#replacing-the-growth-model" title="Permalink to this headline">¶</a></h2>
+<h2>Replacing the Growth Model<a class="headerlink" href="#replacing-the-growth-model" title="Permalink to this heading">¶</a></h2>
 <p>For the next exercise, we will replace the existing growth model, with the
 one you just created.</p>
 <section id="deleting-the-old-model">
-<h3>Deleting the Old Model<a class="headerlink" href="#deleting-the-old-model" title="Permalink to this headline">¶</a></h3>
+<h3>Deleting the Old Model<a class="headerlink" href="#deleting-the-old-model" title="Permalink to this heading">¶</a></h3>
 <p>By right-clicking on the existing growth model, you can delete the existing
 model from the canvas.</p>
 <img alt="../_images/network_delete.png" src="../_images/network_delete.png" />
 </section>
 <section id="adding-your-model">
-<h3>Adding Your Model<a class="headerlink" href="#adding-your-model" title="Permalink to this headline">¶</a></h3>
+<h3>Adding Your Model<a class="headerlink" href="#adding-your-model" title="Permalink to this heading">¶</a></h3>
 <p>You can then add your model by clicking the blue <code class="docutils literal notranslate"><span class="pre">+</span></code> button next to your
 model in the model palette.</p>
 <img alt="../_images/network_add.png" src="../_images/network_add.png" />
@@ -166,7 +167,7 @@ model in the model palette.</p>
 <img alt="../_images/network_no_connect.png" src="../_images/network_no_connect.png" />
 </section>
 <section id="making-connections">
-<h3>Making Connections<a class="headerlink" href="#making-connections" title="Permalink to this headline">¶</a></h3>
+<h3>Making Connections<a class="headerlink" href="#making-connections" title="Permalink to this heading">¶</a></h3>
 <p>Now we want to connect our growth model to the other models in the network.
 First we connect the input dot (on the left side) for our growth model to
 the output from the photosynthesis model.</p>
@@ -180,7 +181,7 @@ channel of the canopy model, by again clicking on one dot and then the other.</p
 </section>
 </section>
 <section id="creating-the-yaml">
-<h2>Creating the YAML<a class="headerlink" href="#creating-the-yaml" title="Permalink to this headline">¶</a></h2>
+<h2>Creating the YAML<a class="headerlink" href="#creating-the-yaml" title="Permalink to this heading">¶</a></h2>
 <p>Once you have finalized your model connections, you can use the interface to
 create your YAML file by clicking the <code class="docutils literal notranslate"><span class="pre">Generate</span> <span class="pre">Manifest</span></code> button,</p>
 <img alt="../_images/network_manifest.png" src="../_images/network_manifest.png" />
@@ -188,7 +189,7 @@ create your YAML file by clicking the <code class="docutils literal notranslate"
 called <code class="docutils literal notranslate"><span class="pre">growth_network.yml</span></code> in the <code class="docutils literal notranslate"><span class="pre">ygg_home</span></code> directory.</p>
 </section>
 <section id="running-the-model-to-model-integration">
-<h2>Running the Model-to-Model Integration<a class="headerlink" href="#running-the-model-to-model-integration" title="Permalink to this headline">¶</a></h2>
+<h2>Running the Model-to-Model Integration<a class="headerlink" href="#running-the-model-to-model-integration" title="Permalink to this heading">¶</a></h2>
 <p>You can run the integration you just created by executing:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggrun growth_network.yml
 </pre></div>

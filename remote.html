@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Running Integrations as Services &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Running Integrations as Services &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -110,12 +111,12 @@
            <div itemprop="articleBody">
              
   <section id="running-integrations-as-services">
-<span id="remote-rst"></span><h1>Running Integrations as Services<a class="headerlink" href="#running-integrations-as-services" title="Permalink to this headline">¶</a></h1>
+<span id="remote-rst"></span><h1>Running Integrations as Services<a class="headerlink" href="#running-integrations-as-services" title="Permalink to this heading">¶</a></h1>
 <p>In release 1.7.1, the ability to run models as services that can be accessed by integrations running on remote machines was added to yggdrasil. This feature allows models (or sets of models) to be exposed for external use without the need to have the model source code or install it on your local machine. It is intended to make it easier for scientists to share models and foster collaboration. Future releases will include tools for exploring remote models &amp; integrations via visualizations.</p>
 <section id="setting-up-an-integration-as-a-service">
-<h2>Setting Up an Integration as a Service<a class="headerlink" href="#setting-up-an-integration-as-a-service" title="Permalink to this headline">¶</a></h2>
+<h2>Setting Up an Integration as a Service<a class="headerlink" href="#setting-up-an-integration-as-a-service" title="Permalink to this heading">¶</a></h2>
 <section id="host-requirements">
-<h3>Host Requirements<a class="headerlink" href="#host-requirements" title="Permalink to this headline">¶</a></h3>
+<h3>Host Requirements<a class="headerlink" href="#host-requirements" title="Permalink to this heading">¶</a></h3>
 <ul>
 <li><p>yggdrasil must be installed</p></li>
 <li><p>A port must be available that can be used to serve a Flask REST API. The port should be either set via the <code class="docutils literal notranslate"><span class="pre">--port</span></code> flag to the <code class="docutils literal notranslate"><span class="pre">integration-service-manager</span> <span class="pre">start</span></code> command (last requirement) or in the <code class="docutils literal notranslate"><span class="pre">PORT</span></code> environment variable before starting the service manager.</p></li>
@@ -134,7 +135,7 @@
 </div>
 </section>
 <section id="registering-integrations">
-<h3>Registering Integrations<a class="headerlink" href="#registering-integrations" title="Permalink to this headline">¶</a></h3>
+<h3>Registering Integrations<a class="headerlink" href="#registering-integrations" title="Permalink to this heading">¶</a></h3>
 <p>In order for an integration to be run on the host machine, it must first be registered via yggdrasil’s <code class="docutils literal notranslate"><span class="pre">integration-service-manager</span></code> CLI. Usage is:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggdrasil integration-service-manager register &lt;integration-name&gt; &lt;integration-yamls ...&gt;
 </pre></div>
@@ -151,7 +152,7 @@
 </div>
 </section>
 <section id="registering-multiple-integrations-at-once">
-<h3>Registering Multiple Integrations at Once<a class="headerlink" href="#registering-multiple-integrations-at-once" title="Permalink to this headline">¶</a></h3>
+<h3>Registering Multiple Integrations at Once<a class="headerlink" href="#registering-multiple-integrations-at-once" title="Permalink to this heading">¶</a></h3>
 <p>To save time, yggdrasil also allows you to register multiple integrations at once from a YAML file containing a set of mappings between integration names and the YAML specification files defining them. The example services file below defines two integrations, each specified by one YAML file.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">photosynthesis</span><span class="p">:</span><span class="w"></span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yggdrasil/examples/fakeplant/photosynthesis.yml</span><span class="w"></span>
@@ -167,9 +168,9 @@
 </section>
 </section>
 <section id="connecting-an-integration-to-a-remote-service">
-<h2>Connecting an Integration to a Remote Service<a class="headerlink" href="#connecting-an-integration-to-a-remote-service" title="Permalink to this headline">¶</a></h2>
+<h2>Connecting an Integration to a Remote Service<a class="headerlink" href="#connecting-an-integration-to-a-remote-service" title="Permalink to this heading">¶</a></h2>
 <section id="client-requirements">
-<h3>Client Requirements<a class="headerlink" href="#client-requirements" title="Permalink to this headline">¶</a></h3>
+<h3>Client Requirements<a class="headerlink" href="#client-requirements" title="Permalink to this heading">¶</a></h3>
 <ul>
 <li><p>yggdrasil must be installed</p></li>
 <li><p>You must be able to connect to the remote host’s service manager. You can check the status via:</p>
@@ -181,7 +182,7 @@
 </ul>
 </section>
 <section id="service-yaml-entry">
-<h3>Service YAML Entry<a class="headerlink" href="#service-yaml-entry" title="Permalink to this headline">¶</a></h3>
+<h3>Service YAML Entry<a class="headerlink" href="#service-yaml-entry" title="Permalink to this heading">¶</a></h3>
 <p>Integrations can connect to remote integration services by including <code class="docutils literal notranslate"><span class="pre">service</span></code> entries in the YAML integration specification files. For example, the entry below requests the <code class="docutils literal notranslate"><span class="pre">photosynthesis</span></code> integration service from the yggdrasil flask service manager located at <a class="reference external" href="http://remote_service_manager_url/">http://remote_service_manager_url/</a>.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">service</span><span class="p">:</span><span class="w"></span>
 <span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">photosynthesis</span><span class="w"></span>
@@ -206,7 +207,7 @@
 </section>
 </section>
 <section id="performance">
-<h2>Performance<a class="headerlink" href="#performance" title="Permalink to this headline">¶</a></h2>
+<h2>Performance<a class="headerlink" href="#performance" title="Permalink to this heading">¶</a></h2>
 <p>It is important to keep in mind that connecting to remote integrations over an internet connection introduces a great deal of overhead and a certain degree of fragility into integrations that is not present when all models are running locally. Such connections between models make integrations dependent on the speed and reliability of the internet connection both at the host and client. If performant and stable communication times are import for your use case, we advise looking for a way to run the integrations locally.</p>
 </section>
 </section>

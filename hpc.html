@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>High Performance Computing (HPC) &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>High Performance Computing (HPC) &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -103,14 +104,14 @@
            <div itemprop="articleBody">
              
   <section id="high-performance-computing-hpc">
-<span id="hpc-rst"></span><h1>High Performance Computing (HPC)<a class="headerlink" href="#high-performance-computing-hpc" title="Permalink to this headline">¶</a></h1>
+<span id="hpc-rst"></span><h1>High Performance Computing (HPC)<a class="headerlink" href="#high-performance-computing-hpc" title="Permalink to this heading">¶</a></h1>
 <p>As of version 1.7, yggdrasil includes support for running integrations (networks of models) on High Performance Computing (HPC) clusters via MPI (either <a class="reference external" href="https://www.open-mpi.org/">OpenMPI</a> or <a class="reference external" href="https://www.mpich.org/">MPICH</a>) and <a class="reference external" href="https://mpi4py.readthedocs.io/en/stable/">mpi4py</a>. yggdrasil will distribute models in an integration evenly amongst the available processes and coordinate message passing between them.</p>
 <p>You can run a yggdrasil integration using MPI, by passing the usual <code class="docutils literal notranslate"><span class="pre">yggrun</span></code> command to <code class="docutils literal notranslate"><span class="pre">mpiexec/mpirun/srun</span></code> e.g.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mpiexec -n 2 yggrun model1.yml model2.yml
 </pre></div>
 </div>
 <section id="setup">
-<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h2>
+<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this heading">¶</a></h2>
 <p>To run an integration using yggdrasil, you must be able to install yggdrasil on the cluster. The existing packages and permissions of the cluster will determine how yggdrasil should be installed.</p>
 <ul>
 <li><p>If conda is already installed on the target cluster, you can install yggdrasil directly into an environment of your choosing. If the target cluster uses a package manager, you may need to activate/load the conda installation.:</p>
@@ -132,7 +133,7 @@ $ bash miniconda.sh -b -p $HOME/miniconda export PATH=&quot;$HOME/miniconda/bin:
 </ul>
 </section>
 <section id="writing-the-job-script">
-<h2>Writing the Job Script<a class="headerlink" href="#writing-the-job-script" title="Permalink to this headline">¶</a></h2>
+<h2>Writing the Job Script<a class="headerlink" href="#writing-the-job-script" title="Permalink to this heading">¶</a></h2>
 <p>Many of the specifics of how you would set up your job script will depend on the scheduler used by the cluster you are targeting (e.g. SLURM, Torque), but there are some general tips:</p>
 <ul class="simple">
 <li><p>Make sure that the YAML files defining the integration and the model codes are located in a directory accessible on compute nodes (usually your home directory or a dedicated drive).</p></li>
@@ -140,7 +141,7 @@ $ bash miniconda.sh -b -p $HOME/miniconda export PATH=&quot;$HOME/miniconda/bin:
 <li><p>If you used conda to install yggdrasil, activate the environment that yggdrasil was installed in before calling <code class="docutils literal notranslate"><span class="pre">mpiexec/mpirun/srun</span></code>.</p></li>
 </ul>
 <section id="example-slurm-job-script">
-<h3>Example SLURM Job Script<a class="headerlink" href="#example-slurm-job-script" title="Permalink to this headline">¶</a></h3>
+<h3>Example SLURM Job Script<a class="headerlink" href="#example-slurm-job-script" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-slurm notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="kp">#SBATCH --partition=general</span>
 <span class="kp">#SBATCH --job-name=example_name</span>

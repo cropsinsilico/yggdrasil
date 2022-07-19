@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Setup &mdash; yggdrasil v1.8.2 documentation</title>
+  <title>Setup &mdash; yggdrasil v1.8.3 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -30,7 +31,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.2
+                v1.8.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -116,13 +117,13 @@
 <p>Once you are satisfied that your question/bug has been answered/solved, please close the issue or let us know that we may do so. If you are reporting a bug, please also refer to the <a class="reference internal" href="debugging.html#debugging"><span class="std std-ref">Debugging</span></a> section for tips.</p>
 </div>
 <section id="id1">
-<h1>Setup<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<h1>Setup<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h1>
 <p>This hackathon is based around materials in Jupyter notebooks located in <a class="reference external" href="https://github.com/cropsinsilico/CiS2021-hackathon">this repository</a>. There are several methods to run them, MyBinder, local install, or Docker container, each of which is described below. We recommend using the MyBinder method as it does not require any local installation, but if you have difficulty opening the MyBinder instance, one of the other methods may be preferable.</p>
 <ol class="arabic simple" start="0">
 <li><p>Reguardless of the installation method, you will need a browser to access the notebooks. MyBinder fully supports Mozilla Firefox, Google Chrome, and Safari. It may work with Microsoft Edge (or Internet Explorer), but these are not guaranteed. If you have trouble accessing the notebooks, we recommend downloading one of those MyBinder fully supports for this workshop.</p></li>
 </ol>
 <section id="mybinder">
-<h2>MyBinder<a class="headerlink" href="#mybinder" title="Permalink to this headline">¶</a></h2>
+<h2>MyBinder<a class="headerlink" href="#mybinder" title="Permalink to this heading">¶</a></h2>
 <p>MyBinder is a free public service that allows users to run Jupyter notebooks on remote compute resources via BinderHub. This method is the most straight forward as it does not require you to install anything on your machine other than a browser.</p>
 <ol class="arabic simple">
 <li><p>Open <a class="reference external" href="https://mybinder.org/v2/gh/cropsinsilico/CiS2021-hackathon/HEAD">this link</a> or click the <code class="docutils literal notranslate"><span class="pre">launch</span> <span class="pre">binder</span></code> button in the README for the <a class="reference external" href="https://github.com/cropsinsilico/CiS2021-hackathon">hackathon materials repository</a>.</p></li>
@@ -135,7 +136,7 @@
 </div>
 </section>
 <section id="local-install">
-<h2>Local Install<a class="headerlink" href="#local-install" title="Permalink to this headline">¶</a></h2>
+<h2>Local Install<a class="headerlink" href="#local-install" title="Permalink to this heading">¶</a></h2>
 <p>This setup method is the most involved, but once it is complete, you will have a local conda environment with yggdrasil installed that can be used in the future.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -182,7 +183,7 @@
 <img alt="../_images/local_browser.png" src="../_images/local_browser.png" />
 </section>
 <section id="docker-container">
-<h2>Docker Container<a class="headerlink" href="#docker-container" title="Permalink to this headline">¶</a></h2>
+<h2>Docker Container<a class="headerlink" href="#docker-container" title="Permalink to this heading">¶</a></h2>
 <p>Docker containers allow developer to package the entire stack (operating system, dependencies, scripts, data) required to run projects in a contained environment. In this case, we are using the container to run the Jupyter notebooks so you don’t have to install the dependencies on your machine which can encounter issues on untested releases and/or combinations of operating systems and/or dependencies.</p>
 <ol class="arabic">
 <li><p><strong>Download and install docker</strong> from <a class="reference external" href="https://docs.docker.com/get-docker/">here</a>.</p></li>
