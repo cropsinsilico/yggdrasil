@@ -3,7 +3,7 @@ import json
 import numpy as np
 from yggdrasil import tools, units
 from yggdrasil.serialize.AsciiMapSerialize import AsciiMapSerialize
-from yggdrasil.metaschema.encoder import JSONReadableEncoder
+from yggdrasil.serialize.JSONSerialize import JSONReadableEncoder
 
 
 class WOFOSTParamSerialize(AsciiMapSerialize):

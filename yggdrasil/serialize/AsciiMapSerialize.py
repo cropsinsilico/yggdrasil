@@ -1,7 +1,6 @@
 import json
 from yggdrasil import tools, constants
 from yggdrasil.serialize.SerializeBase import SerializeBase
-from yggdrasil.metaschema.encoder import JSONReadableEncoder
 
 
 class AsciiMapSerialize(SerializeBase):
@@ -35,6 +34,7 @@ class AsciiMapSerialize(SerializeBase):
             bytes, str: Serialized message.
 
         """
+        from yggdrasil.serialize.JSONSerialize import JSONReadableEncoder
         out = ''
         order = sorted([k for k in args.keys()])
         newline_str = tools.bytes2str(self.newline)

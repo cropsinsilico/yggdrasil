@@ -3,7 +3,6 @@ import copy
 import numpy as np
 import warnings
 from yggdrasil import tools
-from yggdrasil.metaschema.encoder import encode_json, decode_json
 from yggdrasil.metaschema.datatypes import _schema_dir
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
@@ -68,6 +67,7 @@ def create_schema(overwrite=False):
             if the file already exists.
 
     """
+    from yggdrasil.serialize.JSONSerialize import encode_json
     if (not overwrite) and os.path.isfile(_schema_file):
         raise RuntimeError("Schema file already exists.")
     schema = {
@@ -217,6 +217,7 @@ def get_schema():
         dict: Obj schema.
     
     """
+    from yggdrasil.serialize.JSONSerialize import decode_json
     if not os.path.isfile(_schema_file):
         create_schema()
     with open(_schema_file, 'r') as fd:

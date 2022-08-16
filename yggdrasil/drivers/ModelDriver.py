@@ -14,7 +14,6 @@ from pprint import pformat
 from yggdrasil import platform, tools, languages, multitasking, constants
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
-from yggdrasil.metaschema.datatypes import is_default_typedef
 from queue import Empty
 logger = logging.getLogger(__name__)
 
@@ -454,6 +453,10 @@ class ModelDriver(Driver):
                      'additionalProperties': False}]}}}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
+    _schema_additional_kwargs_base = {
+        'pushProperties': {
+            '$properties/inputs/items/allOf/0/properties/default_file': ['working_dir'],
+            '$properties/outputs/items/allOf/0/properties/default_file': ['working_dir']}}
     
     language = None
     language_ext = None
@@ -2314,6 +2317,7 @@ class ModelDriver(Driver):
                 model does not use a flag variable.
 
         """
+        from yggdrasil.metaschema.datatypes import is_default_typedef
         # Read info from the source code
         if (((isinstance(model_file, str) and os.path.isfile(model_file))
              or (contents is not None))):  # pragma: debug

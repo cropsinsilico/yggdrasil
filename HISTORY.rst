@@ -2,18 +2,18 @@
 History
 =======
 
-1.X.X (2022-XX-XX) Migrate to using extended version of rapidjson/python-rapidjson
+2.0.0 (2022-XX-XX) Migrate to using extended version of rapidjson/python-rapidjson
 ------------------
 
 * Drop support for Python 3.5
 * Changed rapidjson submodule to extended version
 * Vendoring the python-rapidjson extension
+* Removed jsonschema requirement
+* Updated yggdrasil to use the vendored rapidjson for serialization, validation, normalization, and units
 
 TODO:
 ~~~~~
 
-* Update yggdrasil to use the vendored rapidjson
-* Remove jsonschema requirement
 * Add check_schema class method to validator/normalizer
 * Add validate alias for calling validator on an object
 

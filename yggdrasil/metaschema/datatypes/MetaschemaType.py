@@ -2,7 +2,7 @@ import six
 import copy
 import uuid
 from yggdrasil import constants, rapidjson
-from yggdrasil.metaschema import (get_metaschema, get_validator, encoder,
+from yggdrasil.metaschema import (get_metaschema, get_validator,
                                   validate_instance, MetaschemaTypeError)
 from yggdrasil.metaschema.datatypes import (
     MetaschemaTypeMeta, compare_schema,
@@ -624,6 +624,7 @@ class MetaschemaType(object):
             bytes, str: Serialized message.
 
         """
+        from yggdrasil.serialize.JSONSerialize import encode_json
         for k in ['size', 'data', 'datatype']:
             if k in kwargs:
                 raise RuntimeError("'%s' is a reserved keyword in the metadata." % k)
@@ -641,12 +642,12 @@ class MetaschemaType(object):
             metadata.update(kwargs)
             is_raw = False
         if not is_raw:
-            data = encoder.encode_json(data)
+            data = encode_json(data)
         if no_metadata:
             return data
         metadata['size'] = len(data)
         metadata.setdefault('id', str(uuid.uuid4()))
-        header = (constants.YGG_MSG_HEAD + encoder.encode_json(metadata)
+        header = (constants.YGG_MSG_HEAD + encode_json(metadata)
                   + constants.YGG_MSG_HEAD)
         if (max_header_size > 0) and (len(header) > max_header_size):
             metadata_type = metadata
@@ -657,12 +658,12 @@ class MetaschemaType(object):
                 if k in metadata_type:
                     metadata[k] = metadata_type.pop(k)
             assert metadata
-            data = (encoder.encode_json(metadata_type)
+            data = (encode_json(metadata_type)
                     + constants.YGG_MSG_HEAD + data)
             metadata['size'] = len(data)
             metadata['type_in_data'] = True
             header = (constants.YGG_MSG_HEAD
-                      + encoder.encode_json(metadata)
+                      + encode_json(metadata)
                       + constants.YGG_MSG_HEAD)
             if len(header) > max_header_size:  # pragma: debug
                 raise AssertionError(("The header is larger (%d) than the "
@@ -696,6 +697,7 @@ class MetaschemaType(object):
             ValueError: If msg does not contain the header separator.
 
         """
+        from yggdrasil.serialize.JSONSerialize import decode_json
         if not isinstance(msg, bytes):
             raise TypeError("Message to be deserialized is not bytes type.")
         # Check for header
@@ -706,12 +708,12 @@ class MetaschemaType(object):
             if len(metadata) == 0:
                 metadata = dict(size=len(data))
             else:
-                metadata = encoder.decode_json(metadata)
+                metadata = decode_json(metadata)
         elif isinstance(metadata, dict) and metadata.get('type_in_data', False):
             assert msg.count(constants.YGG_MSG_HEAD) == 1
             typedef, data = msg.split(constants.YGG_MSG_HEAD, 1)
             if len(typedef) > 0:
-                metadata.update(encoder.decode_json(typedef))
+                metadata.update(decode_json(typedef))
             metadata.pop('type_in_data')
             metadata['size'] = len(data)
         else:
@@ -735,7 +737,7 @@ class MetaschemaType(object):
               or (metadata.get('type', None) == 'direct') or dont_decode):
             return data, metadata
         else:
-            data = encoder.decode_json(data)
+            data = decode_json(data)
             obj = self.decode(metadata['datatype'], data, self._typedef,
                               typedef_validated=True, dont_check=dont_check)
         return obj, metadata

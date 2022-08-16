@@ -782,8 +782,8 @@ def get_supported_type():
         list: The names of data types supported by yggdrasil.
 
     """
-    from yggdrasil.metaschema.datatypes import get_registered_types
-    return list(get_registered_types().keys())
+    from yggdrasil import rapidjson
+    return rapidjson.get_metaschema()['definitions']['simpleTypes']['enum']
 
 
 def get_supported_comm(dont_include_value=False):

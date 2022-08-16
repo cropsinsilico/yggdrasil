@@ -8,6 +8,7 @@ import contextlib
 import weakref
 from collections import OrderedDict
 from yggdrasil.doctools import docs2args
+from yggdrasil import rapidjson
 
 
 _registry = {}
@@ -568,20 +569,18 @@ class ComponentBase(ComponentBaseUnregistered):
                 allow_instance_definitions=True)
             props = list(s['properties'].keys())
             if not skip_component_schema_normalization:
-                from yggdrasil import metaschema
                 kwargs.setdefault(self._schema_subtype_key, subtype)
                 # Remove properties that shouldn't ve validated in class
                 for k in self._schema_excluded_from_class_validation:
                     if k in s['properties']:
                         del s['properties'][k]
                 # Validate and normalize
-                metaschema.validate_instance(kwargs, s, normalize=False)
+                rapidjson.validate(kwargs, s)
                 # TODO: Normalization performance needs improvement
                 # import pprint
                 # print('before')
                 # pprint.pprint(kwargs_comp)
-                # kwargs_comp = metaschema.validate_instance(kwargs_comp, s,
-                #                                            normalize=True)
+                # kwargs_comp = rapidjson.normalize(kwargs_comp, s)
                 # kwargs.update(kwargs_comp)
                 # print('normalized')
                 # pprint.pprint(kwargs_comp)

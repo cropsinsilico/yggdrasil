@@ -2016,6 +2016,11 @@ definitions:
           description: Working directory. If not provided, the current working directory
             is used.
           type: string
+      pushProperties:
+        $properties/inputs/items/allOf/0/properties/default_file:
+        - working_dir
+        $properties/outputs/items/allOf/0/properties/default_file:
+        - working_dir
       required:
       - args
       - inputs

@@ -5,7 +5,7 @@ import yaml
 import json
 import importlib
 from collections import OrderedDict
-from yggdrasil import metaschema, rapidjson
+from yggdrasil import rapidjson
 
 
 _schema_fname = os.path.abspath(os.path.join(
@@ -40,8 +40,8 @@ def ordered_load(stream, object_pairs_hook=SchemaDict, **kwargs):
 
     """
     kwargs['sorted_dict_type'] = object_pairs_hook
-    out = metaschema.encoder.decode_yaml(stream, **kwargs)
-    return out
+    from yggdrasil.serialize import YAMLSerialize
+    return YAMLSerialize.decode_yaml(stream, **kwargs)
 
 
 def ordered_dump(data, **kwargs):
@@ -57,7 +57,8 @@ def ordered_dump(data, **kwargs):
 
     """
     kwargs['sorted_dict_type'] = [SchemaDict, OrderedDict]
-    return metaschema.encoder.encode_yaml(data, **kwargs)
+    from yggdrasil.serialize import YAMLSerialize
+    return YAMLSerialize.encode_yaml(data, **kwargs)
 
 
 def clear_schema():
@@ -190,7 +191,7 @@ def get_json_schema(fname_dst=None, indent=None):
     """
     s = get_schema()
     out = s.get_schema()
-    out['definitions']['schema'] = metaschema.get_metaschema()
+    out['definitions']['schema'] = copy.deepcopy(rapidjson.get_metaschema())
     out = convert_extended2base(out)
     if fname_dst is not None:
         with open(fname_dst, 'w') as fd:
@@ -396,7 +397,7 @@ class ComponentSchema(object):
         for subtype in self.subtypes:
             subtype_schema = self.get_subtype_schema(subtype)
             try:
-                metaschema.validate_instance(doc, subtype_schema)
+                rapidjson.validate(doc, subtype_schema)
                 return subtype
             except rapidjson.ValidationError:
                 pass
@@ -836,7 +837,7 @@ class ComponentSchema(object):
         self._storage[name] = copy.deepcopy(new_schema)
         # Verify that the schema is valid
         if verify:
-            metaschema.validate_schema(self.get_schema())
+            rapidjson.Normalizer.check_schema(self.get_schema())
 
 
 class SchemaRegistry(object):
@@ -878,7 +879,7 @@ class SchemaRegistry(object):
         self._cache = {}
         self._storage[k] = v
         if verify:
-            metaschema.validate_schema(self.get_schema())
+            rapidjson.Normalizer.check_schema(self.get_schema())
 
     def get(self, k, *args, **kwargs):
         r"""Return a component schema from the registry."""
@@ -1028,7 +1029,7 @@ class SchemaRegistry(object):
     def form_schema(self):
         r"""dict: Schema for generating a YAML form."""
         out = self.get_schema(for_form=True)
-        out['definitions']['schema'] = metaschema.get_metaschema()
+        out['definitions']['schema'] = copy.deepcopy(rapidjson.get_metaschema())
         out = convert_extended2base(out)
         return out
 
@@ -1103,7 +1104,7 @@ class SchemaRegistry(object):
         from yggdrasil import constants
         out = self.get_schema(for_form=True)
         scalar_types = list(constants.VALID_TYPES.keys())
-        meta = metaschema.get_metaschema()
+        meta = copy.deepcopy(rapidjson.get_metaschema())
         meta_prop = {
             'subtype': ['1darray', 'ndarray'],
             'units': ['1darray', 'ndarray'] + scalar_types,
@@ -1268,7 +1269,8 @@ class SchemaRegistry(object):
         """
         if normalize:
             return self.normalize(obj)
-        return metaschema.validate_instance(obj, self.get_schema(**kwargs))
+        # TODO: Check schema?
+        return rapidjson.validate(obj, self.get_schema(**kwargs))
 
     def validate_model_submission(self, obj):
         r"""Validate an object against the schema for models submitted to
@@ -1292,7 +1294,7 @@ class SchemaRegistry(object):
 
         """
         comp_schema = self.get_component_schema(comp_name, **kwargs)
-        return metaschema.validate_instance(obj, comp_schema)
+        return rapidjson.validate(obj, comp_schema)
 
     def normalize(self, obj, **kwargs):
         r"""Normalize an object against this schema.
@@ -1305,7 +1307,8 @@ class SchemaRegistry(object):
             object: Normalized object.
 
         """
-        return metaschema.normalize_instance(obj, self.get_schema(**kwargs))
+        # TODO: Check schema?
+        return rapidjson.normalize(obj, self.get_schema(**kwargs))
 
     # def is_valid(self, obj):
     #     r"""Determine if an object is valid under this schema.

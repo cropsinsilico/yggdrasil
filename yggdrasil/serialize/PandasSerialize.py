@@ -3,9 +3,7 @@ import copy
 import numpy as np
 import warnings
 import io as sio
-from yggdrasil import platform, serialize
-from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
-    JSONArrayMetaschemaType)
+from yggdrasil import platform, serialize, rapidjson
 from yggdrasil.serialize.AsciiTableSerialize import AsciiTableSerialize
 from yggdrasil.communication.transforms.PandasTransform import PandasTransform
 
@@ -226,7 +224,7 @@ class PandasSerialize(AsciiTableSerialize):
         if (self.field_names is None) and (not self.no_header):
             self.field_names = out.columns.tolist()
         if not self.initialized:
-            typedef = JSONArrayMetaschemaType.encode_type(out)
+            typedef = rapidjson.encode_schema(out)
             self.update_serializer(extract=True, **typedef)
         return out
 

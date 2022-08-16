@@ -91,15 +91,15 @@ def write_datatype_mapping_table(**kwargs):
 
     """
     from yggdrasil import tools, components
-    from yggdrasil.metaschema.datatypes import _type_registry
     kwargs.setdefault('fname_base', 'datatype_mapping_table.rst')
     args = {}
-    for k, v in _type_registry.items():
-        if v.cross_language_support:
-            args[k] = {'notes': get_docs_section(v.__doc__,
-                                                 keys=['Developer Notes:',
-                                                       'Development Notes:'],
-                                                 join_lines=True)}
+    # TODO: Find another way to add types
+    # for k, v in _type_registry.items():
+    #     if v.cross_language_support:
+    #         args[k] = {'notes': get_docs_section(v.__doc__,
+    #                                              keys=['Developer Notes:',
+    #                                                    'Development Notes:'],
+    #                                              join_lines=True)}
     for lang in tools.get_supported_lang():
         if lang in ['lpy', 'make', 'cmake', 'executable']:
             continue
@@ -202,7 +202,6 @@ def write_datatype_table(table_type='all', **kwargs):
         ValueError: If table_type is not one of the supported values.
 
     """
-    from yggdrasil.metaschema.datatypes import _type_registry
     table_type_list = ['simple', 'container', 'yggdrasil']
     if table_type == 'all':
         fname = kwargs.get("fname", None)
@@ -216,24 +215,25 @@ def write_datatype_table(table_type='all', **kwargs):
         raise ValueError("Unsupported table_type: '%s'" % table_type)
     fname_format = 'datatype_table_%s.rst'
     kwargs.setdefault('fname_base', fname_format % (table_type))
-    target_types = []
+    # target_types = []
     args = {}
-    if table_type == 'simple':
-        for k, v in _type_registry.items():
-            if v._replaces_existing and (not hasattr(v, '_container_type')):
-                target_types.append(k)
-    elif table_type == 'container':
-        for k, v in _type_registry.items():
-            if v._replaces_existing and hasattr(v, '_container_type'):
-                target_types.append(k)
-    elif table_type == 'yggdrasil':
-        for k, v in _type_registry.items():
-            if not v._replaces_existing:
-                target_types.append(k)
-    for k in target_types:
-        v = _type_registry[k]
-        args[k] = {'description': v.description,
-                   'required properties': v.definition_properties}
+    # TODO: Find another way to add types
+    # if table_type == 'simple':
+    #     for k, v in _type_registry.items():
+    #         if v._replaces_existing and (not hasattr(v, '_container_type')):
+    #             target_types.append(k)
+    # elif table_type == 'container':
+    #     for k, v in _type_registry.items():
+    #         if v._replaces_existing and hasattr(v, '_container_type'):
+    #             target_types.append(k)
+    # elif table_type == 'yggdrasil':
+    #     for k, v in _type_registry.items():
+    #         if not v._replaces_existing:
+    #             target_types.append(k)
+    # for k in target_types:
+    #     v = _type_registry[k]
+    #     args[k] = {'description': v.description,
+    #                'required properties': v.definition_properties}
     kwargs.setdefault('key_column_name', 'type')
     kwargs.setdefault('list_columns', 'required properties')
     lines = dict2table(args, **kwargs)

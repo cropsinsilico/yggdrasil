@@ -1,5 +1,86 @@
-from yggdrasil.metaschema.encoder import encode_yaml, decode_yaml
-from yggdrasil.serialize.JSONSerialize import JSONSerialize
+import yaml
+from yggdrasil.serialize.JSONSerialize import (
+    JSONSerialize, indent_char2int, string2import)
+
+
+def encode_yaml(obj, fd=None, indent=None,
+                sorted_dict_type=None, **kwargs):
+    r"""Encode a Python object in YAML format.
+
+    Args:
+        obj (object): Python object to encode.
+        fd (file, optional): File descriptor for file that encoded object
+            should be written to. Defaults to None and string is returned.
+        indent (int, str, optional): Indentation for new lines in encoded
+            string. Defaults to None.
+        **kwargs: Additional keyword arguments are passed to yaml.dump.
+
+    Returns:
+        str, bytes: Encoded object.
+
+    """
+    from yggdrasil.metaschema.datatypes import encode_data_readable
+    if (indent is None) and (fd is not None):
+        indent = '\t'
+    indent = indent_char2int(indent)
+    kwargs['indent'] = indent
+    if fd is not None:
+        assert('stream' not in kwargs)
+        kwargs['stream'] = fd
+    if sorted_dict_type is not None:
+        class OrderedDumper(kwargs.get('Dumper', yaml.SafeDumper)):
+            pass
+        
+        def _dict_representer(dumper, data):
+            return dumper.represent_mapping(
+                yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+                data.items())
+
+        if not isinstance(sorted_dict_type, list):
+            sorted_dict_type = [sorted_dict_type]
+        for x in sorted_dict_type:
+            OrderedDumper.add_representer(x, _dict_representer)
+        kwargs['Dumper'] = OrderedDumper
+    return yaml.dump(encode_data_readable(obj), **kwargs)
+
+
+def decode_yaml(msg, sorted_dict_type=None, **kwargs):
+    r"""Decode a Python object from a YAML serialization.
+
+    Args:
+        msg (str): YAML serialization to decode.
+        sorted_dict_type (type, optional): Class that should be used to
+            contain mapping objects while preserving order. Defaults to
+            None and is ignored.
+        **kwargs: Additional keyword arguments are passed to yaml.load.
+
+    Returns:
+        object: Deserialized Python object.
+
+    """
+    class OrderedLoader(kwargs.get('Loader', yaml.Loader)):
+        pass
+
+    if sorted_dict_type is not None:
+        def construct_mapping(loader, node):
+            loader.flatten_mapping(node)
+            return sorted_dict_type(loader.construct_pairs(node))
+
+        OrderedLoader.add_constructor(
+            yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+            construct_mapping)
+
+    def construct_scalar(loader, node):
+        out = loader.construct_scalar(node)
+        out = string2import(out)
+        return out
+
+    OrderedLoader.add_constructor(
+        yaml.resolver.BaseResolver.DEFAULT_SCALAR_TAG,
+        construct_scalar)
+    kwargs['Loader'] = OrderedLoader
+    out = yaml.load(msg, **kwargs)
+    return out
 
 
 class YAMLSerialize(JSONSerialize):

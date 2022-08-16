@@ -1398,7 +1398,7 @@ class generate_gha_workflow(SubCommand):
     @classmethod
     def func(cls, args, gitdir=None):
         import yaml
-        from yggdrasil.metaschema.encoder import decode_yaml, encode_yaml
+        from yggdrasil.serialize.YAMLSerialize import decode_yaml, encode_yaml
         from collections import OrderedDict
 
         class NoAliasDumper(yaml.SafeDumper):

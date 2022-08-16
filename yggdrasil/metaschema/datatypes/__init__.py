@@ -4,7 +4,6 @@ import jsonschema
 import copy
 from yggdrasil import constants, rapidjson
 from yggdrasil.components import ClassRegistry
-from yggdrasil.metaschema.encoder import decode_json
 from yggdrasil.metaschema.properties import get_metaschema_property
 
 
@@ -154,6 +153,7 @@ def add_type_from_schema(path_to_schema, **kwargs):
     """
     from yggdrasil.metaschema.datatypes.FixedMetaschemaType import (
         create_fixed_type_class)
+    from yggdrasil.serialize.JSONSerialize import decode_json
     if 'target_globals' not in kwargs:
         kwargs['target_globals'] = globals()
     if not os.path.isfile(path_to_schema):
@@ -283,6 +283,7 @@ def guess_type_from_msg(msg):
         MetaschemaType: Instance of the appropriate type class.
 
     """
+    from yggdrasil.serialize.JSONSerialize import decode_json
     try:
         if constants.YGG_MSG_HEAD in msg:
             _, metadata, data = msg.split(constants.YGG_MSG_HEAD, 2)
@@ -437,6 +438,7 @@ def decode(msg):
         object: Decoded Python object.
 
     """
+    from yggdrasil.serialize.JSONSerialize import decode_json
     cls = guess_type_from_msg(msg)
     metadata = decode_json(msg.split(constants.YGG_MSG_HEAD, 2)[1])
     typedef = cls.extract_typedef(metadata.get('datatype', {}))
