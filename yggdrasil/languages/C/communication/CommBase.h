@@ -200,60 +200,60 @@ comm_t* new_comm_base(char *address, const char *direction,
 static inline
 comm_t* init_comm_base(const char *name, const char *direction,
 		       const comm_type t, dtype_t* datatype) {
-  char full_name[COMM_NAME_SIZE];
-  char *model_name = NULL;
-  char *address = NULL;
-  if (name != NULL) {
-    strncpy(full_name, name, COMM_NAME_SIZE);
-    if ((direction != NULL) && (strlen(direction) > 0)) {
-      if (is_send(direction))
-	strcat(full_name, "_OUT");
-      else if (is_recv(direction))
-	strcat(full_name, "_IN");
+    char full_name[COMM_NAME_SIZE];
+    char *model_name = NULL;
+    char *address = NULL;
+    if (name != NULL) {
+        strncpy(full_name, name, COMM_NAME_SIZE);
+        if ((direction != NULL) && (strlen(direction) > 0)) {
+            if (is_send(direction))
+                strcat(full_name, "_OUT");
+            else if (is_recv(direction))
+                strcat(full_name, "_IN");
+        }
+        model_name = getenv("YGG_MODEL_NAME");
+        address = getenv(full_name);
+        if ((address == NULL) && (model_name != NULL)) {
+            char prefix[COMM_NAME_SIZE];
+            snprintf(prefix, COMM_NAME_SIZE, "%s:", model_name);
+            if (strncmp(prefix, full_name, strlen(prefix)) != 0) {
+                strcat(prefix, full_name);
+                strcpy(full_name, prefix);
+                address = getenv(full_name);
+            }
+        }
+        if (address == NULL) {
+            char temp_name[COMM_NAME_SIZE] = "";
+            size_t i;
+            for (i = 0; i < strlen(full_name); i++) {
+                if (full_name[i] == ':') {
+                    strcat(temp_name, "__COLON__");
+                } else {
+                    strncat(temp_name, full_name + i, 1);
+                }
+            }
+            address = getenv(temp_name);
+        }
+        ygglog_debug("init_comm_base: model_name = %s, full_name = %s, address = %s",
+                     model_name, full_name, address);
     }
-    model_name = getenv("YGG_MODEL_NAME");
-    address = getenv(full_name);
-    if ((address == NULL) && (model_name != NULL)) {
-      char prefix[COMM_NAME_SIZE];
-      snprintf(prefix, COMM_NAME_SIZE, "%s:", model_name);
-      if (strncmp(prefix, full_name, strlen(prefix)) != 0) {
-	strcat(prefix, full_name);
-	strcpy(full_name, prefix);
-	address = getenv(full_name);
-      }
+    comm_t *ret = new_comm_base(address, direction, t, datatype);
+    if (ret == NULL) {
+        ygglog_error("init_comm_base: Error in new_comm_base");
+        return ret;
     }
-    if (address == NULL) {
-      char temp_name[COMM_NAME_SIZE] = "";
-      size_t i;
-      for (i = 0; i < strlen(full_name); i++) {
-	if (full_name[i] == ':') {
-	  strcat(temp_name, "__COLON__");
-	} else {
-	  strncat(temp_name, full_name + i, 1);
-	}
-      }
-      address = getenv(temp_name);
+    if (name == NULL) {
+        ret->flags = ret->flags & ~COMM_FLAG_VALID;
+    } else {
+        strncpy(ret->name, full_name, COMM_NAME_SIZE);
     }
-    ygglog_debug("init_comm_base: model_name = %s, full_name = %s, address = %s",
-		 model_name, full_name, address);
-  }
-  comm_t *ret = new_comm_base(address, direction, t, datatype);
-  if (ret == NULL) {
-    ygglog_error("init_comm_base: Error in new_comm_base");
+    if ((strlen(ret->address) == 0) && (t != SERVER_COMM) && (t != CLIENT_COMM)) {
+        ygglog_error("init_comm_base: %s not registered as environment variable.\n",
+                     full_name);
+        ret->flags = ret->flags & ~COMM_FLAG_VALID;
+    }
+    ygglog_debug("init_comm_base(%s): Done", ret->name);
     return ret;
-  }
-  if (name == NULL) {
-    ret->flags = ret->flags & ~COMM_FLAG_VALID;
-  } else {
-    strncpy(ret->name, full_name, COMM_NAME_SIZE);
-  }
-  if ((strlen(ret->address) == 0) && (t != SERVER_COMM) && (t != CLIENT_COMM)) {
-    ygglog_error("init_comm_base: %s not registered as environment variable.\n",
-		 full_name);
-    ret->flags = ret->flags & ~COMM_FLAG_VALID;
-  }
-  ygglog_debug("init_comm_base(%s): Done", ret->name);
-  return ret;
 };
 
 /*!

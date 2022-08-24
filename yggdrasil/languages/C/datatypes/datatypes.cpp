@@ -2782,20 +2782,20 @@ extern "C" {
   }
 
   dtype_t* complete_dtype(dtype_t *dtype, const bool use_generic=false) {
-    try {
-      if (dtype == NULL) {
-	return create_dtype(NULL, use_generic);
-      } else if ((dtype->obj != NULL) && (strlen(dtype->type) == 0)){
-	int ret = set_dtype_name(dtype, dtype_name(dtype));
-	if (ret != 0) {
-	  ygglog_throw_error("complete_dtype: Failed to set data type name.");
-	}
+      try {
+          if (dtype == NULL) {
+              return create_dtype(NULL, use_generic);
+          } else if ((dtype->obj != NULL) && (strlen(dtype->type) == 0)){
+              int ret = set_dtype_name(dtype, dtype_name(dtype));
+              if (ret != 0) {
+                  ygglog_throw_error("complete_dtype: Failed to set data type name.");
+              }
+          }
+      } catch (...) {
+          ygglog_error("complete_dtype: C++ exception thrown.");
+          return NULL;
       }
-    } catch (...) {
-      ygglog_error("complete_dtype: C++ exception thrown.");
-      return NULL;
-    }
-    return dtype;
+      return dtype;
   }
 
   int destroy_dtype(dtype_t **dtype) {

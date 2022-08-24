@@ -19,6 +19,9 @@ yggdrasil/languages/C/stdint.h
 yggdrasil/languages/R/..Rcheck
 yggdrasil/languages/R/man
 
+# C build things
+yggdrasil/languages/CPP/cmake-build*
+
 # Intermediate docs
 docs/build
 docs/source/cis_interface.inc
@@ -72,7 +75,7 @@ tmp/
 
 # Tooling things - not managed
 *.vscode
-
+.idea
 **/tags
 
 
