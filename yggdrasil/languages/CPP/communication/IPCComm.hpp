@@ -1,7 +1,7 @@
 #ifndef YGGINTERFACEP_IPCCOMM_HPP
 #define YGGINTERFACEP_IPCCOMM_HPP
 
-#define IPCINSTALLED
+//#define IPCINSTALLED
 
 #ifdef USE_OSR_YGG
 #undef IPCINSTALLED
@@ -28,16 +28,16 @@ typedef struct msgbuf_t {
 } msgbuf_t;
 
 
-class IPCComm : public CommBase {
+class IPCComm : public CommBase<int,void> {
 public:
-    IPCComm(const std::string &name = "", const std::string &address = "", const std::string & direction = "",
-            DataType* datatype = nullptr);
+    explicit IPCComm(const std::string &name = "", Address *address = new Address(), const Direction direction = NONE,
+                     DataType* datatype = nullptr);
     ~IPCComm();
     int check_channels();
     void add_channel();
-    int remove_comm(const int close_comm);
-    int new_ipc_address();
-    int ipc_comm_nmsg();
+    int remove_comm(bool close_comm);
+    int new_address();
+    int comm_nmsg() override;
     int send(const std::string &data) override;
     int recv(std::string &data) override;
     int send_nolimit(const std::string &data) override;
@@ -46,7 +46,7 @@ private:
     static int _yggChannelNames[_yggTrackChannels];
     /*! @brief Number of channels in use. */
     static unsigned _yggChannelsUsed;
-    static unsigned _ipc_rand_seeded;
+    static bool _ipc_rand_seeded;
 };
 
 #endif //YGGINTERFACEP_IPCCOMM_HPP

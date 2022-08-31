@@ -5,6 +5,7 @@
 #ifndef YGGDRASIL_TOOLS_HPP
 #define YGGDRASIL_TOOLS_HPP
 
+
 #ifdef _MSC_VER
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS 1
@@ -195,6 +196,7 @@ static int global_thread_id = -1;
 #ifdef _OPENMP
 #pragma omp threadprivate(global_thread_id)
 #endif
+#define COMM_ADDRESS_SIZE 500
 
 /*!
   @brief Get an unsigned long seed from the least significant 32bits of a pointer.
@@ -389,6 +391,7 @@ void yggInfo(const char *fmt, ...) {
     va_end(ap);
 }
 
+#ifdef YGG_DEBUG
 /*!
   @brief Print an debug log message.
   Prints a formatted message, prepending it with DEBUG and the process id. A
@@ -404,6 +407,7 @@ void yggDebug(const char *fmt, ...) {
     va_end(ap);
 }
 
+#endif /*YGG_DEBUG*/
 /*!
   @brief Print an error log message from a variable argument list.
   Prints a formatted message, prepending it with ERROR and the process id. A
@@ -436,6 +440,20 @@ void yggError(const char *fmt, ...) {
     va_start(ap, fmt);
     yggError_va(fmt, ap);
     va_end(ap);
+}
+
+/*!
+  @brief Throw an error and long it.
+  @param[in] fmt char* Format string.
+  @param[in] ... Parameters that should be formated using the format string.
+ */
+static inline
+void ygglog_throw_error(const char* fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    yggError_va(fmt, ap);
+    va_end(ap);
+    throw std::exception();
 }
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -547,27 +565,6 @@ int is_eof(const char *buf) {
 }
 
 /*!
-  @brief Check if a character array matches "recv".
-  @param[in] buf constant character pointer to string that should be checked.
-  @returns int 1 if buf is the "recv" message, 0 otherwise.
- */
-static inline
-int is_recv(const std::string &buf) {
-    return not_empty_match("recv", buf);
-}
-
-/*!
-  @brief Check if a character array matches "send".
-  @param[in] buf constant character pointer to string that should be checked.
-  @returns int 1 if buf is the "send" message, 0 otherwise.
- */
-static inline
-int is_send(const std::string &buf) {
-    return not_empty_match("send", buf);
-}
-
-
-/*!
   @brief Initialize a variable argument list from an existing va_list.
   @returns va_list_t New variable argument list structure.
  */
@@ -653,23 +650,40 @@ void va_list_t_skip(va_list_t *ap, size_t nbytes) {
     }
 }
 
-class DataType {
+class Address {
 public:
-    DataType();
-    DataType(const bool use_generic);
-    DataType(void* type_doc, const bool use_generic);
-    DataType(PyObject* pyobj, const bool use_generic);
-    const size_t precision();
-    const std::string subtype();
-    const std::string name();
-    bool empity();
-    ~DataType() {
-        delete obj;
+    Address(const std::string &addr = "") {
+        address(addr);
     }
-protected:
-    std::string type; //!< Type name
-    bool use_generic; //!< Flag for empty dtypes to specify generic in/out
-    void *obj; //!< MetaschemaType Pointer
-} dtype_t;
+    std::string& address() {
+        return _address;
+    }
+    int key() const {
+        return _key;
+    }
+    void address(const std::string& addr) {
+        _address = addr;
+        if (_address.size() > COMM_ADDRESS_SIZE)
+            _address.resize(COMM_ADDRESS_SIZE);
+
+        _key = stoi(addr);
+        if (!_address.empty())
+            _valid = true;
+        else
+            _valid = false;
+    }
+
+    bool operator==(const Address *adr) {
+        return this->_address == adr->_address;
+    }
+    bool operator==(const Address &adr) {
+        return this->_address == adr._address;
+    }
+private:
+    std::string _address;
+    int _key;
+    bool _valid;
+};
+
 
 #endif //YGGDRASIL_TOOLS_HPP
