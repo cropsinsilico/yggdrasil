@@ -11,6 +11,8 @@ import argparse
 import subprocess
 import contextlib
 from yggdrasil import platform, constants
+from yggdrasil.serialize.ObjSerialize import ObjDict
+from yggdrasil.serialize.PlySerialize import PlyDict
 from yggdrasil.tools import (
     get_supported_lang, get_supported_comm, get_supported_type)
 from yggdrasil.components import import_component
@@ -1092,7 +1094,7 @@ def nested_approx(patch_equality, pandas_equality):
             return [nested_approx_(xx, **kwargs) for xx in x]
         elif isinstance(x, tuple):
             return tuple([nested_approx_(xx, **kwargs) for xx in x])
-        elif isinstance(x, pandas.DataFrame):
+        elif isinstance(x, (pandas.DataFrame, ObjDict, PlyDict)):
             return x
         elif isinstance(x, (unyt.array.unyt_quantity, unyt.array.unyt_array)):
             # from yggdrasil.units import get_ureg

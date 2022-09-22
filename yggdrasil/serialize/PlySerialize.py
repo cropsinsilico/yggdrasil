@@ -1,6 +1,6 @@
 import copy
 import numpy as np
-from yggdrasil import constants
+from yggdrasil import constants, rapidjson
 from yggdrasil.serialize.SerializeBase import SerializeBase
 try:
     import trimesh
@@ -54,122 +54,20 @@ def plural2singular(e_plur):
     return e_sing
 
 
-class PlyDict(dict):
+class PlyDict(rapidjson.geometry.Ply):
     r"""Enhanced dictionary class for storing Ply information."""
-
-    def __init__(self, *args, **kwargs):
-        super(PlyDict, self).__init__(*args, **kwargs)
-        self.setdefault('vertices', [])
-        self.setdefault('faces', [])
-        self._type_class.validate(self)
 
     def convert_arrays(self):
         r"""Check fields and convert arrays to nested structures."""
 
     @classmethod
-    def from_dict(cls, in_dict):
-        r"""Get a version of the object from a dictionary."""
-        out = cls(**in_dict)
-        return out
-
-    def as_dict(self):
-        r"""Get a version of the object as a pure dictionary."""
-        out = dict(**self)
-        return out
-
-    @classmethod
     def from_array_dict(cls, in_dict):
         r"""Get a version of the object from a dictionary of arrays."""
-        kws = {}
-        for k in ['material', 'vertices', 'edges', 'faces']:
-            if k in in_dict:
-                kws[k] = copy.deepcopy(in_dict[k])
-        if isinstance(kws.get('vertices', None), np.ndarray):
-            old_vert = kws.pop('vertices')
-            assert(old_vert.shape[1] == 3)
-            kws['vertices'] = [
-                {k: old_vert[i, j] for j, k in enumerate('xyz')}
-                for i in range(old_vert.shape[0])]
-        if isinstance(in_dict.get('vertex_colors', None), np.ndarray):
-            old_colr = in_dict['vertex_colors']
-            assert(old_colr.shape == (len(kws['vertices']), 3))
-            for i in range(old_colr.shape[0]):
-                for j, k in enumerate(['red', 'green', 'blue']):
-                    if not np.isnan(old_colr[i, j]):
-                        kws['vertices'][i][k] = np.int32(old_colr[i, j])
-        if isinstance(kws.get('edges', None), np.ndarray):
-            old_edge = kws.pop('edges')
-            assert(old_edge.shape[1] == 2)
-            kws['edges'] = [
-                {k: np.int32(old_edge[i, j]) for j, k
-                 in enumerate(['vertex1', 'vertex2'])}
-                for i in range(old_edge.shape[0])]
-        if isinstance(in_dict.get('edge_colors', None), np.ndarray):
-            old_colr = in_dict['edge_colors']
-            assert(old_colr.shape == (len(kws['edges']), 3))
-            for i in range(old_colr.shape[0]):
-                for j, k in enumerate(['red', 'green', 'blue']):
-                    if not np.isnan(old_colr[i, j]):
-                        kws['edges'][i][k] = np.int32(old_colr[i, j])
-        if isinstance(kws.get('faces', None), np.ndarray):
-            old_face = kws.pop('faces')
-            assert(old_face.shape[1] >= 3)
-            kws['faces'] = [
-                {'vertex_index': [
-                    np.int32(old_face[i, j]) for j
-                    in range(old_face.shape[1])
-                    if (not np.isnan(old_face[i, j]))]}
-                for i in range(old_face.shape[0])]
-        if isinstance(in_dict.get('face_colors', None), np.ndarray):
-            old_colr = in_dict['face_colors']
-            assert(old_colr.shape == (len(kws['faces']), 3))
-            for i in range(old_colr.shape[0]):
-                for j, k in enumerate(['red', 'green', 'blue']):
-                    if not np.isnan(old_colr[i, j]):
-                        kws['faces'][i][k] = np.int32(old_colr[i, j])
-        return cls.from_dict(kws)
+        return cls.from_dict(in_dict, as_array=True)
 
     def as_array_dict(self):
         r"""Get a version of the object as a dictionary of arrays."""
-        out = {}
-        if self.get('material', None):
-            out['material'] = self['material']
-        if self.get('vertices', None):
-            out['vertices'] = np.asarray(
-                [[v[k] for k in 'xyz'] for v in self['vertices']])
-            out['vertex_colors'] = np.NaN * np.ones(out['vertices'].shape,
-                                                    dtype='int32')
-            for i, v in enumerate(self['vertices']):
-                for j, k in enumerate(['red', 'green', 'blue']):
-                    out['vertex_colors'][i, j] = v.get(k, np.NaN)
-            if np.all(np.isnan(out['vertex_colors'])):
-                out.pop('vertex_colors')
-        if self.get('faces', None):
-            def fkey(x):
-                return len(x['vertex_index'])
-            face_shp = (len(self['faces']),
-                        len(max(self['faces'], key=fkey)['vertex_index']))
-            out['faces'] = np.NaN * np.ones(face_shp, dtype='int32')
-            out['face_colors'] = np.NaN * np.ones(
-                (face_shp[0], 3), dtype='int32')
-            for i, f in enumerate(self['faces']):
-                out['faces'][i, :fkey(f)] = f['vertex_index']
-                for j, k in enumerate(['red', 'green', 'blue']):
-                    out['face_colors'][i, j] = f.get(k, np.NaN)
-            if np.all(np.isnan(out['face_colors'])):
-                out.pop('face_colors')
-        if self.get('edges', None):
-            out['edges'] = np.asarray(
-                [[v[k] for k in ['vertex1', 'vertex2']]
-                 for v in self['edges']])
-            out['edge_colors'] = np.NaN * np.ones(
-                (out['edges'].shape[0], 3), dtype='int32')
-            for i, f in enumerate(self['edges']):
-                for j, k in enumerate(['red', 'green', 'blue']):
-                    out['edge_colors'][i, j] = f.get(k, np.NaN)
-            if np.all(np.isnan(out['edge_colors'])):
-                out.pop('edge_colors')
-        return out
+        return self.as_dict(as_array=True)
 
     @classmethod
     def from_trimesh(cls, in_mesh):
@@ -178,34 +76,17 @@ class PlyDict(dict):
                    vertex_colors=in_mesh.visual.vertex_colors,
                    faces=in_mesh.faces.astype('int32'))
         kws['vertex_colors'] = kws['vertex_colors'][:, :3]
-        return cls.from_array_dict(kws)
+        return cls.from_dict(kws, as_array=True)
 
     def as_trimesh(self, **kwargs):
         r"""Get a version of the object as a trimesh class."""
-        kws0 = self.as_array_dict()
+        kws0 = self.as_dict(as_array=True)
         kws = {'vertices': kws0.get('vertices', None),
                'vertex_colors': kws0.get('vertex_colors', None),
                'faces': kws0.get('faces', None)}
         kws.update(kwargs, process=False)
         return trimesh.base.Trimesh(**kws)
     
-    def count_elements(self, element_name):
-        r"""Get the count of a certain element in the dictionary.
-
-        Args:
-            element_name (str): Name of the element to count.
-
-        Returns:
-            int: Number of the provided element.
-
-        """
-        if element_name in self:
-            return len(self[element_name])
-        elif singular2plural(element_name) in self:
-            return len(self[singular2plural(element_name)])
-        else:
-            raise ValueError("'%s' is not a valid property." % element_name)
-
     @property
     def nvert(self):
         r"""int: Number of vertices."""
@@ -215,28 +96,6 @@ class PlyDict(dict):
     def nface(self):
         r"""int: Number of faces."""
         return self.count_elements('faces')
-
-    @property
-    def bounds(self):
-        r"""tuple: Mins/maxs of vertices in each dimension."""
-        mins = np.empty(3, 'float64')
-        maxs = np.empty(3, 'float64')
-        for i, x in enumerate('xyz'):
-            mins[i] = min([v[x] for v in self['vertices']])
-            maxs[i] = max([v[x] for v in self['vertices']])
-        return mins, maxs
-
-    @property
-    def mesh(self):
-        r"""list: Vertices for each face in the structure."""
-        mesh = []
-        for i in range(self.count_elements('faces')):
-            imesh = []
-            for f in self['faces']:
-                for v in f['vertex_index']:
-                    imesh += [self['vertices'][v][k] for k in ['x', 'y', 'z']]
-            mesh.append(imesh)
-        return mesh
 
     @classmethod
     def from_shape(cls, shape, d, conversion=1.0, _as_obj=False):  # pragma: lpy
@@ -249,10 +108,9 @@ class PlyDict(dict):
                 applied to the vertex positions. Defaults to 1.0.
 
         """
-        out = None
         d.process(shape)
         if d.result is not None:
-            out = cls()
+            out = {}
             # Vertices
             for p in d.result.pointList:
                 new_vert = {}
@@ -284,7 +142,7 @@ class PlyDict(dict):
                 for i3 in d.result.indexList:
                     out['faces'].append({'vertex_index': [i3[j] for j in
                                                           range(len(i3))]})
-        return out
+            return cls.from_dict(out)
 
     @classmethod
     def from_scene(cls, scene, d=None, conversion=1.0):  # pragma: lpy
@@ -358,7 +216,7 @@ class PlyDict(dict):
         # Add vertices
         obj_points = []
         obj_colors = []
-        for v in self['vertices']:
+        for v in self.get('vertices', []):
             xarr = conversion * np.array([v[k] for k in ['x', 'y', 'z']])
             obj_points.append(pgl.Vector3(np.float64(xarr[0]),
                                           np.float64(xarr[1]),
@@ -383,7 +241,7 @@ class PlyDict(dict):
         # index_class = pgl.Index3
         # array_class = pgl.Index3Array
         # smb_class = pgl.TriangleSet
-        for f in self['faces']:
+        for f in self.get('faces', []):
             if _as_obj:
                 f_int = [int(_f['vertex_index']) for _f in f]
             else:
@@ -392,32 +250,6 @@ class PlyDict(dict):
         indices = array_class(obj_indices)
         args = (points, indices)
         return smb_class, args, kwargs
-
-    def append(self, solf):
-        r"""Append new ply information to this dictionary.
-
-        Args:
-            solf (PlyDict): Another ply to append to this one.
-
-        """
-        nvert = self.count_elements('vertices')
-        # Vertex fields
-        self['vertices'] += solf['vertices']
-        # Face fields
-        for f in solf['faces']:
-            self['faces'].append({'vertex_index': [v + nvert for v in
-                                                   f['vertex_index']]})
-        # Edge fields
-        if 'edges' in solf:
-            if 'edges' not in self:
-                self['edges'] = []
-            for e in solf['edges']:
-                iedge = {'vertex1': e['vertex1'] + nvert,
-                         'vertex2': e['vertex2'] + nvert}
-                for k in ['red', 'green', 'blue']:
-                    if k in e:
-                        iedge[k] = e[k]
-                self['edges'].append(iedge)
 
     def merge(self, ply_list, no_copy=False):
         r"""Merge a list of ply dictionaries.
@@ -476,7 +308,7 @@ class PlyDict(dict):
         # Scale by area
         if scale_by_area:
             scalar_arr = copy.deepcopy(scalar_arr)
-            for i, f in enumerate(self['faces']):
+            for i, f in enumerate(self.get('faces', [])):
                 if _as_obj:
                     fv = [_f['vertex_index'] for _f in f]
                 else:
@@ -496,12 +328,12 @@ class PlyDict(dict):
         # Map vertices onto faces
         vertex_scalar = [[] for x in self['vertices']]
         if _as_obj:
-            for i in range(len(self['faces'])):
-                for v in self['faces'][i]:
+            for i in range(len(self.get('faces', []))):
+                for v in self.get('faces', [])[i]:
                     vertex_scalar[v['vertex_index']].append(scalar_arr[i])
         else:
-            for i in range(len(self['faces'])):
-                for v in self['faces'][i]['vertex_index']:
+            for i in range(len(self.get('faces', []))):
+                for v in self.get('faces', [])[i]['vertex_index']:
                     vertex_scalar[v].append(scalar_arr[i])
         for i in range(len(vertex_scalar)):
             if len(vertex_scalar[i]) == 0:
@@ -533,9 +365,7 @@ class PlyDict(dict):
             out = self
         else:
             out = copy.deepcopy(self)
-        for i, c in enumerate(vertex_colors):
-            for j, k in enumerate(['red', 'green', 'blue']):
-                out['vertices'][i][k] = c[j]
+        out.add_colors("vertices", vertex_colors)
         return out
 
 
@@ -581,7 +411,9 @@ class PlySerialize(SerializeBase):
             bytes: Serialized message.
 
         """
-        return self.datatype.encode_data(args, self.typedef).encode("utf-8")
+        if not isinstance(args, PlyDict):
+            args = PlyDict(args)
+        return str(args).encode("utf-8")
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -593,7 +425,7 @@ class PlySerialize(SerializeBase):
             obj: Deserialized message.
 
         """
-        return PlyDict(self.datatype.decode_data(msg, self.typedef))
+        return PlyDict(msg)
 
     @classmethod
     def concatenate(cls, objects, **kwargs):

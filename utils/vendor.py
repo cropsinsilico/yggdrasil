@@ -19,7 +19,8 @@ def vendor(srcdir):
         'README.rst',
         'CHANGES.rst',
         'rapidjson.cpp',
-        'units.cpp'
+        'units.cpp',
+        'geometry.cpp'
     ]
     for x in files_to_copy:
         shutil.copy2(os.path.join(srcdir, x), os.path.join(PYRJ_DIR, x))

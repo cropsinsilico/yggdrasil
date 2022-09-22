@@ -3,7 +3,7 @@ import copy
 import uuid
 from yggdrasil import constants, rapidjson
 from yggdrasil.metaschema import (get_metaschema, get_validator,
-                                  validate_instance, MetaschemaTypeError)
+                                  MetaschemaTypeError)
 from yggdrasil.metaschema.datatypes import (
     MetaschemaTypeMeta, compare_schema,
     get_type_class, conversions, is_default_typedef)
@@ -107,7 +107,7 @@ class MetaschemaType(object):
             string: Encoded object.
 
         """
-        raise NotImplementedError("Method must be overridden by the subclass.")
+        return rapidjson.dumps(obj)
 
     @classmethod
     def encode_data_readable(cls, obj, typedef):
@@ -137,7 +137,7 @@ class MetaschemaType(object):
             object: Decoded object.
 
         """
-        raise NotImplementedError("Method must be overridden by the subclass.")
+        return rapidjson.loads(obj)
 
     @classmethod
     def transform_type(cls, obj, typedef=None):
@@ -169,6 +169,8 @@ class MetaschemaType(object):
             object: Coerced object.
 
         """
+        if typedef:
+            return rapidjson.normalize(obj, typedef)
         return obj
 
     # Methods not to be modified by subclasses
@@ -248,18 +250,7 @@ class MetaschemaType(object):
             if not cls.validate(obj):
                 raise MetaschemaTypeError(f"Object could not be encoded as "
                                           f"'{cls.name}' type.")
-        out = copy.deepcopy(kwargs)
-        for x in cls.properties:
-            itypedef = typedef.get(x, out.get(x, None))
-            if x == 'type':
-                out['type'] = cls.name
-            elif x == 'title':
-                if itypedef is not None:
-                    out[x] = itypedef
-            else:
-                prop_cls = get_metaschema_property(x)
-                out[x] = prop_cls.encode(obj, typedef=itypedef)
-        return out
+        return rapidjson.encode_schema(obj)
 
     @classmethod
     def get_extract_properties(cls, metadata):
@@ -376,7 +367,7 @@ class MetaschemaType(object):
             type_cls = get_type_class(obj['type'])
             if type_cls.is_fixed and type_cls.issubtype(cls.name):
                 obj = type_cls.typedef_fixed2base(obj)
-        return validate_instance(obj, cls.metadata_schema(), **kwargs)
+        return rapidjson.validate(obj, cls.metadata_schema(), **kwargs)
 
     @classmethod
     def validate_definition(cls, obj, **kwargs):
@@ -387,7 +378,7 @@ class MetaschemaType(object):
             **kwargs: Additional keyword arguments are passed to the validator.
 
         """
-        return validate_instance(obj, cls.definition_schema(), **kwargs)
+        return rapidjson.validate(obj, cls.definition_schema(), **kwargs)
 
     @classmethod
     def validate_instance(cls, obj, typedef, **kwargs):
@@ -399,7 +390,11 @@ class MetaschemaType(object):
             **kwargs: Additional keyword arguments are passed to the validator.
 
         """
-        return validate_instance(obj, typedef, **kwargs)
+        try:
+            rapidjson.normalize(obj, typedef, **kwargs)
+            return True
+        except rapidjson.NormalizationError:
+            return False
 
     @classmethod
     def normalize_definition(cls, obj):
@@ -627,7 +622,7 @@ class MetaschemaType(object):
         from yggdrasil.serialize.JSONSerialize import encode_json
         for k in ['size', 'data', 'datatype']:
             if k in kwargs:
-                raise RuntimeError("'%s' is a reserved keyword in the metadata." % k)
+                raise RuntimeError(f"'{k}' is a reserved keyword in the metadata.")
         if ((isinstance(obj, bytes)
              and ((obj == constants.YGG_MSG_EOF) or kwargs.get('raw', False)
                   or dont_encode))):

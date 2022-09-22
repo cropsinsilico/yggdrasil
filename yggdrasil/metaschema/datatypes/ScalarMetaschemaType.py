@@ -2,12 +2,11 @@ import numpy as np
 import copy
 import warnings
 import base64
-from yggdrasil import units, constants
+from yggdrasil import units, constants, rapidjson
 from yggdrasil.metaschema import data2dtype, definition2dtype
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.datatypes.FixedMetaschemaType import (
     create_fixed_type_class)
-from yggdrasil.metaschema.properties import get_metaschema_property
 
 
 class ScalarMetaschemaType(MetaschemaType):
@@ -141,32 +140,33 @@ class ScalarMetaschemaType(MetaschemaType):
             string: Encoded object.
 
         """
-        arr = cls.to_array(obj)
-        if isinstance(typedef, dict):
-            subtype = typedef.get('subtype', typedef.get('type', None))
-        else:
-            subtype_cls = get_metaschema_property('subtype')
-            subtype = subtype_cls.encode(obj)
-        if (cls.name in ['1darray', 'ndarray']):
+        if not isinstance(typedef, dict):
+            typedef = rapidjson.encode_schema(obj)
+        if typedef['type'] in ['1darray', 'ndarray']:
+            arr = cls.to_array(obj)
             return arr.tolist()
-        assert arr.ndim > 0
-        if subtype in ['int', 'uint']:
-            return int(arr[0])
-        elif subtype in ['float']:
-            return float(arr[0])
-        elif subtype in ['complex']:
-            return str(complex(arr[0]))
-        elif subtype in ['bytes', 'unicode']:
-            out = arr[0]
-            if isinstance(out, bytes):
-                out = out.decode("utf-8")
-            else:
-                out = str(out)
-            return out
-        else:  # pragma: debug
-            warnings.warn(("No method for handling readable serialization of "
-                           + "subtype '%s', falling back to default.") % subtype)
-            return super(ScalarMetaschemaType, cls).encode_data_readable(obj, typedef)
+        elif typedef['type'] == 'scalar':
+            subtype = typedef.get('subtype', typedef.get('type', None))
+            if isinstance(obj, (rapidjson.units.Quantity,
+                                rapidjson.units.QuantityArray)):
+                return str(obj)
+            elif subtype in ['int', 'uint']:
+                return int(obj)
+            elif subtype in ['float']:
+                return float(obj)
+            elif subtype in ['complex']:
+                return str(complex(obj))
+            elif subtype in ['bytes', 'unicode']:
+                if isinstance(obj, bytes):
+                    out = obj.decode("utf-8")
+                else:
+                    out = str(obj)
+                return out
+        warnings.warn(f"No method for handling readable serialization"
+                      f" of subtype '{subtype}', falling back to"
+                      f" default.")  # pragma: debug
+        return super(ScalarMetaschemaType,
+                     cls).encode_data_readable(obj, typedef)  # pragma: debug
 
     @classmethod
     def decode_data(cls, obj, typedef):

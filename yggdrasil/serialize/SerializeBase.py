@@ -3,9 +3,9 @@ import copy
 import pprint
 import numpy as np
 import warnings
-from yggdrasil import tools, units, serialize, constants
+from yggdrasil import tools, units, serialize, constants, rapidjson
 from yggdrasil.metaschema.datatypes import (
-    guess_type_from_obj, get_type_from_def, get_type_class, compare_schema)
+    get_type_from_def, get_type_class, compare_schema)
 from yggdrasil.metaschema import type2numpy
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
@@ -474,9 +474,8 @@ class SerializeBase(tools.YggClass):
         if ((self.initialized or metadata.get('raw', False)
              or metadata.get('incomplete', False))):
             return
-        cls = guess_type_from_obj(msg)
-        typedef = cls.encode_type(msg)
-        metadata['datatype'] = cls.extract_typedef(typedef)
+        # TODO: Pass flag indicating that base schema should be created
+        metadata['datatype'] = rapidjson.encode_schema(msg, minimal=True)
         self.initialize_serializer(metadata)
 
     def initialize_serializer(self, metadata, extract=False):
@@ -521,8 +520,8 @@ class SerializeBase(tools.YggClass):
         # Raise an error if the types are not compatible
         seritype = kwargs.pop('seritype', self.seritype)
         if (seritype != self._seritype) and (seritype != 'default'):  # pragma: debug
-            raise Exception("Cannot change types form %s to %s." %
-                            (self._seritype, seritype))
+            raise Exception(f"Cannot change types form {self._seritype} "
+                            f"to {seritype}.")
         # Remove metadata keywords unrelated to serialization
         # TODO: Find a better way of tracking these
         _remove_kws = ['body', 'address', 'size', 'id', 'incomplete', 'raw',
@@ -744,16 +743,16 @@ class SerializeBase(tools.YggClass):
                 data = args
             else:
                 data = self.func_serialize(args)
-                if (self.encoded_typedef['type'] == 'bytes'):
+                if self.encoded_typedef['type'] == 'bytes':
                     if not isinstance(data, bytes):
-                        raise TypeError(("Serialization function returned object "
-                                         + "of type '%s', not required '%s' type.")
-                                        % (type(data), bytes))
+                        raise TypeError(f"Serialization function returned "
+                                        f"object of type '{type(data)}', not "
+                                        f"required '{bytes}' type.")
                     metadata['dont_encode'] = True
                     if not no_metadata:
                         metadata['metadata'] = {
-                            'datatype': self.datatype.encode_type(
-                                args, typedef=self.typedef)}
+                            'datatype': rapidjson.encode_schema(
+                                rapidjson.normalize(args, self.typedef))}
         validate_msgs = os.environ.get('YGG_VALIDATE_MESSAGES', 'first').lower()
         if (((self.initialized and (validate_msgs == 'first'))
              or (validate_msgs in ['false', '0']))):

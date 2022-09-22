@@ -682,6 +682,8 @@ def parse_connection(yml, existing):
     for x in yml['inputs']:
         is_file['inputs'].append('filetype' in x)
         if is_file['inputs'][-1]:
+            if x.get('serializer', {}) == {'seritype': 'default'}:
+                x['serializer'] = {'seritype': 'direct'}
             fname = os.path.expanduser(x['name'])
             if not os.path.isabs(fname):
                 fname = os.path.join(x['working_dir'], fname)
@@ -709,6 +711,8 @@ def parse_connection(yml, existing):
     for x in yml['outputs']:
         is_file['outputs'].append('filetype' in x)
         if is_file['outputs'][-1]:
+            if x.get('serializer', {}) == {'seritype': 'default'}:
+                x['serializer'] = {'seritype': 'direct'}
             fname = os.path.expanduser(x['name'])
             if not x.get('in_temp', False):
                 if not os.path.isabs(fname):

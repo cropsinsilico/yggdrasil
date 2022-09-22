@@ -256,8 +256,11 @@ static PyObject* units_is_compatible(PyObject* self, PyObject* args, PyObject* k
     bool result = v->units->is_compatible(*other->units);
     if (created)
 	Py_DECREF(other);
-    if (result)
+    if (result) {
+	Py_INCREF(Py_True);
 	return Py_True;
+    }
+    Py_INCREF(Py_False);
     return Py_False;
     
 }
@@ -266,8 +269,11 @@ static PyObject* units_is_compatible(PyObject* self, PyObject* args, PyObject* k
 static PyObject* units_is_dimensionless(PyObject* self, PyObject* args) {
     UnitsObject* v = (UnitsObject*) self;
     bool result = v->units->is_dimensionless();
-    if (result)
+    if (result) {
+	Py_INCREF(Py_True);
 	return Py_True;
+    }
+    Py_INCREF(Py_False);
     return Py_False;
 }
 
@@ -277,16 +283,23 @@ static PyObject* units_richcompare(PyObject *self, PyObject *other, int op) {
     UnitsObject* vsolf = (UnitsObject*) other;
     switch (op) {
     case (Py_EQ): {
-	if (*(vself->units) == *(vsolf->units))
+	if (*(vself->units) == *(vsolf->units)) {
+	    Py_INCREF(Py_True);
 	    return Py_True;
+	}
+	Py_INCREF(Py_False);
 	return Py_False;
     }
     case (Py_NE): {
-	if (*(vself->units) != *(vsolf->units))
+	if (*(vself->units) != *(vsolf->units)) {
+	    Py_INCREF(Py_True);
 	    return Py_True;
+	}
+	Py_INCREF(Py_False);
 	return Py_False;
     }
     default:
+	Py_INCREF(Py_NotImplemented);
 	return Py_NotImplemented;
     }
 }
@@ -525,7 +538,7 @@ static PyGetSetDef quantity_properties[] = {
     {"units", quantity_units_get, quantity_units_set,
      "The rapidjson.Units units for the quantity.", NULL},
     {"value", quantity_value_get, quantity_value_set,
-     "The quantity's value (in the current unit system)."},
+     "The quantity's value (in the current unit system).", NULL},
     {NULL}
 };
 
@@ -791,8 +804,11 @@ static PyObject* quantity_is_compatible(PyObject* self, PyObject* args, PyObject
     SWITCH_QUANTITY_SUBTYPE(v, result = , ->is_compatible(*other->units));
     if (created)
 	Py_DECREF(other);
-    if (result)
+    if (result) {
+	Py_INCREF(Py_True);
 	return Py_True;
+    }
+    Py_INCREF(Py_False);
     return Py_False;
     
 }
@@ -802,8 +818,11 @@ static PyObject* quantity_is_dimensionless(PyObject* self, PyObject* args) {
     QuantityObject* v = (QuantityObject*) self;
     bool result;
     SWITCH_QUANTITY_SUBTYPE(v, result = , ->is_dimensionless());
-    if (result)
+    if (result) {
+	Py_INCREF(Py_True);
 	return Py_True;
+    }
+    Py_INCREF(Py_False);
     return Py_False;
 }
 
@@ -817,8 +836,11 @@ static PyObject* do_is_equivalent(Quantity<Ta>* a, Quantity<Tb>* b,
 template <typename Ta, typename Tb>
 static PyObject* do_is_equivalent(Quantity<Ta>* a, Quantity<Tb>* b,
 				  RAPIDJSON_ENABLEIF((YGGDRASIL_IS_CASTABLE(Tb, Ta)))) {
-    if (a->equivalent_to(*b))
+    if (a->equivalent_to(*b)) {
+	Py_INCREF(Py_True);
 	return Py_True;
+    }
+    Py_INCREF(Py_False);
     return Py_False;
 }
 
@@ -904,6 +926,7 @@ static PyObject* quantity_richcompare_nest(Quantity<T>* vself,
     case (Py_NE):
 	Py_RETURN_RICHCOMPARE(*vself, *vsolf, op);
     default:
+	Py_INCREF(Py_NotImplemented);
 	return Py_NotImplemented;
     }
 }
@@ -912,8 +935,10 @@ static PyObject* quantity_richcompare_nest(Quantity<T>* vself,
 static PyObject* quantity_richcompare(PyObject *self, PyObject *other, int op) {
     QuantityObject* vself = (QuantityObject*) self;
     QuantityObject* vsolf = (QuantityObject*) other;
-    if (vself->subtype != vsolf->subtype)
+    if (vself->subtype != vsolf->subtype) {
+	Py_INCREF(Py_False);
 	return Py_False;
+    }
     SWITCH_QUANTITY_SUBTYPE_CALL(vself, return quantity_richcompare_nest,
 				 vsolf, op)
 }
@@ -1678,6 +1703,7 @@ static PyObject* quantity_array_richcompare_nest(QuantityArray<T>* vself,
     case (Py_NE):
 	Py_RETURN_RICHCOMPARE(*vself, *vsolf, op);
     default:
+	Py_INCREF(Py_NotImplemented);
 	return Py_NotImplemented;
     }
 }

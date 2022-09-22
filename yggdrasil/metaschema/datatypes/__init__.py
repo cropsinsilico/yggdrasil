@@ -1,5 +1,4 @@
 import os
-import glob
 import jsonschema
 import copy
 from yggdrasil import constants, rapidjson
@@ -12,32 +11,8 @@ _property_attributes = ['properties', 'definition_properties',
                         'metadata_properties', 'extract_properties']
 
 
-def import_schema_types():
-    r"""Import all types to ensure they are registered."""
-    # Load types from schema
-    schema_files = glob.glob(os.path.join(_schema_dir, '*.json'))
-    names = []
-    for f in schema_files:
-        names.append(add_type_from_schema(f))
-    # TODO: Need to make sure metaschema updated if it was already loaded
-    from yggdrasil.metaschema import get_metaschema
-    _metaschema = get_metaschema()
-    if _metaschema is not None:
-        reload_ygg = False
-        curr = _metaschema
-        new_names = []
-        for n in names:
-            if n not in curr['definitions']['simpleTypes']['enum']:  # pragma: debug
-                reload_ygg = True
-                new_names.append(n)
-        if reload_ygg:  # pragma: debug
-            raise Exception("The metaschema needs to be regenerated to include the "
-                            + "following new schemas found in schema files: %s"
-                            % new_names)
-    
-
 _default_typedef = {'type': 'bytes'}
-_type_registry = ClassRegistry(import_function=import_schema_types)
+_type_registry = ClassRegistry()
 
 
 def is_default_typedef(typedef):
@@ -84,11 +59,6 @@ def register_type(type_class):
     # Add to registry
     type_class._datatype = type_name
     type_class._schema_type = 'type'
-    # type_class._schema_required = type_class.definition_schema()['required']
-    # type_class._schema_properties = {}  # TODO: Transfer from
-    # TODO: Enable schema tracking once ported to jsonschema
-    # from yggdrasil.schema import register_component
-    # register_component(type_class)
     _type_registry[type_name] = type_class
     return type_class
 
@@ -172,29 +142,6 @@ def add_type_from_schema(path_to_schema, **kwargs):
     fixed_properties = out
     return create_fixed_type_class(name, description, base, fixed_properties,
                                    loaded_schema_file=path_to_schema, **kwargs)
-
-
-# def register_type_from_file(path_to_schema):
-#     r"""Decorator for registering a type by loading the schema describing it
-#     from a file. The original base class is discarded and replaced by one
-#     determined from the 'type' key in the schema. All attributes/methods
-#     for the class are preserved.
-
-#     Args:
-#         path_to_schema (str): Full path to the location of a schema file that
-#             can be loaded.
-
-#     Returns:
-#         function: Decorator that will modify a class according to the information
-#             provided in the schema.
-
-#     """
-#     def _wrapped_decorator(type_class):
-#         out = add_type_from_schema(path_to_schema, target_globals=None,
-#                                    class_name=type_class.__name__,
-#                                    **type_class.__dict__)
-#         return out
-#     return _wrapped_decorator
 
 
 def get_registered_types():

@@ -30,6 +30,7 @@
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/error/en.h"
 #include "units.cpp"
+#include "geometry.cpp"
 
 
 using namespace rapidjson;
@@ -51,6 +52,7 @@ using namespace rapidjson;
 
 
 static PyObject* units_submodule = NULL;
+static PyObject* geom_submodule = NULL;
 static PyObject* decimal_type = NULL;
 static PyObject* timezone_type = NULL;
 static PyObject* timezone_utc = NULL;
@@ -1788,7 +1790,8 @@ struct PyHandler {
 	    if (x->IsScalar()) {
 		QuantityObject* v = (QuantityObject*) Quantity_Type.tp_alloc(&Quantity_Type, 0);
 		value = (PyObject*)v;
-		int typenum = x->GetSubTypeNumpyType();
+		Value enc;
+		int typenum = x->GetSubTypeNumpyType(enc);
 #define SET_QUANTITY_(npT, T, subT)					\
 		case (npT): {						\
 		    v->subtype = subT;					\
@@ -1819,7 +1822,8 @@ struct PyHandler {
 		RAPIDJSON_DEFAULT_ALLOCATOR allocator;
 		QuantityArrayObject* v = (QuantityArrayObject*) QuantityArray_Type.tp_alloc(&QuantityArray_Type, 0);
 		value = (PyObject*)v;
-		int typenum = x->GetSubTypeNumpyType();
+		Value enc;
+		int typenum = x->GetSubTypeNumpyType(enc);
 #define SET_QUANTITY_(npT, T, subT)					\
 		case (npT): {						\
 		    v->subtype = subT;					\
@@ -1847,6 +1851,16 @@ struct PyHandler {
 		}
 #undef SET_QUANTITY_
 	    }
+	} else if (x->IsPly()) {
+	    PlyObject* v = (PlyObject*) Ply_Type.tp_alloc(&Ply_Type, 0);
+	    value = (PyObject*)v;
+	    v->ply = new Ply();
+	    x->GetPly(*v->ply);
+	} else if (x->IsObjWavefront()) {
+	    ObjWavefrontObject* v = (ObjWavefrontObject*) ObjWavefront_Type.tp_alloc(&ObjWavefront_Type, 0);
+	    value = (PyObject*)v;
+	    v->obj = new ObjWavefront();
+	    x->GetObjWavefront(*v->obj);
 	} else {
 	    value = x->GetPythonObjectRaw();
 	}
@@ -3264,6 +3278,26 @@ PythonAccept(
 	delete x;
 	if (!ret)
 	    PyErr_Format(PyExc_TypeError, "Error serializing QuantityArray");
+	return ret;
+    } else if (PyObject_IsInstance(object, (PyObject*)&Ply_Type)) {
+	RAPIDJSON_DEFAULT_ALLOCATOR allocator;
+	PlyObject* v = (PlyObject*) object;
+	Value* x = new Value();
+	x->SetPlyRaw(*v->ply, &allocator);
+	bool ret = x->Accept(*handler);
+	delete x;
+	if (!ret)
+	    PyErr_Format(PyExc_TypeError, "Error serializing Ply instance");
+	return ret;
+    } else if (PyObject_IsInstance(object, (PyObject*)&ObjWavefront_Type)) {
+	RAPIDJSON_DEFAULT_ALLOCATOR allocator;
+	ObjWavefrontObject* v = (ObjWavefrontObject*) object;
+	Value* x = new Value();
+	x->SetObj(*v->obj, &allocator);
+	bool ret = x->Accept(*handler);
+	delete x;
+	if (!ret)
+	    PyErr_Format(PyExc_TypeError, "Error serializing ObjWavefront instance");
 	return ret;
     } else if (!((object == Py_None) ||
 		 PyBool_Check(object) ||
@@ -5140,10 +5174,10 @@ validate(PyObject* self, PyObject* args, PyObject* kwargs)
 
 
 PyDoc_STRVAR(encode_schema_docstring,
-             "encode_schema(obj, object_hook=None, number_mode=None,"
-	     " datetime_mode=None, uuid_mode=None, bytes_mode=BM_UTF8,"
-	     " iterable_mode=IM_ANY_ITERABLE, mapping_mode=MM_ANY_MAPPING,"
-	     " allow_nan=True)\n"
+             "encode_schema(obj, minimal=False, object_hook=None,"
+	     " number_mode=None, datetime_mode=None, uuid_mode=None,"
+	     " bytes_mode=BM_UTF8, iterable_mode=IM_ANY_ITERABLE,"
+	     " mapping_mode=MM_ANY_MAPPING, allow_nan=True)\n"
              "\n"
 	     "Encode a schema for a Python object.");
 
@@ -5152,6 +5186,7 @@ static PyObject*
 encode_schema(PyObject* self, PyObject* args, PyObject* kwargs)
 {
     PyObject* jsonObject;
+    int minimalSchema = 0;
     PyObject* objectHook = NULL;
     PyObject* numberModeObj = NULL;
     unsigned numberMode = NM_NAN;
@@ -5168,6 +5203,7 @@ encode_schema(PyObject* self, PyObject* args, PyObject* kwargs)
     int allowNan = -1;
     static char const* kwlist[] = {
 	"obj",
+	"minimal",
         "object_hook"
         "number_mode",
         "datetime_mode",
@@ -5182,9 +5218,10 @@ encode_schema(PyObject* self, PyObject* args, PyObject* kwargs)
         NULL
     };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$OOOOOOOp:encode_schema",
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$pOOOOOOOp:encode_schema",
                                      (char**) kwlist,
 				     &jsonObject,
+				     &minimalSchema,
                                      &objectHook,
                                      &numberModeObj,
                                      &datetimeModeObj,
@@ -5230,7 +5267,7 @@ encode_schema(PyObject* self, PyObject* args, PyObject* kwargs)
 
     bool accept = false;
 
-    SchemaEncoder schema_encoder;
+    SchemaEncoder schema_encoder(minimalSchema);
     accept = d.Accept(schema_encoder);
     if (!accept) {
 	PyErr_SetString(decode_error, "Error encoding schema");
@@ -6018,6 +6055,15 @@ module_exec(PyObject* m)
     units_submodule = add_submodule(m, "units", (PyModuleDef*)units_submodule_def);
     if (units_submodule == NULL) {
 	Py_DECREF(units_submodule_def);
+	return -1;
+    }
+
+    PyObject* geom_submodule_def = PyInit_geom();
+    if (geom_submodule_def == NULL)
+	return -1;
+    geom_submodule = add_submodule(m, "geometry", (PyModuleDef*)geom_submodule_def);
+    if (geom_submodule == NULL) {
+	Py_DECREF(geom_submodule_def);
 	return -1;
     }
 
