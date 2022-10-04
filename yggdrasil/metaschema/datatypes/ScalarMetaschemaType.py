@@ -156,7 +156,7 @@ class ScalarMetaschemaType(MetaschemaType):
                 return float(obj)
             elif subtype in ['complex']:
                 return str(complex(obj))
-            elif subtype in ['bytes', 'unicode']:
+            elif subtype in ['bytes', 'unicode', 'string']:
                 if isinstance(obj, bytes):
                     out = obj.decode("utf-8")
                 else:
@@ -364,6 +364,8 @@ class ScalarMetaschemaType(MetaschemaType):
 
 # Dynamically create explicity scalar classes for shorthand
 for t in constants.VALID_TYPES.keys():
+    if t == 'string':
+        continue
     short_doc = 'A %s value with or without units.' % t
     long_doc = ('%s\n\n'
                 '    Developer Notes:\n'

@@ -140,25 +140,21 @@ def definition2dtype(props):
         np.dtype: Numpy data type.
 
     """
-    typename = props.get('subtype', None)
+    typename = props.get('subtype', props.get('type', None))
     if typename is None:
-        typename = props.get('type', None)
-        if typename is None:
-            raise KeyError('Could not find type in dictionary')
-    if ('precision' not in props):
-        if typename in constants.FLEXIBLE_TYPES:
-            out = np.dtype((constants.VALID_TYPES[typename]))
+        raise KeyError('Could not find type in dictionary')
+    if typename in constants.FLEXIBLE_TYPES:
+        nbytes = constants.ENCODING_SIZES.get(props.get('encoding', None), 1)
+        if (typename == 'string' and 'subtype' not in props) or nbytes == 4:
+            typename = 'unicode'
+        if 'precision' in props:
+            out = np.dtype((constants.VALID_TYPES[typename],
+                            int(props['precision'] // nbytes)))
         else:
-            raise RuntimeError("Precision required for type: '%s'" % typename)
-    elif typename == 'unicode':
-        out = np.dtype((constants.VALID_TYPES[typename],
-                        int(props['precision'] // 32)))
-    elif typename in constants.FLEXIBLE_TYPES:
-        out = np.dtype((constants.VALID_TYPES[typename],
-                        int(props['precision'] // 8)))
+            out = np.dtype((constants.VALID_TYPES[typename]))
     else:
         out = np.dtype('%s%d' % (constants.VALID_TYPES[typename],
-                                 int(props['precision'])))
+                                 int(props['precision'] * 8)))
     return out
 
 

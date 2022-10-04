@@ -9,8 +9,9 @@ from tests import TestComponentBase as base_class
 def test_demote_string():
     r"""Test format str creation of typedef."""
     x = SerializeBase.SerializeBase(format_str='%s')
-    assert(x.typedef == {'type': 'array',
-                         'items': [{'type': 'bytes'}]})
+    assert(x.datatype == {'type': 'array',
+                          'items': [{'type': 'scalar',
+                                     'subtype': 'string'}]})
 
 
 _seritypes = sorted([x for x in schema.get_schema()['serializer'].subtypes
@@ -66,9 +67,9 @@ class TestSerializeBase(base_class):
         assert(instance.numpy_dtype == testing_options['dtype'])
         assert(instance.extra_kwargs
                == nested_approx(testing_options['extra_kwargs']))
-        assert(instance.typedef
-               == nested_approx(testing_options['typedef']))
-        if isinstance(instance.typedef.get('items', []), dict):
+        assert(instance.datatype
+               == nested_approx(testing_options['datatype']))
+        if isinstance(instance.datatype.get('items', []), dict):
             with pytest.raises(Exception):
                 instance.get_field_names()
             with pytest.raises(Exception):
@@ -85,8 +86,7 @@ class TestSerializeBase(base_class):
             assert(instance.concatenate(x) == y)
         
     def test_serialize(self, instance, map_sent2recv, testing_options,
-                       component_subtype, class_name,
-                       unyts_equality_patch):
+                       component_subtype, class_name):
         r"""Test serialize/deserialize."""
         for iobj in testing_options['objects']:
             # if (class_name == 'SerializeBase'):
@@ -97,8 +97,7 @@ class TestSerializeBase(base_class):
             #     break
             msg = instance.serialize(iobj)
             iout, ihead = instance.deserialize(msg)
-            print(iout, map_sent2recv(iobj))
-            assert(iout == map_sent2recv(iobj))
+            assert(map_sent2recv(iobj) == iout)
             # assert(ihead == empty_head(msg))
         if ((('contents' in testing_options)
              and (class_name not in ['SerializeBase', 'DefaultSerialize']))):
@@ -115,40 +114,37 @@ class TestSerializeBase(base_class):
             instance.deserialize(None)
         
     def test_serialize_sinfo(self, instance, testing_options,
-                             map_sent2recv, header_info,
-                             unyts_equality_patch):
+                             map_sent2recv, header_info):
         r"""Test serialize/deserialize with serializer info."""
         hout = copy.deepcopy(header_info)
         temp_seri = import_component(
             'serializer', instance.serializer_info['seritype'])()
         for iobj in testing_options['objects']:
-            msg = instance.serialize(iobj, header_kwargs=header_info,
+            msg = instance.serialize(iobj, metadata=header_info,
                                      add_serializer_info=True)
-            hout.update(instance.serializer_info)
-            hout['datatype'] = instance.datatype.encode_type(
-                iobj, typedef=instance.typedef)
+            hout['serializer'] = instance.serializer_info
             iout, ihead = instance.deserialize(msg)
             hout.update(size=ihead['size'], id=ihead['id'],
                         incomplete=False)
-            assert(iout == map_sent2recv(iobj))
+            assert(map_sent2recv(iobj) == iout)
             assert(ihead == hout)
             # Use info to reconstruct serializer
             iout, ihead = temp_seri.deserialize(msg)
-            assert(iout == map_sent2recv(iobj))
+            assert(map_sent2recv(iobj) == iout)
             assert(ihead == hout)
-            new_seri = import_component('serializer',
-                                        ihead.pop('seritype', None))(**ihead)
+            new_seri = import_component(
+                'serializer', ihead['serializer'].pop('seritype', None))(**ihead)
             iout, ihead = new_seri.deserialize(msg)
-            assert(iout == map_sent2recv(iobj))
+            assert(map_sent2recv(iobj) == iout)
             assert(ihead == hout)
             
     def test_serialize_header(self, instance, testing_options, header_info,
-                              map_sent2recv, unyts_equality_patch):
+                              map_sent2recv):
         r"""Test serialize/deserialize with header."""
         for iobj in testing_options['objects']:
-            msg = instance.serialize(iobj, header_kwargs=header_info)
+            msg = instance.serialize(iobj, metadata=header_info)
             iout, ihead = instance.deserialize(msg)
-            assert(iout == map_sent2recv(iobj))
+            assert(map_sent2recv(iobj) == iout)
             # assert(ihead == header_info)
         
     def test_serialize_eof(self, instance):
@@ -162,7 +158,7 @@ class TestSerializeBase(base_class):
     def test_serialize_eof_header(self, instance, header_info):
         r"""Test serialize/deserialize EOF with header."""
         iobj = constants.YGG_MSG_EOF
-        msg = instance.serialize(iobj, header_kwargs=header_info)
+        msg = instance.serialize(iobj, metadata=header_info)
         iout, ihead = instance.deserialize(msg)
         assert(iout == iobj)
         # assert(ihead == empty_head(msg))
@@ -171,5 +167,5 @@ class TestSerializeBase(base_class):
                                testing_options, map_sent2recv):
         r"""Test call for empty string."""
         out, head = instance.deserialize(empty_msg)
-        assert(out == map_sent2recv(testing_options['empty']))
+        assert(map_sent2recv(testing_options['empty']) == out)
         assert(head == empty_head(empty_msg))

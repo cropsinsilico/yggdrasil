@@ -1,25 +1,15 @@
 import pytest
-import numpy as np
 from yggdrasil.serialize import AsciiTableSerialize
 from yggdrasil import platform
 from tests.serialize.test_DefaultSerialize import (
     TestDefaultSerialize as base_class)
 
 
-def test_serialize_nofmt():
-    r"""Test error on serialization without a format."""
-    inst = AsciiTableSerialize.AsciiTableSerialize()
-    inst.initialized = True
-    test_msg = np.zeros((5, 5))
-    with pytest.raises(RuntimeError):
-        inst.serialize(test_msg)
-
-    
 def test_deserialize_nofmt():
     r"""Test error on deserialization without a format."""
     inst = AsciiTableSerialize.AsciiTableSerialize()
     test_msg = b'lskdbjs;kfbj'
-    test_msg = inst.encoded_datatype.serialize(test_msg, metadata={})
+    test_msg = inst.encode(test_msg, {})
     with pytest.raises(RuntimeError):
         inst.deserialize(test_msg)
 
@@ -57,8 +47,10 @@ _options = [
         'empty': [],
         'objects': [[1]],
         'extra_kwargs': {},
-        'typedef': {'type': 'array',
-                    'items': [{'type': 'int', 'precision': 32}]},
+        'datatype': {'type': 'array',
+                     'items': [{'type': 'scalar',
+                                'subtype': 'int',
+                                'precision': 4}]},
         'dtype': None,
         'is_user_defined': False}},
     {'array_columns': True},
@@ -110,11 +102,11 @@ class TestAsciiTableSerialize_object(TestAsciiTableSerialize):
         out.update(
             kwargs={'field_units': out['kwargs']['field_units']},
             format_str='%s\t%d\t%g\n',
-            field_names=['%s_%s' % (k, x) for k, x
+            field_names=[f'{k}_{x}' for k, x
                          in zip('abc', out['field_names'])])
         out['objects'] = [{k: ix for k, ix in zip(out['field_names'], x)}
                           for x in out['objects']]
-        for x, k2 in zip(out['typedef']['items'], out['field_names']):
+        for x, k2 in zip(out['datatype']['items'], out['field_names']):
             out['contents'].replace(x['title'].encode("utf-8"),
                                     k2.encode("utf-8"))
             x['title'] = k2
@@ -124,6 +116,5 @@ class TestAsciiTableSerialize_object(TestAsciiTableSerialize):
     def map_sent2recv(self, nested_approx, instance):
         r"""Factory for method to convert sent messages to received."""
         def wrapped_map_sent2recv(obj):
-            return instance.datatype.coerce_type(
-                nested_approx(obj), typedef=instance.typedef)
+            return nested_approx(instance.normalize(obj))
         return wrapped_map_sent2recv

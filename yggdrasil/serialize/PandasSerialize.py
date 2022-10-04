@@ -124,6 +124,25 @@ class PandasSerialize(AsciiTableSerialize):
             out = np.dtype('U%d' % out.itemsize)
         return out
     
+    def normalize(self, args):
+        r"""Normalize a message to conform to the expected datatype.
+
+        Args:
+            args (object): Message arguments.
+
+        Returns:
+            object: Normalized message.
+
+        """
+        from yggdrasil.serialize import numpy2pandas, list2pandas, dict2pandas
+        if isinstance(args, np.ndarray):
+            args = numpy2pandas(args)
+        elif isinstance(args, list):
+            args = list2pandas(args)
+        elif isinstance(args, dict):
+            args = dict2pandas(args)
+        return args
+    
     def func_serialize(self, args):
         r"""Serialize a message.
 
@@ -225,7 +244,7 @@ class PandasSerialize(AsciiTableSerialize):
             self.field_names = out.columns.tolist()
         if not self.initialized:
             typedef = rapidjson.encode_schema(out)
-            self.update_serializer(extract=True, **typedef)
+            self.update_serializer(**typedef)
         return out
 
     @property
@@ -354,7 +373,7 @@ class PandasSerialize(AsciiTableSerialize):
                     del x['field_names']
             header_line = b''
             out['kwargs']['no_header'] = True
-            for x in out['typedef']['items']:
+            for x in out['datatype']['items']:
                 x.pop('title', None)
         else:
             if 'field_names' in out['kwargs']:
@@ -378,7 +397,7 @@ class PandasSerialize(AsciiTableSerialize):
                 field_names = ['f0', 'f1', 'f2']
             out['objects'] = [serialize.list2pandas(x, names=field_names)
                               for x in out['objects']]
-        out['kwargs']['datatype'] = copy.deepcopy(out['typedef'])
+        out['kwargs']['datatype'] = copy.deepcopy(out['datatype'])
         if no_names:
             for x in out['kwargs']['datatype']['items']:
                 x.pop('title', None)

@@ -150,7 +150,7 @@ class YAMLSerialize(JSONSerialize):
                'empty': {}, 'dtype': None,
                'extra_kwargs': {},
                'objects': [iobj1, iobj2],  # , iobj3, iobj4],
-               'typedef': {'type': 'object'}}
+               'datatype': {'type': 'object'}}
         out['contents'] = (b'a:\n- b\n- 1\n- 1.0\n'
                            b'c:\n    z: hello\n'
                            b'd: new field\n')

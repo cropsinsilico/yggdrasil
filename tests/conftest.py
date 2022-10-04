@@ -10,7 +10,7 @@ import logging
 import argparse
 import subprocess
 import contextlib
-from yggdrasil import platform, constants
+from yggdrasil import platform, constants, rapidjson
 from yggdrasil.serialize.ObjSerialize import ObjDict
 from yggdrasil.serialize.PlySerialize import PlyDict
 from yggdrasil.tools import (
@@ -1044,29 +1044,6 @@ def pandas_equality_patch(monkeypatch, pandas_equality):
 
 
 @pytest.fixture(scope="session")
-def unyts_equality(nested_approx):
-    r"""Comparison operation for unyt quantities and arrays."""
-    import unyt
-
-    def unyts_equality_w(a, b):
-        if not isinstance(b, unyt.array.unyt_array):
-            return False
-        if a.units != b.units:
-            return False
-        return a.to_ndarray() == nested_approx(b.to_ndarray())
-    return unyts_equality_w
-
-
-@pytest.fixture
-def unyts_equality_patch(monkeypatch, unyts_equality):
-    r"""Patch unyt array so that data and units considered."""
-    import unyt
-    with monkeypatch.context() as m:
-        m.setattr(unyt.array.unyt_array, '__eq__', unyts_equality)
-        yield
-        
-
-@pytest.fixture(scope="session")
 def functions_equality():
     def functions_equality_w(a, b):
         a_str = f"{a.__module__}.{a.__name__}"
@@ -1082,7 +1059,6 @@ def nested_approx(patch_equality, pandas_equality):
     r"""Nest pytest.approx for assertion."""
     from collections import OrderedDict
     import pandas
-    import unyt
 
     def nested_approx_(x, **kwargs):
         if isinstance(x, dict):
@@ -1096,13 +1072,15 @@ def nested_approx(patch_equality, pandas_equality):
             return tuple([nested_approx_(xx, **kwargs) for xx in x])
         elif isinstance(x, (pandas.DataFrame, ObjDict, PlyDict)):
             return x
-        elif isinstance(x, (unyt.array.unyt_quantity, unyt.array.unyt_array)):
-            # from yggdrasil.units import get_ureg
-            # units = str(x.units)
-            # y = pytest.approx(x, **kwargs)
-            # dtype = x.to_ndarray().dtype
-            # return x.__class__(y, units, dtype=dtype, registry=get_ureg())
-            return x
+        elif isinstance(x, (rapidjson.units.Quantity,
+                            rapidjson.units.QuantityArray)):
+            
+            def units_equality(a, b):
+                if a.units != b.units:
+                    return False
+                return pytest.approx(a.value, **kwargs) == b.value
+            
+            return patch_equality(x, units_equality)
         return pytest.approx(x, **kwargs)
     return nested_approx_
 
@@ -1121,9 +1099,13 @@ def patch_equality():
                 return f"EqualityWrapper({self.x!r})"
             
             def __eq__(self, other):
-                if not isinstance(other, self.x.__class__):
+                if isinstance(other, EqualityWrapper):
+                    y = other.x
+                else:
+                    y = other
+                if not isinstance(y, self.x.__class__):
                     return False
-                return method(self.x, other)
+                return method(self.x, y)
         return EqualityWrapper(obj)
     return patch_equality_w
 

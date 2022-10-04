@@ -180,25 +180,26 @@ def get_data(obj):
     return out
 
 
-def add_units(arr, unit_str):
+def add_units(arr, unit_str, **kwargs):
     r"""Add units to an array or scalar.
 
     Args:
         arr (np.ndarray, float, int): Scalar or array of data to add units to.
         unit_str (str): Unit string.
+        **kwargs: Additional keyword arguments are passed to the unit constructor.
 
     Returns:
         Quantity ro QuantityArray: Scalar or array with units.
 
     """
+    if is_null_unit(unit_str):
+        return arr
     if has_units(arr):
         out = convert_to(arr, unit_str)
     elif isinstance(arr, np.ndarray) and (arr.ndim > 0):
-        out = QuantityArray(arr, unit_str)
+        out = QuantityArray(arr, unit_str, **kwargs)
     else:
-        out = Quantity(arr, unit_str)
-    if out.is_dimensionless():
-        return arr
+        out = Quantity(arr, unit_str, **kwargs)
     return out
 
 

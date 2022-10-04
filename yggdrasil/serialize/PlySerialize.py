@@ -398,7 +398,11 @@ class PlySerialize(SerializeBase):
     def __init__(self, *args, **kwargs):
         r"""Initialize immediately as default is only type."""
         super(PlySerialize, self).__init__(*args, **kwargs)
-        self.initialized = True
+
+    @property
+    def initialized(self):
+        r"""bool: True if the serializer has been initialized."""
+        return True
 
     def func_serialize(self, args):
         r"""Serialize a message.

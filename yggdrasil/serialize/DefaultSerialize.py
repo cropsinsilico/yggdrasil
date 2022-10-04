@@ -1,5 +1,5 @@
 import numpy as np
-from yggdrasil import units, serialize
+from yggdrasil import units, serialize, rapidjson
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
@@ -17,8 +17,31 @@ class DefaultSerialize(SerializeBase):
                                    'extended JSON serialization based on a '
                                    'provided type definition (See discussion '
                                    ':ref:`here <serialization_rst>`).')
-    func_serialize = None
-    func_deserialize = None
+    
+    def func_serialize(self, args):
+        r"""Serialize a message.
+
+        Args:
+            args: List of arguments to be formatted or numpy array to be
+                serialized.
+
+        Returns:
+            bytes, str: Serialized message.
+
+        """
+        return rapidjson.dumps(args).encode('utf8')
+
+    def func_deserialize(self, msg):
+        r"""Deserialize a message.
+
+        Args:
+            msg: Message to be deserialized.
+
+        Returns:
+            obj: Deserialized message.
+
+        """
+        return rapidjson.loads(msg.decode('utf8'))
     
     @classmethod
     def object2dict(cls, obj, as_array=False, field_names=None, **kwargs):
@@ -107,18 +130,4 @@ class DefaultSerialize(SerializeBase):
         if cls._seritype == 'default':
             out['concatenate'] = [([], []),
                                   ([b'a', b'b'], [b'ab'])]
-        return out
-        
-    def update_serializer(self, *args, **kwargs):
-        r"""Update serializer with provided information.
-
-        Args:
-            *args: All arguments are passed to the parent class's method.
-            **kwargs: All keyword arguments are passed to the parent class's
-                method.
-
-        """
-        out = super(DefaultSerialize, self).update_serializer(*args, **kwargs)
-        if (self.func_serialize is None) or (self.func_deserialize is None):
-            self.encoded_datatype = self.datatype
         return out

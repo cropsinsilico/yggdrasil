@@ -1,13 +1,11 @@
-import os
+import uuid
 import copy
 import pprint
 import numpy as np
 import warnings
 from yggdrasil import tools, units, serialize, constants, rapidjson
-from yggdrasil.metaschema.datatypes import (
-    get_type_from_def, get_type_class, compare_schema)
+from yggdrasil.metaschema.datatypes import get_empty_msg, compare_schema
 from yggdrasil.metaschema import type2numpy
-from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
 class SerializeBase(tools.YggClass):
@@ -62,7 +60,6 @@ class SerializeBase(tools.YggClass):
     _oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
     _attr_conv = ['newline', 'comment']
     default_datatype = {'type': 'bytes'}
-    default_encoded_datatype = {'type': 'bytes'}
     has_header = False
     default_read_meth = 'read'
     is_framed = False
@@ -73,48 +70,30 @@ class SerializeBase(tools.YggClass):
             drv = tools.get_subprocess_language_driver()
             if drv.decode_format is not None:
                 kwargs['format_str'] = drv.decode_format(kwargs['format_str'])
-        if isinstance(kwargs.get('datatype', None), MetaschemaType):
-            self.datatype = kwargs.pop('datatype')
         super(SerializeBase, self).__init__(**kwargs)
         kwargs = self.extra_kwargs
         self.extra_kwargs = {}
-        # Set defaults
+        self._tmp = {}
+        # Update datatype from other keyword arguments
         if self.datatype is None:
             self.datatype = self.default_datatype
-        elif ((isinstance(self.datatype, dict)
-               and (self.datatype != self.default_datatype))):
+        else:
             kwargs['datatype'] = self.datatype
-        # Update typedef
-        self.initialized = False
-        if isinstance(self.datatype, dict):
-            self.datatype = get_type_from_def(self.default_datatype,
-                                              dont_complete=True)
-        if getattr(self, 'encoded_datatype', None) is None:
-            self.encoded_datatype = self.default_encoded_datatype
-        if isinstance(self.encoded_datatype, dict):
-            self.encoded_datatype = get_type_from_def(self.encoded_datatype,
-                                                      dont_complete=True)
         self.update_serializer(**kwargs)
-        self.initialized = self.is_initialized()
-        
-    def is_initialized(self):
-        r"""Determine if the serializer has been initialized by comparing the
-        current datatype against the default for the class.
 
-        Returns:
-            bool: True if the current datatype is different than the default,
-               False otherwise.
-
-        """
-        return (self.typedef != self.default_datatype)
+    @property
+    def initialized(self):
+        r"""bool: True if the serializer has been initialized."""
+        # return self.datatype is not None
+        return self.datatype != self.default_datatype
 
     @staticmethod
     def before_registration(cls):
         r"""Operations that should be performed to modify class attributes prior
         to registration."""
         tools.YggClass.before_registration(cls)
-        # If the serialization cannot be concatenated, then it is not framed by
-        # definition and would be meaningless if read-in incrementally
+        # If the serialization cannot be concatenated, then it is not framed
+        # by definition and would be meaningless if read-in incrementally
         if not cls.concats_as_str:
             assert not cls.is_framed
             assert cls.default_read_meth == 'read'
@@ -193,9 +172,9 @@ class SerializeBase(tools.YggClass):
         lines += ['%s%-15s:' % (prefix, 'sinfo')]
         lines += [prefix + '\t' + x for x in
                   self.pprint(self.serializer_info).splitlines()]
-        lines += ['%s%-15s:' % (prefix, 'typedef')]
+        lines += ['%s%-15s:' % (prefix, 'datatype')]
         lines += [prefix + '\t' + x for x in
-                  self.pprint(self.typedef).splitlines()]
+                  self.pprint(self.datatype).splitlines()]
         lines += ['%s%s' % (prefix, x) for x in extra_lines_after]
         return lines, prefix
 
@@ -248,28 +227,42 @@ class SerializeBase(tools.YggClass):
             if np.dtype(int) == int_type:  # pragma: windows
                 int_type = int
             if table_string_type == 'bytes':
+                table_string_fmt = '%5s'
                 np_dtype_str = 'S'
                 rows = [(b'one', int_type(1), 1.0),
                         (b'two', int_type(2), 2.0),
                         (b'three', int_type(3), 3.0)]
+                dtype1 = {'type': 'scalar',
+                          'subtype': 'string',
+                          'units': 'n/a',
+                          'title': 'name'}
             else:
+                table_string_fmt = '%5s'
                 np_dtype_str = 'U'
                 rows = [('one', int_type(1), 1.0),
                         ('two', int_type(2), 2.0),
                         ('three', int_type(3), 3.0)]
+                dtype1 = {'type': 'scalar',
+                          'subtype': 'string',
+                          'encoding': 'UTF8',
+                          'units': 'n/a',
+                          'title': 'name'}
             umol = b'\xce\xbcmol'.decode('utf-8')
             out = {'kwargs': {}, 'empty': [], 'dtype': None,
                    'extra_kwargs': {},
-                   'typedef': {'type': 'array',
-                               'items': [{'type': table_string_type,
-                                          'units': 'n/a', 'title': 'name'},
-                                         {'type': 'int', 'precision': 32,
-                                          'units': umol, 'title': 'count'},
-                                         {'type': 'float', 'precision': 64,
-                                          'units': 'cm', 'title': 'size'}]},
+                   'datatype': {'type': 'array',
+                                'items': [dtype1,
+                                          {'type': 'scalar',
+                                           'subtype': 'int', 'precision': 4,
+                                           'units': umol, 'title': 'count'},
+                                          {'type': 'scalar',
+                                           'subtype': 'float', 'precision': 8,
+                                           'units': 'cm', 'title': 'size'}]},
                    'contents': (b'# name\tcount\tsize\n'
                                 + b'# n/a\t\xce\xbcmol\tcm\n'
-                                + b'# %5s\t%d\t%f\n'
+                                + b'# '
+                                + table_string_fmt.encode('utf8')
+                                + b'\t%d\t%f\n'
                                 + b'  one\t1\t1.000000\n'
                                 + b'  two\t2\t2.000000\n'
                                 + b'three\t3\t3.000000\n'
@@ -280,7 +273,7 @@ class SerializeBase(tools.YggClass):
                    'field_names': ['name', 'count', 'size'],
                    'field_units': ['n/a', umol, 'cm']}
             if include_oldkws:
-                out['kwargs'].update({'format_str': '%5s\t%d\t%f\n',
+                out['kwargs'].update({'format_str': table_string_fmt + '\t%d\t%f\n',
                                       'field_names': ['name', 'count', 'size'],
                                       'field_units': ['n/a', umol, 'cm']})
                 out['extra_kwargs']['format_str'] = out['kwargs']['format_str']
@@ -295,25 +288,25 @@ class SerializeBase(tools.YggClass):
                 out['kwargs']['as_array'] = True
                 dtype = np.dtype(
                     {'names': out['field_names'],
-                     'formats': ['%s5' % np_dtype_str, 'i4', 'f8']})
+                     'formats': [f'{np_dtype_str}5', 'i4', 'f8']})
                 out['dtype'] = dtype
                 arr = np.array(rows, dtype=dtype)
                 lst = [units.add_units(arr[n], u) for n, u
                        in zip(out['field_names'], out['field_units'])]
                 out['objects'] = [lst, lst]
-                for x in out['typedef']['items']:
-                    x['subtype'] = x['type']
+                for x in out['datatype']['items']:
                     x['type'] = '1darray'
                     if x['title'] == 'name':
-                        x['precision'] = 40
-                        if x['subtype'] == 'unicode':
+                        x['precision'] = 5
+                        if x.get('encoding', None) in ['UTF8', 'UCS4']:
                             x['precision'] *= 4
         else:
             out = {'kwargs': {}, 'empty': b'', 'dtype': None,
-                   'typedef': cls.default_datatype,
                    'extra_kwargs': {},
                    'objects': [b'Test message\n', b'Test message 2\n']}
             out['contents'] = b''.join(out['objects'])
+            if cls.default_datatype:
+                out['datatype'] = cls.default_datatype
         return out
         
     @property
@@ -325,16 +318,6 @@ class SerializeBase(tools.YggClass):
     def seri_kws(cls):
         r"""Get a list of valid keyword arguments."""
         return list(set(list(cls._schema_properties.keys()) + cls._oldstyle_kws))
-
-    @property
-    def typedef(self):
-        r"""dict: Type definition."""
-        return copy.deepcopy(self.datatype._typedef)
-
-    @property
-    def encoded_typedef(self):
-        r"""dict: Type definition for encoded data objects."""
-        return self.encoded_datatype._typedef
 
     @property
     def input_kwargs(self):
@@ -354,7 +337,7 @@ class SerializeBase(tools.YggClass):
         r"""dict: Serializer info."""
         out = copy.deepcopy(self.extra_kwargs)
         for k in self._schema_properties.keys():
-            if (k != 'seritype') and (k in ['datatype'] + self._defaults_set):
+            if (k != 'seritype') and (k in self._defaults_set):
                 continue
             v = getattr(self, k, None)
             if v is not None:
@@ -370,7 +353,7 @@ class SerializeBase(tools.YggClass):
     @property
     def empty_msg(self):
         r"""obj: Object indicating empty message."""
-        return self.datatype._empty_msg
+        return get_empty_msg(self.datatype)
 
     # def is_empty(self, obj):
     #     r"""Determine if an object represents an empty message for this serializer.
@@ -399,15 +382,15 @@ class SerializeBase(tools.YggClass):
         """
         if getattr(self, 'field_names', None) is not None:
             out = copy.deepcopy(self.field_names)
-        elif ((self.typedef['type'] != 'array')
-              or ('items' not in self.typedef)):
+        elif ((self.datatype['type'] != 'array')
+              or ('items' not in self.datatype)):
             out = None
-        elif isinstance(self.typedef['items'], dict):  # pragma: debug
+        elif isinstance(self.datatype['items'], dict):  # pragma: debug
             raise Exception("Variable number of items not yet supported.")
-        elif isinstance(self.typedef['items'], list):
+        elif isinstance(self.datatype['items'], list):
             out = []
             any_names = False
-            for i, x in enumerate(self.typedef['items']):
+            for i, x in enumerate(self.datatype['items']):
                 out.append(x.get('title', 'f%d' % i))
                 if len(x.get('title', '')) > 0:
                     any_names = True
@@ -433,16 +416,16 @@ class SerializeBase(tools.YggClass):
             list: Units for each field in the data type.
 
         """
-        if self.typedef['type'] != 'array':
+        if self.datatype['type'] != 'array':
             return None
         if getattr(self, 'field_units', None) is not None:
             out = copy.deepcopy(self.field_units)
-        elif isinstance(self.typedef['items'], dict):  # pragma: debug
+        elif isinstance(self.datatype['items'], dict):  # pragma: debug
             raise Exception("Variable number of items not yet supported.")
-        elif isinstance(self.typedef['items'], list):
+        elif isinstance(self.datatype['items'], list):
             out = []
             any_units = False
-            for i, x in enumerate(self.typedef['items']):
+            for i, x in enumerate(self.datatype['items']):
                 out.append(x.get('units', ''))
                 if len(x.get('units', '')) > 0:
                     any_units = True
@@ -460,9 +443,9 @@ class SerializeBase(tools.YggClass):
     def numpy_dtype(self):
         r"""np.dtype: Corresponding structured data type. Will be None unless the
         type is an array of 1darrays."""
-        return type2numpy(self.typedef)
+        return type2numpy(self.datatype)
 
-    def initialize_from_message(self, msg, **metadata):
+    def initialize_from_message(self, msg, serializer=None, **metadata):
         r"""Initialize the serializer based on recieved message.
 
         Args:
@@ -474,65 +457,50 @@ class SerializeBase(tools.YggClass):
         if ((self.initialized or metadata.get('raw', False)
              or metadata.get('incomplete', False))):
             return
-        # TODO: Pass flag indicating that base schema should be created
-        metadata['datatype'] = rapidjson.encode_schema(msg, minimal=True)
+        if serializer is None:
+            serializer = {}
+        serializer['datatype'] = rapidjson.encode_schema(msg, minimal=True)
+        metadata['serializer'] = serializer
         self.initialize_serializer(metadata)
 
-    def initialize_serializer(self, metadata, extract=False):
-        r"""Initialize a serializer based on received metadata. This method will
-        exit early if the serializer has already been intialized.
+    def initialize_serializer(self, metadata):
+        r"""Initialize a serializer based on received metadata. This method
+        will exit early if the serializer has already been intialized.
 
         Args:
-            metadata (dict): Header information including type info that should be
-                used to initialize the serializer class.
-            extract (bool, optional): If True, the type will be defined using a
-                subset of the type information in metadata. If False, all of the
-                type information will be used. Defaults to False.
+            metadata (dict): Header information including type info that
+                should be used to initialize the serializer class.
 
         """
         if ((self.initialized or metadata.get('raw', False)
              or metadata.get('incomplete', False))):
             return
-        self.update_serializer(extract=extract, **metadata)
-        self.initialized = (self.typedef != self.default_datatype)
+        self.update_serializer(**metadata.get('serializer', {}))
 
-    def update_serializer(self, extract=False, skip_type=False, **kwargs):
+    def update_serializer(self, skip_type=False, **kwargs):
         r"""Update serializer with provided information.
 
         Args:
-            extract (bool, optional): If True, the updated typedef will be
-                the bare minimum as extracted from total set of provided
-                keywords, otherwise the entire set will be sued. Defaults to
-                False.
             skip_type (bool, optional): If True, everything is updated except
                 the data type. Defaults to False.
             **kwargs: Additional keyword arguments are processed as part of
                 they type definition and are parsed for old-style keywords.
 
         Raises:
-            RuntimeError: If there are keywords that are not valid typedef
+            RuntimeError: If there are keywords that are not valid datatype
                 keywords (currect or old-style).
 
         """
         old_datatype = None
         if self.initialized:
             old_datatype = copy.deepcopy(self.datatype)
+        elif self.default_datatype:
+            old_datatype = copy.deepcopy(self.default_datatype)
         # Raise an error if the types are not compatible
         seritype = kwargs.pop('seritype', self.seritype)
         if (seritype != self._seritype) and (seritype != 'default'):  # pragma: debug
             raise Exception(f"Cannot change types form {self._seritype} "
                             f"to {seritype}.")
-        # Remove metadata keywords unrelated to serialization
-        # TODO: Find a better way of tracking these
-        _remove_kws = ['body', 'address', 'size', 'id', 'incomplete', 'raw',
-                       'commtype', 'filetype', 'response_address', 'request_id',
-                       'append', 'in_temp', 'is_series', 'working_dir', 'fmts',
-                       'model_driver', 'env', 'send_converter', 'recv_converter',
-                       'typedef_base', 'model', 'closed_clients']
-        kws = list(kwargs.keys())
-        for k in kws:
-            if (k in _remove_kws) or k.startswith('zmq'):
-                kwargs.pop(k)
         # Set attributes and remove unused metadata keys
         for k in self._schema_properties.keys():
             if (k in kwargs) and (k != 'datatype'):
@@ -545,22 +513,20 @@ class SerializeBase(tools.YggClass):
             self.debug("Extra kwargs: %.100s..." % str(self.extra_kwargs))
         # Update type
         if not skip_type:
-            # Update typedef from oldstyle keywords in extra_kwargs
+            # Update datatype from oldstyle keywords in extra_kwargs
             typedef = self.update_typedef_from_oldstyle(typedef)
-            if typedef.get('type', None):
-                if extract:
-                    cls = get_type_class(typedef['type'])
-                    typedef = cls.extract_typedef(typedef)
-                self.datatype = get_type_from_def(typedef)
+            if 'type' in typedef:
+                self.datatype = typedef
             # Check to see if new datatype is compatible with new one
-            if old_datatype is not None:
-                errors = list(compare_schema(self.typedef, old_datatype._typedef) or ())
+            if old_datatype != self.default_datatype and typedef:
+                errors = list(compare_schema(self.datatype, old_datatype) or ())
                 if errors:
+                    # if old_datatype != self.datatype:
                     raise RuntimeError(
                         ("Updated datatype is not compatible with the existing one."
                          + "    New:\n%s\nOld:\n%s\n") % (
-                             pprint.pformat(self.typedef),
-                             pprint.pformat(old_datatype._typedef)))
+                             pprint.pformat(self.datatype),
+                             pprint.pformat(old_datatype)))
         # Enfore that strings used with messages are in bytes
         for k in self._attr_conv:
             v = getattr(self, k, None)
@@ -603,8 +569,6 @@ class SerializeBase(tools.YggClass):
                 continue
             # Key specific changes to type
             if k == 'format_str':
-                from yggdrasil.metaschema.datatypes.ArrayMetaschemaType import (
-                    OneDArrayMetaschemaType)
                 v = tools.bytes2str(v)
                 fmts = serialize.extract_formats(v)
                 if 'type' in typedef:
@@ -620,17 +584,18 @@ class SerializeBase(tools.YggClass):
                 typedef.update(type='array', items=[])
                 for i, fmt in enumerate(fmts):
                     nptype = self.cformat2nptype(fmt)
-                    itype = OneDArrayMetaschemaType.encode_type(np.ones(1, nptype))
-                    itype = OneDArrayMetaschemaType.extract_typedef(itype)
+                    itype = rapidjson.encode_schema(np.ones(1, nptype),
+                                                    minimal=True)
                     if (fmt == '%s') and ('precision' in itype):
                         del itype['precision']
                     if as_array:
                         itype['type'] = '1darray'
                     else:
-                        itype['type'] = itype.pop('subtype')
-                        if (((itype['type'] in constants.FLEXIBLE_TYPES)
+                        itype['type'] = 'scalar'
+                        if (((itype['subtype'] in constants.FLEXIBLE_TYPES)
                              and ('precision' in itype))):
                             del itype['precision']
+                        # itype['type'] = itype.pop('subtype')
                     typedef['items'].append(itype)
                 used.append('as_array')
                 updated.append('format_str')
@@ -696,14 +661,33 @@ class SerializeBase(tools.YggClass):
 
         """
         raise NotImplementedError("func_deserialize not implemented.")
+
+    def normalize(self, args):
+        r"""Normalize a message to conform to the expected datatype.
+
+        Args:
+            args (object): Message arguments.
+
+        Returns:
+            object: Normalized message.
+
+        """
+        if self.initialized:
+            args = rapidjson.normalize(args, self.datatype)
+        return args
+
+    def encode_schema(self, msg, minimal=False, normalize=False):
+        if normalize and self.initialized:
+            msg = self.normalize(msg, self.datatype)
+        return rapidjson.encode_schema(msg, minimal=minimal)
     
-    def serialize(self, args, header_kwargs=None, add_serializer_info=False,
-                  no_metadata=False, max_header_size=0):
+    def serialize(self, args, metadata=None, add_serializer_info=False,
+                  no_metadata=False, max_header_size=0, header_kwargs=None):
         r"""Serialize a message.
 
         Args:
             args (obj): List of arguments to be formatted or a ready made message.
-            header_kwargs (dict, optional): Keyword arguments that should be
+            metadata (dict, optional): Keyword arguments that should be
                 added to the header. Defaults to None and no header is added.
             add_serializer_info (bool, optional): If True, serializer information
                 will be added to the metadata. Defaults to False.
@@ -722,51 +706,77 @@ class SerializeBase(tools.YggClass):
 
 
         """
-        if header_kwargs is None:
-            header_kwargs = {}
+        if header_kwargs is not None:
+            if metadata is None:
+                metadata = header_kwargs
+                warnings.warn(message=("`header_kwargs` is deprecated as an"
+                                       " argument to `serialize`; use"
+                                       " `metadata` instead."),
+                              category=DeprecationWarning)
+            else:
+                raise TypeError("`serialize` received both `metadata` and"
+                                " `header_kwargs` as arguments. `header_kwargs`"
+                                " is deprecated, use `metadata` instead.")
+        if metadata is None:
+            metadata = {}
         if isinstance(args, bytes) and (args == constants.YGG_MSG_EOF):
-            header_kwargs['raw'] = True
-        self.initialize_from_message(args, **header_kwargs)
-        metadata = {'no_metadata': no_metadata,
-                    'max_header_size': max_header_size}
+            metadata['raw'] = True
+        if not metadata.get('raw', False):
+            args = self.normalize(args)
+            self.initialize_from_message(args, **metadata)
         if add_serializer_info:
             self.verbose_debug("serializer_info = %.100s...",
                                str(self.serializer_info))
-            metadata.update(self.serializer_info)
-            metadata['typedef_base'] = self.typedef
-        if header_kwargs is not None:
-            metadata.update(header_kwargs)
-        if header_kwargs.get('raw', False):
+            metadata['serializer'] = self.serializer_info
+        if metadata.get('raw', False):
             data = args
         else:
-            if self.func_serialize is None:
-                data = args
-            else:
-                data = self.func_serialize(args)
-                if self.encoded_typedef['type'] == 'bytes':
-                    if not isinstance(data, bytes):
-                        raise TypeError(f"Serialization function returned "
-                                        f"object of type '{type(data)}', not "
-                                        f"required '{bytes}' type.")
-                    metadata['dont_encode'] = True
-                    if not no_metadata:
-                        metadata['metadata'] = {
-                            'datatype': rapidjson.encode_schema(
-                                rapidjson.normalize(args, self.typedef))}
-        validate_msgs = os.environ.get('YGG_VALIDATE_MESSAGES', 'first').lower()
-        if (((self.initialized and (validate_msgs == 'first'))
-             or (validate_msgs in ['false', '0']))):
-            metadata.setdefault('dont_check', True)
-        out = self.encoded_datatype.serialize(data, **metadata)
-        return out
+            data = self.func_serialize(args)
+        if not isinstance(data, bytes):
+            raise TypeError(f"Serialization function returned "
+                            f"object of type '{type(data)}', not "
+                            f"required '{bytes}' type.")
+        return self.encode(data, metadata, no_metadata=no_metadata,
+                           max_header_size=max_header_size)
+
+    def encode(self, data, metadata, no_metadata=False, max_header_size=0):
+        r"""Encode the message with metadata in a header.
+
+        Args:
+            data (bytes): Message data serialized into bytes.
+            metadata (dict): Metadata that should be included in the message
+                header.
+            no_metadata (bool, optional): If True, no metadata will be added
+                to the serialized message. Defaults to False.
+            max_header_size (int, optional): Maximum size that header
+                should occupy in order to be sent in a single message.
+                A value of 0 indicates that any size header is valid.
+                Defaults to 0.
+
+        Returns:
+            bytes: Encoded message with header.
+
+        """
+        if no_metadata:
+            return data
+        metadata['size'] = len(data)
+        metadata.setdefault('id', str(uuid.uuid4()))
+        header = (constants.YGG_MSG_HEAD
+                  + tools.str2bytes(rapidjson.dumps(metadata))
+                  + constants.YGG_MSG_HEAD)
+        if (max_header_size > 0) and (len(header) > max_header_size):  # pragma: debug
+            raise AssertionError(f"The header is larger ({len(header)})"
+                                 f" than the maximum ({max_header_size}):"
+                                 f" {header[:min(len(header), 100)]}...")
+        return header + data
 
     def deserialize(self, msg, **kwargs):
         r"""Deserialize a message.
 
         Args:
             msg (str, bytes): Message to be deserialized.
-            **kwargs: Additional keyword arguments are passed to the deserialize
-                method of the datatype class.
+            **kwargs: Additional keyword arguments are passed to the decode
+                method.
 
         Returns:
             tuple(obj, dict): Deserialized message and header information.
@@ -775,37 +785,59 @@ class SerializeBase(tools.YggClass):
             TypeError: If msg is not bytes type (str on Python 2).
 
         """
-        if (((self.func_deserialize is not None)
-             and (self.encoded_typedef['type'] == 'bytes'))):
-            kwargs['dont_decode'] = True
-        validate_msgs = os.environ.get('YGG_VALIDATE_MESSAGES', 'first').lower()
-        if (((self.initialized and (validate_msgs == 'first'))
-             or (validate_msgs in ['false', '0']))):
-            kwargs.setdefault('dont_check', True)
-        out, metadata = self.encoded_datatype.deserialize(msg, **kwargs)
-        if (self.func_deserialize is not None):
-            if metadata['size'] == 0:
-                out = self.empty_msg
-            elif not (metadata.get('incomplete', False)
-                      or metadata.get('raw', False)):
-                if 'metadata' in metadata:
-                    for k, v in metadata.items():
-                        if k not in ['datatype', 'metadata']:
-                            metadata['metadata'][k] = v
-                    metadata = metadata.pop('metadata')
-                if not self.initialized:
-                    self.update_serializer(extract=True, **metadata)
-                out = self.func_deserialize(out)
-        # Update serializer
-        if not ((metadata.get('size', 0) == 0)
-                or metadata.get('incomplete', False)
-                or metadata.get('raw', False)):
-            typedef_base = metadata.pop('typedef_base', {})
-            typedef = copy.deepcopy(metadata)
-            typedef.setdefault('datatype', {})
-            typedef['datatype'].update(typedef_base)
-            self.initialize_serializer(typedef, extract=True)
+        msg, metadata = self.decode(msg, **kwargs)
+        self.initialize_serializer(metadata)
+        if metadata['size'] == 0:
+            out = self.empty_msg
+        elif metadata.get('incomplete', False) or metadata.get('raw', False):
+            out = msg
+        else:
+            out = self.func_deserialize(msg)
+            out = self.normalize(out)
         return out, metadata
+
+    def decode(self, msg, no_data=False, metadata=None):
+        r"""Decode message parts into header and body.
+
+        Args:
+            msg (str, bytes): Message to be decoded.
+            no_data (bool, optional): If True, only the metadata is returned.
+                Defaults to False.
+            metadata (dict, optional): Metadata that should be used to deserialize
+                the message instead of the current header content. Defaults to
+                None and is not used.
+
+        Returns:
+            tuple(obj, dict): Deserialized message and header information.
+
+        Raises:
+            ValueError: If msg contains a header, but metadata is also
+                provided as an argument.
+            TypeError: If msg is not bytes.
+
+        """
+        if not isinstance(msg, bytes):
+            raise TypeError("Messages are expected to be bytes.")
+        if msg.startswith(constants.YGG_MSG_HEAD):
+            if metadata is not None:
+                raise ValueError("Metadata in header and provided by keyword.")
+            _, metadata, data = msg.split(constants.YGG_MSG_HEAD, 2)
+            if len(metadata) == 0:
+                metadata = dict(size=len(data))
+            else:
+                metadata = rapidjson.loads(metadata)
+        else:
+            data = msg
+            if metadata is None:
+                metadata = dict(size=len(msg))
+        # Set flags based on data
+        metadata['incomplete'] = (len(data) < metadata['size'])
+        if data == constants.YGG_MSG_EOF:
+            metadata['raw'] = True
+        # Return based on flags
+        if no_data:
+            return metadata
+        return data, metadata
 
     def enable_file_header(self):  # pragma: no cover
         r"""Set serializer attributes to enable file headers to be included in
@@ -880,4 +912,4 @@ class SerializeBase(tools.YggClass):
             dict: Message properties.
 
         """
-        return self.datatype.deserialize(msg, no_data=True)
+        return self.decode(msg, no_data=True)

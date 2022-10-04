@@ -521,3 +521,18 @@ def generate_data(typedef, **kwargs):
     """
     type_cls = get_type_class(typedef['type'])
     return type_cls.generate_data(typedef, **kwargs)
+
+
+def get_empty_msg(typedef):
+    r"""Get an empty message associated with a type.
+
+    Args:
+        typedef (dict): Type definition via a JSON schema.
+    
+    Returns:
+        object: Python object representing an empty message for the provided
+            type.
+
+    """
+    type_cls = get_type_class(typedef['type'])
+    return type_cls._empty_msg

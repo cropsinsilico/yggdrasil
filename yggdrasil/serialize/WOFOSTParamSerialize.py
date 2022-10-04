@@ -49,10 +49,11 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                 iline += (',\n' + indent).join(arr_lines)
             elif isinstance(v, str):
                 iline += "\'%s\'" % v
+            elif hasattr(v, 'units'):
+                iline += json.dumps(float(v), cls=JSONReadableEncoder)
+                iline += f'\t! [{v.units}]'
             else:
                 iline += json.dumps(v, cls=JSONReadableEncoder)
-                if hasattr(v, 'units'):
-                    iline += f'\t! [{v.units}]'
             lines.append(iline)
         return tools.str2bytes('\n'.join(lines))
 
@@ -121,7 +122,7 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                 else:
                     out[k] = units.add_units(
                         out[k], self.parse_units(k_units))
-        
+
         for line in lines:
             if (not line.strip()) or line.startswith('**'):
                 continue

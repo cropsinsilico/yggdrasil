@@ -29,11 +29,13 @@ PYTHON_SCALARS = OrderedDict([
     ('int', [int]),
     ('uint', []),
     ('complex', [complex]),
+    ('string', [bytes]),
     ('bytes', [bytes]),
     ('unicode', [str]),
 ])
 VALID_TYPES = OrderedDict([(k, k) for k in NUMPY_NUMERIC_TYPES])
 VALID_TYPES.update([
+    ('string', 'bytes'),
     ('bytes', 'bytes'),
     ('unicode', 'str'),
 ])
@@ -60,6 +62,11 @@ for k, v in PYTHON_SCALARS.items():
     ALL_PYTHON_SCALARS += list(v)
 ALL_PYTHON_SCALARS = tuple(set(ALL_PYTHON_SCALARS))
 ALL_PYTHON_ARRAYS = (np.ndarray,)
+ENCODING_SIZES = {
+    "UTF8": 4,
+    "UCS4": 4,
+    "ASCII": 1
+}
 
 
 # Serialization constants

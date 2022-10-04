@@ -73,7 +73,7 @@ class DirectSerialize(SerializeBase):
 
         """
         out = {'kwargs': {}, 'empty': b'', 'dtype': None,
-               'typedef': cls.default_datatype,
+               'datatype': cls.default_datatype,
                'extra_kwargs': {}}
         out['objects'] = [b'Test message\n', b'Test message 2\n']
         out['contents'] = b''.join(out['objects'])

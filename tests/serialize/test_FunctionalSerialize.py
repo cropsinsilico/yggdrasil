@@ -27,7 +27,7 @@ class TestFunctionalSerialize(base_class):
                'objects': [['one', np.int32(1), 1.0],
                            ['two', np.int32(2), 1.0]],
                'extra_kwargs': {},
-               'typedef': {'type': 'bytes'},
+               'datatype': {'type': 'bytes'},
                'dtype': None,
                'is_user_defined': True}
         return out
@@ -90,7 +90,7 @@ class TestFunctionalSerialize_class(TestFunctionalSerialize):
                'objects': [['one', np.int32(1), 1.0],
                            ['two', np.int32(2), 1.0]],
                'extra_kwargs': {},
-               'typedef': {'type': 'bytes'},
+               'datatype': {'type': 'bytes'},
                'dtype': None,
                'is_user_defined': True}
         return out

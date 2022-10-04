@@ -148,14 +148,14 @@ def cformat2nptype(cfmt, names=None):
     """
     # TODO: this may fail on 32bit systems where C long types are 32 bit
     if not (isinstance(cfmt, list) or isinstance(cfmt, (str, bytes))):
-        raise TypeError("Input must be a string, bytes string, or list, not %s" %
-                        type(cfmt))
+        raise TypeError(f"Input must be a string, bytes string, or list,"
+                        f" not {type(cfmt)}")
     if isinstance(cfmt, (str, bytes)):
         cfmt = tools.bytes2str(cfmt)
         fmt_list = extract_formats(cfmt)
         if len(fmt_list) == 0:
-            raise ValueError("Could not locate any format codes in the "
-                             + "provided format string (%s)." % cfmt)
+            raise ValueError(f"Could not locate any format codes in the"
+                             f" provided format string ({cfmt}).")
     else:
         fmt_list = cfmt
     nfmt = len(fmt_list)
@@ -256,8 +256,8 @@ def cformat2pyscanf(cfmt):
                          + "provided format string (%s)." % cfmt)
     for cfmt_str in fmt_list:
         # Hacky, but necessary to handle concatenation of a single byte
-        if cfmt_str[-1] == 's':
-            out = '%s'
+        if cfmt_str[-1] in ['s', 'a']:
+            out = '%' + cfmt_str[-1]
         else:
             out = cfmt_str
         # if cfmt_str[-1] == 'j':
@@ -1028,7 +1028,7 @@ def discover_header(fd, serializer, newline=constants.DEFAULT_NEWLINE,
             header['format_str'] = header['format_str'].replace(
                 str_fmt, new_str_fmt, 1)
     # Update serializer
-    serializer.initialize_serializer(header)
+    serializer.initialize_serializer({'serializer': header})
     # Seek to just after the header
     fd.seek(prev_pos + header_size)
 

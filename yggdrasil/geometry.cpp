@@ -206,6 +206,7 @@ static PyObject* ply_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
 	return NULL;
 
     const char* readFrom = 0;
+    const PlyObject* copyFrom = 0;
     if (vertObject && !faceObject && !edgeObject && !kwargs) {
 	if (PyDict_Check(vertObject)) {
 	    kwargs = vertObject;
@@ -216,13 +217,20 @@ static PyObject* ply_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
 	} else if (PyBytes_Check(vertObject)) {
 	    readFrom = PyBytes_AsString(vertObject);
 	    vertObject = NULL;
+	} else if (PyObject_IsInstance(vertObject, (PyObject*)&Ply_Type)) {
+	    copyFrom = (PlyObject*)vertObject;
+	    vertObject = NULL;
 	}
     }
     
     PlyObject* v = (PlyObject*) type->tp_alloc(type, 0);
     if (v == NULL)
         return NULL;
-    v->ply = new Ply();
+    if (copyFrom) {
+	v->ply = new Ply(*(copyFrom->ply));
+    } else {
+	v->ply = new Ply();
+    }
 
     if (readFrom) {
 	std::stringstream ss;

@@ -230,7 +230,7 @@ class JSONSerialize(SerializeBase):
                'empty': {}, 'dtype': None,
                'extra_kwargs': {},
                'objects': [iobj1, iobj2],  # , iobj3, iobj4],
-               'typedef': {'type': 'object'}}
+               'datatype': {'type': 'object'}}
         out['contents'] = (b'{\n\t"a": [\n\t\t"b",\n\t\t1,\n\t\t1.0\n\t],'
                            b'\n\t"c": {\n\t\t"z": "hello"\n\t},'
                            b'\n\t"d": "new field"\n}')

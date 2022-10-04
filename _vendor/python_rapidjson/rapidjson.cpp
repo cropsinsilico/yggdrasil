@@ -178,7 +178,8 @@ enum NumberMode {
 enum BytesMode {
     BM_NONE = 0,
     BM_UTF8 = 1<<0,             // try to convert to UTF-8
-    BM_MAX = 1<<1
+    BM_SCALAR = 1<<1,           // Encode as a yggdrasil scalar
+    BM_MAX = 1<<2
 };
 
 
@@ -1787,70 +1788,24 @@ struct PyHandler {
 	RAPIDJSON_DEFAULT_ALLOCATOR allocator;
 	Value* x = new Value(str, length, allocator, schema);
 	if (x->HasUnits()) {
+	    PyObject* type = NULL;
 	    if (x->IsScalar()) {
-		QuantityObject* v = (QuantityObject*) Quantity_Type.tp_alloc(&Quantity_Type, 0);
-		value = (PyObject*)v;
-		Value enc;
-		int typenum = x->GetSubTypeNumpyType(enc);
-#define SET_QUANTITY_(npT, T, subT)					\
-		case (npT): {						\
-		    v->subtype = subT;					\
-		    v->quantity = x->GetScalarQuantity<T>().copy_void(); \
-		    break;						\
-		}
-		switch (typenum) {
-		SET_QUANTITY_(NPY_INT8  , int8_t  , kInt8QuantitySubType)
-		SET_QUANTITY_(NPY_INT16 , int16_t , kInt16QuantitySubType)
-		SET_QUANTITY_(NPY_INT32 , int32_t , kInt32QuantitySubType)
-		SET_QUANTITY_(NPY_INT64 , int64_t , kInt64QuantitySubType)
-		SET_QUANTITY_(NPY_UINT8 , uint8_t , kUint8QuantitySubType)
-		SET_QUANTITY_(NPY_UINT16, uint16_t, kUint16QuantitySubType)
-		SET_QUANTITY_(NPY_UINT32, uint32_t, kUint32QuantitySubType)
-		SET_QUANTITY_(NPY_UINT64, uint64_t, kUint64QuantitySubType)
-		SET_QUANTITY_(NPY_FLOAT16, float, kFloatQuantitySubType)
-		SET_QUANTITY_(NPY_FLOAT32, float, kFloatQuantitySubType)
-		SET_QUANTITY_(NPY_FLOAT64, double, kDoubleQuantitySubType)
-		SET_QUANTITY_(NPY_COMPLEX64 , std::complex<float>, kComplexFloatQuantitySubType)
-		SET_QUANTITY_(NPY_COMPLEX128, std::complex<double>, kComplexDoubleQuantitySubType)
-		default:
-		    std::cerr << "Unhandled numpy type" << std::endl;
-		    Py_TYPE(value)->tp_free(value);
-		    value = NULL;
-		}
-#undef SET_QUANTITY_
+		type = (PyObject*)&Quantity_Type;
 	    } else {
-		RAPIDJSON_DEFAULT_ALLOCATOR allocator;
-		QuantityArrayObject* v = (QuantityArrayObject*) QuantityArray_Type.tp_alloc(&QuantityArray_Type, 0);
-		value = (PyObject*)v;
-		Value enc;
-		int typenum = x->GetSubTypeNumpyType(enc);
-#define SET_QUANTITY_(npT, T, subT)					\
-		case (npT): {						\
-		    v->subtype = subT;					\
-		    v->quantity = x->GetArrayQuantity<T>(allocator).copy_void(); \
-		    break;						\
-		}
-		switch (typenum) {
-		SET_QUANTITY_(NPY_INT8  , int8_t  , kInt8QuantitySubType)
-		SET_QUANTITY_(NPY_INT16 , int16_t , kInt16QuantitySubType)
-		SET_QUANTITY_(NPY_INT32 , int32_t , kInt32QuantitySubType)
-		SET_QUANTITY_(NPY_INT64 , int64_t , kInt64QuantitySubType)
-		SET_QUANTITY_(NPY_UINT8 , uint8_t , kUint8QuantitySubType)
-		SET_QUANTITY_(NPY_UINT16, uint16_t, kUint16QuantitySubType)
-		SET_QUANTITY_(NPY_UINT32, uint32_t, kUint32QuantitySubType)
-		SET_QUANTITY_(NPY_UINT64, uint64_t, kUint64QuantitySubType)
-		SET_QUANTITY_(NPY_FLOAT16, float, kFloatQuantitySubType)
-		SET_QUANTITY_(NPY_FLOAT32, float, kFloatQuantitySubType)
-		SET_QUANTITY_(NPY_FLOAT64, double, kDoubleQuantitySubType)
-		SET_QUANTITY_(NPY_COMPLEX64 , std::complex<float>, kComplexFloatQuantitySubType)
-		SET_QUANTITY_(NPY_COMPLEX128, std::complex<double>, kComplexDoubleQuantitySubType)
-		default:
-		    std::cerr << "Unhandled numpy type in array" << std::endl;
-		    Py_TYPE(value)->tp_free(value);
-		    value = NULL;
-		}
-#undef SET_QUANTITY_
+		type = (PyObject*)&QuantityArray_Type;
 	    }
+	    RAPIDJSON_DEFAULT_ALLOCATOR allocator;
+	    PyObject* arr = x->GetPythonObjectRaw();
+	    PyObject* units = PyUnicode_FromString(x->GetUnits().GetString());
+	    if (arr != NULL && units != NULL) {
+		PyObject* args = PyTuple_Pack(2, arr, units);
+		if (args != NULL) {
+		    value = PyObject_Call(type, args, NULL);
+		    Py_DECREF(args);
+		}
+	    }
+	    Py_XDECREF(arr);
+	    Py_XDECREF(units);
 	} else if (x->IsPly()) {
 	    PlyObject* v = (PlyObject*) Ply_Type.tp_alloc(&Ply_Type, 0);
 	    value = (PyObject*)v;
@@ -3253,31 +3208,23 @@ PythonAccept(
             return false;
         ASSERT_VALID_SIZE(l);
         handler->String(jsonStr, (SizeType) l, true);
-    } else if (PyObject_IsInstance(object, (PyObject*)&Quantity_Type)) {
-	RAPIDJSON_DEFAULT_ALLOCATOR allocator;
-	QuantityObject* v = (QuantityObject*) object;
-	SizeType nelements = 1;
-	Value* x = new Value();
-	bool ret = false;
-	SWITCH_QUANTITY_SUBTYPE_CALL(v, ret = x->SetNDArrayRaw,
-				     &nelements, 0, &allocator)
-	if (ret)
-	    ret = x->Accept(*handler);
-	delete x;
-	if (!ret)
-	    PyErr_Format(PyExc_TypeError, "Error serializing Quantity");
-	return ret;
     } else if (PyObject_IsInstance(object, (PyObject*)&QuantityArray_Type)) {
 	RAPIDJSON_DEFAULT_ALLOCATOR allocator;
 	QuantityArrayObject* v = (QuantityArrayObject*) object;
 	Value* x = new Value();
-	bool ret = false;
-	SWITCH_QUANTITY_ARRAY_SUBTYPE_CALL(v, ret = x->SetNDArrayRaw, &allocator)
+	bool ret = x->SetPythonObjectRaw(object);
+	if (ret) {
+	    std::string unitsS = v->units->units->str();
+	    ret = x->SetUnits(unitsS.c_str(), unitsS.length());
+	}
 	if (ret)
 	    ret = x->Accept(*handler);
 	delete x;
-	if (!ret)
-	    PyErr_Format(PyExc_TypeError, "Error serializing QuantityArray");
+	if (!ret) {
+	    PyObject* cls_name = PyObject_GetAttrString((PyObject*)(object->ob_type),
+							"__name__");
+	    PyErr_Format(PyExc_TypeError, "Error serializing %s", PyUnicode_AsUTF8(cls_name));
+	}
 	return ret;
     } else if (PyObject_IsInstance(object, (PyObject*)&Ply_Type)) {
 	RAPIDJSON_DEFAULT_ALLOCATOR allocator;
@@ -3305,8 +3252,8 @@ PythonAccept(
 		 PyLong_Check(object) ||
 		 PyFloat_Check(object) ||
 		 PyUnicode_Check(object) ||
-		 PyBytes_Check(object) ||
-		 PyByteArray_Check(object) ||
+		 ((bytesMode == BM_UTF8 || bytesMode == BM_NONE) &&
+		  (PyBytes_Check(object) || PyByteArray_Check(object))) ||
 		 PyList_Check(object) ||
 		 PyTuple_Check(object) ||
 		 PyDict_Check(object) ||
@@ -3323,7 +3270,7 @@ PythonAccept(
 	    ret = x->Accept(*handler);
 	delete x;
 	if (!ret && !PyErr_Occurred())
-	    PyErr_Format(PyExc_TypeError, "%R is not JSON serializable", object);
+	    PyErr_Format(PyExc_TypeError, "%R is not JSON serializable even with yggdrasil extension", object);
 	return ret;
     } else {
 	if (!PyErr_Occurred())
@@ -4105,7 +4052,7 @@ typedef struct {
 PyDoc_STRVAR(dumps_docstring,
              "dumps(obj, *, skipkeys=False, ensure_ascii=True, write_mode=WM_COMPACT,"
              " indent=4, default=None, sort_keys=False, number_mode=None,"
-             " datetime_mode=None, uuid_mode=None, bytes_mode=BM_UTF8,"
+             " datetime_mode=None, uuid_mode=None, bytes_mode=BM_SCALAR,"
              " iterable_mode=IM_ANY_ITERABLE, mapping_mode=MM_ANY_MAPPING,"
              " allow_nan=True)\n"
              "\n"
@@ -4128,7 +4075,7 @@ dumps(PyObject* self, PyObject* args, PyObject* kwargs)
     PyObject* uuidModeObj = NULL;
     unsigned uuidMode = UM_NONE;
     PyObject* bytesModeObj = NULL;
-    unsigned bytesMode = BM_UTF8;
+    unsigned bytesMode = BM_SCALAR;
     PyObject* writeModeObj = NULL;
     unsigned writeMode = WM_COMPACT;
     PyObject* iterableModeObj = NULL;
@@ -4227,7 +4174,7 @@ dumps(PyObject* self, PyObject* args, PyObject* kwargs)
 PyDoc_STRVAR(dump_docstring,
              "dump(obj, stream, *, skipkeys=False, ensure_ascii=True,"
              " write_mode=WM_COMPACT, indent=4, default=None, sort_keys=False,"
-             " number_mode=None, datetime_mode=None, uuid_mode=None, bytes_mode=BM_UTF8,"
+             " number_mode=None, datetime_mode=None, uuid_mode=None, bytes_mode=BM_SCALAR,"
              " iterable_mode=IM_ANY_ITERABLE, mapping_mode=MM_ANY_MAPPING,"
              " chunk_size=65536, allow_nan=True)\n"
              "\n"
@@ -4251,7 +4198,7 @@ dump(PyObject* self, PyObject* args, PyObject* kwargs)
     PyObject* uuidModeObj = NULL;
     unsigned uuidMode = UM_NONE;
     PyObject* bytesModeObj = NULL;
-    unsigned bytesMode = BM_UTF8;
+    unsigned bytesMode = BM_SCALAR;
     PyObject* writeModeObj = NULL;
     unsigned writeMode = WM_COMPACT;
     PyObject* iterableModeObj = NULL;
@@ -4638,7 +4585,7 @@ encoder_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
     PyObject* uuidModeObj = NULL;
     unsigned uuidMode = UM_NONE;
     PyObject* bytesModeObj = NULL;
-    unsigned bytesMode = BM_UTF8;
+    unsigned bytesMode = BM_SCALAR;
     PyObject* writeModeObj = NULL;
     unsigned writeMode = WM_COMPACT;
     PyObject* iterableModeObj = NULL;
@@ -4783,7 +4730,7 @@ typedef struct {
 
 PyDoc_STRVAR(validator_doc,
              "Validator(json_schema, object_hook=None, number_mode=None,"
-	     " datetime_mode=None, uuid_mode=None, bytes_mode=BM_UTF8,"
+	     " datetime_mode=None, uuid_mode=None, bytes_mode=BM_SCALAR,"
 	     " iterable_mode=IM_ANY_ITERABLE, mapping_mode=MM_ANY_MAPPING,"
 	     " allow_nan=True)\n"
              "\n"
@@ -4903,7 +4850,7 @@ static PyObject* validator_new(PyTypeObject* type, PyObject* args, PyObject* kwa
     PyObject* uuidModeObj = NULL;
     unsigned uuidMode = UM_NONE;
     PyObject* bytesModeObj = NULL;
-    unsigned bytesMode = BM_UTF8;
+    unsigned bytesMode = BM_SCALAR;
     PyObject* iterableModeObj = NULL;
     unsigned iterableMode = IM_ANY_ITERABLE;
     PyObject* mappingModeObj = NULL;
@@ -5008,7 +4955,7 @@ static PyObject* validator_check_schema(PyObject* cls, PyObject* args, PyObject*
     PyObject* uuidModeObj = NULL;
     unsigned uuidMode = UM_NONE;
     PyObject* bytesModeObj = NULL;
-    unsigned bytesMode = BM_UTF8;
+    unsigned bytesMode = BM_SCALAR;
     PyObject* iterableModeObj = NULL;
     unsigned iterableMode = IM_ANY_ITERABLE;
     PyObject* mappingModeObj = NULL;
@@ -5123,7 +5070,7 @@ static PyObject* validator_check_schema(PyObject* cls, PyObject* args, PyObject*
 
 PyDoc_STRVAR(validate_docstring,
              "validate(obj, schema, object_hook=None, number_mode=None,"
-	     " datetime_mode=None, uuid_mode=None, bytes_mode=BM_UTF8,"
+	     " datetime_mode=None, uuid_mode=None, bytes_mode=BM_SCALAR,"
 	     " iterable_mode=IM_ANY_ITERABLE, mapping_mode=MM_ANY_MAPPING,"
 	     " allow_nan=True)\n"
              "\n"
@@ -5176,7 +5123,7 @@ validate(PyObject* self, PyObject* args, PyObject* kwargs)
 PyDoc_STRVAR(encode_schema_docstring,
              "encode_schema(obj, minimal=False, object_hook=None,"
 	     " number_mode=None, datetime_mode=None, uuid_mode=None,"
-	     " bytes_mode=BM_UTF8, iterable_mode=IM_ANY_ITERABLE,"
+	     " bytes_mode=BM_SCALAR, iterable_mode=IM_ANY_ITERABLE,"
 	     " mapping_mode=MM_ANY_MAPPING, allow_nan=True)\n"
              "\n"
 	     "Encode a schema for a Python object.");
@@ -5195,7 +5142,7 @@ encode_schema(PyObject* self, PyObject* args, PyObject* kwargs)
     PyObject* uuidModeObj = NULL;
     unsigned uuidMode = UM_NONE;
     PyObject* bytesModeObj = NULL;
-    unsigned bytesMode = BM_UTF8;
+    unsigned bytesMode = BM_SCALAR;
     PyObject* iterableModeObj = NULL;
     unsigned iterableMode = IM_ANY_ITERABLE;
     PyObject* mappingModeObj = NULL;
@@ -5291,7 +5238,7 @@ encode_schema(PyObject* self, PyObject* args, PyObject* kwargs)
 
 PyDoc_STRVAR(get_metaschema_docstring,
              "get_metaschema(object_hook=None, number_mode=None,"
-	     " datetime_mode=None, uuid_mode=None, bytes_mode=BM_UTF8,"
+	     " datetime_mode=None, uuid_mode=None, bytes_mode=BM_SCALAR,"
 	     " iterable_mode=IM_ANY_ITERABLE, mapping_mode=MM_ANY_MAPPING,"
 	     " allow_nan=True)\n"
              "\n"
@@ -5394,7 +5341,7 @@ typedef struct {
 
 PyDoc_STRVAR(normalizer_doc,
              "Normalizer(json_schema, object_hook=None, number_mode=None,"
-	     " datetime_mode=None, uuid_mode=None, bytes_mode=BM_UTF8,"
+	     " datetime_mode=None, uuid_mode=None, bytes_mode=BM_SCALAR,"
 	     " iterable_mode=IM_ANY_ITERABLE, mapping_mode=MM_ANY_MAPPING,"
 	     " allow_nan=True)\n"
              "\n"
@@ -5530,7 +5477,7 @@ static PyObject* normalizer_new(PyTypeObject* type, PyObject* args, PyObject* kw
     PyObject* uuidModeObj = NULL;
     unsigned uuidMode = UM_NONE;
     PyObject* bytesModeObj = NULL;
-    unsigned bytesMode = BM_UTF8;
+    unsigned bytesMode = BM_SCALAR;
     PyObject* iterableModeObj = NULL;
     unsigned iterableMode = IM_ANY_ITERABLE;
     PyObject* mappingModeObj = NULL;
@@ -5665,7 +5612,7 @@ static PyObject* normalizer_check_schema(PyObject*, PyObject* args, PyObject* kw
 
 PyDoc_STRVAR(normalize_docstring,
              "normalize(obj, schema, object_hook=None, number_mode=None,"
-	     " datetime_mode=None, uuid_mode=None, bytes_mode=BM_UTF8,"
+	     " datetime_mode=None, uuid_mode=None, bytes_mode=BM_SCALAR,"
 	     " iterable_mode=IM_ANY_ITERABLE, mapping_mode=MM_ANY_MAPPING,"
 	     " allow_nan=True)\n"
              "\n"
@@ -5940,6 +5887,7 @@ module_exec(PyObject* m)
 
         || PyModule_AddIntConstant(m, "BM_NONE", BM_NONE)
         || PyModule_AddIntConstant(m, "BM_UTF8", BM_UTF8)
+        || PyModule_AddIntConstant(m, "BM_SCALAR", BM_SCALAR)
 
         || PyModule_AddIntConstant(m, "WM_COMPACT", WM_COMPACT)
         || PyModule_AddIntConstant(m, "WM_PRETTY", WM_PRETTY)
@@ -6094,6 +6042,7 @@ PyMODINIT_FUNC
 PyInit_rapidjson()
 {
     import_array();
+    import_umath();
     PyObject* out = PyModuleDef_Init(&module);
     return out;
 }
