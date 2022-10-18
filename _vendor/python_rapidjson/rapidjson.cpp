@@ -62,6 +62,7 @@ static PyObject* validation_warning = NULL;
 static PyObject* normalization_error = NULL;
 static PyObject* normalization_warning = NULL;
 static PyObject* decode_error = NULL;
+static PyObject* comparison_error = NULL;
 
 
 /* These are the names of oftenly used methods or literal values, interned in the module
@@ -251,12 +252,14 @@ static PyObject* validator_call(PyObject* self, PyObject* args, PyObject* kwargs
 static void validator_dealloc(PyObject* self);
 static PyObject* validator_new(PyTypeObject* type, PyObject* args, PyObject* kwargs);
 static PyObject* validator_validate(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* validator_compare(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* validator_check_schema(PyObject* cls, PyObject* args, PyObject* kwargs);
 
 static PyObject* normalizer_call(PyObject* self, PyObject* args, PyObject* kwargs);
 static void normalizer_dealloc(PyObject* self);
 static PyObject* normalizer_new(PyTypeObject* type, PyObject* args, PyObject* kwargs);
 static PyObject* normalizer_validate(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* normalizer_compare(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* normalizer_check_schema(PyObject* cls, PyObject* args, PyObject* kwargs);
 static PyObject* normalizer_normalize(PyObject* self, PyObject* args, PyObject* kwargs);
 
@@ -4743,6 +4746,9 @@ static PyMethodDef validator_methods[] = {
      METH_VARARGS | METH_KEYWORDS,
      "Validate a JSON document."
     },
+    {"compare", (PyCFunction) validator_compare,
+     METH_VARARGS | METH_KEYWORDS,
+     "Compare two schemas for compatiblity."},
     {"check_schema", (PyCFunction) validator_check_schema,
      METH_VARARGS | METH_KEYWORDS | METH_CLASS,
      "Validate a schema against the JSON metaschema."},
@@ -4841,7 +4847,7 @@ static void validator_dealloc(PyObject* self)
 
 static PyObject* validator_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
 {
-    PyObject* jsonObject;
+    PyObject* jsonObject = NULL;
     PyObject* objectHook = NULL;
     PyObject* numberModeObj = NULL;
     unsigned numberMode = NM_NAN;
@@ -5064,6 +5070,71 @@ static PyObject* validator_check_schema(PyObject* cls, PyObject* args, PyObject*
 	set_validation_error(validator, validation_warning, true);
     
     Py_RETURN_NONE;
+    
+}
+
+static PyObject* validator_compare(PyObject* self, PyObject* args, PyObject* kwargs)
+{
+    bool dontRaise = false;
+    PyObject* kwargs_copy = NULL;
+    if (kwargs != NULL) {
+	PyObject* dontRaiseObject = PyDict_GetItemString(kwargs, "dont_raise");
+	if (dontRaiseObject == NULL) {
+	    Py_INCREF(kwargs);
+	    kwargs_copy = kwargs;
+	} else {
+	    if (dontRaiseObject == Py_False)
+		dontRaise = false;
+	    else if (dontRaiseObject == Py_True)
+		dontRaise = true;
+	    PyObject *kw_key, *kw_val;
+	    Py_ssize_t kw_pos = 0;
+	    kwargs_copy = PyDict_New();
+	    if (kwargs_copy == NULL)
+		return NULL;
+	    PyObject* tmp = PyUnicode_FromString("dont_raise");
+	    if (PyDict_Size(kwargs) > 1) {
+		while (PyDict_Next(kwargs, &kw_pos, &kw_key, &kw_val)) {
+		    if (PyObject_RichCompareBool(kw_key, tmp, Py_EQ))
+			continue;
+		    if (PyDict_SetItem(kwargs_copy, kw_key, kw_val) < 0) {
+			Py_DECREF(tmp);
+			return NULL;
+		    }
+		}
+	    }
+	    Py_DECREF(tmp);
+	}
+    }
+    PyObject* validator2 = validator_new(&Validator_Type, args, kwargs_copy);
+    Py_DECREF(kwargs_copy);
+    if (validator2 == NULL)
+	return NULL;
+
+    SchemaValidator v1(*((ValidatorObject*)self)->schema);
+    SchemaValidator v2(*((ValidatorObject*)validator2)->schema);
+    bool accept;
+    
+    if (v1.RequiresPython() || v2.RequiresPython()) {
+	accept = v1.Compare(v2);
+    } else {
+	Py_BEGIN_ALLOW_THREADS
+	accept = v1.Compare(v2);
+	Py_END_ALLOW_THREADS
+    }
+
+    Py_DECREF(validator2);
+    if (!accept) {
+	if (dontRaise) {
+	    Py_INCREF(Py_False);
+	    return Py_False;
+	} else {
+	    set_validation_error(v1, comparison_error);
+	    return NULL;
+	}
+    }
+    Py_INCREF(Py_True);
+    return Py_True;
     
 }
 
@@ -5320,6 +5391,80 @@ rj_get_metaschema(PyObject* self, PyObject* args, PyObject* kwargs)
 }
 
 
+PyDoc_STRVAR(compare_schemas_docstring,
+             "compare_schemas(schemaA, schemaB, dont_raise=False)\n"
+             "\n"
+	     "Compare two schemas for compatibility.");
+
+
+static PyObject*
+compare_schemas(PyObject* self, PyObject* args, PyObject* kwargs)
+{
+    PyObject *validatorObject1 = NULL, *validatorObject2 = NULL;
+    int dontRaise = 0;
+    static char const* kwlist[] = {
+	"schemaA",
+	"schemaB",
+	"dont_raise",
+	NULL
+    };
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|$p:compare_schemas",
+				     (char**) kwlist,
+				     &validatorObject1,
+				     &validatorObject2,
+				     &dontRaise))
+	return NULL;
+
+    if (validatorObject1 == NULL || validatorObject2 == NULL) {
+	return NULL;
+    }
+
+    PyObject* validator1_args = PyTuple_Pack(1, validatorObject1);
+    if (validator1_args == NULL)
+	return NULL;
+    PyObject* validator1_kwargs = PyDict_New();
+    if (validator1_kwargs == NULL) {
+	Py_DECREF(validator1_args);
+	return NULL;
+    }
+    PyObject* validator1 = validator_new(&Validator_Type, validator1_args, validator1_kwargs);
+    Py_DECREF(validator1_args);
+    Py_DECREF(validator1_kwargs);
+    if (validator1 == NULL)
+	return NULL;
+
+    // Py_INCREF(validatorObject2);
+    PyObject* validator2_args = PyTuple_Pack(1, validatorObject2);
+    if (validator2_args == NULL) {
+	Py_DECREF(validator1);
+	return NULL;
+    }
+    PyObject* validator2_kwargs = PyDict_New();
+    if (validator2_kwargs == NULL) {
+	Py_DECREF(validator1);
+	Py_DECREF(validator2_args);
+	return NULL;
+    }
+    PyObject* dontRaiseObject = NULL;
+    if (dontRaise)
+	dontRaiseObject = Py_True;
+    else
+	dontRaiseObject = Py_False;
+    if (PyDict_SetItemString(validator2_kwargs, "dont_raise", dontRaiseObject) < 0) {
+	Py_DECREF(validator1);
+	Py_DECREF(validator2_args);
+	Py_DECREF(validator2_kwargs);
+	return NULL;
+    }
+    PyObject* out = validator_compare(validator1, validator2_args, validator2_kwargs);
+    Py_DECREF(validator1);
+    Py_DECREF(validator2_args);
+    Py_DECREF(validator2_kwargs);
+    return out;
+}
+
+
 ////////////////
 // Normalizer //
 ////////////////
@@ -5356,6 +5501,9 @@ static PyMethodDef normalizer_methods[] = {
     {"normalize", (PyCFunction) normalizer_normalize,
      METH_VARARGS | METH_KEYWORDS,
      "Normalize a JSON document."},
+    {"compare", (PyCFunction) normalizer_compare,
+     METH_VARARGS | METH_KEYWORDS,
+     "Compare two schemas for compatiblity."},
     {"check_schema", (PyCFunction) normalizer_check_schema,
      METH_VARARGS | METH_KEYWORDS | METH_CLASS,
      "Validate a schema against the JSON metaschema."},
@@ -5605,6 +5753,50 @@ static PyObject* normalizer_validate(PyObject* self, PyObject* args, PyObject* k
     Py_RETURN_NONE;
 }
 
+static PyObject* normalizer_compare(PyObject* self, PyObject* args, PyObject* kwargs)
+{
+    bool dontRaise = false;
+    if (kwargs) {
+	PyObject* dontRaiseObject = PyDict_GetItemString(kwargs, "dont_raise");
+	if (dontRaiseObject != NULL) {
+	    if (dontRaiseObject == Py_False)
+		dontRaise = false;
+	    else if (dontRaiseObject == Py_True)
+		dontRaise = true;
+	    if (PyDict_DelItemString(kwargs, "dont_raise") < 0)
+		return NULL;
+	}
+    }
+    PyObject* validator2 = normalizer_new(&Normalizer_Type, args, kwargs);
+    if (validator2 == NULL)
+	return NULL;
+
+    SchemaValidator v1(*((NormalizerObject*)self)->schema);
+    SchemaValidator v2(*((NormalizerObject*)validator2)->schema);
+    bool accept;
+    if (v1.RequiresPython() || v2.RequiresPython()) {
+	accept = v1.Compare(v2);
+    } else {
+	Py_BEGIN_ALLOW_THREADS
+	accept = v1.Compare(v2);
+	Py_END_ALLOW_THREADS
+    }
+    Py_DECREF(validator2);
+    if (!accept) {
+	if (dontRaise) {
+	    Py_INCREF(Py_False);
+	    return Py_False;
+	} else {
+	    set_validation_error(v1, comparison_error);
+	    return NULL;
+	}
+    }
+
+    Py_INCREF(Py_True);
+    return Py_True;
+    
+}
+
 
 static PyObject* normalizer_check_schema(PyObject*, PyObject* args, PyObject* kwargs)
 { return validator_check_schema((PyObject*)(&Validator_Type), args, kwargs); }
@@ -5725,6 +5917,9 @@ static PyMethodDef functions[] = {
     {"get_metaschema", (PyCFunction) rj_get_metaschema,
      METH_VARARGS | METH_KEYWORDS,
      get_metaschema_docstring},
+    {"compare_schemas", (PyCFunction) compare_schemas,
+     METH_VARARGS | METH_KEYWORDS,
+     compare_schemas_docstring},
     {NULL, NULL, 0, NULL} /* sentinel */
 };
 
@@ -5995,6 +6190,16 @@ module_exec(PyObject* m)
     if (PyModule_AddObject(m, "JSONDecodeError", decode_error) < 0) {
         Py_DECREF(decode_error);
         return -1;
+    }
+
+    comparison_error = PyErr_NewException("rapidjson.ComparisonError",
+					  PyExc_ValueError, NULL);
+    if (comparison_error == NULL)
+	return -1;
+    Py_INCREF(comparison_error);
+    if (PyModule_AddObject(m, "ComparisonError", comparison_error) < 0) {
+	Py_DECREF(comparison_error);
+	return -1;
     }
 
     PyObject* units_submodule_def = PyInit_units();

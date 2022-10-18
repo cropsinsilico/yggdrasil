@@ -1,4 +1,5 @@
-from yggdrasil.metaschema.datatypes import encode_type, compare_schema
+from yggdrasil import rapidjson
+from yggdrasil.metaschema.datatypes import encode_type
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 
@@ -17,7 +18,9 @@ class TemptypeMetaschemaProperty(MetaschemaProperty):
     @classmethod
     def compare(cls, prop1, prop2, root1=None, root2=None):
         r"""Comparison for the 'temptype' property."""
-        for e in compare_schema(prop1, prop2, root1=root1, root2=root2):
+        try:
+            rapidjson.compare_schema(prop1, prop2)
+        except rapidjson.ComparisonError as e:
             yield e
 
     @classmethod

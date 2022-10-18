@@ -1,5 +1,4 @@
 import os
-import jsonschema
 import copy
 from yggdrasil import constants, rapidjson
 from yggdrasil.components import ClassRegistry
@@ -428,83 +427,6 @@ def resolve_schema_references(schema, top_level=None):
         for i in range(len(out)):
             out[i] = resolve_schema_references(out[i], top_level=top_level)
     return out
-
-
-def compare_schema(schema1, schema2, root1=None, root2=None):
-    r"""Compare two schemas for compatibility.
-
-    Args:
-        schema1 (dict): First schema.
-        schema2 (dict): Second schema.
-        root1 (dict, optional): Root for first schema. Defaults to None and is
-            set to schema1.
-        root2 (dict, optional): Root for second schema. Defaults to None and is
-            set to schema2.
-
-    Yields:
-        str: Comparision failure messages.
-
-    """
-    try:
-        if root1 is None:
-            root1 = jsonschema.RefResolver.from_schema(schema1)
-        if root2 is None:
-            root2 = jsonschema.RefResolver.from_schema(schema2)
-        if (len(schema2) == 1) and ('$ref' in schema2):
-            with root2.resolving(schema2['$ref']) as resolved_schema2:
-                for e in compare_schema(schema1, resolved_schema2,
-                                        root1=root1, root2=root2):
-                    yield e
-        elif (len(schema1) == 1) and ('$ref' in schema1):
-            with root1.resolving(schema1['$ref']) as resolved_schema1:
-                for e in compare_schema(resolved_schema1, schema2,
-                                        root1=root1, root2=root2):
-                    yield e
-        elif ('type' not in schema2) or ('type' not in schema1):
-            yield "Type required in both schemas for comparison."
-        elif (schema1 != schema2):
-            # Convert fixed types to base types
-            type_cls1 = get_type_class(schema1['type'])
-            if type_cls1.is_fixed:
-                schema1 = type_cls1.typedef_fixed2base(schema1)
-            type_list = schema2['type']
-            if not isinstance(schema2['type'], list):
-                type_list = [type_list]
-            all_errors = []
-            for itype in type_list:
-                itype_cls2 = get_type_class(itype)
-                ischema2 = copy.deepcopy(schema2)
-                ischema2['type'] = itype
-                if itype_cls2.is_fixed:
-                    ischema2 = itype_cls2.typedef_fixed2base(ischema2)
-                # Compare contents of schema
-                ierrors = []
-                for k, v in ischema2.items():
-                    prop_cls = get_metaschema_property(k, skip_generic=True)
-                    if (prop_cls is None) or (k in ['title', 'default']):
-                        continue
-                    if k not in schema1:
-                        ierrors.append("Missing entry for required key '%s'" % k)
-                        continue
-                    if (k == 'properties') and ('required' in ischema2):
-                        vcp = copy.deepcopy(v)
-                        for k2 in list(vcp.keys()):
-                            if (((k2 not in schema1[k])
-                                 and (k2 not in ischema2['required']))):
-                                del vcp[k2]
-                    else:
-                        vcp = v
-                    ierrors += list(prop_cls.compare(schema1[k], vcp,
-                                                     root1=root1, root2=root2))
-                if len(ierrors) == 0:
-                    all_errors = []
-                    break
-                else:
-                    all_errors += ierrors
-            for e in all_errors:
-                yield e
-    except BaseException as e:
-        yield e
 
 
 def generate_data(typedef, **kwargs):

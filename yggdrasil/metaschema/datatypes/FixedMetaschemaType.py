@@ -1,7 +1,7 @@
 import copy
 from yggdrasil import rapidjson
 from yggdrasil.metaschema.datatypes import (
-    compare_schema, generate_data, resolve_schema_references)
+    generate_data, resolve_schema_references)
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
@@ -91,12 +91,7 @@ class FixedMetaschemaType(MetaschemaType):
         out = copy.deepcopy(typedef)
         if out.get('type', None) == cls.base().name:
             out.update(cls.fixed_properties)
-            errors = [e for e in compare_schema(typedef, out)]
-            if errors:
-                error_msg = "Error(s) in comparison with fixed properties.\n"
-                for e in errors:
-                    error_msg += '\t%s\n' % e
-                raise Exception(error_msg)
+            rapidjson.compare_schemas(typedef, out)
             for k, v in cls.fixed_properties.items():
                 if k in out:
                     del out[k]

@@ -5,7 +5,7 @@ from yggdrasil import constants, rapidjson
 from yggdrasil.metaschema import (get_metaschema, get_validator,
                                   MetaschemaTypeError)
 from yggdrasil.metaschema.datatypes import (
-    MetaschemaTypeMeta, compare_schema,
+    MetaschemaTypeMeta,
     get_type_class, conversions, is_default_typedef)
 from yggdrasil.metaschema.properties import get_metaschema_property
 
@@ -455,13 +455,8 @@ class MetaschemaType(object):
                     if raise_errors:
                         raise
                     return False
-            errors = [e for e in compare_schema(metadata, typedef)]
-            if errors:
-                error_msg = "Error(s) in comparison:"
-                for e in errors:
-                    error_msg += ('\t%s' % e)
-                if raise_errors:
-                    raise ValueError(error_msg)
+            if not rapidjson.compare_schemas(metadata, typedef,
+                                             dont_raise=(not raise_errors)):
                 return False
         return True
 

@@ -4,7 +4,7 @@ import pprint
 import numpy as np
 import warnings
 from yggdrasil import tools, units, serialize, constants, rapidjson
-from yggdrasil.metaschema.datatypes import get_empty_msg, compare_schema
+from yggdrasil.metaschema.datatypes import get_empty_msg
 from yggdrasil.metaschema import type2numpy
 
 
@@ -519,9 +519,8 @@ class SerializeBase(tools.YggClass):
                 self.datatype = typedef
             # Check to see if new datatype is compatible with new one
             if old_datatype != self.default_datatype and typedef:
-                errors = list(compare_schema(self.datatype, old_datatype) or ())
-                if errors:
-                    # if old_datatype != self.datatype:
+                if not rapidjson.compare_schemas(self.datatype, old_datatype,
+                                                 dont_raise=True):
                     raise RuntimeError(
                         ("Updated datatype is not compatible with the existing one."
                          + "    New:\n%s\nOld:\n%s\n") % (

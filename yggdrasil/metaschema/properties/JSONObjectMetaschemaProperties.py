@@ -1,4 +1,5 @@
-from yggdrasil.metaschema.datatypes import encode_type, compare_schema
+from yggdrasil import rapidjson
+from yggdrasil.metaschema.datatypes import encode_type
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 
@@ -24,5 +25,7 @@ class PropertiesMetaschemaProperty(MetaschemaProperty):
             if k not in prop1:
                 yield "Missing property '%s'" % k
                 continue
-            for e in compare_schema(prop1[k], prop2[k], root1=root1, root2=root2):
+            try:
+                rapidjson.compare_schemas(prop1[k], prop2[k])
+            except rapidjson.ComparisonError as e:
                 yield e
