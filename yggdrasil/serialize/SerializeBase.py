@@ -234,7 +234,7 @@ class SerializeBase(tools.YggClass):
                         (b'three', int_type(3), 3.0)]
                 dtype1 = {'type': 'scalar',
                           'subtype': 'string',
-                          'units': 'n/a',
+                          # 'units': 'n/a',
                           'title': 'name'}
             else:
                 table_string_fmt = '%5s'
@@ -245,7 +245,7 @@ class SerializeBase(tools.YggClass):
                 dtype1 = {'type': 'scalar',
                           'subtype': 'string',
                           'encoding': 'UTF8',
-                          'units': 'n/a',
+                          # 'units': 'n/a',
                           'title': 'name'}
             umol = b'\xce\xbcmol'.decode('utf-8')
             out = {'kwargs': {}, 'empty': [], 'dtype': None,
@@ -426,7 +426,7 @@ class SerializeBase(tools.YggClass):
             out = []
             any_units = False
             for i, x in enumerate(self.datatype['items']):
-                out.append(x.get('units', ''))
+                out.append(x.get('units', 'n/a'))
                 if len(x.get('units', '')) > 0:
                     any_units = True
             # Don't use field units if they are all defaults
@@ -445,6 +445,14 @@ class SerializeBase(tools.YggClass):
         type is an array of 1darrays."""
         return type2numpy(self.datatype)
 
+    @property
+    def typedef(self):
+        r"""dict: Alias for datatype."""
+        warnings.warn(message=("`typedef` attribute is deprecated`; use "
+                               " `datatype` instead."),
+                      category=DeprecationWarning)
+        return self.datatype
+
     def initialize_from_message(self, msg, serializer=None, **metadata):
         r"""Initialize the serializer based on recieved message.
 
@@ -459,11 +467,11 @@ class SerializeBase(tools.YggClass):
             return
         if serializer is None:
             serializer = {}
-        serializer['datatype'] = rapidjson.encode_schema(msg, minimal=True)
-        metadata['serializer'] = serializer
-        self.initialize_serializer(metadata)
+        if 'datatype' not in serializer:
+            serializer['datatype'] = rapidjson.encode_schema(msg, minimal=True)
+        self.update_serializer(**serializer)
 
-    def initialize_serializer(self, metadata):
+    def initialize_from_metadata(self, metadata):
         r"""Initialize a serializer based on received metadata. This method
         will exit early if the serializer has already been intialized.
 
@@ -477,7 +485,8 @@ class SerializeBase(tools.YggClass):
             return
         self.update_serializer(**metadata.get('serializer', {}))
 
-    def update_serializer(self, skip_type=False, **kwargs):
+    def update_serializer(self, skip_type=False, seritype=None,
+                          datatype=None, **kwargs):
         r"""Update serializer with provided information.
 
         Args:
@@ -491,34 +500,32 @@ class SerializeBase(tools.YggClass):
                 keywords (currect or old-style).
 
         """
-        old_datatype = None
-        if self.initialized:
-            old_datatype = copy.deepcopy(self.datatype)
-        elif self.default_datatype:
-            old_datatype = copy.deepcopy(self.default_datatype)
-        # Raise an error if the types are not compatible
-        seritype = kwargs.pop('seritype', self.seritype)
-        if (seritype != self._seritype) and (seritype != 'default'):  # pragma: debug
+        if seritype not in [None, self._seritype, 'default']:  # pragma: debug
             raise Exception(f"Cannot change types form {self._seritype} "
                             f"to {seritype}.")
         # Set attributes and remove unused metadata keys
         for k in self._schema_properties.keys():
-            if (k in kwargs) and (k != 'datatype'):
+            if k in kwargs:
                 setattr(self, k, kwargs.pop(k))
-        # Create preliminary typedef
-        typedef = kwargs.pop('datatype', {})
         # Update extra keywords
         if (len(kwargs) > 0):
             self.extra_kwargs.update(kwargs)
             self.debug("Extra kwargs: %.100s..." % str(self.extra_kwargs))
         # Update type
         if not skip_type:
+            old_datatype = None
+            if self.initialized:
+                old_datatype = copy.deepcopy(self.datatype)
+            elif self.default_datatype:
+                old_datatype = copy.deepcopy(self.default_datatype)
+            if datatype is None:
+                datatype = {}
             # Update datatype from oldstyle keywords in extra_kwargs
-            typedef = self.update_typedef_from_oldstyle(typedef)
-            if 'type' in typedef:
-                self.datatype = typedef
+            datatype = self.update_typedef_from_oldstyle(datatype)
+            if 'type' in datatype:
+                self.datatype = datatype
             # Check to see if new datatype is compatible with new one
-            if old_datatype != self.default_datatype and typedef:
+            if old_datatype != self.default_datatype and datatype:
                 if not rapidjson.compare_schemas(self.datatype, old_datatype,
                                                  dont_raise=True):
                     raise RuntimeError(
@@ -607,7 +614,9 @@ class SerializeBase(tools.YggClass):
                     tk = 'title'
                 else:
                     tk = 'units'
-                if isinstance(typedef['items'], dict):
+                if 'items' not in typedef:
+                    continue
+                if isinstance(typedef.get('items', []), dict):
                     typedef['items'] = [copy.deepcopy(typedef['items'])
                                         for _ in range(len(v))]
                 assert len(v) == len(typedef.get('items', []))
@@ -619,6 +628,8 @@ class SerializeBase(tools.YggClass):
                 for iv, itype in zip(v, typedef.get('items', [])):
                     if tk in itype:
                         all_updated = False
+                    if tk == 'units' and units.is_null_unit(iv):
+                        continue
                     itype.setdefault(tk, iv)
                 if all_updated:
                     used.append(k)
@@ -758,15 +769,26 @@ class SerializeBase(tools.YggClass):
         """
         if no_metadata:
             return data
-        metadata['size'] = len(data)
-        metadata.setdefault('id', str(uuid.uuid4()))
+        metadata.setdefault('__meta__', {})
+        metadata['__meta__']['size'] = len(data)
+        metadata['__meta__'].setdefault('id', str(uuid.uuid4()))
         header = (constants.YGG_MSG_HEAD
                   + tools.str2bytes(rapidjson.dumps(metadata))
                   + constants.YGG_MSG_HEAD)
-        if (max_header_size > 0) and (len(header) > max_header_size):  # pragma: debug
-            raise AssertionError(f"The header is larger ({len(header)})"
-                                 f" than the maximum ({max_header_size}):"
-                                 f" {header[:min(len(header), 100)]}...")
+        if (max_header_size > 0) and (len(header) > max_header_size):
+            metadata_required = {'__meta__': metadata['__meta__']}
+            metadata = {k: v for k, v in metadata.items() if k != '__meta__'}
+            data = (tools.str2bytes(rapidjson.dumps(metadata))
+                    + constants.YGG_MSG_HEAD + data)
+            metadata_required['__meta__']['size'] = len(data)
+            metadata_required['__meta__']['in_data'] = True
+            header = (constants.YGG_MSG_HEAD
+                      + tools.str2bytes(rapidjson.dumps(metadata_required))
+                      + constants.YGG_MSG_HEAD)
+            if len(header) > max_header_size:  # pragma: debug
+                raise AssertionError(f"The header is larger ({len(header)})"
+                                     f" than the maximum ({max_header_size}):"
+                                     f" {header[:min(len(header), 100)]}...")
         return header + data
 
     def deserialize(self, msg, **kwargs):
@@ -785,8 +807,8 @@ class SerializeBase(tools.YggClass):
 
         """
         msg, metadata = self.decode(msg, **kwargs)
-        self.initialize_serializer(metadata)
-        if metadata['size'] == 0:
+        self.initialize_from_metadata(metadata)
+        if metadata['__meta__']['size'] == 0:
             out = self.empty_msg
         elif metadata.get('incomplete', False) or metadata.get('raw', False):
             out = msg
@@ -825,12 +847,20 @@ class SerializeBase(tools.YggClass):
                 metadata = dict(size=len(data))
             else:
                 metadata = rapidjson.loads(metadata)
+        elif isinstance(metadata, dict) and metadata['__meta__'].get('in_data', False):
+            assert(msg.count(constants.YGG_MSG_HEAD) == 1)
+            metadata_remainder, data = msg.split(constants.YGG_MSG_HEAD, 1)
+            if len(metadata_remainder) > 0:
+                metadata.update(rapidjson.loads(metadata_remainder))
+            metadata['__meta__'].pop('in_data')
+            # Data no longer contains the additional metadata
+            metadata['__meta__']['size'] = len(data)
         else:
             data = msg
             if metadata is None:
-                metadata = dict(size=len(msg))
+                metadata = {'__meta__': {'size': len(msg)}}
         # Set flags based on data
-        metadata['incomplete'] = (len(data) < metadata['size'])
+        metadata['incomplete'] = (len(data) < metadata['__meta__']['size'])
         if data == constants.YGG_MSG_EOF:
             metadata['raw'] = True
         # Return based on flags

@@ -531,14 +531,17 @@ def consolidate_array(arrs, dtype=None):
             out = arrs
         else:
             if len(arrs.dtype) == 0:
-                if arrs.shape[-1] != len(dtype):
-                    raise ValueError("The last dimension of the input array "
-                                     + "(%d) " % arrs.shape[-1]
-                                     + "dosn't match the number of fields in "
-                                     + "the dtype (%d)." % len(dtype))
-                out = np.empty(arrs.shape[:-1], dtype=dtype)
-                for i in range(arrs.shape[-1]):
-                    out[dtype.names[i]] = arrs[..., i]
+                if len(arrs.shape) == 1 and len(dtype) == 1:
+                    out = np.array(arrs, dtype)
+                else:
+                    if arrs.shape[-1] != len(dtype):
+                        raise ValueError("The last dimension of the input array "
+                                         + "(%d) " % arrs.shape[-1]
+                                         + "dosn't match the number of fields in "
+                                         + "the dtype (%d)." % len(dtype))
+                    out = np.empty(arrs.shape[:-1], dtype=dtype)
+                    for i in range(arrs.shape[-1]):
+                        out[dtype.names[i]] = arrs[..., i]
             elif len(arrs.dtype) == len(dtype):
                 out = np.empty(arrs.shape, dtype=dtype)
                 for n1, n2 in zip(arrs.dtype.names, dtype.names):
@@ -1028,7 +1031,8 @@ def discover_header(fd, serializer, newline=constants.DEFAULT_NEWLINE,
             header['format_str'] = header['format_str'].replace(
                 str_fmt, new_str_fmt, 1)
     # Update serializer
-    serializer.initialize_serializer({'serializer': header})
+    if not serializer.initialized:
+        serializer.update_serializer(**header)
     # Seek to just after the header
     fd.seek(prev_pos + header_size)
 

@@ -276,26 +276,6 @@ def transform_type(obj, typedef=None):
     return cls.transform_type(obj, typedef=typedef)
 
     
-def encode_type(obj, typedef=None, **kwargs):
-    r"""Encode an object into a JSON schema that can be used to both
-    describe the object and validate others.
-
-    Args:
-        obj (object): Python object to be encoded.
-        typedef (dict, optional): Type properties that should be used to
-            initialize the encoded type definition in certain cases.
-            Defaults to None and is ignored.
-        **kwargs: Additional keyword arguments are passed to the identified
-            type class's encode_type method.
-
-    Returns:
-        dict: Encoded JSON schema describing the object.
-
-    """
-    cls = guess_type_from_obj(obj)
-    return cls.encode_type(obj, typedef=typedef, **kwargs)
-
-
 def encode_data(obj, typedef=None):
     r"""Encode an object into a JSON serializable object.
 
@@ -456,5 +436,8 @@ def get_empty_msg(typedef):
             type.
 
     """
-    type_cls = get_type_class(typedef['type'])
-    return type_cls._empty_msg
+    if typedef['type'] in ['object', 'ply', 'obj']:
+        return {}
+    elif typedef['type'] in ['array']:
+        return []
+    return b''

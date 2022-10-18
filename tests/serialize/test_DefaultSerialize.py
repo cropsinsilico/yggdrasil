@@ -56,7 +56,7 @@ _options = [
         'empty': b'',
         'objects': [float(x) for x in range(5)],
         'extra_kwargs': {},
-        'datatype': {'type': 'float', 'precision': 8},
+        'datatype': {'type': 'float'},
         'dtype': None}}]
 
 

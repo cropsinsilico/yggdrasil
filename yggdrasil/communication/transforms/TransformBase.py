@@ -1,6 +1,7 @@
 import collections
+from yggdrasil import rapidjson
 from yggdrasil.components import ComponentBase
-from yggdrasil.metaschema.datatypes import encode_type, generate_data
+from yggdrasil.metaschema.datatypes import generate_data
 
 
 class TransformBase(ComponentBase):
@@ -35,6 +36,15 @@ class TransformBase(ComponentBase):
         self.original_datatype = datatype
         self.transformed_datatype = self.transform_datatype(self.original_datatype)
 
+    def set_original_datatype_from_data(self, data):
+        r"""Set datatype from data.
+
+        Args:
+            data (object): Data object.
+
+        """
+        self.set_original_datatype(rapidjson.encode_schema(data))
+        
     def validate_datatype(self, datatype):
         r"""Assert that the provided datatype is valid for this transformation.
         
@@ -59,7 +69,7 @@ class TransformBase(ComponentBase):
 
         """
         try:
-            out = encode_type(self(generate_data(datatype)))
+            out = rapidjson.encode_schema(self(generate_data(datatype)))
             if (((out['type'] == 'array') and (datatype['type'] == 'array')
                  and isinstance(out['items'], list)
                  and isinstance(datatype['items'], list)
@@ -106,11 +116,11 @@ class TransformBase(ComponentBase):
         if isinstance(x, collections.abc.Iterator):
             xlist = list(x)
             if (not self.original_datatype) and (not no_init) and xlist:
-                self.set_original_datatype(encode_type(xlist[0]))
+                self.set_original_datatype_from_data(xlist[0])
             out = iter([self.evaluate_transform(xx, no_copy=no_copy)
                         for xx in xlist])
         else:
             if (not self.original_datatype) and (not no_init):
-                self.set_original_datatype(encode_type(x))
+                self.set_original_datatype_from_data(x)
             out = self.evaluate_transform(x, no_copy=no_copy)
         return out

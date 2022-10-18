@@ -1,5 +1,4 @@
 from yggdrasil import rapidjson
-from yggdrasil.metaschema.datatypes import encode_type
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 
@@ -13,7 +12,7 @@ class TemptypeMetaschemaProperty(MetaschemaProperty):
     @classmethod
     def encode(cls, instance, typedef=None):
         r"""Encoder for the 'temptype' property."""
-        return encode_type(instance, typedef)
+        return rapidjson.encode_schema(instance)
 
     @classmethod
     def compare(cls, prop1, prop2, root1=None, root2=None):

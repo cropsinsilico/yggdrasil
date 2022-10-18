@@ -59,7 +59,6 @@ class TestAsciiTableComm(base_class):
         return wrapped_map_sent2recv
 
 
-@pytest.mark.usefixtures("unyts_equality_patch")
 class TestAsciiTableComm_AsArray(TestAsciiTableComm):
     r"""Test for AsciiTableComm communication class."""
 

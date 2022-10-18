@@ -353,24 +353,24 @@ class ArrayTransform(TransformBase):
         t = {'type': 'array',
              'items': [
                  {'type': '1darray', 'subtype': 'bytes',
-                  'precision': 40, 'length': length},
+                  'precision': 5, 'length': length},
                  {'type': '1darray', 'subtype': 'int',
-                  'precision': 64, 'length': length},
+                  'precision': 8, 'length': length},
                  {'type': '1darray', 'subtype': 'float',
-                  'precision': 64, 'length': length},
+                  'precision': 8, 'length': length},
                  {'type': '1darray', 'subtype': 'complex',
-                  'precision': 128, 'length': length}]}
+                  'precision': 16, 'length': length}]}
         t_prec = {
             'type': 'array',
             'items': [
                 {'type': '1darray', 'subtype': 'bytes',
                  'length': length},
                 {'type': '1darray', 'subtype': 'int',
-                 'precision': 64, 'length': length},
+                 'precision': 8, 'length': length},
                 {'type': '1darray', 'subtype': 'float',
-                 'precision': 64, 'length': length},
+                 'precision': 8, 'length': length},
                 {'type': '1darray', 'subtype': 'complex',
-                 'precision': 128, 'length': length}]}
+                 'precision': 16, 'length': length}]}
         t_arr = {'type': 'array',
                  'items': [{'type': 'array',
                             'items': [dict(i, type='scalar') for

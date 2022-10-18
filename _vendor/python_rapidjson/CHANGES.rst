@@ -1,6 +1,14 @@
 Changes
 -------
 
+1.9 (2022-10-17)
+~~~~~~~~~~~~~~~~
+
+* Produce Python 3.11 wheels, thanks to ``cibuildwheel`` `2.11.1`__
+
+  __ https://cibuildwheel.readthedocs.io/en/stable/changelog/#v2111
+
+
 1.8 (2022-07-07)
 ~~~~~~~~~~~~~~~~
 

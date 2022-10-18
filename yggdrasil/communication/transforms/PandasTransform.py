@@ -43,13 +43,13 @@ class PandasTransform(ArrayTransform):
         t = {'type': 'array',
              'items': [
                  {'type': '1darray', 'subtype': 'bytes',
-                  'precision': 40, 'length': length},
+                  'precision': 5, 'length': length},
                  {'type': '1darray', 'subtype': 'int',
-                  'precision': 64, 'length': length},
+                  'precision': 8, 'length': length},
                  {'type': '1darray', 'subtype': 'float',
-                  'precision': 64, 'length': length},
+                  'precision': 8, 'length': length},
                  {'type': '1darray', 'subtype': 'complex',
-                  'precision': 128, 'length': length}]}
+                  'precision': 16, 'length': length}]}
         dtype = np.dtype([(n, f) for n, f in zip(
             ['f0', 'f1', 'f2', 'f3'], ['S5', 'i8', 'f8', 'c16'])])
         x = np.zeros(length, dtype=dtype)

@@ -27,13 +27,17 @@ def normalize_objects(patch_equality, functions_equality):
                  'column_names': ['a', 'b'],
                  'column_units': ['cm', 'g'],
                  'filter': {
-                     'function': filter_func_ex_name}}],
+                     'function': filter_func_ex_name}},
+                {'name': 'outputB'}],
             'working_dir': os.getcwd()}],
-          'connections': [{
-              'inputs': 'outputA',
-              'outputs': 'fileA.txt',
-              'seritype': 'ply',
-              'working_dir': os.getcwd()}]},
+          'connections': [
+              {'inputs': 'outputA',
+               'outputs': 'fileA.txt',
+               'seritype': 'ply',
+               'working_dir': os.getcwd()},
+              {'inputs': 'outputB',
+               'outputs': 'fileB.txt',
+               'working_dir': os.getcwd()}]},
          {'models': [{
              'name': 'modelA',
              'language': 'c',
@@ -48,20 +52,34 @@ def normalize_objects(patch_equality, functions_equality):
                           'filter': {
                               'function': filter_func_ex2},
                           'field_names': ['a', 'b'],
-                          'field_units': ['cm', 'g']}],
+                          'field_units': ['cm', 'g']},
+                         {'name': 'outputB',
+                          'commtype': 'default',
+                          'datatype': {'type': 'bytes'}}],
              'working_dir': os.getcwd()}],
-          'connections': [{
-              'inputs': [
+          'connections': [
+              {'inputs': [
                   {'name': 'outputA',
                    'datatype': {'type': 'bytes'},
                    'commtype': 'default',
                    'working_dir': os.getcwd()}],
-              'outputs': [
-                  {'name': 'fileA.txt',
-                   'filetype': 'binary',
-                   'working_dir': os.getcwd(),
-                   'serializer': {'seritype': 'ply'}}],
-              'working_dir': os.getcwd()}]})]
+               'outputs': [
+                   {'name': 'fileA.txt',
+                    'filetype': 'binary',
+                    'working_dir': os.getcwd(),
+                    'serializer': {'seritype': 'ply'}}],
+               'working_dir': os.getcwd()},
+              {'inputs': [
+                  {'name': 'outputB',
+                   'datatype': {'type': 'bytes'},
+                   'commtype': 'default',
+                   'working_dir': os.getcwd()}],
+               'outputs': [
+                   {'name': 'fileB.txt',
+                    'filetype': 'binary',
+                    'working_dir': os.getcwd(),
+                    'serializer': {'seritype': 'default'}}],
+               'working_dir': os.getcwd()}]})]
 
 
 def test_get_json_schema():

@@ -439,9 +439,9 @@ class TestConnectionDriverTranslate(TestConnectionDriver):
                     yml={'working_dir': working_dir},
                     timeout=timeout, sleeptime=polling_interval,
                     namespace=namespace, inputs=inputs, outputs=outputs,
-                    translator={'transformtype': 'select_fields',
-                                'selected': ['a'],
-                                'single_as_scalar': True},
+                    transform={'transformtype': 'select_fields',
+                               'selected': ['a'],
+                               'single_as_scalar': True},
                     onexit='printStatus')
 
     @pytest.fixture(scope="class")
@@ -470,9 +470,9 @@ class TestConnectionDriverIterate(TestConnectionDriver):
                     yml={'working_dir': working_dir},
                     timeout=timeout, sleeptime=polling_interval,
                     namespace=namespace, inputs=inputs, outputs=outputs,
-                    translator=[{'transformtype': 'select_fields',
-                                 'selected': ['a', 'b']},
-                                {'transformtype': 'iterate'}],
+                    transform=[{'transformtype': 'select_fields',
+                                'selected': ['a', 'b']},
+                               {'transformtype': 'iterate'}],
                     onexit='printStatus')
 
     @pytest.fixture(scope="class")
@@ -525,7 +525,7 @@ def test_ConnectionDriverTranslate_errors():
     r"""Test that errors are raised for invalid translators."""
     assert(not hasattr(invalid_translate, '__call__'))
     with pytest.raises(ValueError):
-        ConnectionDriver('test', translator=invalid_translate)
+        ConnectionDriver('test', transform=invalid_translate)
 
 
 _comm_types = sorted(

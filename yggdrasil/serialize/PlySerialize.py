@@ -54,11 +54,8 @@ def plural2singular(e_plur):
     return e_sing
 
 
-class PlyDict(rapidjson.geometry.Ply):
-    r"""Enhanced dictionary class for storing Ply information."""
-
-    def convert_arrays(self):
-        r"""Check fields and convert arrays to nested structures."""
+class GeometryBase:
+    r"""Base class for extening rapidjson geometry classes."""
 
     @classmethod
     def from_array_dict(cls, in_dict):
@@ -99,7 +96,7 @@ class PlyDict(rapidjson.geometry.Ply):
 
     @classmethod
     def from_shape(cls, shape, d, conversion=1.0, _as_obj=False):  # pragma: lpy
-        r"""Create a ply dictionary from a PlantGL shape and descritizer.
+        r"""Create a geometry dictionary from a PlantGL shape and descritizer.
 
         Args:
             scene (openalea.plantgl.scene): Scene that should be descritized.
@@ -146,7 +143,7 @@ class PlyDict(rapidjson.geometry.Ply):
 
     @classmethod
     def from_scene(cls, scene, d=None, conversion=1.0):  # pragma: lpy
-        r"""Create a ply dictionary from a PlantGL scene and descritizer.
+        r"""Create a geometry dictionary from a PlantGL scene and descritizer.
 
         Args:
             scene (openalea.plantgl.scene): Scene that should be descritized.
@@ -163,14 +160,14 @@ class PlyDict(rapidjson.geometry.Ply):
         for k, shapes in scene.todict().items():
             for shape in shapes:
                 d.clear()
-                iply = cls.from_shape(shape, d, conversion=conversion)
-                if iply is not None:
-                    out.append(iply)
+                igeom = cls.from_shape(shape, d, conversion=conversion)
+                if igeom is not None:
+                    out.append(igeom)
                 d.clear()
         return out
 
     def to_scene(self, conversion=1.0, name=None):  # pragma: lpy
-        r"""Create a PlantGL scene from a Ply dictionary.
+        r"""Create a PlantGL scene from a geometry dictionary.
 
         Args:
             conversion (float, optional): Conversion factor that should be
@@ -251,27 +248,27 @@ class PlyDict(rapidjson.geometry.Ply):
         args = (points, indices)
         return smb_class, args, kwargs
 
-    def merge(self, ply_list, no_copy=False):
-        r"""Merge a list of ply dictionaries.
+    def merge(self, geom_list, no_copy=False):
+        r"""Merge a list of geometry dictionaries.
 
         Args:
-            ply_list (list): Ply dictionaries.
+            geom_list (list): Geometry dictionaries.
             no_copy (bool, optional): If True, the current dictionary will be
                 updated, otherwise a copy will be returned with the update.
                 Defaults to False.
 
         Returns:
-            dict: Merged ply dictionary.
+            dict: Merged geometry dictionary.
 
         """
-        if not isinstance(ply_list, list):
-            ply_list = [ply_list]
+        if not isinstance(geom_list, list):
+            geom_list = [geom_list]
         # Merge fields
         if no_copy:
             out = self
         else:
             out = copy.deepcopy(self)
-        for x in ply_list:
+        for x in geom_list:
             out.append(x)
         return out
 
@@ -300,7 +297,7 @@ class PlyDict(rapidjson.geometry.Ply):
                 copy. Defaults to False.
 
         Returns:
-            dict: Ply with updated vertex colors.
+            dict: Geometry with updated vertex colors.
 
         """
         from matplotlib import cm
@@ -369,6 +366,11 @@ class PlyDict(rapidjson.geometry.Ply):
         return out
 
 
+class PlyDict(GeometryBase, rapidjson.geometry.Ply):
+    r"""Enhanced dictionary class for storing Ply information."""
+    pass
+
+
 class PlySerialize(SerializeBase):
     r"""Class for serializing/deserializing .ply file formats.
 
@@ -431,6 +433,20 @@ class PlySerialize(SerializeBase):
         """
         return PlyDict(msg)
 
+    def normalize(self, args):
+        r"""Normalize a message to conform to the expected datatype.
+
+        Args:
+            args (object): Message arguments.
+
+        Returns:
+            object: Normalized message.
+
+        """
+        if isinstance(args, PlyDict):
+            return args
+        return PlyDict(super(PlySerialize, self).normalize(args))
+        
     @classmethod
     def concatenate(cls, objects, **kwargs):
         r"""Concatenate objects to get object that would be recieved if
@@ -447,9 +463,8 @@ class PlySerialize(SerializeBase):
         if len(objects) == 0:
             return []
         total = objects[0]
-        for x in objects[1:]:
-            total = total.merge(x)
-        return [total]
+        out = total.merge(objects[1:])
+        return [out]
         
     @classmethod
     def get_testing_options(cls):
@@ -463,9 +478,10 @@ class PlySerialize(SerializeBase):
         obj = PlyDict({'vertices': [{'x': float(0), 'y': float(0), 'z': float(0)},
                                     {'x': float(0), 'y': float(0), 'z': float(1)},
                                     {'x': float(0), 'y': float(1), 'z': float(1)}],
-                       'faces': [{'vertex_index': [int(0), int(1), int(2)]}]})
+                       'faces': [{'vertex_index': [int(0), int(1), int(2)]}],
+                       'comments': ["author ygg_auto", "File generated by yggdrasil"]})
         out.update(objects=[obj, obj],
-                   empty=dict(vertices=[], faces=[]),
+                   empty={},
                    contents=(b'ply\n'
                              + b'format ascii 1.0\n'
                              + b'comment author ygg_auto\n'
@@ -476,12 +492,12 @@ class PlySerialize(SerializeBase):
                              + b'property double z\n'
                              + b'element face 2\nproperty list uchar int vertex_index\n'
                              + b'end_header\n'
-                             + b'0.0000 0.0000 0.0000\n'
-                             + b'0.0000 0.0000 1.0000\n'
-                             + b'0.0000 1.0000 1.0000\n'
-                             + b'0.0000 0.0000 0.0000\n'
-                             + b'0.0000 0.0000 1.0000\n'
-                             + b'0.0000 1.0000 1.0000\n'
+                             + b'0 0 0\n'
+                             + b'0 0 1\n'
+                             + b'0 1 1\n'
+                             + b'0 0 0\n'
+                             + b'0 0 1\n'
+                             + b'0 1 1\n'
                              + b'3 0 1 2\n'
                              + b'3 3 4 5\n'))
         out['concatenate'] = [([], [])]

@@ -1,6 +1,5 @@
 import copy
 from yggdrasil import rapidjson
-from yggdrasil.metaschema.datatypes import encode_type
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 
@@ -19,7 +18,7 @@ class ItemsMetaschemaProperty(MetaschemaProperty):
         else:
             typedef_list = [copy.deepcopy(typedef) for x in instance]
         assert len(typedef_list) == len(instance)
-        return [encode_type(v, typedef=t) for v, t in zip(instance, typedef_list)]
+        return [rapidjson.encode_schema(v) for v in instance]
 
     @classmethod
     def compare(cls, prop1, prop2, root1=None, root2=None):

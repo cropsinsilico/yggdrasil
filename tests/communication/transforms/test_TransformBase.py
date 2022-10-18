@@ -44,10 +44,10 @@ class TestTransformBase(base_class):
 
         def iterator_equality_w(a, b):
             if isinstance(a, Iterator) and isinstance(b, Iterator):
-                assert(list(copy.deepcopy(a))
-                       == nested_approx(list(copy.deepcopy(b))))
+                assert(nested_approx(list(copy.deepcopy(b)))
+                       == list(copy.deepcopy(a)))
             else:
-                assert(a == nested_approx(b))
+                assert(nested_approx(b) == a)
         return iterator_equality_w
 
     def test_transform(self, python_class, testing_options,
@@ -112,7 +112,7 @@ class TestTransformBase(base_class):
                         for iimsg_out in imsg_out:
                             flag, msg_recv = recv_comm.recv(timeout=timeout)
                             assert(flag)
-                            assert(msg_recv == nested_approx(iimsg_out))
+                            assert(nested_approx(iimsg_out) == msg_recv)
                         msg_recv = imsg_out
                     elif ((class_name in ['FilterTransform'])
                           and isinstance(imsg_out, collections.abc.Iterator)):
@@ -128,7 +128,7 @@ class TestTransformBase(base_class):
                     else:
                         flag, msg_recv = recv_comm.recv(timeout=timeout)
                     assert(flag)
-                    assert(msg_recv == nested_approx(imsg_out))
+                    assert(nested_approx(imsg_out) == msg_recv)
             finally:
                 send_comm.close(linger=True)
                 recv_comm.close(linger=True)

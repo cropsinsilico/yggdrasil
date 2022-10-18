@@ -49,7 +49,7 @@ class TestSerializeBase(base_class):
     def empty_head(self):
         def empty_head_w(msg):
             r"""dict: Empty header for message only contains the size."""
-            out = dict(size=len(msg), incomplete=False)
+            out = {'__meta__': {'size': len(msg)}, 'incomplete': False}
             if msg == constants.YGG_MSG_EOF:  # pragma: debug
                 out['eof'] = True
             return out
@@ -124,8 +124,10 @@ class TestSerializeBase(base_class):
                                      add_serializer_info=True)
             hout['serializer'] = instance.serializer_info
             iout, ihead = instance.deserialize(msg)
-            hout.update(size=ihead['size'], id=ihead['id'],
-                        incomplete=False)
+            hout.update(incomplete=False)
+            hout.setdefault('__meta__', {})
+            hout['__meta__'].update(size=ihead['__meta__']['size'],
+                                    id=ihead['__meta__']['id'])
             assert(map_sent2recv(iobj) == iout)
             assert(ihead == hout)
             # Use info to reconstruct serializer

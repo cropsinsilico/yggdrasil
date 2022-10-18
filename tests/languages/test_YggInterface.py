@@ -368,7 +368,7 @@ class TestYggClass(base_class):
 
     def test_msg(self, filecomm, testing_options, instance, timeout,
                  test_comm, iodriver, wait_on_function,
-                 filename, direction, nested_approx, unyts_equality_patch):
+                 filename, direction, nested_approx):
         r"""Test sending/receiving message."""
         if direction == 'input':
             if filecomm:
@@ -491,12 +491,12 @@ class TestYggRpcClient(TestYggClass):
 
     def test_msg(self, filecomm, testing_options, instance, timeout,
                  test_comm, iodriver, wait_on_function,
-                 filename, direction, nested_approx, unyts_equality_patch):
+                 filename, direction, nested_approx):
         r"""Test sending/receiving message."""
         super(TestYggRpcClient, self).test_msg(
             filecomm, testing_options, instance, timeout,
             test_comm, iodriver, wait_on_function, filename, direction,
-            nested_approx, unyts_equality_patch)
+            nested_approx)
         if direction == 'output':
             send_comm = test_comm
             recv_comm = instance

@@ -1,5 +1,4 @@
 from yggdrasil import rapidjson
-from yggdrasil.metaschema.datatypes import encode_type
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 
@@ -15,8 +14,7 @@ class PropertiesMetaschemaProperty(MetaschemaProperty):
         r"""Encoder for the 'properties' container property."""
         if typedef is None:
             typedef = {}
-        return {k: encode_type(v, typedef=typedef.get(k, None))
-                for k, v in instance.items()}
+        return {k: rapidjson.encode_schema(v) for k, v in instance.items()}
 
     @classmethod
     def compare(cls, prop1, prop2, root1=None, root2=None):

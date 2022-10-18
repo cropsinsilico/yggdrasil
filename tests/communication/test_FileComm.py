@@ -42,7 +42,6 @@ _filetypes = sorted([x for x in schema.get_schema()['file'].subtypes
                      if x not in ['ascii', 'table', 'pandas']])
 
 
-@pytest.mark.usefixtures("unyts_equality_patch")
 @pytest.mark.suite("files", ignore="comms")
 class TestFileComm(base_class):
     r"""Test for FileComm communication class."""

@@ -174,7 +174,7 @@ class BaseComm(TestComponentBase):
                     recv_comm, recv_params.get('method', 'recv'))(
                         **recv_params.get('kwargs', {'timeout': 0}))
                 assert(flag == recv_params.get('flag', True))
-                assert(msg == nested_approx(recv_params['message']))
+                assert(nested_approx(recv_params['message']) == msg)
             if not send_params.get('skip_wait', False):
                 wait_on_function(
                     lambda: send_comm.is_closed or (send_comm.n_msg_send == 0))
@@ -329,7 +329,7 @@ class BaseComm(TestComponentBase):
 
         def fcond(x):
             try:
-                assert(x == nested_approx(msg_filter_recv))
+                assert(nested_approx(msg_filter_recv) == x)
                 return False
             except BaseException:
                 return True

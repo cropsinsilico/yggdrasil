@@ -839,7 +839,7 @@ class ZMQComm(CommBase.CommBase):
         # if self.direction == 'send':
         #     return msg, None
         header = self.serializer.parse_header(msg.split(_flag_zmq_filter)[-1])
-        address = header.get('zmq_reply', None)
+        address = header['__meta__'].get('zmq_reply', None)
         if (address is None):
             address = self.reply_socket_address
         if address is not None:
@@ -1090,7 +1090,7 @@ class ZMQComm(CommBase.CommBase):
         """
         out = super(ZMQComm, self).workcomm2header(work_comm, **kwargs)
         if self.direction == 'send':
-            out['zmq_reply_worker'] = work_comm.set_reply_socket_send()
+            out['__meta__']['zmq_reply_worker'] = work_comm.set_reply_socket_send()
         return out
 
     def header2workcomm(self, header, **kwargs):
@@ -1105,25 +1105,17 @@ class ZMQComm(CommBase.CommBase):
             :class:.CommBase: Work comm.
 
         """
-        if ('zmq_reply_worker' in header) and (self.direction == 'recv'):
-            kwargs['reply_socket_address'] = header['zmq_reply_worker']
+        if ('zmq_reply_worker' in header['__meta__']) and (self.direction == 'recv'):
+            kwargs['reply_socket_address'] = header['__meta__']['zmq_reply_worker']
         c = super(ZMQComm, self).header2workcomm(header, **kwargs)
         return c
     
-    def prepare_message(self, *args, **kwargs):
-        r"""Perform actions preparing to send a message.
-
-        Args:
-            *args: Components of the outgoing message.
-            **kwargs: Keyword arguments are passed to the parent class's method.
-
-        Returns:
-            CommMessage: Serialized and annotated message.
-
-        """
-        kwargs.setdefault('header_kwargs', {})
-        kwargs['header_kwargs']['zmq_reply'] = self.set_reply_socket_send()
-        return super(ZMQComm, self).prepare_message(*args, **kwargs)
+    def prepare_header(self, header_kwargs):
+        r"""Prepare header kwargs for the communicator."""
+        out = super(ZMQComm, self).prepare_header(header_kwargs)
+        out.setdefault('__meta__', {})
+        out['__meta__']['zmq_reply'] = self.set_reply_socket_send()
+        return out
         
     def send(self, *args, **kwargs):
         r"""Send a message."""

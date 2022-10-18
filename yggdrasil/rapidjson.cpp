@@ -65,7 +65,7 @@ static PyObject* decode_error = NULL;
 static PyObject* comparison_error = NULL;
 
 
-/* These are the names of oftenly used methods or literal values, interned in the module
+/* These are the names of often used methods or literal values, interned in the module
    initialization function, to avoid repeated creation/destruction of PyUnicode values
    from plain C strings.
 
@@ -425,7 +425,7 @@ public:
             }
         }
         if (c == NULL) {
-            // Propagate the error state, it will be catched by dumps_internal()
+            // Propagate the error state, it will be caught by dumps_internal()
         } else {
             PyObject* res = PyObject_CallMethodObjArgs(stream, write_name, c, NULL);
             if (res == NULL) {
@@ -1340,13 +1340,18 @@ struct PyHandler {
         PyObject* sequence = ctx.object;
         stack.pop_back();
 
+        PyObject* replacement = NULL;
         if (decoderEndArray == NULL) {
-            Py_DECREF(sequence);
-            return true;
-        }
-
-        PyObject* replacement = PyObject_CallFunctionObjArgs(decoderEndArray, sequence,
-                                                             NULL);
+	    if (IsStructuredArray(sequence)) {
+		replacement = GetStructuredArray(sequence);
+	    } else {
+		Py_DECREF(sequence);
+		return true;
+	    }
+        } else {
+	    replacement = PyObject_CallFunctionObjArgs(decoderEndArray, sequence,
+						       NULL);
+	}
         Py_DECREF(sequence);
         if (replacement == NULL)
             return false;
@@ -1799,7 +1804,8 @@ struct PyHandler {
 	    }
 	    RAPIDJSON_DEFAULT_ALLOCATOR allocator;
 	    PyObject* arr = x->GetPythonObjectRaw();
-	    PyObject* units = PyUnicode_FromString(x->GetUnits().GetString());
+	    PyObject* units = PyUnicode_FromStringAndSize(x->GetUnits().GetString(),
+							  x->GetUnits().GetStringLength());
 	    if (arr != NULL && units != NULL) {
 		PyObject* args = PyTuple_Pack(2, arr, units);
 		if (args != NULL) {
@@ -3522,9 +3528,9 @@ dumps_internal(
         ASSERT_VALID_SIZE(l);
         writer->String(s, (SizeType) l);
         Py_DECREF(unicodeObj);
-    } else if ((!(iterableMode & IM_ONLY_LISTS) && PyList_Check(object))
+    } else if (PyList_CheckExact(object)
                ||
-               PyList_CheckExact(object)) {
+               (!(iterableMode & IM_ONLY_LISTS) && PyList_Check(object))) {
         writer->StartArray();
 
         Py_ssize_t size = PyList_GET_SIZE(object);
@@ -3556,9 +3562,9 @@ dumps_internal(
         }
 
         writer->EndArray();
-    } else if (((!(mappingMode & MM_ONLY_DICTS) && PyDict_Check(object))
+    } else if ((PyDict_CheckExact(object)
                 ||
-                PyDict_CheckExact(object))
+                (!(mappingMode & MM_ONLY_DICTS) && PyDict_Check(object)))
                &&
                ((mappingMode & MM_SKIP_NON_STRING_KEYS)
                 ||
@@ -3663,7 +3669,11 @@ dumps_internal(
         char isoformat[ISOFORMAT_LEN];
         memset(isoformat, 0, ISOFORMAT_LEN);
 
-        const int TIMEZONE_LEN = 16;
+        // The timezone is always shorter than this, but gcc12 emits a warning about
+        // sprintf() that *may* produce longer results, because we pass int values when
+        // concretely they are constrained to 24*3600 seconds: pacify gcc using a bigger
+        // buffer
+        const int TIMEZONE_LEN = 24;
         char timeZone[TIMEZONE_LEN] = { 0 };
 
         if (!(datetimeMode & DM_IGNORE_TZ)
@@ -5867,11 +5877,32 @@ add_submodule(PyObject* m, const char* cname, PyModuleDef* module_def) {
     // an object with just a name attribute.
     //
     // _imp.__spec__ is overridden by importlib._bootstrap._instal() anyway.
-    PyObject *attrs = Py_BuildValue("{sO}", "name", name);
-    if (attrs == NULL)
+// #ifdef _PyNamespace_New
+//     PyObject *attrs = Py_BuildValue("{sO}", "name", name);
+//     if (attrs == NULL)
+// 	return NULL;
+//     PyObject *spec = _PyNamespace_New(attrs);
+//     Py_DECREF(attrs);
+// #else
+    PyObject* importlib = PyImport_ImportModule("importlib");
+    if (importlib == NULL)
 	return NULL;
-    PyObject *spec = _PyNamespace_New(attrs);
-    Py_DECREF(attrs);
+    PyObject* machinery = PyObject_GetAttrString(importlib, "machinery");
+    Py_DECREF(importlib);
+    if (machinery == NULL)
+	return NULL;
+    PyObject* ModuleSpecCls = PyObject_GetAttrString(machinery, "ModuleSpec");
+    Py_DECREF(machinery);
+    if (ModuleSpecCls == NULL)
+	return NULL;
+    PyObject* args = PyTuple_Pack(2, name, Py_None);
+    if (args == NULL)
+	return NULL;
+    PyObject* spec = PyObject_Call(ModuleSpecCls, args, NULL);
+    Py_DECREF(ModuleSpecCls);
+    Py_DECREF(args);
+// #endif
+    Py_DECREF(name);
     if (spec == NULL)
 	return NULL;
     PyObject* submodule = PyModule_FromDefAndSpec(module_def, spec);

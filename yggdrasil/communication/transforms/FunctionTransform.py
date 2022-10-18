@@ -53,11 +53,11 @@ class FunctionTransform(TransformBase):
                  'in/out_t': [
                      ({'type': 'array',
                        'items': [
-                           {'type': 'int', 'title': x,
-                            'precision': 64, 'units': ''}
+                           {'type': 'scalar', 'subtype': 'int', 'title': x,
+                            'precision': 8}
                            for x in 'abc']},
                       {'type': 'array',
                        'items': [
-                           {'type': 'int', 'title': x,
-                            'precision': 64, 'units': ''}
+                           {'type': 'scalar', 'subtype': 'int', 'title': x,
+                            'precision': 8}
                            for x in 'abc']})]}]

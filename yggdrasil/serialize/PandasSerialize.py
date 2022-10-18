@@ -312,9 +312,8 @@ class PandasSerialize(AsciiTableSerialize):
                 objects[i] = cls.apply_field_names(objects[i],
                                                    field_names)
             return [pandas.concat(objects, ignore_index=True)]
-        out = super(PandasSerialize, cls).concatenate(objects, as_array=True,
-                                                      **kwargs)
-        return out
+        return super(PandasSerialize, cls).concatenate(objects, as_array=True,
+                                                       **kwargs)
     
     def consolidate_array(self, out):
         r"""Consolidate message into a structure numpy array if possible.

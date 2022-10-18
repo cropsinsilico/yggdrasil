@@ -922,7 +922,7 @@ def recv_message_list(timeout, wait_on_function, nested_approx):
             return (not flag)
         wait_on_function(recv_element, timeout=timeout)
         if expected_result is not None:
-            assert(msg_list == nested_approx(expected_result))
+            assert(nested_approx(expected_result) == msg_list)
         return msg_list
     return wrapped_recv_message_list
 

@@ -264,7 +264,7 @@ class ConnectionDriver(Driver):
         '_comm_closed', '_skip_after_loop', 'shared', 'task_thread',
         'icomm', 'ocomm']
 
-    def __init__(self, name, transform=None, single_use=False, onexit=None,
+    def __init__(self, name, single_use=False, onexit=None,
                  models=None, **kwargs):
         # kwargs['method'] = 'process'
         super(ConnectionDriver, self).__init__(name, **kwargs)
@@ -285,17 +285,15 @@ class ConnectionDriver(Driver):
             self.task_thread = RemoteTaskLoop(
                 self, name=('%s.TaskThread' % self.name))
         # Translator
-        if transform is None:
-            transform = []
-        elif not isinstance(transform, list):
-            transform = [transform]
-        self.transform = []
-        for t in transform:
+        if self.transform is None:
+            self.transform = []
+        elif not isinstance(self.transform, list):
+            self.transform = [self.transform]
+        for i, t in enumerate(self.transform):
             if isinstance(t, dict):
-                t = create_component('transform', **t)
-            if not hasattr(t, '__call__'):
-                raise ValueError("Transform %s not callable." % t)
-            self.transform.append(t)
+                self.transform[i] = create_component('transform', **t)
+            if not hasattr(self.transform[i], '__call__'):
+                raise ValueError(f"Transform {self.transform[i]} not callable.")
         if (onexit is not None) and (not hasattr(self, onexit)):
             raise ValueError("onexit '%s' is not a class method." % onexit)
         self.onexit = onexit
@@ -925,11 +923,11 @@ class ConnectionDriver(Driver):
         # received message rather than create a new one by sending msg.args
         self.ocomm.update_serializer_from_message(msg)
         if (((msg.stype['type'] == 'array')
-             and (self.ocomm.serializer.typedef['type'] != 'array')
+             and (self.ocomm.serializer.datatype['type'] != 'array')
              and (len(msg.stype['items']) == 1))):
-            # if (((self.icomm.serializer.typedef['type'] == 'array')
-            #      and (self.ocomm.serializer.typedef['type'] != 'array')
-            #      and (len(self.icomm.serializer.typedef['items']) == 1))):
+            # if (((self.icomm.serializer.datatype['type'] == 'array')
+            #      and (self.ocomm.serializer.datatype['type'] != 'array')
+            #      and (len(self.icomm.serializer.datatype['items']) == 1))):
             self.transform.insert(0, _translate_list2element)
         self.debug('After update:\n  icomm:\n%s\n  ocomm:\n%s\n'
                    % ("\n".join(self.icomm.get_status_message(nindent=1)[0][1:]),

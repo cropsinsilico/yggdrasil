@@ -1,5 +1,5 @@
 import numpy as np
-from yggdrasil import units, serialize, rapidjson
+from yggdrasil import serialize, rapidjson
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
@@ -114,9 +114,8 @@ class DefaultSerialize(SerializeBase):
         if len(objects) == 0:
             return []
         if as_array:
-            units_list = [units.get_units(ix) for ix in objects[0]]
-            out = [[units.add_units(np.hstack([x[i] for x in objects]), u)
-                    for i, u in enumerate(units_list)]]
+            out = [[np.hstack([x[i] for x in objects])
+                    for i in range(len(objects[0]))]]
         elif isinstance(objects[0], bytes):
             out = [b''.join(objects)]
         else:

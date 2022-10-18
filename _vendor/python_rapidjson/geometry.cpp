@@ -32,6 +32,7 @@ static PyObject* geom_error = NULL;
 // Ply
 static void ply_dealloc(PyObject* self);
 static PyObject* ply_new(PyTypeObject* type, PyObject* args, PyObject* kwargs);
+static int ply_add_elements_from_dict(PyObject *self, PyObject* kwargs, bool preserveOrder=false);
 static PyObject* ply_richcompare(PyObject *self, PyObject *other, int op);
 static PyObject* ply_get_elements(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_add_elements(PyObject* self, PyObject* args, PyObject* kwargs);
@@ -39,6 +40,7 @@ static PyObject* ply_as_dict(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_from_dict(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_count_elements(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_append(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* ply_merge(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_bounds_get(PyObject* self, void*);
 static PyObject* ply_mesh_get(PyObject* self, void*);
 static PyObject* ply_str(PyObject* self);
@@ -48,18 +50,27 @@ static int ply_contains(PyObject* self, PyObject* value);
 static PyObject* ply_items(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_add_colors(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_get_colors(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* ply__getstate__(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* ply__setstate__(PyObject* self, PyObject* state);
 
 
 // Objwavefront
 static void objwavefront_dealloc(PyObject* self);
 static PyObject* objwavefront_new(PyTypeObject* type, PyObject* args, PyObject* kwargs);
+static int objwavefront_add_elements_from_dict(PyObject *self, PyObject* kwargs, bool preserveOrder=false);
+static int objwavefront_add_elements_from_list(PyObject *self, PyObject* kwargs);
+static int objwavefront_add_element_from_python(PyObject* self, PyObject* x, std::string name="");
+static PyObject* objwavefront_element2dict(const ObjElement* x, bool includeCode=false);
 static PyObject* objwavefront_richcompare(PyObject *self, PyObject *other, int op);
 static PyObject* objwavefront_get_elements(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_add_elements(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_as_dict(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_from_dict(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* objwavefront_as_list(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* objwavefront_from_list(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_count_elements(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_append(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* objwavefront_merge(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_bounds_get(PyObject* self, void*);
 static PyObject* objwavefront_mesh_get(PyObject* self, void*);
 static PyObject* objwavefront_str(PyObject* self);
@@ -69,6 +80,8 @@ static int objwavefront_contains(PyObject* self, PyObject* value);
 static PyObject* objwavefront_items(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_add_colors(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_get_colors(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* objwavefront__getstate__(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* objwavefront__setstate__(PyObject* self, PyObject* state);
 
 
 /////////
@@ -108,6 +121,9 @@ static PyMethodDef ply_methods[] = {
     {"append", (PyCFunction) ply_append,
      METH_VARARGS,
      "Append another 3D structure."},
+    {"merge", (PyCFunction) ply_merge,
+     METH_VARARGS,
+     "Merge this structure with one or more other 3D structures and return the result."},
     {"items", (PyCFunction) ply_items,
      METH_NOARGS,
      "Get the dict-like list of items in the structure."},
@@ -117,6 +133,12 @@ static PyMethodDef ply_methods[] = {
     {"add_colors", (PyCFunction) ply_add_colors,
      METH_VARARGS,
      "Set colors associated with elements of a given type."},
+    {"__getstate__", (PyCFunction) ply__getstate__,
+     METH_NOARGS,
+     "Get the instance state."},
+    {"__setstate__", (PyCFunction) ply__setstate__,
+     METH_O,
+     "Set the instance state."},
     {NULL}  /* Sentinel */
 };
 
@@ -144,7 +166,7 @@ static PySequenceMethods ply_seq = {
 
 static PyTypeObject Ply_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "rapidjson.Ply",                /* tp_name */
+    "rapidjson.geometry.Ply",       /* tp_name */
     sizeof(PlyObject),              /* tp_basicsize */
     0,                              /* tp_itemsize */
     (destructor) ply_dealloc,       /* tp_dealloc */
@@ -205,33 +227,25 @@ static PyObject* ply_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
     if (kwargs && !PyArg_ValidateKeywordArguments(kwargs))
 	return NULL;
 
-    const char* readFrom = 0;
-    const PlyObject* copyFrom = 0;
-    if (vertObject && !faceObject && !edgeObject && !kwargs) {
-	if (PyDict_Check(vertObject)) {
-	    kwargs = vertObject;
-	    vertObject = NULL;
-	} else if (PyUnicode_Check(vertObject)) {
-	    readFrom = PyUnicode_AsUTF8(vertObject);
-	    vertObject = NULL;
-	} else if (PyBytes_Check(vertObject)) {
-	    readFrom = PyBytes_AsString(vertObject);
-	    vertObject = NULL;
-	} else if (PyObject_IsInstance(vertObject, (PyObject*)&Ply_Type)) {
-	    copyFrom = (PlyObject*)vertObject;
-	    vertObject = NULL;
-	}
-    }
-    
     PlyObject* v = (PlyObject*) type->tp_alloc(type, 0);
     if (v == NULL)
         return NULL;
-    if (copyFrom) {
-	v->ply = new Ply(*(copyFrom->ply));
+    if (vertObject != NULL &&
+	PyObject_IsInstance(vertObject, (PyObject*)&Ply_Type)) {
+	v->ply = new Ply(*(((PlyObject*)vertObject)->ply));
+	vertObject = NULL;
     } else {
 	v->ply = new Ply();
     }
 
+    const char* readFrom = 0;
+    if (vertObject != NULL && PyUnicode_Check(vertObject)) {
+	readFrom = PyUnicode_AsUTF8(vertObject);
+	vertObject = NULL;
+    } else if (vertObject != NULL && PyBytes_Check(vertObject)) {
+	readFrom = PyBytes_AsString(vertObject);
+	vertObject = NULL;
+    }
     if (readFrom) {
 	std::stringstream ss;
 	ss.str(std::string(readFrom));
@@ -239,6 +253,11 @@ static PyObject* ply_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
 	    PyErr_SetString(geom_error, "Error reading from string");
 	    return NULL;
 	}
+    }
+    if (vertObject != NULL && PyDict_Check(vertObject)) {
+	if (ply_add_elements_from_dict((PyObject*)v, vertObject) < 0)
+	    return NULL;
+	vertObject = NULL;
     }
     
 #define ADD_ARRAY(x, name)						\
@@ -261,41 +280,13 @@ static PyObject* ply_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
 
 #undef ADD_ARRAY
 
-    if (kwargs) {
-	PyObject *key, *value;
-	Py_ssize_t pos = 0;
-	std::vector<std::string> delayed;
-	while (PyDict_Next(kwargs, &pos, &key, &value)) {
-	    std::string keyS(PyUnicode_AsUTF8(key));
-	    if (keyS.size() > 7 &&
-		keyS.substr(keyS.size() - 7) == "_colors") {
-		delayed.push_back(keyS);
-		continue;
-	    }
-	    PyObject* iargs = Py_BuildValue("(OO)", key, value);
-	    if (ply_add_elements((PyObject*)v, iargs, NULL) == NULL) {
-		Py_DECREF(iargs);
-		return NULL;
-	    }
-	    Py_DECREF(iargs);
-	}
-	for (std::vector<std::string>::iterator it = delayed.begin();
-	     it != delayed.end(); it++) {
-	    value = PyDict_GetItemString(kwargs, it->c_str());
-	    PyObject* iargs = Py_BuildValue("(sO)", it->c_str(), value);
-	    if (ply_add_elements((PyObject*)v, iargs, NULL) == NULL) {
-		Py_DECREF(iargs);
-		return NULL;
-	    }
-	    Py_DECREF(iargs);
-	}
-    }
+    if (ply_add_elements_from_dict((PyObject*)v, kwargs) < 0)
+	return NULL;
 
     // if (!v->ply->get_element_set("vertex"))
     // 	v->ply->add_element_set("vertex");
     // if (!v->ply->get_element_set("face"))
     // 	v->ply->add_element_set("face");
-    
 
     if (!v->ply->is_valid()) {
 	PyErr_SetString(geom_error, "Structure is invalid. Check that indexes do not exceed the number of vertices");
@@ -303,6 +294,70 @@ static PyObject* ply_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
     }
 
     return (PyObject*) v;
+}
+
+
+static int ply_add_elements_from_dict(PyObject *self, PyObject* kwargs,
+				      bool preserveOrder) {
+    if (kwargs) {
+	if (!PyDict_Check(kwargs)) {
+	    return -1;
+	}
+	PyObject *key, *value;
+	Py_ssize_t pos = 0;
+	std::vector<std::string> skip, delayed;
+
+	// Do comments & vertices first
+	if (!preserveOrder) {
+	    std::vector<std::string> skip_names = {"comment", "comments", "vertex", "vertices", "vertexes"};
+	    for (std::vector<std::string>::iterator it = skip_names.begin();
+		 it != skip_names.end(); it++) {
+		value = PyDict_GetItemString(kwargs, it->c_str());
+		if (value == NULL) continue;
+		PyObject* iargs = Py_BuildValue("(sO)", it->c_str(), value);
+		if (ply_add_elements(self, iargs, NULL) == NULL) {
+		    Py_DECREF(iargs);
+		    return -1;
+		}
+		Py_DECREF(iargs);
+		skip.push_back(*it);
+	    }
+	}
+	while (PyDict_Next(kwargs, &pos, &key, &value)) {
+	    std::string keyS(PyUnicode_AsUTF8(key));
+	    bool skipped = false;
+	    for (std::vector<std::string>::iterator it = skip.begin();
+		 it != skip.end(); it++) {
+		if (keyS == *it) {
+		    skipped = true;
+		    break;
+		}
+	    }
+	    if (skipped) continue;
+	    if (keyS.size() > 7 &&
+		keyS.substr(keyS.size() - 7) == "_colors") {
+		delayed.push_back(keyS);
+		continue;
+	    }
+	    PyObject* iargs = Py_BuildValue("(OO)", key, value);
+	    if (ply_add_elements(self, iargs, NULL) == NULL) {
+		Py_DECREF(iargs);
+		return -1;
+	    }
+	    Py_DECREF(iargs);
+	}
+	for (std::vector<std::string>::iterator it = delayed.begin();
+	     it != delayed.end(); it++) {
+	    value = PyDict_GetItemString(kwargs, it->c_str());
+	    PyObject* iargs = Py_BuildValue("(sO)", it->c_str(), value);
+	    if (ply_add_elements(self, iargs, NULL) == NULL) {
+		Py_DECREF(iargs);
+		return -1;
+	    }
+	    Py_DECREF(iargs);
+	}
+    }
+    return 0;
 }
 
 
@@ -347,22 +402,42 @@ static PyObject* ply_get_elements(PyObject* self, PyObject* args, PyObject* kwar
         NULL
     };
     
-    
+
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "s|p:", (char**) kwlist,
 				     &elementType0, &asArray))
 	return NULL;
 
     std::string elementType(elementType0);
+    std::cerr << "ply_get_elements: " << elementType << std::endl;
 
     PlyObject* v = (PlyObject*) self;
+
+    PyObject* out = NULL;
     
+    if (ply_alias2base(elementType) == "comment") {
+	out = PyList_New(v->ply->comments.size());
+	if (out == NULL)
+	    return NULL;
+	Py_ssize_t i = 0;
+	for (std::vector<std::string>::const_iterator it = v->ply->comments.begin();
+	     it != v->ply->comments.end(); it++, i++) {
+	    PyObject* iComment = PyUnicode_FromStringAndSize(it->c_str(), (Py_ssize_t)(it->size()));
+	    if (iComment == NULL) {
+		Py_DECREF(out);
+		return NULL;
+	    }
+	    if (PyList_SetItem(out, i, iComment) < 0) {
+		Py_DECREF(out);
+		return NULL;
+	    }
+	}
+	return out;
+    }
     const PlyElementSet* elementSet = v->ply->get_element_set(elementType);
     if (elementSet == NULL) {
 	PyErr_SetString(PyExc_KeyError, elementType0);
 	return NULL;
     }
-
-    PyObject* out = NULL;
     
     if (asArray) {
 	
@@ -378,7 +453,7 @@ static PyObject* ply_get_elements(PyObject* self, PyObject* args, PyObject* kwar
 	if (tmp == NULL) return NULL;					\
 	out = (PyObject*)PyArray_NewCopy((PyArrayObject*)tmp, NPY_CORDER); \
 	Py_DECREF(tmp)
-	
+
 	if (elementSet->requires_double()) {
 	    GET_ARRAY(double, NPY_DOUBLE);
 	} else {
@@ -386,79 +461,93 @@ static PyObject* ply_get_elements(PyObject* self, PyObject* args, PyObject* kwar
 	}
 #undef GET_ARRAY
     } else {
-	out = PyDict_New();
-	if (out == NULL)
+	out = PyList_New(elementSet->elements.size());
+	if (out == NULL) {
 	    return NULL;
-	{
-	    PyObject* val = PyList_New(elementSet->elements.size());
-	    if (val == NULL) {
+	}
+	Py_ssize_t i = 0;
+	for (std::vector<PlyElement>::const_iterator elit = elementSet->elements.begin(); elit != elementSet->elements.end(); elit++, i++) {
+	    PyObject* item = PyDict_New();
+	    if (item == NULL) {
 		Py_DECREF(out);
 		return NULL;
 	    }
-	    Py_ssize_t i = 0;
-	    for (std::vector<PlyElement>::const_iterator elit = elementSet->elements.begin(); elit != elementSet->elements.end(); elit++, i++) {
-		PyObject* item = PyDict_New();
-		if (item == NULL) {
-		    Py_DECREF(val);
-		    Py_DECREF(out);
-		    return NULL;
+	    for (std::vector<std::string>::const_iterator p = elit->property_order.begin(); p != elit->property_order.end(); p++) {
+		PyObject* ival = NULL;
+		uint16_t p_flags = elit->flags(*p);
+#define CASE_SCALAR_(dst, flag, type, method, ...)			\
+		case (PlyElement::ElementType::flag): {			\
+		    dst = method(elit->get_value_as<type>(__VA_ARGS__)); \
+		    break;						\
 		}
-		for (std::vector<std::string>::const_iterator p = elit->property_order.begin(); p != elit->property_order.end(); p++) {
-		    PyObject* ival = NULL;
-		    if (elit->is_vector(*p)) {
-			ival = PyList_New(elit->size());
-			if (ival != NULL) {
-			    for (size_t iProp = 0; iProp < elit->size(); iProp++) {
-				PyObject* iival = NULL;
-				if (elit->requires_double(*p))
-				    iival = PyFloat_FromDouble(elit->get_value_as<double>(*p, iProp));
-				else
-				    iival = PyLong_FromLong(elit->get_value_as<long>(*p, iProp));
-				if (iival == NULL) {
-				    Py_DECREF(ival);
-				    Py_DECREF(item);
-				    Py_DECREF(val);
-				    Py_DECREF(out);
-				    return NULL;
-				}
-				if (PyList_SetItem(ival, iProp, iival) < 0) {
-				    Py_DECREF(iival);
-				    Py_DECREF(ival);
-				    Py_DECREF(item);
-				    Py_DECREF(val);
-				    Py_DECREF(out);
-				    return NULL;
-				}
+#define CASE_SCALAR_NPY_(dst, flag, type, npy_type, ...)		\
+		case (PlyElement::ElementType::flag): {			\
+		    PyArray_Descr* desc = PyArray_DescrNewFromType(npy_type); \
+		    type svalue = elit->get_value_as<type>(__VA_ARGS__); \
+		    dst = PyArray_Scalar(&svalue, desc, NULL);		\
+		    break;						\
+		}
+#define CASES_SCALAR_NPY_(dst, flag, type, npy_type, ...)		\
+		CASE_SCALAR_NPY_(dst, k ## flag ## 8Flag, type ## 8_t, NPY_ ## npy_type ## 8, __VA_ARGS__) \
+		CASE_SCALAR_NPY_(dst, k ## flag ## 16Flag, type ## 16_t, NPY_ ## npy_type ## 16, __VA_ARGS__) \
+		CASE_SCALAR_NPY_(dst, k ## flag ## 32Flag, type ## 32_t, NPY_ ## npy_type ## 32, __VA_ARGS__)
+#define SWITCH_SCALAR_(dst, ...)					\
+		switch (p_flags) {					\
+		    CASES_SCALAR_NPY_(dst, Int, int, INT, __VA_ARGS__)	\
+		    CASES_SCALAR_NPY_(dst, Uint, uint, UINT, __VA_ARGS__) \
+		    CASE_SCALAR_NPY_(dst, kFloatFlag, float, NPY_FLOAT, __VA_ARGS__) \
+		    CASE_SCALAR_(dst, kDoubleFlag, double, PyFloat_FromDouble, __VA_ARGS__) \
+		default: {						\
+		    dst = PyFloat_FromDouble(elit->get_value_as<double>(__VA_ARGS__)); \
+		}							\
+		}
+		if (elit->is_vector(*p)) {
+		    p_flags = (uint16_t)(p_flags & ~PlyElement::ElementType::kListFlag);
+		    ival = PyList_New(elit->size());
+		    if (ival != NULL) {
+			for (size_t iProp = 0; iProp < elit->size(); iProp++) {
+			    PyObject* iival = NULL;
+			    SWITCH_SCALAR_(iival, *p, iProp)
+			    if (iival == NULL) {
+				Py_DECREF(ival);
+				Py_DECREF(item);
+				Py_DECREF(out);
+				return NULL;
+			    }
+			    if (PyList_SetItem(ival, iProp, iival) < 0) {
+				Py_DECREF(iival);
+				Py_DECREF(ival);
+				Py_DECREF(item);
+				Py_DECREF(out);
+				return NULL;
 			    }
 			}
-		    } else if (elit->requires_double(*p)) {
-			ival = PyFloat_FromDouble(elit->get_value_as<double>(*p));
-		    } else {
-			ival = PyLong_FromLong(elit->get_value_as<long>(*p));
 		    }
-		    if (ival == NULL) {
-			Py_DECREF(item);
-			Py_DECREF(val);
-			Py_DECREF(out);
-			return NULL;
-		    }
-		    if (PyDict_SetItemString(item, p->c_str(), ival) < 0) {
-			Py_DECREF(ival);
-			Py_DECREF(item);
-			Py_DECREF(val);
-			Py_DECREF(out);
-			return NULL;
-		    }
-		    Py_DECREF(ival);
+		} else {
+		    SWITCH_SCALAR_(ival, *p)
 		}
-		if (PyList_SetItem(val, i, item) < 0) {
+#undef SWITCH_SCALAR_
+#undef CASES_SCALAR_NPY_
+#undef CASE_SCALAR_NPY_
+#undef CASE_SCALAR_
+		if (ival == NULL) {
 		    Py_DECREF(item);
-		    Py_DECREF(val);
 		    Py_DECREF(out);
 		    return NULL;
 		}
+		if (PyDict_SetItemString(item, p->c_str(), ival) < 0) {
+		    Py_DECREF(ival);
+		    Py_DECREF(item);
+		    Py_DECREF(out);
+		    return NULL;
+		}
+		Py_DECREF(ival);
 	    }
-	    out = val;
+	    if (PyList_SetItem(out, i, item) < 0) {
+		Py_DECREF(item);
+		Py_DECREF(out);
+		return NULL;
+	    }
 	}
     }
     
@@ -486,76 +575,164 @@ static PyObject* ply_add_elements(PyObject* self, PyObject* args, PyObject* kwar
 	Py_DECREF(iargs);
 	return out;
     }
-    
-    if (PyList_Check(x)) {
+
+    if (ply_alias2base(name) == "comment") {
+	if (!PySequence_Check(x)) {
+	    PyErr_SetString(PyExc_TypeError, "Ply comments must be provided as a sequence of strings");
+	    return NULL;
+	}
+	for (Py_ssize_t iC = 0; iC != PySequence_Size(x); iC++) {
+	    PyObject* iComment = PySequence_GetItem(x, iC);
+	    if (iComment == NULL)
+		return NULL;
+	    if (!PyUnicode_Check(iComment)) {
+		PyErr_SetString(PyExc_TypeError, "Ply comments must be strings");
+		Py_DECREF(iComment);
+		return NULL;
+	    }
+	    std::string iCommentS(PyUnicode_AsUTF8(iComment));
+	    v->ply->comments.push_back(iCommentS);
+	    Py_DECREF(iComment);
+	}
+    } else if (PyList_Check(x)) {
 	for (Py_ssize_t i = 0; i < PyList_Size(x); i++) {
 	    PyObject* item = PyList_GetItem(x, i);
 	    if (item == NULL) return NULL;
 	    if (PyDict_Check(item)) {
 		PyObject *key, *value;
 		Py_ssize_t pos = 0;
-		bool isDouble = false;
-		std::vector<double> values;
-		std::vector<std::string> names;
-		std::vector<std::string> colors;
+		PlyElement* new_element = v->ply->add_element(name);
+		if (!new_element) {
+		    PyErr_SetString(geom_error, "Error adding element to Ply instance");
+		    return NULL;
+		}
 		while (PyDict_Next(item, &pos, &key, &value)) {
 		    if (!PyUnicode_Check(key)) {
 			PyErr_SetString(PyExc_TypeError, "Ply element keys must be strings");
 			return NULL;
 		    }
 		    std::string iname = std::string(PyUnicode_AsUTF8(key));
-		    names.push_back(iname);
-		    if (iname == "red" || iname == "blue" || iname == "green")
-			colors.push_back(iname);
+		    bool iIsColor = (iname == "red" || iname == "blue" || iname == "green");
+#define HANDLE_SCALAR_(type, method)					\
+		    type ivalue = method;				\
+		    if (!new_element->set_property(iname, ivalue, iIsColor)) {	\
+			PyErr_SetString(geom_error, "Error adding " #type " value to Ply element"); \
+			return NULL;					\
+		    }
+#define HANDLE_SCALAR_NPY_(type, npy_type)				\
+		    type ivalue;					\
+		    PyArray_Descr* desc = PyArray_DescrNewFromType(npy_type); \
+		    PyArray_CastScalarToCtype(value, &ivalue, desc);	\
+		    Py_DECREF(desc);					\
+		    if (!new_element->set_property(iname, ivalue, iIsColor)) {	\
+			PyErr_SetString(geom_error, "Error adding " #type " numpy scalar value to Ply element"); \
+			return NULL;					\
+		    }
+#define CASE_SCALAR_NPY_(type, npy_type)				\
+		    if (value_desc->type_num == npy_type) {		\
+			HANDLE_SCALAR_NPY_(type, npy_type)		\
+		    }
+#define CASES_SCALAR_NPY_(type, npy_type)				\
+		    CASE_SCALAR_NPY_(type ## 8_t, NPY_ ## npy_type ## 8) \
+		    else CASE_SCALAR_NPY_(type ## 16_t, NPY_ ## npy_type ## 16) \
+		    else CASE_SCALAR_NPY_(type ## 32_t, NPY_ ## npy_type ## 32) \
+		    else CASE_SCALAR_NPY_(type ## 64_t, NPY_ ## npy_type ## 64)
+#define HANDLE_ARRAY_(type, check, method)				\
+		    std::vector<type> values;				\
+		    for (Py_ssize_t j = 0; j < PyList_Size(value); j++) { \
+			PyObject* vv = PyList_GetItem(value, j);	\
+			if (vv == NULL) return NULL;			\
+			if (!check(vv)) {				\
+			    PyErr_SetString(geom_error, "Error adding " #type " values array to Ply element. Not all elements are the same type."); \
+			    return NULL;				\
+			}						\
+			values.push_back(method);			\
+		    }							\
+		    if (!new_element->set_property(iname, values, iIsColor)) { \
+			PyErr_SetString(geom_error, "Error adding " #type " values to Ply element"); \
+			return NULL;					\
+		    }
+#define HANDLE_ARRAY_NPY_(type, npy_type)				\
+		    std::vector<type> values;				\
+		    for (Py_ssize_t j = 0; j < PyList_Size(value); j++) { \
+			PyObject* vv = PyList_GetItem(value, j);	\
+			if (vv == NULL) return NULL;			\
+			if (!PyArray_CheckScalar(vv)) {			\
+			    PyErr_SetString(geom_error, "Error adding " #type " values array to Ply element. Not all elements are numpy scalars."); \
+			    return NULL;				\
+			}						\
+			PyArray_Descr* desc0 = PyArray_DescrFromScalar(vv); \
+			if (!PyArray_CanCastSafely(desc0->type_num, npy_type)) { \
+			    PyErr_SetString(geom_error, "Error adding " #type " values array to Ply element from numpy scalars. Not all elements are the same type."); \
+			    return NULL;				\
+			}						\
+			type ivalue;					\
+			PyArray_Descr* desc = PyArray_DescrNewFromType(npy_type); \
+			PyArray_CastScalarToCtype(vv, &ivalue, desc);	\
+			values.push_back(ivalue);			\
+			Py_DECREF(desc);				\
+		    }							\
+		    if (!new_element->set_property(iname, values, iIsColor)) { \
+			PyErr_SetString(geom_error, "Error adding " #type " values to Ply element"); \
+			return NULL;					\
+		    }
+#define CASE_ARRAY_NPY_(type, npy_type)					\
+		    if (first_desc->type_num == npy_type) {		\
+			HANDLE_ARRAY_NPY_(type, npy_type)		\
+		    }
+#define CASES_ARRAY_NPY_(type, npy_type)				\
+		    CASE_ARRAY_NPY_(type ## 8_t, NPY_ ## npy_type ## 8) \
+		    else CASE_ARRAY_NPY_(type ## 16_t, NPY_ ## npy_type ## 16) \
+		    else CASE_ARRAY_NPY_(type ## 32_t, NPY_ ## npy_type ## 32) \
+		    else CASE_ARRAY_NPY_(type ## 64_t, NPY_ ## npy_type ## 64)
+		    
 		    if (PyLong_Check(value)) {
-			values.push_back(PyLong_AsDouble(value));
+			HANDLE_SCALAR_(int, static_cast<int>(PyLong_AsLong(value)));
 		    } else if (PyFloat_Check(value)) {
-			values.push_back(PyFloat_AsDouble(value));
-			isDouble = true;
+			HANDLE_SCALAR_(double, PyFloat_AsDouble(value));
+		    } else if (PyArray_CheckScalar(value)) {
+			PyArray_Descr* value_desc = PyArray_DescrFromScalar(value);
+			CASES_SCALAR_NPY_(int, INT)
+			else CASES_SCALAR_NPY_(uint, UINT)
+			else CASE_SCALAR_NPY_(float, NPY_FLOAT)
+			else CASE_SCALAR_NPY_(double, NPY_DOUBLE)
+			else {
+			    PyErr_SetString(PyExc_TypeError, "Ply element property value must be integer or float");
+			    return NULL;
+			}
 		    } else if (PyList_Check(value)) {
-			for (Py_ssize_t j = 0; j < PyList_Size(value); j++) {
-			    PyObject* vv = PyList_GetItem(value, j);
-			    if (vv == NULL) return NULL;
-			    if (PyLong_Check(vv)) {
-				values.push_back(PyLong_AsDouble(vv));
-			    } else if (PyFloat_Check(vv)) {
-				values.push_back(PyFloat_AsDouble(vv));
-				isDouble = true;
-			    } else if (PyArray_CheckScalar(vv)) {
-				PyArray_Descr* desc0 = PyArray_DescrFromScalar(vv);
-				if (PyDataType_ISFLOAT(desc0))
-				    isDouble = true;
-				PyArray_Descr* desc = PyArray_DescrNewFromType(NPY_FLOAT64);
-				double d = 0;
-				PyArray_CastScalarToCtype(vv, &d, desc);
-				values.push_back(d);
-				Py_DECREF(desc);
-			    } else {
+			PyObject* first_item = PyList_GetItem(value, 0);
+			if (first_item == NULL) return NULL;
+			if (PyLong_Check(first_item)) {
+			    HANDLE_ARRAY_(int, PyLong_Check, static_cast<int>(PyLong_AsLong(vv)));
+			} else if (PyFloat_Check(first_item)) {
+			    HANDLE_ARRAY_(double, PyFloat_Check, PyFloat_AsDouble(vv));
+			} else if (PyArray_CheckScalar(first_item)) {
+			    PyArray_Descr* first_desc = PyArray_DescrFromScalar(first_item);
+			    CASES_ARRAY_NPY_(int, INT)
+			    else CASES_ARRAY_NPY_(uint, UINT)
+			    else CASE_ARRAY_NPY_(float, NPY_FLOAT)
+			    else CASE_ARRAY_NPY_(double, NPY_DOUBLE)
+			    else {
 				PyErr_SetString(PyExc_TypeError, "Ply element list values must be integers or floats");
 				return NULL;
 			    }
+			} else {
+			    PyErr_SetString(PyExc_TypeError, "Ply element list values must be integers or floats");
+			    return NULL;
 			}
-		    } else if (PyArray_CheckScalar(value)) {
-			PyArray_Descr* desc0 = PyArray_DescrFromScalar(value);
-			if (PyDataType_ISFLOAT(desc0))
-			    isDouble = true;
-			PyArray_Descr* desc = PyArray_DescrNewFromType(NPY_FLOAT64);
-			double d = 0;
-			PyArray_CastScalarToCtype(value, &d, desc);
-			values.push_back(d);
-			Py_DECREF(desc);
+#undef HANDLE_SCALAR_
+#undef HANDLE_SCALAR_NPY_
+#undef CASE_SCALAR_NPY_
+#undef CASES_SCALAR_NPY_
+#undef HANDLE_ARRAY_
+#undef HANDLE_ARRAY_NPY_
+#undef CASE_ARRAY_NPY_
+#undef CASES_ARRAY_NPY_
 		    } else {
 			PyErr_SetString(PyExc_TypeError, "Ply element values must be integers or floats");
 			return NULL;
 		    }
-		}
-		if (isDouble) {
-		    v->ply->add_element(name, values, names, colors);
-		} else {
-		    std::vector<int> values_int;
-		    for (std::vector<double>::iterator it = values.begin(); it != values.end(); it++)
-			values_int.push_back((int)(*it));
-		    v->ply->add_element(name, values_int, names, colors);
 		}
 	    } else if (PyList_Check(item)) {
 		bool isDouble = false;
@@ -596,28 +773,40 @@ static PyObject* ply_add_elements(PyObject* self, PyObject* args, PyObject* kwar
 	if (np_shape == NULL) return NULL;
 	xn = (SizeType)(np_shape[0]);
 	xm = (SizeType)(np_shape[1]);
-	bool isDouble = PyTypeNum_ISFLOAT(PyArray_TYPE((PyArrayObject*)x));
+#define CASE_ARRAY_NPY_(type, npy_type, ig)				\
+	case (npy_type): {						\
+	    type* xa = (type*)PyArray_BYTES((PyArrayObject*)x2);	\
+	    type ignore = ig;						\
+	    v->ply->add_element_set(name, xa, xn, xm, &ignore);		\
+	    break;							\
+	}
+#define CASES_ARRAY_NPY_(type, npy_type, ig)	\
+	CASE_ARRAY_NPY_(type ## 8_t, NPY_ ## npy_type ## 8, ig)		\
+	CASE_ARRAY_NPY_(type ## 16_t, NPY_ ## npy_type ## 16, ig)	\
+	CASE_ARRAY_NPY_(type ## 32_t, NPY_ ## npy_type ## 32, ig)	\
+	CASE_ARRAY_NPY_(type ## 64_t, NPY_ ## npy_type ## 64, ig)
+	
 	PyObject* x2 = NULL;
-	if (isDouble)
-	    x2 = PyArray_Cast((PyArrayObject*)x, NPY_FLOAT64);
-	else
-	    x2 = PyArray_Cast((PyArrayObject*)x, NPY_INT);
-	if (x2 == NULL) return NULL;
-	if (!PyArray_IS_C_CONTIGUOUS((PyArrayObject*)x2)) {
-	    PyArrayObject* cpy = PyArray_GETCONTIGUOUS((PyArrayObject*)x2);
-	    if (cpy == NULL) return NULL;
-	    Py_DECREF(x2);
-	    x2 = (PyObject*)cpy;
-	}
-	if (isDouble) {
-	    double* xa = (double*)PyArray_BYTES((PyArrayObject*)x2);
-	    double ignore = NAN;
-	    v->ply->add_element_set(name, xa, xn, xm, &ignore);
+	if (PyArray_IS_C_CONTIGUOUS((PyArrayObject*)x)) {
+	    x2 = x;
+	    Py_INCREF(x2);
 	} else {
-	    int* xa = (int*)PyArray_BYTES((PyArrayObject*)x2);
-	    int ignore = -1;
-	    v->ply->add_element_set(name, xa, xn, xm, &ignore);
+	    x2 = (PyObject*)PyArray_GETCONTIGUOUS((PyArrayObject*)x);
+	    if (x2 == NULL) return NULL;
 	}
+	switch (PyArray_TYPE((PyArrayObject*)x2)) {
+	CASES_ARRAY_NPY_(int, INT, -1)
+	CASES_ARRAY_NPY_(uint, UINT, -1)
+	CASE_ARRAY_NPY_(float, NPY_FLOAT, NAN)
+	CASE_ARRAY_NPY_(double, NPY_DOUBLE, NAN)
+	default: {
+	    Py_DECREF(x2);
+	    PyErr_SetString(PyExc_TypeError, "Unsupported numpy datatype.");
+	    return NULL;
+	}
+	}
+#undef CASES_ARRAY_NPY_
+#undef CASE_ARRAY_NPY_
 	Py_DECREF(x2);
     } else {
 	PyErr_SetString(PyExc_TypeError, "Ply element sets must be lists of element dictionaries or arrays.");
@@ -647,10 +836,39 @@ static PyObject* ply_as_dict(PyObject* self, PyObject* args, PyObject* kwargs) {
     PyObject* out = PyDict_New();
     if (out == NULL)
 	return NULL;
+    if (v->ply->comments.size() > 0) {
+	PyObject* commentStr = PyUnicode_FromString("comment");
+	if (commentStr == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+	PyObject* comment_args = PyTuple_Pack(1, commentStr);
+	Py_DECREF(commentStr);
+	if (comment_args == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+	PyObject* comments = ply_get_elements(self, comment_args, NULL);
+	Py_DECREF(comment_args);
+	if (comments == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+	if (PyDict_SetItemString(out, "comment", comments) < 0) {
+	    Py_DECREF(comments);
+	    Py_DECREF(out);
+	    return NULL;
+	}
+	Py_DECREF(comments);
+    }
     for (std::vector<std::string>::const_iterator it = v->ply->element_order.begin(); it != v->ply->element_order.end(); it++) {
 	std::map<std::string,PlyElementSet>::const_iterator eit = v->ply->elements.find(*it);
 	if (eit == v->ply->elements.end()) continue;
 	PyObject* iargs = Py_BuildValue("(s)", it->c_str());
+	if (iargs == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
 	PyObject* val = ply_get_elements(self, iargs, kwargs);
 	Py_DECREF(iargs);
 	if (val == NULL) {
@@ -781,6 +999,72 @@ static PyObject* ply_append(PyObject* self, PyObject* args, PyObject* kwargs) {
 	return NULL;
     }
     Py_RETURN_NONE;
+}
+
+
+static PyObject* ply_merge(PyObject* self, PyObject* args, PyObject*) {
+    PyObject* tmp_args = PyTuple_New(0);
+    if (tmp_args == NULL)
+	return NULL;
+    PyObject* type = (PyObject*)self->ob_type;
+    PyObject* out = PyObject_Call(type, tmp_args, NULL);
+    Py_DECREF(tmp_args);
+    if (out == NULL)
+	return NULL;
+    PyObject* append_list = NULL;
+    if (PyTuple_Size(args) == 1) {
+	append_list = PyTuple_GetItem(args, 0);
+    } else {
+	append_list = args;
+    }
+    PyObject* result = NULL;
+    PyObject* item_args = PyTuple_Pack(1, self);
+    if (item_args == NULL) {
+	Py_DECREF(out);
+	return NULL;
+    }
+    result = ply_append(out, item_args, NULL);
+    Py_DECREF(item_args);
+    if (result == NULL) {
+	Py_DECREF(out);
+	return NULL;
+    }
+    if (PyTuple_Check(append_list) || PyList_Check(append_list)) {
+	for (Py_ssize_t i = 0; i < PySequence_Size(append_list); i++) {
+	    PyObject* item = PySequence_GetItem(append_list, i);
+	    if (item == NULL) {
+		Py_DECREF(out);
+		return NULL;
+	    }
+	    item_args = PyTuple_Pack(1, item);
+	    if (item_args == NULL) {
+		Py_DECREF(item);
+		Py_DECREF(out);
+		return NULL;
+	    }
+	    result = ply_append(out, item_args, NULL);
+	    Py_DECREF(item_args);
+	    Py_DECREF(item);
+	    if (result == NULL) {
+		Py_DECREF(out);
+		return NULL;
+	    }
+	    Py_DECREF(result);
+	}
+    } else {
+	item_args = PyTuple_Pack(1, append_list);
+	if (item_args == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+	result = ply_append(out, item_args, NULL);
+	Py_DECREF(item_args);
+	if (result == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+    }
+    return out;
 }
 
 static PyObject* ply_items(PyObject* self, PyObject*, PyObject*) {
@@ -1147,6 +1431,19 @@ static PyObject* ply_get_colors(PyObject* self, PyObject* args, PyObject* kwargs
     
 }
 
+static PyObject* ply__getstate__(PyObject* self, PyObject*, PyObject*) {
+    PyObject* args = PyTuple_New(0);
+    if (args == NULL)
+	return NULL;
+    return ply_as_dict(self, args, NULL);
+}
+static PyObject* ply__setstate__(PyObject* self, PyObject* state) {
+    if (ply_add_elements_from_dict(self, state, true) < 0)
+	return NULL;
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 
 //////////////////
 // ObjWavefront //
@@ -1179,12 +1476,21 @@ static PyMethodDef objwavefront_methods[] = {
     {"from_dict", (PyCFunction) objwavefront_from_dict,
      METH_VARARGS | METH_CLASS,
      "Create a ObjWavefront instance from a dictionary of elements."},
+    {"as_list", (PyCFunction) objwavefront_as_list,
+     METH_NOARGS,
+     "Get the structure as a list of elements."},
+    {"from_list", (PyCFunction) objwavefront_from_list,
+     METH_VARARGS | METH_CLASS,
+     "Create a ObjWavefront instance from a list of elements."},
     {"count_elements", (PyCFunction) objwavefront_count_elements,
      METH_VARARGS,
      "Get the number of elements of a given type in the structure."},
     {"append", (PyCFunction) objwavefront_append,
      METH_VARARGS,
      "Append another 3D structure."},
+    {"merge", (PyCFunction) objwavefront_merge,
+     METH_VARARGS,
+     "Merge this structure with one or more other 3D structures and return the result."},
     {"items", (PyCFunction) objwavefront_items,
      METH_NOARGS,
      "Get the dict-like list of items in the structure."},
@@ -1194,6 +1500,12 @@ static PyMethodDef objwavefront_methods[] = {
     {"add_colors", (PyCFunction) objwavefront_add_colors,
      METH_VARARGS,
      "Set colors associated with elements of a given type."},
+    {"__getstate__", (PyCFunction) objwavefront__getstate__,
+     METH_NOARGS,
+     "Get the instance state."},
+    {"__setstate__", (PyCFunction) objwavefront__setstate__,
+     METH_O,
+     "Set the instance state."},
     {NULL}  /* Sentinel */
 };
 
@@ -1220,7 +1532,7 @@ static PySequenceMethods objwavefront_seq = {
 
 static PyTypeObject ObjWavefront_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "rapidjson.ObjWavefront",           /* tp_name */
+    "rapidjson.geometry.ObjWavefront",  /* tp_name */
     sizeof(ObjWavefrontObject),         /* tp_basicsize */
     0,                                  /* tp_itemsize */
     (destructor) objwavefront_dealloc,  /* tp_dealloc */
@@ -1281,33 +1593,24 @@ static PyObject* objwavefront_new(PyTypeObject* type, PyObject* args, PyObject* 
     if (kwargs && !PyArg_ValidateKeywordArguments(kwargs))
 	return NULL;
 
-    const char* readFrom = 0;
-    const ObjWavefrontObject* copyFrom = 0;
-    if (vertObject && !faceObject && !edgeObject && !kwargs) {
-	if (PyDict_Check(vertObject)) {
-	    kwargs = vertObject;
-	    vertObject = NULL;
-	} else if (PyUnicode_Check(vertObject)) {
-	    readFrom = PyUnicode_AsUTF8(vertObject);
-	    vertObject = NULL;
-	} else if (PyBytes_Check(vertObject)) {
-	    readFrom = PyBytes_AsString(vertObject);
-	    vertObject = NULL;
-	} else if (PyObject_IsInstance(vertObject, (PyObject*)&ObjWavefront_Type)) {
-	    copyFrom = (ObjWavefrontObject*)vertObject;
-	    vertObject = NULL;
-	}
-    }
-    
     ObjWavefrontObject* v = (ObjWavefrontObject*) type->tp_alloc(type, 0);
     if (v == NULL)
         return NULL;
-    if (copyFrom) {
-	v->obj = (ObjWavefront*)(copyFrom->obj->copy());
+    if (vertObject != NULL &&
+	PyObject_IsInstance(vertObject, (PyObject*)&ObjWavefront_Type)) {
+	v->obj = (ObjWavefront*)(((ObjWavefrontObject*)vertObject)->obj->copy());
+	vertObject = NULL;
     } else {
 	v->obj = new ObjWavefront();
     }
-    
+    const char* readFrom = 0;
+    if (vertObject != NULL && PyUnicode_Check(vertObject)) {
+	readFrom = PyUnicode_AsUTF8(vertObject);
+	vertObject = NULL;
+    } else if (vertObject != NULL && PyBytes_Check(vertObject)) {
+	readFrom = PyBytes_AsString(vertObject);
+	vertObject = NULL;
+    }
     if (readFrom) {
 	std::stringstream ss;
 	ss.str(std::string(readFrom));
@@ -1316,74 +1619,34 @@ static PyObject* objwavefront_new(PyTypeObject* type, PyObject* args, PyObject* 
 	    return NULL;
 	}
     }
+    PyObject* inDict = PyDict_New();
+    if (inDict == NULL)
+	return NULL;
+    if (vertObject != NULL && PyDict_Check(vertObject)) {
+	if (PyDict_Update(inDict, vertObject) < 0)
+	    return NULL;
+	vertObject = NULL;
+    }
     
 #define ADD_ARRAY(x, name)						\
     if (x != NULL) {							\
-	PyObject* x_name = PyUnicode_FromString(#name);			\
-	if (x_name == NULL) return NULL;				\
-	PyObject* iargs = Py_BuildValue("(OO)", x_name, x);		\
-	Py_DECREF(x_name);						\
-	if (iargs == NULL) return NULL;					\
-	if (objwavefront_add_elements((PyObject*)v, iargs, NULL) == NULL) {	\
-	    Py_DECREF(iargs);						\
+	if (PyDict_SetItemString(inDict, #name, x) < 0)			\
 	    return NULL;						\
-	}								\
-	Py_DECREF(iargs);						\
     }
 
-    ADD_ARRAY(vertObject, vertex)
-    ADD_ARRAY(faceObject, face)
-    ADD_ARRAY(edgeObject, edge)
+    ADD_ARRAY(vertObject, vertex);
+    ADD_ARRAY(faceObject, face);
+    ADD_ARRAY(edgeObject, edge);
 
 #undef ADD_ARRAY
 
-    if (kwargs) {
-	PyObject *key, *value;
-	Py_ssize_t pos = 0;
-	std::vector<std::string> delayed;
-
-	// Do vertices first
-	std::string vert_key;
-	std::vector<std::string> vert_names = {"vertex", "vertices", "vertexes"};
-	for (std::vector<std::string>::iterator it = vert_names.begin();
-	     it != vert_names.end(); it++) {
-	    value = PyDict_GetItemString(kwargs, it->c_str());
-	    if (value == NULL) continue;
-	    PyObject* iargs = Py_BuildValue("(sO)", it->c_str(), value);
-	    if (objwavefront_add_elements((PyObject*)v, iargs, NULL) == NULL) {
-		Py_DECREF(iargs);
-		return NULL;
-	    }
-	    Py_DECREF(iargs);
-	    vert_key = *it;
-	    break;
-	}
-	while (PyDict_Next(kwargs, &pos, &key, &value)) {
-	    std::string keyS(PyUnicode_AsUTF8(key));
-	    if (keyS == vert_key) continue;
-	    if (keyS.size() > 7 &&
-		keyS.substr(keyS.size() - 7) == "_colors") {
-		delayed.push_back(keyS);
-		continue;
-	    }
-	    PyObject* iargs = Py_BuildValue("(OO)", key, value);
-	    if (objwavefront_add_elements((PyObject*)v, iargs, NULL) == NULL) {
-		Py_DECREF(iargs);
-		return NULL;
-	    }
-	    Py_DECREF(iargs);
-	}
-	for (std::vector<std::string>::iterator it = delayed.begin();
-	     it != delayed.end(); it++) {
-	    value = PyDict_GetItemString(kwargs, it->c_str());
-	    PyObject* iargs = Py_BuildValue("(sO)", it->c_str(), value);
-	    if (objwavefront_add_elements((PyObject*)v, iargs, NULL) == NULL) {
-		Py_DECREF(iargs);
-		return NULL;
-	    }
-	    Py_DECREF(iargs);
-	}
+    if (kwargs != NULL) {
+	if (PyDict_Update(inDict, kwargs) < 0)
+	    return NULL;
     }
+
+    if (objwavefront_add_elements_from_dict((PyObject*)v, inDict) < 0)
+	return NULL;
 
     // if (!v->obj->get_element_set("vertex"))
     // 	v->obj->add_element_set("vertex");
@@ -1397,6 +1660,449 @@ static PyObject* objwavefront_new(PyTypeObject* type, PyObject* args, PyObject* 
     }
 
     return (PyObject*) v;
+}
+
+static int objwavefront_add_elements_from_dict(PyObject *self, PyObject* kwargs, bool preserveOrder) {
+    if (kwargs) {
+	PyObject *key, *value;
+	Py_ssize_t pos = 0;
+	std::vector<std::string> skip, delayed;
+
+	// Do comments & vertices first
+	if (!preserveOrder) {
+	    std::vector<std::string> skip_names = {"comment", "comments", "vertex", "vertices", "vertexes"};
+	    for (std::vector<std::string>::iterator it = skip_names.begin();
+		 it != skip_names.end(); it++) {
+		value = PyDict_GetItemString(kwargs, it->c_str());
+		if (value == NULL) continue;
+		PyObject* iargs = Py_BuildValue("(sO)", it->c_str(), value);
+		if (objwavefront_add_elements(self, iargs, NULL) == NULL) {
+		    Py_DECREF(iargs);
+		    return -1;
+		}
+		Py_DECREF(iargs);
+		skip.push_back(*it);
+	    }
+	}
+	while (PyDict_Next(kwargs, &pos, &key, &value)) {
+	    std::string keyS(PyUnicode_AsUTF8(key));
+	    bool skipped = false;
+	    for (std::vector<std::string>::iterator it = skip.begin();
+		 it != skip.end(); it++) {
+		if (keyS == *it) {
+		    skipped = true;
+		    break;
+		}
+	    }
+	    if (skipped) continue;
+	    if (keyS.size() > 7 &&
+		keyS.substr(keyS.size() - 7) == "_colors") {
+		delayed.push_back(keyS);
+		continue;
+	    }
+	    PyObject* iargs = Py_BuildValue("(OO)", key, value);
+	    if (objwavefront_add_elements(self, iargs, NULL) == NULL) {
+		Py_DECREF(iargs);
+		return -1;
+	    }
+	    Py_DECREF(iargs);
+	}
+	for (std::vector<std::string>::iterator it = delayed.begin();
+	     it != delayed.end(); it++) {
+	    value = PyDict_GetItemString(kwargs, it->c_str());
+	    PyObject* iargs = Py_BuildValue("(sO)", it->c_str(), value);
+	    if (objwavefront_add_elements(self, iargs, NULL) == NULL) {
+		Py_DECREF(iargs);
+		return -1;
+	    }
+	    Py_DECREF(iargs);
+	}
+    }
+    return 0;
+}
+static int objwavefront_add_elements_from_list(PyObject *self, PyObject* inList) {
+    if (!PyList_Check(inList)) {
+	PyErr_SetString(PyExc_TypeError, "Argument must be a list.");
+	return -1;
+    }
+    for (Py_ssize_t i = 0; i < PyList_Size(inList); i++) {
+	PyObject* item = PyList_GetItem(inList, i);
+	if (item == NULL) return -1;
+	if (objwavefront_add_element_from_python(self, item, "") < 0)
+	    return -1;
+    }
+    return 0;
+}
+static int objwavefront_add_element_from_python(PyObject* self, PyObject* x, std::string name) {
+    if (x == NULL)
+	return -1;
+    ObjWavefrontObject* v = (ObjWavefrontObject*) self;
+    bool is_dict = PyDict_Check(x);
+    if (!(PyDict_Check(x) || PyList_Check(x) || PyUnicode_Check(x))) {
+	PyErr_SetString(PyExc_TypeError, "Dictionary or list required.");
+	return -1;
+    }
+    PyObject* code = NULL;
+    if (is_dict) {
+	code = PyDict_GetItemString(x, "code");
+	if (name.size() == 0) {
+	    if (code == NULL) {
+		PyErr_SetString(geom_error, "No code string present.");
+		return -1;
+	    }
+	    if (!PyUnicode_Check(code)) {
+		PyErr_SetString(geom_error, "No code string present.");
+		return -1;
+	    }
+	    name = PyUnicode_AsUTF8(code);
+	}
+    }
+    ObjElement* new_element = v->obj->add_element(name);
+    if (!new_element) {
+	PyErr_SetString(geom_error, "Error adding element to ObjWavefront instance");
+	return -1;
+    }
+    if (PyUnicode_Check(x)) {
+	if (obj_alias2base(name) == "#") {
+	    PyObject* comments = PyUnicode_Split(x, NULL, -1);
+	    if (comments == NULL)
+		return -1;
+	    std::vector<std::string> commentsS;
+	    for (Py_ssize_t i = 0; i < PyList_Size(comments); i++) {
+		PyObject* iComment = PyList_GetItem(comments, i);
+		if (iComment == NULL) {
+		    Py_DECREF(comments);
+		    return -1;
+		}
+		commentsS.push_back(PyUnicode_AsUTF8(iComment));
+	    }
+	    Py_DECREF(comments);
+	    if (!new_element->set_property(static_cast<size_t>(0), commentsS)) {
+		PyErr_SetString(geom_error, "Error setting ObjWavefront element property.");
+		return -1;
+	    }
+	} else {
+	    std::string iComment(PyUnicode_AsUTF8(x));
+	    if (!new_element->set_property(static_cast<size_t>(0), iComment)) {
+		PyErr_SetString(geom_error, "Error setting ObjWavefront element property.");
+		return -1;
+	    }
+	}
+	return 0;
+    }
+    PyObject *key, *value, *src;
+    Py_ssize_t pos = 0, src_idx = 0;
+    std::string iname = "";
+    std::string src_key;
+    bool src_is_dict;
+    Py_ssize_t Nprops = 0;
+    if (is_dict) {
+	Nprops = PyDict_Size(x);
+    } else {
+	Nprops = PyList_Size(x);
+    }
+    Py_ssize_t Nprops_meta = Nprops;
+    if (code != NULL) Nprops_meta--;
+    if (!new_element->set_meta_properties(Nprops_meta)) {
+	PyErr_SetString(geom_error, "Error setting metadata for ObjWavefront element.");
+	return -1;
+    }
+    if (!is_dict) {
+	int min_size = new_element->min_values();
+	int max_size = new_element->max_values();
+	if ((min_size >= 0 && Nprops_meta < (Py_ssize_t)min_size) ||
+	    (max_size >= 0 && Nprops_meta > (Py_ssize_t)max_size)) {
+	    PyErr_SetString(geom_error, "Error adding element to ObjWavefront instance. Incorrect number of property values.");
+	    return -1;
+	}
+    }
+    for (Py_ssize_t j = 0; j < Nprops; j++) {
+	if (is_dict) {
+	    if (!PyDict_Next(x, &pos, &key, &value)) {
+		PyErr_SetString(geom_error, "Error processing element dictionary");
+		return -1;
+	    }
+	    if (!PyUnicode_Check(key)) {
+		PyErr_SetString(PyExc_TypeError, "ObjWavefront element keys must be strings");
+		return -1;
+	    }
+	    iname = std::string(PyUnicode_AsUTF8(key));
+	    if (iname == "code") continue;
+	} else {
+	    key = NULL;
+	    value = PyList_GetItem(x, j);
+	    if (value == NULL)
+		return -1;
+	    iname = "";
+	}
+#define HANDLE_SET_(type, ELEMENT)					\
+	bool iresult = false;						\
+	if (src_is_dict) {						\
+	    iresult = ELEMENT->set_property(src_key, ivalue, true);	\
+	} else {							\
+	    iresult = ELEMENT->set_property(src_idx, ivalue, true);	\
+	}								\
+	if (!iresult) {							\
+	    PyErr_SetString(geom_error, "Error adding " type " value to ObjWavefront element"); \
+	    return -1;							\
+	}
+#define HANDLE_SCALAR_(type, method, ELEMENT)				\
+	type ivalue = method;						\
+	HANDLE_SET_(#type " scalar", ELEMENT)
+#define HANDLE_SCALAR_NPY_(type, npy_type, ELEMENT)			\
+	type ivalue;							\
+	PyArray_Descr* desc = PyArray_DescrNewFromType(npy_type);	\
+	PyArray_CastScalarToCtype(src, &ivalue, desc);			\
+	Py_DECREF(desc);						\
+	HANDLE_SET_(#type " numpy scalar", ELEMENT)
+#define HANDLE_ARRAY_(type, check, method, ELEMENT)			\
+	std::vector<type> ivalue;					\
+	for (Py_ssize_t k = 0; k < PyList_Size(src); k++) {		\
+	    PyObject* vv = PyList_GetItem(src, k);			\
+	    if (vv == NULL) return -1;					\
+	    if (!check(vv)) {						\
+		PyErr_SetString(geom_error, "Error adding " #type " values array to ObjWavefront element. Not all elements are the same type."); \
+		return -1;						\
+	    }								\
+	    ivalue.push_back(method);					\
+	}								\
+	HANDLE_SET_(#type " vector", ELEMENT)
+#define HANDLE_ARRAY_NPY_(type, check, npy_type, ELEMENT)		\
+	std::vector<type> ivalue;					\
+	for (Py_ssize_t k = 0; k < PyList_Size(src); k++) {		\
+	    PyObject* vv = PyList_GetItem(src, k);			\
+	    if (vv == NULL) return -1;					\
+	    if (!PyArray_CheckScalar(vv)) {				\
+		PyErr_SetString(geom_error, "Error adding " #type " values array to ObjWavefront element. Not all elements are numpy scalars."); \
+		return -1;						\
+	    }								\
+	    PyArray_Descr* desc0 = PyArray_DescrFromScalar(vv);		\
+	    if (!check(desc0)) {					\
+		PyErr_SetString(geom_error, "Error adding " #type " values array to ObjWavefront element from numpy scalars. Not all elements are the same type."); \
+		return -1;						\
+	    }								\
+	    type ivv;							\
+	    PyArray_Descr* desc = PyArray_DescrNewFromType(npy_type);	\
+	    PyArray_CastScalarToCtype(vv, &ivv, desc);			\
+	    ivalue.push_back(ivv);					\
+	    Py_DECREF(desc);						\
+	}								\
+	HANDLE_SET_(#type " numpy array", ELEMENT)
+#define HANDLE_SCALAR_ITEM_(ELEMENT)					\
+	if (PyLong_Check(src)) {					\
+	    HANDLE_SCALAR_(int, static_cast<int>(PyLong_AsLong(src)), ELEMENT);	\
+	} else if (PyFloat_Check(src)) {				\
+	    HANDLE_SCALAR_(double, PyFloat_AsDouble(src), ELEMENT);	\
+	} else if (PyUnicode_Check(src)) {				\
+	    HANDLE_SCALAR_(std::string, std::string(PyUnicode_AsUTF8(src)), ELEMENT); \
+	} else if (PyArray_CheckScalar(src)) {				\
+	    PyArray_Descr* desc0 = PyArray_DescrFromScalar(src);	\
+	    if (PyDataType_ISINTEGER(desc0)) {				\
+		HANDLE_SCALAR_NPY_(int, NPY_INT32, ELEMENT);		\
+	    } else if (PyDataType_ISFLOAT(desc0)) {			\
+		HANDLE_SCALAR_NPY_(double, NPY_FLOAT64, ELEMENT);	\
+	    } else if (PyDataType_ISSTRING(desc0)) {			\
+		HANDLE_SCALAR_NPY_(std::string, NPY_UNICODE, ELEMENT);	\
+	    } else {							\
+		PyErr_SetString(PyExc_TypeError, "ObjWavefront element property value must be integer, float, or string"); \
+		return -1;						\
+	    }								\
+	}
+#define HANDLE_ARRAY_ITEM_(ELEMENT)					\
+        if (PyList_Check(src)) {					\
+	    PyObject* first_item = PyList_GetItem(src, 0);		\
+	    if (first_item == NULL) return -1;				\
+	    if (PyLong_Check(first_item)) {				\
+		HANDLE_ARRAY_(int, PyLong_Check, static_cast<int>(PyLong_AsLong(vv)), ELEMENT); \
+	    } else if (PyFloat_Check(first_item)) {			\
+		HANDLE_ARRAY_(double, PyFloat_Check, PyFloat_AsDouble(vv), ELEMENT); \
+	    } else if (PyUnicode_Check(first_item)) {			\
+		HANDLE_ARRAY_(std::string, PyUnicode_Check, std::string(PyUnicode_AsUTF8(vv)), ELEMENT); \
+	    } else if (PyArray_CheckScalar(first_item)) {		\
+		PyArray_Descr* first_desc = PyArray_DescrFromScalar(first_item); \
+		if (PyDataType_ISINTEGER(first_desc)) {			\
+		    HANDLE_ARRAY_NPY_(int, PyDataType_ISINTEGER, NPY_INT32, ELEMENT); \
+		} else if (PyDataType_ISFLOAT(first_desc)) {		\
+		    HANDLE_ARRAY_NPY_(double, PyDataType_ISFLOAT, NPY_FLOAT64, ELEMENT); \
+		} else if (PyDataType_ISSTRING(first_desc)) {		\
+		    HANDLE_ARRAY_NPY_(std::string, PyDataType_ISSTRING, NPY_UNICODE, ELEMENT); \
+		} else {						\
+		    PyErr_SetString(PyExc_TypeError, "ObjWavefront element list values must be integers, floats, or strings"); \
+		    return -1;						\
+		}							\
+	    } else {							\
+	        PyErr_SetString(PyExc_TypeError, "ObjWavefront element list values must be integers, floats, or strings"); \
+		return -1;						\
+            }								\
+        }
+
+	src = value;
+	src_is_dict = is_dict;
+	src_key = iname;
+	src_idx = j;
+	HANDLE_SCALAR_ITEM_(new_element)
+	else HANDLE_ARRAY_ITEM_(new_element)
+	else if (!is_dict && PyDict_Check(value)) {
+	    if (!new_element->add_subelement()) {
+		PyErr_SetString(geom_error, "Error adding subelement to ObjWavefront element.");
+		return -1;
+	    }
+	    bool temp = false;
+	    ObjPropertyElement* last_sub = new_element->last_subelement(&temp);
+	    if (!last_sub) {
+		PyErr_SetString(geom_error, "Error retrieving last subelement from ObjWavefront element.");
+		return -1;
+	    }
+	    PyObject *value_key, *value_val;
+	    Py_ssize_t value_pos = 0;
+	    std::string value_keyS;
+	    while (PyDict_Next(value, &value_pos, &value_key, &value_val)) {
+		if (!PyUnicode_Check(value_key)) {
+		    PyErr_SetString(PyExc_TypeError, "ObjWavefront subelement keys must be strings");
+		    return -1;
+		}
+		value_keyS = std::string(PyUnicode_AsUTF8(value_key));
+		src = value_val;
+		src_is_dict = true;
+		src_key = value_keyS;
+		src_idx = 0;
+		HANDLE_SCALAR_ITEM_(last_sub)
+		else HANDLE_ARRAY_ITEM_(last_sub)
+		else {
+		    PyErr_SetString(PyExc_TypeError, "ObjWavefront subelement properties must be integers, floats, strings, or lists/arrays of those types.");
+		    return -1;
+		}
+	    }
+#undef HANDLE_SET_
+#undef HANDLE_SCALAR_
+#undef HANDLE_SCALAR_NPY_
+#undef HANDLE_ARRAY_
+#undef HANDLE_ARRAY_NPY_
+#undef HANDLE_SCALAR_ITEM_
+#undef HANDLE_ARRAY_ITEM_
+	} else {
+	    PyErr_SetString(PyExc_TypeError, "ObjWavefront element property values must be integers, floats, strings, or lists of those types.");
+	    return -1;
+	}
+    }
+    std::map<std::string,size_t> counts = v->obj->element_counts();
+    if (!new_element->is_valid_idx(counts)) {
+	PyErr_SetString(geom_error, "New ObjWavefront element is invalid");
+	return -1;
+    }
+    return 0;
+}
+static PyObject* objwavefront_element2dict(const ObjElement* x, bool includeCode) {
+    PyObject* out = PyDict_New();
+    if (out == NULL)
+	return NULL;
+    if (includeCode) {
+	PyObject* code = PyUnicode_FromString(x->code.c_str());
+	if (code == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+	if (PyDict_SetItemString(out, "code", code) < 0) {
+	    Py_DECREF(code);
+	    Py_DECREF(out);
+	    return NULL;
+	}
+	Py_DECREF(code);
+    }
+    for (ObjPropertiesMap::const_iterator p = x->properties.begin();
+	 p != x->properties.end(); p++) {
+	PyObject* ival = NULL;
+	if (!x->has_property(p->first, true)) continue;
+	if (p->is_vector()) {
+	    ival = PyList_New(x->size());
+	    if (ival == NULL) {
+		Py_DECREF(out);
+		return NULL;
+	    }
+#define GET_ARRAY_(type, method)					\
+	    std::vector<type> values;					\
+	    if (!p->get(values, true)) {				\
+		Py_DECREF(ival);					\
+		Py_DECREF(out);						\
+		return NULL;						\
+	    }								\
+	    for (size_t iProp = 0; iProp < values.size(); iProp++) {	\
+		PyObject* iival = method;				\
+		if (iival == NULL) {					\
+		    Py_DECREF(ival);					\
+		    Py_DECREF(out);					\
+		    return NULL;					\
+		}							\
+		if (PyList_SetItem(ival, iProp, iival) < 0) {		\
+		    Py_DECREF(iival);					\
+		    Py_DECREF(ival);					\
+		    Py_DECREF(out);					\
+		    return NULL;					\
+		}							\
+	    }
+
+	    if (_type_compatible_double(p->second)) {
+		GET_ARRAY_(double, PyFloat_FromDouble(values[iProp]));
+	    } else if (_type_compatible_int(p->second)) {
+		GET_ARRAY_(int, PyLong_FromLong(values[iProp]));
+	    } else if (_type_compatible_string(p->second)) {
+		GET_ARRAY_(std::string, PyUnicode_FromString(values[iProp].c_str()));
+	    } else {
+		Py_DECREF(out);
+		PyErr_SetString(PyExc_TypeError, "Could not find a Python type to match the C++ type");
+		return NULL;
+	    }
+
+#undef GET_ARRAY_
+#define GET_SCALAR_(type, method)					\
+	    type value;							\
+	    if (!p->get(value, true)) {					\
+		Py_DECREF(out);						\
+		return NULL;						\
+	    }								\
+	    ival = method
+	} else if (_type_compatible_double(p->second)) {
+	    GET_SCALAR_(double, PyFloat_FromDouble(value));
+	} else if (_type_compatible_int(p->second)) {
+	    GET_SCALAR_(int, PyLong_FromLong(value));
+	} else if (_type_compatible_string(p->second)) {
+	    GET_SCALAR_(std::string, PyUnicode_FromString(value.c_str()));
+	} else {
+	    Py_DECREF(out);
+	    PyErr_SetString(PyExc_TypeError, "Could not find a Python type to match the C++ type");
+	    return NULL;
+	}
+#undef GET_SCALAR_
+	if (ival == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+	if (x->code == "#" && !includeCode) {
+	    PyObject* sep = PyUnicode_FromString(" ");
+	    if (sep == NULL) {
+		Py_DECREF(ival);
+		Py_DECREF(out);
+		return NULL;
+	    }
+	    PyObject* joined = PyUnicode_Join(sep, ival);
+	    Py_DECREF(sep);
+	    Py_DECREF(ival);
+	    if (joined == NULL) {
+		Py_DECREF(out);
+		return NULL;
+	    }
+	    Py_DECREF(out);
+	    out = joined;
+	} else {
+	    if (PyDict_SetItemString(out, p->first.c_str(), ival) < 0) {
+		Py_DECREF(ival);
+		Py_DECREF(out);
+		return NULL;
+	    }
+	    Py_DECREF(ival);
+	}
+    }
+    return out;
 }
 
 
@@ -1461,7 +2167,7 @@ static PyObject* objwavefront_get_elements(PyObject* self, PyObject* args, PyObj
 	
 #define GET_ARRAY(T, npT)						\
 	size_t N = 0, M = 0;						\
-	std::vector<T> vect = v->obj->get_ ## T ## _array(elementType, N, M, true); \
+	std::vector<T> vect = v->obj->get_ ## T ## _array(elementType, N, M, true, true); \
 	PyArray_Descr* desc = PyArray_DescrNewFromType(npT);		\
 	if (desc == NULL) return NULL;					\
 	npy_intp np_shape[2] = { (npy_intp)N, (npy_intp)M };		\
@@ -1479,126 +2185,24 @@ static PyObject* objwavefront_get_elements(PyObject* self, PyObject* args, PyObj
 	}
 #undef GET_ARRAY
     } else {
-	out = PyDict_New();
-	if (out == NULL)
+	out = PyList_New(v->obj->count_elements(elementType));
+	if (out == NULL) {
 	    return NULL;
-	{
-	    PyObject* val = PyList_New(v->obj->count_elements(elementType));
-	    if (val == NULL) {
+	}
+	Py_ssize_t i = 0;
+	for (std::vector<ObjElement*>::const_iterator elit = v->obj->elements.begin(); elit != v->obj->elements.end(); elit++) {
+	    if ((*elit)->code != elementType) continue;
+	    PyObject* item = objwavefront_element2dict(*elit);
+	    if (item == NULL) {
 		Py_DECREF(out);
 		return NULL;
 	    }
-	    Py_ssize_t i = 0;
-	    for (std::vector<ObjElement*>::const_iterator elit = v->obj->elements.begin(); elit != v->obj->elements.end(); elit++) {
-		if ((*elit)->code != elementType) continue;
-		PyObject* item = PyDict_New();
-		if (item == NULL) {
-		    Py_DECREF(val);
-		    Py_DECREF(out);
-		    return NULL;
-		}
-		for (ObjPropertiesMap::const_iterator p = (*elit)->properties.begin();
-		     p != (*elit)->properties.end(); p++) {
-		    PyObject* ival = NULL;
-		    if (!(*elit)->has_property(p->first, true)) continue;
-		    if (p->is_vector()) {
-			ival = PyList_New((*elit)->size());
-			if (ival == NULL) {
-			    Py_DECREF(item);
-			    Py_DECREF(val);
-			    Py_DECREF(out);
-			    return NULL;
-			}
-#define GET_ARRAY_(type, method)					\
-			std::vector<type> values;			\
-			if (!p->get(values)) {				\
-			    Py_DECREF(ival);				\
-			    Py_DECREF(item);				\
-			    Py_DECREF(val);				\
-			    Py_DECREF(out);				\
-			    return NULL;				\
-			}						\
-			for (size_t iProp = 0; iProp < values.size(); iProp++) { \
-			    PyObject* iival = method;			\
-			    if (iival == NULL) {			\
-				Py_DECREF(ival);			\
-				Py_DECREF(item);			\
-				Py_DECREF(val);				\
-				Py_DECREF(out);				\
-				return NULL;				\
-			    }						\
-			    if (PyList_SetItem(ival, iProp, iival) < 0) { \
-				Py_DECREF(iival);			\
-				Py_DECREF(ival);			\
-				Py_DECREF(item);			\
-				Py_DECREF(val);				\
-				Py_DECREF(out);				\
-				return NULL;				\
-			    }						\
-	                }
-
-			if (_type_compatible_double(p->second)) {
-			    GET_ARRAY_(double, PyFloat_FromDouble(values[iProp]));
-			} else if (_type_compatible_int(p->second)) {
-			    GET_ARRAY_(int, PyLong_FromLong(values[iProp]));
-			} else if (_type_compatible_string(p->second)) {
-			    GET_ARRAY_(std::string, PyUnicode_FromString(values[iProp].c_str()));
-			} else {
-			    Py_DECREF(item);
-			    Py_DECREF(val);
-			    Py_DECREF(out);
-			    PyErr_SetString(PyExc_TypeError, "Could not find a Python type to match the C++ type");
-			    return NULL;
-			}
-
-#undef GET_ARRAY_
-#define GET_SCALAR_(type, method)				\
-			type value;					\
-			if (!p->get(value)) {				\
-			    Py_DECREF(item);				\
-			    Py_DECREF(val);				\
-			    Py_DECREF(out);				\
-			    return NULL;				\
-			}						\
-			ival = method
-		    } else if (_type_compatible_double(p->second)) {
-			GET_SCALAR_(double, PyFloat_FromDouble(value));
-		    } else if (_type_compatible_int(p->second)) {
-			GET_SCALAR_(int, PyLong_FromLong(value));
-		    } else if (_type_compatible_string(p->second)) {
-			GET_SCALAR_(std::string, PyUnicode_FromString(value.c_str()));
-		    } else {
-			Py_DECREF(item);
-			Py_DECREF(val);
-			Py_DECREF(out);
-			PyErr_SetString(PyExc_TypeError, "Could not find a Python type to match the C++ type");
-			return NULL;
-		    }
-#undef GET_SCALAR_
-		    if (ival == NULL) {
-			Py_DECREF(item);
-			Py_DECREF(val);
-			Py_DECREF(out);
-			return NULL;
-		    }
-		    if (PyDict_SetItemString(item, p->first.c_str(), ival) < 0) {
-			Py_DECREF(ival);
-			Py_DECREF(item);
-			Py_DECREF(val);
-			Py_DECREF(out);
-			return NULL;
-		    }
-		    Py_DECREF(ival);
-		}
-		if (PyList_SetItem(val, i, item) < 0) {
-		    Py_DECREF(item);
-		    Py_DECREF(val);
-		    Py_DECREF(out);
-		    return NULL;
-		}
-		i++;
+	    if (PyList_SetItem(out, i, item) < 0) {
+		Py_DECREF(item);
+		Py_DECREF(out);
+		return NULL;
 	    }
-	    out = val;
+	    i++;
 	}
     }
     
@@ -1607,6 +2211,7 @@ static PyObject* objwavefront_get_elements(PyObject* self, PyObject* args, PyObj
 }
 
 static PyObject* objwavefront_add_elements(PyObject* self, PyObject* args, PyObject* kwargs) {
+    // TODO: Get double & int values to ignore, maybe flag for skipping inc
     const char* name0 = 0;
     PyObject* x = NULL;
     
@@ -1630,232 +2235,8 @@ static PyObject* objwavefront_add_elements(PyObject* self, PyObject* args, PyObj
     if (PyList_Check(x)) {
 	for (Py_ssize_t i = 0; i < PyList_Size(x); i++) {
 	    PyObject* item = PyList_GetItem(x, i);
-	    if (item == NULL) return NULL;
-	    if (PyDict_Check(item)) { // Dictionary of element properties
-		PyObject *key, *value;
-		Py_ssize_t pos = 0;
-		ObjElement* new_element = v->obj->add_element(name);
-		if (!new_element) {
-		    PyErr_SetString(geom_error, "Error adding element to ObjWavefront instance");
-		    return NULL;
-		}
-		if (!new_element->set_meta_properties(PyDict_Size(item))) {
-		    PyErr_SetString(geom_error, "Error setting metadata for ObjWavefront element.");
-		    return NULL;
-		}
-		while (PyDict_Next(item, &pos, &key, &value)) {
-		    if (!PyUnicode_Check(key)) {
-			PyErr_SetString(PyExc_TypeError, "ObjWavefront element keys must be strings");
-			return NULL;
-		    }
-		    std::string iname = std::string(PyUnicode_AsUTF8(key));
-#define HANDLE_SCALAR_(type, method)					\
-		    type ivalue = method;				\
-		    if (!new_element->set_property(iname, ivalue)) {	\
-			PyErr_SetString(geom_error, "Error adding " #type " value to ObjWavefront element"); \
-			return NULL;					\
-		    }
-#define HANDLE_SCALAR_NPY_(type, npy_type)				\
-		    type ivalue;					\
-		    PyArray_Descr* desc = PyArray_DescrNewFromType(npy_type); \
-		    PyArray_CastScalarToCtype(value, &ivalue, desc);	\
-		    Py_DECREF(desc);					\
-		    if (!new_element->set_property(iname, ivalue)) {	\
-			PyErr_SetString(geom_error, "Error adding " #type " numpy scalar value to ObjWavefront element"); \
-			return NULL;					\
-		    }
-#define HANDLE_ARRAY_(type, check, method)				\
-		    std::vector<type> values;				\
-		    for (Py_ssize_t j = 0; j < PyList_Size(value); j++) { \
-			PyObject* vv = PyList_GetItem(value, j);	\
-			if (vv == NULL) return NULL;			\
-			if (!check(vv)) {				\
-			    PyErr_SetString(geom_error, "Error adding " #type " values array to ObjWavefront element. Not all elements are the same type."); \
-			    return NULL;				\
-			}						\
-			values.push_back(method);			\
-		    }							\
-		    if (!new_element->set_property(iname, values)) {	\
-			PyErr_SetString(geom_error, "Error adding " #type " values to ObjWavefront element"); \
-			return NULL;					\
-		    }
-#define HANDLE_ARRAY_NPY_(type, check, npy_type)			\
-		    std::vector<type> values;				\
-		    for (Py_ssize_t j = 0; j < PyList_Size(value); j++) { \
-			PyObject* vv = PyList_GetItem(value, j);	\
-			if (vv == NULL) return NULL;			\
-			if (!PyArray_CheckScalar(vv)) {			\
-			    PyErr_SetString(geom_error, "Error adding " #type " values array to ObjWavefront element. Not all elements are numpy scalars."); \
-			    return NULL;				\
-			}						\
-			PyArray_Descr* desc0 = PyArray_DescrFromScalar(vv); \
-			if (!check(desc0)) {				\
-			    PyErr_SetString(geom_error, "Error adding " #type " values array to ObjWavefront element from numpy scalars. Not all elements are the same type."); \
-			    return NULL;				\
-			}						\
-			type ivalue;					\
-			PyArray_Descr* desc = PyArray_DescrNewFromType(npy_type); \
-			PyArray_CastScalarToCtype(vv, &ivalue, desc);	\
-			values.push_back(ivalue);			\
-			Py_DECREF(desc);				\
-		    }							\
-		    if (!new_element->set_property(iname, values)) {	\
-			PyErr_SetString(geom_error, "Error adding " #type " values to ObjWavefront element"); \
-			return NULL;					\
-		    }
-		    
-		    if (PyLong_Check(value)) {
-			HANDLE_SCALAR_(int, static_cast<int>(PyLong_AsLong(value)));
-		    } else if (PyFloat_Check(value)) {
-			HANDLE_SCALAR_(double, PyFloat_AsDouble(value));
-		    } else if (PyUnicode_Check(value)) {
-			HANDLE_SCALAR_(std::string, std::string(PyUnicode_AsUTF8(value)));
-		    } else if (PyArray_CheckScalar(value)) {
-			PyArray_Descr* desc0 = PyArray_DescrFromScalar(value);
-			if (PyDataType_ISINTEGER(desc0)) {
-			    HANDLE_SCALAR_NPY_(int, NPY_INT32);
-			} else if (PyDataType_ISFLOAT(desc0)) {
-			    HANDLE_SCALAR_NPY_(double, NPY_FLOAT64);
-			} else if (PyDataType_ISSTRING(desc0)) {
-			    HANDLE_SCALAR_NPY_(std::string, NPY_UNICODE);
-			} else {
-			    PyErr_SetString(PyExc_TypeError, "ObjWavefront element property value must be integer, float, or string");
-			    return NULL;
-			}
-		    } else if (PyList_Check(value)) {
-			PyObject* first_item = PyList_GetItem(value, 0);
-			if (first_item == NULL) return NULL;
-			if (PyLong_Check(first_item)) {
-			    HANDLE_ARRAY_(int, PyLong_Check, static_cast<int>(PyLong_AsLong(vv)));
-			} else if (PyFloat_Check(first_item)) {
-			    HANDLE_ARRAY_(double, PyFloat_Check, PyFloat_AsDouble(vv));
-			} else if (PyUnicode_Check(first_item)) {
-			    HANDLE_ARRAY_(std::string, PyUnicode_Check, std::string(PyUnicode_AsUTF8(vv)));
-			} else if (PyArray_CheckScalar(first_item)) {
-			    PyArray_Descr* first_desc = PyArray_DescrFromScalar(first_item);
-			    if (PyDataType_ISINTEGER(first_desc)) {
-				HANDLE_ARRAY_NPY_(int, PyDataType_ISINTEGER, NPY_INT32);
-			    } else if (PyDataType_ISFLOAT(first_desc)) {
-				HANDLE_ARRAY_NPY_(double, PyDataType_ISFLOAT, NPY_FLOAT64);
-			    } else if (PyDataType_ISSTRING(first_desc)) {
-				HANDLE_ARRAY_NPY_(std::string, PyDataType_ISSTRING, NPY_UNICODE);
-			    } else {
-				PyErr_SetString(PyExc_TypeError, "ObjWavefront element list values must be integers, floats, or strings");
-				return NULL;
-			    }
-			} else {
-			    PyErr_SetString(PyExc_TypeError, "ObjWavefront element list values must be integers, floats, or strings");
-			    return NULL;
-			}
-#undef HANDLE_SCALAR_
-#undef HANDLE_SCALAR_NPY_
-#undef HANDLE_ARRAY_
-#undef HANDLE_ARRAY_NPY_
-		    } else {
-			PyErr_SetString(PyExc_TypeError, "ObjWavefront element property values must be integers, floats, strings, or lists of those types.");
-			return NULL;
-		    }
-		}
-	    } else if (PyList_Check(item)) { // List of element properties
-		ObjElement* new_element = v->obj->add_element(name);
-		if (!new_element) {
-		    PyErr_SetString(geom_error, "Error adding element to ObjWavefront instance");
-		    return NULL;
-		}
-		Py_ssize_t item_size = PyList_Size(item);
-		if (!new_element->set_meta_properties(item_size)) {
-		    PyErr_SetString(geom_error, "Error setting metadata for ObjWavefront element.");
-		    return NULL;
-		}
-		int min_size = new_element->min_values();
-		int max_size = new_element->max_values();
-		if ((min_size >= 0 && item_size < (Py_ssize_t)min_size) ||
-		    (max_size >= 0 && item_size > (Py_ssize_t)max_size)) {
-		    PyErr_SetString(geom_error, "Error adding element to ObjWavefront instance. Incorrect number of property values.");
-		    return NULL;
-		}
-		for (Py_ssize_t j = 0; j < PyList_Size(item); j++) {
-		    PyObject* value = PyList_GetItem(item, j);
-		    if (value == NULL) return NULL;
-#define HANDLE_SCALAR_(method)						\
-		    if (!new_element->set_property(static_cast<size_t>(j), \
-						   method)) {		\
-			PyErr_SetString(geom_error, "Error setting ObjWavefront element property."); \
-			return NULL;					\
-		    }
-		    if (PyLong_Check(value)) {
-			HANDLE_SCALAR_(static_cast<int>(PyLong_AsLong(value)));
-		    } else if (PyFloat_Check(value)) {
-			HANDLE_SCALAR_(PyFloat_AsDouble(value));
-		    } else if (PyUnicode_Check(value)) {
-			HANDLE_SCALAR_(std::string(PyUnicode_AsUTF8(value)));
-#undef HANDLE_SCALAR_
-		    } else if (PyDict_Check(value)) {
-#define HANDLE_SCALAR_(type, method)					\
-			type ivalue = method;				\
-			if (!last_sub->set_property(keyS, ivalue)) {	\
-			    PyErr_SetString(geom_error, "Error setting subelement property for ObjWavefront element.");	\
-			    return NULL;				\
-			}
-			if (!new_element->add_subelement()) {
-			    PyErr_SetString(geom_error, "Error adding subelement to ObjWavefront element.");
-			    return NULL;
-			}
-			bool temp = false;
-			ObjPropertyElement* last_sub = new_element->last_subelement(&temp);
-			if (!last_sub) {
-			    PyErr_SetString(geom_error, "Error retrieving last subelement from ObjWavefront element.");
-			    return NULL;
-			}
-			PyObject *key, *key_value;
-			Py_ssize_t pos = 0;
-			while (PyDict_Next(value, &pos, &key, &key_value)) {
-			    std::string keyS = PyUnicode_AsUTF8(key);
-			    if (PyLong_Check(key_value)) {
-				HANDLE_SCALAR_(int, static_cast<int>(PyLong_AsLong(key_value)));
-			    } else if (PyFloat_Check(key_value)) {
-				HANDLE_SCALAR_(double, PyFloat_AsDouble(key_value));
-			    } else if (PyUnicode_Check(key_value)) {
-				HANDLE_SCALAR_(std::string, std::string(PyUnicode_AsUTF8(key_value)));
-			    // } else if (PyList_Check(key_value)) {
-			    // 	PyObject* first_item = PyList_GetItem(value, 0);
-			    // 	if (first_item == NULL) return NULL;
-				
-			    // 	for (Py_ssize_t k = 0; k < PyList_Size(key_value); k++) {
-			    // 	    PyObject* kvv = PyList_GetItem(key_value, k);
-			    // 	    if (kvv == NULL) return NULL;
-			    // 	    if (PyLong_Check(kvv)) {
-			    // 		it->second.push_back(PyLong_AsDouble(kvv));
-			    // 	    } else if (PyFloat_Check(kvv)) {
-			    // 		it->second.push_back(PyFloat_AsDouble(kvv));
-			    // 	    } else {
-			    // 		PyErr_SetString(PyExc_TypeError, "ObjWavefront element parameter list values must be integers or floats");
-			    // 		return NULL;
-			    // 	    }
-			    // 	}
-			    } else {
-				PyErr_SetString(PyExc_TypeError, "ObjWavefront element subelements must be integers, floats, or strings");
-				return NULL;
-			    }
-			}
-			if (temp) {
-			    delete last_sub;
-			}
-#undef HANDLE_SCALAR_
-		    } else {
-			PyErr_SetString(PyExc_TypeError, "ObjWavefront element list values must be integers or floats");
-			return NULL;
-		    }
-		}
-		std::map<std::string,size_t> counts = v->obj->element_counts();
-		if (!new_element->is_valid_idx(counts)) {
-		    PyErr_SetString(geom_error, "New ObjWavefront element is invalid");
-		    return NULL;
-		}
-	    } else {
-		PyErr_SetString(PyExc_TypeError, "ObjWavefront elements must be lists, integers, or floats");
+	    if (objwavefront_add_element_from_python(self, item, name) < 0)
 		return NULL;
-	    }
 	}
     } else if (PyArray_Check(x)) {
 	SizeType xn = 0, xm = 0;
@@ -1881,11 +2262,11 @@ static PyObject* objwavefront_add_elements(PyObject* self, PyObject* args, PyObj
 	if (isDouble) {
 	    double* xa = (double*)PyArray_BYTES((PyArrayObject*)x2);
 	    double ignore = NAN;
-	    v->obj->add_element_set(name, xa, xn, xm, &ignore);
+	    v->obj->add_element_set(name, xa, xn, xm, &ignore, true);
 	} else {
 	    int* xa = (int*)PyArray_BYTES((PyArrayObject*)x2);
-	    int ignore = 0;
-	    v->obj->add_element_set(name, xa, xn, xm, &ignore);
+	    int ignore = -1;
+	    v->obj->add_element_set(name, xa, xn, xm, &ignore, true);
 	}
 	Py_DECREF(x2);
     } else {
@@ -1978,6 +2359,46 @@ static PyObject* objwavefront_from_dict(PyObject* self, PyObject* args, PyObject
     
 }
 
+static PyObject* objwavefront_as_list(PyObject* self, PyObject*, PyObject*) {
+    ObjWavefrontObject* v = (ObjWavefrontObject*) self;
+    PyObject* out = PyList_New(v->obj->elements.size());
+    if (out == NULL)
+	return NULL;
+    Py_ssize_t i = 0;
+    for (std::vector<ObjElement*>::const_iterator it = v->obj->elements.begin();
+	 it != v->obj->elements.end(); it++, i++) {
+	PyObject* element = objwavefront_element2dict(*it, true);
+	if (element == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+	if (PyList_SetItem(out, i, element) < 0) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+    }
+    return out;
+}
+
+static PyObject* objwavefront_from_list(PyObject* self, PyObject* args, PyObject* kwargs) {
+    PyObject* inList = NULL;
+    
+    if (!PyArg_ParseTuple(args, "O:", &inList))
+	return NULL;
+
+    PyObject* emptyArgs = PyTuple_New(0);
+    PyObject* out = objwavefront_new(&ObjWavefront_Type, emptyArgs, NULL);
+    Py_DECREF(emptyArgs);
+    if (out == NULL)
+	return NULL;
+
+    if (objwavefront_add_elements_from_list(out, inList) < 0)
+	return NULL;
+    
+    return out;
+}
+
+
 static PyObject* objwavefront_count_elements(PyObject* self, PyObject* args, PyObject* kwargs) {
     const char* elementType0 = 0;
     
@@ -2017,6 +2438,72 @@ static PyObject* objwavefront_append(PyObject* self, PyObject* args, PyObject* k
 	return NULL;
     }
     Py_RETURN_NONE;
+}
+
+
+static PyObject* objwavefront_merge(PyObject* self, PyObject* args, PyObject* kwargs) {
+    PyObject* tmp_args = PyTuple_New(0);
+    if (tmp_args == NULL)
+	return NULL;
+    PyObject* type = (PyObject*)self->ob_type;
+    PyObject* out = PyObject_Call(type, tmp_args, NULL);
+    Py_DECREF(tmp_args);
+    if (out == NULL)
+	return NULL;
+    PyObject* append_list = NULL;
+    if (PyTuple_Size(args) == 1) {
+	append_list = PyTuple_GetItem(args, 0);
+    } else {
+	append_list = args;
+    }
+    PyObject* result = NULL;
+    PyObject* item_args = PyTuple_Pack(1, self);
+    if (item_args == NULL) {
+	Py_DECREF(out);
+	return NULL;
+    }
+    result = objwavefront_append(out, item_args, NULL);
+    Py_DECREF(item_args);
+    if (result == NULL) {
+	Py_DECREF(out);
+	return NULL;
+    }
+    if (PyTuple_Check(append_list) || PyList_Check(append_list)) {
+	for (Py_ssize_t i = 0; i < PySequence_Size(append_list); i++) {
+	    PyObject* item = PySequence_GetItem(append_list, i);
+	    if (item == NULL) {
+		Py_DECREF(out);
+		return NULL;
+	    }
+	    item_args = PyTuple_Pack(1, item);
+	    if (item_args == NULL) {
+		Py_DECREF(item);
+		Py_DECREF(out);
+		return NULL;
+	    }
+	    result = objwavefront_append(out, item_args, NULL);
+	    Py_DECREF(item_args);
+	    Py_DECREF(item);
+	    if (result == NULL) {
+		Py_DECREF(out);
+		return NULL;
+	    }
+	    Py_DECREF(result);
+	}
+    } else {
+	item_args = PyTuple_Pack(1, append_list);
+	if (item_args == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+	result = objwavefront_append(out, item_args, NULL);
+	Py_DECREF(item_args);
+	if (result == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+    }
+    return out;
 }
 
 
@@ -2346,6 +2833,19 @@ static PyObject* objwavefront_get_colors(PyObject* self, PyObject* args, PyObjec
     
 }
 
+static PyObject* objwavefront__getstate__(PyObject* self, PyObject*, PyObject*) {
+    PyObject* args = PyTuple_New(0);
+    if (args == NULL)
+	return NULL;
+    return objwavefront_as_list(self, args, NULL);
+}
+static PyObject* objwavefront__setstate__(PyObject* self, PyObject* state) {
+    if (objwavefront_add_elements_from_list(self, state) < 0)
+	return NULL;
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 
 ////////////
 // Module //
@@ -2394,7 +2894,7 @@ geom_module_exec(PyObject* m)
         return -1;
     }
 
-    geom_error = PyErr_NewException("rapidjson.GeometryError",
+    geom_error = PyErr_NewException("rapidjson.geometry.GeometryError",
 				    PyExc_ValueError, NULL);
     if (geom_error == NULL)
         return -1;
@@ -2416,11 +2916,11 @@ static struct PyModuleDef_Slot geom_slots[] = {
 
 static PyModuleDef geom_module = {
     PyModuleDef_HEAD_INIT,      /* m_base */
-    "geometry",                 /* m_name */
+    "rapidjson.geometry",       /* m_name */
     PyDoc_STR("Structures for handling 3D geometries."),
     0,                          /* m_size */
-    geom_functions,            /* m_methods */
-    geom_slots,                /* m_slots */
+    geom_functions,             /* m_methods */
+    geom_slots,                 /* m_slots */
     NULL,                       /* m_traverse */
     NULL,                       /* m_clear */
     NULL                        /* m_free */

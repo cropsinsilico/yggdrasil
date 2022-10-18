@@ -414,7 +414,7 @@ class ForkComm(CommBase.CommBase):
                                        "scattered.")
                 for i, x in enumerate(self.comm_list):
                     imsg = copy.deepcopy(msg)
-                    imsg.header = {}
+                    imsg.header = {'__meta__': {}}
                     imsg.stype = msg.stype['items'][i]
                     imsg.args = msg.args[i]
                     x.update_serializer_from_message(imsg)
