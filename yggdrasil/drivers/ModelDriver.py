@@ -2414,8 +2414,7 @@ class ModelDriver(Driver):
                     else:
                         # TODO: Remove types associated with length?
                         assert x['datatype']['type'] == 'array'
-                        assert len(x['datatype']['items']
-                               == len(non_length))
+                        assert len(x['datatype']['items']) == len(non_length)
                         for v, t in zip(non_length, x['datatype']['items']):
                             v['datatype'] = t
                 elif any('datatype' in x for x in non_length):

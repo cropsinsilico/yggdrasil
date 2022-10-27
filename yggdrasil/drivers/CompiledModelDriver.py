@@ -901,8 +901,7 @@ class CompilationToolBase(object):
             vcpkg_dir = cfg.get('c', 'vcpkg_dir', None)
             if vcpkg_dir is not None:
                 if not os.path.isdir(vcpkg_dir):  # pragma: debug
-                    raise RuntimeError("vcpkg_dir is not valid: '%s'"
-                                       % vcpkg_dir)
+                    raise RuntimeError(f"vcpkg_dir is not valid: '{vcpkg_dir}'")
                 typ2dir = {'include': 'include',
                            'shared': 'bin',
                            'static': 'lib'}
@@ -914,7 +913,17 @@ class CompilationToolBase(object):
                 if (libtype in typ2dir) and os.path.isdir(vcpkg_dir):
                     paths.append(os.path.join(vcpkg_dir, 'installed', arch,
                                               typ2dir[libtype]))
-                    assert os.path.isdir(paths[-1])
+                    if not os.path.isdir(paths[-1]):  # pragma: debug
+                        partial = vcpkg_dir
+                        for x in ['installed', arch, typ2dir[libtype]]:
+                            next_partial = os.path.join(partial, x)
+                            if not os.path.isdir(next_partial):
+                                files = glob.glob(os.path.join(partial, '*'))
+                                print(f'missing {next_partial}: {files}')
+                                break
+                            partial = next_partial
+                        raise RuntimeError(r"vcpkg subdirectory does not "
+                                           r"exist: {paths[-1]}")
             if os.environ.get('ChocolateyInstall'.upper(), None):
                 base_paths.append(os.environ['ChocolateyInstall'])
         else:
@@ -925,7 +934,8 @@ class CompilationToolBase(object):
                 '/Library/Developer/CommandLineTools/usr',
                 # XCode >= 12
                 '/Applications/Xcode.app/Contents/Developer/'
-                'Toolchains/XcodeDefault.xctoolchain/usr']
+                'Toolchains/XcodeDefault.xctoolchain/usr',
+                '/usr/local/opt/llvm']
             if macos_sdkroot is not None:
                 base_paths.append(os.path.join(macos_sdkroot, 'usr'))
                 if 'Platforms' in macos_sdkroot:

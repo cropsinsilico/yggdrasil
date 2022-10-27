@@ -814,6 +814,8 @@ class CModelDriver(CompiledModelDriver):
         if vcpkg_dir is None:
             vcpkg_dir = os.environ.get('VCPKG_ROOT', None)
         if vcpkg_dir is not None:
+            print(f"Setting vcpkg_dir to {vcpkg_dir}"
+                  f" ({os.path.abspath(vcpkg_dir)})")
             vcpkg_dir = os.path.abspath(vcpkg_dir)
             if not os.path.isdir(vcpkg_dir):  # pragma: debug
                 raise ValueError("Path to vcpkg root directory "
