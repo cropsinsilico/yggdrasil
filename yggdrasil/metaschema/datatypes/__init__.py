@@ -391,7 +391,7 @@ def resolve_schema_references(schema, top_level=None):
         out = schema
     if isinstance(out, dict):
         if (len(out) == 1) and ('$ref' in out):
-            assert(out['$ref'].startswith('#'))
+            assert out['$ref'].startswith('#')
             parts = out['$ref'].split('/')
             for k in parts:
                 if k == '#':

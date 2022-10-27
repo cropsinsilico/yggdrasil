@@ -902,7 +902,7 @@ def migrate_keys(from_dict, to_dict, exclude_key_list=None, include_key_list=Non
              to None and all keys in from_dict are included.
 
     """
-    assert(isinstance(to_dict, list))
+    assert isinstance(to_dict, list)
     if len(to_dict) == 0:
         return
     if exclude_key_list is None:

@@ -96,7 +96,7 @@ class AsciiTableSerialize(DefaultSerialize):
             kwargs['datatype'] = new_typedef
         elif 'field_names' in self._tmp:
             field_names = self._tmp.pop('field_names')
-            assert(len(field_names) == len(old_typedef.get('items', [])))
+            assert len(field_names) == len(old_typedef.get('items', []))
             for x, n in zip(old_typedef.get('items', []), field_names):
                 x['title'] = n
         out = super(AsciiTableSerialize, self).update_serializer(*args, **kwargs)

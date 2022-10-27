@@ -848,7 +848,7 @@ class SerializeBase(tools.YggClass):
             else:
                 metadata = rapidjson.loads(metadata)
         elif isinstance(metadata, dict) and metadata['__meta__'].get('in_data', False):
-            assert(msg.count(constants.YGG_MSG_HEAD) == 1)
+            assert msg.count(constants.YGG_MSG_HEAD) == 1
             metadata_remainder, data = msg.split(constants.YGG_MSG_HEAD, 1)
             if len(metadata_remainder) > 0:
                 metadata.update(rapidjson.loads(metadata_remainder))
