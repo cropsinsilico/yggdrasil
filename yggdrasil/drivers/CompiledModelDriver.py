@@ -910,7 +910,8 @@ class CompilationToolBase(object):
                 else:  # pragma: debug
                     arch = 'x86-windows'
                     raise NotImplementedError("Not yet tested on 32bit Python")
-                if (libtype in typ2dir) and os.path.isdir(vcpkg_dir):
+                if (libtype in typ2dir) and os.path.isdir(os.path.join(vcpkg_dir,
+                                                                       'installed')):
                     paths.append(os.path.join(vcpkg_dir, 'installed', arch,
                                               typ2dir[libtype]))
                     if not os.path.isdir(paths[-1]):  # pragma: debug
