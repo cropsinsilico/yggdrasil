@@ -17,8 +17,8 @@ class IterateTransform(TransformBase):
             AssertionError: If the datatype is not valid.
 
         """
-        assert(datatype.get('type', None) in ['array', 'object', '1darray',
-                                              'ndarray'])
+        assert datatype.get('type', None) in ['array', 'object', '1darray',
+                                              'ndarray']
 
     def get_elements(self, datatype):
         r"""Get a list of elements in the datatype for iteration.

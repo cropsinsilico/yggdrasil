@@ -113,7 +113,7 @@ class RESTComm(CommBase.CommBase):
                 self.host = self.host.format(port=self.port)
             host = self.host
             name = self.name_base
-            assert(client_id is not None)
+            assert client_id is not None
             self.address = f'{host}{client_id}/{model}/{name}'
         return super(RESTComm, self).bind(*args, **kwargs)
 

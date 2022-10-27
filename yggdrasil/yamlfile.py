@@ -209,7 +209,7 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None):
             x.setdefault('for_request', True)
             cli = IntegrationServiceManager(**x)
             response = cli.send_request(**request)
-            assert(response.pop('status') == 'complete')
+            assert response.pop('status') == 'complete'
             y['models'].append(response)
     # Standardize format of models and connections to be lists and
     # add working_dir to each
@@ -311,7 +311,7 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
     for tsync in set(timesync_names):
         for m in yml_norm['models']:
             if m['name'] == tsync:
-                assert(m['language'] == 'timesync')
+                assert m['language'] == 'timesync'
                 m.update(is_server=True, inputs=[], outputs=[])
                 break
         else:

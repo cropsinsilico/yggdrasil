@@ -207,7 +207,7 @@ def write_datatype_table(table_type='all', **kwargs):
     if table_type == 'all':
         fname = kwargs.get("fname", None)
         fname_base = kwargs.get("fname_base", None)
-        assert((fname is None) and (fname_base is None))
+        assert (fname is None) and (fname_base is None)
         out = []
         for k in table_type_list:
             out.append(write_datatype_table(table_type=k, **kwargs))
@@ -271,7 +271,7 @@ def write_classdocs_table(class_, table_type='all', **kwargs):
     if table_type == 'all':
         fname = kwargs.get("fname", None)
         fname_base = kwargs.get("fname_base", None)
-        assert((fname is None) and (fname_base is None))
+        assert (fname is None) and (fname_base is None)
         out = []
         for k in table_type_list:
             out.append(write_classdocs_table(class_, table_type=k, **kwargs))
@@ -330,7 +330,7 @@ def write_component_table(comp='all', table_type='all', **kwargs):
     if comp == 'all':
         fname = kwargs.get("fname", None)
         fname_base = kwargs.get("fname_base", None)
-        assert((fname is None) and (fname_base is None))
+        assert (fname is None) and (fname_base is None)
         out = []
         for k in s.keys():
             new_out = write_component_table(comp=k, table_type=table_type, **kwargs)
@@ -342,7 +342,7 @@ def write_component_table(comp='all', table_type='all', **kwargs):
     if table_type == 'all':
         fname = kwargs.get("fname", None)
         fname_base = kwargs.get("fname_base", None)
-        assert((fname is None) and (fname_base is None))
+        assert (fname is None) and (fname_base is None)
         out = []
         for k in table_type_list:
             out.append(write_component_table(comp=comp, table_type=k, **kwargs))
@@ -816,7 +816,7 @@ def document_cli_subcommand(prog, sub, alias=None, dummy_file=None,
                 f"   :func: {sub.__name__}.get_parser",
             ]
         else:
-            assert(dummy_def is not None)
+            assert dummy_def is not None
             dummy_def += [
                 f"def {prog}():",
                 f"    from {sub.__module__} import {sub.__name__}",

@@ -277,7 +277,7 @@ class ServiceBase(YggClass):
 
         """
         request_str = self.serialize(request)
-        assert(self.for_request)
+        assert self.for_request
         # if not self.for_request:
         #     x = self.__class__(self.name, *self._args,
         #                        **self._kwargs, for_request=True,
@@ -703,7 +703,7 @@ def create_service_manager_class(service_type=None):
             
         def stop_server(self):
             r"""Stop the server from the client-side."""
-            assert(self.for_request)
+            assert self.for_request
             try:
                 response = self.send_request(action='shutdown')
             except ClientError:  # pragma: debug
@@ -922,7 +922,7 @@ def create_service_manager_class(service_type=None):
                         args = (self.address, registry_str, running_str)
                         response['status'] = fmt % args
                     else:
-                        assert(client_id is not None)
+                        assert client_id is not None
                         response['status'] = (
                             self.integrations[client_id][name].printStatus(
                                 return_str=True))
@@ -1049,7 +1049,7 @@ class IntegrationServiceRegistry(object):
         """
         with open(name, 'r') as fd:
             out = yaml.safe_load(fd.read())
-        assert(isinstance(out, dict))
+        assert isinstance(out, dict)
         base_dir = os.path.dirname(name)
         for k in out.keys():
             v = out.get(k, [])
@@ -1135,11 +1135,11 @@ class IntegrationServiceRegistry(object):
         """
         registry = self.load()
         if os.path.isfile(name):
-            assert(not yamls)
+            assert not yamls
             collection = {k: dict(kwargs, name=k, yamls=v)
                           for k, v in self.load_collection(name).items()}
         else:
-            assert(yamls)
+            assert yamls
             collection = {name: dict(kwargs, name=name, yamls=yamls)}
         for k, v in collection.items():
             if (k in registry) and (registry[k] != v):

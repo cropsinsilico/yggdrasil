@@ -70,7 +70,7 @@ class ArrayTransform(TransformBase):
                                   "to array elements.") % x['type'])
         subt = x.get('subtype', x['type'])
         title = x.get('title', None)
-        assert(subt in constants.VALID_TYPES)
+        assert subt in constants.VALID_TYPES
         if subtype:
             out = {'type': t, 'subtype': subt,
                    'shape': s, 'title': title}
@@ -99,7 +99,7 @@ class ArrayTransform(TransformBase):
         """
         if a == b:
             return
-        assert(len(a) == len(b))
+        assert len(a) == len(b)
         err_msg = []
         for k in a.keys():
             if a[k] != b[k]:
@@ -152,10 +152,10 @@ class ArrayTransform(TransformBase):
         """
         if isinstance(items, dict):
             items = [items]
-        assert(isinstance(items, (list, tuple)))
+        assert isinstance(items, (list, tuple))
         if items[0]['type'] == 'array':
             base_types = items[0]['items']
-            assert(isinstance(base_types, list))
+            assert isinstance(base_types, list)
         elif items[0]['type'] == 'object':
             if order is None:
                 order = list(items[0]['properties'].keys())
@@ -171,12 +171,12 @@ class ArrayTransform(TransformBase):
             base_summary = [cls.get_summary(x, subtype=(not items_as_columns))
                             for x in base_types]
             for i, x in zip(range(1, len(items)), items[1:]):
-                assert(x['type'] == items[0]['type'])
+                assert x['type'] == items[0]['type']
                 if x['type'] == 'array':
                     x_types = x['items']
                 else:
                     x_types = [x['properties'][k] for k in order]
-                assert(len(x_types) == len(base_types))
+                assert len(x_types) == len(base_types)
                 if items_as_columns:
                     cls.check_element(x_types, subtype=True)
                 x_summary = [cls.get_summary(t, subtype=(not items_as_columns))
@@ -237,10 +237,10 @@ class ArrayTransform(TransformBase):
         """
         if isinstance(items, dict):
             items = [items]
-        assert(isinstance(items, (list, tuple)))
+        assert isinstance(items, (list, tuple))
         if items[0]['type'] == 'array':
             base_types = items[0]['items']
-            assert(isinstance(base_types, list))
+            assert isinstance(base_types, list)
         elif items[0]['type'] == 'object':
             if order is None:
                 order = list(items[0]['properties'].keys())
@@ -295,7 +295,7 @@ class ArrayTransform(TransformBase):
                  for k in order])
             out.pop('properties', None)
         if self.field_names is not None:
-            assert(len(self.field_names) == len(out['items']))
+            assert len(self.field_names) == len(out['items'])
             for x, n in zip(out['items'], self.field_names):
                 x['title'] = n
         return out

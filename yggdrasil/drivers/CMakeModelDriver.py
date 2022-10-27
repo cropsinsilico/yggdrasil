@@ -343,7 +343,7 @@ class CMakeConfigure(BuildToolBase):
             str: Output to stdout from the command execution.
 
         """
-        assert(len(args) == 1)
+        assert len(args) == 1
         new_args = []
         if (args == cls.version_flags) or ('--help' in args):
             new_args = args
@@ -420,8 +420,8 @@ class CMakeConfigure(BuildToolBase):
             library_flags = []
         if internal_library_flags is None:
             internal_library_flags = []
-        assert(compiler is not None)
-        assert(linker is not None)
+        assert compiler is not None
+        assert linker is not None
         lines = []
         pretarget_lines = []
         preamble_lines = []
@@ -689,7 +689,7 @@ class CMakeBuilder(LinkerBase):
             str: Output to stdout from the command execution.
 
         """
-        assert(len(args) == 1)
+        assert len(args) == 1
         if not kwargs.get('skip_flags', False):
             builddir = kwargs.get('builddir', args[0])
             if not os.path.isabs(builddir) and os.path.isabs(args[0]):
@@ -813,7 +813,7 @@ class CMakeModelDriver(BuildModelDriver):
                     self.target_language_info['internal_library_flags']))
         newlines_before = self.get_tool_instance('compiler').create_include(
             include_file, self.target, **kws)
-        assert(os.path.isfile(include_file))
+        assert os.path.isfile(include_file)
         # Create copy of cmakelists and modify
         newlines_after = []
         if os.path.isfile(self.buildfile):

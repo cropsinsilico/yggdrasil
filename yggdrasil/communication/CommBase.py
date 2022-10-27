@@ -769,7 +769,7 @@ class CommBase(tools.YggClass):
         # Set send/recv converter based on the serializer
         dir_conv = '%s_converter' % self.direction
         if getattr(self, 'transform', []):
-            assert(not getattr(self, dir_conv, []))
+            assert not getattr(self, dir_conv, [])
             # setattr(self, dir_conv, self.transform)
         elif getattr(self, dir_conv, []):
             self.transform = getattr(self, dir_conv)
@@ -1461,7 +1461,7 @@ class CommBase(tools.YggClass):
         # about the received datatype that was recorded by the serializer
         if (((self.direction == 'recv') and self.serializer.initialized
              and (not for_empty))):
-            assert(self.transform[0].original_datatype)
+            assert self.transform[0].original_datatype
         # if (((self.direction == 'recv')
         #      and self.serializer.initialized
         #      and (not self.transform[0].original_datatype))):
@@ -1507,7 +1507,7 @@ class CommBase(tools.YggClass):
             msg_in = msg_in[0]
         if self.filter and (not self.is_eof(msg_in)):
             out = self.filter(msg_in)
-        assert(isinstance(out, bool))
+        assert isinstance(out, bool)
         return out
         
     @property
@@ -1533,7 +1533,7 @@ class CommBase(tools.YggClass):
             elif isinstance(msg, pandas.DataFrame):
                 pandas.testing.assert_frame_equal(msg, emsg)
             else:
-                assert(msg == emsg)
+                assert msg == emsg
         except AssertionError:
             return False
         return True
@@ -1618,7 +1618,7 @@ class CommBase(tools.YggClass):
         global _registered_servers
         with _registered_servers.lock:
             if self._server is None:
-                assert(not self.server_exists(self.address))
+                assert not self.server_exists(self.address)
                 self.debug("Creating new server")
                 self._server = self.new_server(self.address)
                 self._server.start()
@@ -1898,7 +1898,7 @@ class CommBase(tools.YggClass):
             raise Exception("Unrecognized message flag: %s" % msg.flag)
         self.special_debug('Sending %d bytes to %s', msg.length, self.address)
         if self.maxMsgSize != 0:
-            assert(msg.length <= self.maxMsgSize)
+            assert msg.length <= self.maxMsgSize
         try:
             if skip_safe_send:
                 pass

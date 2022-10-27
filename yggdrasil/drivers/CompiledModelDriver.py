@@ -225,12 +225,12 @@ class CompilationToolMeta(type):
             cls.before_registration(cls)
             if cls._dont_register:
                 return cls
-            assert(cls.toolname is not None)
+            assert cls.toolname is not None
             if getattr(cls, 'is_build_tool', False):
                 languages = [cls.build_language]
             else:
                 languages = cls.languages
-            assert(len(languages) > 0)
+            assert len(languages) > 0
             if cls.toolname in cls.aliases:  # pragma: debug
                 raise ValueError(("The name '%s' for class %s is also in "
                                   "its list of aliases: %s")
@@ -874,7 +874,7 @@ class CompilationToolBase(object):
                 paths.append(os.path.join(prefix, suffix))
         # Get search paths from environment variable
         if (cls.search_path_envvar is not None) and (not env_only):
-            assert(isinstance(cls.search_path_envvar, list))
+            assert isinstance(cls.search_path_envvar, list)
             for ienv in cls.search_path_envvar:
                 paths += os.environ.get(ienv, '').split(os.pathsep)
         # Get flags based on path
@@ -892,7 +892,7 @@ class CompilationToolBase(object):
         # Get search paths from the virtualenv/conda environment
         if (cls.search_path_env is not None):
             for iprefix in cls.get_env_prefixes():
-                assert(isinstance(cls.search_path_env, list))
+                assert isinstance(cls.search_path_env, list)
                 for ienv in cls.search_path_env:
                     paths.append(os.path.join(iprefix, ienv))
         # Get libtype specific search paths
@@ -914,7 +914,7 @@ class CompilationToolBase(object):
                 if (libtype in typ2dir) and os.path.isdir(vcpkg_dir):
                     paths.append(os.path.join(vcpkg_dir, 'installed', arch,
                                               typ2dir[libtype]))
-                    assert(os.path.isdir(paths[-1]))
+                    assert os.path.isdir(paths[-1])
             if os.environ.get('ChocolateyInstall'.upper(), None):
                 base_paths.append(os.environ['ChocolateyInstall'])
         else:
@@ -1147,7 +1147,7 @@ class CompilationToolBase(object):
         # Add additional arguments
         if isinstance(args, (str, bytes)):
             args = [args]
-        assert(isinstance(args, list))
+        assert isinstance(args, list)
         if additional_args is not None:
             args = args + additional_args
         # Process arguments only valid if skip_flags is False
@@ -1161,7 +1161,7 @@ class CompilationToolBase(object):
             elif (((out != 'clean') and (not os.path.isabs(out))
                    and (working_dir is not None))):
                 out = os.path.join(working_dir, out)
-            assert(out not in args)  # Don't remove source files
+            assert out not in args  # Don't remove source files
             # Check for file
             if overwrite and (not dry_run):
                 cls.remove_products(args, out)
@@ -1354,7 +1354,7 @@ class CompilerBase(CompilationToolBase):
         if linker:
             out = get_compilation_tool('linker', linker)(flags=linker_flags,
                                                          executable=linker)
-            assert(out.is_installed())
+            assert out.is_installed()
         else:
             out = linker
         return out
@@ -2163,7 +2163,7 @@ class CompiledModelDriver(ModelDriver):
         if not skip_compile:
             self.compile_model()
             self.products.append(self.model_file)
-            assert(os.path.isfile(self.model_file))
+            assert os.path.isfile(self.model_file)
             self.debug("Compiled %s", self.model_file)
 
     @staticmethod
@@ -2312,7 +2312,7 @@ class CompiledModelDriver(ModelDriver):
         global _buildfile_locks
         if fname is None:
             fname = cls.locked_buildfile
-        assert(fname is not None)
+        assert fname is not None
         if (context is None) and (instance is not None):
             context = instance.context
         with _buildfile_locks_lock:
@@ -2634,7 +2634,7 @@ class CompiledModelDriver(ModelDriver):
         """
         out = None
         if isinstance(dep, tuple):
-            assert(len(dep) == 2)
+            assert len(dep) == 2
             dep_lang, dep = dep
             if dep_lang != cls.language:
                 drv = import_component('model', dep_lang)
@@ -2677,7 +2677,7 @@ class CompiledModelDriver(ModelDriver):
         """
         out = None
         if isinstance(dep, tuple):
-            assert(len(dep) == 2)
+            assert len(dep) == 2
             dep_lang, dep = dep
             if dep_lang != cls.language:
                 drv = import_component('model', dep_lang)
@@ -2736,7 +2736,7 @@ class CompiledModelDriver(ModelDriver):
 
         """
         if isinstance(dep, tuple):
-            assert(len(dep) == 2)
+            assert len(dep) == 2
             dep_lang, dep = dep
             if dep_lang != cls.language:
                 drv = import_component('model', dep_lang)
@@ -2797,7 +2797,7 @@ class CompiledModelDriver(ModelDriver):
 
         """
         if isinstance(dep, tuple):
-            assert(len(dep) == 2)
+            assert len(dep) == 2
             dep_lang, dep = dep
             if dep_lang != cls.language:
                 drv = import_component('model', dep_lang)
@@ -2910,7 +2910,7 @@ class CompiledModelDriver(ModelDriver):
         """
         out = None
         if isinstance(dep, tuple):
-            assert(len(dep) == 2)
+            assert len(dep) == 2
             dep_lang, dep = dep
             if dep_lang != cls.language:
                 drv = import_component('model', dep_lang)
@@ -2966,7 +2966,7 @@ class CompiledModelDriver(ModelDriver):
         for d in deps:
             new_deps = []
             if isinstance(d, tuple):
-                assert(len(d) == 2)
+                assert len(d) == 2
                 d_lang = d[0]
                 if d_lang == cls.language:
                     drv = cls
@@ -2987,7 +2987,7 @@ class CompiledModelDriver(ModelDriver):
                     new_deps.append(sub_d)
             if d in out:
                 dpos = out.index(d)
-                assert(dpos <= min_dep)
+                assert dpos <= min_dep
                 min_dep = dpos
             elif d not in new_deps:
                 new_deps.insert(0, d)
@@ -3367,7 +3367,7 @@ class CompiledModelDriver(ModelDriver):
 
         """
         if isinstance(lib, tuple) and (lib[0] != cls.language):
-            assert(len(lib) == 2)
+            assert len(lib) == 2
             lib_lang, lib = lib
             drv = import_component("model", lib_lang)
             return drv.is_library_installed(lib, cfg=cfg)
@@ -3554,7 +3554,7 @@ class CompiledModelDriver(ModelDriver):
         k_lang = v.get('language', cls.language)
         for t in v.keys():
             fname = v[t]
-            assert(isinstance(fname, str))
+            assert isinstance(fname, str)
             opt = f'{k}_{t}'
             if t in ['libtype', 'language']:
                 continue
@@ -3602,7 +3602,7 @@ class CompiledModelDriver(ModelDriver):
                         for exts in ext_sets:
                             if fname.endswith(exts):
                                 base = fname.split('.', 1)[0]
-                                assert(not base.startswith('lib'))
+                                assert not base.startswith('lib')
                                 fname = []
                                 for ext in exts:
                                     fname += [base + ext,
@@ -3728,7 +3728,7 @@ class CompiledModelDriver(ModelDriver):
             dep_order = cls.get_dependency_order(dep, toolname=toolname)
             for k in dep_order[::-1]:
                 if isinstance(k, tuple):
-                    assert(len(k) == 2)
+                    assert len(k) == 2
                     ikw = dict(kwargs, language=k[0],
                                toolname=get_compatible_tool(compiler, 'compiler', k[0]))
                     cls.call_compiler(k[1], **ikw)

@@ -82,9 +82,9 @@ class RemoteTaskLoop(multitasking.YggTaskLoop):
 
     def run_task_remote(self, task, args, kwargs):
         r"""Run task on the connection loop process."""
-        assert(self.connection.as_process
-               and (not self.connection.in_process)
-               and self.connection.is_alive())
+        assert (self.connection.as_process
+                and (not self.connection.in_process)
+                and self.connection.is_alive())
         if self.break_flag.is_set():  # pragma: debug
             raise TaskThreadError("Task thread was stopped.")
         self.q_tasks.put_nowait((task, args, kwargs))
@@ -293,8 +293,8 @@ class ConnectionDriver(Driver):
         r"""Parse keyword arguments for input/output comm."""
         self.debug("Creating %s comm", io)
         comm_kws = dict()
-        assert(isinstance(comm_list, list))
-        assert(comm_list)
+        assert isinstance(comm_list, list)
+        assert comm_list
         if io == 'input':
             direction = 'recv'
             attr_comm = 'icomm'
@@ -315,7 +315,7 @@ class ConnectionDriver(Driver):
             if x is None:
                 comm_list[i] = dict()
             else:
-                assert(isinstance(x, dict))
+                assert isinstance(x, dict)
             if 'filetype' not in comm_list[i]:
                 comm_list[i].setdefault('commtype', comm_type)
             if self.as_process:
@@ -781,7 +781,7 @@ class ConnectionDriver(Driver):
             self.open_comm()
             self.sleep()  # Help ensure senders/receivers connected before messages
             self.debug('Running in %s, is_valid = %s', os.getcwd(), str(self.is_valid))
-            assert(self.is_valid)
+            assert self.is_valid
         except BaseException:  # pragma: debug
             self.printStatus()
             self.exception('Could not prep for loop (is_open = (%s, %s)).' % (
@@ -833,7 +833,7 @@ class ConnectionDriver(Driver):
             CommMessage, bool: False if no more messages, message otherwise.
 
         """
-        assert(self.in_process)
+        assert self.in_process
         kwargs.setdefault('timeout', 0)
         with self.lock:
             if self.icomm.is_closed:
@@ -986,7 +986,7 @@ class ConnectionDriver(Driver):
             bool: Success or failure of send.
 
         """
-        assert(self.in_process)
+        assert self.in_process
         self.debug('')
         with self.lock:
             self._used = True

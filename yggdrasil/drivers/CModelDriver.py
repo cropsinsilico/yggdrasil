@@ -209,7 +209,7 @@ class GCCCompiler(CCompilerBase):
                     [dlltool, '-D', dll, '-d', '%s.def' % base, '-l', dst])
             else:
                 dst = dll
-        assert(os.path.isfile(dst))
+        assert os.path.isfile(dst)
         return dst
 
 
@@ -297,8 +297,8 @@ class MSVCCompiler(CCompilerBase):
                   != os.path.dirname(linker_path).lower()))):
             cls.linker_attributes['default_executable'] = os.path.join(
                 os.path.dirname(compiler_path), os.path.basename(linker_path))
-            assert(os.path.isfile(
-                cls.linker_attributes['default_executable']))
+            assert os.path.isfile(
+                cls.linker_attributes['default_executable'])
         CCompilerBase.before_registration(cls)
         
     @classmethod
@@ -775,7 +775,7 @@ class CModelDriver(CompiledModelDriver):
         cls.internal_libraries['ygg']['include_dirs'] += [_top_lang_dir]
         if platform._is_win:  # pragma: windows
             stdint_win = os.path.join(_top_lang_dir, 'windows_stdint.h')
-            assert(os.path.isfile(stdint_win))
+            assert os.path.isfile(stdint_win)
             shutil.copy(stdint_win, os.path.join(_top_lang_dir, 'stdint.h'))
             cls.internal_libraries['datatypes']['include_dirs'] += [_top_lang_dir]
         if platform._is_linux:
@@ -1041,7 +1041,7 @@ class CModelDriver(CompiledModelDriver):
                 x['datatype']['shape'] = [
                     int(float(s.strip('[]')))
                     for s in x.pop('shape').split('][')]
-                assert(x['datatype']['subtype'] in constants.VALID_TYPES)
+                assert x['datatype']['subtype'] in constants.VALID_TYPES
                 if len(x['datatype']['shape']) == 1:
                     x['datatype']['length'] = x['datatype'].pop(
                         'shape')[0]
@@ -1141,7 +1141,7 @@ class CModelDriver(CompiledModelDriver):
         """
         out = super(CModelDriver, cls).input2output(var)
         if out.get('ptr', ''):
-            assert(out['native_type'].endswith('*'))
+            assert out['native_type'].endswith('*')
             out['ptr'] = out['ptr'][:-1]
             out['native_type'] = out['native_type'][:-1]
             out['datatype'] = cls.get_json_type(out['native_type'])
@@ -1263,7 +1263,7 @@ class CModelDriver(CompiledModelDriver):
             json_type = {'type': json_type}
         # if 'type' in kwargs:
         #     json_type.update(kwargs)
-        assert(isinstance(json_type, dict))
+        assert isinstance(json_type, dict)
         json_type = get_type_class(json_type['type']).normalize_definition(
             json_type)
         if out == '*':
@@ -1506,7 +1506,7 @@ class CModelDriver(CompiledModelDriver):
         """
         if isinstance(var, str):  # pragma: no cover
             return var
-        assert(isinstance(var, dict))
+        assert isinstance(var, dict)
         out = var['name']
         if 'length' in var.get('datatype', {}):
             out += '[%d]' % var['datatype']['length']
@@ -1572,7 +1572,7 @@ class CModelDriver(CompiledModelDriver):
             if isinstance(x, str):
                 new_vars_list.append(x)
             else:
-                assert(isinstance(x, dict))
+                assert isinstance(x, dict)
                 if for_yggdrasil and x.get('is_length_var', False):
                     continue
                 new_vars_list.append(x)

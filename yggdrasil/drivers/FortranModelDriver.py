@@ -536,7 +536,7 @@ class FortranModelDriver(CompiledModelDriver):
             json_type = {'type': json_type}
         if 'type' in kwargs:  # pragma: no cover
             json_type.update(kwargs)
-        assert(isinstance(json_type, dict))
+        assert isinstance(json_type, dict)
         json_type = get_type_class(json_type['type']).normalize_definition(
             json_type)
         if out == '*':
@@ -746,7 +746,7 @@ class FortranModelDriver(CompiledModelDriver):
         if for_yggdrasil:
             new_vars_list = []
             for v in vars_list:
-                assert(isinstance(v, dict))
+                assert isinstance(v, dict)
                 # if isinstance(v, dict):
                 v = dict(v, name=('yggarg(%s)' % v['name']))
                 # else:

@@ -136,7 +136,7 @@ class TimeSyncModelDriver(DSLModelDriver):
             **kwargs: Additional keyword arguments are ignored.
 
         """
-        assert(isinstance(args, list) and (len(args) == 0))
+        assert isinstance(args, list) and (len(args) == 0)
         self.model_file = 'dummy'
         
     @property
@@ -335,11 +335,11 @@ class TimeSyncModelDriver(DSLModelDriver):
             if alt['base2alt'] is not None:
                 alt_vars = alt['base2alt'](tot[kbase])
                 if isinstance(alt_vars, (tuple, list)):
-                    assert(len(alt_vars) == len(alt['alt']))
+                    assert len(alt_vars) == len(alt['alt'])
                     for k, v in zip(alt['alt'], alt_vars):
                         tot[k] = v
                 else:
-                    assert(len(alt['alt']) == 1)
+                    assert len(alt['alt']) == 1
                     tot[alt['alt'][0]] = alt_vars
             else:
                 tot[alt['alt'][0]] = tot[kbase]

@@ -97,7 +97,7 @@ class OSRModelDriver(ExecutableModelDriver):
         # if not (isinstance(self.executable_path, str)
         #         and os.path.isfile(self.executable_path)):
         self.compile_dependencies()
-        assert(os.path.isfile(self.executable_path))
+        assert os.path.isfile(self.executable_path)
 
     @classmethod
     def is_library_installed(cls, lib, **kwargs):
@@ -207,14 +207,14 @@ class OSRModelDriver(ExecutableModelDriver):
             sio.StringIO(src_contents).getvalue(), self.set_env())
         root = ET.fromstring(src_contents)
         timesync = self.timesync
-        assert(timesync)
+        assert timesync
         if not isinstance(timesync, list):
             timesync = [timesync]
         for tsync in reversed(timesync):
             ivars = tsync.get('inputs', [])
             ovars = tsync.get('outputs', [])
-            assert(isinstance(ivars, list))
-            assert(isinstance(ovars, list))
+            assert isinstance(ivars, list)
+            assert isinstance(ovars, list)
             ivars = ' '.join(ivars)
             ovars = ' '.join(ovars)
             tupdate = self.update_interval.get(tsync['name'], 1.0)

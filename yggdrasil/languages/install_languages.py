@@ -22,7 +22,7 @@ def is_path(fpath):
 
     """
     pdir, base = os.path.split(fpath)
-    return(base in os.listdir(pdir))
+    return (base in os.listdir(pdir))
 
 
 def is_file(fname):

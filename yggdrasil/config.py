@@ -255,7 +255,7 @@ def get_language_order(drivers):
                 new_deps[sub_d] = sub_drv
         if d in out.keys():
             dpos = list(out.keys()).index(d)
-            assert(dpos > min_dep)
+            assert dpos > min_dep
             min_dep = dpos
         else:
             new_deps[d] = drv

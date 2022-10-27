@@ -58,7 +58,7 @@ class SelectFieldsTransform(TransformBase):
             AssertionError: If the datatype is not valid.
 
         """
-        assert(datatype.get('type', None) in ['array', 'object'])
+        assert datatype.get('type', None) in ['array', 'object']
         
     def transform_datatype(self, datatype):
         r"""Determine the datatype that will result from applying the transform

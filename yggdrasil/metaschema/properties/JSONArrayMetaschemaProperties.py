@@ -17,7 +17,7 @@ class ItemsMetaschemaProperty(MetaschemaProperty):
             typedef_list = typedef
         else:
             typedef_list = [copy.deepcopy(typedef) for x in instance]
-        assert(len(typedef_list) == len(instance))
+        assert len(typedef_list) == len(instance)
         return [encode_type(v, typedef=t) for v, t in zip(instance, typedef_list)]
 
     @classmethod

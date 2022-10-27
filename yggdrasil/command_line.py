@@ -176,7 +176,7 @@ class SubCommand(metaclass=SubCommandMeta):
                 cls.add_argument_to_parser(parser, xx)
         elif isinstance(x, (tuple, ArgumentTuple,
                             ConditionalArgumentTuple)):
-            assert(len(x) == 2)
+            assert len(x) == 2
             args, kwargs = x[:]
             try:
                 parser.add_argument(*args, **kwargs)
@@ -1232,7 +1232,7 @@ class update_config(SubCommand):
             return
         for x_true, x_false in cls.opposite_arguments:
             if getattr(args, x_false, None) is not None:
-                assert(getattr(args, x_true, None) is None)
+                assert getattr(args, x_true, None) is None
                 setattr(args, x_true, not getattr(args, x_false))
             if hasattr(args, x_false):
                 delattr(args, x_false)

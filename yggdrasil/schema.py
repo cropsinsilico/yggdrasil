@@ -155,15 +155,15 @@ def convert_extended2base(s):
                     s['type'] = type_map[s['type']]
                     s.pop('class', None)
                 else:
-                    assert(s['type'] not in ['scalar'])
+                    assert s['type'] not in ['scalar']
                 # Scalars not currently included in the schema
                 # elif s['type'] in ['scalar']:
                 #     s.pop("precision", None)
                 #     s.pop("units", None)
                 #     s['type'] = type_map[s.pop('subtype')]
             elif isinstance(s['type'], list):
-                assert('schema' not in s['type'])
-                assert('scalar' not in s['type'])
+                assert 'schema' not in s['type']
+                assert 'scalar' not in s['type']
                 s['type'] = [type_map.get(t, t) for t in s['type']]
                 if all([t == s['type'][0] for t in s['type']]):
                     s['type'] = s['type'][0]
@@ -279,7 +279,7 @@ def update_constants(schema=None):
         drv_type = typemap.get(drv.executable_type, drv.executable_type)
         if drv.language_ext:
             if k not in lang2ext:
-                assert(isinstance(drv.language_ext, list))
+                assert isinstance(drv.language_ext, list)
                 lang2ext[k] = drv.language_ext[0]
             for ka in drv.language_aliases:
                 lang2ext[ka] = lang2ext[k]
@@ -554,9 +554,9 @@ class ComponentSchema(object):
             ikeys = set(list(v['properties'].keys()))
             subt_props |= ikeys
             subt_overlap &= ikeys
-        assert(len(subt_overlap) == 1)
+        assert len(subt_overlap) == 1
         subtype_key = list(subt_overlap)[0]
-        assert(subtype_key in schema['allOf'][0]['properties'])
+        assert subtype_key in schema['allOf'][0]['properties']
         # Initialize schema
         out = cls(schema_type, subtype_key, schema_registry=schema_registry)
         out._base_schema = schema['allOf'][0]
@@ -569,7 +569,7 @@ class ComponentSchema(object):
             if out.module is None:
                 out.module = v_module
             else:
-                assert(v_module == out.module)
+                assert v_module == out.module
         # Remove subtype specific properties
         for k in subt_props:
             if k != out.subtype_key:
@@ -696,8 +696,8 @@ class ComponentSchema(object):
                 adding the component class. Defaults to False.
 
         """
-        assert(comp_cls._schema_type == self.schema_type)
-        assert(comp_cls._schema_subtype_key == self.subtype_key)
+        assert comp_cls._schema_type == self.schema_type
+        assert comp_cls._schema_subtype_key == self.subtype_key
         name = comp_cls.__name__
         fullname = f'{comp_cls.__module__}.{comp_cls.__name__}'
         subtype_module = '.'.join(comp_cls.__module__.split('.')[:-1])
@@ -707,7 +707,7 @@ class ComponentSchema(object):
             subtype_list = [subtype_list]
         subtype_list += getattr(comp_cls, '_%s_aliases' % self.subtype_key, [])
         self.schema_subtypes[name] = subtype_list
-        assert(subtype_module == self.module)
+        assert subtype_module == self.module
         # Create new schema for subtype
         new_schema = {'title': fullname,
                       'description': ('Schema for %s component %s subtype.'
@@ -1448,7 +1448,7 @@ def migrate_keys(from_dict, to_dict, exclude_key_list=None, include_key_list=Non
              to None and all keys in from_dict are included.
 
     """
-    assert(isinstance(to_dict, list))
+    assert isinstance(to_dict, list)
     if len(to_dict) == 0:
         return
     if exclude_key_list is None:

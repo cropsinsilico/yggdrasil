@@ -116,8 +116,8 @@ class SerializeBase(tools.YggClass):
         # If the serialization cannot be concatenated, then it is not framed by
         # definition and would be meaningless if read-in incrementally
         if not cls.concats_as_str:
-            assert(not cls.is_framed)
-            assert(cls.default_read_meth == 'read')
+            assert not cls.is_framed
+            assert cls.default_read_meth == 'read'
         
     @classmethod
     def object2dict(cls, obj, **kwargs):
@@ -241,7 +241,7 @@ class SerializeBase(tools.YggClass):
         if array_columns:
             table_example = True
         if table_example:
-            assert(table_string_type in ['bytes', 'unicode', 'string'])
+            assert table_string_type in ['bytes', 'unicode', 'string']
             if table_string_type == 'string':
                 table_string_type = 'unicode'
             int_type = np.int32
@@ -610,7 +610,7 @@ class SerializeBase(tools.YggClass):
                 fmts = serialize.extract_formats(v)
                 if 'type' in typedef:
                     if (typedef.get('type', None) == 'array'):
-                        assert(len(typedef.get('items', [])) == len(fmts))
+                        assert len(typedef.get('items', [])) == len(fmts)
                     # This continue is covered, but the optimization
                     # causes it to be skipped at runtime
                     # https://bitbucket.org/ned/coveragepy/issues/198/
@@ -647,7 +647,7 @@ class SerializeBase(tools.YggClass):
                 if isinstance(typedef['items'], dict):
                     typedef['items'] = [copy.deepcopy(typedef['items'])
                                         for _ in range(len(v))]
-                assert(len(v) == len(typedef.get('items', [])))
+                assert len(v) == len(typedef.get('items', []))
                 # if len(v) != len(typedef.get('items', [])):
                 #     warnings.warn('%d %ss provided, but only %d items in typedef.'
                 #                   % (len(v), k, len(typedef.get('items', []))))

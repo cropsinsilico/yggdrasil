@@ -938,7 +938,7 @@ def format_header(format_str=None, dtype=None,
     out = []
     for x in [field_names, field_units, fmts]:
         if (x is not None) and (len(max(x, key=len)) > 0):
-            assert(len(x) == nfld)
+            assert len(x) == nfld
             x_bytes = tools.str2bytes(x, recurse=True)
             out.append(comment + delimiter.join(x_bytes))
     out = newline.join(out) + newline

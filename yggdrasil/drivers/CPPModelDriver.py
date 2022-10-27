@@ -407,7 +407,7 @@ class CPPModelDriver(CModelDriver):
                 new_recv_var_par = []
                 for i, v in enumerate(recv_var_par):
                     if cls.allows_realloc(v) and cls.is_vector(v):
-                        assert(v.get('ptr_var', False))
+                        assert v.get('ptr_var', False)
                         out_after.append(
                             '{var}.assign({ptr_var}, '
                             '{ptr_var} + {len_var});'.format(

@@ -289,34 +289,34 @@ class PlyDict(dict):
                 kws[k] = copy.deepcopy(in_dict[k])
         if isinstance(kws.get('vertices', None), np.ndarray):
             old_vert = kws.pop('vertices')
-            assert(old_vert.shape[1] == 3)
+            assert old_vert.shape[1] == 3
             kws['vertices'] = [
                 {k: old_vert[i, j] for j, k in enumerate('xyz')}
                 for i in range(old_vert.shape[0])]
         if isinstance(in_dict.get('vertex_colors', None), np.ndarray):
             old_colr = in_dict['vertex_colors']
-            assert(old_colr.shape == (len(kws['vertices']), 3))
+            assert old_colr.shape == (len(kws['vertices']), 3)
             for i in range(old_colr.shape[0]):
                 for j, k in enumerate(['red', 'green', 'blue']):
                     if not np.isnan(old_colr[i, j]):
                         kws['vertices'][i][k] = np.int32(old_colr[i, j])
         if isinstance(kws.get('edges', None), np.ndarray):
             old_edge = kws.pop('edges')
-            assert(old_edge.shape[1] == 2)
+            assert old_edge.shape[1] == 2
             kws['edges'] = [
                 {k: np.int32(old_edge[i, j]) for j, k
                  in enumerate(['vertex1', 'vertex2'])}
                 for i in range(old_edge.shape[0])]
         if isinstance(in_dict.get('edge_colors', None), np.ndarray):
             old_colr = in_dict['edge_colors']
-            assert(old_colr.shape == (len(kws['edges']), 3))
+            assert old_colr.shape == (len(kws['edges']), 3)
             for i in range(old_colr.shape[0]):
                 for j, k in enumerate(['red', 'green', 'blue']):
                     if not np.isnan(old_colr[i, j]):
                         kws['edges'][i][k] = np.int32(old_colr[i, j])
         if isinstance(kws.get('faces', None), np.ndarray):
             old_face = kws.pop('faces')
-            assert(old_face.shape[1] >= 3)
+            assert old_face.shape[1] >= 3
             kws['faces'] = [
                 {'vertex_index': [
                     np.int32(old_face[i, j]) for j
@@ -325,7 +325,7 @@ class PlyDict(dict):
                 for i in range(old_face.shape[0])]
         if isinstance(in_dict.get('face_colors', None), np.ndarray):
             old_colr = in_dict['face_colors']
-            assert(old_colr.shape == (len(kws['faces']), 3))
+            assert old_colr.shape == (len(kws['faces']), 3)
             for i in range(old_colr.shape[0]):
                 for j, k in enumerate(['red', 'green', 'blue']):
                     if not np.isnan(old_colr[i, j]):
@@ -831,7 +831,7 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
             for e in element_order:
                 if e == 'material':
                     continue
-                assert(isinstance(obj[e], (list, tuple)))
+                assert isinstance(obj[e], (list, tuple))
                 if len(obj[e]) == 0:
                     continue
                 property_order[e] = get_key_order(obj[e][0].keys(),
@@ -842,7 +842,7 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
         for e in element_order:
             if e == 'material':
                 continue
-            assert(isinstance(obj[e], (list, tuple)))
+            assert isinstance(obj[e], (list, tuple))
             type_map[e] = {}
             size_map[e] = len(obj[e])
             if size_map[e] == 0:
@@ -980,7 +980,7 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
                         prop_type = translate_ply2py(type_map[e][p])
                         new[p] = prop_type(vars[iv])
                         iv += 1
-                assert(iv == len(vars))
+                assert iv == len(vars)
                 obj[e].append(new)
                 i += 1
         # Check that all properties filled in
@@ -988,7 +988,7 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
             if e not in metadata['property_order']:
                 continue
             for p in metadata['property_order'][e]:
-                assert(len(obj[e]) == size_map[e])
+                assert len(obj[e]) == size_map[e]
         # Return
         return PlyDict(obj)
 

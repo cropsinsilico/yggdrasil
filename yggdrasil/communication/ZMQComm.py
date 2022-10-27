@@ -835,7 +835,7 @@ class ZMQComm(CommBase.CommBase):
             str: Messages with reply address removed if present.
 
         """
-        assert(self.direction != 'send')
+        assert self.direction != 'send'
         # if self.direction == 'send':
         #     return msg, None
         header = self.serializer.parse_header(msg.split(_flag_zmq_filter)[-1])
@@ -923,7 +923,7 @@ class ZMQComm(CommBase.CommBase):
             raise multitasking.BreakLoopError(
                 "_reply_handshake_recv (in recv) => ZMQ Error(%s): %s"
                 % (key, e))
-        assert(msg_recv == msg_send)
+        assert msg_recv == msg_send
         self._n_reply_recv[key] += 1
         return True
 
@@ -1247,7 +1247,7 @@ class ZMQComm(CommBase.CommBase):
         total_msg, k = self.check_reply_socket_recv(total_msg)
         if self.socket_type_name == 'SUB':
             topic, msg = total_msg.split(_flag_zmq_filter)
-            assert(topic == self.topic_filter)
+            assert topic == self.topic_filter
         else:
             msg = total_msg
         # Confirm receipt
@@ -1277,8 +1277,8 @@ class ZMQComm(CommBase.CommBase):
         # Drain signon messages
         def drain_signon():
             flag, msg = self.recv(timeout=0)
-            assert(flag)
-            assert(self.is_empty_recv(msg))
+            assert flag
+            assert self.is_empty_recv(msg)
             return (self.n_msg == 0)
 
         multitasking.wait_on_function(drain_signon, timeout=10.0)

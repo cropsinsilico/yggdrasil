@@ -567,7 +567,7 @@ class ModelDriver(Driver):
         # Parse arguments
         self.debug(str(args))
         self.parse_arguments(args)
-        assert(self.model_file is not None)
+        assert self.model_file is not None
         # Remove products
         if self.overwrite:
             self.remove_products()
@@ -741,7 +741,7 @@ class ModelDriver(Driver):
             args = args.split()
         for i in range(len(args)):
             args[i] = str(args[i])
-        assert(isinstance(args, list))
+        assert isinstance(args, list)
         if default_model_dir is None:
             default_model_dir = self.working_dir
         self.raw_model_file = args[0]
@@ -879,7 +879,7 @@ class ModelDriver(Driver):
                 False.
 
         """
-        assert(package)
+        assert package
         if isinstance(package, str):
             package = package.split()
         if package_manager is None:
@@ -1837,7 +1837,7 @@ class ModelDriver(Driver):
                     self.exception("Error killing model process")
                 if not self.has_sent_messages:
                     ignore_error_code = True
-            assert(self.model_process_complete)
+            assert self.model_process_complete
             if (((self.model_process_returncode != 0)
                  and (not ignore_error_code))):
                 self.error(("return code of %s indicates model error. "
@@ -1926,7 +1926,7 @@ class ModelDriver(Driver):
             fd.write('\n'.join(lines))
         inst = None
         try:
-            assert(os.path.isfile(fname))
+            assert os.path.isfile(fname)
             inst = cls(name, [fname], working_dir=working_dir)
             inst.run_model(return_process=False, **process_kwargs)
         except BaseException:  # pragma: debug
@@ -1998,7 +1998,7 @@ class ModelDriver(Driver):
         """
         if outputs_in_inputs is None:
             outputs_in_inputs = cls.outputs_in_inputs
-        assert(io in ['inputs', 'outputs'])
+        assert io in ['inputs', 'outputs']
         if ('%s_def_regex' % io) not in cls.function_param:  # pragma: debug
             raise NotImplementedError(
                 ("'%s_def_regex' not defined for "
@@ -2076,7 +2076,7 @@ class ModelDriver(Driver):
                                        % (pformat(contents), function_regex))
                 # Match brackets to determine where the function definition is
                 if isinstance(cls.brackets, tuple):
-                    assert(len(cls.brackets) == 2)
+                    assert len(cls.brackets) == 2
                     contents = match.group(0)
                     counts = {k: 0 for k in cls.brackets}
                     first_zero = 0
@@ -2088,14 +2088,14 @@ class ModelDriver(Driver):
                                   == counts[cls.brackets[1]]))):
                             first_zero = x.span(0)[1]
                             break
-                    assert((first_zero == 0) or (first_zero == len(contents)))
+                    assert ((first_zero == 0) or (first_zero == len(contents)))
                     # This is currently commented as regex's are
                     # sufficient so far, but this may be needed in the
                     # future to isolate single definitions.
                     # if (first_zero != 0) and first_zero != len(contents):
                     #     contents = contents[:first_zero]
                     #     match = re.search(function_regex, contents)
-                    #     assert(match)
+                    #     assert match
             out = match.groupdict()
             for k in list(out.keys()):
                 if out[k] is None:
@@ -2235,7 +2235,7 @@ class ModelDriver(Driver):
         if 'function' not in yml:
             return
         if yml.get('is_server', False):
-            assert(isinstance(yml['is_server'], dict))
+            assert isinstance(yml['is_server'], dict)
         if cls.function_param is None:
             raise ValueError(("Language %s is not parameterized "
                               "and so functions cannot be automatically "
@@ -2359,10 +2359,10 @@ class ModelDriver(Driver):
                  and (len(info.get('outputs', [])) == 0))):
                 for i, vdict in enumerate(info['inputs'][:len(inputs)]):
                     inputs[i].setdefault('vars', [vdict['name']])
-                    assert(inputs[i]['vars'] == [vdict['name']])
+                    assert inputs[i]['vars'] == [vdict['name']]
                 for i, vdict in enumerate(info['inputs'][len(inputs):]):
                     outputs[i].setdefault('vars', [vdict['name']])
-                    assert(outputs[i]['vars'] == [vdict['name']])
+                    assert outputs[i]['vars'] == [vdict['name']]
             for x in outputs:
                 for i, v in enumerate(x.get('vars', [])):
                     if v in info_map['inputs']:
@@ -2413,8 +2413,8 @@ class ModelDriver(Driver):
                         non_length[0]['datatype'] = x['datatype']
                     else:
                         # TODO: Remove types associated with length?
-                        assert(x['datatype']['type'] == 'array')
-                        assert(len(x['datatype']['items'])
+                        assert x['datatype']['type'] == 'array'
+                        assert len(x['datatype']['items']
                                == len(non_length))
                         for v, t in zip(non_length, x['datatype']['items']):
                             v['datatype'] = t
@@ -2436,7 +2436,7 @@ class ModelDriver(Driver):
                     if v['name'] in iter_function_over:
                         v['iter_datatype'] = copy.deepcopy(v.get('datatype', {}))
                         if v.get('datatype', {}):
-                            assert(v['datatype']['type'] == 'scalar')
+                            assert v['datatype']['type'] == 'scalar'
                             v['datatype']['type'] = '1darray'
                             v.pop('native_type', None)
                         v['native_type'] = cls.get_native_type(**v)
@@ -2456,7 +2456,7 @@ class ModelDriver(Driver):
             direction (str): Direction of channel ('input' or 'output')
 
         """
-        assert(direction in ['input', 'output'])
+        assert direction in ['input', 'output']
 
     @classmethod
     def write_model_wrapper(cls, model_file, model_function,
@@ -2752,7 +2752,7 @@ class ModelDriver(Driver):
             name_base = name
         if datatype['type'] == 'array':
             if 'items' in datatype:
-                assert(isinstance(datatype['items'], list))
+                assert isinstance(datatype['items'], list)
                 out += cls.write_declaration(
                     {'name': '%s_items' % name_base,
                      'datatype': {
@@ -2773,7 +2773,7 @@ class ModelDriver(Driver):
                         no_decl=True)
         elif datatype['type'] == 'object':
             if 'properties' in datatype:
-                assert(isinstance(datatype['properties'], dict))
+                assert isinstance(datatype['properties'], dict)
                 precision = 0
                 if datatype['properties']:
                     precision = max([len(k) for k in
@@ -2856,7 +2856,7 @@ class ModelDriver(Driver):
             name_base = name
         if datatype['type'] == 'array':
             if 'items' in datatype:
-                assert(isinstance(datatype['items'], list))
+                assert isinstance(datatype['items'], list)
                 keys['nitems'] = len(datatype['items'])
                 keys['items'] = '%s_items' % name_base
                 if cls.zero_based:
@@ -2881,7 +2881,7 @@ class ModelDriver(Driver):
         elif datatype['type'] == 'object':
             keys['use_generic'] = cls.function_param['true']
             if 'properties' in datatype:
-                assert(isinstance(datatype['properties'], dict))
+                assert isinstance(datatype['properties'], dict)
                 keys['nitems'] = len(datatype['properties'])
                 keys['keys'] = '%s_keys' % name_base
                 keys['values'] = '%s_vals' % name_base
@@ -3477,7 +3477,7 @@ class ModelDriver(Driver):
                            'print', message=closing_msg))
         # This is not currently used by the tests, but may be
         # needed in the future
-        assert(not free_vars)
+        assert not free_vars
         # for x in free_vars:
         #     out += [cls.function_param['indent'] + line
         #             for line in cls.write_free(x)]
@@ -3787,7 +3787,7 @@ class ModelDriver(Driver):
         """
         if 'native_type' in kwargs:
             return kwargs['native_type']
-        assert('json_type' not in kwargs)
+        assert 'json_type' not in kwargs
         json_type = kwargs.get('datatype', kwargs)
         if isinstance(json_type, dict):
             type_name = json_type.get('type', 'bytes')
@@ -3890,7 +3890,7 @@ class ModelDriver(Driver):
             init_type = 'init_%s' % var['datatype']['type']
             free_type = 'free_%s' % var['datatype']['type']
             if init_type in cls.function_param:
-                assert(free_type in cls.function_param)
+                assert free_type in cls.function_param
                 # value = cls.format_function_param(init_type, **var['datatype'])
                 value = cls.function_param[init_type]
                 if requires_freeing is not None:
@@ -3954,7 +3954,7 @@ class ModelDriver(Driver):
         """
         if isinstance(var, str):  # pragma: no cover
             return var
-        assert(isinstance(var, dict))
+        assert isinstance(var, dict)
         out = var['name']
         return out
     
@@ -4135,7 +4135,7 @@ class ModelDriver(Driver):
             if isinstance(x, str):
                 name_list.append(x)
             else:
-                assert(isinstance(x, dict))
+                assert isinstance(x, dict)
                 name_list.append(x['name'])
         return ', '.join(name_list)
 
@@ -4222,7 +4222,7 @@ class ModelDriver(Driver):
         if not isinstance(cond, list):
             cond = [cond]
             block_contents = [block_contents]
-        assert(len(cond) == len(block_contents))
+        assert len(cond) == len(block_contents)
         for i, (icond, iblock_contents) in enumerate(zip(cond, block_contents)):
             if i == 0:
                 out.append(cls.format_function_param('if_begin', cond=icond))

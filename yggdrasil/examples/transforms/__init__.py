@@ -59,4 +59,4 @@ def check_received_data(transform, x_recv):
     elif isinstance(x_sent, pd.DataFrame):
         pd.testing.assert_frame_equal(x_recv, x_sent)
     else:
-        assert(x_recv == x_sent)
+        assert x_recv == x_sent

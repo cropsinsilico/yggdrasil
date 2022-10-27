@@ -114,7 +114,7 @@ class FileComm(CommBase.CommBase):
             self.disable_header()
         if 'read_meth' not in self._schema_properties:
             self.read_meth = self.serializer.read_meth
-        assert(self.read_meth in ['read', 'readline'])
+        assert self.read_meth in ['read', 'readline']
         # Force overwrite for concatenation in append mode
         if self.append:
             if self.direction == 'recv':
@@ -123,8 +123,8 @@ class FileComm(CommBase.CommBase):
                 self.append = 'ow'
         # Assert that keyword args match serialization parameters
         if not self.concats_as_str:
-            assert(self.read_meth == 'read')
-            assert(not self.serializer.is_framed)
+            assert self.read_meth == 'read'
+            assert not self.serializer.is_framed
 
     @property
     def concats_as_str(self):
@@ -139,7 +139,7 @@ class FileComm(CommBase.CommBase):
         CommBase.CommBase.before_registration(cls)
         # Add serializer properties to schema
         if cls._filetype != 'binary':
-            assert('serializer' not in cls._schema_properties)
+            assert 'serializer' not in cls._schema_properties
             # if registration_in_progress():
             seri = import_component('serializer', cls._default_serializer)
             new = seri._schema_properties
@@ -531,7 +531,7 @@ class FileComm(CommBase.CommBase):
 
     def remove_file(self):
         r"""Remove the file."""
-        assert(self.is_closed)
+        assert self.is_closed
         if self.is_series:
             i = 0
             while True:
@@ -639,7 +639,7 @@ class FileComm(CommBase.CommBase):
                 with open(self.current_address, 'rb') as fd:
                     old_obj = self.deserialize(fd.read())[0]
                 obj = self.serializer.concatenate([old_obj, new_obj])
-                assert(len(obj) == 1)
+                assert len(obj) == 1
                 obj = obj[0]
                 # Reset file so that header will be written
                 self.reset_position(truncate=True)

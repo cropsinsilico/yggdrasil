@@ -121,7 +121,7 @@ class FixedMetaschemaType(MetaschemaType):
                 if (k == 'type') or (k not in cls.base().properties):
                     continue
                 if k in out:
-                    assert(out[k] == v)
+                    assert out[k] == v
                 else:
                     out[k] = v
             out['type'] = cls.base().name

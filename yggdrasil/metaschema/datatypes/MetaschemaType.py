@@ -677,7 +677,7 @@ class MetaschemaType(object):
                       'zmq_reply_worker', 'model']:
                 if k in metadata_type:
                     metadata[k] = metadata_type.pop(k)
-            assert(metadata)
+            assert metadata
             data = (encoder.encode_json(metadata_type)
                     + constants.YGG_MSG_HEAD + data)
             metadata['size'] = len(data)
@@ -729,7 +729,7 @@ class MetaschemaType(object):
             else:
                 metadata = encoder.decode_json(metadata)
         elif isinstance(metadata, dict) and metadata.get('type_in_data', False):
-            assert(msg.count(constants.YGG_MSG_HEAD) == 1)
+            assert msg.count(constants.YGG_MSG_HEAD) == 1
             typedef, data = msg.split(constants.YGG_MSG_HEAD, 1)
             if len(typedef) > 0:
                 metadata.update(encoder.decode_json(typedef))

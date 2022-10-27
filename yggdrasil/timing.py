@@ -119,7 +119,7 @@ def write_pyperf_script(script_file, nmsg, msg_size,
     #     tmpdir = os.environ['TMPDIR']
     #     if platform._is_win:  # pragma: windows
     #         tmpdir = repr(tmpdir)
-    #         assert(tmpdir.startswith('\'') and tmpdir.endswith('\''))
+    #         assert tmpdir.startswith('\'') and tmpdir.endswith('\'')
     #         tmpdir = tmpdir[1:-1]
     #         # tmpdir = tmpdir.replace('\\', '\\\\')
     #     lines += ['os.environ["TMPDIR"] = "%s"' % tmpdir]
@@ -131,7 +131,7 @@ def write_pyperf_script(script_file, nmsg, msg_size,
         'out = runner.bench_time_func(timer.entry_name(nmsg, msg_size),',
         '                             timing.pyperf_func,',
         '                             timer, nmsg, msg_size, max_errors)']
-    assert(not os.path.isfile(script_file))
+    assert not os.path.isfile(script_file)
     with open(script_file, 'w') as fd:
         fd.write('\n'.join(lines))
 
@@ -475,7 +475,7 @@ class TimedRun(tools.YggClass):
         wait_on_function(lambda: os.stat(fout).st_size == len(fres),
                          timeout=self.timeout, on_timeout=on_timeout)
         ocont = open(fout, 'r').read()
-        assert(ocont == fres)
+        assert ocont == fres
 
     def cleanup_output(self, fout):
         r"""Cleanup the output file.
@@ -567,7 +567,7 @@ class TimedRun(tools.YggClass):
             str: Unique identifier for the run.
 
         """
-        assert(self.matlab_running == MatlabModelDriver.is_matlab_running())
+        assert self.matlab_running == MatlabModelDriver.is_matlab_running()
         nmsg = int(nmsg)
         msg_size = int(msg_size)
         run_uuid = self.get_new_uuid()
@@ -599,7 +599,7 @@ class TimedRun(tools.YggClass):
         self.info("Finished %s: %f s", self.entry_name(nmsg, msg_size), result)
         self.check_output(fout, nmsg, msg_size)
         self.cleanup_output(fout)
-        assert(self.matlab_running == MatlabModelDriver.is_matlab_running())
+        assert self.matlab_running == MatlabModelDriver.is_matlab_running()
         del self.entries[run_uuid], self.fyaml[run_uuid], self.foutput[run_uuid]
 
     def run(self, run_uuid, timer=time.time, t0=None):
@@ -622,7 +622,7 @@ class TimedRun(tools.YggClass):
         r = runner.get_runner(self.fyaml[run_uuid],
                               namespace=self.name + run_uuid)
         times = r.run(timer=timer, t0=t0)
-        assert(not r.error_flag)
+        assert not r.error_flag
         del r
         return times
 
@@ -701,7 +701,7 @@ class TimedRun(tools.YggClass):
                '--inherit-environ=' + ','.join(copy_env),
                '--warmups=%d' % _pyperf_warmups]
         subprocess.call(cmd)
-        assert(os.path.isfile(self.filename))
+        assert os.path.isfile(self.filename)
         os.remove(self.pyperfscript)
 
     def time_run_mine(self, nmsg, msg_size, nrep):
@@ -1170,7 +1170,7 @@ class TimedRun(tools.YggClass):
             with open(self.filename, 'rb') as fd:
                 out = pickle.load(fd, encoding='latin1')
         else:
-            assert(self.filename.endswith('.json'))
+            assert self.filename.endswith('.json')
             if as_json:
                 with open(self.filename, 'r') as fd:
                     out = json.load(fd)
@@ -1263,7 +1263,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
     if compare_values is None:
         compare_values = default_vals.get(compare, None)
     else:
-        assert(isinstance(compare_values, list))
+        assert isinstance(compare_values, list)
     per_message = kwargs.get('per_message', False)
     if compare == 'comm_type':
         color_var = 'comm_type'
@@ -1310,7 +1310,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
         yscale = 'linear'
     else:
         raise ValueError("Invalid compare: '%s'" % compare)
-    assert(len(var_kws) > 0)
+    assert len(var_kws) > 0
     # Raise error if any of the varied keys are set in kwargs
     for k in var_kws[0].keys():
         if k in kwargs:
@@ -1345,7 +1345,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
         kws.update(kwargs)
         if MatlabModelDriver.is_matlab_running():  # pragma: debug
             MatlabModelDriver.kill_all()
-            assert(not MatlabModelDriver.is_matlab_running())
+            assert not MatlabModelDriver.is_matlab_running()
         if ((kws.get('matlab_running', False)
              and MatlabModelDriver._matlab_engine_installed)):  # pragma: matlab
             nml = 0
@@ -1364,7 +1364,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
              and MatlabModelDriver._matlab_engine_installed)):  # pragma: matlab
             for v in ml_sessions:
                 MatlabModelDriver.stop_matlab_engine(*v)
-            assert(not MatlabModelDriver.is_matlab_running())
+            assert not MatlabModelDriver.is_matlab_running()
     # Print a table
     print('%-20s\t%-20s\t%-20s' % ('Label', 'Time per Message (s)', 'Overhead (s)'))
     print('%-20s\t%-20s\t%-20s' % (20 * '=', 20 * '=', 20 * '='))

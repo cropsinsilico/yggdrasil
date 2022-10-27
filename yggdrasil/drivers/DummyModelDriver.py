@@ -86,12 +86,12 @@ class DummyModelDriver(InterpretedModelDriver):
                     drv[io1 + 's'][0]['partner_model'] + ':')[-1]
                 out[io2 + 's'].append(x)
                 if drv['instance']._connection_type.startswith('rpc_'):
-                    assert(io2 == 'input')
+                    assert io2 == 'input'
                     out[io1 + 's'].append({'name': x['name'] + '_response'})
                     out['is_server'] = {io2: x['name'],
                                         io1: x['name'] + '_response'}
         for io1, io2 in dir2opp.items():
-            assert(out[io2 + 's'])
+            assert out[io2 + 's']
             # TODO: Is there a case where a DummyModelDriver will be created
             # for a model that does not have inputs or outputs?
             # if not out[io2 + 's']:

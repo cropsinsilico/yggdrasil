@@ -149,7 +149,7 @@ class ScalarMetaschemaType(MetaschemaType):
             subtype = subtype_cls.encode(obj)
         if (cls.name in ['1darray', 'ndarray']):
             return arr.tolist()
-        assert(arr.ndim > 0)
+        assert arr.ndim > 0
         if subtype in ['int', 'uint']:
             return int(arr[0])
         elif subtype in ['float']:
