@@ -44,6 +44,29 @@ class DefaultSerialize(SerializeBase):
         return rapidjson.loads(msg.decode('utf8'))
     
     @classmethod
+    def dict2object(cls, obj, as_array=False, field_names=None, **kwargs):
+        r"""Conver a dictionary to a message object.
+
+        Args:
+            obj (dict): Dictionary to convert to serializable object.
+            as_array (bool, optional): If True, the objects in the list
+                are complete columns in a table and as_format is set to True.
+                Defaults to False.
+            field_names (list, optional): The field names associated with a
+                table-like data type. Defaults to None. This keyword must be
+                provided if as_array is True.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            object: Serializable object.
+
+        """
+        if field_names is None and len(obj) == 1:
+            assert not as_array
+            return super(DefaultSerialize, cls).dict2object(obj, **kwargs)
+        return serialize.dict2list(obj, order=field_names)
+
+    @classmethod
     def object2dict(cls, obj, as_array=False, field_names=None, **kwargs):
         r"""Convert a message object into a dictionary.
 
@@ -65,9 +88,7 @@ class DefaultSerialize(SerializeBase):
         if field_names is None:
             assert not as_array
             return super(DefaultSerialize, cls).object2dict(obj, **kwargs)
-        else:
-            out = serialize.list2dict(obj, names=field_names)
-        return out
+        return serialize.list2dict(obj, names=field_names)
 
     @classmethod
     def object2array(cls, obj, as_array=False, field_names=None, **kwargs):
@@ -90,10 +111,8 @@ class DefaultSerialize(SerializeBase):
         """
         if as_array:
             assert field_names is not None
-            out = serialize.list2numpy(obj, names=field_names)
-        else:
-            out = super(DefaultSerialize, cls).object2array(obj, **kwargs)
-        return out
+            return serialize.list2numpy(obj, names=field_names)
+        return super(DefaultSerialize, cls).object2array(obj, **kwargs)
 
     @classmethod
     def concatenate(cls, objects, as_array=False, **kwargs):

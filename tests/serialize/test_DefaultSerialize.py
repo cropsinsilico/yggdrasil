@@ -79,10 +79,10 @@ class TestDefaultSerialize(base_class):
         r"""Test serialize/deserialize without format string."""
         if (len(instance_kwargs) == 0) and (class_name == 'DefaultSerialize'):
             for iobj in testing_options['objects']:
-                msg = instance.serialize(iobj, header_kwargs=header_info)
+                msg = instance.serialize(iobj, metadata=header_info)
                 iout, ihead = instance.deserialize(msg)
-                assert(iout == map_sent2recv(iobj))
-                # assert(ihead == header_info)
+                assert iout == map_sent2recv(iobj)
+                # assert ihead == header_info
             # with pytest.raises(Exception):
             #     instance.serialize(['msg', 0])
 

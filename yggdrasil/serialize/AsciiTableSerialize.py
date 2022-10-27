@@ -1,8 +1,7 @@
 import numpy as np
-import pandas as pd
-from yggdrasil import units, serialize, tools, constants
+from yggdrasil import serialize, tools, constants
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
-from yggdrasil.metaschema import definition2dtype, data2dtype
+from yggdrasil.metaschema import definition2dtype
 
 
 class AsciiTableSerialize(DefaultSerialize):
@@ -150,13 +149,9 @@ class AsciiTableSerialize(DefaultSerialize):
             object: Normalized message.
 
         """
-        from yggdrasil.serialize import pandas2list, numpy2list, dict2list
-        if isinstance(args, pd.DataFrame):
-            args = pandas2list(args)
-        elif isinstance(args, np.ndarray):
-            if len(args.dtype) > 0:
-                args = numpy2list(args)
-            elif len(args.shape) == 2:
+        from yggdrasil.serialize import dict2list
+        if isinstance(args, np.ndarray):
+            if len(args.dtype) == 0 and len(args.shape) == 2:
                 args = [args[:, i] for i in range(args.shape[1])]
         elif isinstance(args, dict):
             field_names = self.get_field_names()
@@ -203,14 +198,6 @@ class AsciiTableSerialize(DefaultSerialize):
                                            names=self.get_field_names(as_bytes=True))
         else:
             out = list(serialize.process_message(msg, self.format_str))
-        field_units = self.get_field_units()
-        if field_units is not None:
-            if isinstance(out, np.ndarray) and len(out.dtype) == len(field_units):
-                out = [units.add_units(x, u) for x, u in
-                       zip(serialize.numpy2list(out), field_units)]
-            else:
-                out = [units.add_units(x, u, dtype=data2dtype(x))
-                       for x, u in zip(out, field_units)]
         return out
 
     @classmethod

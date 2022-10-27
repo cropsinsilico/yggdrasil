@@ -299,63 +299,64 @@ static PyObject* ply_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
 
 static int ply_add_elements_from_dict(PyObject *self, PyObject* kwargs,
 				      bool preserveOrder) {
-    if (kwargs) {
-	if (!PyDict_Check(kwargs)) {
-	    return -1;
-	}
-	PyObject *key, *value;
-	Py_ssize_t pos = 0;
-	std::vector<std::string> skip, delayed;
-
-	// Do comments & vertices first
-	if (!preserveOrder) {
-	    std::vector<std::string> skip_names = {"comment", "comments", "vertex", "vertices", "vertexes"};
-	    for (std::vector<std::string>::iterator it = skip_names.begin();
-		 it != skip_names.end(); it++) {
-		value = PyDict_GetItemString(kwargs, it->c_str());
-		if (value == NULL) continue;
-		PyObject* iargs = Py_BuildValue("(sO)", it->c_str(), value);
-		if (ply_add_elements(self, iargs, NULL) == NULL) {
-		    Py_DECREF(iargs);
-		    return -1;
-		}
-		Py_DECREF(iargs);
-		skip.push_back(*it);
-	    }
-	}
-	while (PyDict_Next(kwargs, &pos, &key, &value)) {
-	    std::string keyS(PyUnicode_AsUTF8(key));
-	    bool skipped = false;
-	    for (std::vector<std::string>::iterator it = skip.begin();
-		 it != skip.end(); it++) {
-		if (keyS == *it) {
-		    skipped = true;
-		    break;
-		}
-	    }
-	    if (skipped) continue;
-	    if (keyS.size() > 7 &&
-		keyS.substr(keyS.size() - 7) == "_colors") {
-		delayed.push_back(keyS);
-		continue;
-	    }
-	    PyObject* iargs = Py_BuildValue("(OO)", key, value);
-	    if (ply_add_elements(self, iargs, NULL) == NULL) {
-		Py_DECREF(iargs);
-		return -1;
-	    }
-	    Py_DECREF(iargs);
-	}
-	for (std::vector<std::string>::iterator it = delayed.begin();
-	     it != delayed.end(); it++) {
+    if (kwargs == NULL)
+	return 0;
+    if (!PyDict_Check(kwargs))
+	return -1;
+    if (PyDict_Size(kwargs) == 0)
+	return 0;
+    PyObject *key, *value;
+    Py_ssize_t pos = 0;
+    std::vector<std::string> skip, delayed;
+    
+    // Do comments & vertices first
+    if (!preserveOrder) {
+	std::vector<std::string> skip_names = {"comment", "comments", "vertex", "vertices", "vertexes"};
+	for (std::vector<std::string>::iterator it = skip_names.begin();
+	     it != skip_names.end(); it++) {
 	    value = PyDict_GetItemString(kwargs, it->c_str());
+	    if (value == NULL) continue;
 	    PyObject* iargs = Py_BuildValue("(sO)", it->c_str(), value);
 	    if (ply_add_elements(self, iargs, NULL) == NULL) {
 		Py_DECREF(iargs);
 		return -1;
 	    }
 	    Py_DECREF(iargs);
+	    skip.push_back(*it);
 	}
+    }
+    while (PyDict_Next(kwargs, &pos, &key, &value)) {
+	std::string keyS(PyUnicode_AsUTF8(key));
+	bool skipped = false;
+	for (std::vector<std::string>::iterator it = skip.begin();
+	     it != skip.end(); it++) {
+	    if (keyS == *it) {
+		skipped = true;
+		break;
+	    }
+	}
+	if (skipped) continue;
+	if (keyS.size() > 7 &&
+	    keyS.substr(keyS.size() - 7) == "_colors") {
+	    delayed.push_back(keyS);
+	    continue;
+	}
+	PyObject* iargs = Py_BuildValue("(OO)", key, value);
+	if (ply_add_elements(self, iargs, NULL) == NULL) {
+	    Py_DECREF(iargs);
+	    return -1;
+	}
+	Py_DECREF(iargs);
+    }
+    for (std::vector<std::string>::iterator it = delayed.begin();
+	 it != delayed.end(); it++) {
+	value = PyDict_GetItemString(kwargs, it->c_str());
+	PyObject* iargs = Py_BuildValue("(sO)", it->c_str(), value);
+	if (ply_add_elements(self, iargs, NULL) == NULL) {
+	    Py_DECREF(iargs);
+	    return -1;
+	}
+	Py_DECREF(iargs);
     }
     return 0;
 }
@@ -408,7 +409,6 @@ static PyObject* ply_get_elements(PyObject* self, PyObject* args, PyObject* kwar
 	return NULL;
 
     std::string elementType(elementType0);
-    std::cerr << "ply_get_elements: " << elementType << std::endl;
 
     PlyObject* v = (PlyObject*) self;
 
@@ -861,6 +861,8 @@ static PyObject* ply_as_dict(PyObject* self, PyObject* args, PyObject* kwargs) {
 	}
 	Py_DECREF(comments);
     }
+    if (v->ply->element_order.size() == 0)
+	return out;
     for (std::vector<std::string>::const_iterator it = v->ply->element_order.begin(); it != v->ply->element_order.end(); it++) {
 	std::map<std::string,PlyElementSet>::const_iterator eit = v->ply->elements.find(*it);
 	if (eit == v->ply->elements.end()) continue;
@@ -1435,7 +1437,9 @@ static PyObject* ply__getstate__(PyObject* self, PyObject*, PyObject*) {
     PyObject* args = PyTuple_New(0);
     if (args == NULL)
 	return NULL;
-    return ply_as_dict(self, args, NULL);
+    PyObject* out = ply_as_dict(self, args, NULL);
+    Py_DECREF(args);
+    return out;
 }
 static PyObject* ply__setstate__(PyObject* self, PyObject* state) {
     if (ply_add_elements_from_dict(self, state, true) < 0)

@@ -1141,6 +1141,29 @@ def dict2list(d, order=None):
     return out
 
 
+def list2names(arrays, no_default=False):
+    r"""Get the field order based on the provided arrays. If the arrays do
+    not have fields, they are set based on order (e.g. 'f0', 'f1').
+
+    Args:
+        arrays (list): List of arrays.
+        no_default (bool, optional): If True, fields will not be set from
+            order if they cannot be determined from the passed arrays. None
+            will be returned instead.
+
+    Returns:
+        list: Field names.
+
+    """
+    if all(len(x.dtype) == 1 for x in arrays):
+        names = [x.dtype.names[0] for x in arrays]
+    elif no_default:
+        names = None
+    else:
+        names = ['f%d' % i for i in range(len(arrays))]
+    return names
+
+
 def list2dict(arrays, names=None):
     r"""Convert a list of arrays to a dictionary of arrays.
 
@@ -1157,7 +1180,9 @@ def list2dict(arrays, names=None):
         raise TypeError("arrays must be a list or tuple, not %s."
                         % type(arrays))
     if names is None:
-        names = ['f%d' % i for i in range(len(arrays))]
+        names = list2names(arrays)
+    if all((hasattr(x, 'dtype') and len(x.dtype) == 1) for x in arrays):
+        arrays = [x[x.dtype.names[0]] for x in arrays]
     out = {k: x for k, x in zip(names, arrays)}
     return out
 
@@ -1189,6 +1214,8 @@ def list2numpy(arrays, names=None):
         np.ndarray: Structured numpy array.
 
     """
+    if names is None:
+        names = list2names(arrays)
     return dict2numpy(list2dict(arrays, names=names), order=names)
 
 
@@ -1310,7 +1337,10 @@ def dict2pandas(d, order=None):
         pandas.DataFrame: Pandas data frame with contents from the input dict.
 
     """
-    return numpy2pandas(dict2numpy(d, order=order))
+    out = numpy2pandas(dict2numpy(d, order=order))
+    if order is None:
+        out.columns = pandas.RangeIndex(len(out.columns))
+    return out
 
 
 def pandas2dict(frame):
@@ -1340,6 +1370,8 @@ def list2pandas(arrays, names=None):
         pandas.DataFrame: Pandas data frame with contents from the input list.
 
     """
+    if names is None:
+        names = list2names(arrays, no_default=True)
     out = numpy2pandas(list2numpy(arrays, names=names))
     if names is None:
         out.columns = pandas.RangeIndex(len(arrays))

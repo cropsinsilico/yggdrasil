@@ -9,9 +9,9 @@ from tests import TestComponentBase as base_class
 def test_demote_string():
     r"""Test format str creation of typedef."""
     x = SerializeBase.SerializeBase(format_str='%s')
-    assert(x.datatype == {'type': 'array',
+    assert x.datatype == {'type': 'array',
                           'items': [{'type': 'scalar',
-                                     'subtype': 'string'}]})
+                                     'subtype': 'string'}]}
 
 
 _seritypes = sorted([x for x in schema.get_schema()['serializer'].subtypes
@@ -64,49 +64,49 @@ class TestSerializeBase(base_class):
 
     def test_field_specs(self, instance, testing_options, nested_approx):
         r"""Test field specifiers."""
-        assert(instance.numpy_dtype == testing_options['dtype'])
-        assert(instance.extra_kwargs
-               == nested_approx(testing_options['extra_kwargs']))
-        assert(instance.datatype
-               == nested_approx(testing_options['datatype']))
+        assert instance.numpy_dtype == testing_options['dtype']
+        assert (instance.extra_kwargs
+                == nested_approx(testing_options['extra_kwargs']))
+        assert (instance.datatype
+                == nested_approx(testing_options['datatype']))
         if isinstance(instance.datatype.get('items', []), dict):
             with pytest.raises(Exception):
                 instance.get_field_names()
             with pytest.raises(Exception):
                 instance.get_field_units()
         else:
-            assert(instance.get_field_names()
-                   == testing_options.get('field_names', None))
-            assert(instance.get_field_units()
-                   == testing_options.get('field_units', None))
+            assert (instance.get_field_names()
+                    == testing_options.get('field_names', None))
+            assert (instance.get_field_units()
+                    == testing_options.get('field_units', None))
 
     def test_concatenation(self, instance, testing_options):
         r"""Test message concatenation."""
         for x, y in testing_options.get('concatenate', []):
-            assert(instance.concatenate(x) == y)
+            assert instance.concatenate(x) == y
         
     def test_serialize(self, instance, map_sent2recv, testing_options,
                        component_subtype, class_name):
         r"""Test serialize/deserialize."""
         for iobj in testing_options['objects']:
-            # if (class_name == 'SerializeBase'):
-            #     with pytest.raises(NotImplementedError):
-            #         instance.serialize(iobj)
-            #     with pytest.raises(NotImplementedError):
-            #         instance.serialize(b'test')
-            #     break
             msg = instance.serialize(iobj)
             iout, ihead = instance.deserialize(msg)
-            assert(map_sent2recv(iobj) == iout)
-            # assert(ihead == empty_head(msg))
+            assert map_sent2recv(iobj) == iout
         if ((('contents' in testing_options)
              and (class_name not in ['SerializeBase', 'DefaultSerialize']))):
             instance.deserialize(testing_options['contents'])
 
-    def test_serialize_no_metadata(self, instance, testing_options):
-        r"""Test serializing without metadata."""
-        instance.serialize(testing_options['objects'][0],
-                           no_metadata=True)
+    def test_serialize_no_metadata(self, instance, map_sent2recv,
+                                   testing_options, component_subtype,
+                                   class_name):
+        r"""Test serialize/deserialize."""
+        for iobj in testing_options['objects']:
+            msg = instance.serialize(iobj, no_metadata=True)
+            iout, ihead = instance.deserialize(msg)
+            assert map_sent2recv(iobj) == iout
+        if ((('contents' in testing_options)
+             and (class_name not in ['SerializeBase', 'DefaultSerialize']))):
+            instance.deserialize(testing_options['contents'])
 
     def test_deserialize_error(self, instance):
         r"""Test error when deserializing message that is not bytes."""
@@ -128,17 +128,17 @@ class TestSerializeBase(base_class):
             hout.setdefault('__meta__', {})
             hout['__meta__'].update(size=ihead['__meta__']['size'],
                                     id=ihead['__meta__']['id'])
-            assert(map_sent2recv(iobj) == iout)
-            assert(ihead == hout)
+            assert map_sent2recv(iobj) == iout
+            assert ihead == hout
             # Use info to reconstruct serializer
             iout, ihead = temp_seri.deserialize(msg)
-            assert(map_sent2recv(iobj) == iout)
-            assert(ihead == hout)
+            assert map_sent2recv(iobj) == iout
+            assert ihead == hout
             new_seri = import_component(
                 'serializer', ihead['serializer'].pop('seritype', None))(**ihead)
             iout, ihead = new_seri.deserialize(msg)
-            assert(map_sent2recv(iobj) == iout)
-            assert(ihead == hout)
+            assert map_sent2recv(iobj) == iout
+            assert ihead == hout
             
     def test_serialize_header(self, instance, testing_options, header_info,
                               map_sent2recv):
@@ -146,28 +146,28 @@ class TestSerializeBase(base_class):
         for iobj in testing_options['objects']:
             msg = instance.serialize(iobj, metadata=header_info)
             iout, ihead = instance.deserialize(msg)
-            assert(map_sent2recv(iobj) == iout)
-            # assert(ihead == header_info)
+            assert map_sent2recv(iobj) == iout
+            # assert ihead == header_info
         
     def test_serialize_eof(self, instance):
         r"""Test serialize/deserialize EOF."""
         iobj = constants.YGG_MSG_EOF
         msg = instance.serialize(iobj)
         iout, ihead = instance.deserialize(msg)
-        assert(iout == iobj)
-        # assert(ihead == empty_head(msg))
+        assert iout == iobj
+        # assert ihead == empty_head(msg)
         
     def test_serialize_eof_header(self, instance, header_info):
         r"""Test serialize/deserialize EOF with header."""
         iobj = constants.YGG_MSG_EOF
         msg = instance.serialize(iobj, metadata=header_info)
         iout, ihead = instance.deserialize(msg)
-        assert(iout == iobj)
-        # assert(ihead == empty_head(msg))
+        assert iout == iobj
+        # assert ihead == empty_head(msg)
         
     def test_deserialize_empty(self, instance, empty_msg, empty_head,
                                testing_options, map_sent2recv):
         r"""Test call for empty string."""
         out, head = instance.deserialize(empty_msg)
-        assert(map_sent2recv(testing_options['empty']) == out)
-        assert(head == empty_head(empty_msg))
+        assert map_sent2recv(testing_options['empty']) == out
+        assert head == empty_head(empty_msg)

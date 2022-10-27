@@ -14,7 +14,6 @@ from yggdrasil.communication import (
 from yggdrasil.components import (
     import_component, create_component, ComponentError)
 from yggdrasil.metaschema import MetaschemaTypeError, type2numpy
-from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 from yggdrasil.serialize import consolidate_array
 
@@ -606,8 +605,6 @@ class CommBase(tools.YggClass):
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
                  is_async=False, **kwargs):
-        if isinstance(kwargs.get('datatype', None), MetaschemaType):
-            self.datatype = kwargs.pop('datatype')
         super(CommBase, self).__init__(name, **kwargs)
         if (((not is_interface)
              and (not self.__class__.is_installed(
@@ -2419,26 +2416,14 @@ class CommBase(tools.YggClass):
             dict: Converted message.
 
         """
-        if self.direction == 'send':
-            from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
-                JSONArrayMetaschemaType)
-            TypeClass = JSONArrayMetaschemaType
-        else:
-            from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
-                JSONObjectMetaschemaType)
-            TypeClass = JSONObjectMetaschemaType
-            if self.serializer.datatype['type'] != 'array':
-                return {'f0': msg}
         if key_order is None:
             key_order = metadata.pop('key_order', self.serializer.get_field_names())
-        if (key_order is None) and isinstance(msg, dict) and (len(msg) <= 1):
-            key_order = [k for k in msg.keys()]
         if key_order:
-            if not self.serializer.initialized:
-                metadata['field_names'] = key_order
-            metadata['key_order'] = key_order
-        out = TypeClass.coerce_type(msg, **metadata)
-        return out
+            metadata['field_names'] = key_order
+        if self.direction == 'send':
+            return self.serializer.dict2object(msg, **metadata)
+        else:
+            return self.serializer.object2dict(msg, **metadata)
     
     def send_dict(self, args_dict, **kwargs):
         r"""Send a message with fields specified in the input dictionary.
@@ -2458,7 +2443,7 @@ class CommBase(tools.YggClass):
         kwargs.setdefault('header_kwargs', {})
         args = self.coerce_to_dict(args_dict, key_order,
                                    kwargs['header_kwargs'])
-        return self.send(*args, **kwargs)
+        return self.send(args, **kwargs)
 
     def recv_dict(self, *args, **kwargs):
         r"""Return a received message as a dictionary of fields. If there are

@@ -97,6 +97,21 @@ class SerializeBase(tools.YggClass):
         if not cls.concats_as_str:
             assert not cls.is_framed
             assert cls.default_read_meth == 'read'
+
+    @classmethod
+    def dict2object(cls, obj, **kwargs):
+        r"""Conver a dictionary to a message object.
+
+        Args:
+            obj (dict): Dictionary to convert to serializable object.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            object: Serializable object.
+
+        """
+        assert len(obj) == 1
+        return list(obj.values())[0]
         
     @classmethod
     def object2dict(cls, obj, **kwargs):
@@ -180,7 +195,8 @@ class SerializeBase(tools.YggClass):
 
     @classmethod
     def get_testing_options(cls, table_example=False, array_columns=False,
-                            include_oldkws=False, table_string_type='bytes'):
+                            include_oldkws=False, table_string_type='bytes',
+                            no_names=False):
         r"""Method to return a dictionary of testing options for this class.
 
         Arguments:
@@ -196,6 +212,8 @@ class SerializeBase(tools.YggClass):
                 table_example is True. Defaults to False.
             table_string_type (str, optional): Type that should be used
                 for the string column in the table. Defaults to 'bytes'.
+            no_names (bool, optional): If True, an example is returned where the
+                names are not provided to the deserializer. Defaults to False.
 
         Returns:
             dict: Dictionary of variables to use for testing. Key/value pairs:
@@ -220,6 +238,7 @@ class SerializeBase(tools.YggClass):
         if array_columns:
             table_example = True
         if table_example:
+            field_names = ['name', 'count', 'size']
             assert table_string_type in ['bytes', 'unicode', 'string']
             if table_string_type == 'string':
                 table_string_type = 'unicode'
@@ -233,9 +252,7 @@ class SerializeBase(tools.YggClass):
                         (b'two', int_type(2), 2.0),
                         (b'three', int_type(3), 3.0)]
                 dtype1 = {'type': 'scalar',
-                          'subtype': 'string',
-                          # 'units': 'n/a',
-                          'title': 'name'}
+                          'subtype': 'string'}
             else:
                 table_string_fmt = '%5s'
                 np_dtype_str = 'U'
@@ -244,9 +261,7 @@ class SerializeBase(tools.YggClass):
                         ('three', int_type(3), 3.0)]
                 dtype1 = {'type': 'scalar',
                           'subtype': 'string',
-                          'encoding': 'UTF8',
-                          # 'units': 'n/a',
-                          'title': 'name'}
+                          'encoding': 'UCS4'}
             umol = b'\xce\xbcmol'.decode('utf-8')
             out = {'kwargs': {}, 'empty': [], 'dtype': None,
                    'extra_kwargs': {},
@@ -254,10 +269,10 @@ class SerializeBase(tools.YggClass):
                                 'items': [dtype1,
                                           {'type': 'scalar',
                                            'subtype': 'int', 'precision': 4,
-                                           'units': umol, 'title': 'count'},
+                                           'units': umol},
                                           {'type': 'scalar',
                                            'subtype': 'float', 'precision': 8,
-                                           'units': 'cm', 'title': 'size'}]},
+                                           'units': 'cm'}]},
                    'contents': (b'# name\tcount\tsize\n'
                                 + b'# n/a\t\xce\xbcmol\tcm\n'
                                 + b'# '
@@ -270,12 +285,16 @@ class SerializeBase(tools.YggClass):
                                 + b'  two\t2\t2.000000\n'
                                 + b'three\t3\t3.000000\n'),
                    'objects': 2 * rows,
-                   'field_names': ['name', 'count', 'size'],
                    'field_units': ['n/a', umol, 'cm']}
+            if not no_names:
+                out['field_names'] = field_names
+                for x, n in zip(out['datatype']['items'], field_names):
+                    x['title'] = n
             if include_oldkws:
                 out['kwargs'].update({'format_str': table_string_fmt + '\t%d\t%f\n',
-                                      'field_names': ['name', 'count', 'size'],
                                       'field_units': ['n/a', umol, 'cm']})
+                if not no_names:
+                    out['kwargs']['field_names'] = field_names
                 out['extra_kwargs']['format_str'] = out['kwargs']['format_str']
                 out['objects'] = [
                     [units.add_units(x, u) for x, u in
@@ -286,20 +305,24 @@ class SerializeBase(tools.YggClass):
                         out['extra_kwargs']['format_str'])
             if array_columns:
                 out['kwargs']['as_array'] = True
-                dtype = np.dtype(
-                    {'names': out['field_names'],
-                     'formats': [f'{np_dtype_str}5', 'i4', 'f8']})
+                if not no_names:
+                    dtype = np.dtype(
+                        {'names': out['field_names'],
+                         'formats': [f'{np_dtype_str}5', 'i4', 'f8']})
+                else:
+                    dtype = np.dtype(f'{np_dtype_str}5,i4,f8')
                 out['dtype'] = dtype
-                arr = np.array(rows, dtype=dtype)
-                lst = [units.add_units(arr[n], u) for n, u
-                       in zip(out['field_names'], out['field_units'])]
-                out['objects'] = [lst, lst]
                 for x in out['datatype']['items']:
                     x['type'] = '1darray'
-                    if x['title'] == 'name':
+                    if x['subtype'] == 'string':
                         x['precision'] = 5
                         if x.get('encoding', None) in ['UTF8', 'UCS4']:
                             x['precision'] *= 4
+                arr = np.array(rows, dtype=dtype)
+                if no_names:
+                    arr = [arr[n] for n in arr.dtype.names]
+                lst = rapidjson.normalize(arr, out['datatype'])
+                out['objects'] = [lst, lst]
         else:
             out = {'kwargs': {}, 'empty': b'', 'dtype': None,
                    'extra_kwargs': {},
@@ -815,6 +838,7 @@ class SerializeBase(tools.YggClass):
         else:
             out = self.func_deserialize(msg)
             out = self.normalize(out)
+            self.initialize_from_message(out, **metadata)
         return out, metadata
 
     def decode(self, msg, no_data=False, metadata=None):

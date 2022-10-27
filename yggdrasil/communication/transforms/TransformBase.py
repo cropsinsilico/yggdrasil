@@ -43,7 +43,7 @@ class TransformBase(ComponentBase):
             data (object): Data object.
 
         """
-        self.set_original_datatype(rapidjson.encode_schema(data))
+        self.set_original_datatype(rapidjson.encode_schema(data, minimal=True))
         
     def validate_datatype(self, datatype):
         r"""Assert that the provided datatype is valid for this transformation.
