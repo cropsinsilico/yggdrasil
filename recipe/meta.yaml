@@ -40,6 +40,7 @@ build:
 requirements:
   host:
     - czmq
+    - lz4
     - pip
     - python
     - r-base
@@ -54,6 +55,7 @@ requirements:
     - chevron
     - cmake  # [not win]
     - czmq
+    - lz4
     - flaky
     - flask
     - git
