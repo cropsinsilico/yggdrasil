@@ -764,7 +764,7 @@ class CompilationToolBase(object):
         """
         if flags is None:
             flags = []
-        flags = kwargs.pop('%s_flags' % cls.tooltype, flags)
+        flags = kwargs.pop(f'{cls.tooltype}_flags', flags)
         out = copy.deepcopy(flags)
         if not isinstance(out, list):
             out = [out]
@@ -2529,7 +2529,7 @@ class CompiledModelDriver(ModelDriver):
             # Get tool
             kwargs = {'flags': tool_flags}
             kwargs['executable'] = cls.cfg.get(cls.language,
-                                               '%s_executable' % toolname,
+                                               f'{toolname}_executable',
                                                toolname)
             if tooltype == 'compiler':
                 kwargs.update(

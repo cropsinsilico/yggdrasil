@@ -151,6 +151,9 @@ jobs:
     - name: (WINDOWS,PIP) Update R requirements
       if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR == 1
       run: ygginstall R --update-r-requirements
+    - name: (MACOS,PIP) Set C compiler to llvm clang
+      if: matrix.install-method == 'pip' && runner.os == 'macOS'
+      run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     # ========================================================
 
     # ========================================================
