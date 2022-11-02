@@ -51,6 +51,7 @@ requirements:
     - r-zeallot
     - sysv_ipc  # [unix]
     - zeromq
+    - numpy >=1.17.0
   run:
     - chevron
     - cmake  # [not win]
@@ -64,7 +65,7 @@ requirements:
     - GitPython  # [py>36]
     - jsonschema==3.2.0
     - matplotlib-base
-    - numpy >=1.13.0
+    - numpy >=1.17.0
     - pandas
     - pyperf
     - pint  # [py2k]
