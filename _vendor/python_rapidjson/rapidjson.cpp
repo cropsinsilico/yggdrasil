@@ -3303,10 +3303,13 @@ static bool python2document(PyObject* jsonObject, Document& d,
 			    unsigned mappingMode,
 			    unsigned expectsString,
 			    bool forSchema = false,
-			    bool forceObject = false) {
+			    bool forceObject = false,
+			    bool* isEmptyString = NULL) {
     const char* jsonStr;
     Py_ssize_t jsonStrLen = 0;
 
+    if (isEmptyString != NULL)
+	isEmptyString[0] = false;
     if ((!forceObject) && PyBytes_Check(jsonObject)) {
         jsonStr = PyBytes_AsString(jsonObject);
         if (jsonStr == NULL)
@@ -3321,6 +3324,12 @@ static bool python2document(PyObject* jsonObject, Document& d,
     } else {
         PyErr_Format(PyExc_TypeError, "Expected string or UTF-8 encoded bytes or a schema in a Python dictionary (not %R).", PyObject_Type(jsonObject));
 	return false;
+    }
+    if (jsonStr != NULL && jsonStrLen == 0 && !forSchema) {
+	if (isEmptyString != NULL) {
+	    isEmptyString[0] = true;
+	}
+	jsonStr = NULL;
     }
 
     bool error;
@@ -4818,9 +4827,11 @@ static PyObject* validator_call(PyObject* self, PyObject* args, PyObject* kwargs
 
     ValidatorObject* v = (ValidatorObject*) self;
     Document d;
+    bool isEmptyString = false;
     if (!python2document(jsonObject, d, v->numberMode, v->datetimeMode,
 			 v->uuidMode, v->bytesMode, v->iterableMode,
-			 v->mappingMode, v->expectsString))
+			 v->mappingMode, v->expectsString,
+			 false, false, &isEmptyString))
 	return NULL;
 
     SchemaValidator validator(*v->schema);
@@ -4835,6 +4846,10 @@ static PyObject* validator_call(PyObject* self, PyObject* args, PyObject* kwargs
     }
 
     if (!accept) {
+	if (isEmptyString) {
+	    PyErr_SetString(decode_error, "Invalid JSON");
+	    return NULL;
+	}
 	set_validation_error(validator);
         return NULL;
     }
@@ -5573,9 +5588,11 @@ static PyObject* normalizer_call(PyObject* self, PyObject* args, PyObject* kwarg
 
     NormalizerObject* v = (NormalizerObject*) self;
     Document d;
+    bool isEmptyString = false;
     if (!python2document(jsonObject, d, v->numberMode, v->datetimeMode,
 			 v->uuidMode, v->bytesMode, v->iterableMode,
-			 v->mappingMode, v->expectsString))
+			 v->mappingMode, v->expectsString,
+			 false, false, &isEmptyString))
 	return NULL;
     
     SchemaNormalizer normalizer(*((NormalizerObject*) self)->schema);
@@ -5590,6 +5607,10 @@ static PyObject* normalizer_call(PyObject* self, PyObject* args, PyObject* kwarg
     }
 
     if (!accept) {
+	if (isEmptyString) {
+	    PyErr_SetString(decode_error, "Invalid JSON");
+	    return NULL;
+	}
 	set_validation_error(normalizer, normalization_error);
 	return NULL;
     }
@@ -5736,9 +5757,11 @@ static PyObject* normalizer_validate(PyObject* self, PyObject* args, PyObject* k
 
     NormalizerObject* v = (NormalizerObject*) self;
     Document d;
+    bool isEmptyString = false;
     if (!python2document(jsonObject, d, v->numberMode, v->datetimeMode,
 			 v->uuidMode, v->bytesMode, v->iterableMode,
-			 v->mappingMode, v->expectsString))
+			 v->mappingMode, v->expectsString,
+			 false, false, &isEmptyString))
 	return NULL;
 
     SchemaValidator validator(*(v->schema));
@@ -5753,6 +5776,10 @@ static PyObject* normalizer_validate(PyObject* self, PyObject* args, PyObject* k
     }
 
     if (!accept) {
+	if (isEmptyString) {
+	    PyErr_SetString(decode_error, "Invalid JSON");
+	    return NULL;
+	}
 	set_validation_error(validator);
         return NULL;
     }

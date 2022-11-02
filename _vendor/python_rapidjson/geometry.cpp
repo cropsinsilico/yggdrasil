@@ -38,11 +38,15 @@ static PyObject* ply_get_elements(PyObject* self, PyObject* args, PyObject* kwar
 static PyObject* ply_add_elements(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_as_dict(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_from_dict(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* ply_as_array_dict(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* ply_from_array_dict(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_count_elements(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_append(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_merge(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_bounds_get(PyObject* self, void*);
 static PyObject* ply_mesh_get(PyObject* self, void*);
+static PyObject* ply_nvert(PyObject* self, void*);
+static PyObject* ply_nface(PyObject* self, void*);
 static PyObject* ply_str(PyObject* self);
 static Py_ssize_t ply_size(PyObject* self);
 static PyObject* ply_subscript(PyObject* self, PyObject* key);
@@ -66,6 +70,8 @@ static PyObject* objwavefront_get_elements(PyObject* self, PyObject* args, PyObj
 static PyObject* objwavefront_add_elements(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_as_dict(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_from_dict(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* objwavefront_as_array_dict(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* objwavefront_from_array_dict(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_as_list(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_from_list(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_count_elements(PyObject* self, PyObject* args, PyObject* kwargs);
@@ -73,6 +79,8 @@ static PyObject* objwavefront_append(PyObject* self, PyObject* args, PyObject* k
 static PyObject* objwavefront_merge(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_bounds_get(PyObject* self, void*);
 static PyObject* objwavefront_mesh_get(PyObject* self, void*);
+static PyObject* objwavefront_nvert(PyObject* self, void*);
+static PyObject* objwavefront_nface(PyObject* self, void*);
 static PyObject* objwavefront_str(PyObject* self);
 static Py_ssize_t objwavefront_size(PyObject* self);
 static PyObject* objwavefront_subscript(PyObject* self, PyObject* key);
@@ -115,6 +123,12 @@ static PyMethodDef ply_methods[] = {
     {"from_dict", (PyCFunction) ply_from_dict,
      METH_VARARGS | METH_CLASS,
      "Create a Ply instance from a dictionary of elements."},
+    {"as_array_dict", (PyCFunction) ply_as_array_dict,
+     METH_VARARGS | METH_KEYWORDS,
+     "Get the structure as a dictionary of arrays."},
+    {"from_array_dict", (PyCFunction) ply_from_array_dict,
+     METH_VARARGS | METH_CLASS,
+     "Create a Ply instance from a dictionary of element arrays."},
     {"count_elements", (PyCFunction) ply_count_elements,
      METH_VARARGS,
      "Get the number of elements of a given type in the structure."},
@@ -148,6 +162,10 @@ static PyGetSetDef ply_properties[] = {
      "The minimum & maximum bounds for the structure in x, y, & z.", NULL},
     {"mesh", ply_mesh_get, NULL,
      "The 3D mesh representing the faces in the structure.", NULL},
+    {"nvert", ply_nvert, NULL,
+     "The number of vertices in the structure.", NULL},
+    {"nface", ply_nface, NULL,
+     "The number of faces in the structure.", NULL},
     {NULL}
 };
 
@@ -929,6 +947,43 @@ static PyObject* ply_from_dict(PyObject* self, PyObject* args, PyObject* kwargs)
     
 }
 
+static PyObject* ply_as_array_dict(PyObject* self, PyObject* args, PyObject* kwargs) {
+    bool dec_kwargs = false;
+    PyObject* out = NULL;
+    if (kwargs == NULL) {
+	kwargs = PyDict_New();
+	dec_kwargs = true;
+	if (kwargs == NULL)
+	    return NULL;
+    }
+    if (PyDict_SetItemString(kwargs, "as_array", Py_True) < 0) {
+	goto cleanup;
+    }
+    out = ply_as_dict(self, args, kwargs);
+cleanup:
+    if (dec_kwargs)
+	Py_DECREF(kwargs);
+    return out;
+}
+static PyObject* ply_from_array_dict(PyObject* self, PyObject* args, PyObject* kwargs) {
+    bool dec_kwargs = false;
+    PyObject* out = NULL;
+    if (kwargs == NULL) {
+	kwargs = PyDict_New();
+	dec_kwargs = true;
+	if (kwargs == NULL)
+	    return NULL;
+    }
+    if (PyDict_SetItemString(kwargs, "as_array", Py_True) < 0) {
+	goto cleanup;
+    }
+    out = ply_from_dict(self, args, kwargs);
+cleanup:
+    if (dec_kwargs)
+	Py_DECREF(kwargs);
+    return out;
+}
+
 #define VECTOR2LIST_(T, meth, args)					\
     template<>								\
     PyObject* vector2list(const std::vector<T>& x) {			\
@@ -1152,6 +1207,19 @@ static PyObject* ply_mesh_get(PyObject* self, void*) {
 	}
     }
     return out;
+}
+
+static PyObject* ply_nvert(PyObject* self, void*) {
+    PyObject* args = Py_BuildValue("(s)", "vertices");
+    if (args == NULL)
+	return NULL;
+    return ply_count_elements(self, args, NULL);
+}
+static PyObject* ply_nface(PyObject* self, void*) {
+    PyObject* args = Py_BuildValue("(s)", "faces");
+    if (args == NULL)
+	return NULL;
+    return ply_count_elements(self, args, NULL);
 }
 
 
@@ -1480,6 +1548,12 @@ static PyMethodDef objwavefront_methods[] = {
     {"from_dict", (PyCFunction) objwavefront_from_dict,
      METH_VARARGS | METH_CLASS,
      "Create a ObjWavefront instance from a dictionary of elements."},
+    {"as_array_dict", (PyCFunction) objwavefront_as_array_dict,
+     METH_VARARGS | METH_KEYWORDS,
+     "Get the structure as a dictionary of arrays."},
+    {"from_array_dict", (PyCFunction) objwavefront_from_array_dict,
+     METH_VARARGS | METH_CLASS,
+     "Create a ObjWavefront instance from a dictionary of element arrays."},
     {"as_list", (PyCFunction) objwavefront_as_list,
      METH_NOARGS,
      "Get the structure as a list of elements."},
@@ -1519,6 +1593,10 @@ static PyGetSetDef objwavefront_properties[] = {
      "The minimum & maximum bounds for the structure in x, y, & z.", NULL},
     {"mesh", objwavefront_mesh_get, NULL,
      "The 3D mesh representing the faces in the structure.", NULL},
+    {"nvert", objwavefront_nvert, NULL,
+     "The number of vertices in the structure.", NULL},
+    {"nface", objwavefront_nface, NULL,
+     "The number of faces in the structure.", NULL},
     {NULL}
 };
 
@@ -2363,6 +2441,43 @@ static PyObject* objwavefront_from_dict(PyObject* self, PyObject* args, PyObject
     
 }
 
+static PyObject* objwavefront_as_array_dict(PyObject* self, PyObject* args, PyObject* kwargs) {
+    bool dec_kwargs = false;
+    PyObject* out = NULL;
+    if (kwargs == NULL) {
+	kwargs = PyDict_New();
+	dec_kwargs = true;
+	if (kwargs == NULL)
+	    return NULL;
+    }
+    if (PyDict_SetItemString(kwargs, "as_array", Py_True) < 0) {
+	goto cleanup;
+    }
+    out = objwavefront_as_dict(self, args, kwargs);
+cleanup:
+    if (dec_kwargs)
+	Py_DECREF(kwargs);
+    return out;
+}
+static PyObject* objwavefront_from_array_dict(PyObject* self, PyObject* args, PyObject* kwargs) {
+    bool dec_kwargs = false;
+    PyObject* out = NULL;
+    if (kwargs == NULL) {
+	kwargs = PyDict_New();
+	dec_kwargs = true;
+	if (kwargs == NULL)
+	    return NULL;
+    }
+    if (PyDict_SetItemString(kwargs, "as_array", Py_True) < 0) {
+	goto cleanup;
+    }
+    out = objwavefront_from_dict(self, args, kwargs);
+cleanup:
+    if (dec_kwargs)
+	Py_DECREF(kwargs);
+    return out;
+}
+
 static PyObject* objwavefront_as_list(PyObject* self, PyObject*, PyObject*) {
     ObjWavefrontObject* v = (ObjWavefrontObject*) self;
     PyObject* out = PyList_New(v->obj->elements.size());
@@ -2596,6 +2711,18 @@ static PyObject* objwavefront_mesh_get(PyObject* self, void*) {
     return out;
 }
 
+static PyObject* objwavefront_nvert(PyObject* self, void*) {
+    PyObject* args = Py_BuildValue("(s)", "vertices");
+    if (args == NULL)
+	return NULL;
+    return objwavefront_count_elements(self, args, NULL);
+}
+static PyObject* objwavefront_nface(PyObject* self, void*) {
+    PyObject* args = Py_BuildValue("(s)", "faces");
+    if (args == NULL)
+	return NULL;
+    return objwavefront_count_elements(self, args, NULL);
+}
 
 static PyObject* objwavefront_str(PyObject* self) {
     ObjWavefrontObject* v = (ObjWavefrontObject*) self;

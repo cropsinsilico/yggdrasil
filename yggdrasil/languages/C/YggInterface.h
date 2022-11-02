@@ -5,8 +5,6 @@
 #include "../tools.h"
 #include "../datatypes/datatypes.h"
 #include "../communication/communication.h"
-#include "../dataio/AsciiFile.h"
-#include "../dataio/AsciiTable.h"
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
@@ -234,7 +232,6 @@ int ygg_send_eof(const yggOutput_t yggQ) {
  */
 static inline
 int ygg_recv(yggInput_t yggQ, char *data, const size_t len){
-  char* temp = NULL;
   int ret = -1;
   size_t len_used = len;
   int nargs_exp = 2;
@@ -247,8 +244,6 @@ int ygg_recv(yggInput_t yggQ, char *data, const size_t len){
   } else {
     ret = nargs_used;
   }
-  if (temp != NULL)
-    free(temp);
   return ret;
 };
 
@@ -626,14 +621,13 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
   @return integer specifying if the receive was succesful. Values >= 0
     indicate success.
 */
-#define vrpcRecv(rpc, nargs, ap) vcommRecv(rpc, 0, nargs, ap)
+#define vrpcRecv(rpc, ap) vcommRecv(rpc, 0, ap)
 
 /*!
   @brief Receive a message from a comm into variables in a variable argument
     list. If received message data will exceed the bounds of provided 
     variables, the variables will be reallocated.
   @param[in] rpc RPC comm structure that message should be sent to.
-  @param[in] nargs Number of arguments contained in ap.
   @param[out] ap Variable list of arguments that should be assigned
     parameters extracted using the associated data type. Since these will 
     be assigned and possibly reallocated, they should be pointers to memory 
@@ -641,7 +635,7 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
   @return integer specifying if the receive was succesful. Values >= 0
     indicate success.
 */
-#define vrpcRecvRealloc(rpc, nargs, ap) vcommRecv(rpc, 1, nargs, ap)
+#define vrpcRecvRealloc(rpc, ap) vcommRecv(rpc, 1, ap)
 
 /*!
   @brief Format and send a message to an RPC output queue.
@@ -696,8 +690,6 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
     pointers to pointers such that they can be reallocated as necessary to 
     receive incoming data. If 0, output arguments are assumed to be 
     preallocated.
-  @param[in] nargs size_t Number of arguments contained in ap including both
-    input and output arguments.
   @param[in,out] ap va_list mixed arguments that include those that should be
     formatted using the output format string, followed by those that should 
     be assigned parameters extracted using the input format string. These 
@@ -707,8 +699,7 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
     indicate success.
  */
 static inline
-int vrpcCallBase(yggRpc_t rpc, const int allow_realloc,
-		 size_t nargs, va_list_t ap) {
+int vrpcCallBase(yggRpc_t rpc, const int allow_realloc, va_list_t ap) {
   int sret, rret;
   rret = 0;
 
@@ -723,7 +714,9 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc,
   } else {
     send_nargs = nargs_exp_dtype(send_comm->datatype);
   }
-  sret = vcommSend(rpc, send_nargs, ap);
+  size_t recv_nargs = ap.nargs[0] - send_nargs;
+  ap.nargs = &send_nargs;
+  sret = vcommSend(rpc, ap);
   if (sret < 0) {
     ygglog_error("vrpcCall: vcommSend error: ret %d: %s", sret, strerror(errno));
     return -1;
@@ -732,14 +725,11 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc,
   // Advance through sent arguments
   ygglog_debug("vrpcCall: Used %d arguments in send", sret);
   if (sret > 0) {
-    if (skip_va_elements(send_comm->datatype, &nargs, &op)) {
-      ygglog_error("vrpcCall: Error skipping send arguments.");
-      return -1;
-    }
+    ap.nargs = &recv_nargs;
   }
 
   // unpack the messages into the remaining variable arguments
-  rret = vcommRecv(rpc, allow_realloc, nargs, op);
+  rret = vcommRecv(rpc, allow_realloc, op);
   if (rret < 0) {
     ygglog_error("vrpcCall: vcommRecv error: ret %d: %s", sret, strerror(errno));
   }
@@ -749,8 +739,8 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc,
 };
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-#define vrpcCall(rpc, nargs, ap) vrpcCallBase(rpc, 0, nargs, ap)
-#define vrpcCallRealloc(rpc, nargs, ap) vrpcCallBase(rpc, 1, nargs, ap)
+#define vrpcCall(rpc, ap) vrpcCallBase(rpc, 0, ap)
+#define vrpcCallRealloc(rpc, ap) vrpcCallBase(rpc, 1, ap)
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 /*!
@@ -779,9 +769,9 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc,
 static inline
 int nrpcCallBase(yggRpc_t rpc, const int allow_realloc, size_t nargs, ...){
   int ret;
-  va_list_t ap = init_va_list();
+  va_list_t ap = init_va_list(&nargs);
   va_start(ap.va, nargs);
-  ret = vrpcCallBase(rpc, allow_realloc, nargs, ap);
+  ret = vrpcCallBase(rpc, allow_realloc, ap);
   end_va_list(&ap);
   return ret;
 };
@@ -1067,7 +1057,7 @@ comm_t* yggAsciiArrayInput(const char *name) {
 static inline
 comm_t* yggPlyOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_ply(false));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->schema == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1140,7 +1130,7 @@ comm_t* yggPlyInput(const char *name) {
 static inline
 comm_t* yggObjOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_obj(false));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->schema == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1270,7 +1260,7 @@ comm_t* yggGenericInput(const char *name) {
 static inline
 comm_t* yggAnyOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_any(true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->schema == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1284,7 +1274,7 @@ comm_t* yggAnyOutput(const char *name) {
 static inline
 comm_t* yggAnyInput(const char *name) {
   comm_t* out = init_comm(name, "recv", _default_comm, create_dtype_any(true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->schema == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1341,7 +1331,7 @@ comm_t* yggAnyInput(const char *name) {
 static inline
 comm_t* yggJSONArrayOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_json_array(0, NULL, true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->schema == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1355,7 +1345,7 @@ comm_t* yggJSONArrayOutput(const char *name) {
 static inline
 comm_t* yggJSONArrayInput(const char *name) {
   comm_t* out = init_comm(name, "recv", _default_comm, create_dtype_json_array(0, NULL, true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->schema == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1417,7 +1407,7 @@ comm_t* yggJSONArrayInput(const char *name) {
 static inline
 comm_t* yggJSONObjectOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_json_object(0, NULL, NULL, true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->schema == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1431,7 +1421,7 @@ comm_t* yggJSONObjectOutput(const char *name) {
 static inline
 comm_t* yggJSONObjectInput(const char *name) {
   comm_t* out = init_comm(name, "recv", _default_comm, create_dtype_json_object(0, NULL, NULL, true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->schema == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;

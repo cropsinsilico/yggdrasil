@@ -128,9 +128,9 @@ public:
    */
   int recv(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list();
+    va_list_t va = init_va_list(&nargs_copy);
     va_start(va.va, nargs);
-    int ret = vcommRecv(_pi, 0, nargs_copy, va);
+    int ret = vcommRecv(_pi, 0, va);
     va_end(va.va);
     return ret;
   }
@@ -147,9 +147,9 @@ public:
    */
   int recvRealloc(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list();
+    va_list_t va = init_va_list(&nargs_copy);
     va_start(va.va, nargs);
-    int ret = vcommRecv(_pi, 1, nargs_copy, va);
+    int ret = vcommRecv(_pi, 1, va);
     va_end(va.va);
     return ret;
   }
@@ -178,9 +178,10 @@ public:
     indicate success.
    */
   int recv_nolimit(const int nargs, ...) {
-    va_list_t va = init_va_list();
+    size_t nargs_copy = (size_t)nargs;
+    va_list_t va = init_va_list(&nargs_copy);
     va_start(va.va, nargs);
-    int ret = vyggRecv(_pi, 0, nargs, va);
+    int ret = vyggRecv(_pi, 0, va);
     va_end(va.va);
     return ret;
   }
@@ -306,9 +307,10 @@ public:
     success.
   */
   int send(const int nargs, ...) {
-    va_list_t va = init_va_list();
+    size_t nargs_copy = (size_t)nargs;
+    va_list_t va = init_va_list(&nargs_copy);
     va_start(va.va, nargs);
-    int ret = vyggSend(_pi, (size_t)nargs, va);
+    int ret = vyggSend(_pi, va);
     va_end(va.va);
     return ret;
   }
@@ -333,9 +335,10 @@ public:
     success.
   */
   int send_nolimit(const int nargs, ...) {
-    va_list_t va = init_va_list();
+    size_t nargs_copy = (size_t)nargs;
+    va_list_t va = init_va_list(&nargs_copy);
     va_start(va.va, nargs);
-    int ret = vyggSend(_pi, nargs, va);
+    int ret = vyggSend(_pi, va);
     va_end(va.va);
     return ret;
   }
@@ -402,9 +405,10 @@ public:
     success.
   */
   int send(const int nargs, ...) {
-    va_list_t va = init_va_list();
+    size_t nargs_copy = (size_t)nargs;
+    va_list_t va = init_va_list(&nargs_copy);
     va_start(va.va, nargs);
-    int ret = vrpcSend(_pi, nargs, va);
+    int ret = vrpcSend(_pi, va);
     va_end(va.va);
     return ret;
   }
@@ -420,9 +424,10 @@ public:
     indicate success.
    */
   int recv(const int nargs, ...) {
-    va_list_t va = init_va_list();
+    size_t nargs_copy = (size_t)nargs;
+    va_list_t va = init_va_list(&nargs_copy);
     va_start(va.va, nargs);
-    int ret = vrpcRecv(_pi, nargs, va);
+    int ret = vrpcRecv(_pi, va);
     va_end(va.va);
     return ret;
   }
@@ -440,9 +445,10 @@ public:
     indicate success.
    */
   int recvRealloc(const int nargs, ...) {
-    va_list_t va = init_va_list();
+    size_t nargs_copy = (size_t)nargs;
+    va_list_t va = init_va_list(&nargs_copy);
     va_start(va.va, nargs);
-    int ret = vrpcRecvRealloc(_pi, nargs, va);
+    int ret = vrpcRecvRealloc(_pi, va);
     va_end(va.va);
     return ret;
   }
@@ -561,10 +567,11 @@ public:
     indicate success.
   */
   int call(const int nargs, ...) {
+    size_t nargs_copy = (size_t)nargs;
     yggRpc_t _cpi = pi();
-    va_list_t va = init_va_list();
+    va_list_t va = init_va_list(&nargs_copy);
     va_start(va.va, nargs);
-    int ret = vrpcCall(_cpi, nargs, va);
+    int ret = vrpcCall(_cpi, va);
     va_end(va.va);
     return ret;
   }
@@ -585,10 +592,11 @@ public:
     indicate success.
   */
   int callRealloc(const int nargs, ...) {
+    size_t nargs_copy = (size_t)nargs;
     yggRpc_t _cpi = pi();
-    va_list_t va = init_va_list();
+    va_list_t va = init_va_list(&nargs_copy);
     va_start(va.va, nargs);
-    int ret = vrpcCallRealloc(_cpi, nargs, va);
+    int ret = vrpcCallRealloc(_cpi, va);
     va_end(va.va);
     return ret;
   }

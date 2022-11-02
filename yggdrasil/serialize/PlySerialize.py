@@ -58,15 +58,6 @@ class GeometryBase:
     r"""Base class for extening rapidjson geometry classes."""
 
     @classmethod
-    def from_array_dict(cls, in_dict):
-        r"""Get a version of the object from a dictionary of arrays."""
-        return cls.from_dict(in_dict, as_array=True)
-
-    def as_array_dict(self):
-        r"""Get a version of the object as a dictionary of arrays."""
-        return self.as_dict(as_array=True)
-
-    @classmethod
     def from_trimesh(cls, in_mesh):
         r"""Get a version of the object from a trimesh class."""
         kws = dict(vertices=in_mesh.vertices,
@@ -84,16 +75,6 @@ class GeometryBase:
         kws.update(kwargs, process=False)
         return trimesh.base.Trimesh(**kws)
     
-    @property
-    def nvert(self):
-        r"""int: Number of vertices."""
-        return self.count_elements('vertices')
-
-    @property
-    def nface(self):
-        r"""int: Number of faces."""
-        return self.count_elements('faces')
-
     @classmethod
     def from_shape(cls, shape, d, conversion=1.0, _as_obj=False):  # pragma: lpy
         r"""Create a geometry dictionary from a PlantGL shape and descritizer.

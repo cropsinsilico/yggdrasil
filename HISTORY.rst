@@ -7,15 +7,16 @@ History
 
 * Drop support for Python 3.5
 * Changed rapidjson submodule to extended version
-* Vendoring the python-rapidjson extension
+* Vendor python-rapidjson extension
 * Removed jsonschema requirement
 * Updated yggdrasil to use the vendored rapidjson for serialization, validation, normalization, and units
+* Removed C and C++ API for AsciiFile and AsciiTable
 
 TODO:
 ~~~~~
 
-* Add check_schema class method to validator/normalizer
-* Add validate alias for calling validator on an object
+* Add generate method to validator/normalizer
+
 
 1.8.2 (2021-03-18) Migrate tests out of package into pytest fixtures & various bug fixes
 ------------------

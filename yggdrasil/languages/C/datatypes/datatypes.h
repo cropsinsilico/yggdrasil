@@ -4,8 +4,6 @@
 #include <stdbool.h>
 
 #include "../tools.h"
-#include "PlyDict.h"
-#include "ObjDict.h"
 
 #define MSG_HEAD_SEP "YGG_MSG_HEAD"
 /*! @brief Size of COMM buffer. */
@@ -25,14 +23,14 @@ static char prefix_char = '#';
 /*! @brief Bit flags. */
 #define HEAD_FLAG_VALID      0x00000001  //!< Set if the header is valid.
 #define HEAD_FLAG_MULTIPART  0x00000002  //!< Set if the header is for a multipart message
-#define HEAD_TYPE_IN_DATA    0x00000004  //!< Set if the type is stored with the data during serialization
+#define HEAD_META_IN_DATA    0x00000004  //!< Set if the type is stored with the data during serialization
 #define HEAD_AS_ARRAY        0x00000008  //!< Set if messages will be serialized arrays
 
-/*! @brief C-friendly definition of MetaschemaType. */
+/*! @brief C-friendly definition of rapidjson::Document. */
 typedef struct dtype_t {
-  char type[COMMBUFFSIZ]; //!< Type name
   bool use_generic; //!< Flag for empty dtypes to specify generic in/out
-  void *obj; //!< MetaschemaType Pointer
+  void *schema; //!< Pointer to rapidjson::Value for validation.
+  void *metadata; //!< Pointer ot rapidjson::Document containing additional metadata.
 } dtype_t;
 
 /*! @brief C-friendly defintion of YggGeneric. */
@@ -82,41 +80,49 @@ typedef struct comm_head_t {
   char zmq_reply[COMMBUFFSIZ]; //!< Reply address for ZMQ sockets.
   char zmq_reply_worker[COMMBUFFSIZ]; //!< Reply address for worker socket.
   char model[COMMBUFFSIZ]; //!< Name of model that sent the header.
-  // These should be removed once JSON fully implemented
-  int serializer_type; //!< Code indicating the type of serializer.
-  char format_str[COMMBUFFSIZ]; //!< Format string for serializer.
-  char field_names[COMMBUFFSIZ]; //!< String containing field names.
-  char field_units[COMMBUFFSIZ]; //!< String containing field units.
   //
-  dtype_t* dtype; //!< Type structure.
+  void* dtype; //!< JSON schema for validating received data in rapidjson::Document.
+  void* metadata; //!< Additional user defined options in rapidjson::Value.
 } comm_head_t;
 
 
-/*!
-  @brief C wrapper for the C++ delete_dtype_class function.
-  @param x void* Pointer to MetaschemaType subclass that should be deleted.
- */
-void delete_dtype_class_c(void* x);
+/*! @brief Obj structure. */
+typedef struct obj_t {
+  int nvert; //!< Number of vertices.
+  int ntexc; //!< Number of texture coordinates.
+  int nnorm; //!< Number of normals.
+  int nparam; //!< Number of params.
+  int npoint; //!< Number of points.
+  int nline; //!< Number of lines.
+  int nface; //!< Number of faces.
+  int ncurve; //!< Number of curves.
+  int ncurve2; //!< Number of curv2.
+  int nsurf; //!< Number of surfaces.
+  void* obj; //!< Pointer to rapidjson::ObjWavefront instance.
+} obj_t;
 
-
+/*! @brief Ply structure. */
+typedef struct ply_t {
+  int nvert; //!< Number of vertices.
+  int nface; //!< Number of faces.
+  int nedge; //!< Number of edges.
+  void* obj; //!< Pointer to rapidjson::Ply instance.
+} ply_t;
+  
 /*!
   @brief C wrapper for the C++ type_from_doc function.
   @param type_doc void* Pointer to const rapidjson::Value type doc.
-  @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
-  @returns void* Pointer to MetaschemaType class.
+  @returns void* Pointer to rapidjson::Document.
  */
-void* type_from_doc_c(const void* type_doc, const bool use_generic);
+void* type_from_doc_c(const void* type_doc);
 
 
 /*!
   @brief C wrapper for the C++ type_from_pyobj function.
   @param pyobj void* Pointer to const rapidjson::Value type doc.
-  @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
-  @returns void* Pointer to MetaschemaType class.
+  @returns void* Pointer to rapidjson::Document.
  */
-void* type_from_pyobj_c(PyObject* pyobj, const bool use_generic);
+void* type_from_pyobj_c(PyObject* pyobj);
 
 
 /*!
@@ -127,7 +133,20 @@ void* type_from_pyobj_c(PyObject* pyobj, const bool use_generic);
  */
 int is_dtype_format_array(dtype_t* type_struct);
   
+/*!
+  @brief Get the name of the type described by the datatype schema.
+  @param[in] schema Datatype schema.
+  @returns Name.
+*/
+const char* schema2name_c(void* schema);
 
+/*!
+  @brief Get the name of the type described by the datatype schema.
+  @param[in] type_struct dtype_t* Datatype structure.
+  @returns Name.
+*/
+const char* dtype2name(dtype_t* type_struct);
+  
 /*!
   @brief Initialize an empty generic object.
   @returns generic_t New generic object structure.
@@ -202,7 +221,7 @@ void display_generic(generic_t x);
   @param[in] ap va_list_t Variable argument list.
   @returns generic_t Generic structure if one is present.
  */
-generic_t get_generic_va(size_t nargs, va_list_t ap);
+/* generic_t get_generic_va(size_t nargs, va_list_t ap); */
 
 
 /*!
@@ -212,7 +231,7 @@ generic_t get_generic_va(size_t nargs, va_list_t ap);
   @param[in] ap va_list_t Variable argument list.
   @returns generic_t* Generic structure if one is present, NULL otherwise.
  */
-generic_t* get_generic_va_ptr(size_t nargs, va_list_t ap);
+/* generic_t* get_generic_va_ptr(size_t nargs, va_list_t ap); */
 
 
 /*!
@@ -223,7 +242,7 @@ generic_t* get_generic_va_ptr(size_t nargs, va_list_t ap);
   @param[in] ap va_list_t* Pointer to variable argument list.
   @returns generic_t Generic structure if one is present.
  */
-generic_t pop_generic_va(size_t* nargs, va_list_t* ap);
+/* generic_t pop_generic_va(size_t* nargs, va_list_t* ap); */
 
 
 /*!
@@ -234,7 +253,7 @@ generic_t pop_generic_va(size_t* nargs, va_list_t* ap);
   @param[in] ap va_list_t* Pointer to variable argument list.
   @returns generic_t* Generic structure if one is present, NULL otherwise.
  */
-generic_t* pop_generic_va_ptr(size_t* nargs, va_list_t* ap);
+/* generic_t* pop_generic_va_ptr(size_t* nargs, va_list_t* ap); */
 
 /*!
   @brief Add an element to the end of an array of generic elements.
@@ -303,115 +322,7 @@ size_t generic_array_get_size(generic_t x);
  */
 void* generic_array_get_item(generic_t x, const size_t index,
 			   const char *type);
-/*!
-  @brief Get the size of an item from an array in bytes.
-  @param[in] x Generic object that is presumed to contain an array.
-  @param[in] index Index for value that the size should be returned for.
-  @returns Size of the item in bytes.
- */
-int generic_array_get_item_nbytes(generic_t x, const size_t index);
-bool generic_array_get_bool(generic_t x, const size_t index);
-int generic_array_get_integer(generic_t x, const size_t index);
-void* generic_array_get_null(generic_t x, const size_t index);
-double generic_array_get_number(generic_t x, const size_t index);
-char* generic_array_get_string(generic_t x, const size_t index);
-generic_t generic_array_get_object(generic_t x, const size_t index);
-generic_t generic_array_get_array(generic_t x, const size_t index);
-char* generic_array_get_direct(generic_t x, const size_t index);
-ply_t generic_array_get_ply(generic_t x, const size_t index);
-obj_t generic_array_get_obj(generic_t x, const size_t index);
-python_t generic_array_get_python_class(generic_t x, const size_t index);
-python_t generic_array_get_python_function(generic_t x, const size_t index);
-schema_t generic_array_get_schema(generic_t x, const size_t index);
-generic_t generic_array_get_any(generic_t x, const size_t index);
 
-  
-/*!
-  @brief Get a scalar value from an array.
-  @param[in] x generic_t Generic object that is presumed to contain an array.
-  @param[in] index size_t Index for value that should be returned.
-  @param[in] subtype const char* Subtype of scalar expected.
-  @param[in] precision const int Precision of scalar that is expected.
-  @returns void* Pointer to scalar data.
- */
-void* generic_array_get_scalar(generic_t x, const size_t index,
-			       const char *subtype, const size_t precision);
-int8_t generic_array_get_int8(generic_t x, const size_t index);
-int16_t generic_array_get_int16(generic_t x, const size_t index);
-int32_t generic_array_get_int32(generic_t x, const size_t index);
-int64_t generic_array_get_int64(generic_t x, const size_t index);
-uint8_t generic_array_get_uint8(generic_t x, const size_t index);
-uint16_t generic_array_get_uint16(generic_t x, const size_t index);
-uint32_t generic_array_get_uint32(generic_t x, const size_t index);
-uint64_t generic_array_get_uint64(generic_t x, const size_t index);
-float generic_array_get_float(generic_t x, const size_t index);
-double generic_array_get_double(generic_t x, const size_t index);
-long double generic_array_get_long_double(generic_t x, const size_t index);
-complex_float_t generic_array_get_complex_float(generic_t x, const size_t index);
-complex_double_t generic_array_get_complex_double(generic_t x, const size_t index);
-complex_long_double_t generic_array_get_complex_long_double(generic_t x, const size_t index);
-char* generic_array_get_bytes(generic_t x, const size_t index);
-char* generic_array_get_unicode(generic_t x, const size_t index);
-  
-/*!
-  @brief Get a 1d array value from an array.
-  @param[in] x generic_t Generic object that is presumed to contain an array.
-  @param[in] index size_t Index for value that should be returned.
-  @param[in] subtype const char* Subtype of array expected.
-  @param[in] precision const size_t Precision of array that is expected.
-  @param[out] data void** Pointer to pointer that should be reallocated to store the data.
-  @returns size_t Number of elements in the data.
- */
-size_t generic_array_get_1darray(generic_t x, const size_t index,
-				 const char *subtype, const size_t precision,
-				 void** data);
-size_t generic_array_get_1darray_int8(generic_t x, const size_t index, int8_t** data);
-size_t generic_array_get_1darray_int16(generic_t x, const size_t index, int16_t** data);
-size_t generic_array_get_1darray_int32(generic_t x, const size_t index, int32_t** data);
-size_t generic_array_get_1darray_int64(generic_t x, const size_t index, int64_t** data);
-size_t generic_array_get_1darray_uint8(generic_t x, const size_t index, uint8_t** data);
-size_t generic_array_get_1darray_uint16(generic_t x, const size_t index, uint16_t** data);
-size_t generic_array_get_1darray_uint32(generic_t x, const size_t index, uint32_t** data);
-size_t generic_array_get_1darray_uint64(generic_t x, const size_t index, uint64_t** data);
-size_t generic_array_get_1darray_float(generic_t x, const size_t index, float** data);
-size_t generic_array_get_1darray_double(generic_t x, const size_t index, double** data);
-size_t generic_array_get_1darray_long_double(generic_t x, const size_t index, long double** data);
-size_t generic_array_get_1darray_complex_float(generic_t x, const size_t index, complex_float_t** data);
-size_t generic_array_get_1darray_complex_double(generic_t x, const size_t index, complex_double_t** data);
-size_t generic_array_get_1darray_complex_long_double(generic_t x, const size_t index, complex_long_double_t** data);
-size_t generic_array_get_1darray_bytes(generic_t x, const size_t index, char** data);
-size_t generic_array_get_1darray_unicode(generic_t x, const size_t index, char** data);
-  
-/*!
-  @brief Get a nd array value from an array.
-  @param[in] x generic_t Generic object that is presumed to contain an array.
-  @param[in] index size_t Index for value that should be returned.
-  @param[in] subtype const char* Subtype of array expected.
-  @param[in] precision const size_t Precision of array that is expected.
-  @param[out] data void** Pointer to array that should be reallocated to store the data.
-  @param[out] shape size_t** Pointer to array that should be reallocated to store the array shape in each dimension.
-  @returns size_t Number of dimensions in the array.
- */
-size_t generic_array_get_ndarray(generic_t x, const size_t index,
-				 const char *subtype, const size_t precision,
-				 void** data, size_t** shape);
-size_t generic_array_get_ndarray_int8(generic_t x, const size_t index, int8_t** data, size_t** shape);
-size_t generic_array_get_ndarray_int16(generic_t x, const size_t index, int16_t** data, size_t** shape);
-size_t generic_array_get_ndarray_int32(generic_t x, const size_t index, int32_t** data, size_t** shape);
-size_t generic_array_get_ndarray_int64(generic_t x, const size_t index, int64_t** data, size_t** shape);
-size_t generic_array_get_ndarray_uint8(generic_t x, const size_t index, uint8_t** data, size_t** shape);
-size_t generic_array_get_ndarray_uint16(generic_t x, const size_t index, uint16_t** data, size_t** shape);
-size_t generic_array_get_ndarray_uint32(generic_t x, const size_t index, uint32_t** data, size_t** shape);
-size_t generic_array_get_ndarray_uint64(generic_t x, const size_t index, uint64_t** data, size_t** shape);
-size_t generic_array_get_ndarray_float(generic_t x, const size_t index, float** data, size_t** shape);
-size_t generic_array_get_ndarray_double(generic_t x, const size_t index, double** data, size_t** shape);
-size_t generic_array_get_ndarray_long_double(generic_t x, const size_t index, long double** data, size_t** shape);
-size_t generic_array_get_ndarray_complex_float(generic_t x, const size_t index, complex_float_t** data, size_t** shape);
-size_t generic_array_get_ndarray_complex_double(generic_t x, const size_t index, complex_double_t** data, size_t** shape);
-size_t generic_array_get_ndarray_complex_long_double(generic_t x, const size_t index, complex_long_double_t** data, size_t** shape);
-size_t generic_array_get_ndarray_bytes(generic_t x, const size_t index, char** data, size_t** shape);
-size_t generic_array_get_ndarray_unicode(generic_t x, const size_t index, char** data, size_t** shape);
-  
 /*!
   @brief Get the number of elements in an map object.
   @param[in] x generic_t Generic object that is presumed to contain a map.
@@ -432,517 +343,106 @@ int generic_map_has_key(generic_t x, char* key);
   @returns size_t Number of keys in map.
  */
 size_t generic_map_get_keys(generic_t x, char*** keys);
-/*!
-  @brief Get an item from a map for types that don't require additional parameters.
-  @param[in] x generic_t Generic object that is presumed to contain a map.
-  @param[in] key const char* Key string for value that should be returned.
-  @param[in] type const char* Type of value expected.
-  @returns void* Pointer to data for map item.
- */
-void* generic_map_get_item(generic_t x, const char* key,
-			   const char *type);
-int generic_map_get_item_nbytes(generic_t x, const char* key);
-bool generic_map_get_bool(generic_t x, const char* key);
-int generic_map_get_integer(generic_t x, const char* key);
-void* generic_map_get_null(generic_t x, const char* key);
-double generic_map_get_number(generic_t x, const char* key);
-char* generic_map_get_string(generic_t x, const char* key);
-generic_t generic_map_get_object(generic_t x, const char* key);
-generic_t generic_map_get_array(generic_t x, const char* key);
-char* generic_map_get_direct(generic_t x, const char* key);
-ply_t generic_map_get_ply(generic_t x, const char* key);
-obj_t generic_map_get_obj(generic_t x, const char* key);
-python_t generic_map_get_python_class(generic_t x, const char* key);
-python_t generic_map_get_python_function(generic_t x, const char* key);
-schema_t generic_map_get_schema(generic_t x, const char* key);
-generic_t generic_map_get_any(generic_t x, const char* key);
-  
-/*!
-  @brief Get a scalar value from a map.
-  @param[in] x generic_t Generic object that is presumed to contain a map.
-  @param[in] key const char* Key string for value that should be returned.
-  @param[in] subtype const char* Subtype of scalar expected.
-  @param[in] precision const int Precision of scalar that is expected.
-  @returns void* Pointer to scalar data.
- */
-void* generic_map_get_scalar(generic_t x, const char* key,
-			     const char *subtype, const size_t precision);
-int8_t generic_map_get_int8(generic_t x, const char* key);
-int16_t generic_map_get_int16(generic_t x, const char* key);
-int32_t generic_map_get_int32(generic_t x, const char* key);
-int64_t generic_map_get_int64(generic_t x, const char* key);
-uint8_t generic_map_get_uint8(generic_t x, const char* key);
-uint16_t generic_map_get_uint16(generic_t x, const char* key);
-uint32_t generic_map_get_uint32(generic_t x, const char* key);
-uint64_t generic_map_get_uint64(generic_t x, const char* key);
-float generic_map_get_float(generic_t x, const char* key);
-double generic_map_get_double(generic_t x, const char* key);
-long double generic_map_get_long_double(generic_t x, const char* key);
-complex_float_t generic_map_get_complex_float(generic_t x, const char* key);
-complex_double_t generic_map_get_complex_double(generic_t x, const char* key);
-complex_long_double_t generic_map_get_complex_long_double(generic_t x, const char* key);
-char* generic_map_get_bytes(generic_t x, const char* key);
-char* generic_map_get_unicode(generic_t x, const char* key);
-  
-/*!
-  @brief Get a 1d array value from a map.
-  @param[in] x generic_t Generic object that is presumed to contain a map.
-  @param[in] key const char* Key string for value that should be returned.
-  @param[in] subtype const char* Subtype of array expected.
-  @param[in] precision const size_t Precision of array that is expected.
-  @param[out] data void** Pointer to pointer that should be reallocated to store the data.
-  @returns size_t Number of elements in the data.
- */
-size_t generic_map_get_1darray(generic_t x, const char* key,
-			       const char *subtype, const size_t precision,
-			       void** data);
-size_t generic_map_get_1darray_int8(generic_t x, const char* key, int8_t** data);
-size_t generic_map_get_1darray_int16(generic_t x, const char* key, int16_t** data);
-size_t generic_map_get_1darray_int32(generic_t x, const char* key, int32_t** data);
-size_t generic_map_get_1darray_int64(generic_t x, const char* key, int64_t** data);
-size_t generic_map_get_1darray_uint8(generic_t x, const char* key, uint8_t** data);
-size_t generic_map_get_1darray_uint16(generic_t x, const char* key, uint16_t** data);
-size_t generic_map_get_1darray_uint32(generic_t x, const char* key, uint32_t** data);
-size_t generic_map_get_1darray_uint64(generic_t x, const char* key, uint64_t** data);
-size_t generic_map_get_1darray_float(generic_t x, const char* key, float** data);
-size_t generic_map_get_1darray_double(generic_t x, const char* key, double** data);
-size_t generic_map_get_1darray_long_double(generic_t x, const char* key, long double** data);
-size_t generic_map_get_1darray_complex_float(generic_t x, const char* key, complex_float_t** data);
-size_t generic_map_get_1darray_complex_double(generic_t x, const char* key, complex_double_t** data);
-size_t generic_map_get_1darray_complex_long_double(generic_t x, const char* key, complex_long_double_t** data);
-size_t generic_map_get_1darray_bytes(generic_t x, const char* key, char** data);
-size_t generic_map_get_1darray_unicode(generic_t x, const char* key, char** data);
-  
-/*!
-  @brief Get a nd array value from a map.
-  @param[in] x generic_t Generic object that is presumed to contain a map.
-  @param[in] key const char* Key string for value that should be returned.
-  @param[in] subtype const char* Subtype of array expected.
-  @param[in] precision const size_t Precision of array that is expected.
-  @param[out] data void** Pointer to array that should be reallocated to store the data.
-  @param[out] shape size_t** Pointer to array that should be reallocated to store the array shape in each dimension.
-  @returns size_t Number of dimensions in the array.
- */
-size_t generic_map_get_ndarray(generic_t x, const char* key,
-			       const char *subtype, const size_t precision,
-			       void** data, size_t** shape);
-size_t generic_map_get_ndarray_int8(generic_t x, const char* key, int8_t** data, size_t** shape);
-size_t generic_map_get_ndarray_int16(generic_t x, const char* key, int16_t** data, size_t** shape);
-size_t generic_map_get_ndarray_int32(generic_t x, const char* key, int32_t** data, size_t** shape);
-size_t generic_map_get_ndarray_int64(generic_t x, const char* key, int64_t** data, size_t** shape);
-size_t generic_map_get_ndarray_uint8(generic_t x, const char* key, uint8_t** data, size_t** shape);
-size_t generic_map_get_ndarray_uint16(generic_t x, const char* key, uint16_t** data, size_t** shape);
-size_t generic_map_get_ndarray_uint32(generic_t x, const char* key, uint32_t** data, size_t** shape);
-size_t generic_map_get_ndarray_uint64(generic_t x, const char* key, uint64_t** data, size_t** shape);
-size_t generic_map_get_ndarray_float(generic_t x, const char* key, float** data, size_t** shape);
-size_t generic_map_get_ndarray_double(generic_t x, const char* key, double** data, size_t** shape);
-size_t generic_map_get_ndarray_long_double(generic_t x, const char* key, long double** data, size_t** shape);
-size_t generic_map_get_ndarray_complex_float(generic_t x, const char* key, complex_float_t** data, size_t** shape);
-size_t generic_map_get_ndarray_complex_double(generic_t x, const char* key, complex_double_t** data, size_t** shape);
-size_t generic_map_get_ndarray_complex_long_double(generic_t x, const char* key, complex_long_double_t** data, size_t** shape);
-size_t generic_map_get_ndarray_bytes(generic_t x, const char* key, char** data, size_t** shape);
-size_t generic_map_get_ndarray_unicode(generic_t x, const char* key, char** data, size_t** shape);
 
-/*!
-  @brief Set an item in an array for types that don't require additional parameters.
-  @param[in] x generic_t Generic object that is presumed to contain an array.
-  @param[in] index size_t Index for value that should be set.
-  @param[in] type const char* Type of value being set.
-  @param[in] value void* Pointer to data that item should be set to.
-  @returns int -1 if there is an error, 0 otherwise.
- */
-int generic_array_set_item(generic_t x, const size_t index,
-			   const char *type, void* value);
-int generic_array_set_bool(generic_t x, const size_t index,
-			   bool value);
-int generic_array_set_integer(generic_t x, const size_t index,
-			      int value);
-int generic_array_set_null(generic_t x, const size_t index,
-			   void* value);
-int generic_array_set_number(generic_t x, const size_t index,
-			     double value);
-int generic_array_set_string(generic_t x, const size_t index,
-			     char* value);
-int generic_array_set_object(generic_t x, const size_t index,
-			     generic_t value);
-int generic_array_set_map(generic_t x, const size_t index,
-			  generic_t value);
-int generic_array_set_array(generic_t x, const size_t index,
-			    generic_t value);
-int generic_array_set_direct(generic_t x, const size_t index,
-			     char* value);
-int generic_array_set_ply(generic_t x, const size_t index,
-			  ply_t value);
-int generic_array_set_obj(generic_t x, const size_t index,
-			  obj_t value);
-int generic_array_set_python_class(generic_t x, const size_t index,
-				   python_t value);
-int generic_array_set_python_function(generic_t x, const size_t index,
-				      python_t value);
-int generic_array_set_schema(generic_t x, const size_t index,
-			     schema_t value);
-int generic_array_set_any(generic_t x, const size_t index,
-			  generic_t value);
-
-/*!
-  @brief Set a scalar value in an array.
-  @param[in] x generic_t Generic object that is presumed to contain an array.
-  @param[in] index size_t Index for value that should be set.
-  @param[in] value void* Pointer to scalar data.
-  @param[in] subtype const char* Subtype of scalar in value.
-  @param[in] precision const int Precision of scalar in value.
-  @param[in] units const char* Units of value.
-  @returns int -1 if there is an error, 0 otherwise.
- */
-int generic_array_set_scalar(generic_t x, const size_t index,
-			     void* value, const char *subtype,
-			     const size_t precision,
-			     const char* units);
-int generic_array_set_int8(generic_t x, const size_t index, int8_t value, const char* units);
-int generic_array_set_int16(generic_t x, const size_t index, int16_t value, const char* units);
-int generic_array_set_int32(generic_t x, const size_t index, int32_t value, const char* units);
-int generic_array_set_int64(generic_t x, const size_t index, int64_t value, const char* units);
-int generic_array_set_uint8(generic_t x, const size_t index, uint8_t value, const char* units);
-int generic_array_set_uint16(generic_t x, const size_t index, uint16_t value, const char* units);
-int generic_array_set_uint32(generic_t x, const size_t index, uint32_t value, const char* units);
-int generic_array_set_uint64(generic_t x, const size_t index, uint64_t value, const char* units);
-int generic_array_set_float(generic_t x, const size_t index, float value, const char* units);
-int generic_array_set_double(generic_t x, const size_t index, double value, const char* units);
-int generic_array_set_long_double(generic_t x, const size_t index, long double value, const char* units);
-int generic_array_set_complex_float(generic_t x, const size_t index,
-				    complex_float_t value,
-				    const char* units);
-int generic_array_set_complex_double(generic_t x, const size_t index,
-				     complex_double_t value,
-				     const char* units);
-int generic_array_set_complex_long_double(generic_t x, const size_t index,
-					  complex_long_double_t value,
-					  const char* units);
-int generic_array_set_bytes(generic_t x, const size_t index, char* value, const char* units);
-int generic_array_set_unicode(generic_t x, const size_t index, char* value, const char* units);
-
-/*!
-  @brief Set a 1d array value in an array.
-  @param[in] x generic_t Generic object that is presumed to contain an array.
-  @param[in] index size_t Index for value that should be set.
-  @param[in] value void* Pointer to array data.
-  @param[in] subtype const char* Subtype of array expected.
-  @param[in] precision const size_t Precision of array that is expected.
-  @param[in] length const size_t Number of elements in value.
-  @param[in] units const char* Units of value.
-  @returns int -1 if there is an error, 0 otherwise.
- */
-int generic_array_set_1darray(generic_t x, const size_t index,
-			      void* value, const char *subtype,
-			      const size_t precision,
-			      const size_t length,
-			      const char* units);
-int generic_array_set_1darray_int8(generic_t x, const size_t index,
-				   int8_t* value, const size_t length,
-				   const char* units);
-int generic_array_set_1darray_int16(generic_t x, const size_t index,
-				    int16_t* value, const size_t length,
-				    const char* units);
-int generic_array_set_1darray_int32(generic_t x, const size_t index,
-				    int32_t* value, const size_t length,
-				    const char* units);
-int generic_array_set_1darray_int64(generic_t x, const size_t index,
-				    int64_t* value, const size_t length,
-				    const char* units);
-int generic_array_set_1darray_uint8(generic_t x, const size_t index,
-				    uint8_t* value, const size_t length,
-				    const char* units);
-int generic_array_set_1darray_uint16(generic_t x, const size_t index,
-				     uint16_t* value, const size_t length,
-				     const char* units);
-int generic_array_set_1darray_uint32(generic_t x, const size_t index,
-				     uint32_t* value, const size_t length,
-				     const char* units);
-int generic_array_set_1darray_uint64(generic_t x, const size_t index,
-				     uint64_t* value, const size_t length,
-				     const char* units);
-int generic_array_set_1darray_float(generic_t x, const size_t index,
-				    float* value, const size_t length,
-				    const char* units);
-int generic_array_set_1darray_double(generic_t x, const size_t index,
-				     double* value, const size_t length,
-				     const char* units);
-int generic_array_set_1darray_long_double(generic_t x, const size_t index, long double* value, const size_t length, const char* units);
-int generic_array_set_1darray_complex_float(generic_t x, const size_t index, complex_float_t* value, const size_t length, const char* units);
-int generic_array_set_1darray_complex_double(generic_t x, const size_t index, complex_double_t* value, const size_t length, const char* units);
-int generic_array_set_1darray_complex_long_double(generic_t x, const size_t index, complex_long_double_t* value, const size_t length, const char* units);
-int generic_array_set_1darray_bytes(generic_t x, const size_t index,
-				    char** value, const size_t length,
-				    const char* units);
-int generic_array_set_1darray_unicode(generic_t x, const size_t index,
-				      char** value, const size_t length,
-				      const char* units);
   
-/*!
-  @brief Set a nd array value from an array.
-  @param[in] x generic_t Generic object that is presumed to contain an array.
-  @param[in] index size_t Index for value that should be set.
-  @param[in] data void* Pointer to array data.
-  @param[in] subtype const char* Subtype of array in value.
-  @param[in] precision const size_t Precision of array that is in value.
-  @param[in] ndim size_t Number of dimensions in the array.
-  @param[in] shape size_t* Pointer to array containing the size of
-  the array in each dimension.
-  @param[in] units const char* Units that should be added to the array.
-  @returns int -1 if there is an error, 0 otherwise.
- */
-int generic_array_set_ndarray(generic_t x, const size_t index,
-			      void* data, const char *subtype,
-			      const size_t precision,
-			      const size_t ndim, const size_t* shape,
-			      const char* units);
-int generic_array_set_ndarray_int8(generic_t x, const size_t index,
-				   int8_t* data, const size_t ndim,
-				   const size_t* shape,
-				   const char* units);
-int generic_array_set_ndarray_int16(generic_t x, const size_t index,
-				    int16_t* data, const size_t ndim,
-				    const size_t* shape,
-				    const char* units);
-int generic_array_set_ndarray_int32(generic_t x, const size_t index,
-				    int32_t* data, const size_t ndim,
-				    const size_t* shape,
-				    const char* units);
-int generic_array_set_ndarray_int64(generic_t x, const size_t index,
-				    int64_t* data, const size_t ndim,
-				    const size_t* shape,
-				    const char* units);
-int generic_array_set_ndarray_uint8(generic_t x, const size_t index,
-				    uint8_t* data, const size_t ndim,
-				    const size_t* shape,
-				    const char* units);
-int generic_array_set_ndarray_uint16(generic_t x, const size_t index,
-				     uint16_t* data, const size_t ndim,
-				     const size_t* shape,
-				     const char* units);
-int generic_array_set_ndarray_uint32(generic_t x, const size_t index,
-				     uint32_t* data, const size_t ndim,
-				     const size_t* shape,
-				     const char* units);
-int generic_array_set_ndarray_uint64(generic_t x, const size_t index,
-				     uint64_t* data, const size_t ndim,
-				     const size_t* shape,
-				     const char* units);
-int generic_array_set_ndarray_float(generic_t x, const size_t index,
-				    float* data, const size_t ndim,
-				    const size_t* shape,
-				    const char* units);
-int generic_array_set_ndarray_double(generic_t x, const size_t index,
-				     double* data, const size_t ndim,
-				     const size_t* shape,
-				     const char* units);
-int generic_array_set_ndarray_long_double(generic_t x, const size_t index, long double* data, const size_t ndim, const size_t* shape, const char* units);
-int generic_array_set_ndarray_complex_float(generic_t x, const size_t index, complex_float_t* data, const size_t ndim, const size_t* shape, const char* units);
-int generic_array_set_ndarray_complex_double(generic_t x, const size_t index, complex_double_t* data, const size_t ndim, const size_t* shape, const char* units);
-int generic_array_set_ndarray_complex_long_double(generic_t x, const size_t index, complex_long_double_t* data, const size_t ndim, const size_t* shape, const char* units);
-int generic_array_set_ndarray_bytes(generic_t x, const size_t index, char** data, const size_t ndim, const size_t* shape, const char* units);
-int generic_array_set_ndarray_unicode(generic_t x, const size_t index, char** data, const size_t ndim, const size_t* shape, const char* units);
+#define NESTED_BASE_SET_(base, idx, idxType, name, ...)			\
+  int generic_ ## base ## _set_ ## name(generic_t x, idxType idx, __VA_ARGS__)
+#define NESTED_BASE_GET_(base, idx, idxType, name, type, ...)		\
+  type generic_ ## base ## _get_ ## name(generic_t x, idxType idx, __VA_ARGS__)
+#define NESTED_BASE_GET_NOARGS_(base, idx, idxType, name, type)	\
+  type generic_ ## base ## _get_ ## name(generic_t x, idxType idx)
+#define NESTED_SET_(name, ...)						\
+  NESTED_BASE_SET_(array, index, const size_t, name, __VA_ARGS__);	\
+  NESTED_BASE_SET_(map, key, const char*, name, __VA_ARGS__)
+#define NESTED_GET_(name, type, ...)					\
+  NESTED_BASE_GET_(array, index, const size_t, name, type, __VA_ARGS__); \
+  NESTED_BASE_GET_(map, key, const char*, name, type, __VA_ARGS__)
+#define NESTED_GET_NOARGS_(name, type)		\
+  NESTED_BASE_GET_NOARGS_(array, index, const size_t, name, type);	\
+  NESTED_BASE_GET_NOARGS_(map, key, const char*, name, type)
+#define STD_JSON_NESTED_(name)						\
+  generic_t generic_array_get_ ## name(generic_t x, const size_t index); \
+  generic_t generic_map_get_ ## name(generic_t x, const char* key);	\
+  int generic_array_set_ ## name(generic_t x, const size_t index, generic_t item); \
+  int generic_map_set_ ## name(generic_t x, const char* key, generic_t item)
+#define STD_JSON_(name, type)						\
+  type generic_get_ ## name(generic_t x);				\
+  int generic_set_ ## name(generic_t x, type value);			\
+  NESTED_GET_NOARGS_(name, type);					\
+  NESTED_SET_(name, type value)
+#define STD_UNITS_(name, type)			\
+  type generic_get_ ## name(generic_t x);				\
+  int generic_set_ ## name(generic_t x, type value, const char* units); \
+  NESTED_GET_NOARGS_(name, type);					\
+  NESTED_SET_(name, type value, const char* units)
+#define GEOMETRY_(name, type)			\
+  STD_JSON_(name, type)
+// TODO: Allow units when calling "get" methods?
+#define ARRAY_(name, type)						\
+  size_t generic_get_1darray_ ## name(generic_t x, type** data);	\
+  size_t generic_get_ndarray_ ## name(generic_t x, type** data, size_t** shape); \
+  NESTED_GET_(1darray_ ## name, size_t, type** data);			\
+  NESTED_GET_(ndarray_ ## name, size_t, type** data, size_t** shape);	\
+  NESTED_SET_(1darray_ ## name, type* value, const size_t length, const char* units); \
+  NESTED_SET_(ndarray_ ## name, type* data, const size_t ndim, const size_t* shape, const char* units)
+#define SCALAR_(name, type)		\
+  STD_UNITS_(name, type);		\
+  ARRAY_(name, type)
+#define COMPLEX_(name, type)			\
+  SCALAR_(name, type)
+#define PYTHON_(name)				\
+  STD_JSON_(name, python_t)
   
-  
-/*!
-  @brief Set an item from a map for types that don't require additional parameters.
-  @param[in] x generic_t Generic object that is presumed to contain a map.
-  @param[in] key const char* Key string for value that should be set.
-  @param[in] type const char* Type of value being set.
-  @param[in] value void* Pointer to data that item should be set to.
-  @returns int -1 if there is an error, 0 otherwise.
- */
-int generic_map_set_item(generic_t x, const char* key,
-			 const char* type, void* value);
-int generic_map_set_bool(generic_t x, const char* key,
-			 bool value);
-int generic_map_set_integer(generic_t x, const char* key,
-			    int value);
-int generic_map_set_null(generic_t x, const char* key,
-			 void* value);
-int generic_map_set_number(generic_t x, const char* key,
-			   double value);
-int generic_map_set_string(generic_t x, const char* key,
-			   char* value);
-int generic_map_set_object(generic_t x, const char* key,
-			   generic_t value);
-int generic_map_set_map(generic_t x, const char* key,
-			generic_t value);
-int generic_map_set_array(generic_t x, const char* key,
-			  generic_t value);
-int generic_map_set_direct(generic_t x, const char* key,
-			   char* value);
-int generic_map_set_ply(generic_t x, const char* key,
-			ply_t value);
-int generic_map_set_obj(generic_t x, const char* key,
-			obj_t value);
-int generic_map_set_python_class(generic_t x, const char* key,
-				 python_t value);
-int generic_map_set_python_function(generic_t x, const char* key,
-				    python_t value);
-int generic_map_set_schema(generic_t x, const char* key,
-			   schema_t value);
-int generic_map_set_any(generic_t x, const char* key,
-			generic_t value);
+  STD_JSON_(bool, bool);
+  STD_JSON_(integer, int);
+  STD_JSON_(null, void*);
+  STD_JSON_(number, double);
+  STD_JSON_(string, const char*);
+  STD_JSON_NESTED_(object);
+  STD_JSON_NESTED_(array);
+  STD_JSON_NESTED_(any);
+  STD_JSON_NESTED_(schema);
+  SCALAR_(int8, int8_t);
+  SCALAR_(int16, int16_t);
+  SCALAR_(int32, int32_t);
+  SCALAR_(int64, int64_t);
+  SCALAR_(uint8, uint8_t);
+  SCALAR_(uint16, uint16_t);
+  SCALAR_(uint32, uint32_t);
+  SCALAR_(uint64, uint64_t);
+  SCALAR_(float, float);
+  SCALAR_(double, double);
+  COMPLEX_(complex_float, complex_float_t);
+  COMPLEX_(complex_double, complex_double_t);
+#ifdef YGGDRASIL_LONG_DOUBLE_AVAILABLE
+  SCALAR_(long_double, long double);
+  COMPLEX_(complex_long_double, complex_long_double_t);
+#endif // YGGDRASIL_LONG_DOUBLE_AVAILABLE
+  /* SCALAR_(bytes, const char*); */
+  /* SCALAR_(unicode, const char*); */
+  PYTHON_(python_class);
+  PYTHON_(python_function);
+  PYTHON_(python_instance);
+  GEOMETRY_(obj, obj_t);
+  GEOMETRY_(ply, ply_t);
 
-/*!
-  @brief Set a scalar value in a map.
-  @param[in] x generic_t Generic object that is presumed to contain a map.
-  @param[in] key const char* Key string for value that should be set.
-  @param[in] value void* Pointer to scalar data.
-  @param[in] subtype const char* Subtype of scalar in value.
-  @param[in] precision const int Precision of scalar in value.
-  @param[in] units const char* Units of value.
-  @returns int -1 if there is an error, 0 otherwise.
- */
-int generic_map_set_scalar(generic_t x, const char* key,
-			   void* value, const char *subtype,
-			   const size_t precision,
-			   const char* units);
-int generic_map_set_int8(generic_t x, const char* key, int8_t value, const char* units);
-int generic_map_set_int16(generic_t x, const char* key, int16_t value, const char* units);
-int generic_map_set_int32(generic_t x, const char* key, int32_t value, const char* units);
-int generic_map_set_int64(generic_t x, const char* key, int64_t value, const char* units);
-int generic_map_set_uint8(generic_t x, const char* key, uint8_t value, const char* units);
-int generic_map_set_uint16(generic_t x, const char* key, uint16_t value, const char* units);
-int generic_map_set_uint32(generic_t x, const char* key, uint32_t value, const char* units);
-int generic_map_set_uint64(generic_t x, const char* key, uint64_t value, const char* units);
-int generic_map_set_float(generic_t x, const char* key, float value, const char* units);
-int generic_map_set_double(generic_t x, const char* key, double value, const char* units);
-int generic_map_set_long_double(generic_t x, const char* key, long double value, const char* units);
-int generic_map_set_complex_float(generic_t x, const char* key,
-				  complex_float_t value,
-				  const char* units);
-int generic_map_set_complex_double(generic_t x, const char* key,
-				   complex_double_t value,
-				   const char* units);
-int generic_map_set_complex_long_double(generic_t x, const char* key,
-					complex_long_double_t value,
-					const char* units);
-int generic_map_set_bytes(generic_t x, const char* key, char* value, const char* units);
-int generic_map_set_unicode(generic_t x, const char* key, char* value, const char* units);
-
-/*!
-  @brief Set a 1d array value in a map.
-  @param[in] x generic_t Generic object that is presumed to contain a map.
-  @param[in] key const char* Key string for value that should be set.
-  @param[in] value void* Pointer to array data.
-  @param[in] subtype const char* Subtype of array expected.
-  @param[in] precision const size_t Precision of array that is expected.
-  @param[in] length const size_t Number of elements in value.
-  @param[in] units const char* Units of value.
-  @returns int -1 if there is an error, 0 otherwise.
- */
-int generic_map_set_1darray(generic_t x, const char* key,
-			    void* value, const char *subtype,
-			    const size_t precision,
-			    const size_t length,
-			    const char* units);
-int generic_map_set_1darray_int8(generic_t x, const char* key,
-				 int8_t* value, const size_t length,
-				 const char* units);
-int generic_map_set_1darray_int16(generic_t x, const char* key,
-				  int16_t* value, const size_t length,
-				  const char* units);
-int generic_map_set_1darray_int32(generic_t x, const char* key,
-				  int32_t* value, const size_t length,
-				  const char* units);
-int generic_map_set_1darray_int64(generic_t x, const char* key,
-				  int64_t* value, const size_t length,
-				  const char* units);
-int generic_map_set_1darray_uint8(generic_t x, const char* key,
-				  uint8_t* value, const size_t length,
-				  const char* units);
-int generic_map_set_1darray_uint16(generic_t x, const char* key,
-				   uint16_t* value, const size_t length,
-				   const char* units);
-int generic_map_set_1darray_uint32(generic_t x, const char* key,
-				   uint32_t* value, const size_t length,
-				   const char* units);
-int generic_map_set_1darray_uint64(generic_t x, const char* key,
-				   uint64_t* value, const size_t length,
-				   const char* units);
-int generic_map_set_1darray_float(generic_t x, const char* key,
-				  float* value, const size_t length,
-				  const char* units);
-int generic_map_set_1darray_double(generic_t x, const char* key,
-				   double* value, const size_t length,
-				   const char* units);
-int generic_map_set_1darray_long_double(generic_t x, const char* key, long double* value, const size_t length, const char* units);
-int generic_map_set_1darray_complex_float(generic_t x, const char* key, complex_float_t* value, const size_t length, const char* units);
-int generic_map_set_1darray_complex_double(generic_t x, const char* key, complex_double_t* value, const size_t length, const char* units);
-int generic_map_set_1darray_complex_long_double(generic_t x, const char* key, complex_long_double_t* value, const size_t length, const char* units);
-int generic_map_set_1darray_bytes(generic_t x, const char* key,
-				  char** value, const size_t length,
-				  const char* units);
-int generic_map_set_1darray_unicode(generic_t x, const char* key,
-				    char** value, const size_t length,
-				    const char* units);
+#undef GEOMETRY_
+#undef COMPLEX_
+#undef PYTHON_
+#undef SCALAR_
+#undef ARRAY_
+#undef STD_UNITS_
+#undef STD_JSON_
+#undef STD_JSON_NESTED_
+#undef NESTED_SET_
+#undef NESTED_GET_
+#undef NESTED_GET_NOARGS_
+#undef NESTED_BASE_SET_
+#undef NESTED_BASE_GET_
+#undef NESTED_BASE_GET_NOARGS_
+#undef GENERIC_ERROR_
+#undef GENERIC_SUCCESS_
   
-/*!
-  @brief Set a nd array value in a map.
-  @param[in] x generic_t Generic object that is presumed to contain a map.
-  @param[in] key const char* Key string for value that should be set.
-  @param[in] data void* Pointer to array data.
-  @param[in] subtype const char* Subtype of array in value.
-  @param[in] precision const size_t Precision of array that is in value.
-  @param[in] ndim size_t Number of dimensions in the array.
-  @param[in] shape size_t* Pointer to array containing the size of
-  the array in each dimension.
-  @param[in] units const char* Units that should be added to the array.
-  @returns int -1 if there is an error, 0 otherwise.
- */
-int generic_map_set_ndarray(generic_t x, const char* key,
-			    void* data, const char *subtype,
-			    const size_t precision,
-			    const size_t ndim, const size_t* shape,
-			    const char* units);
-int generic_map_set_ndarray_int8(generic_t x, const char* key,
-				 int8_t* data, const size_t ndim,
-				 const size_t* shape,
-				 const char* units);
-int generic_map_set_ndarray_int16(generic_t x, const char* key,
-				  int16_t* data, const size_t ndim,
-				  const size_t* shape,
-				  const char* units);
-int generic_map_set_ndarray_int32(generic_t x, const char* key,
-				  int32_t* data, const size_t ndim,
-				  const size_t* shape,
-				  const char* units);
-int generic_map_set_ndarray_int64(generic_t x, const char* key,
-				  int64_t* data, const size_t ndim,
-				  const size_t* shape,
-				  const char* units);
-int generic_map_set_ndarray_uint8(generic_t x, const char* key,
-				  uint8_t* data, const size_t ndim,
-				  const size_t* shape,
-				  const char* units);
-int generic_map_set_ndarray_uint16(generic_t x, const char* key,
-				   uint16_t* data, const size_t ndim,
-				   const size_t* shape,
-				   const char* units);
-int generic_map_set_ndarray_uint32(generic_t x, const char* key,
-				   uint32_t* data, const size_t ndim,
-				   const size_t* shape,
-				   const char* units);
-int generic_map_set_ndarray_uint64(generic_t x, const char* key,
-				   uint64_t* data, const size_t ndim,
-				   const size_t* shape,
-				   const char* units);
-int generic_map_set_ndarray_float(generic_t x, const char* key,
-				  float* data, const size_t ndim,
-				  const size_t* shape,
-				  const char* units);
-int generic_map_set_ndarray_double(generic_t x, const char* key,
-				   double* data, const size_t ndim,
-				   const size_t* shape,
-				   const char* units);
-int generic_map_set_ndarray_long_double(generic_t x, const char* key, long double* data, const size_t ndim, const size_t* shape, const char* units);
-int generic_map_set_ndarray_complex_float(generic_t x, const char* key, complex_float_t* data, const size_t ndim, const size_t* shape, const char* units);
-int generic_map_set_ndarray_complex_double(generic_t x, const char* key, complex_double_t* data, const size_t ndim, const size_t* shape, const char* units);
-int generic_map_set_ndarray_complex_long_double(generic_t x, const char* key, complex_long_double_t* data, const size_t ndim, const size_t* shape, const char* units);
-int generic_map_set_ndarray_bytes(generic_t x, const char* key, char** data, const size_t ndim, const size_t* shape, const char* units);
-int generic_map_set_ndarray_unicode(generic_t x, const char* key, char** data, const size_t ndim, const size_t* shape, const char* units);
   
 /*!
 >>>>>>> topic/timesync
@@ -981,7 +481,7 @@ void destroy_python_function(python_function_t *x);
   @param[in, out] ap va_list_t Variable argument list.
   @returns int 0 if there are no errors, 1 otherwise.
  */
-int skip_va_elements(const dtype_t* dtype, size_t *nargs, va_list_t *ap);
+/* int skip_va_elements(const dtype_t* dtype, size_t *nargs, va_list_t *ap); */
 
 
 /*!
@@ -1259,9 +759,16 @@ dtype_t* create_dtype_any(const bool use_generic);
 
 
 /*!
-  @brief Wrapper for freeing MetaschemaType class wrapper struct.
-  @param[in] dtype dtype_t** Wrapper struct for C++ Metaschema type class.
-  @returns: int 0 if free was successfull, -1 if there was an error.
+  @brief Wrapper for freeing rapidjson::Document class.
+  @param[in] obj Pointer to rapidjson::Document.
+  @returns int 0 if free was successfull, -1 if there was an error.
+*/
+int destroy_document(void** obj);
+  
+/*!
+  @brief Wrapper for freeing rapidjson::Document class wrapper struct.
+  @param[in] dtype dtype_t** Wrapper struct for C++ rapidjson::Document.
+  @returns int 0 if free was successfull, -1 if there was an error.
 */
 int destroy_dtype(dtype_t** dtype);
 
@@ -1297,14 +804,33 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
   out.zmq_reply[0] = '\0';
   out.zmq_reply_worker[0] = '\0';
   out.model[0] = '\0';
-  // Parameters that will be removed
-  out.serializer_type = -1;
-  out.format_str[0] = '\0';
   // Parameters used for type
   out.dtype = NULL;
+  out.metadata = NULL;
   return out;
 };
 
+static inline
+comm_head_t create_send_header(const char * data, const size_t len,
+			       dtype_t *datatype) {
+  /* printf("create_send_header: %d\n", len); */
+  comm_head_t head = init_header(len, NULL, NULL);
+  sprintf(head.id, "%d", rand());
+  char *model_name = getenv("YGG_MODEL_NAME");
+  if (model_name != NULL) {
+    strcpy(head.model, model_name);
+  }
+  char *model_copy = getenv("YGG_MODEL_COPY");
+  if (model_copy != NULL) {
+    strcat(head.model, "_copy");
+    strcat(head.model, model_copy);
+  }
+  head.flags = head.flags | HEAD_FLAG_VALID | HEAD_FLAG_MULTIPART;
+  // Add datatype information to header
+  head.dtype = datatype->schema;
+  head.metadata = datatype->metadata;
+  return head;
+};
 
 /*!
   @brief Destroy a header object.
@@ -1314,8 +840,10 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
 static inline
 int destroy_header(comm_head_t* x) {
   int ret = 0;
-  if (x->dtype != NULL) {
-    ret = destroy_dtype(&(x->dtype));
+  if (x->metadata != NULL) {
+    ret = destroy_document(&(x->metadata));
+    x->metadata = NULL;
+    x->dtype = NULL;
   }
   return ret;
 };
@@ -1423,15 +951,15 @@ comm_head_t parse_comm_header(const char *buf, const size_t buf_siz);
 
 /*!
   @brief Get the ascii table data structure.
-  @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
+  @param[in] dtype dtype_t* Wrapper struct for C++ rapidjson::Document.
   @returns: void* Cast pointer to ascii table.
 */
-void* dtype_ascii_table(const dtype_t* dtype);
+/* void* dtype_ascii_table(const dtype_t* dtype); */
 
 
 /*!
   @brief Get a copy of a type structure.
-  @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
+  @param[in] dtype dtype_t* Wrapper struct for C++ rapidjson::Document.
   @returns: dtype_t* Type class.
 */
 dtype_t* copy_dtype(const dtype_t* dtype);
@@ -1439,27 +967,26 @@ dtype_t* copy_dtype(const dtype_t* dtype);
 
 /*!
   @brief Wrapper for updating a type object with information from another.
-  @param[in] dtype1 dtype_t* Wrapper struct for C++ Metaschema type class that should be updated.
-  @param[in] dtype2 dtype_t* Wrapper struct for C++ Metaschema type class that should be updated from.
+  @param[in] dtype1 Wrapper struct for C++ rapidjson::Document that should be updated.
+  @param[in] schema2 C++ rapidjson::Document that should be updated from.
   @returns: int 0 if successfull, -1 if there was an error.
 */
-int update_dtype(dtype_t* dtype1, dtype_t* dtype2);
+int update_dtype(dtype_t* dtype1, void* schema2);
 
 
 /*!
   @brief Wrapper for updatining a type object with information from
   the provided variable arguments if a generic structure is present.
-  @param[in] dtype1 dtype_t* Wrapper struct for C++ Metaschema type class that should be updated.
-  @param[in] nargs size_t Number of arguments in ap.
+  @param[in] dtype1 dtype_t* Wrapper struct for C++ rapidjson::Document that should be updated.
   @param[in] ap va_list_t Variable argument list.
   @returns: int 0 if successfull, -1 if there was an error.
  */
-int update_dtype_from_generic_ap(dtype_t* dtype1, size_t nargs, va_list_t ap);
+int update_dtype_from_generic_ap(dtype_t* dtype1, va_list_t ap);
 
   
 /*!
   @brief Wrapper for updating the precision of a bytes or unicode scalar type.
-  @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
+  @param[in] dtype dtype_t* Wrapper struct for C++ rapidjson::Document.
   @param[in] new_precision size_t New precision.
   @returns: int 0 if free was successfull, -1 if there was an error.
 */
@@ -1468,40 +995,38 @@ int update_precision_dtype(const dtype_t* dtype,
 
 /*!
   @brief Wrapper for deserializing from a data type.
-  @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
+  @param[in] dtype dtype_t* Wrapper struct for C++ rapidjson::Document.
   @param[in] buf character pointer to serialized message.
   @param[in] buf_siz size_t Size of buf.
   @param[in] allow_realloc int If 1, variables being filled are assumed to be
   pointers to pointers for heap memory. If 0, variables are assumed to be pointers
   to stack memory. If allow_realloc is set to 1, but stack variables are passed,
   a segfault can occur.
-  @param[in, out] nargs int Number of arguments remaining in argument list.
   @param[in] ap va_list Arguments to be parsed from message.
   returns: int The number of populated arguments. -1 indicates an error.
 */
 int deserialize_dtype(const dtype_t *dtype, const char *buf, const size_t buf_siz,
-		      const int allow_realloc, size_t *nargs, va_list_t ap);
+		      const int allow_realloc, va_list_t ap);
 
 
 /*!
   @brief Wrapper for serializing from a data type.
-  @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
+  @param[in] dtype dtype_t* Wrapper struct for C++ rapidjson::Document.
   @param[in] buf character pointer to pointer to memory where serialized message
   should be stored.
   @param[in] buf_siz size_t Size of memory allocated to buf.
   @param[in] allow_realloc int If 1, buf will be realloced if it is not big
   enough to hold the serialized emssage. If 0, an error will be returned.
-  @param[in, out] nargs int Number of arguments remaining in argument list.
   @param[in] ap va_list Arguments to be formatted.
   returns: int The length of the serialized message or -1 if there is an error.
 */
 int serialize_dtype(const dtype_t *dtype, char **buf, size_t *buf_siz,
-		    const int allow_realloc, size_t *nargs, va_list_t ap);
+		    const int allow_realloc, va_list_t ap);
 
 
 /*!
   @brief Wrapper for displaying a data type.
-  @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
+  @param[in] dtype dtype_t* Wrapper struct for C++ rapidjson::Document.
   @param[in] indent char* Indentation to add to display output.
 */
   void display_dtype(const dtype_t *dtype, const char* indent);
@@ -1509,7 +1034,7 @@ int serialize_dtype(const dtype_t *dtype, char **buf, size_t *buf_siz,
 
 /*!
   @brief Wrapper for determining how many arguments a data type expects.
-  @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
+  @param[in] dtype dtype_t* Wrapper struct for C++ rapidjson::Document.
 */
 size_t nargs_exp_dtype(const dtype_t *dtype);
 
@@ -1527,6 +1052,95 @@ size_t nargs_exp_dtype(const dtype_t *dtype);
 #define display_json_object display_generic
 #define display_json_array display_generic
 #define display_schema display_generic
+
+// ObjWavefront wrapped methods
+
+/*!
+  @brief Initialize empty obj structure.
+  @returns obj_t Obj structure.
+*/
+obj_t init_obj();
+
+/*!
+  @brief Set parameters from a rapidjson::ObjWavefront object.
+  @param[in,out] x Structure to modify.
+  @param[in] obj rapidjson::ObjWavefront object to copy.
+  @param[in] copy If 1, the provided object will be copied, otherwise the
+    pointer will be added to the structured directly and it will be freed on
+    destruction.
+*/
+void set_obj(obj_t* x, void* obj, int copy);
+  
+/*!
+  @brief Free obj structure.
+  @param[in] p *obj_t Pointer to obj structure.
+*/
+void free_obj(obj_t *p);
+
+/*!
+  @brief Copy an obj structure.
+  @param[in] src obj_t Obj structure that should be copied.
+  @returns Copy of obj structure.
+*/
+obj_t copy_obj(obj_t src);
+
+/*!
+  @brief Display the information contained by an Obj struct.
+  @param[in] p obj_t Obj structure.
+  @param[in] indent const char* Indentation that should be added to each line.
+ */
+void display_obj_indent(obj_t p, const char* indent);
+
+/*!
+  @brief Display the information contained by an Obj struct.
+  @param[in] p obj_t Obj structure.
+ */
+void display_obj(obj_t p);
+
+  
+// Ply wrapped methods
+
+/*!
+  @brief Initialize empty ply structure.
+  @returns ply_t Ply structure.
+ */
+ply_t init_ply();
+
+/*!
+  @brief Set parameters from a rapidjson::Ply object.
+  @param[in,out] x Structure to modify.
+  @param[in] obj rapidjson::Ply object to copy.
+  @param[in] copy If 1, the provided object will be copied, otherwise the
+    pointer will be added to the structured directly and it will be freed on
+    destruction.
+*/
+void set_ply(ply_t* x, void* obj, int copy);
+  
+/*!
+  @brief Free ply structure.
+  @param[in] p *ply_t Pointer to ply structure.
+ */
+void free_ply(ply_t *p);
+
+/*!
+  @brief Copy a ply structure.
+  @param[in] src ply_t Ply structure that should be copied.
+  @returns Copy of ply structure.
+*/
+ply_t copy_ply(ply_t src);
+
+/*!
+  @brief Display the information contained by a Ply struct.
+  @param[in] p ply_t Ply structure.
+  @param[in] indent const char* Indentation that should be added to each line.
+ */
+void display_ply_indent(ply_t p, const char* indent);
+
+/*!
+  @brief Display the information contained by a Ply struct.
+  @param[in] p ply_t Ply structure.
+ */
+void display_ply(ply_t p);
 
   
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */

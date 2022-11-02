@@ -9,8 +9,6 @@
 #include "ZMQComm.h"
 #include "ServerComm.h"
 #include "ClientComm.h"
-#include "AsciiFileComm.h"
-#include "AsciiTableComm.h"
 #include "DefaultComm.h"
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
@@ -193,10 +191,6 @@ int free_comm_type(comm_t *x) {
     ret = free_server_comm(x);
   else if (t == CLIENT_COMM)
     ret = free_client_comm(x);
-  else if (t == ASCII_FILE_COMM)
-    ret = free_ascii_file_comm(x);
-  else if ((t == ASCII_TABLE_COMM) || (t == ASCII_TABLE_ARRAY_COMM))
-    ret = free_ascii_table_comm(x);
   else {
     ygglog_error("free_comm_type: Unsupported comm_type %d", t);
   }
@@ -382,12 +376,6 @@ int new_comm_type(comm_t *x) {
     flag = new_server_address(x);
   else if (t == CLIENT_COMM)
     flag = new_client_address(x);
-  else if (t == ASCII_FILE_COMM)
-    flag = new_ascii_file_address(x);
-  else if (t == ASCII_TABLE_COMM)
-    flag = new_ascii_table_address(x);
-  else if (t == ASCII_TABLE_ARRAY_COMM)
-    flag = new_ascii_table_array_address(x);
   else {
     ygglog_error("new_comm_type: Unsupported comm_type %d", t);
     flag = -1;
@@ -413,12 +401,6 @@ int init_comm_type(comm_t *x) {
     flag = init_server_comm(x);
   else if (t == CLIENT_COMM)
     flag = init_client_comm(x);
-  else if (t == ASCII_FILE_COMM)
-    flag = init_ascii_file_comm(x);
-  else if (t == ASCII_TABLE_COMM)
-    flag = init_ascii_table_comm(x);
-  else if (t == ASCII_TABLE_ARRAY_COMM)
-    flag = init_ascii_table_array_comm(x);
   else {
     ygglog_error("init_comm_type: Unsupported comm_type %d", t);
     flag = -1;
@@ -493,7 +475,7 @@ comm_t* init_comm(const char *name, const char *direction,
     return ret;
   }
   if ((datatype == NULL) && (strcmp(direction, "send") == 0)) {
-    datatype = create_dtype_scalar("bytes", 0, "", false);
+    datatype = create_dtype_scalar("string", 0, "", false);
   }
   ret = init_comm_base(name, direction, t, datatype);
   if (ret == NULL) {
@@ -588,10 +570,6 @@ int comm_nmsg(const comm_t *x) {
     ret = server_comm_nmsg(x);
   else if (t == CLIENT_COMM)
     ret = client_comm_nmsg(x);
-  else if (t == ASCII_FILE_COMM)
-    ret = ascii_file_comm_nmsg(x);
-  else if ((t == ASCII_TABLE_COMM) || (t == ASCII_TABLE_ARRAY_COMM))
-    ret = ascii_table_comm_nmsg(x);
   else {
     ygglog_error("comm_nmsg: Unsupported comm_type %d", t);
   }
@@ -628,10 +606,6 @@ int comm_send_single(const comm_t *x, const char *data, const size_t len) {
     ret = server_comm_send(x, data, len);
   else if (t == CLIENT_COMM)
     ret = client_comm_send(x, data, len);
-  else if (t == ASCII_FILE_COMM)
-    ret = ascii_file_comm_send(x, data, len);
-  else if ((t == ASCII_TABLE_COMM) || (t == ASCII_TABLE_ARRAY_COMM))
-    ret = ascii_table_comm_send(x, data, len);
   else {
     ygglog_error("comm_send_single: Unsupported comm_type %d", t);
   }
@@ -656,29 +630,14 @@ int comm_send_single(const comm_t *x, const char *data, const size_t len) {
 static
 comm_head_t comm_send_multipart_header(const comm_t *x, const char * data,
 				       const size_t len) {
-  comm_head_t head = init_header(len, NULL, NULL);
-  sprintf(head.id, "%d", rand());
-  char *model_name = getenv("YGG_MODEL_NAME");
-  if (model_name != NULL) {
-    strcpy(head.model, model_name);
+  dtype_t *datatype;
+  if (x->type == CLIENT_COMM) {
+    comm_t *req_comm = (comm_t*)(x->handle);
+    datatype = req_comm->datatype;
+  } else {
+    datatype = x->datatype;
   }
-  char *model_copy = getenv("YGG_MODEL_COPY");
-  if (model_copy != NULL) {
-    strcat(head.model, "_copy");
-    strcat(head.model, model_copy);
-  }
-  head.flags = head.flags | HEAD_FLAG_VALID | HEAD_FLAG_MULTIPART;
-  // Add datatype information to header
-  if (!(x->flags & COMM_FLAG_FILE)) {
-    dtype_t *datatype;
-    if (x->type == CLIENT_COMM) {
-      comm_t *req_comm = (comm_t*)(x->handle);
-      datatype = req_comm->datatype;
-    } else {
-      datatype = x->datatype;
-    }
-    head.dtype = datatype;
-  }
+  comm_head_t head = create_send_header(data, len, datatype);
   const comm_t *x0;
   if (x->type == SERVER_COMM) {
     if (!(is_eof(data))) {
@@ -807,7 +766,7 @@ int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
   }
   // Send header
   size_t data_in_header = 0;
-  if ((head.flags & HEAD_TYPE_IN_DATA) && ((size_t)headlen > (x->maxMsgSize - x->msgBufSize))) {
+  if ((head.flags & HEAD_META_IN_DATA) && ((size_t)headlen > (x->maxMsgSize - x->msgBufSize))) {
     ret = comm_send_single(x, headbuf, x->maxMsgSize - x->msgBufSize);
     data_in_header = headlen - (x->maxMsgSize - x->msgBufSize);
   } else {
@@ -985,10 +944,6 @@ int comm_recv_single(comm_t *x, char **data, const size_t len,
     ret = server_comm_recv(x, data, len, allow_realloc);
   else if (t == CLIENT_COMM)
     ret = client_comm_recv(x, data, len, allow_realloc);
-  else if (t == ASCII_FILE_COMM)
-    ret = ascii_file_comm_recv(x, data, len, allow_realloc);
-  else if ((t == ASCII_TABLE_COMM) || (t == ASCII_TABLE_ARRAY_COMM))
-    ret = ascii_table_comm_recv(x, data, len, allow_realloc);
   else {
     ygglog_error("comm_recv: Unsupported comm_type %d", t);
   }
@@ -1041,18 +996,20 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
       destroy_header(&head);
       return -1;
     }
-    if ((!(x->const_flags[0] & COMM_FLAGS_USED)) && (!(x->flags & COMM_FLAG_FILE)) && (updtype->obj == NULL) && (!(head.flags & HEAD_TYPE_IN_DATA))) {
+    if ((!(x->const_flags[0] & COMM_FLAGS_USED)) &&
+	(updtype->schema == NULL) &&
+	(!(head.flags & HEAD_META_IN_DATA))) {
       ygglog_debug("comm_recv_multipart(%s): Updating datatype to '%s'",
-		   x->name, head.dtype->type);
+		   x->name, schema2name_c(head.dtype));
       ret = update_dtype(updtype, head.dtype);
       if (ret != 0) {
 	ygglog_error("comm_recv_multipart(%s): Error updating datatype.", x->name);
 	destroy_header(&head);
 	return -1;
       }
-    } else if ((!(x->flags & COMM_FLAG_FILE)) && (head.dtype != NULL)) {
+    } else if (head.dtype != NULL) {
       ygglog_debug("comm_recv_multipart(%s): Updating existing datatype to '%s' from '%s'",
-		   x->name, head.dtype->type, updtype->type);
+		   x->name, schema2name_c(head.dtype), schema2name_c(updtype->schema));
       ret = update_dtype(updtype, head.dtype);
       if (ret != 0) {
 	ygglog_error("comm_recv_multipart(%s): Error updating existing datatype.", x->name);
@@ -1124,7 +1081,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
 	ygglog_debug("comm_recv_multipart(%s): %d of %d bytes received",
 		     x->name, prev, head.size);
       }
-      if ((ret > 0) && (head.flags & HEAD_TYPE_IN_DATA)) {
+      if ((ret > 0) && (head.flags & HEAD_META_IN_DATA)) {
 	ygglog_debug("comm_recv_multipart(%s): Extracting type from data.");
 	ret = parse_type_in_data(data, prev, &head);
 	if (ret > 0) {
@@ -1267,14 +1224,13 @@ int comm_recv_nolimit(comm_t *x, char **data, const size_t len) {
   is then sent to the specified output comm. If the message is larger than
   YGG_MSG_MAX or cannot be encoded, it will not be sent.  
   @param[in] x comm_t* structure for comm that message should be sent to.
-  @param[in] nargs size_t Number of arguments in the variable argument list.
   @param[in] ap va_list arguments to be formatted into a message using sprintf.
   @returns int Number of arguments formatted if send succesfull, -1 if send
   unsuccessful.
  */
 static
-int vcommSend(const comm_t *x, size_t nargs, va_list_t ap) {
-  ygglog_debug("vcommSend: Formatting %lu arguments.", nargs);
+int vcommSend(const comm_t *x, va_list_t ap) {
+  ygglog_debug("vcommSend: Formatting %lu arguments.", ap.nargs[0]);
   int ret = -1;
   if ((x == NULL) || (!(x->flags & COMM_FLAG_VALID))) {
     ygglog_error("vcommSend: Invalid comm");
@@ -1293,11 +1249,11 @@ int vcommSend(const comm_t *x, size_t nargs, va_list_t ap) {
     datatype = handle->datatype;
   }
   // Update datatype if not yet set and object being sent includes type
-  if (update_dtype_from_generic_ap(datatype, nargs, ap) < 0) {
+  if (update_dtype_from_generic_ap(datatype, ap) < 0) {
     return -1;
   }
-  size_t nargs_orig = nargs;
-  ret = serialize_dtype(datatype, &buf, &buf_siz, 1, &nargs, ap);
+  size_t nargs_orig = ap.nargs[0];
+  ret = serialize_dtype(datatype, &buf, &buf_siz, 1, ap);
   if (ret < 0) {
     ygglog_error("vcommSend(%s): serialization error", x->name);
     free(buf);
@@ -1305,12 +1261,12 @@ int vcommSend(const comm_t *x, size_t nargs, va_list_t ap) {
   }
   ret = comm_send(x, buf, ret);
   ygglog_debug("vcommSend(%s): comm_send returns %d, nargs (remaining) = %d",
-	       x->name, ret, nargs);
+	       x->name, ret, ap.nargs[0]);
   free(buf);
   if (ret < 0) {
     return ret;
   } else {
-    return (int)(nargs_orig - nargs);
+    return (int)(nargs_orig - ap.nargs[0]);
   }
 };
 
@@ -1326,10 +1282,10 @@ int vcommSend(const comm_t *x, size_t nargs, va_list_t ap) {
 */
 static
 int ncommSend(const comm_t *x, size_t nargs, ...) {
-  va_list_t ap = init_va_list();
+  va_list_t ap = init_va_list(&nargs);
   va_start(ap.va, nargs);
   ygglog_debug("ncommSend: nargs = %d", nargs);
-  int ret = vcommSend(x, nargs, ap);
+  int ret = vcommSend(x, ap);
   va_end(ap.va);
   return ret;
 };
@@ -1344,7 +1300,6 @@ int ncommSend(const comm_t *x, size_t nargs, ...) {
   pointers to pointers for heap memory. If 0, variables are assumed to be pointers
   to stack memory. If allow_realloc is set to 1, but stack variables are passed,
   a segfault can occur.
-  @param[in] nargs size_t Number of arguments in the variable argument list.
   @param[out] ap va_list arguments that should be assigned by parsing the
   received message using sscanf. As these are being assigned, they should be
   pointers to memory that has already been allocated.
@@ -1353,9 +1308,9 @@ int ncommSend(const comm_t *x, size_t nargs, ...) {
   returned if EOF is received.
  */
 static
-int vcommRecv(comm_t *x, const int allow_realloc, size_t nargs, va_list_t ap) {
+int vcommRecv(comm_t *x, const int allow_realloc, va_list_t ap) {
   int ret = -1;
-  ygglog_debug("vcommRecv: Parsing %lu arguments.", nargs);
+  ygglog_debug("vcommRecv: Parsing %lu arguments.", ap.nargs[0]);
   if ((x == NULL) || (!(x->flags & COMM_FLAG_VALID))) {
     ygglog_error("vcommRecv: Invalid comm");
     return ret;
@@ -1381,7 +1336,7 @@ int vcommRecv(comm_t *x, const int allow_realloc, size_t nargs, va_list_t ap) {
     comm_t *handle = (comm_t*)(x->handle);
     datatype = handle->datatype;
   }
-  ret = deserialize_dtype(datatype, buf, ret, allow_realloc, &nargs, ap);
+  ret = deserialize_dtype(datatype, buf, ret, allow_realloc, ap);
   if (ret < 0) {
     ygglog_error("vcommRecv(%s): error deserializing message (ret=%d)",
 		 x->name, ret);
@@ -1411,10 +1366,10 @@ int vcommRecv(comm_t *x, const int allow_realloc, size_t nargs, va_list_t ap) {
  */
 static
 int ncommRecv(comm_t *x, const int allow_realloc, size_t nargs, ...) {
-  va_list_t ap = init_va_list();
+  va_list_t ap = init_va_list(&nargs);
   va_start(ap.va, nargs);
   ygglog_debug("ncommRecv: nargs = %d", nargs);
-  int ret = vcommRecv(x, allow_realloc, nargs, ap);
+  int ret = vcommRecv(x, allow_realloc, ap);
   va_end(ap.va);
   return ret;
 };

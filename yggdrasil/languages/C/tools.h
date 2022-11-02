@@ -216,9 +216,9 @@ unsigned long ptr2seed(void *ptr) {
 */
 typedef struct va_list_t {
   va_list va;  //!< Traditional variable argument list.
-  int using_ptrs; //!< Flag that is 1 if the arguments are stored using pointers.
+  size_t nargs_; //!< Storage for number of remaining arguments if not provided as a pointer.
+  size_t *nargs; //!< The number of remaining arguments.
   void **ptrs; //!< Variable arguments stored as pointers.
-  int nptrs; //!< The number of variable arguments stored as pointers.
   int iptr; //!< The index of the current variable argument pointer.
   int for_fortran; //!< Flag that is 1 if this structure will be accessed by fortran.
 } va_list_t;
@@ -226,12 +226,8 @@ typedef struct va_list_t {
 
 /*! @brief Structure used to wrap Python objects. */
 typedef struct python_t {
-  char name[PYTHON_NAME_SIZE]; //!<Name of the Python class/type/function.
-  void *args; //!< Arguments used in creating a Python instance.
-  void *kwargs; //!< Keyword arguments used in creating a Python instance.
   PyObject *obj; //!< Python object.
 } python_t;
-
 
 /*!
   @brief Get the ID for the current thread (if inside one).
@@ -260,9 +256,6 @@ int get_thread_id() {
 static inline
 python_t init_python() {
   python_t out;
-  out.name[0] = '\0';
-  out.args = NULL;
-  out.kwargs = NULL;
   out.obj = NULL;
   return out;
 };
@@ -573,11 +566,11 @@ int is_send(const char *buf) {
   @returns va_list_t New variable argument list structure.
  */
 static inline
-va_list_t init_va_list() {
+va_list_t init_va_list(size_t *nargs) {
   va_list_t out;
-  out.using_ptrs = 0;
+  out.nargs_ = 0;
+  out.nargs = nargs;
   out.ptrs = NULL;
-  out.nptrs = 0;
   out.iptr = 0;
   out.for_fortran = 0;
   return out;
@@ -585,16 +578,16 @@ va_list_t init_va_list() {
 
 
 /*! Initialize a variable argument list from an array of pointers.
-  @param[in] nptrs int Number of pointers.
-  @param[in] ptrs void** Array of pointers. 
+  @param[in] nptrs Number of pointers.
+  @param[in] ptrs Array of pointers. 
   @returns va_list_t New variable argument list structure.
 */
 static inline
-va_list_t init_va_ptrs(const int nptrs, void** ptrs) {
+va_list_t init_va_ptrs(const size_t nptrs, void** ptrs) {
   va_list_t out;
-  out.using_ptrs = 1;
+  out.nargs_ = nptrs;
+  out.nargs = &out.nargs_;
   out.ptrs = ptrs;
-  out.nptrs = nptrs;
   out.iptr = 0;
   out.for_fortran = 0;
   return out;
@@ -606,7 +599,7 @@ va_list_t init_va_ptrs(const int nptrs, void** ptrs) {
 */
 static inline
 void end_va_list(va_list_t *ap) {
-  if (!(ap->using_ptrs)) {
+  if (!(ap->ptrs)) {
     va_end(ap->va);
   }
 };
@@ -619,11 +612,12 @@ void end_va_list(va_list_t *ap) {
 static inline
 va_list_t copy_va_list(va_list_t ap) {
   va_list_t out;
-  if (ap.using_ptrs) {
-    out = init_va_ptrs(ap.nptrs, ap.ptrs);
+  out.nargs_ = ap.nargs[0];
+  out.nargs = &(out.nargs_);
+  if (ap.ptrs) {
+    out.ptrs = ap.ptrs;
     out.iptr = ap.iptr;
   } else {
-    out = init_va_list();
     va_copy(out.va, ap.va);
   }
   out.for_fortran = ap.for_fortran;
@@ -637,7 +631,11 @@ va_list_t copy_va_list(va_list_t ap) {
  */
 static inline
 void va_list_t_skip(va_list_t *ap, size_t nbytes) {
-  if (ap->using_ptrs) {
+  if (ap->nargs[0] == 0) {
+    ygglog_error("va_list_t_skip: No more arguments");
+    return;
+  }
+  if (ap->ptrs) {
     ap->iptr++;
   } else {
     if (nbytes == sizeof(void*)) {
@@ -652,6 +650,8 @@ void va_list_t_skip(va_list_t *ap, size_t nbytes) {
       // va_arg(ap->va, char[nbytes]);
     }
   }
+  if (ap->nargs[0] > 0)
+    ap->nargs[0]--;
 };
 
   

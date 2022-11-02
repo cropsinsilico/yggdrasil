@@ -207,7 +207,7 @@ class ObjSerialize(PlySerialize):
         """
         if not isinstance(args, ObjDict):
             args = ObjDict(args)
-        return str(args).encode("utf-8")
+        return str(args).strip().encode("utf-8")
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -219,7 +219,7 @@ class ObjSerialize(PlySerialize):
             obj: Deserialized message.
 
         """
-        return ObjDict(msg)
+        return ObjDict(msg.strip())
 
     def normalize(self, args):
         r"""Normalize a message to conform to the expected datatype.
