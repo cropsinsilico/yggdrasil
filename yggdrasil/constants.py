@@ -32,12 +32,16 @@ PYTHON_SCALARS = OrderedDict([
     ('string', [bytes]),
     ('bytes', [bytes]),
     ('unicode', [str]),
+    ('number', [float]),
+    ('integer', [int]),
 ])
 VALID_TYPES = OrderedDict([(k, k) for k in NUMPY_NUMERIC_TYPES])
 VALID_TYPES.update([
     ('string', 'bytes'),
     ('bytes', 'bytes'),
     ('unicode', 'str'),
+    ('number', 'float'),
+    ('integer', 'int'),
 ])
 NUMPY_PRECISIONS = {
     'float': [16, 32, 64],
@@ -79,6 +83,7 @@ FMT_CHAR_STR = FMT_CHAR.decode("utf-8")
 DEFAULT_COMMENT_STR = DEFAULT_COMMENT.decode("utf-8")
 DEFAULT_DELIMITER_STR = DEFAULT_DELIMITER.decode("utf-8")
 DEFAULT_NEWLINE_STR = DEFAULT_NEWLINE.decode("utf-8")
+DEFAULT_DATATYPE = {'type': 'scalar', 'subtype': 'string'}
 
 
 # Communication constants

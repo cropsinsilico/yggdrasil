@@ -119,12 +119,25 @@ bool pop_va_list(va_list_t &ap, T& dst, int allow_null = 0) {
     return true;							\
   }
 POP_SPECIAL_(bool, int)
+POP_SPECIAL_(char, int)
 POP_SPECIAL_(int8_t, int)
 POP_SPECIAL_(int16_t, int)
 POP_SPECIAL_(uint8_t, int)
 POP_SPECIAL_(uint16_t, int)
 POP_SPECIAL_(float, double)
 #undef POP_SPECIAL_
+
+template<typename T>
+bool skip_va_list(va_list_t &ap, bool pointers) {
+  if (pointers) {
+    T* tmp = NULL;
+    T** tmp_ref = NULL;
+    return pop_va_list_mem(ap, tmp, tmp_ref);
+  } else {
+    T tmp;
+    return pop_va_list(ap, tmp);
+  }
+}
 
 template<typename T>
 bool get_va_list(va_list_t &ap, T& dst, int allow_null = 0) {
@@ -163,7 +176,7 @@ bool set_va_list_mem(char*& dst, char**& dst_ref, size_t& dst_len,
 }
   
 template<typename T>
-bool get_va_list_mem(va_list_t &ap, T*& dst, T**& dst_ref, int allow_realloc = 0) {
+bool pop_va_list_mem(va_list_t &ap, T*& dst, T**& dst_ref, int allow_realloc = 0) {
   try {
     if (ap.nargs[0] == 0) {
       ygglog_throw_error("set_va_list: No more arguments");
@@ -193,6 +206,11 @@ bool get_va_list_mem(va_list_t &ap, T*& dst, T**& dst_ref, int allow_realloc = 0
   return true;
 }
 template<typename T>
+bool get_va_list_mem(va_list_t &ap, T*& dst, T**& dst_ref, int allow_realloc = 0) {
+  va_list_t ap_copy = copy_va_list(ap);
+  return pop_va_list_mem(ap_copy, dst, dst_ref, allow_realloc);
+}
+template<typename T>
 bool set_va_list(va_list_t &ap, T& src, int allow_realloc = 0) {
   try {
     T** p = NULL;
@@ -200,7 +218,7 @@ bool set_va_list(va_list_t &ap, T& src, int allow_realloc = 0) {
     if (ap.nargs[0] == 0) {
       ygglog_throw_error("set_va_list: No more arguments");
     }
-    if (!get_va_list_mem(ap, arg, p, allow_realloc))
+    if (!pop_va_list_mem(ap, arg, p, allow_realloc))
       return false;
     if (allow_realloc) {
       if (ap.for_fortran) {

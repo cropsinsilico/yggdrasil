@@ -6,7 +6,7 @@ subroutine generic_array_get_generic(x, index, out)
   integer, intent(in) :: index
   type(ygggeneric), pointer, intent(out) :: out
   integer(kind=c_int) :: flag
-  flag = get_generic_array(x, int(index, c_size_t), out)
+  flag = get_generic_array(x, int(index, c_size_t), out, 0)
   if (flag.ne.0) then
      stop "generic_array_get_generic: Error extracting generic object."
   end if
@@ -81,9 +81,13 @@ subroutine generic_array_get_ply(x, index, out)
   integer, intent(in) :: index
   type(c_ptr) :: c_out
   type(yggply), pointer, intent(out) :: out
+  integer(kind=c_int) :: copy
+  allocate(out)
+  out = init_ply()
+  ! this returns a copy, is there a way to get a reference?
   c_out = generic_array_get_item(x, index, "ply")
-  ! Copy?
-  call c_f_pointer(c_out, out)
+  copy = 0
+  call set_ply(out, c_out, copy)
 end subroutine generic_array_get_ply
 subroutine generic_array_get_obj(x, index, out)
   implicit none
@@ -91,19 +95,23 @@ subroutine generic_array_get_obj(x, index, out)
   integer, intent(in) :: index
   type(c_ptr) :: c_out
   type(yggobj), pointer, intent(out) :: out
+  integer(kind=c_int) :: copy
+  allocate(out)
+  out = init_obj()
+  ! this returns a copy, is there a way to get a reference?
   c_out = generic_array_get_item(x, index, "obj")
-  ! Copy?
-  call c_f_pointer(c_out, out)
+  copy = 0
+  call set_obj(out, c_out, copy)
 end subroutine generic_array_get_obj
 subroutine generic_array_get_python_class(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(c_ptr) :: c_out
   type(yggpython), pointer, intent(out) :: out
-  c_out = generic_array_get_item(x, index, "class")
-  ! Copy?
-  call c_f_pointer(c_out, out)
+  allocate(out)
+  out = yggpython(init_python())
+  ! this returns a copy, is there a way to get a reference?
+  out%obj = generic_array_get_item(x, index, "class")
 end subroutine generic_array_get_python_class
 subroutine generic_array_get_python_function(x, index, out)
   implicit none
@@ -111,9 +119,10 @@ subroutine generic_array_get_python_function(x, index, out)
   integer, intent(in) :: index
   type(c_ptr) :: c_out
   type(yggpython), pointer, intent(out) :: out
-  c_out = generic_array_get_item(x, index, "function")
-  ! Copy?
-  call c_f_pointer(c_out, out)
+  allocate(out)
+  out = yggpython(init_python())
+  ! this returns a copy, is there a way to get a reference?
+  out%obj = generic_array_get_item(x, index, "function")
 end subroutine generic_array_get_python_function
 subroutine generic_array_get_schema(x, index, out)
   implicit none

@@ -618,6 +618,8 @@ va_list_t copy_va_list(va_list_t ap) {
     out.ptrs = ap.ptrs;
     out.iptr = ap.iptr;
   } else {
+    out.ptrs = NULL;
+    out.iptr = 0;
     va_copy(out.va, ap.va);
   }
   out.for_fortran = ap.for_fortran;

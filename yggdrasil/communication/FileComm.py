@@ -79,25 +79,22 @@ class FileComm(CommBase.CommBase):
         'in_temp': {'type': 'boolean', 'default': False},
         'is_series': {'type': 'boolean', 'default': False},
         'wait_for_creation': {'type': 'number', 'default': 0.0},
-        'serializer': {
-            'oneOf': [
-                {'$ref': '#/definitions/serializer'},
-                {'type': 'instance'}],
-            'default': {}}}
+        'serializer': {'$ref': '#/definitions/serializer'}}
     _schema_excluded_from_inherit = (
-        ['name', 'commtype', 'datatype', 'read_meth', 'serializer']
+        ['commtype', 'datatype', 'read_meth', 'serializer']
         + CommBase.CommBase._model_schema_prop)
     _schema_excluded_from_class_validation = ['serializer']
     _schema_base_class = None
     _schema_additional_kwargs = {'allowSingular': 'name'}
     _schema_additional_kwargs_no_inherit = {
-        'pushProperties': {'$properties/serializer/oneOf/0': True}}
+        'pushProperties': {'$properties/serializer': True}}
     _default_serializer = 'direct'
     _default_extension = '.txt'
     is_file = True
     _maxMsgSize = 0
     _mode_as_bytes = True
     _synchronous_read = False
+    _deprecated_drivers = ['FileInputDriver', 'FileOutputDriver']
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('close_on_eof_send', True)

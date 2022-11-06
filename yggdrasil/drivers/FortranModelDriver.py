@@ -3,7 +3,7 @@ import re
 import copy
 import logging
 from collections import OrderedDict
-from yggdrasil import platform, tools, constants
+from yggdrasil import platform, tools, constants, rapidjson
 from yggdrasil.languages import get_language_dir
 from yggdrasil.drivers import CModelDriver
 from yggdrasil.drivers.CompiledModelDriver import (
@@ -530,15 +530,13 @@ class FortranModelDriver(CompiledModelDriver):
             if out.startswith('ygg'):
                 out = 'type(%s)' % out
             return out
-        from yggdrasil.metaschema.datatypes import get_type_class
         json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
         if isinstance(json_type, str):  # pragma: no cover
             json_type = {'type': json_type}
         if 'type' in kwargs:  # pragma: no cover
             json_type.update(kwargs)
         assert isinstance(json_type, dict)
-        json_type = get_type_class(json_type['type']).normalize_definition(
-            json_type)
+        json_type = rapidjson.normalize(json_type, {'type': 'schema'})
         if out == '*':
             dim_str = ''
             if json_type['type'] == '1darray':
@@ -549,7 +547,7 @@ class FortranModelDriver(CompiledModelDriver):
                     dim_str = ', dimension(%s)' % ','.join(
                         [str(x) for x in json_type['shape']])
             json_subtype = copy.deepcopy(json_type)
-            json_subtype['type'] = json_subtype.pop('subtype')
+            json_subtype['type'] = 'scalar'
             out = cls.get_native_type(datatype=json_subtype) + dim_str
             if not dim_str:
                 json_subtype['type'] = out.split('(')[0]
@@ -557,7 +555,7 @@ class FortranModelDriver(CompiledModelDriver):
                     json_subtype['precision'] = ''
                     raise RuntimeError("Character array requires precision.")
                 else:
-                    json_subtype['precision'] = int(json_subtype['precision'] / 8)
+                    json_subtype['precision'] = int(json_subtype['precision'])
                 json_subtype.setdefault('ndim', 'n')
                 out = 'type(%s)' % cls.get_native_type(
                     type=('%s_pointer' % json_type['type'])).format(
@@ -569,14 +567,14 @@ class FortranModelDriver(CompiledModelDriver):
                 if out.startswith('ygguint'):
                     out = 'type(%s)' % out
                 if out.startswith('logical'):
-                    precision = json_type.get('precision', 8)
+                    precision = json_type.get('precision', 1)
                 elif out.startswith('complex'):
                     precision = json_type['precision'] / 2
                 elif json_type.get('subtype', json_type['type']) == 'unicode':
                     precision = json_type['precision'] / 4
                 else:
                     precision = json_type['precision']
-                out = out.replace('X', str(int(precision / 8)))
+                out = out.replace('X', str(int(precision)))
         return out
         
     @classmethod
@@ -604,7 +602,7 @@ class FortranModelDriver(CompiledModelDriver):
             grp = {'type': 'ygguintX',
                    'precision': grp['type'].split('ygguint')[-1]}
         if grp.get('precision', False):
-            out['precision'] = 8 * int(grp['precision'])
+            out['precision'] = int(grp['precision'])
             if grp['type'] == 'complex':
                 out['precision'] *= 2
         if (((grp.get('precision', False) or (grp['type'] == 'logical'))
@@ -612,7 +610,7 @@ class FortranModelDriver(CompiledModelDriver):
             grp['type'] += '(kind = X)'
         if grp['type'] == 'character':
             if grp.get('length', None):
-                out['precision'] = int(grp.get('length', 0)) * 8
+                out['precision'] = int(grp.get('length', 0))
             if grp.get('precision_var', None) == 'selected_char_kind(\'ISO_10646\')':
                 grp['type'] += '(kind = selected_char_kind(\'ISO_10646\'), len = X)'
                 if grp.get('length', None):
@@ -1131,7 +1129,7 @@ class FortranModelDriver(CompiledModelDriver):
             if 'precision' not in datatype:
                 datatype = dict(datatype, precision=0)
         elif datatype.get('subtype', datatype['type']) in constants.VALID_TYPES:
-            datatype.setdefault('precision', 32)
+            datatype.setdefault('precision', 4)
         out = super(FortranModelDriver, cls).write_type_def(
             name, datatype, **kwargs)
         return out
@@ -1220,8 +1218,7 @@ class FortranModelDriver(CompiledModelDriver):
             knew = k
             vnew = v
             if v == '*':
-                knew = {'type': k, 'subtype': 'float',
-                        'precision': 32}
+                knew = {'type': k, 'subtype': 'float', 'precision': 4}
                 vnew = 'real(kind = 4)'
                 if k == '1darray':
                     knew['length'] = 3
@@ -1231,11 +1228,11 @@ class FortranModelDriver(CompiledModelDriver):
                     vnew += ', dimension(3,4)'
             elif 'X' in v:
                 if vnew.startswith('complex'):
-                    knew = {'type': knew, 'precision': 128}
-                elif 'ISO_10646' in vnew:
-                    knew = {'type': knew, 'precision': 4 * 64}
-                else:
                     knew = {'type': knew, 'precision': 64}
+                elif 'ISO_10646' in vnew:
+                    knew = {'type': knew, 'precision': 4 * 8}
+                else:
+                    knew = {'type': knew, 'precision': 8}
                 vnew = vnew.replace('X', '8')
             if vnew.startswith('ygg'):
                 vnew = 'type(%s)' % vnew
@@ -1247,18 +1244,18 @@ class FortranModelDriver(CompiledModelDriver):
             # Single output
             {'inputs': [{'name': 'x', 'value': 1.0,
                          'datatype': {'type': 'float',
-                                      'precision': 32,
+                                      'precision': 4,
                                       'units': 'cm'}}],
              'outputs': [{'name': 'y',
                           'datatype': {'type': 'float',
-                                       'precision': 32,
+                                       'precision': 4,
                                        'units': 'cm'}}],
              'outputs_in_inputs': False,
              'dont_add_lengths': True},
             # No output
             {'inputs': [{'name': 'x', 'value': 1.0,
                          'datatype': {'type': 'float',
-                                      'precision': 32,
+                                      'precision': 4,
                                       'units': 'cm'}}],
              'outputs': [],
              'outputs_in_inputs': False},
@@ -1270,7 +1267,7 @@ class FortranModelDriver(CompiledModelDriver):
                                       'units': ''}},
                         {'name': 'length_x', 'value': 5,
                          'datatype': {'type': 'uint',
-                                      'precision': 64},
+                                      'precision': rapidjson.SIZE_OF_SIZE_T},
                          'is_length_var': True}],
              'outputs': [{'name': 'y',
                           'length_var': 'length_y',
@@ -1279,28 +1276,28 @@ class FortranModelDriver(CompiledModelDriver):
                                        'units': ''}},
                          {'name': 'length_y',
                           'datatype': {'type': 'uint',
-                                       'precision': 64},
+                                       'precision': rapidjson.SIZE_OF_SIZE_T},
                           'is_length_var': True}],
              'dont_add_lengths': True},
             # Returns output instead of parameter
             {'inputs': [{'name': 'x', 'value': 1.0,
                          'datatype': {'type': 'float',
-                                      'precision': 32,
+                                      'precision': 4,
                                       'units': 'cm'}}],
              'outputs': [{'name': 'y',
                           'datatype': {'type': 'float',
-                                       'precision': 32,
+                                       'precision': 4,
                                        'units': 'cm'}}],
              'outputs_in_inputs': False,
              'guess_at_outputs_in_inputs': True},
             # Guess at outputs in inputs
             {'inputs': [{'name': 'x', 'value': 1.0,
                          'datatype': {'type': 'float',
-                                      'precision': 32,
+                                      'precision': 4,
                                       'units': 'cm'}}],
              'outputs': [{'name': 'y',
                           'datatype': {'type': 'float',
-                                       'precision': 32,
+                                       'precision': 4,
                                        'units': 'cm'}}],
              'guess_at_outputs_in_inputs': True},
         ]

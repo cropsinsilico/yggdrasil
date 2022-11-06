@@ -19,7 +19,6 @@ def encode_yaml(obj, fd=None, indent=None,
         str, bytes: Encoded object.
 
     """
-    from yggdrasil.metaschema.datatypes import encode_data_readable
     if (indent is None) and (fd is not None):
         indent = '\t'
     indent = indent_char2int(indent)
@@ -41,7 +40,13 @@ def encode_yaml(obj, fd=None, indent=None,
         for x in sorted_dict_type:
             OrderedDumper.add_representer(x, _dict_representer)
         kwargs['Dumper'] = OrderedDumper
-    return yaml.dump(encode_data_readable(obj), **kwargs)
+        
+    # class OrderedDecoder(rapidjson.Decoder):
+    #     def start_object(self):
+    #         return OrderedDict()
+    # obj = rapidjson.as_pure_json(obj, decoder=OrderedDecoder(),
+    #                              mapping_mode=rapidjson.MM_SORT_KEYS)
+    return yaml.dump(obj, **kwargs)
 
 
 def decode_yaml(msg, sorted_dict_type=None, **kwargs):

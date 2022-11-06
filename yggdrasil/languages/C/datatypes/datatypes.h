@@ -28,15 +28,14 @@ static char prefix_char = '#';
 
 /*! @brief C-friendly definition of rapidjson::Document. */
 typedef struct dtype_t {
-  bool use_generic; //!< Flag for empty dtypes to specify generic in/out
   void *schema; //!< Pointer to rapidjson::Value for validation.
   void *metadata; //!< Pointer ot rapidjson::Document containing additional metadata.
 } dtype_t;
 
-/*! @brief C-friendly defintion of YggGeneric. */
+/*! @brief C-friendly wrapper for rapidjson::Document. */
 typedef struct generic_t {
   char prefix; //!< Prefix character for limited verification.
-  void *obj; //!< Pointer to YggGeneric class.
+  void *obj; //!< Pointer to rapidjson::Document class.
 } generic_t;
 
 /*! @brief C-friendly definition of vector object. */
@@ -188,7 +187,7 @@ int is_generic_init(generic_t x);
   @param[in] nbytes size_t Size of data.
   @returns generic_t Pointer to new generic object structure.
  */
-generic_t create_generic(dtype_t* type_class, void* data, size_t nbytes);
+/* generic_t create_generic(dtype_t* type_class, void* data, size_t nbytes); */
 
   
 /*!
@@ -280,9 +279,11 @@ int set_generic_array(generic_t arr, size_t i, generic_t x);
   @param[in] i size_t Index of element to get.
   @param[out] x generic_t* Pointer to address where element should be
   stored.
+  @param[in] copy If 1, the element will be copied, otherwise a reference
+    will be returned.
   @returns int Flag that is 1 if there is an error and 0 otherwise.
  */
-int get_generic_array(generic_t arr, size_t i, generic_t *x);
+int get_generic_array(generic_t arr, size_t i, generic_t *x, int copy);
 
 
 /*!
@@ -301,9 +302,15 @@ int set_generic_object(generic_t arr, const char* k, generic_t x);
   @param[in] k const char* Key of element to return.
   @param[out] x generic_t* Pointer to address where element should be
   stored.
+  @param[in] copy If 1, the element will be copied, otherwise a reference
+    will be returned.
   @returns int Flag that is 1 if there is an error and 0 otherwise.
  */
-int get_generic_object(generic_t arr, const char* k, generic_t *x);
+int get_generic_object(generic_t arr, const char* k, generic_t *x, int copy);
+
+
+#define set_generic_map set_generic_object
+#define get_generic_map get_generic_object
 
 
 /*!
@@ -321,8 +328,19 @@ size_t generic_array_get_size(generic_t x);
   @returns void* Pointer to data for array item.
  */
 void* generic_array_get_item(generic_t x, const size_t index,
-			   const char *type);
+			     const char *type);
 
+/*!
+  @brief Set an item in an array for types that don't require additional parameters.
+  @param[in] x generic_t Generic object that is presumed to contain an array.
+  @param[in] index size_t Index for value that should be set.
+  @param[in] type const char* Type of value expected.
+  @param[in] value Pointer to data for array item.
+  @returns -1 if there is an error, 0 otherwise.
+ */
+int generic_array_set_item(generic_t x, const size_t index,
+			   const char *type, void* value);
+  
 /*!
   @brief Get the number of elements in an map object.
   @param[in] x generic_t Generic object that is presumed to contain a map.
@@ -344,6 +362,48 @@ int generic_map_has_key(generic_t x, char* key);
  */
 size_t generic_map_get_keys(generic_t x, char*** keys);
 
+// TODO: Copy docs
+
+void* generic_array_get_scalar(generic_t x, const size_t index,
+			       const char * subtype, const size_t precision);
+size_t generic_array_get_1darray(generic_t x, const size_t index,
+				 const char* subtype, const size_t precision, void** data);
+size_t generic_array_get_ndarray(generic_t x, const size_t index,
+				 const char* subtype, const size_t precision,
+				 void** data, size_t** shape);
+int generic_array_set_scalar(generic_t x, const size_t index, void* value,
+			     const char* subtype, const size_t precision,
+			     const char *units);
+int generic_array_set_1darray(generic_t x, const size_t index, void* value,
+			      const char* subtype, const size_t precision,
+			      const size_t length, const char *units);
+int generic_array_set_ndarray(generic_t x, const size_t index, void* value,
+			      const char* subtype, const size_t precision,
+			      const size_t ndim, const size_t* shape,
+			      const char *units);
+void* generic_get_item(generic_t x, const char *type);
+void* generic_map_get_item(generic_t x, const char* key, const char *type);
+void* generic_map_get_scalar(generic_t x, const char* key,
+			     const char * subtype, const size_t precision);
+size_t generic_map_get_1darray(generic_t x, const char* key,
+			       const char* subtype, const size_t precision,
+			       void** data);
+size_t generic_map_get_ndarray(generic_t x, const char* key,
+			       const char* subtype, const size_t precision,
+			       void** data, size_t** shape);
+int generic_set_item(generic_t x, const char *type, void* value);
+int generic_map_set_item(generic_t x, const char* key,
+			 const char* type, void* value);
+int generic_map_set_scalar(generic_t x, const char* key, void* value,
+			   const char* subtype, const size_t precision,
+			   const char *units);
+int generic_map_set_1darray(generic_t x, const char* key, void* value,
+			    const char* subtype, const size_t precision,
+			    const size_t length, const char *units);
+int generic_map_set_ndarray(generic_t x, const char* key, void* value,
+			    const char* subtype, const size_t precision,
+			    const size_t ndim, const size_t* shape,
+			    const char *units);
   
 #define NESTED_BASE_SET_(base, idx, idxType, name, ...)			\
   int generic_ ## base ## _set_ ## name(generic_t x, idxType idx, __VA_ARGS__)
@@ -477,11 +537,11 @@ void destroy_python_function(python_function_t *x);
 /*!
   @brief Skip datatype arguments.
   @param[in] dtype dtype_t* Type structure to skip arguments for.
-  @param[in, out] nargs Pointer to number of arguments in ap.
   @param[in, out] ap va_list_t Variable argument list.
-  @returns int 0 if there are no errors, 1 otherwise.
+  @param[in] pointers If true, the skipped arguments are assumed to be pointers.
+  @returns int 1 if there are no errors, 0 otherwise.
  */
-/* int skip_va_elements(const dtype_t* dtype, size_t *nargs, va_list_t *ap); */
+int skip_va_elements(const dtype_t* dtype, va_list_t *ap, bool pointers);
 
 
 /*!
@@ -519,7 +579,7 @@ const size_t dtype_precision(const dtype_t* type_class);
   @brief Initialize a datatype structure including setting the type string.
   @param[in] dtype dtype_t* Type structure/class.
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Initialized type structure/class.
 */
 dtype_t* complete_dtype(dtype_t *dtype, const bool use_generic);
@@ -528,7 +588,7 @@ dtype_t* complete_dtype(dtype_t *dtype, const bool use_generic);
 /*!
   @brief Construct and empty type object.
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_empty(const bool use_generic);
@@ -538,7 +598,7 @@ dtype_t* create_dtype_empty(const bool use_generic);
   @brief Create a datatype based on a JSON document.
   @param type_doc void* Pointer to const rapidjson::Value type doc.
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
  */
 dtype_t* create_dtype_doc(void* type_doc, const bool use_generic);
@@ -548,7 +608,7 @@ dtype_t* create_dtype_doc(void* type_doc, const bool use_generic);
   @brief Create a datatype based on a Python dictionary.
   @param[in] pyobj PyObject* Python dictionary.
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
  */
 dtype_t* create_dtype_python(PyObject* pyobj, const bool use_generic);
@@ -557,7 +617,7 @@ dtype_t* create_dtype_python(PyObject* pyobj, const bool use_generic);
 /*!
   @brief Construct a Direct type object.
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_direct(const bool use_generic);
@@ -568,7 +628,7 @@ dtype_t* create_dtype_direct(const bool use_generic);
   @brief Construct a type object for one of the default JSON types.
   @param[in] type char* Name of the type.
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_default(const char* type,
@@ -581,7 +641,7 @@ dtype_t* create_dtype_default(const char* type,
   @param[in] precision size_t Precision of the scalar in bits.
   @param[in] units char* Units for scalar. (e.g. "cm", "g", "" for unitless)
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_scalar(const char* subtype, const size_t precision,
@@ -595,7 +655,7 @@ dtype_t* create_dtype_scalar(const char* subtype, const size_t precision,
   @param[in] length size_t Number of elements in the array.
   @param[in] units char* Units for array elements. (e.g. "cm", "g", "" for unitless)
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_1darray(const char* subtype, const size_t precision,
@@ -613,7 +673,7 @@ dtype_t* create_dtype_1darray(const char* subtype, const size_t precision,
   array in that dimension.
   @param[in] units char* Units for array elements. (e.g. "cm", "g", "" for unitless)
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_ndarray(const char* subtype, const size_t precision,
@@ -631,7 +691,7 @@ dtype_t* create_dtype_ndarray(const char* subtype, const size_t precision,
   array in that dimension.
   @param[in] units char* Units for array elements. (e.g. "cm", "g", "" for unitless)
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_ndarray_arr(const char* subtype, const size_t precision,
@@ -645,7 +705,7 @@ dtype_t* create_dtype_ndarray_arr(const char* subtype, const size_t precision,
   @param[in] items dtype_t** Pointer to array of types describing the array
   elements.
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_json_array(const size_t nitems, dtype_t** items,
@@ -659,7 +719,7 @@ dtype_t* create_dtype_json_array(const size_t nitems, dtype_t** items,
   @param[in] values dtype_t** Pointer to array of types describing the values
   for each key.
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_json_object(const size_t nitems, char** keys,
@@ -668,7 +728,7 @@ dtype_t* create_dtype_json_object(const size_t nitems, char** keys,
 /*!
   @brief Construct a Ply type object.
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_ply(const bool use_generic);
@@ -677,7 +737,7 @@ dtype_t* create_dtype_ply(const bool use_generic);
 /*!
   @brief Construct a Obj type object.
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_obj(const bool use_generic);
@@ -691,7 +751,7 @@ dtype_t* create_dtype_obj(const bool use_generic);
   @param[in] as_array int If 1, the types will be arrays. Otherwise they will be
   scalars.
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_ascii_table(const char *format_str, const int as_array,
@@ -706,7 +766,7 @@ dtype_t* create_dtype_ascii_table(const char *format_str, const int as_array,
   @param[in] as_array int If 1, the types will be arrays. Otherwise they will be
   scalars.
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_format(const char *format_str, const int as_array,
@@ -717,7 +777,7 @@ dtype_t* create_dtype_format(const char *format_str, const int as_array,
   @brief Construct a type object for Python objects.
   @param[in] type char* Type string.
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
  */
 dtype_t* create_dtype_pyobj(const char* type, const bool use_generic);
@@ -731,7 +791,7 @@ dtype_t* create_dtype_pyobj(const char* type, const bool use_generic);
   @param[in] kwargs_dtype dtype_t* Datatype describing the keyword 
   arguments creating the instance.
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
  */
 dtype_t* create_dtype_pyinst(const char* class_name,
@@ -743,7 +803,7 @@ dtype_t* create_dtype_pyinst(const char* class_name,
 /*!
   @brief Construct a type object for a schema.
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
  */
 dtype_t* create_dtype_schema(const bool use_generic);
@@ -752,7 +812,7 @@ dtype_t* create_dtype_schema(const bool use_generic);
 /*!
   @brief Construct a type object for receiving any type.
   @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be YggGeneric classes.
+  objects will be expected to be generic_t instances.
   @returns dtype_t* Type structure/class.
  */
 dtype_t* create_dtype_any(const bool use_generic);

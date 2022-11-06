@@ -55,12 +55,7 @@ class JSONReadableEncoder(stdjson.JSONEncoder):
 
     def default(self, o):  # pragma: no cover
         r"""Encoder that allows for expansion types."""
-        from yggdrasil.metaschema import MetaschemaTypeError
-        from yggdrasil.metaschema.datatypes import encode_data_readable
-        try:
-            return encode_data_readable(o)
-        except MetaschemaTypeError:
-            raise TypeError("Cannot encode %s" % o)
+        return json.dumps(o, yggdrasil_mode=json.YM_READABLE)
 
 
 class JSONEncoder(_json_encoder):
@@ -68,12 +63,7 @@ class JSONEncoder(_json_encoder):
 
     def default(self, o):
         r"""Encoder that allows for expansion types."""
-        from yggdrasil.metaschema import MetaschemaTypeError
-        from yggdrasil.metaschema.datatypes import encode_data
-        try:
-            return encode_data(o)
-        except MetaschemaTypeError:
-            raise TypeError("Cannot encode %s" % o)
+        return json.dumps(o)
     
 
 class JSONDecoder(_json_decoder):

@@ -31,6 +31,7 @@ if sys.version_info < (3, 6):
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 rj_include_dir = './rapidjson/include'
+with_asan = False
 
 for idx, arg in enumerate(sys.argv[:]):
     if arg.startswith('--rj-include-dir='):
@@ -39,10 +40,16 @@ for idx, arg in enumerate(sys.argv[:]):
         break
 else:
     if not os.path.isdir(os.path.join(ROOT_PATH, 'rapidjson', 'include')):
-        raise RuntimeError("RapidJSON sources not found: if you cloned the git"
-                           " repository, you should initialize the rapidjson submodule"
-                           " as explained in the README.rst; in all other cases you may"
+        raise RuntimeError("RapidJSON sources not found: if you cloned the"
+                           " git repository, you should initialize the"
+                           " rapidjson submodule as explained in the"
+                           " README.rst; in all other cases you may"
                            " want to report the issue.")
+for idx, arg in enumerate(sys.argv[:]):
+    if arg == '--with-asan':
+        sys.argv.pop(idx)
+        with_asan = True
+        break
 
 with open('version.txt', encoding='utf-8') as f:
     VERSION = f.read()
@@ -53,11 +60,13 @@ with open('README.rst', encoding='utf-8') as f:
 with open('CHANGES.rst', encoding='utf-8') as f:
     CHANGES = f.read()
 
+
 class get_numpy_include(object):
 
     def __str__(self):
         import numpy
         return numpy.get_include()
+
 
 extension_options = {
     'sources': ['./rapidjson.cpp'],
@@ -83,15 +92,16 @@ if cxx and 'g++' in cxx:
             sysconfig.get_config_vars()[varname] = value
 
     # Add -pedantic, so we get a warning when using non-standard features, and
-    # -Wno-long-long to pacify old gcc (or Apple's hybrids) that treat "long long" as an
-    # error under C++ (see issue #69). C++11 is required since commit
+    # -Wno-long-long to pacify old gcc (or Apple's hybrids) that treat
+    # "long long" as an error under C++ (see issue #69). C++11 is required
+    # since commit
     # https://github.com/Tencent/rapidjson/commit/9965ab37f6cfae3d58a0a6e34c76112866ace0b1
     extension_options['extra_compile_args'] = [
         '-pedantic', '-Wno-long-long', '-std=c++11']
 
     # Up to Python 3.7, some structures use "char*" instead of "const char*",
     # and ISO C++ forbids assigning string literal constants
-    if sys.version_info < (3,7):
+    if sys.version_info < (3, 7):
         extension_options['extra_compile_args'].append('-Wno-write-strings')
 
 # Ensure rapidjson is compiled with yggdrasil
@@ -99,3 +109,8 @@ extension_options.setdefault('extra_compile_args', [])
 extension_options['extra_compile_args'] += ['-DRAPIDJSON_YGGDRASIL',
                                             '-DRAPIDJSON_YGGDRASIL_PYTHON']
 
+if with_asan:
+    extension_options.setdefault('extra_link_args', [])
+    extension_options['extra_compile_args'].append('-fsanitize=address')
+    extension_options['extra_link_args'].append('-fsanitize=address')
+    extension_options['extra_link_args'].append('-shared-libasan')

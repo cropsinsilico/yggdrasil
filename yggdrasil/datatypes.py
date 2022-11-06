@@ -1,31 +1,42 @@
 import copy
 import numpy as np
-from yggdrasil import constants, units, rapidjson
+from yggdrasil import constants, rapidjson, units
 
 
-class MetaschemaTypeError(TypeError):
+class DataTypeError(TypeError):
     r"""Error that should be raised when a class encounters a type it cannot handle."""
     pass
 
 
-def create_metaschema(overwrite=False):
-    r"""Create the meta schema for validating ygg schema.
+def is_default_typedef(typedef):
+    r"""Determine if a type definition is the default type definition.
 
     Args:
-        overwrite (bool, optional): If True, the existing meta schema will be
-            overwritten. If False and the metaschema exists, an error will be
-            raised. Defaults to False.
+        typedef (dict): Type definition to test.
 
     Returns:
-        dict: Meta schema specifying rules for ygg type schema. This includes
-            all original JSON schema rules with the addition of types and
-            property definitions.
-
-    Raises:
-        RuntimeError: If the file already exists and overwrite is False.
+        bool: True if typedef is the default, False otherwise.
 
     """
-    return rapidjson.get_metaschema()
+    return (typedef == constants.DEFAULT_DATATYPE)
+
+
+def get_empty_msg(typedef):
+    r"""Get an empty message associated with a type.
+
+    Args:
+        typedef (dict): Type definition via a JSON schema.
+    
+    Returns:
+        object: Python object representing an empty message for the provided
+            type.
+
+    """
+    if typedef['type'] in ['object', 'ply', 'obj']:
+        return {}
+    elif typedef['type'] in ['array']:
+        return []
+    return b''
 
 
 def get_metaschema():
@@ -41,23 +52,7 @@ def get_metaschema():
               all of the necessary modules have been loaded.
 
     """
-    return copy.deepcopy(create_metaschema())
-
-
-def get_validator(overwrite=False, normalizers=None, **kwargs):
-    r"""Return the validator that includes ygg expansion types.
-
-    Args:
-        overwrite (bool, optional): If True, the existing validator will be
-            overwritten. Defaults to False.
-        normalizers (dict, optional): Additional normalizers to add.
-        **kwargs: Additional keyword arguments are passed to normalizer.create.
-
-    Returns:
-        yggdrasil.rapidjson.Normalizer: JSON schema normalizer.
-
-    """
-    return rapidjson.Normalizer
+    return copy.deepcopy(rapidjson.get_metaschema())
 
 
 def validate_schema(obj):
@@ -70,8 +65,7 @@ def validate_schema(obj):
         ValidationError: If the schema is not valid.
 
     """
-    cls = get_validator()
-    cls.check_schema(obj)
+    rapidjson.Normalizer.check_schema(obj)
 
 
 def validate_instance(obj, schema, **kwargs):
@@ -86,7 +80,7 @@ def validate_instance(obj, schema, **kwargs):
         ValidationError: If the object is not valid.
 
     """
-    cls = get_validator()
+    cls = rapidjson.Normalizer
     cls.check_schema(schema)
     return cls(schema).validate(obj)
 
@@ -102,7 +96,7 @@ def normalize_instance(obj, schema):
         object: Normalized instance.
 
     """
-    cls = get_validator()
+    cls = rapidjson.Normalizer
     cls.check_schema(schema)
     return cls(schema).normalize(obj)
 
@@ -121,7 +115,7 @@ def data2dtype(data):
     if isinstance(data_nounits, np.ndarray):
         dtype = data_nounits.dtype
     elif isinstance(data_nounits, (list, dict, tuple)):
-        raise MetaschemaTypeError
+        raise DataTypeError
     elif isinstance(data_nounits,
                     np.dtype(constants.VALID_TYPES['bytes']).type):
         dtype = np.array(data_nounits).dtype
@@ -152,9 +146,11 @@ def definition2dtype(props):
                             int(props['precision'] // nbytes)))
         else:
             out = np.dtype((constants.VALID_TYPES[typename]))
-    else:
+    elif 'precision' in props:
         out = np.dtype('%s%d' % (constants.VALID_TYPES[typename],
                                  int(props['precision'] * 8)))
+    else:
+        out = np.dtype(constants.VALID_TYPES[typename])
     return out
 
 
@@ -188,3 +184,20 @@ def type2numpy(typedef):
             if as_array:
                 out = np.dtype(dict(names=field_names, formats=dtype_list))
     return out
+
+
+def complete_typedef(typedef):
+    r"""Complete the type definition by converting it into the standard format.
+
+    Args:
+        typedef (str, dict, list): A type name, type definition dictionary,
+            dictionary of subtype definitions, or a list of subtype definitions.
+
+    Returns:
+        dict: Type definition dictionary.
+
+    Raises:
+        TypeError: If typedef is not a valid type.
+
+    """
+    return rapidjson.normalize(typedef, {'type': 'schema'})

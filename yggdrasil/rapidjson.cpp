@@ -63,6 +63,7 @@ static PyObject* normalization_error = NULL;
 static PyObject* normalization_warning = NULL;
 static PyObject* decode_error = NULL;
 static PyObject* comparison_error = NULL;
+static PyObject* generate_error = NULL;
 
 
 /* These are the names of often used methods or literal values, interned in the module
@@ -217,6 +218,16 @@ enum MappingMode {
 };
 
 
+enum YggdrasilMode {
+    YM_BASE64 = 0,              // Default, yggdrasil extension types are base 64 encoded
+    YM_READABLE = 1<<0,         // Encode yggdrasil extension types in a readable format
+    YM_PICKLE = 1<<2,           // Pickle unsupported Python objects
+    YM_MAX = 1<<3
+};
+
+static int SIZE_OF_SIZE_T = sizeof(size_t);
+
+
 //////////////////////////
 // Forward declarations //
 //////////////////////////
@@ -236,14 +247,15 @@ static PyObject* do_encode(PyObject* value, PyObject* defaultFn, bool ensureAsci
                            unsigned writeMode, char indentChar, unsigned indentCount,
                            unsigned numberMode, unsigned datetimeMode,
                            unsigned uuidMode, unsigned bytesMode,
-                           unsigned iterableMode, unsigned mappingMode);
+                           unsigned iterableMode, unsigned mappingMode,
+			   unsigned yggdrasilMode);
 static PyObject* do_stream_encode(PyObject* value, PyObject* stream, size_t chunkSize,
                                   PyObject* defaultFn, bool ensureAscii,
                                   unsigned writeMode, char indentChar,
                                   unsigned indentCount, unsigned numberMode,
                                   unsigned datetimeMode, unsigned uuidMode,
                                   unsigned bytesMode, unsigned iterableMode,
-                                  unsigned mappingMode);
+                                  unsigned mappingMode, unsigned yggdrasilMode);
 static PyObject* encoder_call(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* encoder_new(PyTypeObject* type, PyObject* args, PyObject* kwargs);
 
@@ -253,6 +265,7 @@ static void validator_dealloc(PyObject* self);
 static PyObject* validator_new(PyTypeObject* type, PyObject* args, PyObject* kwargs);
 static PyObject* validator_validate(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* validator_compare(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* validator_generate_data(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* validator_check_schema(PyObject* cls, PyObject* args, PyObject* kwargs);
 
 static PyObject* normalizer_call(PyObject* self, PyObject* args, PyObject* kwargs);
@@ -260,6 +273,7 @@ static void normalizer_dealloc(PyObject* self);
 static PyObject* normalizer_new(PyTypeObject* type, PyObject* args, PyObject* kwargs);
 static PyObject* normalizer_validate(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* normalizer_compare(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* normalizer_generate_data(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* normalizer_check_schema(PyObject* cls, PyObject* args, PyObject* kwargs);
 static PyObject* normalizer_normalize(PyObject* self, PyObject* args, PyObject* kwargs);
 
@@ -766,6 +780,25 @@ accept_mapping_mode_arg(PyObject* arg, unsigned &mapping_mode)
 }
 
 static bool
+accept_yggdrasil_mode_arg(PyObject* arg, unsigned &yggdrasil_mode)
+{
+    if (arg != NULL && arg != Py_None) {
+        if (PyLong_Check(arg)) {
+            long mode = PyLong_AsLong(arg);
+            if (mode < 0 || mode >= YM_MAX) {
+                PyErr_SetString(PyExc_ValueError, "Invalid yggdrasil_mode, out of range");
+                return false;
+            }
+            yggdrasil_mode = (unsigned) mode;
+        } else {
+            PyErr_SetString(PyExc_TypeError, "yggdrasil_mode must be a non-negative int");
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool
 accept_chunk_size_arg(PyObject* arg, size_t &chunk_size)
 {
     if (arg != NULL && arg != Py_None) {
@@ -1017,6 +1050,7 @@ float_from_string(const char* s, Py_ssize_t len)
 
 
 struct PyHandler {
+    typedef char Ch;
     PyObject* decoderStartObject;
     PyObject* decoderEndObject;
     PyObject* decoderEndArray;
@@ -2416,7 +2450,7 @@ do_decode(PyObject* decoder, const char* jsonStr, Py_ssize_t jsonStrLen,
             // value is a string.  Otherwise, use the original exception since
             // we can't be sure the exception type takes a single string.
             if (evalue != NULL && PyUnicode_Check(evalue)) {
-                PyErr_Format(etype, "Parse error at offset %zu: %S", offset, evalue);
+                PyErr_Format(etype, "Python parse error at offset %zu: %S", offset, evalue);
                 Py_DECREF(etype);
                 Py_DECREF(evalue);
                 Py_XDECREF(etraceback);
@@ -2679,13 +2713,15 @@ PythonAccept(
     unsigned uuidMode,
     unsigned bytesMode,
     unsigned iterableMode,
-    unsigned mappingMode)
+    unsigned mappingMode,
+    unsigned yggdrasilMode)
 {
     int is_decimal;
 
 #define RECURSE(v) PythonAccept(handler, v,				\
 				numberMode, datetimeMode, uuidMode,	\
-				bytesMode, iterableMode, mappingMode)
+				bytesMode, iterableMode, mappingMode,	\
+				yggdrasilMode)
 
 #define ASSERT_VALID_SIZE(l) do {                                       \
     if (l < 0 || l > UINT_MAX) {                                        \
@@ -3274,7 +3310,8 @@ PythonAccept(
 	// PythonAccept
 	RAPIDJSON_DEFAULT_ALLOCATOR allocator;
 	Value* x = new Value();
-	bool ret = x->SetPythonObjectRaw(object, &allocator);
+	bool ret = x->SetPythonObjectRaw(object, &allocator, false,
+					 (yggdrasilMode & YM_PICKLE));
 	if (ret)
 	    ret = x->Accept(*handler);
 	delete x;
@@ -3301,6 +3338,7 @@ static bool python2document(PyObject* jsonObject, Document& d,
 			    unsigned bytesMode,
 			    unsigned iterableMode,
 			    unsigned mappingMode,
+			    unsigned yggdrasilMode,
 			    unsigned expectsString,
 			    bool forSchema = false,
 			    bool forceObject = false,
@@ -3342,7 +3380,7 @@ static bool python2document(PyObject* jsonObject, Document& d,
     if (jsonStr == NULL) {
         error = (!PythonAccept(&d, jsonObject, numberMode, datetimeMode,
 			       uuidMode, bytesMode, iterableMode,
-			       mappingMode));
+			       mappingMode, yggdrasilMode));
 	d.FinalizeFromStack();
 	if (error)
 	    return false;
@@ -3370,13 +3408,15 @@ dumps_internal(
     unsigned uuidMode,
     unsigned bytesMode,
     unsigned iterableMode,
-    unsigned mappingMode)
+    unsigned mappingMode,
+    unsigned yggdrasilMode)
 {
     int is_decimal;
 
 #define RECURSE(v) dumps_internal(writer, v, defaultFn,                 \
                                   numberMode, datetimeMode, uuidMode,   \
-                                  bytesMode, iterableMode, mappingMode)
+                                  bytesMode, iterableMode, mappingMode,	\
+				  yggdrasilMode)
 
 #define ASSERT_VALID_SIZE(l) do {                                       \
     if (l < 0 || l > UINT_MAX) {                                        \
@@ -4028,7 +4068,7 @@ dumps_internal(
 	    PyObject *type, *value, *traceback;
 	    PyErr_Fetch(&type, &value, &traceback);
 	    bool r = PythonAccept(writer, object, numberMode, datetimeMode, uuidMode,
-				  bytesMode, iterableMode, mappingMode);
+				  bytesMode, iterableMode, mappingMode, yggdrasilMode);
 	    PyErr_Restore(type, value, traceback);
 	    if (r)
 		PyErr_Clear();
@@ -4045,7 +4085,7 @@ dumps_internal(
             return false;
     } else {
 	return PythonAccept(writer, object, numberMode, datetimeMode, uuidMode,
-			    bytesMode, iterableMode, mappingMode);
+			    bytesMode, iterableMode, mappingMode, yggdrasilMode);
     }
 
     // Catch possible error raised in associated stream operations
@@ -4068,6 +4108,7 @@ typedef struct {
     unsigned bytesMode;
     unsigned iterableMode;
     unsigned mappingMode;
+    unsigned yggdrasilMode;
 } EncoderObject;
 
 
@@ -4076,7 +4117,7 @@ PyDoc_STRVAR(dumps_docstring,
              " indent=4, default=None, sort_keys=False, number_mode=None,"
              " datetime_mode=None, uuid_mode=None, bytes_mode=BM_SCALAR,"
              " iterable_mode=IM_ANY_ITERABLE, mapping_mode=MM_ANY_MAPPING,"
-             " allow_nan=True)\n"
+             " yggdrasil_mode=YM_BASE64, allow_nan=True)\n"
              "\n"
              "Encode a Python object into a JSON string.");
 
@@ -4104,6 +4145,8 @@ dumps(PyObject* self, PyObject* args, PyObject* kwargs)
     unsigned iterableMode = IM_ANY_ITERABLE;
     PyObject* mappingModeObj = NULL;
     unsigned mappingMode = MM_ANY_MAPPING;
+    PyObject* yggdrasilModeObj = NULL;
+    unsigned yggdrasilMode = YM_BASE64;
     char indentChar = ' ';
     unsigned indentCount = 4;
     static char const* kwlist[] = {
@@ -4120,6 +4163,7 @@ dumps(PyObject* self, PyObject* args, PyObject* kwargs)
         "write_mode",
         "iterable_mode",
         "mapping_mode",
+	"yggdrasil_mode",
 
         /* compatibility with stdlib json */
         "allow_nan",
@@ -4130,7 +4174,7 @@ dumps(PyObject* self, PyObject* args, PyObject* kwargs)
     int sortKeys = false;
     int allowNan = -1;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$ppOOpOOOOOOOp:rapidjson.dumps",
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$ppOOpOOOOOOOOp:rapidjson.dumps",
                                      (char**) kwlist,
                                      &value,
                                      &skipKeys,
@@ -4145,6 +4189,7 @@ dumps(PyObject* self, PyObject* args, PyObject* kwargs)
                                      &writeModeObj,
                                      &iterableModeObj,
                                      &mappingModeObj,
+				     &yggdrasilModeObj,
                                      &allowNan))
         return NULL;
 
@@ -4181,6 +4226,9 @@ dumps(PyObject* self, PyObject* args, PyObject* kwargs)
     if (!accept_mapping_mode_arg(mappingModeObj, mappingMode))
         return NULL;
 
+    if (!accept_yggdrasil_mode_arg(yggdrasilModeObj, yggdrasilMode))
+        return NULL;
+
     if (skipKeys)
         mappingMode |= MM_SKIP_NON_STRING_KEYS;
 
@@ -4189,7 +4237,7 @@ dumps(PyObject* self, PyObject* args, PyObject* kwargs)
 
     return do_encode(value, defaultFn, ensureAscii ? true : false, writeMode, indentChar,
                      indentCount, numberMode, datetimeMode, uuidMode, bytesMode,
-                     iterableMode, mappingMode);
+                     iterableMode, mappingMode, yggdrasilMode);
 }
 
 
@@ -4198,7 +4246,7 @@ PyDoc_STRVAR(dump_docstring,
              " write_mode=WM_COMPACT, indent=4, default=None, sort_keys=False,"
              " number_mode=None, datetime_mode=None, uuid_mode=None, bytes_mode=BM_SCALAR,"
              " iterable_mode=IM_ANY_ITERABLE, mapping_mode=MM_ANY_MAPPING,"
-             " chunk_size=65536, allow_nan=True)\n"
+             " yggdrasil_mode=YM_BASE64, chunk_size=65536, allow_nan=True)\n"
              "\n"
              "Encode a Python object into a JSON stream.");
 
@@ -4227,6 +4275,8 @@ dump(PyObject* self, PyObject* args, PyObject* kwargs)
     unsigned iterableMode = IM_ANY_ITERABLE;
     PyObject* mappingModeObj = NULL;
     unsigned mappingMode = MM_ANY_MAPPING;
+    PyObject* yggdrasilModeObj = NULL;
+    unsigned yggdrasilMode = YM_BASE64;
     char indentChar = ' ';
     unsigned indentCount = 4;
     PyObject* chunkSizeObj = NULL;
@@ -4248,6 +4298,7 @@ dump(PyObject* self, PyObject* args, PyObject* kwargs)
         "write_mode",
         "iterable_mode",
         "mapping_mode",
+	"yggdrasil_mode",
 
         /* compatibility with stdlib json */
         "allow_nan",
@@ -4257,7 +4308,7 @@ dump(PyObject* self, PyObject* args, PyObject* kwargs)
     int skipKeys = false;
     int sortKeys = false;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|$ppOOpOOOOOOOOp:rapidjson.dump",
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|$ppOOpOOOOOOOOOp:rapidjson.dump",
                                      (char**) kwlist,
                                      &value,
                                      &stream,
@@ -4274,6 +4325,7 @@ dump(PyObject* self, PyObject* args, PyObject* kwargs)
                                      &writeModeObj,
                                      &iterableModeObj,
                                      &mappingModeObj,
+				     &yggdrasilModeObj,
                                      &allowNan))
         return NULL;
 
@@ -4313,6 +4365,9 @@ dump(PyObject* self, PyObject* args, PyObject* kwargs)
     if (!accept_mapping_mode_arg(mappingModeObj, mappingMode))
         return NULL;
 
+    if (!accept_yggdrasil_mode_arg(yggdrasilModeObj, yggdrasilMode))
+        return NULL;
+
     if (skipKeys)
         mappingMode |= MM_SKIP_NON_STRING_KEYS;
 
@@ -4322,7 +4377,7 @@ dump(PyObject* self, PyObject* args, PyObject* kwargs)
     return do_stream_encode(value, stream, chunkSize, defaultFn,
                             ensureAscii ? true : false, writeMode, indentChar,
                             indentCount, numberMode, datetimeMode, uuidMode, bytesMode,
-                            iterableMode, mappingMode);
+                            iterableMode, mappingMode, yggdrasilMode);
 }
 
 
@@ -4330,7 +4385,7 @@ PyDoc_STRVAR(encoder_doc,
              "Encoder(skip_invalid_keys=False, ensure_ascii=True, write_mode=WM_COMPACT,"
              " indent=4, sort_keys=False, number_mode=None, datetime_mode=None,"
              " uuid_mode=None, bytes_mode=None, iterable_mode=IM_ANY_ITERABLE,"
-             " mapping_mode=MM_ANY_MAPPING)\n\n"
+             " mapping_mode=MM_ANY_MAPPING, yggdrasil_mode=YM_BASE64)\n\n"
              "Create and return a new Encoder instance.");
 
 
@@ -4365,6 +4420,9 @@ static PyMemberDef encoder_members[] = {
     {"mapping_mode",
      T_UINT, offsetof(EncoderObject, mappingMode), READONLY,
      "Whether mapping values other than dicts shall be encoded as JSON objects or not."},
+    {"yggdrasil_mode",
+     T_UINT, offsetof(EncoderObject, yggdrasilMode), READONLY,
+     "Whether yggdrasil extension values shall be encoded in base64 or not."},
     {NULL}
 };
 
@@ -4447,7 +4505,8 @@ static PyTypeObject Encoder_Type = {
                     uuidMode,                           \
                     bytesMode,                          \
                     iterableMode,                       \
-                    mappingMode)                        \
+                    mappingMode,				\
+		    yggdrasilMode)				\
      ? PyUnicode_FromString(buf.GetString()) : NULL)
 
 
@@ -4455,16 +4514,22 @@ static PyObject*
 do_encode(PyObject* value, PyObject* defaultFn, bool ensureAscii, unsigned writeMode,
           char indentChar, unsigned indentCount, unsigned numberMode,
           unsigned datetimeMode, unsigned uuidMode, unsigned bytesMode,
-          unsigned iterableMode, unsigned mappingMode)
+          unsigned iterableMode, unsigned mappingMode, unsigned yggdrasilMode)
 {
     if (writeMode == WM_COMPACT) {
         if (ensureAscii) {
             GenericStringBuffer<ASCII<> > buf;
             Writer<GenericStringBuffer<ASCII<> >, UTF8<>, ASCII<> > writer(buf);
+	    if (yggdrasilMode & YM_READABLE) {
+		writer.SetYggdrasilMode(true);
+	    }
             return DUMPS_INTERNAL_CALL;
         } else {
             StringBuffer buf;
             Writer<StringBuffer> writer(buf);
+	    if (yggdrasilMode & YM_READABLE) {
+		writer.SetYggdrasilMode(true);
+	    }
             return DUMPS_INTERNAL_CALL;
         }
     } else if (ensureAscii) {
@@ -4474,6 +4539,9 @@ do_encode(PyObject* value, PyObject* defaultFn, bool ensureAscii, unsigned write
         if (writeMode & WM_SINGLE_LINE_ARRAY) {
             writer.SetFormatOptions(kFormatSingleLineArray);
         }
+	if (yggdrasilMode & YM_READABLE) {
+	    writer.SetYggdrasilMode(true);
+	}
         return DUMPS_INTERNAL_CALL;
     } else {
         StringBuffer buf;
@@ -4482,6 +4550,9 @@ do_encode(PyObject* value, PyObject* defaultFn, bool ensureAscii, unsigned write
         if (writeMode & WM_SINGLE_LINE_ARRAY) {
             writer.SetFormatOptions(kFormatSingleLineArray);
         }
+	if (yggdrasilMode & YM_READABLE) {
+	    writer.SetYggdrasilMode(true);
+	}
         return DUMPS_INTERNAL_CALL;
     }
 }
@@ -4496,7 +4567,8 @@ do_encode(PyObject* value, PyObject* defaultFn, bool ensureAscii, unsigned write
                     uuidMode,                   \
                     bytesMode,                  \
                     iterableMode,               \
-                    mappingMode)                \
+                    mappingMode,			\
+		    yggdrasilMode)			\
      ? Py_INCREF(Py_None), Py_None : NULL)
 
 
@@ -4505,16 +4577,22 @@ do_stream_encode(PyObject* value, PyObject* stream, size_t chunkSize, PyObject* 
                  bool ensureAscii, unsigned writeMode, char indentChar,
                  unsigned indentCount, unsigned numberMode, unsigned datetimeMode,
                  unsigned uuidMode, unsigned bytesMode, unsigned iterableMode,
-                 unsigned mappingMode)
+                 unsigned mappingMode, unsigned yggdrasilMode)
 {
     PyWriteStreamWrapper os(stream, chunkSize);
 
     if (writeMode == WM_COMPACT) {
         if (ensureAscii) {
             Writer<PyWriteStreamWrapper, UTF8<>, ASCII<> > writer(os);
+	    if (yggdrasilMode & YM_READABLE) {
+		writer.SetYggdrasilMode(true);
+	    }
             return DUMP_INTERNAL_CALL;
         } else {
             Writer<PyWriteStreamWrapper> writer(os);
+	    if (yggdrasilMode & YM_READABLE) {
+		writer.SetYggdrasilMode(true);
+	    }
             return DUMP_INTERNAL_CALL;
         }
     } else if (ensureAscii) {
@@ -4523,6 +4601,9 @@ do_stream_encode(PyObject* value, PyObject* stream, size_t chunkSize, PyObject* 
         if (writeMode & WM_SINGLE_LINE_ARRAY) {
             writer.SetFormatOptions(kFormatSingleLineArray);
         }
+	if (yggdrasilMode & YM_READABLE) {
+	    writer.SetYggdrasilMode(true);
+	}
         return DUMP_INTERNAL_CALL;
     } else {
         PrettyWriter<PyWriteStreamWrapper> writer(os);
@@ -4530,6 +4611,9 @@ do_stream_encode(PyObject* value, PyObject* stream, size_t chunkSize, PyObject* 
         if (writeMode & WM_SINGLE_LINE_ARRAY) {
             writer.SetFormatOptions(kFormatSingleLineArray);
         }
+	if (yggdrasilMode & YM_READABLE) {
+	    writer.SetYggdrasilMode(true);
+	}
         return DUMP_INTERNAL_CALL;
     }
 }
@@ -4576,7 +4660,8 @@ encoder_call(PyObject* self, PyObject* args, PyObject* kwargs)
         result = do_stream_encode(value, stream, chunkSize, defaultFn, e->ensureAscii,
                                   e->writeMode, e->indentChar, e->indentCount,
                                   e->numberMode, e->datetimeMode, e->uuidMode,
-                                  e->bytesMode, e->iterableMode, e->mappingMode);
+                                  e->bytesMode, e->iterableMode, e->mappingMode,
+				  e->yggdrasilMode);
     } else {
         if (PyObject_HasAttr(self, default_name)) {
             defaultFn = PyObject_GetAttr(self, default_name);
@@ -4584,7 +4669,8 @@ encoder_call(PyObject* self, PyObject* args, PyObject* kwargs)
 
         result = do_encode(value, defaultFn, e->ensureAscii, e->writeMode, e->indentChar,
                            e->indentCount, e->numberMode, e->datetimeMode, e->uuidMode,
-                           e->bytesMode, e->iterableMode, e->mappingMode);
+                           e->bytesMode, e->iterableMode, e->mappingMode,
+			   e->yggdrasilMode);
     }
 
     if (defaultFn != NULL)
@@ -4614,6 +4700,8 @@ encoder_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
     unsigned iterableMode = IM_ANY_ITERABLE;
     PyObject* mappingModeObj = NULL;
     unsigned mappingMode = MM_ANY_MAPPING;
+    PyObject* yggdrasilModeObj = NULL;
+    unsigned yggdrasilMode = YM_BASE64;
     char indentChar = ' ';
     unsigned indentCount = 4;
     static char const* kwlist[] = {
@@ -4628,12 +4716,13 @@ encoder_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
         "write_mode",
         "iterable_mode",
         "mapping_mode",
+	"yggdrasil_mode",
         NULL
     };
     int skipInvalidKeys = false;
     int sortKeys = false;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "|ppOpOOOOOOO:Encoder",
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "|ppOpOOOOOOOO:Encoder",
                                      (char**) kwlist,
                                      &skipInvalidKeys,
                                      &ensureAscii,
@@ -4645,7 +4734,8 @@ encoder_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
                                      &bytesModeObj,
                                      &writeModeObj,
                                      &iterableModeObj,
-                                     &mappingModeObj))
+                                     &mappingModeObj,
+				     &yggdrasilModeObj))
         return NULL;
 
     if (!accept_indent_arg(indent, writeMode, indentCount, indentChar))
@@ -4672,6 +4762,9 @@ encoder_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
     if (!accept_mapping_mode_arg(mappingModeObj, mappingMode))
         return NULL;
 
+    if (!accept_yggdrasil_mode_arg(yggdrasilModeObj, yggdrasilMode))
+	return NULL;
+
     if (skipInvalidKeys)
         mappingMode |= MM_SKIP_NON_STRING_KEYS;
 
@@ -4692,6 +4785,7 @@ encoder_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
     e->bytesMode = bytesMode;
     e->iterableMode = iterableMode;
     e->mappingMode = mappingMode;
+    e->yggdrasilMode = yggdrasilMode;
 
     return (PyObject*) e;
 }
@@ -4746,6 +4840,7 @@ typedef struct {
     unsigned bytesMode;
     unsigned iterableMode;
     unsigned mappingMode;
+    unsigned yggdrasilMode;
     unsigned expectsString;
 } ValidatorObject;
 
@@ -4754,7 +4849,7 @@ PyDoc_STRVAR(validator_doc,
              "Validator(json_schema, object_hook=None, number_mode=None,"
 	     " datetime_mode=None, uuid_mode=None, bytes_mode=BM_SCALAR,"
 	     " iterable_mode=IM_ANY_ITERABLE, mapping_mode=MM_ANY_MAPPING,"
-	     " allow_nan=True)\n"
+	     " yggdrasil_mode=YM_BASE64, allow_nan=True)\n"
              "\n"
              "Create and return a new Validator instance from the given `json_schema`"
              " string or Python dictionary.");
@@ -4768,6 +4863,9 @@ static PyMethodDef validator_methods[] = {
     {"compare", (PyCFunction) validator_compare,
      METH_VARARGS | METH_KEYWORDS,
      "Compare two schemas for compatiblity."},
+    {"generate_data", (PyCFunction) validator_generate_data,
+     METH_NOARGS,
+     "Generate data that fits the schema."},
     {"check_schema", (PyCFunction) validator_check_schema,
      METH_VARARGS | METH_KEYWORDS | METH_CLASS,
      "Validate a schema against the JSON metaschema."},
@@ -4821,8 +4919,17 @@ static PyTypeObject Validator_Type = {
 static PyObject* validator_call(PyObject* self, PyObject* args, PyObject* kwargs)
 {
     PyObject* jsonObject;
+    PyObject* relativePathRootObj = NULL;
+    static char const* kwlist[] = {
+	"obj",
+	"relative_path_root",
+	NULL
+    };
 
-    if (!PyArg_ParseTuple(args, "O", &jsonObject))
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$O",
+				     (char**) kwlist,
+				     &jsonObject,
+				     &relativePathRootObj))
         return NULL;
 
     ValidatorObject* v = (ValidatorObject*) self;
@@ -4830,11 +4937,19 @@ static PyObject* validator_call(PyObject* self, PyObject* args, PyObject* kwargs
     bool isEmptyString = false;
     if (!python2document(jsonObject, d, v->numberMode, v->datetimeMode,
 			 v->uuidMode, v->bytesMode, v->iterableMode,
-			 v->mappingMode, v->expectsString,
+			 v->mappingMode, v->yggdrasilMode, v->expectsString,
 			 false, false, &isEmptyString))
 	return NULL;
 
     SchemaValidator validator(*v->schema);
+    if (relativePathRootObj != NULL) {
+	Py_ssize_t relativePathRootLen = 0;
+	const char* relativePathRootStr = PyUnicode_AsUTF8AndSize(relativePathRootObj, &relativePathRootLen);
+	if (!relativePathRootStr)
+	    return NULL;
+	validator.SetRelativePathRoot(relativePathRootStr,
+				      (SizeType)relativePathRootLen);
+    }
     bool accept;
 
     if (validator.RequiresPython() || d.RequiresPython()) {
@@ -4886,6 +5001,8 @@ static PyObject* validator_new(PyTypeObject* type, PyObject* args, PyObject* kwa
     unsigned iterableMode = IM_ANY_ITERABLE;
     PyObject* mappingModeObj = NULL;
     unsigned mappingMode = MM_ANY_MAPPING;
+    PyObject* yggdrasilModeObj = NULL;
+    unsigned yggdrasilMode = YM_BASE64;
     int allowNan = -1;
     static char const* kwlist[] = {
 	"schema",
@@ -4896,6 +5013,7 @@ static PyObject* validator_new(PyTypeObject* type, PyObject* args, PyObject* kwa
         "bytes_mode",
         "iterable_mode",
         "mapping_mode",
+	"yggdrasil_mode",
 
         /* compatibility with stdlib json */
         "allow_nan",
@@ -4903,7 +5021,7 @@ static PyObject* validator_new(PyTypeObject* type, PyObject* args, PyObject* kwa
         NULL
     };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$OOOOOOOp:Validator",
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$OOOOOOOOp:Validator",
                                      (char**) kwlist,
 				     &jsonObject,
                                      &objectHook,
@@ -4913,6 +5031,7 @@ static PyObject* validator_new(PyTypeObject* type, PyObject* args, PyObject* kwa
 				     &bytesModeObj,
 				     &iterableModeObj,
 				     &mappingModeObj,
+				     &yggdrasilModeObj,
                                      &allowNan))
         return NULL;
 
@@ -4943,10 +5062,13 @@ static PyObject* validator_new(PyTypeObject* type, PyObject* args, PyObject* kwa
     if (!accept_mapping_mode_arg(mappingModeObj, mappingMode))
         return NULL;
 
+    if (!accept_yggdrasil_mode_arg(yggdrasilModeObj, yggdrasilMode))
+        return NULL;
+
     Document d;
     if (!python2document(jsonObject, d, numberMode, datetimeMode,
 			 uuidMode, bytesMode, iterableMode,
-			 mappingMode, 0, true))
+			 mappingMode, yggdrasilMode, 0, true))
 	return NULL;
 
     ValidatorObject* v = (ValidatorObject*) type->tp_alloc(type, 0);
@@ -4963,6 +5085,7 @@ static PyObject* validator_new(PyTypeObject* type, PyObject* args, PyObject* kwa
     v->bytesMode = bytesMode;
     v->iterableMode = iterableMode;
     v->mappingMode = mappingMode;
+    v->yggdrasilMode = yggdrasilMode;
     v->expectsString = check_expectsString(d);
 
     return (PyObject*) v;
@@ -4991,6 +5114,8 @@ static PyObject* validator_check_schema(PyObject* cls, PyObject* args, PyObject*
     unsigned iterableMode = IM_ANY_ITERABLE;
     PyObject* mappingModeObj = NULL;
     unsigned mappingMode = MM_ANY_MAPPING;
+    PyObject* yggdrasilModeObj = NULL;
+    unsigned yggdrasilMode = YM_BASE64;
     int allowNan = -1;
     static char const* kwlist[] = {
 	"schema",
@@ -5002,6 +5127,7 @@ static PyObject* validator_check_schema(PyObject* cls, PyObject* args, PyObject*
         "bytes_mode",
         "iterable_mode",
         "mapping_mode",
+	"yggdrasil_mode",
 
         /* compatibility with stdlib json */
         "allow_nan",
@@ -5010,7 +5136,7 @@ static PyObject* validator_check_schema(PyObject* cls, PyObject* args, PyObject*
     };
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs,
-				     "O|$OOOOOOOOp:Validator.check_schema",
+				     "O|$OOOOOOOOOp:Validator.check_schema",
                                      (char**) kwlist,
 				     &jsonObject,
 				     &jsonStandardObj,
@@ -5021,6 +5147,7 @@ static PyObject* validator_check_schema(PyObject* cls, PyObject* args, PyObject*
 				     &bytesModeObj,
 				     &iterableModeObj,
 				     &mappingModeObj,
+				     &yggdrasilModeObj,
                                      &allowNan))
         return NULL;
 
@@ -5055,10 +5182,13 @@ static PyObject* validator_check_schema(PyObject* cls, PyObject* args, PyObject*
     if (!accept_mapping_mode_arg(mappingModeObj, mappingMode))
         return NULL;
 
+    if (!accept_yggdrasil_mode_arg(yggdrasilModeObj, yggdrasilMode))
+        return NULL;
+
     Document d;
     if (!python2document(jsonObject, d, numberMode, datetimeMode,
 			 uuidMode, bytesMode, iterableMode,
-			 mappingMode, 0, true))
+			 mappingMode, yggdrasilMode, 0, true))
 	return NULL;
 
     Document d_meta;
@@ -5164,11 +5294,39 @@ static PyObject* validator_compare(PyObject* self, PyObject* args, PyObject* kwa
 }
 
 
+static PyObject* validator_generate_data(PyObject* self, PyObject*, PyObject*)
+{
+    Document d;
+    ValidatorObject* v = (ValidatorObject*) self;
+    SchemaValidator validator(*v->schema);
+    bool accept = validator.GenerateData(d);
+    if (!accept) {
+	set_validation_error(validator, generate_error);
+	return NULL;
+    }
+
+    PyHandler handler(NULL, v->objectHook, v->datetimeMode, v->uuidMode,
+		      v->numberMode);
+    accept = d.Accept(handler);
+    if (!accept) {
+	PyErr_SetString(generate_error, "Error converting the generated JSON document to a Python object");
+	return NULL;
+    }
+    
+    if (PyErr_Occurred()) {
+        Py_XDECREF(handler.root);
+        return NULL;
+    }
+    
+    return handler.root;
+}
+
+
 PyDoc_STRVAR(validate_docstring,
              "validate(obj, schema, object_hook=None, number_mode=None,"
 	     " datetime_mode=None, uuid_mode=None, bytes_mode=BM_SCALAR,"
 	     " iterable_mode=IM_ANY_ITERABLE, mapping_mode=MM_ANY_MAPPING,"
-	     " allow_nan=True)\n"
+	     " allow_nan=True, relative_path_root=None)\n"
              "\n"
 	     "Validate a Python object against a JSON schema.");
 
@@ -5197,20 +5355,43 @@ validate(PyObject* self, PyObject* args, PyObject* kwargs)
 	    return NULL;
 	}
     }
+
+    PyObject* relativePathRootObj = NULL;
+    if (kwargs != NULL)
+	relativePathRootObj = PyDict_GetItemString(kwargs, "relative_path_root");
+    PyObject* call_kwargs = NULL;
+    if (relativePathRootObj != NULL) {
+	call_kwargs = PyDict_New();
+	if (PyDict_SetItemString(call_kwargs, "relative_path_root",
+				 relativePathRootObj) < 0) {
+	    Py_DECREF(validator_args);
+	    Py_DECREF(call_kwargs);
+	    return NULL;
+	}
+	if (PyDict_DelItemString(kwargs, "relative_path_root") < 0) {
+	    Py_DECREF(validator_args);
+	    Py_DECREF(call_kwargs);
+	    return NULL;
+	}
+    }
 			
     PyObject* validator = validator_new(&Validator_Type, validator_args, kwargs);
     Py_DECREF(validator_args);
-    if (validator == NULL)
+    if (validator == NULL) {
+	Py_XDECREF(call_kwargs);
 	return NULL;
+    }
 
     PyObject* instance = PyTuple_GetItem(args, 0);
     if (instance == NULL) {
+	Py_XDECREF(call_kwargs);
 	Py_DECREF(validator);
 	return NULL;
     }
     PyObject* call_args = PyTuple_Pack(1, instance);
     PyObject* out = validator_call(validator, call_args, NULL);
     Py_DECREF(call_args);
+    Py_XDECREF(call_kwargs);
     Py_DECREF(validator);
     return out;
 }
@@ -5243,6 +5424,8 @@ encode_schema(PyObject* self, PyObject* args, PyObject* kwargs)
     unsigned iterableMode = IM_ANY_ITERABLE;
     PyObject* mappingModeObj = NULL;
     unsigned mappingMode = MM_ANY_MAPPING;
+    PyObject* yggdrasilModeObj = NULL;
+    unsigned yggdrasilMode = YM_BASE64;
     int allowNan = -1;
     static char const* kwlist[] = {
 	"obj",
@@ -5254,6 +5437,7 @@ encode_schema(PyObject* self, PyObject* args, PyObject* kwargs)
         "bytes_mode",
         "iterable_mode",
         "mapping_mode",
+	"yggdrasil_mode",
 
         /* compatibility with stdlib json */
         "allow_nan",
@@ -5261,7 +5445,7 @@ encode_schema(PyObject* self, PyObject* args, PyObject* kwargs)
         NULL
     };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$pOOOOOOOp:encode_schema",
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$pOOOOOOOOp:encode_schema",
                                      (char**) kwlist,
 				     &jsonObject,
 				     &minimalSchema,
@@ -5272,6 +5456,7 @@ encode_schema(PyObject* self, PyObject* args, PyObject* kwargs)
 				     &bytesModeObj,
 				     &iterableModeObj,
 				     &mappingModeObj,
+				     &yggdrasilModeObj,
                                      &allowNan))
         return NULL;
 
@@ -5302,10 +5487,13 @@ encode_schema(PyObject* self, PyObject* args, PyObject* kwargs)
     if (!accept_mapping_mode_arg(mappingModeObj, mappingMode))
         return NULL;
 
+    if (!accept_yggdrasil_mode_arg(yggdrasilModeObj, yggdrasilMode))
+        return NULL;
+
     Document d;
     if (!python2document(jsonObject, d, numberMode, datetimeMode,
 			 uuidMode, bytesMode, iterableMode,
-			 mappingMode, 0, false, true))
+			 mappingMode, yggdrasilMode, 0, false, true))
 	return NULL;
 
     bool accept = false;
@@ -5490,6 +5678,157 @@ compare_schemas(PyObject* self, PyObject* args, PyObject* kwargs)
 }
 
 
+PyDoc_STRVAR(generate_data_docstring,
+             "generate_data(schema)\n"
+             "\n"
+	     "Generate data that conforms to the provided schema.");
+
+
+static PyObject*
+generate_data(PyObject* self, PyObject* args, PyObject* kwargs)
+{
+    PyObject *validatorObject = NULL;
+    static char const* kwlist[] = {
+	"schema",
+	NULL
+    };
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$p:generate_data",
+				     (char**) kwlist,
+				     &validatorObject))
+	return NULL;
+
+    if (validatorObject == NULL) {
+	return NULL;
+    }
+
+    PyObject* validator_args = PyTuple_Pack(1, validatorObject);
+    if (validator_args == NULL)
+	return NULL;
+    PyObject* validator_kwargs = PyDict_New();
+    if (validator_kwargs == NULL) {
+	Py_DECREF(validator_args);
+	return NULL;
+    }
+    PyObject* validator = validator_new(&Validator_Type, validator_args, validator_kwargs);
+    Py_DECREF(validator_args);
+    Py_DECREF(validator_kwargs);
+    if (validator == NULL)
+	return NULL;
+
+    PyObject* out = validator_generate_data(validator, NULL, NULL);
+    Py_DECREF(validator);
+    return out;
+}
+
+
+PyDoc_STRVAR(as_pure_json_docstring,
+	     "as_pure_json(json)\n"
+	     "\n"
+	     "Convert a JSON document containing yggdrasil extension values to pure JSON.");
+
+
+static PyObject*
+as_pure_json(PyObject* self, PyObject* args, PyObject* kwargs)
+{
+    PyObject* jsonObject = NULL;
+    PyObject* decoderObject = NULL;
+    PyObject* objectHook = NULL;
+    PyObject* numberModeObj = NULL;
+    unsigned numberMode = NM_NAN;
+    PyObject* datetimeModeObj = NULL;
+    unsigned datetimeMode = DM_NONE;
+    PyObject* uuidModeObj = NULL;
+    unsigned uuidMode = UM_NONE;
+    PyObject* bytesModeObj = NULL;
+    unsigned bytesMode = BM_SCALAR;
+    PyObject* iterableModeObj = NULL;
+    unsigned iterableMode = IM_ANY_ITERABLE;
+    PyObject* mappingModeObj = NULL;
+    unsigned mappingMode = MM_ANY_MAPPING;
+    PyObject* yggdrasilModeObj = NULL;
+    unsigned yggdrasilMode = YM_BASE64;
+    int allowNan = -1;
+    static char const* kwlist[] = {
+	"json",
+	"decoder",
+        "object_hook",
+        "number_mode",
+        "datetime_mode",
+        "uuid_mode",
+        "bytes_mode",
+        "iterable_mode",
+        "mapping_mode",
+	"yggdrasil_mode",
+
+        /* compatibility with stdlib json */
+        "allow_nan",
+
+	NULL
+    };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$OOOOOOOOp:as_pure_json",
+				     (char**) kwlist,
+				     &jsonObject,
+				     &decoderObject,
+                                     &objectHook,
+                                     &numberModeObj,
+                                     &datetimeModeObj,
+                                     &uuidModeObj,
+				     &bytesModeObj,
+				     &iterableModeObj,
+				     &mappingModeObj,
+				     &yggdrasilModeObj,
+                                     &allowNan))
+	return NULL;
+    
+    if (objectHook && !PyCallable_Check(objectHook)) {
+        if (objectHook == Py_None) {
+            objectHook = NULL;
+        } else {
+            PyErr_SetString(PyExc_TypeError, "object_hook is not callable");
+            return NULL;
+        }
+    }
+
+    if (!accept_number_mode_arg(numberModeObj, allowNan, numberMode))
+        return NULL;
+
+    if (!accept_datetime_mode_arg(datetimeModeObj, datetimeMode))
+        return NULL;
+
+    if (!accept_uuid_mode_arg(uuidModeObj, uuidMode))
+        return NULL;
+
+    if (!accept_bytes_mode_arg(bytesModeObj, bytesMode))
+        return NULL;
+
+    if (!accept_iterable_mode_arg(iterableModeObj, iterableMode))
+        return NULL;
+
+    if (!accept_mapping_mode_arg(mappingModeObj, mappingMode))
+        return NULL;
+
+    if (!accept_yggdrasil_mode_arg(yggdrasilModeObj, yggdrasilMode))
+        return NULL;
+
+    Document d;
+    bool isEmptyString = false;
+    if (!python2document(jsonObject, d, numberMode, datetimeMode,
+			 uuidMode, bytesMode, iterableMode,
+			 mappingMode, yggdrasilMode, 0, false, false,
+			 &isEmptyString))
+	return NULL;
+
+    PyHandler handler(decoderObject, objectHook, datetimeMode, uuidMode,
+		      numberMode);
+    JSONCoreWrapper<PyHandler> wrapped(handler);
+    if (!d.Accept(wrapped)) {
+	return NULL;
+    }
+    return handler.root;
+}
+
+
 ////////////////
 // Normalizer //
 ////////////////
@@ -5505,6 +5844,7 @@ typedef struct {
     unsigned bytesMode;
     unsigned iterableMode;
     unsigned mappingMode;
+    unsigned yggdrasilMode;
     unsigned expectsString;
 } NormalizerObject;
 
@@ -5513,7 +5853,7 @@ PyDoc_STRVAR(normalizer_doc,
              "Normalizer(json_schema, object_hook=None, number_mode=None,"
 	     " datetime_mode=None, uuid_mode=None, bytes_mode=BM_SCALAR,"
 	     " iterable_mode=IM_ANY_ITERABLE, mapping_mode=MM_ANY_MAPPING,"
-	     " allow_nan=True)\n"
+	     " yggdrasil_mode=YM_BASE64, allow_nan=True)\n"
              "\n"
              "Create and return a new Normalizer instance from the given `json_schema`"
              " string or Python dictionary.");
@@ -5529,6 +5869,9 @@ static PyMethodDef normalizer_methods[] = {
     {"compare", (PyCFunction) normalizer_compare,
      METH_VARARGS | METH_KEYWORDS,
      "Compare two schemas for compatiblity."},
+    {"generate_data", (PyCFunction) normalizer_generate_data,
+     METH_NOARGS,
+     "Generate data that fits the schema."},
     {"check_schema", (PyCFunction) normalizer_check_schema,
      METH_VARARGS | METH_KEYWORDS | METH_CLASS,
      "Validate a schema against the JSON metaschema."},
@@ -5582,8 +5925,17 @@ static PyTypeObject Normalizer_Type = {
 static PyObject* normalizer_call(PyObject* self, PyObject* args, PyObject* kwargs)
 {
     PyObject* jsonObject;
+    PyObject* relativePathRootObj = NULL;
+    static char const* kwlist[] = {
+	"obj",
+	"relative_path_root",
+	NULL
+    };
 
-    if (!PyArg_ParseTuple(args, "O", &jsonObject))
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$O",
+				     (char**) kwlist,
+				     &jsonObject,
+				     &relativePathRootObj))
         return NULL;
 
     NormalizerObject* v = (NormalizerObject*) self;
@@ -5591,11 +5943,19 @@ static PyObject* normalizer_call(PyObject* self, PyObject* args, PyObject* kwarg
     bool isEmptyString = false;
     if (!python2document(jsonObject, d, v->numberMode, v->datetimeMode,
 			 v->uuidMode, v->bytesMode, v->iterableMode,
-			 v->mappingMode, v->expectsString,
+			 v->mappingMode, v->yggdrasilMode, v->expectsString,
 			 false, false, &isEmptyString))
 	return NULL;
     
     SchemaNormalizer normalizer(*((NormalizerObject*) self)->schema);
+    if (relativePathRootObj != NULL) {
+	Py_ssize_t relativePathRootLen = 0;
+	const char* relativePathRootStr = PyUnicode_AsUTF8AndSize(relativePathRootObj, &relativePathRootLen);
+	if (!relativePathRootStr)
+	    return NULL;
+	normalizer.SetRelativePathRoot(relativePathRootStr,
+				       (SizeType)relativePathRootLen);
+    }
     bool accept;
 
     if (normalizer.RequiresPython() || d.RequiresPython()) {
@@ -5661,6 +6021,8 @@ static PyObject* normalizer_new(PyTypeObject* type, PyObject* args, PyObject* kw
     unsigned iterableMode = IM_ANY_ITERABLE;
     PyObject* mappingModeObj = NULL;
     unsigned mappingMode = MM_ANY_MAPPING;
+    PyObject* yggdrasilModeObj = NULL;
+    unsigned yggdrasilMode = YM_BASE64;
     int allowNan = -1;
     static char const* kwlist[] = {
 	"schema",
@@ -5671,6 +6033,7 @@ static PyObject* normalizer_new(PyTypeObject* type, PyObject* args, PyObject* kw
         "bytes_mode",
         "iterable_mode",
         "mapping_mode",
+	"yggdrasil_mode",
 
         /* compatibility with stdlib json */
         "allow_nan",
@@ -5678,7 +6041,7 @@ static PyObject* normalizer_new(PyTypeObject* type, PyObject* args, PyObject* kw
         NULL
     };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$OOOOOOOp:Normalizer",
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$OOOOOOOOp:Normalizer",
                                      (char**) kwlist,
 				     &jsonObject,
                                      &objectHook,
@@ -5688,6 +6051,7 @@ static PyObject* normalizer_new(PyTypeObject* type, PyObject* args, PyObject* kw
 				     &bytesModeObj,
 				     &iterableModeObj,
 				     &mappingModeObj,
+				     &yggdrasilModeObj,
                                      &allowNan))
         return NULL;
 
@@ -5718,10 +6082,13 @@ static PyObject* normalizer_new(PyTypeObject* type, PyObject* args, PyObject* kw
     if (!accept_mapping_mode_arg(mappingModeObj, mappingMode))
         return NULL;
 
+    if (!accept_yggdrasil_mode_arg(yggdrasilModeObj, yggdrasilMode))
+        return NULL;
+
     Document d;
     if (!python2document(jsonObject, d, numberMode, datetimeMode,
 			 uuidMode, bytesMode, iterableMode,
-			 mappingMode, 0, true))
+			 mappingMode, yggdrasilMode, 0, true))
 	return NULL;
 
     NormalizerObject* v = (NormalizerObject*) type->tp_alloc(type, 0);
@@ -5738,6 +6105,7 @@ static PyObject* normalizer_new(PyTypeObject* type, PyObject* args, PyObject* kw
     v->bytesMode = bytesMode;
     v->iterableMode = iterableMode;
     v->mappingMode = mappingMode;
+    v->yggdrasilMode = yggdrasilMode;
     v->expectsString = check_expectsString(d);
 
     return (PyObject*) v;
@@ -5760,7 +6128,7 @@ static PyObject* normalizer_validate(PyObject* self, PyObject* args, PyObject* k
     bool isEmptyString = false;
     if (!python2document(jsonObject, d, v->numberMode, v->datetimeMode,
 			 v->uuidMode, v->bytesMode, v->iterableMode,
-			 v->mappingMode, v->expectsString,
+			 v->mappingMode, v->yggdrasilMode, v->expectsString,
 			 false, false, &isEmptyString))
 	return NULL;
 
@@ -5839,11 +6207,39 @@ static PyObject* normalizer_check_schema(PyObject*, PyObject* args, PyObject* kw
 { return validator_check_schema((PyObject*)(&Validator_Type), args, kwargs); }
 
 
+static PyObject* normalizer_generate_data(PyObject* self, PyObject*, PyObject*)
+{
+    Document d;
+    NormalizerObject* v = (NormalizerObject*) self;
+    SchemaNormalizer normalizer(*v->schema);
+    bool accept = normalizer.GenerateData(d);
+    if (!accept) {
+	set_validation_error(normalizer, generate_error);
+	return NULL;
+    }
+
+    PyHandler handler(NULL, v->objectHook, v->datetimeMode, v->uuidMode,
+		      v->numberMode);
+    accept = d.Accept(handler);
+    if (!accept) {
+	PyErr_SetString(generate_error, "Error converting the generated JSON document to a Python object");
+	return NULL;
+    }
+    
+    if (PyErr_Occurred()) {
+        Py_XDECREF(handler.root);
+        return NULL;
+    }
+    
+    return handler.root;
+}
+
+
 PyDoc_STRVAR(normalize_docstring,
              "normalize(obj, schema, object_hook=None, number_mode=None,"
 	     " datetime_mode=None, uuid_mode=None, bytes_mode=BM_SCALAR,"
 	     " iterable_mode=IM_ANY_ITERABLE, mapping_mode=MM_ANY_MAPPING,"
-	     " allow_nan=True)\n"
+	     " allow_nan=True, relative_path_root=None)\n"
              "\n"
 	     "Normalize a Python object against a JSON schema.");
 
@@ -5873,19 +6269,42 @@ normalize(PyObject* self, PyObject* args, PyObject* kwargs)
 	}
     }
 			
+    PyObject* relativePathRootObj = NULL;
+    if (kwargs != NULL)
+	relativePathRootObj = PyDict_GetItemString(kwargs, "relative_path_root");
+    PyObject* call_kwargs = NULL;
+    if (relativePathRootObj != NULL) {
+	call_kwargs = PyDict_New();
+	if (PyDict_SetItemString(call_kwargs, "relative_path_root",
+				 relativePathRootObj) < 0) {
+	    Py_DECREF(normalizer_args);
+	    Py_DECREF(call_kwargs);
+	    return NULL;
+	}
+	if (PyDict_DelItemString(kwargs, "relative_path_root") < 0) {
+	    Py_DECREF(normalizer_args);
+	    Py_DECREF(call_kwargs);
+	    return NULL;
+	}
+    }
+			
     PyObject* normalizer = normalizer_new(&Normalizer_Type, normalizer_args, kwargs);
     Py_DECREF(normalizer_args);
-    if (normalizer == NULL)
+    if (normalizer == NULL) {
+	Py_XDECREF(call_kwargs);
 	return NULL;
+    }
 
     PyObject* instance = PyTuple_GetItem(args, 0);
     if (instance == NULL) {
+	Py_XDECREF(call_kwargs);
 	Py_DECREF(normalizer);
 	return NULL;
     }
     PyObject* call_args = PyTuple_Pack(1, instance);
-    PyObject* out = normalizer_call(normalizer, call_args, NULL);
+    PyObject* out = normalizer_call(normalizer, call_args, call_kwargs);
     Py_DECREF(call_args);
+    Py_XDECREF(call_kwargs);
     Py_DECREF(normalizer);
     return out;
 }
@@ -5978,6 +6397,12 @@ static PyMethodDef functions[] = {
     {"compare_schemas", (PyCFunction) compare_schemas,
      METH_VARARGS | METH_KEYWORDS,
      compare_schemas_docstring},
+    {"generate_data", (PyCFunction) generate_data,
+     METH_VARARGS | METH_KEYWORDS,
+     generate_data_docstring},
+    {"as_pure_json", (PyCFunction) as_pure_json,
+     METH_VARARGS | METH_KEYWORDS,
+     as_pure_json_docstring},
     {NULL, NULL, 0, NULL} /* sentinel */
 };
 
@@ -6155,6 +6580,12 @@ module_exec(PyObject* m)
                                    MM_COERCE_KEYS_TO_STRINGS)
         || PyModule_AddIntConstant(m, "MM_SKIP_NON_STRING_KEYS", MM_SKIP_NON_STRING_KEYS)
         || PyModule_AddIntConstant(m, "MM_SORT_KEYS", MM_SORT_KEYS)
+	
+	|| PyModule_AddIntConstant(m, "YM_BASE64", YM_BASE64)
+	|| PyModule_AddIntConstant(m, "YM_READABLE", YM_READABLE)
+	|| PyModule_AddIntConstant(m, "YM_PICKLE", YM_PICKLE)
+
+	|| PyModule_AddIntConstant(m, "SIZE_OF_SIZE_T", SIZE_OF_SIZE_T)
 
         || PyModule_AddStringConstant(m, "__version__",
                                       STRINGIFY(PYTHON_RAPIDJSON_VERSION))
@@ -6257,6 +6688,16 @@ module_exec(PyObject* m)
     Py_INCREF(comparison_error);
     if (PyModule_AddObject(m, "ComparisonError", comparison_error) < 0) {
 	Py_DECREF(comparison_error);
+	return -1;
+    }
+
+    generate_error = PyErr_NewException("rapidjson.GenerateError",
+					  PyExc_ValueError, NULL);
+    if (generate_error == NULL)
+	return -1;
+    Py_INCREF(generate_error);
+    if (PyModule_AddObject(m, "GenerateError", generate_error) < 0) {
+	Py_DECREF(generate_error);
 	return -1;
     }
 

@@ -253,13 +253,15 @@ class ConnectionDriver(Driver):
     _schema_additional_kwargs_base = {
         'pushProperties': {
             '!$properties/inputs/items': ['transform', 'onexit',
-                                          'read_meth', 'write_meth'],
+                                          'read_meth', 'write_meth',
+                                          'in_temp'],
             '!$properties/outputs/items/anyOf/1': ['transform', 'onexit',
-                                                   'read_meth', 'write_meth'],
+                                                   'read_meth', 'write_meth',
+                                                   'in_temp'],
             ('$properties/inputs/items/anyOf/1/allOf/1/anyOf/0/'
-             'properties/serializer/oneOf/0'): True,
+             'properties/serializer'): True,
             ('$properties/outputs/items/anyOf/1/allOf/1/anyOf/0/'
-             'properties/serializer/oneOf/0'): True}}
+             'properties/serializer'): True}}
     _disconnect_attr = Driver._disconnect_attr + [
         '_comm_closed', '_skip_after_loop', 'shared', 'task_thread',
         'icomm', 'ocomm']
@@ -363,7 +365,7 @@ class ConnectionDriver(Driver):
                 if ((x.get('datatype', {}).get('from_function', False)
                      and (x.get('datatype', {}).get('type', None)
                           in ['any', 'instance']))):
-                    x['datatype'] = {'type': 'bytes'}
+                    x['datatype'] = {'type': 'scalar', 'subtype': 'string'}
                 x.get('datatype', {}).pop('from_function', False)
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
         setattr(self, attr_comm, new_comm(**comm_kws))
@@ -864,11 +866,11 @@ class ConnectionDriver(Driver):
                 return False
             msg = self.icomm.recv(return_message_object=True, **kwargs)
             self.errors += self.icomm.errors
-        if msg.header and ('model' in msg.header):
-            self.models_recvd.setdefault(msg.header['model'], 0)
-            self.models_recvd[msg.header['model']] += 1
-            if msg.header['model'] not in self.models['input']:
-                self.models['input'].append(msg.header['model'])
+        if msg.header and ('model' in msg.header['__meta__']):
+            self.models_recvd.setdefault(msg.header['__meta__']['model'], 0)
+            self.models_recvd[msg.header['__meta__']['model']] += 1
+            if msg.header['__meta__']['model'] not in self.models['input']:
+                self.models['input'].append(msg.header['__meta__']['model'])
         if msg.flag == CommBase.FLAG_EOF:
             return self.on_eof(msg)
         if msg.flag == CommBase.FLAG_SUCCESS:
@@ -1014,9 +1016,11 @@ class ConnectionDriver(Driver):
         self.debug('')
         with self.lock:
             self._used = True
-        if (msg.header is not None) and ('model' in msg.header):
+        if (msg.header is not None) and ('model' in msg.header['__meta__']):
             kwargs.setdefault('header_kwargs', {})
-            kwargs['header_kwargs'].setdefault('model', msg.header['model'])
+            kwargs['header_kwargs'].setdefault('__meta__', {})
+            kwargs['header_kwargs']['__meta__'].setdefault(
+                'model', msg.header['__meta__']['model'])
         kws_prepare = {k: kwargs.pop(k) for k in self.ocomm._prepare_message_kws
                        if k in kwargs}
         msg_out = self.ocomm.prepare_message(msg.args, **kws_prepare)

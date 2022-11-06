@@ -97,7 +97,10 @@ class TimeSyncModelDriver(DSLModelDriver):
             'type': 'object',
             'additionalProperties': {'type': 'array',
                                      'items': {'type': 'string'}},
-            'default': {}}}
+            'default': {}},
+        'args': {'type': 'array', 'default': [],
+                 'items': {'type': ['string', 'number']},
+                 'allowSingular': True}}
     language = 'timesync'
     executable_type = 'other'
 

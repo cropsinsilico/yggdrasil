@@ -4,9 +4,6 @@ definitions:
     allOf:
     - additionalProperties: false
       allowSingular: name
-      dependencies:
-        driver:
-        - args
       description: Base schema for all subtypes of comm components.
       properties:
         address:
@@ -26,7 +23,6 @@ definitions:
         client_id:
           type: string
         commtype:
-          default: default
           description: Communication mechanism that should be used.
           enum:
           - buffer
@@ -47,7 +43,8 @@ definitions:
           type: integer
         datatype:
           default:
-            type: bytes
+            subtype: string
+            type: scalar
           description: 'JSON schema (with expanded core types defined by |yggdrasil|)
             that constrains the type of data that should be sent/received by this
             object. Defaults to {''type'': ''bytes''}. Additional information on specifying
@@ -73,6 +70,9 @@ definitions:
         driver:
           deprecated: true
           description: '[DEPRECATED] Name of driver class that should be used.'
+          enum:
+          - InputDriver
+          - OutputDriver
           type: string
         field_names:
           aliases:
@@ -164,11 +164,12 @@ definitions:
           description: Names of variables to be sent/received by this comm. Defaults
             to [].
           items:
-            allowSingular: true
+            allowSingular: name
             properties:
               datatype:
                 default:
-                  type: bytes
+                  subtype: string
+                  type: scalar
                 type: schema
               name:
                 type: string
@@ -181,7 +182,6 @@ definitions:
       pushProperties:
         $properties/datatype: true
       required:
-      - commtype
       - datatype
       - name
       title: comm_base
@@ -191,16 +191,29 @@ definitions:
         allowSingular: name
         description: Schema for comm component ['default'] subtype.
         properties:
+          args:
+            deprecated: true
+            description: '[DEPRECATED] Arguments that should be provided to the driver.'
+            type: string
           commtype:
             default: default
             description: Communication mechanism selected based on the current platform.
             enum:
             - default
             type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - InputDriver
+            - OutputDriver
+            type: string
           name:
             description: Name used for component in log messages.
             pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
+        required:
+        - commtype
         title: yggdrasil.communication.DefaultComm.DefaultComm
         type: object
       - additionalProperties: true
@@ -208,7 +221,7 @@ definitions:
         description: Schema for comm component ['buffer'] subtype.
         properties:
           commtype:
-            default: default
+            default: buffer
             description: Communication mechanism that should be used.
             enum:
             - buffer
@@ -217,22 +230,37 @@ definitions:
             description: Name used for component in log messages.
             pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
+        required:
+        - commtype
         title: yggdrasil.communication.BufferComm.BufferComm
         type: object
       - additionalProperties: true
         allowSingular: name
         description: Schema for comm component ['ipc'] subtype.
         properties:
+          args:
+            deprecated: true
+            description: '[DEPRECATED] Arguments that should be provided to the driver.'
+            type: string
           commtype:
-            default: default
+            default: ipc
             description: Interprocess communication (IPC) queue.
             enum:
             - ipc
+            type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - IPCInputDriver
+            - IPCOutputDriver
             type: string
           name:
             description: Name used for component in log messages.
             pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
+        required:
+        - commtype
         title: yggdrasil.communication.IPCComm.IPCComm
         type: object
       - additionalProperties: true
@@ -240,7 +268,7 @@ definitions:
         description: Schema for comm component ['mpi'] subtype.
         properties:
           commtype:
-            default: default
+            default: mpi
             description: MPI communicator.
             enum:
             - mpi
@@ -249,6 +277,8 @@ definitions:
             description: Name used for component in log messages.
             pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
+        required:
+        - commtype
         title: yggdrasil.communication.MPIComm.MPIComm
         type: object
       - additionalProperties: true
@@ -258,7 +288,7 @@ definitions:
           client_id:
             type: string
           commtype:
-            default: default
+            default: rest
             description: RESTful API.
             enum:
             - rest
@@ -279,38 +309,66 @@ definitions:
             type: object
           port:
             type: int
+        required:
+        - commtype
         title: yggdrasil.communication.RESTComm.RESTComm
         type: object
       - additionalProperties: true
         allowSingular: name
         description: Schema for comm component ['rmq_async'] subtype.
         properties:
+          args:
+            deprecated: true
+            description: '[DEPRECATED] Arguments that should be provided to the driver.'
+            type: string
           commtype:
-            default: default
+            default: rmq_async
             description: Asynchronous RabbitMQ connection.
             enum:
             - rmq_async
+            type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - RMQAsyncInputDriver
+            - RMQAsyncOutputDriver
             type: string
           name:
             description: Name used for component in log messages.
             pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
+        required:
+        - commtype
         title: yggdrasil.communication.RMQAsyncComm.RMQAsyncComm
         type: object
       - additionalProperties: true
         allowSingular: name
         description: Schema for comm component ['rmq'] subtype.
         properties:
+          args:
+            deprecated: true
+            description: '[DEPRECATED] Arguments that should be provided to the driver.'
+            type: string
           commtype:
-            default: default
+            default: rmq
             description: RabbitMQ connection.
             enum:
             - rmq
+            type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - RMQInputDriver
+            - RMQOutputDriver
             type: string
           name:
             description: Name used for component in log messages.
             pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
+        required:
+        - commtype
         title: yggdrasil.communication.RMQComm.RMQComm
         type: object
       - additionalProperties: true
@@ -318,7 +376,7 @@ definitions:
         description: Schema for comm component ['value'] subtype.
         properties:
           commtype:
-            default: default
+            default: value
             description: Constant value.
             enum:
             - value
@@ -330,26 +388,56 @@ definitions:
             description: Name used for component in log messages.
             pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
+        required:
+        - commtype
         title: yggdrasil.communication.ValueComm.ValueComm
         type: object
       - additionalProperties: true
         allowSingular: name
         description: Schema for comm component ['zmq'] subtype.
         properties:
+          args:
+            deprecated: true
+            description: '[DEPRECATED] Arguments that should be provided to the driver.'
+            type: string
           commtype:
-            default: default
+            default: zmq
             description: ZeroMQ socket.
             enum:
             - zmq
+            type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - ZMQInputDriver
+            - ZMQOutputDriver
             type: string
           name:
             description: Name used for component in log messages.
             pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
+        required:
+        - commtype
         title: yggdrasil.communication.ZMQComm.ZMQComm
         type: object
     description: Schema for comm components.
     title: comm
+  comm_driver:
+    allOf:
+    - $ref: '#/definitions/comm'
+    - properties:
+        args:
+          deprecated: true
+          description: '[DEPRECATED] Arguments that should be provided to the driver.'
+          type: string
+        driver:
+          deprecated: true
+          description: '[DEPRECATED] Name of driver class that should be used.'
+          type: string
+      required:
+      - driver
+      - args
   connection:
     allOf:
     - additionalProperties: false
@@ -375,6 +463,14 @@ definitions:
         driver:
           deprecated: true
           description: '[DEPRECATED] Name of driver class that should be used.'
+          enum:
+          - ConnectionDriver
+          - FileInputDriver
+          - FileOutputDriver
+          - InputDriver
+          - OutputDriver
+          - RPCRequestDriver
+          - RPCResponseDriver
           type: string
         input_pattern:
           default: cycle
@@ -505,13 +601,15 @@ definitions:
         - onexit
         - read_meth
         - write_meth
+        - in_temp
         '!$properties/outputs/items/anyOf/1':
         - transform
         - onexit
         - read_meth
         - write_meth
-        $properties/inputs/items/anyOf/1/allOf/1/anyOf/0/properties/serializer/oneOf/0: true
-        $properties/outputs/items/anyOf/1/allOf/1/anyOf/0/properties/serializer/oneOf/0: true
+        - in_temp
+        $properties/inputs/items/anyOf/1/allOf/1/anyOf/0/properties/serializer: true
+        $properties/outputs/items/anyOf/1/allOf/1/anyOf/0/properties/serializer: true
       required:
       - inputs
       - outputs
@@ -522,10 +620,17 @@ definitions:
         description: Schema for connection component ['connection'] subtype.
         properties:
           connection_type:
+            default: connection
             description: Connection between one or more comms/files and one or more
               comms/files.
             enum:
             - connection
+            type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - ConnectionDriver
             type: string
         title: yggdrasil.drivers.ConnectionDriver.ConnectionDriver
         type: object
@@ -533,9 +638,16 @@ definitions:
         description: Schema for connection component ['file_input'] subtype.
         properties:
           connection_type:
+            default: file_input
             description: Connection between a file and a model.
             enum:
             - file_input
+            type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - FileInputDriver
             type: string
         title: yggdrasil.drivers.FileInputDriver.FileInputDriver
         type: object
@@ -543,9 +655,16 @@ definitions:
         description: Schema for connection component ['file_output'] subtype.
         properties:
           connection_type:
+            default: file_output
             description: Connection between a model and a file.
             enum:
             - file_output
+            type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - FileOutputDriver
             type: string
         title: yggdrasil.drivers.FileOutputDriver.FileOutputDriver
         type: object
@@ -553,9 +672,16 @@ definitions:
         description: Schema for connection component ['input'] subtype.
         properties:
           connection_type:
+            default: input
             description: Connection between one or more comms/files and a model.
             enum:
             - input
+            type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - InputDriver
             type: string
         title: yggdrasil.drivers.InputDriver.InputDriver
         type: object
@@ -563,9 +689,16 @@ definitions:
         description: Schema for connection component ['output'] subtype.
         properties:
           connection_type:
+            default: output
             description: Connection between a model and one or more comms/files.
             enum:
             - output
+            type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - OutputDriver
             type: string
         title: yggdrasil.drivers.OutputDriver.OutputDriver
         type: object
@@ -573,10 +706,17 @@ definitions:
         description: Schema for connection component ['rpc_request'] subtype.
         properties:
           connection_type:
+            default: rpc_request
             description: Connection between one or more comms/files and one or more
               comms/files.
             enum:
             - rpc_request
+            type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - RPCRequestDriver
             type: string
         title: yggdrasil.drivers.RPCRequestDriver.RPCRequestDriver
         type: object
@@ -584,15 +724,37 @@ definitions:
         description: Schema for connection component ['rpc_response'] subtype.
         properties:
           connection_type:
+            default: rpc_response
             description: Connection between one or more comms/files and one or more
               comms/files.
             enum:
             - rpc_response
             type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - RPCResponseDriver
+            type: string
         title: yggdrasil.drivers.RPCResponseDriver.RPCResponseDriver
         type: object
     description: Schema for connection components.
     title: connection
+  connection_driver:
+    allOf:
+    - $ref: '#/definitions/connection'
+    - properties:
+        args:
+          deprecated: true
+          description: '[DEPRECATED] Arguments that should be provided to the driver.'
+          type: string
+        driver:
+          deprecated: true
+          description: '[DEPRECATED] Name of driver class that should be used.'
+          type: string
+      required:
+      - driver
+      - args
   file:
     allOf:
     - additionalProperties: false
@@ -646,6 +808,26 @@ definitions:
         driver:
           deprecated: true
           description: '[DEPRECATED] Name of driver class that should be used.'
+          enum:
+          - ''
+          - AsciiFileInputDriver
+          - AsciiFileOutputDriver
+          - AsciiMapInputDriver
+          - AsciiMapOutputDriver
+          - AsciiTableInputDriver
+          - AsciiTableOutputDriver
+          - FileInputDriver
+          - FileOutputDriver
+          - MatInputDriver
+          - MatOutputDriver
+          - ObjFileInputDriver
+          - ObjFileOutputDriver
+          - PandasFileInputDriver
+          - PandasFileOutputDriver
+          - PickleFileInputDriver
+          - PickleFileOutputDriver
+          - PlyFileInputDriver
+          - PlyFileOutputDriver
           type: string
         encoding:
           default: utf-8
@@ -673,7 +855,6 @@ definitions:
             type: string
           type: array
         filetype:
-          default: binary
           description: The type of file that will be read from or written to.
           enum:
           - ascii
@@ -763,13 +944,10 @@ definitions:
           - readline
           type: string
         serializer:
-          default: {}
+          $ref: '#/definitions/serializer'
           description: Class with serialize and deserialize methods that should be
             used to process sent and received messages. Defaults to None and is constructed
             using provided 'serializer_kwargs'.
-          oneOf:
-          - $ref: '#/definitions/serializer'
-          - type: instance
         sort_keys:
           default: true
           description: If True, the serialization of dictionaries will be in key sorted
@@ -812,11 +990,12 @@ definitions:
           description: Names of variables to be sent/received by this comm. Defaults
             to [].
           items:
-            allowSingular: true
+            allowSingular: name
             properties:
               datatype:
                 default:
-                  type: bytes
+                  subtype: string
+                  type: scalar
                 type: schema
               name:
                 type: string
@@ -841,7 +1020,7 @@ definitions:
             is used.
           type: string
       required:
-      - filetype
+      - name
       - working_dir
       title: file_base
       type: object
@@ -850,6 +1029,17 @@ definitions:
         allowSingular: name
         description: Schema for file component ['binary'] subtype.
         properties:
+          args:
+            deprecated: true
+            description: '[DEPRECATED] Arguments that should be provided to the driver.'
+            type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - FileInputDriver
+            - FileOutputDriver
+            type: string
           filetype:
             default: binary
             description: The entire file is read/written all at once as bytes.
@@ -870,17 +1060,14 @@ definitions:
             - readline
             type: string
           serializer:
-            default: {}
+            $ref: '#/definitions/serializer'
             description: Class with serialize and deserialize methods that should
               be used to process sent and received messages. Defaults to None and
               is constructed using provided 'serializer_kwargs'.
-            oneOf:
-            - $ref: '#/definitions/serializer'
-            - type: instance
         pushProperties:
-          $properties/serializer/oneOf/0: true
+          $properties/serializer: true
         required:
-        - name
+        - filetype
         - serializer
         title: yggdrasil.communication.FileComm.FileComm
         type: object
@@ -888,6 +1075,10 @@ definitions:
         allowSingular: name
         description: Schema for file component ['ascii'] subtype.
         properties:
+          args:
+            deprecated: true
+            description: '[DEPRECATED] Arguments that should be provided to the driver.'
+            type: string
           comment:
             default: '# '
             description: One or more characters indicating a comment. Defaults to
@@ -897,11 +1088,22 @@ definitions:
             description: JSON schema defining the type of object that the serializer
               will be used to serialize/deserialize. Defaults to default_datatype.
             type: schema
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - AsciiFileInputDriver
+            - AsciiFileOutputDriver
+            type: string
           filetype:
-            default: binary
+            default: ascii
             description: This file is read/written as encoded text one line at a time.
             enum:
             - ascii
+            type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
           newline:
             default: '
@@ -910,12 +1112,18 @@ definitions:
             description: One or more characters indicating a newline. Defaults to
               '\n'.
             type: string
+        required:
+        - filetype
         title: yggdrasil.communication.AsciiFileComm.AsciiFileComm
         type: object
       - additionalProperties: true
         allowSingular: name
         description: Schema for file component ['map'] subtype.
         properties:
+          args:
+            deprecated: true
+            description: '[DEPRECATED] Arguments that should be provided to the driver.'
+            type: string
           comment:
             default: '# '
             description: One or more characters indicating a comment. Defaults to
@@ -930,12 +1138,23 @@ definitions:
             description: Delimiter that should be used to separate name/value pairs
               in the map. Defaults to \t.
             type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - AsciiMapInputDriver
+            - AsciiMapOutputDriver
+            type: string
           filetype:
-            default: binary
+            default: map
             description: The file contains a key/value mapping with one key/value
               pair per line and separated by some delimiter.
             enum:
             - map
+            type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
           newline:
             default: '
@@ -944,12 +1163,18 @@ definitions:
             description: One or more characters indicating a newline. Defaults to
               '\n'.
             type: string
+        required:
+        - filetype
         title: yggdrasil.communication.AsciiMapComm.AsciiMapComm
         type: object
       - additionalProperties: true
         allowSingular: name
         description: Schema for file component ['table'] subtype.
         properties:
+          args:
+            deprecated: true
+            description: '[DEPRECATED] Arguments that should be provided to the driver.'
+            type: string
           comment:
             default: '# '
             description: One or more characters indicating a comment. Defaults to
@@ -966,13 +1191,24 @@ definitions:
             description: Character(s) that should be used to separate columns. Defaults
               to '\t'.
             type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - AsciiTableInputDriver
+            - AsciiTableOutputDriver
+            type: string
           filetype:
-            default: binary
+            default: table
             description: The file is an ASCII table that will be read/written one
               row at a time. If ``as_array`` is ``True``, the table will be read/written
               all at once.
             enum:
             - table
+            type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
           newline:
             default: '
@@ -986,6 +1222,8 @@ definitions:
             description: If True, the astropy package will be used to serialize/deserialize
               table. Defaults to False.
             type: boolean
+        required:
+        - filetype
         title: yggdrasil.communication.AsciiTableComm.AsciiTableComm
         type: object
       - additionalProperties: true
@@ -1001,8 +1239,14 @@ definitions:
             description: JSON schema defining the type of object that the serializer
               will be used to serialize/deserialize. Defaults to default_datatype.
             type: schema
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - ''
+            type: string
           filetype:
-            default: binary
+            default: json
             description: The file contains a JSON serialized object.
             enum:
             - json
@@ -1014,6 +1258,10 @@ definitions:
             type:
             - string
             - int
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+            type: string
           newline:
             default: '
 
@@ -1026,12 +1274,18 @@ definitions:
             description: If True, the serialization of dictionaries will be in key
               sorted order. Defaults to True.
             type: boolean
+        required:
+        - filetype
         title: yggdrasil.communication.JSONFileComm.JSONFileComm
         type: object
       - additionalProperties: true
         allowSingular: name
         description: Schema for file component ['mat'] subtype.
         properties:
+          args:
+            deprecated: true
+            description: '[DEPRECATED] Arguments that should be provided to the driver.'
+            type: string
           comment:
             default: '# '
             description: One or more characters indicating a comment. Defaults to
@@ -1041,12 +1295,23 @@ definitions:
             description: JSON schema defining the type of object that the serializer
               will be used to serialize/deserialize. Defaults to default_datatype.
             type: schema
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - MatInputDriver
+            - MatOutputDriver
+            type: string
           filetype:
-            default: binary
+            default: mat
             description: The file is a Matlab .mat file containing one or more serialized
               Matlab variables.
             enum:
             - mat
+            type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
           newline:
             default: '
@@ -1055,6 +1320,8 @@ definitions:
             description: One or more characters indicating a newline. Defaults to
               '\n'.
             type: string
+        required:
+        - filetype
         title: yggdrasil.communication.MatFileComm.MatFileComm
         type: object
       - additionalProperties: true
@@ -1070,11 +1337,21 @@ definitions:
             description: JSON schema defining the type of object that the serializer
               will be used to serialize/deserialize. Defaults to default_datatype.
             type: schema
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - ''
+            type: string
           filetype:
-            default: binary
+            default: netcdf
             description: The file is read/written as netCDF.
             enum:
             - netcdf
+            type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
           newline:
             default: '
@@ -1102,12 +1379,18 @@ definitions:
             - 1
             - 2
             type: integer
+        required:
+        - filetype
         title: yggdrasil.communication.NetCDFFileComm.NetCDFFileComm
         type: object
       - additionalProperties: true
         allowSingular: name
         description: Schema for file component ['obj'] subtype.
         properties:
+          args:
+            deprecated: true
+            description: '[DEPRECATED] Arguments that should be provided to the driver.'
+            type: string
           comment:
             default: '# '
             description: One or more characters indicating a comment. Defaults to
@@ -1117,12 +1400,23 @@ definitions:
             description: JSON schema defining the type of object that the serializer
               will be used to serialize/deserialize. Defaults to default_datatype.
             type: schema
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - ObjFileInputDriver
+            - ObjFileOutputDriver
+            type: string
           filetype:
-            default: binary
+            default: obj
             description: The file is in the `Obj <http://paulbourke.net/dataformats/obj/>`_
               data format for 3D structures.
             enum:
             - obj
+            type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
           newline:
             default: '
@@ -1131,12 +1425,18 @@ definitions:
             description: One or more characters indicating a newline. Defaults to
               '\n'.
             type: string
+        required:
+        - filetype
         title: yggdrasil.communication.ObjFileComm.ObjFileComm
         type: object
       - additionalProperties: true
         allowSingular: name
         description: Schema for file component ['pandas'] subtype.
         properties:
+          args:
+            deprecated: true
+            description: '[DEPRECATED] Arguments that should be provided to the driver.'
+            type: string
           comment:
             default: '# '
             description: One or more characters indicating a comment. Defaults to
@@ -1153,11 +1453,22 @@ definitions:
             description: Character(s) that should be used to separate columns. Defaults
               to '\t'.
             type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - PandasFileInputDriver
+            - PandasFileOutputDriver
+            type: string
           filetype:
-            default: binary
+            default: pandas
             description: The file is a Pandas frame output as a table.
             enum:
             - pandas
+            type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
           newline:
             default: '
@@ -1181,12 +1492,18 @@ definitions:
             description: If True, the astropy package will be used to serialize/deserialize
               table. Defaults to False.
             type: boolean
+        required:
+        - filetype
         title: yggdrasil.communication.PandasFileComm.PandasFileComm
         type: object
       - additionalProperties: true
         allowSingular: name
         description: Schema for file component ['pickle'] subtype.
         properties:
+          args:
+            deprecated: true
+            description: '[DEPRECATED] Arguments that should be provided to the driver.'
+            type: string
           comment:
             default: '# '
             description: One or more characters indicating a comment. Defaults to
@@ -1196,11 +1513,22 @@ definitions:
             description: JSON schema defining the type of object that the serializer
               will be used to serialize/deserialize. Defaults to default_datatype.
             type: schema
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - PickleFileInputDriver
+            - PickleFileOutputDriver
+            type: string
           filetype:
-            default: binary
+            default: pickle
             description: The file contains one or more pickled Python objects.
             enum:
             - pickle
+            type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
           newline:
             default: '
@@ -1209,12 +1537,18 @@ definitions:
             description: One or more characters indicating a newline. Defaults to
               '\n'.
             type: string
+        required:
+        - filetype
         title: yggdrasil.communication.PickleFileComm.PickleFileComm
         type: object
       - additionalProperties: true
         allowSingular: name
         description: Schema for file component ['ply'] subtype.
         properties:
+          args:
+            deprecated: true
+            description: '[DEPRECATED] Arguments that should be provided to the driver.'
+            type: string
           comment:
             default: '# '
             description: One or more characters indicating a comment. Defaults to
@@ -1224,12 +1558,23 @@ definitions:
             description: JSON schema defining the type of object that the serializer
               will be used to serialize/deserialize. Defaults to default_datatype.
             type: schema
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - PlyFileInputDriver
+            - PlyFileOutputDriver
+            type: string
           filetype:
-            default: binary
+            default: ply
             description: The file is in the `Ply <http://paulbourke.net/dataformats/ply/>`_
               data format for 3D structures.
             enum:
             - ply
+            type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
           newline:
             default: '
@@ -1238,6 +1583,8 @@ definitions:
             description: One or more characters indicating a newline. Defaults to
               '\n'.
             type: string
+        required:
+        - filetype
         title: yggdrasil.communication.PlyFileComm.PlyFileComm
         type: object
       - additionalProperties: true
@@ -1258,11 +1605,21 @@ definitions:
             description: Delimiter that should be used to separate name/value pairs
               in the map. Defaults to \t.
             type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - ''
+            type: string
           filetype:
-            default: binary
+            default: wofost
             description: The file is a WOFOST parameter file.
             enum:
             - wofost
+            type: string
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
             type: string
           newline:
             default: '
@@ -1271,6 +1628,8 @@ definitions:
             description: One or more characters indicating a newline. Defaults to
               '\n'.
             type: string
+        required:
+        - filetype
         title: yggdrasil.communication.WOFOSTParamFileComm.WOFOSTParamFileComm
         type: object
       - additionalProperties: true
@@ -1292,13 +1651,19 @@ definitions:
               style. If False, they will always be serialized in the flow style. See
               `PyYAML Documentation <https://pyyaml.org/wiki/PyYAMLDocumentation>`_.
             type: boolean
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - ''
+            type: string
           encoding:
             default: utf-8
             description: Encoding that should be used to serialize the object. Defaults
               to 'utf-8'.
             type: string
           filetype:
-            default: binary
+            default: yaml
             description: The file contains a YAML serialized object.
             enum:
             - yaml
@@ -1310,6 +1675,10 @@ definitions:
             type:
             - string
             - int
+          name:
+            description: Name used for component in log messages.
+            pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+            type: string
           newline:
             default: '
 
@@ -1317,16 +1686,33 @@ definitions:
             description: One or more characters indicating a newline. Defaults to
               '\n'.
             type: string
+        required:
+        - filetype
         title: yggdrasil.communication.YAMLFileComm.YAMLFileComm
         type: object
     description: Schema for file components.
     title: file
+  file_driver:
+    allOf:
+    - $ref: '#/definitions/file'
+    - properties:
+        args:
+          deprecated: true
+          description: '[DEPRECATED] Arguments that should be provided to the driver.'
+          type: string
+        driver:
+          deprecated: true
+          description: '[DEPRECATED] Name of driver class that should be used.'
+          type: string
+        working_dir:
+          type: string
+      required:
+      - driver
+      - args
+      - working_dir
   filter:
     allOf:
     - additionalProperties: false
-      dependencies:
-        driver:
-        - args
       description: Base schema for all subtypes of filter components.
       properties:
         filtertype:
@@ -1357,6 +1743,7 @@ definitions:
         description: Schema for filter component ['direct'] subtype.
         properties:
           filtertype:
+            default: direct
             enum:
             - direct
         title: yggdrasil.communication.filters.DirectFilter.DirectFilter
@@ -1365,6 +1752,7 @@ definitions:
         description: Schema for filter component ['function'] subtype.
         properties:
           filtertype:
+            default: function
             enum:
             - function
           function:
@@ -1384,6 +1772,7 @@ definitions:
         description: Schema for filter component ['statement'] subtype.
         properties:
           filtertype:
+            default: statement
             enum:
             - statement
           statement:
@@ -1456,8 +1845,9 @@ definitions:
             that should be passed as input to the model program or language executable
             (e.g. source code or configuration file for a domain specific language).
           items:
-            minLength: 1
-            type: string
+            type:
+            - string
+            - number
           type: array
         builddir:
           description: Directory where the build should be saved. Defaults to <sourcedir>/build.
@@ -1545,6 +1935,23 @@ definitions:
         driver:
           deprecated: true
           description: '[DEPRECATED] Name of driver class that should be used.'
+          enum:
+          - CMakeModelDriver
+          - CModelDriver
+          - CPPModelDriver
+          - DummyModelDriver
+          - ExecutableModelDriver
+          - FortranModelDriver
+          - GCCModelDriver
+          - LPyModelDriver
+          - MPIPartnerModel
+          - MakeModelDriver
+          - MatlabModelDriver
+          - OSRModelDriver
+          - PythonModelDriver
+          - RModelDriver
+          - SBMLModelDriver
+          - TimeSyncModelDriver
           type: string
         env:
           additional_properties:
@@ -1588,14 +1995,18 @@ definitions:
           default:
           - commtype: default
             datatype:
-              type: bytes
+              subtype: string
+              type: scalar
             is_default: true
             name: input
           description: Zero or more channels carrying input to the model. A full description
             of channel entries and the options available for channels can be found
             :ref:`here<yaml_comm_options>`.
           items:
-            $ref: '#/definitions/comm'
+            anyOf:
+            - $ref: '#/definitions/comm'
+            - $ref: '#/definitions/comm_driver'
+            - $ref: '#/definitions/file_driver'
           type: array
         integrator:
           default: cvode
@@ -1675,7 +2086,6 @@ definitions:
             type: string
           type: array
         language:
-          default: executable
           description: The programming language that the model is written in. A list
             of available languages can be found :ref:`here <schema_table_model_subtype_rst>`.
           enum:
@@ -1745,14 +2155,18 @@ definitions:
           default:
           - commtype: default
             datatype:
-              type: bytes
+              subtype: string
+              type: scalar
             is_default: true
             name: output
           description: Zero or more channels carrying output from the model. A full
             description of channel entries and the options available for channels
             can be found :ref:`here<yaml_comm_options>`.
           items:
-            $ref: '#/definitions/comm'
+            anyOf:
+            - $ref: '#/definitions/comm'
+            - $ref: '#/definitions/comm_driver'
+            - $ref: '#/definitions/file_driver'
           type: array
         outputs_in_inputs:
           description: If True, outputs from wrapped model functions are passed by
@@ -2017,14 +2431,17 @@ definitions:
             is used.
           type: string
       pushProperties:
-        $properties/inputs/items/allOf/0/properties/default_file:
+        $properties/inputs/items/anyOf/0/allOf/0/properties/default_file:
         - working_dir
-        $properties/outputs/items/allOf/0/properties/default_file:
+        $properties/inputs/items/anyOf/2:
+        - working_dir
+        $properties/outputs/items/anyOf/0/allOf/0/properties/default_file:
+        - working_dir
+        $properties/outputs/items/anyOf/2:
         - working_dir
       required:
       - args
       - inputs
-      - language
       - name
       - outputs
       - working_dir
@@ -2034,12 +2451,20 @@ definitions:
       - additionalProperties: true
         description: Schema for model component ['executable'] subtype.
         properties:
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - ExecutableModelDriver
+            type: string
           language:
             default: executable
             description: Model is an executable.
             enum:
             - executable
             type: string
+        required:
+        - language
         title: yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver
         type: object
       - additionalProperties: true
@@ -2071,6 +2496,12 @@ definitions:
             description: Build type/configuration that should be built. Defaults to
               'Release'.
             type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - CMakeModelDriver
+            type: string
           env_compiler:
             description: Environment variable where the compiler executable should
               be stored for use within the Makefile. If not provided, this will be
@@ -2092,7 +2523,7 @@ definitions:
               If not provided, this will be determined by the target language driver.
             type: string
           language:
-            default: executable
+            default: cmake
             description: Model is written in C/C++ and has a CMake build system.
             enum:
             - cmake
@@ -2154,6 +2585,8 @@ definitions:
             items:
               type: string
             type: array
+        required:
+        - language
         title: yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver
         type: object
       - additionalProperties: true
@@ -2174,8 +2607,15 @@ definitions:
             items:
               type: string
             type: array
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - GCCModelDriver
+            - CModelDriver
+            type: string
           language:
-            default: executable
+            default: c
             description: Model is written in C.
             enum:
             - c
@@ -2203,6 +2643,8 @@ definitions:
             items:
               type: string
             type: array
+        required:
+        - language
         title: yggdrasil.drivers.CModelDriver.CModelDriver
         type: object
       - additionalProperties: true
@@ -2223,8 +2665,15 @@ definitions:
             items:
               type: string
             type: array
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - GCCModelDriver
+            - CPPModelDriver
+            type: string
           language:
-            default: executable
+            default: c++
             description: Model is written in C++.
             enum:
             - c++
@@ -2254,11 +2703,19 @@ definitions:
             items:
               type: string
             type: array
+        required:
+        - language
         title: yggdrasil.drivers.CPPModelDriver.CPPModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['dummy'] subtype.
         properties:
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - DummyModelDriver
+            type: string
           interpreter:
             description: Name or path of interpreter executable that should be used
               to run the model. If not provided, the interpreter will be determined
@@ -2275,7 +2732,7 @@ definitions:
               type: string
             type: array
           language:
-            default: executable
+            default: dummy
             description: The programming language that the model is written in. A
               list of available languages can be found :ref:`here <schema_table_model_subtype_rst>`.
             enum:
@@ -2287,6 +2744,8 @@ definitions:
               should only be used for subclasses that will not be invoking the model
               via the command line. Defaults to False.
             type: boolean
+        required:
+        - language
         title: yggdrasil.drivers.DummyModelDriver.DummyModelDriver
         type: object
       - additionalProperties: true
@@ -2307,8 +2766,14 @@ definitions:
             items:
               type: string
             type: array
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - FortranModelDriver
+            type: string
           language:
-            default: executable
+            default: fortran
             description: Model is written in Fortran.
             enum:
             - fortran
@@ -2343,11 +2808,19 @@ definitions:
             - f2003
             - f2008
             type: string
+        required:
+        - language
         title: yggdrasil.drivers.FortranModelDriver.FortranModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['lpy'] subtype.
         properties:
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - LPyModelDriver
+            type: string
           interpreter:
             description: Name or path of interpreter executable that should be used
               to run the model. If not provided, the interpreter will be determined
@@ -2364,7 +2837,7 @@ definitions:
               type: string
             type: array
           language:
-            default: executable
+            default: lpy
             description: Model is an LPy system.
             enum:
             - lpy
@@ -2375,18 +2848,28 @@ definitions:
               should only be used for subclasses that will not be invoking the model
               via the command line. Defaults to False.
             type: boolean
+        required:
+        - language
         title: yggdrasil.drivers.LPyModelDriver.LPyModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['mpi'] subtype.
         properties:
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - MPIPartnerModel
+            type: string
           language:
-            default: executable
+            default: mpi
             description: Model is being run on another MPI process and this driver
               is used as as stand-in to monitor it on the root process.
             enum:
             - mpi
             type: string
+        required:
+        - language
         title: yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel
         type: object
       - additionalProperties: true
@@ -2411,6 +2894,12 @@ definitions:
             items:
               type: string
             type: array
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - MakeModelDriver
+            type: string
           env_compiler:
             description: Environment variable where the compiler executable should
               be stored for use within the Makefile. If not provided, this will be
@@ -2432,7 +2921,7 @@ definitions:
               If not provided, this will be determined by the target language driver.
             type: string
           language:
-            default: executable
+            default: make
             description: Model is written in C/C++ and has a Makefile for compilation.
             enum:
             - make
@@ -2499,11 +2988,19 @@ definitions:
             items:
               type: string
             type: array
+        required:
+        - language
         title: yggdrasil.drivers.MakeModelDriver.MakeModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['matlab'] subtype.
         properties:
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - MatlabModelDriver
+            type: string
           interpreter:
             description: Name or path of interpreter executable that should be used
               to run the model. If not provided, the interpreter will be determined
@@ -2520,7 +3017,7 @@ definitions:
               type: string
             type: array
           language:
-            default: executable
+            default: matlab
             description: Model is written in Matlab.
             enum:
             - matlab
@@ -2536,6 +3033,8 @@ definitions:
             description: If True, input/output variables with units will be represented
               in Matlab using symunit. Defaults to False.
             type: boolean
+        required:
+        - language
         title: yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver
         type: object
       - additionalProperties: true
@@ -2548,8 +3047,14 @@ definitions:
               use any of the files located there since OSR always assumes the included
               file paths are relative. Defaults to False.
             type: boolean
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - OSRModelDriver
+            type: string
           language:
-            default: executable
+            default: osr
             description: Model is an OSR model.
             enum:
             - osr
@@ -2578,11 +3083,19 @@ definitions:
               additional export modules that output at a shorter rate, the existing
               table of values will be extrapolated.
             type: object
+        required:
+        - language
         title: yggdrasil.drivers.OSRModelDriver.OSRModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['python'] subtype.
         properties:
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - PythonModelDriver
+            type: string
           interpreter:
             description: Name or path of interpreter executable that should be used
               to run the model. If not provided, the interpreter will be determined
@@ -2599,7 +3112,7 @@ definitions:
               type: string
             type: array
           language:
-            default: executable
+            default: python
             description: Model is written in Python.
             enum:
             - python
@@ -2610,11 +3123,19 @@ definitions:
               should only be used for subclasses that will not be invoking the model
               via the command line. Defaults to False.
             type: boolean
+        required:
+        - language
         title: yggdrasil.drivers.PythonModelDriver.PythonModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['R', 'r'] subtype.
         properties:
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - RModelDriver
+            type: string
           interpreter:
             description: Name or path of interpreter executable that should be used
               to run the model. If not provided, the interpreter will be determined
@@ -2631,7 +3152,7 @@ definitions:
               type: string
             type: array
           language:
-            default: executable
+            default: R
             description: Model is written in R.
             enum:
             - R
@@ -2643,11 +3164,19 @@ definitions:
               should only be used for subclasses that will not be invoking the model
               via the command line. Defaults to False.
             type: boolean
+        required:
+        - language
         title: yggdrasil.drivers.RModelDriver.RModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['sbml'] subtype.
         properties:
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - SBMLModelDriver
+            type: string
           integrator:
             default: cvode
             description: Name of integrator that should be used. Valid options include
@@ -2678,7 +3207,7 @@ definitions:
               type: string
             type: array
           language:
-            default: executable
+            default: sbml
             description: Model is an SBML model.
             enum:
             - sbml
@@ -2722,6 +3251,8 @@ definitions:
             default: 1
             description: Number of steps that should be output. Defaults to None.
             type: integer
+        required:
+        - language
         title: yggdrasil.drivers.SBMLModelDriver.SBMLModelDriver
         type: object
       - additionalProperties: true
@@ -2744,6 +3275,24 @@ definitions:
                 - type: string
               type: object
             default: mean
+          args:
+            allowSingular: true
+            default: []
+            description: The path to the file containing the model program that will
+              be run by the driver for the model's language and/or a list of arguments
+              that should be passed as input to the model program or language executable
+              (e.g. source code or configuration file for a domain specific language).
+            items:
+              type:
+              - string
+              - number
+            type: array
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - TimeSyncModelDriver
+            type: string
           interpolation:
             anyOf:
             - type: string
@@ -2780,7 +3329,7 @@ definitions:
               type: string
             type: array
           language:
-            default: executable
+            default: timesync
             description: Model is dedicated to synchronizingtimesteps between other
               models.
             enum:
@@ -2822,16 +3371,32 @@ definitions:
               (implies equivalence with the base variable in everything but name and
               units) or mappings with the keys:'
             type: object
+        required:
+        - args
+        - language
         title: yggdrasil.drivers.TimeSyncModelDriver.TimeSyncModelDriver
         type: object
     description: Schema for model components.
     title: model
+  model_driver:
+    allOf:
+    - $ref: '#/definitions/model'
+    - properties:
+        args:
+          deprecated: true
+          description: '[DEPRECATED] Arguments that should be provided to the driver.'
+          type: string
+        driver:
+          deprecated: true
+          description: '[DEPRECATED] Name of driver class that should be used.'
+          type: string
+      required:
+      - driver
+      - args
   serializer:
     allOf:
     - additionalProperties: false
-      dependencies:
-        driver:
-        - args
+      default: {}
       description: Base schema for all subtypes of serializer components.
       properties:
         as_array:
@@ -2924,7 +3489,6 @@ definitions:
             Defaults to False.
           type: boolean
         seritype:
-          default: default
           description: Serializer type.
           enum:
           - default
@@ -2956,12 +3520,11 @@ definitions:
           description: If True, the astropy package will be used to serialize/deserialize
             table. Defaults to False.
           type: boolean
-      required:
-      - seritype
       title: serializer_base
       type: object
     - anyOf:
       - additionalProperties: true
+        default: {}
         description: Schema for serializer component ['default'] subtype.
         properties:
           seritype:
@@ -2972,9 +3535,12 @@ definitions:
             enum:
             - default
             type: string
+        required:
+        - seritype
         title: yggdrasil.serialize.DefaultSerialize.DefaultSerialize
         type: object
       - additionalProperties: true
+        default: {}
         description: Schema for serializer component ['map'] subtype.
         properties:
           delimiter:
@@ -2983,15 +3549,18 @@ definitions:
               in the map. Defaults to \t.
             type: string
           seritype:
-            default: default
+            default: map
             description: Serialzation of mapping between key/value pairs with one
               pair per line and using a character delimiter to separate keys and values.
             enum:
             - map
             type: string
+        required:
+        - seritype
         title: yggdrasil.serialize.AsciiMapSerialize.AsciiMapSerialize
         type: object
       - additionalProperties: true
+        default: {}
         description: Schema for serializer component ['table'] subtype.
         properties:
           as_array:
@@ -3032,7 +3601,7 @@ definitions:
               already be bytes.
             type: string
           seritype:
-            default: default
+            default: table
             description: ASCII tab (or otherwise) delimited table.
             enum:
             - table
@@ -3042,20 +3611,26 @@ definitions:
             description: If True, the astropy package will be used to serialize/deserialize
               table. Defaults to False.
             type: boolean
+        required:
+        - seritype
         title: yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize
         type: object
       - additionalProperties: true
+        default: {}
         description: Schema for serializer component ['direct'] subtype.
         properties:
           seritype:
-            default: default
+            default: direct
             description: Direct serialization of bytes.
             enum:
             - direct
             type: string
+        required:
+        - seritype
         title: yggdrasil.serialize.DirectSerialize.DirectSerialize
         type: object
       - additionalProperties: true
+        default: {}
         description: Schema for serializer component ['functional'] subtype.
         properties:
           encoded_datatype:
@@ -3076,14 +3651,17 @@ definitions:
               and the default serialization for encoded_datatype will be used.
             type: function
           seritype:
-            default: default
+            default: functional
             description: Serializer that uses provied function to serialize messages.
             enum:
             - functional
             type: string
+        required:
+        - seritype
         title: yggdrasil.serialize.FunctionalSerialize.FunctionalSerialize
         type: object
       - additionalProperties: true
+        default: {}
         description: Schema for serializer component ['json'] subtype.
         properties:
           indent:
@@ -3094,7 +3672,7 @@ definitions:
             - string
             - int
           seritype:
-            default: default
+            default: json
             description: Serializes Python objects using the JSON standard.
             enum:
             - json
@@ -3104,31 +3682,40 @@ definitions:
             description: If True, the serialization of dictionaries will be in key
               sorted order. Defaults to True.
             type: boolean
+        required:
+        - seritype
         title: yggdrasil.serialize.JSONSerialize.JSONSerialize
         type: object
       - additionalProperties: true
+        default: {}
         description: Schema for serializer component ['mat'] subtype.
         properties:
           seritype:
-            default: default
+            default: mat
             description: Serializes objects using the Matlab .mat format.
             enum:
             - mat
             type: string
+        required:
+        - seritype
         title: yggdrasil.serialize.MatSerialize.MatSerialize
         type: object
       - additionalProperties: true
+        default: {}
         description: Schema for serializer component ['obj'] subtype.
         properties:
           seritype:
-            default: default
+            default: obj
             description: Serialize 3D structures using Obj format.
             enum:
             - obj
             type: string
+        required:
+        - seritype
         title: yggdrasil.serialize.ObjSerialize.ObjSerialize
         type: object
       - additionalProperties: true
+        default: {}
         description: Schema for serializer component ['pandas'] subtype.
         properties:
           delimiter:
@@ -3168,7 +3755,7 @@ definitions:
               Defaults to False.
             type: boolean
           seritype:
-            default: default
+            default: pandas
             description: Serializes tables using the pandas package.
             enum:
             - pandas
@@ -3183,31 +3770,40 @@ definitions:
             description: If True, the astropy package will be used to serialize/deserialize
               table. Defaults to False.
             type: boolean
+        required:
+        - seritype
         title: yggdrasil.serialize.PandasSerialize.PandasSerialize
         type: object
       - additionalProperties: true
+        default: {}
         description: Schema for serializer component ['pickle'] subtype.
         properties:
           seritype:
-            default: default
+            default: pickle
             description: Serialize any Python object using a Python pickle.
             enum:
             - pickle
             type: string
+        required:
+        - seritype
         title: yggdrasil.serialize.PickleSerialize.PickleSerialize
         type: object
       - additionalProperties: true
+        default: {}
         description: Schema for serializer component ['ply'] subtype.
         properties:
           seritype:
-            default: default
+            default: ply
             description: Serialize 3D structures using Ply format.
             enum:
             - ply
             type: string
+        required:
+        - seritype
         title: yggdrasil.serialize.PlySerialize.PlySerialize
         type: object
       - additionalProperties: true
+        default: {}
         description: Schema for serializer component ['wofost'] subtype.
         properties:
           delimiter:
@@ -3216,15 +3812,18 @@ definitions:
               in the map. Defaults to \t.
             type: string
           seritype:
-            default: default
+            default: wofost
             description: Serialization of mapping between keys and scalar or array
               values as used in the WOFOST parameter files.
             enum:
             - wofost
             type: string
+        required:
+        - seritype
         title: yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize
         type: object
       - additionalProperties: true
+        default: {}
         description: Schema for serializer component ['yaml'] subtype.
         properties:
           default_flow_style:
@@ -3246,11 +3845,13 @@ definitions:
             - string
             - int
           seritype:
-            default: default
+            default: yaml
             description: Serializes Python objects using the YAML standard.
             enum:
             - yaml
             type: string
+        required:
+        - seritype
         title: yggdrasil.serialize.YAMLSerialize.YAMLSerialize
         type: object
     description: Schema for serializer components.
@@ -3258,9 +3859,6 @@ definitions:
   transform:
     allOf:
     - additionalProperties: false
-      dependencies:
-        driver:
-        - args
       description: Base schema for all subtypes of transform components.
       properties:
         field_names:
@@ -3330,6 +3928,7 @@ definitions:
               type: string
             type: array
           transformtype:
+            default: array
             enum:
             - array
         title: yggdrasil.communication.transforms.ArrayTransform.ArrayTransform
@@ -3338,6 +3937,7 @@ definitions:
         description: Schema for transform component ['direct'] subtype.
         properties:
           transformtype:
+            default: direct
             enum:
             - direct
         title: yggdrasil.communication.transforms.DirectTransform.DirectTransform
@@ -3348,6 +3948,7 @@ definitions:
           filter:
             $ref: '#/definitions/filter'
           transformtype:
+            default: filter
             enum:
             - filter
         required:
@@ -3366,6 +3967,7 @@ definitions:
               as input and return the transformed message.
             type: function
           transformtype:
+            default: function
             enum:
             - function
         required:
@@ -3376,6 +3978,7 @@ definitions:
         description: Schema for transform component ['iterate'] subtype.
         properties:
           transformtype:
+            default: iterate
             enum:
             - iterate
         title: yggdrasil.communication.transforms.IterateTransform.IterateTransform
@@ -3389,6 +3992,7 @@ definitions:
             description: A mapping from original field name to new field names.
             type: object
           transformtype:
+            default: map_fields
             enum:
             - map_fields
         required:
@@ -3403,6 +4007,7 @@ definitions:
               type: string
             type: array
           transformtype:
+            default: pandas
             enum:
             - pandas
         title: yggdrasil.communication.transforms.PandasTransform.PandasTransform
@@ -3427,6 +4032,7 @@ definitions:
               to False.
             type: boolean
           transformtype:
+            default: select_fields
             enum:
             - select_fields
         required:
@@ -3444,6 +4050,7 @@ definitions:
               use the FunctionTransform class.
             type: string
           transformtype:
+            default: statement
             enum:
             - statement
         required:
@@ -3454,21 +4061,25 @@ definitions:
     title: transform
 description: Schema for yggdrasil YAML input files.
 properties:
-  models:
-    aliases:
-    - model
-    allowSingular: true
-    items:
-      $ref: '#/definitions/model'
-    minItems: 1
-    type: array
   connections:
     aliases:
     - connection
     allowSingular: true
     default: []
     items:
-      $ref: '#/definitions/connection'
+      anyOf:
+      - $ref: '#/definitions/connection'
+      - $ref: '#/definitions/connection_driver'
+    type: array
+  models:
+    aliases:
+    - model
+    allowSingular: true
+    items:
+      anyOf:
+      - $ref: '#/definitions/model'
+      - $ref: '#/definitions/model_driver'
+    minItems: 1
     type: array
   working_dir:
     type: string

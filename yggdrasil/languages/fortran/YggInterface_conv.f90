@@ -58,26 +58,20 @@ end function ygggeneric2yggpyinst
 function yggpython2yggpython(input) result(out)
   type(yggpython) :: input
   type(yggpython) :: out
-  out%name = input%name
-  out%args = input%args
-  out%kwargs = input%kwargs
+  out%prefix = input%prefix
   out%obj = input%obj
 end function yggpython2yggpython
 
 function yggpyfunc2yggpython(input) result(out)
   type(yggpyfunc) :: input
   type(yggpython) :: out
-  out%name = input%name
-  out%args = input%args
-  out%kwargs = input%kwargs
+  out%prefix = input%prefix
   out%obj = input%obj
 end function yggpyfunc2yggpython
 
 function yggpython2yggpyfunc(input) result(out)
   type(yggpython) :: input
   type(yggpyfunc) :: out
-  out%name = input%name
-  out%args = input%args
-  out%kwargs = input%kwargs
+  out%prefix = input%prefix
   out%obj = input%obj
 end function yggpython2yggpyfunc

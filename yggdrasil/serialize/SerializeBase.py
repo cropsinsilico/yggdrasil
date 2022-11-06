@@ -3,9 +3,7 @@ import copy
 import pprint
 import numpy as np
 import warnings
-from yggdrasil import tools, units, serialize, constants, rapidjson
-from yggdrasil.metaschema.datatypes import get_empty_msg
-from yggdrasil.metaschema import type2numpy
+from yggdrasil import tools, units, serialize, constants, rapidjson, datatypes
 
 
 class SerializeBase(tools.YggClass):
@@ -39,8 +37,8 @@ class SerializeBase(tools.YggClass):
             directly as strings.
         encoded_datatype (schema): JSON schema defining the type of object
             produced by the class's func_serialize method. For most classes
-            this will be {'type': 'bytes'}, indicating that the method will
-            produce bytes suitable for serialization.
+            this will be {'type': 'scalar', 'subtype': 'string'}, indicating
+            that the method will produce bytes suitable for serialization.
 
     """
 
@@ -57,9 +55,10 @@ class SerializeBase(tools.YggClass):
         'comment': {'type': 'string',
                     'default': constants.DEFAULT_COMMENT_STR},
         'datatype': {'type': 'schema'}}
+    _schema_additional_kwargs = {'default': {}}
     _oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
     _attr_conv = ['newline', 'comment']
-    default_datatype = {'type': 'bytes'}
+    default_datatype = constants.DEFAULT_DATATYPE
     has_header = False
     default_read_meth = 'read'
     is_framed = False
@@ -376,7 +375,7 @@ class SerializeBase(tools.YggClass):
     @property
     def empty_msg(self):
         r"""obj: Object indicating empty message."""
-        return get_empty_msg(self.datatype)
+        return datatypes.get_empty_msg(self.datatype)
 
     # def is_empty(self, obj):
     #     r"""Determine if an object represents an empty message for this serializer.
@@ -466,7 +465,7 @@ class SerializeBase(tools.YggClass):
     def numpy_dtype(self):
         r"""np.dtype: Corresponding structured data type. Will be None unless the
         type is an array of 1darrays."""
-        return type2numpy(self.datatype)
+        return datatypes.type2numpy(self.datatype)
 
     @property
     def typedef(self):
@@ -546,16 +545,16 @@ class SerializeBase(tools.YggClass):
             # Update datatype from oldstyle keywords in extra_kwargs
             datatype = self.update_typedef_from_oldstyle(datatype)
             if 'type' in datatype:
-                self.datatype = datatype
+                self.datatype = rapidjson.normalize(datatype,
+                                                    {'type': 'schema'})
             # Check to see if new datatype is compatible with new one
             if old_datatype != self.default_datatype and datatype:
                 if not rapidjson.compare_schemas(self.datatype, old_datatype,
                                                  dont_raise=True):
                     raise RuntimeError(
-                        ("Updated datatype is not compatible with the existing one."
-                         + "    New:\n%s\nOld:\n%s\n") % (
-                             pprint.pformat(self.datatype),
-                             pprint.pformat(old_datatype)))
+                        f"Updated datatype is not compatible with the existing one."
+                        f"    New:\n{pprint.pformat(self.datatype)}\n"
+                        f"    Old:\n{pprint.pformat(old_datatype)}\n")
         # Enfore that strings used with messages are in bytes
         for k in self._attr_conv:
             v = getattr(self, k, None)
@@ -600,9 +599,16 @@ class SerializeBase(tools.YggClass):
             if k == 'format_str':
                 v = tools.bytes2str(v)
                 fmts = serialize.extract_formats(v)
+                if typedef == self.default_datatype:
+                    typedef.clear()
                 if 'type' in typedef:
                     if (typedef.get('type', None) == 'array'):
                         assert len(typedef.get('items', [])) == len(fmts)
+                    elif len(fmts) == 1:
+                        cpy = copy.deepcopy(typedef)
+                        typedef.clear()
+                        typedef.update(type='array', items=[cpy],
+                                       allowSingular=True)
                     # This continue is covered, but the optimization
                     # causes it to be skipped at runtime
                     # https://bitbucket.org/ned/coveragepy/issues/198/
@@ -626,6 +632,8 @@ class SerializeBase(tools.YggClass):
                             del itype['precision']
                         # itype['type'] = itype.pop('subtype')
                     typedef['items'].append(itype)
+                if len(fmts) == 1:
+                    typedef['allowSingular'] = True
                 used.append('as_array')
                 updated.append('format_str')
             elif k == 'as_array':

@@ -173,8 +173,21 @@ bool add_dtype(rapidjson::Document* d,
   // subtype
   if (!d->Key("subtype", 7, true))
     return false;
-  if (!d->String(subtype, strlen(subtype), true))
-    return false;
+  if (strcmp(subtype, "bytes") == 0) {
+    if (!d->String("string", 6, true))
+      return false;
+  } else if (strcmp(subtype, "unicode") == 0) {
+    if (!d->String("string", 6, true))
+      return false;
+    if (!d->Key("encoding", 8, true))
+      return false;
+    if (!d->String("UTF8", 4, true))
+      return false;
+    N++;
+  } else {
+    if (!d->String(subtype, strlen(subtype), true))
+      return false;
+  }
   N++;
   // precision
   if (precision > 0) {
@@ -186,16 +199,23 @@ bool add_dtype(rapidjson::Document* d,
   }
   // shape
   if (ndim > 0) {
-    if (!d->Key("shape", 5, true))
-      return false;
-    if (!d->StartArray())
-      return false;
-    for (size_t i = 0; i < ndim; i++) {
-      if (!d->Uint(shape[i]))
+    if (shape != NULL) {
+      if (!d->Key("shape", 5, true))
+	return false;
+      if (!d->StartArray())
+	return false;
+      for (size_t i = 0; i < ndim; i++) {
+	if (!d->Uint(shape[i]))
+	  return false;
+      }
+      if (!d->EndArray(ndim))
+	return false;
+    } else {
+      if (!d->Key("ndim", 4, true))
+	return false;
+      if (!d->Uint(ndim))
 	return false;
     }
-    if (!d->EndArray(ndim))
-      return false;
     N++;
   }
   // units
@@ -223,7 +243,7 @@ rapidjson::Document* copy_document(rapidjson::Document* rhs) {
   return out;
 }
 
-void display_document(rapidjson::Document* rhs, const char* indent="") {
+void display_document(rapidjson::Value* rhs, const char* indent="") {
   if (rhs == NULL) {
     ygglog_error("display_document: NULL document");
     return;
@@ -354,42 +374,126 @@ rapidjson::Document* create_dtype_format_class(const char *format_str,
     beg = end;
   }
   out->EndArray(nOuter);
+  // if (nOuter == 1) {
+  //   out->Key("allowSingular", 13, true);
+  //   out->Bool(true);
+  //   out->EndObject(3);
+  // } else {
+  //   out->EndObject(2);
+  // }
   out->EndObject(2);
   out->EndObject(2);
   out->EndObject(1);
   out->FinalizeFromStack();
+  if (nOuter == 1) {
+    typename rapidjson::Document::ValueType tmp;
+    (*out)["serializer"]["datatype"].Swap(tmp);
+    (*out)["serializer"]["datatype"].Swap(tmp["items"][0]);
+    (*out)["serializer"].RemoveMember("format_str");
+  }
   return out;
 };
 
-
-rapidjson::Document* encode_dtype(rapidjson::Value* document) {
-  rapidjson::SchemaEncoder encoder;
+rapidjson::Document* encode_schema(rapidjson::Value* document) {
+  rapidjson::SchemaEncoder encoder(true);
   if (!document->Accept(encoder)) {
-    ygglog_throw_error("create_dtype: Error in schema encoding.");
+    ygglog_throw_error("encode_schema: Error in schema encoding.");
   }
   rapidjson::Document* s = new rapidjson::Document();
   if (!encoder.Accept(*s)) {
-    ygglog_throw_error("create_dtype: Error in getting encoded schema.");
+    ygglog_throw_error("encode_schema: Error in getting encoded schema.");
   }
+  s->FinalizeFromStack();
   return s;
 }
 
+template <typename Validator>
+void throw_validator_error(const char* source, Validator& n) {
+  rapidjson::Value err;
+  typename rapidjson::Document::AllocatorType allocator;
+  n.GetErrorMsg(err, allocator);
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+  if (!err.Accept(writer)) {
+    ygglog_throw_error("%s: Error displaying normalization error", source);
+  }
+  ygglog_throw_error("%s:\n%s\n", source, sb.GetString());
+}
+
+int normalize_document(rapidjson::Document* d, rapidjson::Document* s,
+		       bool dont_raise=false) {
+  if (d == NULL)
+    return 0;
+  if (s == NULL)
+    return 0;
+  rapidjson::SchemaDocument sd(*s);
+  rapidjson::SchemaNormalizer normalizer(sd);
+  if (!d->Accept(normalizer)) {
+    if (dont_raise)
+      return 0;
+    throw_validator_error("normalize_document", normalizer);
+  }
+  if (normalizer.WasNormalized()) {
+    d->SetNull();
+    if (!normalizer.GetNormalized().Accept(*d))
+      return 0;
+    d->FinalizeFromStack();
+  }
+  return 1;
+}
+
+void dtype_schema(rapidjson::Value& s,
+		  typename rapidjson::Document::AllocatorType& allocator,
+		  bool is_metadata = false) {
+  s.SetObject();
+  if (is_metadata) {
+#define ADD_OBJECT_(x, name, len)					\
+    x.AddMember(rapidjson::Value("type", 4, allocator).Move(),		\
+		rapidjson::Value("object", 6, allocator).Move(),	\
+		allocator);						\
+    x.AddMember(rapidjson::Value("properties", 10, allocator).Move(),	\
+		rapidjson::Value(rapidjson::kObjectType).Move(),	\
+		allocator);						\
+    x["properties"].AddMember(rapidjson::Value(#name, len, allocator).Move(), \
+			      rapidjson::Value(rapidjson::kObjectType).Move(), \
+			      allocator)
+    ADD_OBJECT_(s, serializer, 10);
+    ADD_OBJECT_(s["properties"]["serializer"], datatype, 8);
+#undef ADD_OBJECT_
+    dtype_schema(s["properties"]["serializer"]["properties"]["datatype"], allocator);
+  } else {
+    s.AddMember(rapidjson::Value("type", 4, allocator).Move(),
+		rapidjson::Value("schema", 6, allocator).Move(),
+		allocator);
+  }
+}
 
 dtype_t* create_dtype(rapidjson::Document* document=NULL,
 		      const bool use_generic=false,
 		      bool encode=false, bool is_metadata=false) {
   dtype_t* out = NULL;
   out = (dtype_t*)malloc(sizeof(dtype_t));
+  typename rapidjson::Document::AllocatorType* allocator = NULL;
   if (out == NULL) {
     ygglog_throw_error("create_dtype: Failed to malloc for datatype.");
   }
   out->schema = NULL;
   out->metadata = NULL;
-  out->use_generic = use_generic;
+  if (use_generic && document == NULL && !encode) {
+    document = new rapidjson::Document(rapidjson::kObjectType);
+    is_metadata = false;
+  }
   if (document != NULL) {
     if (encode) {
-      out->schema = (void*)(encode_dtype(document));
+      out->schema = (void*)(encode_schema(document));
+      allocator = &(((rapidjson::Document*)(out->schema))->GetAllocator());
     } else {
+      rapidjson::Document s;
+      dtype_schema(s, s.GetAllocator(), is_metadata);
+      if (!normalize_document(document, &s)) {
+	ygglog_throw_error("create_dtype: Failed to normalize schema.");
+      }
+      allocator = &(document->GetAllocator());
       if (is_metadata) {
 	out->metadata = (void*)document;
 	if (document->HasMember("serializer") &&
@@ -401,6 +505,11 @@ dtype_t* create_dtype(rapidjson::Document* document=NULL,
       } else {
 	out->schema = (void*)document;
       }
+    }
+    if (use_generic) {
+      ((rapidjson::Value*)out->schema)->AddMember(rapidjson::Value("use_generic", 11, *allocator).Move(),
+						  rapidjson::Value(true).Move(),
+						  *allocator);
     }
   }
   return out;
@@ -506,7 +615,7 @@ rapidjson::StringBuffer format_comm_header_json(const comm_head_t head,
 
 rapidjson::Document* type_from_pyobj(PyObject* pyobj) {
   rapidjson::Value d(pyobj);
-  return encode_dtype(&d);
+  return encode_schema(&d);
 };
 
 size_t is_document_format_array(rapidjson::Value* d,
@@ -573,12 +682,17 @@ size_t is_schema_format_array(rapidjson::Value* d,
   return 1;
 };
 
-int schema_count_vargs(rapidjson::Value& schema,
-		       size_t& count, bool use_generic,
+int schema_count_vargs(rapidjson::Value& schema, size_t& count,
 		       size_t table_nelements = 0) {
   if (!(schema.IsObject() && schema.HasMember("type") && schema["type"].IsString()))
     return 0;
+  bool use_generic = false;
   std::string schema_type(schema["type"].GetString());
+  if (schema.HasMember("use_generic") &&
+      schema["use_generic"].IsBool() &&
+      schema["use_generic"].GetBool()) {
+    use_generic = true;
+  }
   if (use_generic) {
     count++;
   }
@@ -594,7 +708,8 @@ int schema_count_vargs(rapidjson::Value& schema,
     }
     for (typename rapidjson::Value::ValueIterator it = schema["items"].Begin();
 	 it != schema["items"].End(); it++) {
-      if (!schema_count_vargs(*it, count, use_generic, nelements))
+      
+      if (!schema_count_vargs(*it, count, nelements))
 	return 0;
     }
   }
@@ -603,7 +718,7 @@ int schema_count_vargs(rapidjson::Value& schema,
       ygglog_throw_error("schema_count_vargs: Schema must have an object as its properties member");
     for (typename rapidjson::Value::MemberIterator it = schema["properties"].MemberBegin();
 	 it != schema["properties"].MemberEnd(); it++) {
-      if (!schema_count_vargs(it->value, count, use_generic))
+      if (!schema_count_vargs(it->value, count))
 	return 0;
     }
   }
@@ -653,9 +768,18 @@ int schema_count_vargs(rapidjson::Value& schema,
 };
 
 int document_count_vargs(rapidjson::Value& document,
-			 rapidjson::Value& schema,
-			 size_t& count, bool use_generic,
+			 rapidjson::Value& schema, size_t& count,
 			 size_t table_nelements = 0) {
+  bool use_generic = false;
+  if (schema.HasMember("use_generic") &&
+      schema["use_generic"].IsBool() &&
+      schema["use_generic"].GetBool()) {
+    use_generic = true;
+  }
+  if (use_generic) {
+    count++;
+    return 1;
+  }
   switch (document.GetType()) {
   case (rapidjson::kNullType):
   case (rapidjson::kFalseType):
@@ -701,7 +825,7 @@ int document_count_vargs(rapidjson::Value& document,
     for (typename rapidjson::Value::MemberIterator it = document.MemberBegin();
 	 it != document.MemberEnd(); it++) {
       if (!document_count_vargs(it->value, schema["properties"][it->name],
-				count, use_generic))
+				count))
 	return 0;
     }
   }
@@ -718,11 +842,11 @@ int document_count_vargs(rapidjson::Value& document,
 	 it != document.End(); it++) {
       if (schema["items"].IsArray()) {
 	if (!document_count_vargs(*it, schema["items"][i],
-				  count, use_generic, nelements))
+				  count, nelements))
 	  return 0;
       } else {
 	if (!document_count_vargs(*it, schema["items"],
-				  count, use_generic, nelements))
+				  count, nelements))
 	  return 0;
       }
     }
@@ -734,11 +858,11 @@ int document_count_vargs(rapidjson::Value& document,
 
 int document_get_vargs(rapidjson::Value& document,
 		       rapidjson::Value& schema,
-		       va_list_t &ap, bool use_generic,
-		       rapidjson::Document& d,
+		       va_list_t &ap, rapidjson::Document& d,
 		       size_t table_nelements = 0) {
-  if (!(schema.IsObject() && schema.HasMember("type") && schema["type"].IsString()))
-    return 0;
+  if (!(schema.IsObject() && schema.HasMember("type") && schema["type"].IsString())) {
+    ygglog_throw_error("document_get_vargs: Schema must be an object containing a 'type' string property.");
+  }
   std::string schema_type(schema["type"].GetString());
 #define CASE_STD_(name, method, type)				\
   if (schema_type == std::string(#name)) {			\
@@ -747,6 +871,12 @@ int document_get_vargs(rapidjson::Value& document,
       return 0;							\
     }								\
     method;							\
+  }
+  bool use_generic = false;
+  if (schema.HasMember("use_generic") &&
+      schema["use_generic"].IsBool() &&
+      schema["use_generic"].GetBool()) {
+    use_generic = true;
   }
   if (use_generic || schema_type == std::string("any") || schema_type == std::string("schema")) {
     generic_t tmp;
@@ -771,17 +901,17 @@ int document_get_vargs(rapidjson::Value& document,
   else if (schema_type == std::string("array")) {
     if (!(schema.HasMember("items") && schema["items"].IsArray()))
       ygglog_throw_error("document_get_vargs: Schema must have an array as its items member.");
-    document.SetArray();
-    document.Reserve(schema["items"].Size(), d.GetAllocator());
     size_t nelements = 0;
     if (is_schema_format_array(&schema)) {
       if (!pop_va_list(ap, nelements))
 	return 0;
     }
+    document.SetArray();
+    document.Reserve(schema["items"].Size(), d.GetAllocator());
     for (typename rapidjson::Value::ValueIterator it = schema["items"].Begin();
 	 it != schema["items"].End(); it++) {
       rapidjson::Value item;
-      if (!document_get_vargs(item, *it, ap, use_generic, d, nelements))
+      if (!document_get_vargs(item, *it, ap, d, nelements))
 	return 0;
       document.PushBack(item, d.GetAllocator());
     }
@@ -794,7 +924,7 @@ int document_get_vargs(rapidjson::Value& document,
     for (typename rapidjson::Value::MemberIterator it = schema["properties"].MemberBegin();
 	 it != schema["properties"].MemberEnd(); it++) {
       rapidjson::Value item;
-      if (!document_get_vargs(item, it->value, ap, use_generic, d))
+      if (!document_get_vargs(item, it->value, ap, d))
 	return 0;
       document.AddMember(rapidjson::Value(it->name, d.GetAllocator()).Move(),
 			 item, d.GetAllocator());
@@ -804,14 +934,17 @@ int document_get_vargs(rapidjson::Value& document,
     if (!(schema.HasMember("subtype") && schema["subtype"].IsString()))
       ygglog_throw_error("document_get_vargs: Scalar schema must contain a string subtype member");
     std::string schema_subtype(schema["subtype"].GetString());
+    bool is_string = (schema_subtype == std::string("string") ||
+		      schema_subtype == std::string("bytes") ||
+		      schema_subtype == std::string("unicode"));
     rapidjson::Value schema_cpy(schema, d.GetAllocator());
     int schema_precision = 0;
     if (schema.HasMember("precision") && schema["precision"].IsInt()) {
-      if (schema_subtype != std::string("string"))
+      if (!is_string)
 	schema_precision = schema["precision"].GetInt();
     } else {
-      if (schema_subtype != std::string("string"))
-	ygglog_throw_error("document_get_vargs: Scalar schema must contain an integer precision member");
+      if (!is_string)
+	ygglog_throw_error("document_get_vargs: Scalar %s schema must contain an integer precision member", schema_subtype.c_str());
       else
 	schema_cpy.AddMember(rapidjson::Document::GetPrecisionString(), rapidjson::Value(0).Move(), d.GetAllocator());
     }
@@ -840,7 +973,7 @@ int document_get_vargs(rapidjson::Value& document,
     else CASE_SCALAR_(float, 16, long double)
     else CASE_SCALAR_(complex, 32, complex_long_double_t)
 #endif // YGGDRASIL_LONG_DOUBLE_AVAILABLE
-    else if (schema_subtype == std::string("string")) {
+    else if (is_string) {
       char* tmp;
       size_t tmp_len;
       if (!pop_va_list(ap, tmp))
@@ -851,7 +984,7 @@ int document_get_vargs(rapidjson::Value& document,
 				  d.GetAllocator(), schema_cpy);
     }
     else {
-      ygglog_throw_error("document_get_vargs: Unsupported subtype and precision combination: subtype = %s, precision = %d", schema_subtype.c_str(), schema_precision);
+      ygglog_throw_error("document_get_vargs: Unsupported subtype and precision combination for scalar: subtype = %s, precision = %d", schema_subtype.c_str(), schema_precision);
     }
 #undef CASE_SCALAR_    
   }
@@ -865,7 +998,9 @@ int document_get_vargs(rapidjson::Value& document,
     rapidjson::Value schema_cpy(schema, d.GetAllocator());
     std::string schema_subtype(schema["subtype"].GetString());
     int schema_precision = 0;
-    bool is_string = (schema_subtype == std::string("string"));
+    bool is_string = (schema_subtype == std::string("string") ||
+		      schema_subtype == std::string("bytes") ||
+		      schema_subtype == std::string("unicode"));
     if (schema.HasMember("precision") && schema["precision"].IsInt()) {
       schema_precision = schema["precision"].GetInt();
     } else {
@@ -934,7 +1069,7 @@ int document_get_vargs(rapidjson::Value& document,
     else CASE_NDARRAY_(complex, 32, complex_long_double_t)
 #endif // YGGDRASIL_LONG_DOUBLE_AVAILABLE
     else {
-      ygglog_throw_error("document_get_vargs: Unsupported subtype and precision combination: subtype = %s, precision = %d", schema_subtype.c_str(), schema_precision);
+      ygglog_throw_error("document_get_vargs: Unsupported subtype and precision combination for ndarray: subtype = %s, precision = %d", schema_subtype.c_str(), schema_precision);
     }
     if (!(has_shape || table_nelements)) {
       if (schema_ndim == 1) {
@@ -959,7 +1094,7 @@ int document_get_vargs(rapidjson::Value& document,
 	}
       }
     }
-    if (!table_nelements && is_string) {
+    if ((!table_nelements) && is_string) {
       if (!pop_va_list(ap, src_nbytes)) {
 	return 0;
       }
@@ -989,7 +1124,7 @@ int document_get_vargs(rapidjson::Value& document,
 
 int document_set_vargs(rapidjson::Value& document,
 		       rapidjson::Value& schema,
-		       va_list_t &ap, bool use_generic, int allow_realloc,
+		       va_list_t &ap, int allow_realloc,
 		       size_t table_nelements = 0) {
 #define BASE_(method, type)				\
     type tmp = method;					\
@@ -1043,12 +1178,18 @@ int document_set_vargs(rapidjson::Value& document,
   char** mem_ref = NULL;						\
   size_t* mem_len = NULL;						\
   size_t** mem_len_ref = NULL;						\
-  if (!get_va_list_mem(ap, mem, mem_ref, allow_realloc))		\
+  if (!pop_va_list_mem(ap, mem, mem_ref, allow_realloc))		\
     return 0;								\
-  if (!get_va_list_mem(ap, mem_len, mem_len_ref))			\
+  if (!pop_va_list_mem(ap, mem_len, mem_len_ref))			\
     return 0;								\
   if (!set_va_list_mem(mem, mem_ref, mem_len[0], tmp, tmp_len, allow_realloc)) \
     return 0
+  bool use_generic = false;
+  if (schema.HasMember("use_generic") &&
+      schema["use_generic"].IsBool() &&
+      schema["use_generic"].GetBool()) {
+    use_generic = true;
+  }
   if (use_generic) {
     rapidjson::Document* tmp_doc = new rapidjson::Document();
     tmp_doc->CopyFrom(document, tmp_doc->GetAllocator());
@@ -1119,21 +1260,21 @@ int document_set_vargs(rapidjson::Value& document,
 	size_t len = 1;
 	size_t* mem_len = NULL;
 	size_t** mem_len_ref = NULL;
-	if (!get_va_list_mem(ap, mem, mem_ref, allow_realloc))
+	if (!pop_va_list_mem(ap, mem, mem_ref, allow_realloc))
 	  return 0;
 	if (has_shape || table_nelements) {
 	  len = 0;
 	  mem_len = &len;
 	  mem_len_ref = &mem_len;
 	} else {
-	  if (!get_va_list_mem(ap, mem_len, mem_len_ref))
+	  if (!pop_va_list_mem(ap, mem_len, mem_len_ref))
 	    return 0;
 	  if (!document.Is1DArray()) {
 	    size_t* mem_ndim = mem_len;
 	    mem_len = &len;
 	    size_t* mem_shape = NULL;
 	    size_t** mem_shape_ref = NULL;
-	    if (!get_va_list_mem(ap, mem_shape, mem_shape_ref, allow_realloc))
+	    if (!pop_va_list_mem(ap, mem_shape, mem_shape_ref, allow_realloc))
 	      return 0;
 	    for (size_t i = 0; i < mem_ndim[0]; i++) {
 	      len *= mem_shape[i];
@@ -1176,7 +1317,7 @@ int document_set_vargs(rapidjson::Value& document,
 	  if (!table_nelements) {
 	    size_t* mem_prec = NULL;
 	    size_t** mem_prec_ref = NULL;
-	    if (!get_va_list_mem(ap, mem_prec, mem_prec_ref))
+	    if (!pop_va_list_mem(ap, mem_prec, mem_prec_ref))
 	      return 0;
 	    len = mem_len[0] * mem_prec[0];
 	    mem_prec[0] = precision;
@@ -1223,7 +1364,7 @@ int document_set_vargs(rapidjson::Value& document,
       for (typename rapidjson::Value::MemberIterator it = document.MemberBegin();
 	   it != document.MemberEnd(); it++) {
 	if (!document_set_vargs(it->value, schema["properties"][it->name],
-				ap, use_generic, allow_realloc))
+				ap, allow_realloc))
 	  return 0;
       }
     }
@@ -1243,11 +1384,11 @@ int document_set_vargs(rapidjson::Value& document,
 	 it != document.End(); it++, i++) {
       if (schema["items"].IsArray()) {
 	if (!document_set_vargs(*it, schema["items"][i],
-				ap, use_generic, allow_realloc, nelements))
+				ap, allow_realloc, nelements))
 	  return 0;
       } else {
 	if (!document_set_vargs(*it, schema["items"],
-				ap, use_generic, allow_realloc, nelements))
+				ap, allow_realloc, nelements))
 	  return 0;
       }
     }
@@ -1263,12 +1404,254 @@ int document_set_vargs(rapidjson::Value& document,
 #undef BASE_
   return 1;
 }
-		       
+
+int document_skip_vargs(rapidjson::Value& schema,
+			va_list_t &ap, bool pointers,
+			size_t table_nelements = 0) {
+  if (!(schema.IsObject() && schema.HasMember("type") && schema["type"].IsString())) {
+    ygglog_throw_error("document_skip_vargs: Schema must be an object containing a 'type' string property.");
+  }
+  std::string schema_type(schema["type"].GetString());
+#define CASE_STD_(name, type)					\
+  if (schema_type == std::string(#name)) {			\
+    if (!skip_va_list<type>(ap, pointers)) {			\
+      return 0;							\
+    }								\
+  }
+  bool use_generic = false;
+  if (schema.HasMember("use_generic") &&
+      schema["use_generic"].IsBool() &&
+      schema["use_generic"].GetBool()) {
+    use_generic = true;
+  }
+  if (use_generic || schema_type == std::string("any") || schema_type == std::string("schema")) {
+    if (!skip_va_list<generic_t>(ap, pointers))
+      return 0;
+  }
+  else CASE_STD_(null, void*)
+  else CASE_STD_(boolean, bool)
+  else CASE_STD_(integer, int)
+  else CASE_STD_(number, double)
+  else if (schema_type == std::string("string")) {
+    if (pointers) {
+      if (!skip_va_list<char>(ap, pointers))
+	return 0;
+    } else {
+      if (!skip_va_list<char*>(ap, pointers))
+	return 0;
+    }
+    if (!skip_va_list<size_t>(ap, pointers))
+      return 0;
+  }
+  else if (schema_type == std::string("array")) {
+    if (!(schema.HasMember("items") && schema["items"].IsArray()))
+      ygglog_throw_error("document_skip_vargs: Schema must have an array as its items member.");
+    size_t nelements = 0;
+    if (is_schema_format_array(&schema)) {
+      if (!skip_va_list<size_t>(ap, pointers))
+	return 0;
+      nelements = 1;
+    }
+    for (typename rapidjson::Value::ValueIterator it = schema["items"].Begin();
+	 it != schema["items"].End(); it++) {
+      if (!document_skip_vargs(*it, ap, pointers, nelements))
+	return 0;
+    }
+  }
+  else if (schema_type == std::string("object")) {
+    if (!(schema.HasMember("properties") && schema["properties"].IsObject()))
+      ygglog_throw_error("document_skip_vargs: Schema must have an object as its properties member");
+    for (typename rapidjson::Value::MemberIterator it = schema["properties"].MemberBegin();
+	 it != schema["properties"].MemberEnd(); it++) {
+      if (!document_skip_vargs(it->value, ap, pointers))
+	return 0;
+    }
+  }
+  else if (schema_type == std::string("scalar")) {
+    if (!(schema.HasMember("subtype") && schema["subtype"].IsString()))
+      ygglog_throw_error("document_skip_vargs: Scalar schema must contain a string subtype member");
+    std::string schema_subtype(schema["subtype"].GetString());
+    bool is_string = (schema_subtype == std::string("string") ||
+		      schema_subtype == std::string("bytes") ||
+		      schema_subtype == std::string("unicode"));
+    int schema_precision = 0;
+    if (schema.HasMember("precision") && schema["precision"].IsInt()) {
+      if (!is_string)
+	schema_precision = schema["precision"].GetInt();
+    } else {
+      if (!is_string)
+	ygglog_throw_error("document_skip_vargs: Scalar schema must contain an integer precision member");
+    }
+#define CASE_SCALAR_(subtype, precision, type)				\
+    if (schema_subtype == std::string(#subtype) && schema_precision == precision) { \
+      if (!skip_va_list<type>(ap, pointers)) {				\
+	return 0;							\
+      }									\
+    }
+    CASE_SCALAR_(int, 1, int8_t)
+    else CASE_SCALAR_(int, 2, int16_t)
+    else CASE_SCALAR_(int, 4, int32_t)
+    else CASE_SCALAR_(int, 8, int64_t)
+    else CASE_SCALAR_(uint, 1, uint8_t)
+    else CASE_SCALAR_(uint, 2, uint16_t)
+    else CASE_SCALAR_(uint, 4, uint32_t)
+    else CASE_SCALAR_(uint, 8, uint64_t)
+    else CASE_SCALAR_(float, 4, float)
+    else CASE_SCALAR_(float, 8, double)
+    else CASE_SCALAR_(complex, 8, complex_float_t)
+    else CASE_SCALAR_(complex, 16, complex_double_t)
+#ifdef YGGDRASIL_LONG_DOUBLE_AVAILABLE
+    else CASE_SCALAR_(float, 16, long double)
+    else CASE_SCALAR_(complex, 32, complex_long_double_t)
+#endif // YGGDRASIL_LONG_DOUBLE_AVAILABLE
+    else if (is_string) {
+      if (pointers) {
+	if (!skip_va_list<char>(ap, pointers))
+	  return 0;
+      } else {
+	if (!skip_va_list<char*>(ap, pointers))
+	  return 0;
+      }
+      if (!skip_va_list<size_t>(ap, pointers))
+	return 0;
+    }
+    else {
+      ygglog_throw_error("document_skip_vargs: Unsupported subtype and precision combination: subtype = %s, precision = %d", schema_subtype.c_str(), schema_precision);
+    }
+#undef CASE_SCALAR_    
+  }
+  else if (schema_type == std::string("ndarray") ||
+	   schema_type == std::string("1darray")) {
+    if (!(schema.HasMember("subtype") && schema["subtype"].IsString()))
+      ygglog_throw_error("document_skip_vargs: ndarray schema must contain a string subtype member");
+    int schema_ndim = 0;
+    bool has_shape = false;
+    std::string schema_subtype(schema["subtype"].GetString());
+    int schema_precision = 0;
+    bool is_string = (schema_subtype == std::string("string") ||
+		      schema_subtype == std::string("bytes") ||
+		      schema_subtype == std::string("unicode"));
+    if (schema.HasMember("precision") && schema["precision"].IsInt()) {
+      schema_precision = schema["precision"].GetInt();
+    } else {
+      if ((!is_string) || (is_string && !table_nelements))
+	ygglog_throw_error("document_skip_vargs: ndarray schema must contain an integer precision member");
+    }
+    if (schema_type == std::string("1darray")) {
+      schema_ndim = 1;
+    }
+    if (schema.HasMember("length") && schema["length"].IsInt()) {
+      schema_ndim = 1;
+      has_shape = true;
+    } else if (schema.HasMember("shape") && schema["shape"].IsArray()) {
+      schema_ndim = (int)(schema["shape"].Size());
+      has_shape = true;
+    }
+    if (schema_ndim == 0 && schema.HasMember("ndim") && schema["ndim"].IsInt())
+      schema_ndim = schema["ndim"].GetInt();
+#define CASE_NDARRAY_(subtype, precision, type)				\
+    if (schema_subtype == std::string(#subtype) && schema_precision == precision) { \
+      if (!skip_va_list<type*>(ap, pointers)) {				\
+	return 0;							\
+      }									\
+    }
+    CASE_NDARRAY_(int, 1, int8_t)
+    else CASE_NDARRAY_(int, 2, int16_t)
+    else CASE_NDARRAY_(int, 4, int32_t)
+    else CASE_NDARRAY_(int, 8, int64_t)
+    else CASE_NDARRAY_(uint, 1, uint8_t)
+    else CASE_NDARRAY_(uint, 2, uint16_t)
+    else CASE_NDARRAY_(uint, 4, uint32_t)
+    else CASE_NDARRAY_(uint, 8, uint64_t)
+    else CASE_NDARRAY_(float, 4, float)
+    else CASE_NDARRAY_(float, 8, double)
+    else CASE_NDARRAY_(complex, 8, complex_float_t)
+    else CASE_NDARRAY_(complex, 16, complex_double_t)
+    else CASE_NDARRAY_(string, schema_precision, char)
+#ifdef YGGDRASIL_LONG_DOUBLE_AVAILABLE
+    else CASE_NDARRAY_(float, 16, long double)
+    else CASE_NDARRAY_(complex, 32, complex_long_double_t)
+#endif // YGGDRASIL_LONG_DOUBLE_AVAILABLE
+    else {
+      ygglog_throw_error("document_skip_vargs: Unsupported subtype and precision combination: subtype = %s, precision = %d", schema_subtype.c_str(), schema_precision);
+    }
+    if (!(has_shape || table_nelements)) {
+      if (schema_ndim == 1) {
+	if (!skip_va_list<size_t>(ap, pointers)) {
+	  return 0;
+	}
+      } else {
+	if (!skip_va_list<size_t>(ap, pointers)) {
+	  return 0;
+	}
+	if (!skip_va_list<size_t*>(ap, pointers)) {
+	  return 0;
+	}
+      }
+    }
+    if (!table_nelements && is_string) {
+      if (!skip_va_list<size_t>(ap, pointers)) {
+	return 0;
+      }
+    }
+#undef CASE_NDARRAY_    
+  }
+#define CASE_GEOMETRY_(name)			\
+  CASE_STD_(name, name ## _t)
+  else CASE_GEOMETRY_(obj)
+  else CASE_GEOMETRY_(ply)
+#undef CASE_GEOMETRY_
+#define CASE_PYTHON_(name)			\
+  CASE_STD_(name, python_t)
+  else CASE_PYTHON_(class)
+  else CASE_PYTHON_(function)
+  else CASE_PYTHON_(instance)
+#undef CASE_PYTHON_
+  else {
+    ygglog_throw_error("document_skip_vargs: Unsupported type %s", schema_type.c_str());
+  }
+#undef CASE_STD_
+  return 1;
+};
+
+int args2document(rapidjson::Document* document, rapidjson::Document* schema,
+		  va_list_t& ap) {
+  if (schema == NULL)
+    ygglog_throw_error("args2document: schema is NULL");
+  if (document == NULL)
+    ygglog_throw_error("args2document: document is NULL");
+  if (!document_get_vargs(*((rapidjson::Value*)document),
+			  *((rapidjson::Value*)schema),
+			  ap, *document))
+    return 0;
+  return 1;
+};
+
+int document2args(rapidjson::Document* document, rapidjson::Document* schema,
+		  va_list_t& ap, int allow_realloc) {
+  if (document == NULL)
+    ygglog_throw_error("document2args: document is NULL");
+  bool cleanup_s = false;
+  if (schema == NULL) {
+    schema = encode_schema((rapidjson::Value*)document);
+    cleanup_s = true;
+  }
+  if (schema == NULL)
+    ygglog_throw_error("document2args: encoded schema is NULL");
+  if (!document_set_vargs(*((rapidjson::Value*)document),
+			  *((rapidjson::Value*)schema),
+			  ap, allow_realloc))
+    return 0;
+  if (cleanup_s)
+    delete schema;
+  return 1;
+};
+
 const char* schema2name(rapidjson::Document* schema) {
   if (schema == NULL || !schema->IsObject() || !schema->HasMember("type"))
     return "";
   return (*schema)["type"].GetString();
-}
+};
 
 // class SetArgsHandler {
 // public:
@@ -1337,6 +1720,48 @@ rapidjson::ObjWavefront obj2ObjWavefront(obj_t x) {
   } else {
     rapidjson::ObjWavefront* obj = (rapidjson::ObjWavefront*)(x.obj);
     return rapidjson::ObjWavefront(*obj);
+  }
+}
+
+void document_check_type(rapidjson::Document* d, std::string& type) {
+  if (d == NULL) {
+    ygglog_throw_error("document_check_type: Document is NULL");
+  }
+#define CASE_ERROR_(name)						\
+  ygglog_throw_error("document_check_type: Document type is '%s', not '%s'", name, type.c_str())
+#define CASE_(method, name)						\
+  if (!d->Is ## method()) {						\
+    if (type != std::string(#name)) {					\
+      CASE_ERROR_(#name);						\
+    }									\
+  }
+  if (d->IsYggdrasil()) {
+    if (type != std::string(d->GetYggType().GetString())) {
+      CASE_ERROR_(d->GetYggType().GetString());
+    }
+  }
+  else CASE_(Null, null)
+  else CASE_(Bool, boolean)
+  else CASE_(String, string)
+  else CASE_(Array, array)
+  else CASE_(Object, object)
+  else CASE_(Double, number)
+  else CASE_(Int, integer)
+  else {
+    CASE_ERROR_("unknown");
+  }
+#undef CASE_ERROR_
+#undef CASE_
+}
+
+void document_check_yggtype(rapidjson::Document* d, std::string& type,
+			    std::string& subtype, size_t precision) {
+  document_check_type(d, type);
+  if (type != std::string(d->GetSubType().GetString())) {
+    ygglog_throw_error("document_check_yggtype: Document subtype is '%s', not '%s'", d->GetSubType().GetString(), type.c_str());
+  }
+  if (precision != (size_t)(d->GetPrecision())) {
+    ygglog_throw_error("document_check_yggtype: Document precision is %d, not %d", (int)(d->GetPrecision()), (int)precision);
   }
 }
 
@@ -1482,7 +1907,7 @@ extern "C" {
   void display_generic(generic_t x) {
     try {
       if (is_generic_init(x)) {
-	display_document((rapidjson::Document*)(x.obj));
+	display_document((rapidjson::Value*)(x.obj));
       }
     } catch (...) {
       ygglog_error("display_generic: C++ exception thrown.");
@@ -1559,6 +1984,444 @@ extern "C" {
 #define GENERIC_SUCCESS_ 0
 #define GENERIC_ERROR_ -1
 
+  void* generic_get_item(generic_t x, const char *type) {
+    void* out = NULL;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_get_item: Object not initialized.");
+      }
+      if (x.obj == NULL) {
+	ygglog_throw_error("generic_get_item: Object is NULL.");
+      }
+      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      std::string typeS(type);
+      document_check_type(x_obj, typeS);
+      bool requires_freeing = false;
+      out = x_obj->GetDataPtr(requires_freeing);
+    } catch (...) {
+      ygglog_error("generic_get_item: C++ exception thrown.");
+      out = NULL;
+    }
+    return out;
+  }
+  int generic_get_item_nbytes(generic_t x, const char *type) {
+    int out = -1;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_get_item_nbytes: Object not initialized.");
+      }
+      if (x.obj == NULL) {
+	ygglog_throw_error("generic_get_item_nbytes: Object is NULL.");
+      }
+      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      std::string typeS(type);
+      document_check_type(x_obj, typeS);
+      out = x_obj->GetNBytes();
+    } catch (...) {
+      ygglog_error("generic_get_item_nbytes: C++ exception thrown.");
+      out = -1;
+    }
+    return out;
+  }
+  int generic_set_item(generic_t x, const char *type, void* value) {
+    int out = GENERIC_ERROR_;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_set_item: Object not initialized.");
+      }
+      if (x.obj == NULL) {
+	ygglog_throw_error("generic_set_item: Object is NULL.");
+      }
+      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      std::string typeS(type);
+#define CASE_(name, method)			\
+      if (typeS == std::string(#name)) {	\
+	x_obj->method;				\
+      }
+#define GEOMETRY_(name, rjtype)					\
+      if (typeS == std::string(#name)) {			\
+	rapidjson::rjtype* tmp = (rapidjson::rjtype*)value;	\
+	x_obj->Set ## rjtype(*tmp);				\
+      }
+      CASE_(null, SetNull())
+      else CASE_(boolean, SetBool(((bool*)value)[0]))
+      else CASE_(number, SetDouble(((double*)value)[0]))
+      else CASE_(integer, SetInt(((int*)value)[0]))
+      else CASE_(string, SetString(((char*)value), strlen((char*)value), x_obj->GetAllocator())) // Shouuld this be cast to char**?
+      else if (typeS == std::string("any") ||
+	       typeS == std::string("instance") ||
+	       typeS == std::string("schema") ||
+	       typeS == std::string("array") ||
+	       typeS == std::string("object")) {
+	generic_t tmp = init_generic();
+	tmp.obj = copy_document((rapidjson::Document*)value);
+      }
+      else if (typeS == std::string("class") ||
+	       typeS == std::string("function")) {
+	python_t tmp = init_python();
+	tmp.obj = (PyObject*)value;
+	if (generic_set_python_class(x, tmp) != GENERIC_SUCCESS_)
+	  return GENERIC_ERROR_;
+      }
+      else GEOMETRY_(obj, ObjWavefront)
+      else GEOMETRY_(ply, Ply)
+      else {
+	ygglog_throw_error("generic_set_item: Unsupported type '%s'", type);
+      }
+#undef CASE_
+#undef GEOMETRY_
+    } catch(...) {
+      ygglog_error("generic_set_item: C++ exception thrown");
+      return GENERIC_ERROR_;
+    }
+    return out;
+  }
+  void* generic_get_scalar(generic_t x, const char *subtype, const size_t precision) {
+    try {
+      std::string typeS("scalar");
+      std::string subtypeS(subtype);
+      document_check_yggtype((rapidjson::Document*)(x.obj), typeS, subtypeS, precision);
+    } catch(...) {
+      ygglog_error("generic_get_scalar: C++ exception thrown");
+      return NULL;
+    }
+    return generic_get_item(x, "scalar");
+  }
+  size_t generic_get_1darray(generic_t x, const char *subtype, const size_t precision, void** data) {
+    size_t new_length = 0;
+    try {
+      std::string typeS("1darray");
+      std::string subtypeS(subtype);
+      document_check_yggtype((rapidjson::Document*)(x.obj), typeS, subtypeS, precision);
+      void* new_data = generic_get_item(x, "1darray");
+      if (new_data == NULL)
+	return 0;
+      size_t nbytes = generic_get_item_nbytes(x, "1darray");
+      if (nbytes == 0)
+	return 0;
+      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      new_length = (size_t)(x_obj->GetNElements());
+      data[0] = (void*)realloc(data[0], nbytes);
+      if (data[0] == NULL) {
+	ygglog_throw_error("generic_get_1darray: Failed to reallocate array.");
+      }
+      memcpy(data[0], new_data, nbytes);
+    } catch (...) {
+      ygglog_error("generic_get_1darra: C++ exception thrown");
+      return 0;
+    }
+    return new_length;
+  }
+  size_t generic_get_ndarray(generic_t x, const char *subtype, const size_t precision, void** data, size_t** shape) {
+    size_t new_ndim = 0;
+    try {
+      std::string typeS("ndarray");
+      std::string subtypeS(subtype);
+      document_check_yggtype((rapidjson::Document*)(x.obj), typeS, subtypeS, precision);
+      void* new_data = generic_get_item(x, "ndarray");
+      if (new_data == NULL)
+	return 0;
+      size_t nbytes = generic_get_item_nbytes(x, "ndarray");
+      if (nbytes == 0)
+	return 0;
+      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      data[0] = (void*)realloc(data[0], nbytes);
+      if (data[0] == NULL) {
+	ygglog_throw_error("generic_get_ndarray: Failed to reallocate array.");
+      }
+      memcpy(data[0], new_data, nbytes);
+      const rapidjson::Value& rjshape = x_obj->GetShape();
+      new_ndim = (size_t)(rjshape.Size());
+      size_t i = 0;
+      shape[0] = (size_t*)realloc(shape[0], new_ndim);
+      if (shape[0] == NULL) {
+	ygglog_throw_error("generic_get_ndarray: Failed to reallocate shape.");
+      }
+      for (rapidjson::Value::ConstValueIterator it = rjshape.Begin();
+	   it != rjshape.End(); it++, i++) {
+	shape[0][i] = (size_t)(it->GetInt());
+      }
+    } catch (...) {
+      ygglog_error("generic_get_ndarray: C++ exception thrown");
+      return 0;
+    }
+    return new_ndim;
+  }
+  int generic_set_scalar(generic_t x, void* value, const char *subtype,
+			 const size_t precision, const char *units) {
+    int out = GENERIC_ERROR_;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_set_scalar: Object not initialized.");
+      }
+      if (x.obj == NULL) {
+	ygglog_throw_error("generic_set_scalar: Object is NULL.");
+      }
+      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Document schema(rapidjson::kObjectType);
+      schema.AddMember(rapidjson::Document::GetTypeString(),
+		       rapidjson::Value("scalar", 6,
+					schema.GetAllocator()).Move(),
+		       schema.GetAllocator());
+      schema.AddMember(rapidjson::Document::GetSubTypeString(),
+		       rapidjson::Value(subtype, strlen(subtype),
+					schema.GetAllocator()).Move(),
+		       schema.GetAllocator());
+      schema.AddMember(rapidjson::Document::GetPrecisionString(),
+		       rapidjson::Value((unsigned)precision).Move(),
+		       schema.GetAllocator());
+      if (units && strlen(units) > 0) {
+	schema.AddMember(rapidjson::Document::GetUnitsString(),
+			 rapidjson::Value(units, strlen(units),
+					  schema.GetAllocator()).Move(),
+			 schema.GetAllocator());
+      }
+      x_obj->SetYggdrasilString((char*)value, precision,
+				x_obj->GetAllocator(),
+				schema);
+    } catch(...) {
+      ygglog_error("generic_set_scalar: C++ exception thrown");
+      return GENERIC_ERROR_;
+    }
+    return out;
+  }
+  int generic_set_1darray(generic_t x, void* value, const char *subtype,
+			  const size_t precision, const size_t length,
+			  const char* units) {
+    int out = GENERIC_ERROR_;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_set_1darray: Object not initialized.");
+      }
+      if (x.obj == NULL) {
+	ygglog_throw_error("generic_set_1darray: Object is NULL.");
+      }
+      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Document schema(rapidjson::kObjectType);
+      schema.AddMember(rapidjson::Document::GetTypeString(),
+		       rapidjson::Value("1darray", 7,
+					schema.GetAllocator()).Move(),
+		       schema.GetAllocator());
+      schema.AddMember(rapidjson::Document::GetSubTypeString(),
+		       rapidjson::Value(subtype, strlen(subtype),
+					schema.GetAllocator()).Move(),
+		       schema.GetAllocator());
+      schema.AddMember(rapidjson::Document::GetPrecisionString(),
+		       rapidjson::Value((unsigned)precision).Move(),
+		       schema.GetAllocator());
+      if (units && strlen(units) > 0) {
+	schema.AddMember(rapidjson::Document::GetUnitsString(),
+			 rapidjson::Value(units, strlen(units),
+					  schema.GetAllocator()).Move(),
+			 schema.GetAllocator());
+      }
+      rapidjson::Value rjshape(rapidjson::kArrayType);
+      rjshape.PushBack(rapidjson::Value((unsigned)length).Move(),
+		       schema.GetAllocator());
+      schema.AddMember(rapidjson::Document::GetShapeString(), rjshape,
+		       schema.GetAllocator());
+      x_obj->SetYggdrasilString((char*)value, precision,
+				x_obj->GetAllocator(),
+				schema);
+    } catch(...) {
+      ygglog_error("generic_set_1darray: C++ exception thrown");
+      return GENERIC_ERROR_;
+    }
+    return out;
+  }
+  int generic_set_ndarray(generic_t x, void* data, const char *subtype,
+			  const size_t precision, const size_t ndim, const size_t* shape,
+			  const char* units) {
+    int out = GENERIC_ERROR_;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_set_ndarray: Object not initialized.");
+      }
+      if (x.obj == NULL) {
+	ygglog_throw_error("generic_set_ndarray: Object is NULL.");
+      }
+      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Document schema(rapidjson::kObjectType);
+      schema.AddMember(rapidjson::Document::GetTypeString(),
+		       rapidjson::Value("ndarray", 7,
+					schema.GetAllocator()).Move(),
+		       schema.GetAllocator());
+      schema.AddMember(rapidjson::Document::GetSubTypeString(),
+		       rapidjson::Value(subtype, strlen(subtype),
+					schema.GetAllocator()).Move(),
+		       schema.GetAllocator());
+      schema.AddMember(rapidjson::Document::GetPrecisionString(),
+		       rapidjson::Value((unsigned)precision).Move(),
+		       schema.GetAllocator());
+      if (units && strlen(units) > 0) {
+	schema.AddMember(rapidjson::Document::GetUnitsString(),
+			 rapidjson::Value(units, strlen(units),
+					  schema.GetAllocator()).Move(),
+			 schema.GetAllocator());
+      }
+      rapidjson::Value rjshape(rapidjson::kArrayType);
+      for (size_t i = 0; i < ndim; i++) {
+	rjshape.PushBack(rapidjson::Value((unsigned)(shape[i])).Move(),
+			 schema.GetAllocator());
+      }
+      schema.AddMember(rapidjson::Document::GetShapeString(), rjshape,
+		       schema.GetAllocator());
+      x_obj->SetYggdrasilString((char*)data, precision,
+				x_obj->GetAllocator(),
+				schema);
+    } catch(...) {
+      ygglog_error("generic_set_ndarray: C++ exception thrown");
+      return GENERIC_ERROR_;
+    }
+    return out;
+  }
+  // TODO: Cleanup temporary item created during setting
+#define NESTED_GET_(base, idx, idxType)					\
+  void* generic_ ## base ## _get_item(generic_t x, idxType idx, const char *type) { \
+    try {								\
+      generic_t tmp;							\
+      if (get_generic_ ## base(x, idx, &tmp, false) != GENERIC_SUCCESS_) { \
+	return NULL;							\
+      }									\
+      return generic_get_item(tmp, type);				\
+    } catch(...) {							\
+      ygglog_error("generic_" #base "_get: C++ exception thrown");	\
+      return NULL;							\
+    }									\
+  }									\
+  int generic_ ## base ## _get_item_nbytes(generic_t x, idxType idx, const char *type) { \
+    try {								\
+      generic_t tmp;							\
+      if (get_generic_ ## base(x, idx, &tmp, false) != GENERIC_SUCCESS_) { \
+	return 0;							\
+      }									\
+      return generic_get_item_nbytes(tmp, type);			\
+    } catch(...) {							\
+      ygglog_error("generic_" #base "_get_nbytes: C++ exception thrown"); \
+      return 0;								\
+    }									\
+  }									\
+  void* generic_ ## base ## _get_scalar(generic_t x, idxType idx, const char *subtype, const size_t precision) { \
+    try {								\
+      generic_t tmp;							\
+      if (get_generic_ ## base(x, idx, &tmp, false) != GENERIC_SUCCESS_) { \
+	return NULL;							\
+      }									\
+      return generic_get_scalar(tmp, subtype, precision);		\
+    } catch(...) {							\
+      ygglog_error("generic_" #base "_get_scalar: C++ exception thrown"); \
+      return NULL;							\
+    }									\
+  }									\
+  size_t generic_ ## base ## _get_1darray(generic_t x, idxType idx, const char *subtype, const size_t precision, void** data) { \
+    try {								\
+      generic_t tmp;							\
+      if (get_generic_ ## base(x, idx, &tmp, false) != GENERIC_SUCCESS_) { \
+	return 0;							\
+      }									\
+      return generic_get_1darray(tmp, subtype, precision, data);	\
+    } catch(...) {							\
+      ygglog_error("generic_" #base "_get_1darray: C++ exception thrown"); \
+      return 0;								\
+    }									\
+  }									\
+  size_t generic_ ## base ## _get_ndarray(generic_t x, idxType idx, const char *subtype, const size_t precision, void** data, size_t** shape) { \
+    try {								\
+      generic_t tmp;							\
+      if (get_generic_ ## base(x, idx, &tmp, false) != GENERIC_SUCCESS_) { \
+	return 0;							\
+      }									\
+      return generic_get_ndarray(tmp, subtype, precision, data, shape);	\
+    } catch(...) {							\
+      ygglog_error("generic_" #base "_get_ndarary: C++ exception thrown"); \
+      return 0;								\
+    }									\
+  }									\
+  int generic_ ## base ## _set_item(generic_t x, idxType idx, const char *type, void* value) { \
+    try {								\
+      generic_t tmp;							\
+      if (generic_set_item(tmp, type, value) != GENERIC_SUCCESS_) {	\
+        return GENERIC_ERROR_;						\
+      }									\
+      if (set_generic_ ## base(x, idx, tmp) != GENERIC_SUCCESS_) {	\
+	return GENERIC_ERROR_;						\
+      }									\
+      destroy_generic(&tmp);						\
+    } catch(...) {							\
+      ygglog_error("generic_" #base "_set_item: C++ exception thrown");	\
+      return GENERIC_ERROR_;						\
+    }									\
+    return GENERIC_SUCCESS_;						\
+  }									\
+  int generic_ ## base ## _set_scalar(generic_t x, idxType idx,		\
+				      void* value,			\
+				      const char *subtype,		\
+				      const size_t precision,		\
+				      const char *units) {		\
+    try {								\
+      generic_t tmp;							\
+      if (generic_set_scalar(tmp, value, subtype, precision, units) != GENERIC_SUCCESS_) { \
+        return GENERIC_ERROR_;						\
+      }									\
+      if (set_generic_ ## base(x, idx, tmp) != GENERIC_SUCCESS_) {	\
+	return GENERIC_ERROR_;						\
+      }									\
+      destroy_generic(&tmp);						\
+    } catch(...) {							\
+      ygglog_error("generic_" #base "_set_scalar: C++ exception thrown");	\
+      return GENERIC_ERROR_;						\
+    }									\
+    return GENERIC_SUCCESS_;						\
+  }									\
+  int generic_ ## base ## _set_1darray(generic_t x, idxType idx,	\
+				       void* value,			\
+				       const char *subtype,		\
+				       const size_t precision,		\
+				       const size_t length,		\
+				       const char *units) {		\
+    try {								\
+      generic_t tmp;							\
+      if (generic_set_1darray(tmp, value, subtype, precision, length, units) != GENERIC_SUCCESS_) { \
+        return GENERIC_ERROR_;						\
+      }									\
+      if (set_generic_ ## base(x, idx, tmp) != GENERIC_SUCCESS_) {	\
+	return GENERIC_ERROR_;						\
+      }									\
+      destroy_generic(&tmp);						\
+    } catch(...) {							\
+      ygglog_error("generic_" #base "_set_1darray: C++ exception thrown"); \
+      return GENERIC_ERROR_;						\
+    }									\
+    return GENERIC_SUCCESS_;						\
+  }									\
+  int generic_ ## base ## _set_ndarray(generic_t x, idxType idx,	\
+				       void* value,			\
+				       const char *subtype,		\
+				       const size_t precision,		\
+				       const size_t ndim,		\
+				       const size_t* shape,		\
+				       const char *units) {		\
+    try {								\
+      generic_t tmp;							\
+      if (generic_set_ndarray(tmp, value, subtype, precision, ndim, shape, units) != GENERIC_SUCCESS_) { \
+        return GENERIC_ERROR_;						\
+      }									\
+      if (set_generic_ ## base(x, idx, tmp) != GENERIC_SUCCESS_) {	\
+	return GENERIC_ERROR_;						\
+      }									\
+      destroy_generic(&tmp);						\
+    } catch(...) {							\
+      ygglog_error("generic_" #base "_set_ndarray: C++ exception thrown"); \
+      return GENERIC_ERROR_;						\
+    }									\
+    return GENERIC_SUCCESS_;						\
+  }
+
+  NESTED_GET_(array, index, const size_t)
+  NESTED_GET_(map, key, const char*)
+  
+#undef NESTED_GET_
+  
   int add_generic_array(generic_t arr, generic_t x) {
     int out = GENERIC_SUCCESS_;
     try {
@@ -1623,7 +2486,7 @@ extern "C" {
     return out;
   }
 
-  int get_generic_array(generic_t arr, size_t i, generic_t *x) {
+  int get_generic_array(generic_t arr, size_t i, generic_t *x, int copy) {
     int out = GENERIC_SUCCESS_;
     x[0] = init_generic();
     try {
@@ -1640,12 +2503,16 @@ extern "C" {
       if (arr_obj->Size() <= i) {
 	ygglog_throw_error("get_generic_array: Document only has %d elements", (int)(arr_obj->Size()));
       }
-      rapidjson::Document* cpy = new rapidjson::Document();
-      if (!(*arr_obj)[i].Accept(*cpy)) {
-	ygglog_throw_error("get_generic_array: Error in Accept");
+      if (copy) {
+	rapidjson::Document* cpy = new rapidjson::Document();
+	if (!(*arr_obj)[i].Accept(*cpy)) {
+	  ygglog_throw_error("get_generic_array: Error in Accept");
+	}
+	cpy->FinalizeFromStack();
+	x[0].obj = (void*)cpy;
+      } else {
+	x[0].obj = (void*)(&((*arr_obj)[i]));
       }
-      cpy->FinalizeFromStack();
-      x[0].obj = (void*)cpy;
     } catch (...) {
       ygglog_error("get_generic_array: C++ exception thrown.");
       out = GENERIC_ERROR_;
@@ -1689,7 +2556,7 @@ extern "C" {
     return out;
   }
 
-  int get_generic_object(generic_t arr, const char* k, generic_t *x) {
+  int get_generic_object(generic_t arr, const char* k, generic_t *x, int copy) {
     int out = 0;
     x[0] = init_generic();
     try {
@@ -1706,24 +2573,28 @@ extern "C" {
       if (!arr_obj->HasMember(k)) {
 	ygglog_throw_error("get_generic_object: Document does not have the requested key.");
       }
-      rapidjson::Document* cpy = new rapidjson::Document();
-      if (!(*arr_obj)[k].Accept(*cpy)) {
-	ygglog_throw_error("get_generic_object: Error in Accept");
+      if (copy) {
+	rapidjson::Document* cpy = new rapidjson::Document();
+	if (!(*arr_obj)[k].Accept(*cpy)) {
+	  ygglog_throw_error("get_generic_object: Error in Accept");
+	}
+	cpy->FinalizeFromStack();
+	x[0].obj = (void*)cpy;
+      } else {
+	x[0].obj = (void*)(&((*arr_obj)[k]));
       }
-      cpy->FinalizeFromStack();
-      x[0].obj = (void*)cpy;
     } catch (...) {
       ygglog_error("get_generic_object: C++ exception thrown.");
       out = 1;
     }
     return out;
   }
-#define set_generic_map set_generic_object
-#define get_generic_map get_generic_object
 
 #define NESTED_BASE_SET_(base, idx, idxType, name, args, ...)	\
   int generic_ ## base ## _set_ ## name(generic_t x, idxType idx, __VA_ARGS__) { \
     generic_t item = init_generic();					\
+    rapidjson::Document* item_x = new rapidjson::Document(rapidjson::kNullType); \
+    item.obj = (void*)item_x;						\
     if (generic_set_ ## name (item, UNPACK_MACRO args) != GENERIC_SUCCESS_) { \
       return GENERIC_ERROR_;						\
     }									\
@@ -1735,22 +2606,20 @@ extern "C" {
   type generic_ ## base ## _get_ ## name(generic_t x, idxType idx, __VA_ARGS__) { \
     generic_t item;							\
     type out = defV;							\
-    if (get_generic_ ## base(x, (idxType)idx, &item) != GENERIC_SUCCESS_) { \
+    if (get_generic_ ## base(x, (idxType)idx, &item, false) != GENERIC_SUCCESS_) { \
       return out;							\
     }									\
     out = generic_get_ ## name(item, UNPACK_MACRO args);		\
-    destroy_generic(&item);						\
     return out;								\
   }
 #define NESTED_BASE_GET_NOARGS_(base, idx, idxType, name, type, defV)	\
   type generic_ ## base ## _get_ ## name(generic_t x, idxType idx) {	\
     generic_t item;							\
     type out = defV;							\
-    if (get_generic_ ## base(x, (idxType)idx, &item) != GENERIC_SUCCESS_) { \
+    if (get_generic_ ## base(x, (idxType)idx, &item, false) != GENERIC_SUCCESS_) { \
       return out;							\
     }									\
     out = generic_get_ ## name(item);					\
-    destroy_generic(&item);						\
     return out;								\
   }
 #define NESTED_SET_(name, args, ...)					\
@@ -1766,12 +2635,12 @@ extern "C" {
 #define STD_JSON_NESTED_(name)						\
   generic_t generic_array_get_ ## name(generic_t x, const size_t index) { \
     generic_t item;							\
-    get_generic_array(x, index, &item);					\
+    get_generic_array(x, index, &item, true);				\
     return item;							\
   }									\
   generic_t generic_map_get_ ## name(generic_t x, const char* key) {	\
     generic_t item;							\
-    get_generic_object(x, key, &item);					\
+    get_generic_object(x, key, &item, true);				\
     return item;							\
   }									\
   int generic_array_set_ ## name(generic_t x, const size_t index, generic_t item) { \
@@ -1791,6 +2660,7 @@ extern "C" {
     }									\
     rapidjson::Document* d = (rapidjson::Document*)(x.obj);		\
     if (!isMethod) {							\
+      display_document(d);						\
       ygglog_error("Generic object is not " #name);			\
       return out;							\
     }									\
@@ -1996,18 +2866,6 @@ extern "C" {
 #undef GENERIC_ERROR_
 #undef GENERIC_SUCCESS_
 
-#define CASE_(name, nameF, idx, idxType)				\
-  if (typeS == std::string(#name)) {					\
-  }
-  void* generic_get_item(generic_t x, const char *type) {
-    std::string typeS(type);
-  }
-#define NESTED_GET_(base, idx, idxType)					\
-  void* generic_ ## base ## _get(generic_t x, idxType idx, const char *type) { \
-    std::string typeS(type);						\
-    void* out = NULL;							\
-    return out;								\
-  }
 	    
 
   // Generic array methods
@@ -2125,22 +2983,16 @@ extern "C" {
     }
   }
 
-  // int skip_va_elements(const dtype_t* dtype, size_t *nargs, va_list_t *ap) {
-  //   if (dtype == NULL) {
-  //     return 1;
-  //   }
-  //   if (dtype->schema == NULL) {
-  //     return 1;
-  //   }
-  //   rapidjson::Document* s = (rapidjson::Document*)(dtype->schema);
-  //   rapidjson::SchemaDocument sd(*s);
-  //   rapidjson::SchemaValidator v(sd);
-  //   if (!v.SkipVargs(ap, nargs)) {
-  //     ygglog_error("skip_va_elements: Error skipping arguments");
-  //     return 1;
-  //   }
-  //   return 0;
-  // }
+  int skip_va_elements(const dtype_t* dtype, va_list_t *ap, bool pointers) {
+    if (dtype == NULL) {
+      return 0;
+    }
+    if (dtype->schema == NULL) {
+      return 0;
+    }
+    return document_skip_vargs(((rapidjson::Value*)(dtype->schema))[0], *ap,
+			       pointers);
+  }
   
   int is_empty_dtype(const dtype_t* dtype) {
     if (dtype == NULL) {
@@ -2351,7 +3203,11 @@ extern "C" {
 				const size_t length, const char* units,
 				const bool use_generic) {
     rapidjson::Document* obj = new rapidjson::Document;
-    if (!add_dtype(obj, "ndarray", subtype, precision, 1, &length, units)) {
+    size_t ndim = 1;
+    const size_t* shape = &length;
+    if (length == 0)
+      shape = NULL;
+    if (!add_dtype(obj, "ndarray", subtype, precision, ndim, shape, units)) {
       ygglog_error("create_dtype_1darray: Error in add_dtype");
       CSafe(delete obj);
       return NULL;
@@ -2443,17 +3299,21 @@ extern "C" {
       obj->StartObject();
       obj->Key("type", 4, true);
       obj->String("object", 6, true);
-      obj->Key("properties", 5, true);
-      obj->StartObject();
-      for (i = 0; i < nitems; i++) {
-	obj->Key(keys[i], strlen(keys[i]), true);
-	rapidjson::Document* iSchema = (rapidjson::Document*)(values[i]->schema);
-	if (!iSchema->Accept(*obj)) {
-	  ygglog_throw_error("create_dtype_json_array: Error adding element %d.", i);
+      if (nitems > 0) {
+	obj->Key("properties", 10, true);
+	obj->StartObject();
+	for (i = 0; i < nitems; i++) {
+	  obj->Key(keys[i], strlen(keys[i]), true);
+	  rapidjson::Document* iSchema = (rapidjson::Document*)(values[i]->schema);
+	  if (!iSchema->Accept(*obj)) {
+	    ygglog_throw_error("create_dtype_json_array: Error adding element %d.", i);
+	  }
 	}
+	obj->EndObject(nitems);
+	obj->EndObject(2);
+      } else {
+	obj->EndObject(1);
       }
-      obj->EndObject(nitems);
-      obj->EndObject(2);
       obj->FinalizeFromStack();
       return create_dtype(obj, use_generic);
     } catch(...) {
@@ -2662,12 +3522,26 @@ extern "C" {
     try {
       rapidjson::Document* s_old = (rapidjson::Document*)(dtype->schema);
       rapidjson::Document* s_new = copy_document(s_old);
-      return create_dtype(s_new, dtype->use_generic);
+      return create_dtype(s_new, false);
     } catch (...) {
       ygglog_error("copy_dtype: C++ exception thrown.");
       destroy_dtype(&out);
       return NULL;
     }
+  }
+
+  int dtype_uses_generic(dtype_t* dtype) {
+    if (dtype == NULL)
+      return 0;
+    rapidjson::Value* schema = (rapidjson::Value*)(dtype->schema);
+    if (schema == NULL)
+      return 0;
+    if (schema->HasMember("use_generic") &&
+	(*schema)["use_generic"].IsBool() &&
+	(*schema)["use_generic"].GetBool()) {
+      return 1;
+    }
+    return 0;
   }
 
   int update_dtype(dtype_t* dtype1, void* schema2) {
@@ -2676,25 +3550,28 @@ extern "C" {
 	ygglog_throw_error("update_dtype: Could not recover type to update from.");
       } else if (dtype1 == NULL) {
 	ygglog_throw_error("update_dtype: Could not recover type for update.");
-      } else if (dtype1->schema == NULL) {
-	dtype1->schema = (void*)copy_document((rapidjson::Document*)(schema2));
+      } else if (is_empty_dtype(dtype1)) {
+	bool use_generic = false;
+	if (dtype1->schema != NULL) {
+	  use_generic = dtype_uses_generic(dtype1);
+	  dtype1->schema = NULL;
+	  rapidjson::Document* s_old = (rapidjson::Document*)(dtype1->schema);
+	  delete s_old;
+	}
+	rapidjson::Document* s_new = copy_document((rapidjson::Document*)(schema2));
+	if (use_generic) {
+	  s_new->AddMember(rapidjson::Value("use_generic", 11, s_new->GetAllocator()).Move(),
+			   rapidjson::Value(true).Move(),
+			   s_new->GetAllocator());
+	}
+	dtype1->schema = (void*)s_new;
       } else {
 	rapidjson::Document* s_old = (rapidjson::Document*)(dtype1->schema);
 	rapidjson::Document* s_new = (rapidjson::Document*)(schema2);
 	rapidjson::SchemaDocument sd_old(*s_old);
-	rapidjson::SchemaDocument sd_new(*s_new);
 	rapidjson::SchemaNormalizer n(sd_old);
-	if (!n.Compare(sd_new)) {
-	  // TODO: Report errors
-	  // if (!n.Update(*s_new)) {
-	  ygglog_throw_error("update_dtype: Error in rapidjson update.");
-	}
-	if (n.WasNormalized()) {
-	  s_old->SetNull();
-	  if (!n.GetNormalized().Accept(*s_old)) {
-	    ygglog_throw_error("update_dtype: Error retrieving updated schema.");
-	  }
-	  s_old->FinalizeFromStack();
+	if (!n.Compare(*s_new)) {
+	  throw_validator_error("update_dtype", n);
 	}
       }
     } catch (...) {
@@ -2705,10 +3582,7 @@ extern "C" {
   }
 
   int update_dtype_from_generic_ap(dtype_t* dtype1, va_list_t ap) {
-    if (!(is_empty_dtype(dtype1))) {
-      return 0;
-    }
-    if (!(dtype1->use_generic)) {
+    if (!(is_empty_dtype(dtype1) && dtype_uses_generic(dtype1))) {
       return 0;
     }
     try {
@@ -2722,7 +3596,7 @@ extern "C" {
 	if (gen_arg.obj == NULL) {
 	  ygglog_throw_error("update_dtype_from_generic_ap: Type in generic class is NULL.");
 	}
-	rapidjson::Document* type_class = encode_dtype((rapidjson::Document*)(gen_arg.obj));
+	rapidjson::Document* type_class = encode_schema((rapidjson::Document*)(gen_arg.obj));
 	dtype2.schema = (void*)(type_class);
 	if (update_dtype(dtype1, dtype2.schema) < 0) {
 	  return -1;
@@ -2790,76 +3664,37 @@ extern "C" {
     return 1;
   }
 
-  int args2document(void* document, void* schema, va_list_t ap, bool use_generic) {
-    if (schema == NULL || document == NULL)
-      return 0;
-    rapidjson::Document* d = (rapidjson::Document*)(document);
-    if (!document_get_vargs(*((rapidjson::Value*)document),
-			    *((rapidjson::Value*)schema),
-			    ap, use_generic, *d))
-      return 0;
-    return 1;
-  }
-
-  int document2args(void* document, void* schema, va_list_t ap, bool use_generic, int allow_realloc) {
-    if (document == NULL)
-      return 0;
-    rapidjson::Document* s = (rapidjson::Document*)schema;
-    bool cleanup_s = false;
-    if (s == NULL) {
-      s = encode_dtype((rapidjson::Value*)document);
-      cleanup_s = true;
-    }
-    if (!document_set_vargs(*((rapidjson::Value*)document),
-			    *((rapidjson::Value*)s),
-			    ap, use_generic, allow_realloc))
-      return 0;
-    if (cleanup_s)
-      delete s;
-    return 1;
-  }
-
-  int normalize_document(void* document, void* schema) {
-    rapidjson::Document* d = (rapidjson::Document*)document;
-    if (d == NULL)
-      return 0;
-    rapidjson::Document* s = (rapidjson::Document*)schema;
-    if (s == NULL)
-      return 0;
-    rapidjson::SchemaDocument sd(*s);
-    rapidjson::SchemaNormalizer normalizer(sd);
-    // TODO: Report errors
-    if (!d->Accept(normalizer))
-      return 0;
-    if (normalizer.WasNormalized()) {
-      d->SetNull();
-      if (!normalizer.GetNormalized().Accept(*d))
-	return 0;
-      d->FinalizeFromStack();
-    }
-    return 1;
-  }
-
   int deserialize_dtype(const dtype_t *dtype, const char *buf, const size_t buf_siz,
 			const int allow_realloc, va_list_t ap) {
-    size_t nargs_orig = ap.nargs[0];
-    rapidjson::Document* d = NULL;
-    if (!deserialize_document(buf, buf_siz, (void**)(&d)))
-      return -1;
-    if (dtype->schema != NULL) {
-      if (!normalize_document(d, dtype->schema))
+    try {
+      size_t nargs_orig = ap.nargs[0];
+      rapidjson::Document* d = NULL;
+      if (!deserialize_document(buf, buf_siz, (void**)(&d)))
 	return -1;
-    }
-    if (!document2args((void*)(d), dtype->schema, ap, dtype->use_generic, allow_realloc))
+      if (d == NULL) {
+	ygglog_throw_error("deserialize_dtype: Document is NULL");
+	return -1;
+      }
+      if (dtype->schema != NULL) {
+	if (!normalize_document((rapidjson::Document*)d,
+				(rapidjson::Document*)(dtype->schema)))
+	  return -1;
+      }
+      if (!document2args(d, (rapidjson::Document*)(dtype->schema),
+			 ap, allow_realloc))
+	return -1;
+      return (int)(nargs_orig - ap.nargs[0]);
+    } catch (...) {
+      ygglog_error("deserialize_dtype: C++ exception thrown.");
       return -1;
-    return (int)(nargs_orig - ap.nargs[0]);
+    }
   }
 
   int serialize_dtype(const dtype_t *dtype, char **buf, size_t *buf_siz,
 		      const int allow_realloc, va_list_t ap) {
     try {
       rapidjson::Document d;
-      if (!args2document((void*)(&d), dtype->schema, ap, dtype->use_generic))
+      if (!args2document(&d, (rapidjson::Document*)(dtype->schema), ap))
 	return -1;
       if (!serialize_document(buf, buf_siz, (void*)(&d)))
 	return -1;
@@ -2871,7 +3706,7 @@ extern "C" {
   }
 
   void display_dtype(const dtype_t *dtype, const char* indent="") {
-    rapidjson::Document* s = (rapidjson::Document*)(dtype->schema);
+    rapidjson::Value* s = (rapidjson::Value*)(dtype->schema);
     display_document(s, indent);
   }
 
@@ -2880,7 +3715,7 @@ extern "C" {
     if (s == NULL)
       return 0;
     size_t count = 0;
-    if (!schema_count_vargs(*s, count, dtype->use_generic))
+    if (!schema_count_vargs(*s, count))
       return 0;
     return count;
   }

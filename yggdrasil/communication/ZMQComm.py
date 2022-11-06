@@ -416,6 +416,7 @@ class ZMQComm(CommBase.CommBase):
     _disconnect_attr = (CommBase.CommBase._disconnect_attr
                         + ['reply_socket_lock', 'socket_lock',
                            '_reply_thread'])
+    _deprecated_drivers = ['ZMQInputDriver', 'ZMQOutputDriver']
     
     def _init_before_open(self, context=None, socket_type=None,
                           socket_action=None, topic_filter='',

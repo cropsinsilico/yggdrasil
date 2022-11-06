@@ -1,7 +1,6 @@
 import collections
 from yggdrasil import rapidjson
 from yggdrasil.components import ComponentBase
-from yggdrasil.metaschema.datatypes import generate_data
 
 
 class TransformBase(ComponentBase):
@@ -69,7 +68,7 @@ class TransformBase(ComponentBase):
 
         """
         try:
-            out = rapidjson.encode_schema(self(generate_data(datatype)))
+            out = rapidjson.encode_schema(self(rapidjson.generate_data(datatype)))
             if (((out['type'] == 'array') and (datatype['type'] == 'array')
                  and isinstance(out['items'], list)
                  and isinstance(datatype['items'], list)

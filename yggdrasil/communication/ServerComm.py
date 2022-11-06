@@ -218,29 +218,30 @@ class ServerComm(CommBase.CommBase):
         r"""Create a response comm based on information from the last header."""
         if not isinstance(header, dict):  # pragma: debug
             raise RuntimeError("No header received with last message.")
-        elif 'response_address' not in header:  # pragma: debug
+        meta = header.get('__meta__', {})
+        if 'response_address' not in meta:  # pragma: debug
             raise RuntimeError("Last header does not contain response address.")
-        comm_kwargs = dict(address=header['response_address'],
+        comm_kwargs = dict(address=meta['response_address'],
                            direction='send',
                            **self.response_kwargs)
         if self.direct_connection:
             comm_kwargs['is_response_client'] = True
         else:
             comm_kwargs['is_response_server'] = True
-        response_id = header['request_id']
+        response_id = meta['request_id']
         while response_id in self.requests:  # pragma: debug
             response_id += str(uuid.uuid4())
-        header['response_id'] = response_id
-        if header['response_address'] not in self.ocomm:
-            self.ocomm[header['response_address']] = get_comm(
+        meta['response_id'] = response_id
+        if meta['response_address'] not in self.ocomm:
+            self.ocomm[meta['response_address']] = get_comm(
                 self.name + '.server_response_comm.' + response_id,
                 **comm_kwargs)
-            client_model = header.get('model', '')
-            self.ocomm[header['response_address']].client_model = client_model
+            client_model = meta.get('model', '')
+            self.ocomm[meta['response_address']].client_model = client_model
             if client_model and (client_model not in self.clients):
                 self.clients.append(client_model)
-        self.requests[response_id] = Request(header['response_address'],
-                                             header['request_id'])
+        self.requests[response_id] = Request(meta['response_address'],
+                                             meta['request_id'])
 
     # SEND METHODS
     def send_to(self, response_id, *args, **kwargs):
@@ -256,7 +257,8 @@ class ServerComm(CommBase.CommBase):
 
         """
         kwargs.setdefault('header_kwargs', {})
-        kwargs['header_kwargs']['response_id'] = response_id
+        kwargs['header_kwargs'].setdefault('__meta__', {})
+        kwargs['header_kwargs']['__meta__']['response_id'] = response_id
         return self.send(*args, **kwargs)
         
     def prepare_message(self, *args, **kwargs):
@@ -274,12 +276,13 @@ class ServerComm(CommBase.CommBase):
         if len(self.requests) == 0:  # pragma: debug
             raise RuntimeError("There is no registered request.")
         kwargs.setdefault('header_kwargs', {})
-        response_id = kwargs['header_kwargs'].get('response_id', None)
+        kwargs['header_kwargs'].setdefault('__meta__', {})
+        response_id = kwargs['header_kwargs']['__meta__'].get('response_id', None)
         if response_id is None:
             response_id = next(iter(self.requests.keys()))
-            kwargs['header_kwargs']['response_id'] = response_id
+            kwargs['header_kwargs']['__meta__']['response_id'] = response_id
         request = self.requests[response_id]
-        kwargs['header_kwargs']['request_id'] = request.request_id
+        kwargs['header_kwargs']['__meta__']['request_id'] = request.request_id
         return self.ocomm[request.response_address].prepare_message(
             *args, **kwargs)
         
@@ -295,7 +298,7 @@ class ServerComm(CommBase.CommBase):
             bool: Success or failure of send.
         
         """
-        response_id = msg.header['response_id']
+        response_id = msg.header['__meta__']['response_id']
         response_comm = self.ocomm[self.requests[response_id].response_address]
         out = response_comm.send_message(msg, **kwargs)
         self.errors += response_comm.errors
@@ -324,7 +327,7 @@ class ServerComm(CommBase.CommBase):
         out = self.recv(*args, **kwargs)
         if not return_message_object:
             if out.flag == CommBase.FLAG_SUCCESS:
-                response_id = out.header['response_id']
+                response_id = out.header['__meta__']['response_id']
             out = (bool(out.flag), out.args, response_id)
         return out
     
@@ -359,8 +362,8 @@ class ServerComm(CommBase.CommBase):
         def check_for_client_info(msg):
             if msg.flag == CommBase.FLAG_SUCCESS:
                 if isinstance(msg.args, bytes) and (msg.args == constants.YGG_CLIENT_EOF):
-                    self.debug("Client signed off: %s", msg.header['model'])
-                    self.closed_clients.append(msg.header['model'])
+                    self.debug("Client signed off: %s", msg.header['__meta__']['model'])
+                    self.closed_clients.append(msg.header['__meta__']['model'])
                     msg.flag = CommBase.FLAG_SKIP
                 else:
                     self.create_response_comm(msg.header)

@@ -223,7 +223,7 @@ function yggarg_scalar_ply(x) result(y)
   y = yggarg_scalar_init(x)
   xp => x
   y%type = "ply"
-  y%ptr = c_loc(xp%material(1))
+  y%ptr = c_loc(xp%nvert)
   y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_ply
 function yggarg_scalar_obj(x) result(y)
@@ -233,7 +233,7 @@ function yggarg_scalar_obj(x) result(y)
   y = yggarg_scalar_init(x)
   xp => x
   y%type = "obj"
-  y%ptr = c_loc(xp%material(1))
+  y%ptr = c_loc(xp%nvert)
   y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_obj
 function yggarg_scalar_null(x) result(y)
@@ -303,7 +303,7 @@ function yggarg_scalar_yggpython(x) result(y)
   y = yggarg_scalar_init(x)
   xp => x
   y%type = "python"
-  y%ptr = c_loc(xp%name)
+  y%ptr = c_loc(xp%prefix)
   y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_yggpython
 function yggarg_scalar_yggpyfunc(x) result(y)
@@ -313,7 +313,7 @@ function yggarg_scalar_yggpyfunc(x) result(y)
   y = yggarg_scalar_init(x)
   xp => x
   y%type = "class"
-  y%ptr = c_loc(xp%name)
+  y%ptr = c_loc(xp%prefix)
   y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_yggpyfunc
 function yggarg_scalar_yggptr(x) result(y)

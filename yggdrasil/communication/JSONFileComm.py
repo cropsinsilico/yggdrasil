@@ -13,3 +13,4 @@ class JSONFileComm(FileComm.FileComm):
     _filetype = 'json'
     _schema_subtype_description = ('The file contains a JSON serialized object.')
     _default_serializer = 'json'
+    _deprecated_drivers = []

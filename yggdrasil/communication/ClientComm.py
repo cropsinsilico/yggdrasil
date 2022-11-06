@@ -202,7 +202,7 @@ class ClientComm(CommBase.CommBase):
     # RESPONSE COMM
     def create_response_comm(self):
         r"""Create a response comm based on information from the last header."""
-        header = dict(request_id=str(uuid.uuid4()))
+        header = {'request_id': str(uuid.uuid4())}
         while header['request_id'] in self.request_order:  # pragma: debug
             header['request_id'] += str(uuid.uuid4())
         if self.icomm is None:
@@ -232,7 +232,8 @@ class ClientComm(CommBase.CommBase):
             if msg.flag == CommBase.FLAG_SUCCESS:
                 if msg.header is None:
                     msg.header = {}
-                msg.header.update(self.create_response_comm())
+                msg.header.setdefault('__meta__', {})
+                msg.header['__meta__'].update(self.create_response_comm())
             return msg
         kwargs.setdefault('after_prepare_message', [])
         kwargs['after_prepare_message'].append(add_response_address)
@@ -274,8 +275,8 @@ class ClientComm(CommBase.CommBase):
             self.errors += self.icomm.errors
             if msg.flag != CommBase.FLAG_SUCCESS:  # pragma: debug
                 break
-            assert msg.header['request_id'] not in self.responses
-            self.responses[msg.header['request_id']] = msg
+            assert msg.header['__meta__']['request_id'] not in self.responses
+            self.responses[msg.header['__meta__']['request_id']] = msg
         if self.request_order[0] in self.responses:
             msg = self.responses.pop(self.request_order[0])
             self.request_order.pop(0)

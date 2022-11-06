@@ -64,8 +64,9 @@ class RPCResponseDriver(ConnectionDriver):
             bool: Success or failure of send.
 
         """
-        if msg.header and ('request_id' in msg.header):
+        if msg.header and ('request_id' in msg.header['__meta__']):
             kwargs.setdefault('header_kwargs', {})
-            kwargs['header_kwargs'].setdefault(
-                'request_id', msg.header['request_id'])
+            kwargs['header_kwargs'].setdefault('__meta__', {})
+            kwargs['header_kwargs']['__meta__'].setdefault(
+                'request_id', msg.header['__meta__']['request_id'])
         return super(RPCResponseDriver, self).send_message(msg, **kwargs)

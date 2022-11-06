@@ -956,7 +956,7 @@ module fygg
   end type character_2d
   !> @brief A wrapper for any scalar or array accessed via a C pointer.
   !>   Only some of the members will be used for each specific type.
-  type :: yggptr
+   type :: yggptr
      character(len=15) :: type = "none" !< Type of data wrapped
      logical :: ndarray = .false. !< .true. if the data is an ND array
      logical :: array = .false. !< .true. if the data is an array
@@ -1026,34 +1026,23 @@ module fygg
   end type yggpyinst
   !> @brief Wrapper for a Python function.
   type, bind(c) :: yggpyfunc
-     character(kind=c_char), dimension(1000) :: name = c_null_char !< Name of the Python function.
-     type(c_ptr) :: args = c_null_ptr !< Arguments used to construct the Python object (unused).
-     type(c_ptr) :: kwargs = c_null_ptr !< Keyword arguments used to construct the Python object (unused).
-     type(c_ptr) :: obj = c_null_ptr !< Python object.
+     character(kind=c_char) :: prefix !< Character used to identify generic objects
+     type(c_ptr) :: obj !< Pointer to wrapped Python instance.
   end type yggpyfunc
   !> @brief Wrapper for a Python object.
   type, bind(c) :: yggpython
-     character(kind=c_char), dimension(1000) :: name = c_null_char !< Name of the Python class.
-     type(c_ptr) :: args = c_null_ptr !< Arguments used to construct the Python object.
-     type(c_ptr) :: kwargs = c_null_ptr !< Keyword arguments used to construct the Python object.
-     type(c_ptr) :: obj = c_null_ptr !< Python object.
+     character(kind=c_char) :: prefix !< Character used to identify generic objects
+     type(c_ptr) :: obj !< Pointer to wrapped Python instance.
   end type yggpython
   !> @brief Ply structure.
   type, bind(c) :: yggply
-     character(kind=c_char), dimension(100) :: material !< Name of material.
      integer(kind=c_int) :: nvert !< Number of vertices.
      integer(kind=c_int) :: nface !< Number of faces.
      integer(kind=c_int) :: nedge !< Number of edges.
-     type(c_ptr) :: c_vertices !< X, Y, Z positions of vertices.
-     type(c_ptr) :: c_faces !< Indices of the vertices composing each face.
-     type(c_ptr) :: c_edges !< Indices of the vertices composing each edge.
-     type(c_ptr) :: c_vertex_colors !< RGB colors of each vertex.
-     type(c_ptr) :: c_edge_colors !< RGB colors of each edge.
-     type(c_ptr) :: c_nvert_in_face !< Number of vertices in each face.
+     type(c_ptr) :: obj !< Pointer to wrapped rapidjson::Ply instance.
   end type yggply
   !> @brief Obj structure.
   type, bind(c) :: yggobj
-     character(kind=c_char), dimension(100) :: material !< Material that should be used for faces.
      integer(kind=c_int) :: nvert !< Material that should be used for faces.
      integer(kind=c_int) :: ntexc !< Number of vertices.
      integer(kind=c_int) :: nnorm !< Number of texture coordinates.
@@ -1064,31 +1053,7 @@ module fygg
      integer(kind=c_int) :: ncurve !< Number of curves.
      integer(kind=c_int) :: ncurve2 !< Number of curv2.
      integer(kind=c_int) :: nsurf !< Number of surfaces.
-     type(c_ptr) :: c_vertices !< X, Y, Z positions of vertices.
-     type(c_ptr) :: c_vertex_colors !< RGB colors of each vertex.
-     type(c_ptr) :: c_texcoords !< Texture coordinates.
-     type(c_ptr) :: c_normals !< X, Y, Z direction of normals.
-     type(c_ptr) :: c_params !< U, V, W directions of params.
-     type(c_ptr) :: c_points !< Sets of one or more vertex indices.
-     type(c_ptr) :: c_nvert_in_point !< Number of vertex indices in each point set.
-     type(c_ptr) :: c_lines !< Indices of the vertices composing each line.
-     type(c_ptr) :: c_nvert_in_line !< Number of vertex indices in each line.
-     type(c_ptr) :: c_line_texcoords !< Indices of texcoords for each line vertex.
-     type(c_ptr) :: c_faces !< Indices of the vertices composing each face.
-     type(c_ptr) :: c_nvert_in_face !< Number of vertex indices in each face.
-     type(c_ptr) :: c_face_texcoords !< Indices of texcoords for each face vertex.
-     type(c_ptr) :: c_face_normals !< Indices of normals for each face vertex.
-     type(c_ptr) :: c_curves !< Indices of control point vertices for each curve.
-     type(c_ptr) :: c_curve_params !< Starting and ending parameters for each curve.
-     type(c_ptr) :: c_nvert_in_curve !< Number of vertex indices in each curve.
-     type(c_ptr) :: c_curves2 !< Indices of control parameters for each curve.
-     type(c_ptr) :: c_nparam_in_curve2 !< Number of parameter indices in each curve.
-     type(c_ptr) :: c_surfaces !< Indices of control point vertices for each surface.
-     type(c_ptr) :: c_nvert_in_surface !< Number of vertices in each surface.
-     type(c_ptr) :: c_surface_params_u !< Starting and ending parameters for each curve in the u direction.
-     type(c_ptr) :: c_surface_params_v !< Starting and ending parameters for each curve in the v direction.
-     type(c_ptr) :: c_surface_texcoords !< Indices of texcoords for each surface vertex.
-     type(c_ptr) :: c_surface_normals !< Indices of normals for each surface vertex.
+     type(c_ptr) :: obj !< Pointer to wrapped rapidjson::ObjWavefront instance.
   end type yggobj
   !> @brief Wrapper for a 1 byte unsigned integer.
   type ygguint1
@@ -3008,6 +2973,24 @@ contains
     type(yggply) :: out
     out = init_ply_c()
   end function init_ply
+  !> @brief Set the wrapped ply mesh instance.
+  !> @param[in] p The ply mesh to modify.
+  !> @param[in] ply The rapidjson::Ply instance to insert.
+  !> @param[in] copy If 1, the instance will be copied, otherwise a reference
+  !>   will be inserted.
+  subroutine set_ply(p, obj, copy)
+    implicit none
+    type(yggply), target :: p
+    type(c_ptr), intent(in) :: obj
+    integer(kind=c_int), intent(in) :: copy
+    type(yggply), pointer :: pp
+    type(c_ptr) :: c_p
+    pp => p
+    c_p = c_loc(pp)
+    ! c_p = c_loc(p)
+    call set_ply_c(c_p, obj, copy)
+    nullify(pp)
+  end subroutine set_ply
   !> @brief Free a ply mesh instance.
   !> @param[in] p The ply mesh to free.
   subroutine free_ply(p)
@@ -3056,6 +3039,24 @@ contains
     type(yggobj) :: out
     out = init_obj_c()
   end function init_obj
+  !> @brief Set the wrapped obj mesh instance.
+  !> @param[in] p The obj mesh to modify.
+  !> @param[in] obj The rapidjson::ObjWavefront instance to insert.
+  !> @param[in] copy If 1, the instance will be copied, otherwise a reference
+  !>   will be inserted.
+  subroutine set_obj(p, obj, copy)
+    implicit none
+    type(yggobj), target :: p
+    type(c_ptr), intent(in) :: obj
+    integer(kind=c_int), intent(in) :: copy
+    type(yggobj), pointer :: pp
+    type(c_ptr) :: c_p
+    pp => p
+    c_p = c_loc(pp)
+    ! c_p = c_loc(p)
+    call set_obj_c(c_p, obj, copy)
+    nullify(pp)
+  end subroutine set_obj
   !> @brief Free an obj mesh instance.
   !> @param[in] p The obj mesh to free.
   subroutine free_obj(p)
@@ -3122,19 +3123,19 @@ contains
   !> @param[in] type_class The data type associated with the data pointer.
   !> @param[in] data A pointer to data of an arbitrary type defined by type_class.
   !> @returns A new generic object containing the provided data.
-  function create_generic(type_class, data) result(out)
-    implicit none
-    type(yggdtype) :: type_class
-    type(yggptr) :: data
-    integer(kind=c_size_t) :: nbytes
-    type(c_ptr) :: c_type_class
-    type(c_ptr) :: c_data
-    type(ygggeneric) :: out
-    c_type_class = type_class%ptr
-    c_data = data%ptr
-    nbytes = data%nbytes
-    out = create_generic_c(c_type_class, c_data, nbytes)
-  end function create_generic
+  ! function create_generic(type_class, data) result(out)
+  !   implicit none
+  !   type(yggdtype) :: type_class
+  !   type(yggptr) :: data
+  !   integer(kind=c_size_t) :: nbytes
+  !   type(c_ptr) :: c_type_class
+  !   type(c_ptr) :: c_data
+  !   type(ygggeneric) :: out
+  !   c_type_class = type_class%ptr
+  !   c_data = data%ptr
+  !   nbytes = data%nbytes
+  !   out = create_generic_c(c_type_class, c_data, nbytes)
+  ! end function create_generic
   !> @brief Free a generic object.
   !> @param[in] x A generic object to free.
   subroutine free_generic(x)
@@ -3204,17 +3205,20 @@ contains
   !> @param[in] arr Array to get element from.
   !> @param[in] i Index of element to get.
   !> @param[out] x Pointer to address where element should be stored.
+  !> @param[in] copy If 1, the element will be copied. Otherwise the element
+  !>   reference will be used.
   !> @returns A flag that is 1 if there is an error and 0 otherwise.
-  function get_generic_array(arr, i, x) result(out)
+  function get_generic_array(arr, i, x, copy) result(out)
     implicit none
     type(ygggeneric), intent(in) :: arr
     integer(kind=c_size_t), intent(in) :: i
     type(ygggeneric), pointer :: x
+    integer(kind=c_int), intent(in) :: copy
     integer(kind=c_int) :: out
     type(c_ptr) :: c_x
     allocate(x);
     c_x = c_loc(x) ! Maybe use first element in type
-    out = get_generic_array_c(arr, i-1, c_x)
+    out = get_generic_array_c(arr, i-1, c_x, copy)
   end function get_generic_array
   !> @brief Set an element in the object at for a given key to a new value.
   !> @param[in] arr Object to add element to.
@@ -3235,19 +3239,22 @@ contains
   !> @param[in] arr Object to get element from.
   !> @param[in] k Key of element to return.
   !> @param[out] x Pointer to address where element should be stored.
+  !> @param[in] copy If 1, the element will be copied. Otherwise the element
+  !>   reference will be used.
   !> @returns A flag that is 1 if there is an error and 0 otherwise.
-  function get_generic_object(arr, k, x) result(out)
+  function get_generic_object(arr, k, x, copy) result(out)
     implicit none
     type(ygggeneric), intent(in) :: arr
     character(len=*), intent(in) :: k
     type(ygggeneric), pointer, intent(out) :: x
+    integer(kind=c_int), intent(in) :: copy
     integer(kind=c_int) :: out
     character(len=len_trim(k)+1) :: c_k
     type(c_ptr) :: c_x
     allocate(x);
     c_k = trim(k)//c_null_char
     c_x = c_loc(x) ! Maybe use first element in type
-    out = get_generic_object_c(arr, c_k, c_x)
+    out = get_generic_object_c(arr, c_k, c_x, copy)
   end function get_generic_object
 
   ! Python interface

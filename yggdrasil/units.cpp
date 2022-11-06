@@ -339,6 +339,7 @@ static PyObject* units_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
     if (!PyArg_ParseTuple(args, "O:Units", &exprObject))
 	return NULL;
 
+    std::string exprStr_;
     const char* exprStr = 0;
     const UnitsObject* other;
 
@@ -363,14 +364,16 @@ static PyObject* units_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
     if (v == NULL)
         return NULL;
 
-    if (exprStr)
+    if (exprStr) {
 	v->units = new Units(exprStr);
-    else
+    } else {
+	exprStr_ = other->units->str();
+	exprStr = exprStr_.c_str();
 	v->units = new Units(*other->units);
+    }
     if (v->units->is_empty()) {
-	PyObject* error = Py_BuildValue("s", "Failed to parse units.");
-	PyErr_SetObject(units_error, error);
-	Py_XDECREF(error);
+	PyErr_Format(units_error,
+		     "Failed to parse units '%s'", exprStr);
 	return NULL;
     }
 
@@ -518,7 +521,7 @@ static PyObject* do_units_pow(PyObject* a, PyObject *b, PyObject* mod,
     PyObject* out;
     if (inplace) {
 	out = a;
-	((UnitsObject*)out)->units->inplace_pow(expV);
+	((UnitsObject*)out)->units->pow_inplace(expV);
     } else {
 	out = (PyObject*) Units_Type.tp_alloc(&Units_Type, 0);
 	((UnitsObject*)out)->units = new Units();
@@ -1372,12 +1375,20 @@ static PyObject* quantity_array__array_ufunc__(PyObject* self, PyObject* args, P
 		   ufunc_name == "cosh" ||
 		   ufunc_name == "tanh") {
 	    if (_has_units(i0)) {
-		tmp = PyUnicode_FromString("radians");
-		if (tmp == NULL) {
-		    goto cleanup;
+		tmp2 = _get_units(i0);
+		if (((UnitsObject*)tmp2)->units->is_null()) {
+		    Py_DECREF(tmp2);
+		    convert_units = get_empty_units();
+		} else {
+		    Py_DECREF(tmp2);
+		    tmp = PyUnicode_FromString("radians");
+		    if (tmp == NULL) {
+			goto cleanup;
+		    }
+		    convert_units = (PyObject*)units_coerce(tmp);
+		    Py_DECREF(tmp);
 		}
-		convert_units = (PyObject*)units_coerce(tmp);
-		Py_DECREF(tmp);
+		tmp2 = NULL;
 		if (convert_units == NULL) {
 		    goto cleanup;
 		}

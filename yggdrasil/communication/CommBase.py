@@ -13,7 +13,7 @@ from yggdrasil.communication import (
     import_comm, check_env_for_address)
 from yggdrasil.components import (
     import_component, create_component, ComponentError)
-from yggdrasil.metaschema import MetaschemaTypeError, type2numpy
+from yggdrasil.datatypes import DataTypeError, type2numpy
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 from yggdrasil.serialize import consolidate_array
 
@@ -530,15 +530,15 @@ class CommBase(tools.YggClass):
                      'description': ('Communication mechanism '
                                      'that should be used.')},
         'datatype': {'type': 'schema',
-                     'default': {'type': 'bytes'}},
+                     'default': constants.DEFAULT_DATATYPE},
         'vars': {
             'type': 'array',
             'items': {'type': 'object',
                       'properties': {
                           'name': {'type': 'string'},
                           'datatype': {'type': 'schema',
-                                       'default': {'type': 'bytes'}}},
-                      'allowSingular': True}},
+                                       'default': constants.DEFAULT_DATATYPE}},
+                      'allowSingular': 'name'}},
         'length_map': {
             'type': 'object',
             'additionalProperties': {'type': 'string'}},
@@ -569,9 +569,6 @@ class CommBase(tools.YggClass):
         'default_value': {'type': 'any'},
         'for_service': {'type': 'boolean', 'default': False},
         'working_dir': {'type': 'string'},
-        'driver': {'type': 'string', 'deprecated': True,
-                   'description': ('[DEPRECATED] Name of driver'
-                                   ' class that should be used.')},
         'onexit': {'type': 'string', 'deprecated': True,
                    'description': ('[DEPRECATED] Method of input/output '
                                    'driver to call when the connection '
@@ -759,6 +756,7 @@ class CommBase(tools.YggClass):
         if self.serializer is None:
             # Get serializer class
             if seri_cls is None:
+                seri_kws.setdefault('seritype', self._default_serializer)
                 seri_cls = import_component('serializer',
                                             subtype=seri_kws['seritype'])
             # Recover keyword arguments for serializer passed to comm class
@@ -1925,7 +1923,7 @@ class CommBase(tools.YggClass):
                 self.linger_close()
                 # self.close_in_thread(no_wait=True, timeout=False)
             return True
-        except MetaschemaTypeError as e:  # pragma: debug
+        except DataTypeError as e:  # pragma: debug
             self._type_errors.append(e)
             try:
                 self.exception('Failed to send: %.100s.', str(msg.args))
@@ -1960,7 +1958,8 @@ class CommBase(tools.YggClass):
         if model_name:
             if header_kwargs is None:
                 header_kwargs = {}
-            header_kwargs.setdefault('model', model_name)
+            header_kwargs.setdefault('__meta__', {})
+            header_kwargs['__meta__'].setdefault('model', model_name)
         return header_kwargs
 
     def prepare_message(self, *args, header_kwargs=None, skip_serialization=False,

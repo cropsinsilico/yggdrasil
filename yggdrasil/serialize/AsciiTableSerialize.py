@@ -1,7 +1,6 @@
 import numpy as np
-from yggdrasil import serialize, tools, constants
+from yggdrasil import serialize, tools, constants, datatypes
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
-from yggdrasil.metaschema import definition2dtype
 
 
 class AsciiTableSerialize(DefaultSerialize):
@@ -80,19 +79,22 @@ class AsciiTableSerialize(DefaultSerialize):
         # Transform scalar into array for table
         old_typedef = kwargs.get('datatype', {})
         if old_typedef.get('type', 'array') != 'array':
+            new_typedef = None
             old_typedef = kwargs.pop('datatype')
             if old_typedef['type'] == 'object':
                 names = self.get_field_names()
                 if not names:
-                    names = list(old_typedef['properties'].keys())
-                assert len(old_typedef['properties']) == len(names)
-                new_typedef = {'type': 'array', 'items': []}
-                for n in names:
-                    new_typedef['items'].append(dict(
-                        old_typedef['properties'][n], title=n))
+                    names = list(old_typedef.get('properties', {}).keys())
+                assert len(old_typedef.get('properties', {})) == len(names)
+                if names:
+                    new_typedef = {'type': 'array', 'items': []}
+                    for n in names:
+                        new_typedef['items'].append(dict(
+                            old_typedef['properties'][n], title=n))
             else:
                 new_typedef = {'type': 'array', 'items': [old_typedef]}
-            kwargs['datatype'] = new_typedef
+            if new_typedef:
+                kwargs['datatype'] = new_typedef
         elif 'field_names' in self._tmp:
             field_names = self._tmp.pop('field_names')
             assert len(field_names) == len(old_typedef.get('items', []))
@@ -113,13 +115,13 @@ class AsciiTableSerialize(DefaultSerialize):
             assert self.datatype['type'] == 'array'
             fmts = []
             if isinstance(self.datatype['items'], dict):  # pragma: debug
-                idtype = definition2dtype(self.datatype['items'])
+                idtype = datatypes.definition2dtype(self.datatype['items'])
                 ifmt = serialize.nptype2cformat(idtype, asbytes=True)
                 # fmts = [ifmt for x in msg]
                 raise Exception("Variable number of items not yet supported.")
             elif isinstance(self.datatype['items'], list):
                 for x in self.datatype['items']:
-                    idtype = definition2dtype(x)
+                    idtype = datatypes.definition2dtype(x)
                     ifmt = serialize.nptype2cformat(idtype, asbytes=True)
                     fmts.append(ifmt)
             if fmts:

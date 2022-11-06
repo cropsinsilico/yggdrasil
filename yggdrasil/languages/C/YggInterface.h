@@ -724,10 +724,14 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc, va_list_t ap) {
 
   // Advance through sent arguments
   ygglog_debug("vrpcCall: Used %d arguments in send", sret);
-  if (sret > 0) {
-    ap.nargs = &recv_nargs;
+  if (!skip_va_elements(send_comm->datatype, &op, false)) {
+    ygglog_error("vrpcCall: Error skipping vargs");
+    return -1;
   }
-
+  if (op.nargs[0] != recv_nargs) {
+    ygglog_error("vrpcCall: Number of arguments after skip (%d) doesn't match the number expected (%d)", op.nargs[0], recv_nargs);
+    return -1;
+  }
   // unpack the messages into the remaining variable arguments
   rret = vcommRecv(rpc, allow_realloc, op);
   if (rret < 0) {

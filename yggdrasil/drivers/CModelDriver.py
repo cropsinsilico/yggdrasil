@@ -7,7 +7,7 @@ import subprocess
 import numpy as np
 import sysconfig
 from collections import OrderedDict
-from yggdrasil import platform, tools, constants
+from yggdrasil import platform, tools, constants, rapidjson
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase,
     get_compilation_tool)
@@ -500,6 +500,7 @@ class CModelDriver(CompiledModelDriver):
     r"""Class for running C models."""
 
     _schema_subtype_description = ('Model is written in C.')
+    _deprecated_drivers = ['GCCModelDriver']
     language = 'c'
     language_ext = ['.c', '.h']
     interface_library = 'ygg'
@@ -573,6 +574,7 @@ class CModelDriver(CompiledModelDriver):
         'object': 'json_object_t',
         'integer': 'int',
         'boolean': 'bool',
+        'length': 'size_t',
         'null': 'void*',
         'uint': 'uintX_t',
         'complex': 'complex_X',
@@ -1067,11 +1069,13 @@ class CModelDriver(CompiledModelDriver):
             # Add length_vars if missing for use by yggdrasil
             for v in x['vars']:
                 if cls.requires_length_var(v) and (not v.get('length_var', False)):
-                    v['length_var'] = {'name': v['name'] + '_length',
-                                       'datatype': {'type': 'uint',
-                                                    'precision': 64},
-                                       'is_length_var': True,
-                                       'dependent': True}
+                    v['length_var'] = {
+                        'name': v['name'] + '_length',
+                        'datatype': {
+                            'type': 'uint',
+                            'precision': rapidjson.SIZE_OF_SIZE_T},
+                        'is_length_var': True,
+                        'dependent': True}
                 elif cls.requires_shape_var(v):
                     if not (v.get('ndim_var', False)
                             and v.get('shape_var', False)):  # pragma: debug
@@ -1079,16 +1083,18 @@ class CModelDriver(CompiledModelDriver):
                     # if not v.get('ndim_var', False):
                     #     v['ndim_var'] = {
                     #         'name': v['name'] + '_ndim',
-                    #         'datatype': {'type': 'uint',
-                    #                      'precision': 64},
+                    #         'datatype': {
+                    #             'type': 'uint',
+                    #             'precision': rapidjson.SIZE_OF_SIZE_T},
                     #         'is_length_var': True,
                     #         'dependent': True}
                     # if not v.get('shape_var', False):
                     #     v['shape_var'] = {
                     #         'name': v['name'] + '_ndim',
-                    #         'datatype': {'type': '1darray',
-                    #                      'subtype': 'uint',
-                    #                      'precision': 64},
+                    #         'datatype': {
+                    #             'type': '1darray',
+                    #             'subtype': 'uint',
+                    #             'precision': rapidjson.SIZE_OF_SIZE_T},
                     #         'is_length_var': True,
                     #         'dependent': True}
             # Flag input variables for reallocation
@@ -1259,36 +1265,35 @@ class CModelDriver(CompiledModelDriver):
         out = super(CModelDriver, cls).get_native_type(**kwargs)
         if not ((out == '*') or ('X' in out) or (out == 'double')):
             return out
-        from yggdrasil.metaschema.datatypes import get_type_class
         json_type = kwargs.get('datatype', kwargs)
         if isinstance(json_type, str):
             json_type = {'type': json_type}
         # if 'type' in kwargs:
         #     json_type.update(kwargs)
         assert isinstance(json_type, dict)
-        json_type = get_type_class(json_type['type']).normalize_definition(
-            json_type)
+        if 'subtype' not in json_type:
+            json_type = rapidjson.normalize(json_type, {'type': 'schema'})
         if out == '*':
             json_subtype = copy.deepcopy(json_type)
-            json_subtype['type'] = json_subtype.pop('subtype')
+            json_subtype['type'] = 'scalar'
             out = cls.get_native_type(datatype=json_subtype)
             if ('length' not in json_type) and ('shape' not in json_type):
                 out += '*'
         elif 'X' in out:
             precision = json_type['precision']
-            if json_type['type'] == 'complex':
-                precision_map = {64: 'float',
-                                 128: 'double',
-                                 256: 'long_double'}
+            if json_type['subtype'] == 'complex':
+                precision_map = {8: 'float',
+                                 16: 'double',
+                                 32: 'long_double'}
                 if precision in precision_map:
                     out = out.replace('X', precision_map[precision])
                 else:  # pragma: debug
                     raise ValueError("Unsupported precision for complex types: %d"
                                      % precision)
             else:
-                out = out.replace('X', str(precision))
+                out = out.replace('X', str(8 * precision))
         elif out == 'double':
-            if json_type['precision'] == 32:
+            if json_type['precision'] == 4:
                 out = 'float'
         return out.replace(' ', '')
         
@@ -1311,14 +1316,13 @@ class CModelDriver(CompiledModelDriver):
             grp['type'] = grp['type'].replace(grp['precision'], 'X')
         if grp['type'] == 'char':
             out['type'] = 'bytes'
-            out['precision'] = 0
         elif grp['type'] == 'void':
             out['type'] = 'null'
         elif grp['type'].startswith('complex'):
             out['type'] = 'complex'
-            precision_map = {'long_double': 256,
-                             'double': 128,
-                             'float': 64}
+            precision_map = {'long_double': 32,
+                             'double': 16,
+                             'float': 8}
             prec_str = grp['type'].split('complex_')[-1]
             if prec_str in precision_map:
                 out['precision'] = precision_map[prec_str]
@@ -1327,15 +1331,13 @@ class CModelDriver(CompiledModelDriver):
                                  % grp['type'])
         else:
             if grp['type'] == 'double':
-                out['precision'] = 8 * 8
+                out['precision'] = 8
             elif grp['type'] == 'float':
                 grp['type'] = 'double'
-                out['precision'] = 4 * 8
+                out['precision'] = 4
             elif grp['type'] in ['int', 'uint']:
                 grp['type'] += 'X_t'
-                out['precision'] = 8 * np.dtype('intc').itemsize
-            elif grp['type'] in ['bytes_t', 'string_t', 'unicode_t']:
-                out['precision'] = 0
+                out['precision'] = np.dtype('intc').itemsize
             out['type'] = super(CModelDriver, cls).get_json_type(grp['type'])
         if grp.get('pointer', False):
             nptr = len(grp['pointer'])
@@ -1707,30 +1709,34 @@ class CModelDriver(CompiledModelDriver):
                         if not x.get('length_var', False):
                             x['length_var'] = {
                                 'name': v_length,
-                                'datatype': {'type': 'uint',
-                                             'precision': 64},
+                                'datatype': {
+                                    'type': 'uint',
+                                    'precision': rapidjson.SIZE_OF_SIZE_T},
                                 'is_length_var': True}
                             io_var.append(x['length_var'])
                     elif cls.requires_shape_var(x):
                         if not x.get('ndim_var', False):
                             x['ndim_var'] = {
                                 'name': v_ndim,
-                                'datatype': {'type': 'uint',
-                                             'precision': 64},
+                                'datatype': {
+                                    'type': 'uint',
+                                    'precision': rapidjson.SIZE_OF_SIZE_T},
                                 'is_length_var': True}
                             io_var.append(x['ndim_var'])
                         if not x.get('shape_var', False):
                             x['shape_var'] = {
                                 'name': v_shape,
-                                'datatype': {'type': '1darray',
-                                             'subtype': 'uint',
-                                             'precision': 64},
+                                'datatype': {
+                                    'type': '1darray',
+                                    'subtype': 'uint',
+                                    'precision': rapidjson.SIZE_OF_SIZE_T},
                                 'is_length_var': True}
                             io_var.append(x['shape_var'])
                         length_var = {
                             'name': v_length,
-                            'datatype': {'type': 'uint',
-                                         'precision': 64},
+                            'datatype': {
+                                'type': 'uint',
+                                'precision': rapidjson.SIZE_OF_SIZE_T},
                             'is_length_var': True}
                         kwargs['function_contents'] = (
                             cls.write_declaration(length_var)
@@ -1852,12 +1858,14 @@ class CModelDriver(CompiledModelDriver):
                     dst_var_ndim = dst_var['name'] + '_ndim'
             if isinstance(src_var_ndim, str):
                 src_var_ndim = {'name': src_var_ndim,
-                                'datatype': {'type': 'uint',
-                                             'precision': 64}}
+                                'datatype': {
+                                    'type': 'uint',
+                                    'precision': rapidjson.SIZE_OF_SIZE_T}}
             if isinstance(dst_var_ndim, str):
                 dst_var_ndim = {'name': dst_var_ndim,
-                                'datatype': {'type': 'uint',
-                                             'precision': 64}}
+                                'datatype': {
+                                    'type': 'uint',
+                                    'precision': rapidjson.SIZE_OF_SIZE_T}}
 
             out += cls.write_assign_to_output(
                 dst_var_ndim, src_var_ndim,
@@ -1881,15 +1889,17 @@ class CModelDriver(CompiledModelDriver):
                     dst_var_shape = dst_var['name'] + '_shape'
             if isinstance(src_var_shape, str):
                 src_var_shape = {'name': src_var_shape,
-                                 'datatype': {'type': '1darray',
-                                              'subtype': 'uint',
-                                              'precision': 64},
+                                 'datatype': {
+                                     'type': '1darray',
+                                     'subtype': 'uint',
+                                     'precision': rapidjson.SIZE_OF_SIZE_T},
                                  'length_var': src_var_ndim['name']}
             if isinstance(dst_var_shape, str):
                 dst_var_shape = {'name': dst_var_shape,
-                                 'datatype': {'type': '1darray',
-                                              'subtype': 'uint',
-                                              'precision': 64},
+                                 'datatype': {
+                                     'type': '1darray',
+                                     'subtype': 'uint',
+                                     'precision': rapidjson.SIZE_OF_SIZE_T},
                                  'length_var': dst_var_ndim['name']}
             out += cls.write_assign_to_output(
                 dst_var_shape, src_var_shape,
@@ -1955,16 +1965,15 @@ class CModelDriver(CompiledModelDriver):
         out['replacement_code_types'] = {}
         for k, v in cls.type_map.items():
             if v == '*':
-                knew = {'type': k, 'subtype': 'float',
-                        'precision': 32}
+                knew = {'type': k, 'subtype': 'float', 'precision': 4}
                 vnew = 'float*'
                 out['replacement_code_types'][(k, v)] = (knew, vnew)
             elif 'X' in v:
-                knew = {'type': k, 'precision': 64}
+                knew = {'type': k, 'precision': 8}
                 if k == 'complex':
                     vnew = v.replace('X', 'float')
                 else:
-                    vnew = v.replace('X', '64')
+                    vnew = v.replace('X', '8')
                 out['replacement_code_types'][(k, v)] = (knew, vnew)
         # Code composition parameters
         out.setdefault('write_function_def_params', [])
@@ -1972,18 +1981,18 @@ class CModelDriver(CompiledModelDriver):
             # Single output
             {'inputs': [{'name': 'x', 'value': 1.0,
                          'datatype': {'type': 'float',
-                                      'precision': 32,
+                                      'precision': 4,
                                       'units': 'cm'}}],
              'outputs': [{'name': 'y',
                           'datatype': {'type': 'float',
-                                       'precision': 32,
+                                       'precision': 4,
                                        'units': 'cm'}}],
              'outputs_in_inputs': False,
              'dont_add_lengths': True},
             # No output
             {'inputs': [{'name': 'x', 'value': 1.0,
                          'datatype': {'type': 'float',
-                                      'precision': 32,
+                                      'precision': 4,
                                       'units': 'cm'}}],
              'outputs': [],
              'outputs_in_inputs': False},
@@ -1995,7 +2004,7 @@ class CModelDriver(CompiledModelDriver):
                                       'units': ''}},
                         {'name': 'length_x', 'value': 5,
                          'datatype': {'type': 'uint',
-                                      'precision': 64},
+                                      'precision': rapidjson.SIZE_OF_SIZE_T},
                          'is_length_var': True}],
              'outputs': [{'name': 'y',
                           'length_var': 'length_y',
@@ -2004,7 +2013,7 @@ class CModelDriver(CompiledModelDriver):
                                        'units': ''}},
                          {'name': 'length_y',
                           'datatype': {'type': 'uint',
-                                       'precision': 64},
+                                       'precision': rapidjson.SIZE_OF_SIZE_T},
                           'is_length_var': True}],
              'dont_add_lengths': True},
         ]

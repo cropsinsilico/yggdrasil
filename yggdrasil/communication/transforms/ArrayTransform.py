@@ -3,7 +3,7 @@ import copy
 import pandas
 from yggdrasil import constants
 from yggdrasil.communication.transforms.TransformBase import TransformBase
-from yggdrasil.metaschema import type2numpy
+from yggdrasil.datatypes import type2numpy
 from yggdrasil.serialize import (
     consolidate_array, pandas2numpy, numpy2pandas, dict2list)
 

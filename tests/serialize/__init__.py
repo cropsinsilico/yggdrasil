@@ -11,7 +11,8 @@ def test_demote_string():
     x = SerializeBase.SerializeBase(format_str='%s')
     assert x.datatype == {'type': 'array',
                           'items': [{'type': 'scalar',
-                                     'subtype': 'string'}]}
+                                     'subtype': 'string'}],
+                          'allowSingular': True}
 
 
 _seritypes = sorted([x for x in schema.get_schema()['serializer'].subtypes

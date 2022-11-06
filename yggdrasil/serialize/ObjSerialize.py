@@ -263,5 +263,5 @@ class ObjSerialize(PlySerialize):
                            + b'v 0.0 0.0 0.0\n'
                            + b'v 0.0 0.0 1.0\n'
                            + b'v 0.0 1.0 1.0\n'
-                           + b'f 4 5 6\n\n')
+                           + b'f 4 5 6')
         return out

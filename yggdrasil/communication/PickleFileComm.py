@@ -15,3 +15,4 @@ class PickleFileComm(FileComm.FileComm):
                                    'Python objects.')
     _default_serializer = 'pickle'
     _default_extension = '.pkl'
+    _deprecated_drivers = ['PickleFileInputDriver', 'PickleFileOutputDriver']

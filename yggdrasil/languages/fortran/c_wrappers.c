@@ -245,7 +245,7 @@ int ygg_send_var_f(const void *yggQ, int nargs, void *args) {
     return -1;
   }
   va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  return vcommSend((const comm_t*)yggQ, (size_t)nargs, ap);
+  return vcommSend((const comm_t*)yggQ, ap);
 }
 
 int ygg_recv_var_f(void *yggQ, int nargs, void *args) {
@@ -255,7 +255,7 @@ int ygg_recv_var_f(void *yggQ, int nargs, void *args) {
   }
   va_list_t ap = init_va_ptrs(nargs, (void**)args);
   ap.for_fortran = 1;
-  return vcommRecv((comm_t*)yggQ, 0, (size_t)nargs, ap);
+  return vcommRecv((comm_t*)yggQ, 0, ap);
 }
 
 int ygg_recv_var_realloc_f(void *yggQ, int nargs, void *args) {
@@ -265,7 +265,7 @@ int ygg_recv_var_realloc_f(void *yggQ, int nargs, void *args) {
   }
   va_list_t ap = init_va_ptrs(nargs, (void**)args);
   ap.for_fortran = 1;
-  return vcommRecv((comm_t*)yggQ, 1, (size_t)nargs, ap);
+  return vcommRecv((comm_t*)yggQ, 1, ap);
 }
 
 int rpc_send_f(const void *yggQ, int nargs, void *args) {
@@ -287,7 +287,7 @@ int rpc_call_f(void *yggQ, int nargs, void *args) {
   }
   va_list_t ap = init_va_ptrs(nargs, (void**)args);
   ap.for_fortran = 1;
-  return vrpcCallBase((comm_t*)yggQ, 0, (size_t)nargs, ap);
+  return vrpcCallBase((comm_t*)yggQ, 0, ap);
 }
 
 int rpc_call_realloc_f(void *yggQ, int nargs, void *args) {
@@ -297,12 +297,18 @@ int rpc_call_realloc_f(void *yggQ, int nargs, void *args) {
   }
   va_list_t ap = init_va_ptrs(nargs, (void**)args);
   ap.for_fortran = 1;
-  return vrpcCallBase((comm_t*)yggQ, 1, (size_t)nargs, ap);
+  return vrpcCallBase((comm_t*)yggQ, 1, ap);
 }
 
 // Ply interface
 ply_t init_ply_f() {
   return init_ply();
+}
+
+void set_ply_f(void* x, void* obj, int copy) {
+  ply_t* c_x = (ply_t*)x;
+  if (c_x != NULL)
+    set_ply(c_x, obj, copy);
 }
 
 void free_ply_f(void* p) {
@@ -327,6 +333,12 @@ void display_ply_f(ply_t p) {
 // Obj interface
 obj_t init_obj_f() {
   return init_obj();
+}
+
+void set_obj_f(void* x, void* obj, int copy) {
+  obj_t* c_x = (obj_t*)x;
+  if (c_x != NULL)
+    set_obj(c_x, obj, copy);
 }
 
 void free_obj_f(void* p) {
@@ -362,9 +374,9 @@ generic_t init_generic_map_f() {
   return init_generic_map();
 }
 
-generic_t create_generic_f(void* type_class, void* data, size_t nbytes) {
-  return create_generic((dtype_t*)type_class, data, nbytes);
-}
+/* generic_t create_generic_f(void* type_class, void* data, size_t nbytes) { */
+/*   return create_generic((dtype_t*)type_class, data, nbytes); */
+/* } */
 
 int free_generic_f(void* x) {
   return destroy_generic((generic_t*)x);
@@ -390,16 +402,16 @@ int set_generic_array_f(generic_t arr, size_t i, generic_t x) {
   return set_generic_array(arr, i, x);
 }
 
-int get_generic_array_f(generic_t arr, size_t i, void* x) {
-  return get_generic_array(arr, i, (generic_t*)x);
+int get_generic_array_f(generic_t arr, size_t i, void* x, int copy) {
+  return get_generic_array(arr, i, (generic_t*)x, copy);
 }
 
 int set_generic_object_f(generic_t arr, const char* k, generic_t x) {
   return set_generic_object(arr, k, x);
 }
 
-int get_generic_object_f(generic_t arr, const char* k, void* x) {
-  return get_generic_object(arr, k, (generic_t*)x);
+int get_generic_object_f(generic_t arr, const char* k, void* x, int copy) {
+  return get_generic_object(arr, k, (generic_t*)x, copy);
 }
 
 // Python interface

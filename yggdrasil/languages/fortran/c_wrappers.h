@@ -90,12 +90,14 @@ int rpc_call_f(void *yggQ, int nargs, void *args);
 int rpc_call_realloc_f(void *yggQ, int nargs, void *args);
 // Ply interface
 ply_t init_ply_f();
+void set_ply_f(void* x, void* obj, int copy);
 void free_ply_f(void* p);
 ply_t copy_ply_f(ply_t p);
 void display_ply_indent_f(ply_t p, const char *indent);
 void display_ply_f(ply_t p);
 // Obj interface
 obj_t init_obj_f();
+void set_obj_f(void* x, void* obj, int copy);
 void free_obj_f(void* p);
 obj_t copy_obj_f(obj_t p);
 void display_obj_indent_f(obj_t p, const char *indent);
@@ -104,16 +106,16 @@ void display_obj_f(obj_t p);
 generic_t init_generic_f();
 generic_t init_generic_array_f();
 generic_t init_generic_map_f();
-generic_t create_generic_f(void* type_class, void* data, size_t nbytes);
+/* generic_t create_generic_f(void* type_class, void* data, size_t nbytes); */
 int free_generic_f(void* x);
 generic_t copy_generic_f(generic_t src);
 int is_generic_init_f(generic_t x);
 void display_generic_f(generic_t x);
 int add_generic_array_f(generic_t arr, generic_t x);
 int set_generic_array_f(generic_t arr, size_t i, generic_t x);
-int get_generic_array_f(generic_t arr, size_t i, void *x);
+int get_generic_array_f(generic_t arr, size_t i, void *x, int copy);
 int set_generic_object_f(generic_t arr, const char* k, generic_t x);
-int get_generic_object_f(generic_t arr, const char* k, void *x);
+int get_generic_object_f(generic_t arr, const char* k, void *x, int copy);
 // Python interface
 python_t init_python_f();
 void free_python_f(void *x);
