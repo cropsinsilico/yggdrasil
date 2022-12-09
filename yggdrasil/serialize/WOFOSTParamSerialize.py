@@ -72,14 +72,13 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                         "kg P": "kg",
                         "kg-1 dry biomass": "kg-1",
                         "kg CH2O": "kg",
-                        "days": "d",
-                        "cel": "degC"}
+                        "cel": "degC",
+                        "degC d": "ΔdegC d"}
         for k, v in replacements.items():
             x = x.replace(k, v)
         if x == '-':
             x = ""
-        out = units.convert_R_unit_string(x)
-        return out
+        return x
             
     def func_deserialize(self, msg):
         r"""Deserialize a message.

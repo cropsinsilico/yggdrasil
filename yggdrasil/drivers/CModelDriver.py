@@ -1262,17 +1262,10 @@ class CModelDriver(CompiledModelDriver):
             str: The native type.
 
         """
-        out = super(CModelDriver, cls).get_native_type(**kwargs)
+        out, json_type = super(CModelDriver, cls).get_native_type(
+            return_json=True, **kwargs)
         if not ((out == '*') or ('X' in out) or (out == 'double')):
             return out
-        json_type = kwargs.get('datatype', kwargs)
-        if isinstance(json_type, str):
-            json_type = {'type': json_type}
-        # if 'type' in kwargs:
-        #     json_type.update(kwargs)
-        assert isinstance(json_type, dict)
-        if 'subtype' not in json_type:
-            json_type = rapidjson.normalize(json_type, {'type': 'schema'})
         if out == '*':
             json_subtype = copy.deepcopy(json_type)
             json_subtype['type'] = 'scalar'

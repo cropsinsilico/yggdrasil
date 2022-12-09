@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from yggdrasil import units
+from yggdrasil import units, rapidjson
 from tests.serialize import TestSerializeBase as base_class
 
 
@@ -56,7 +56,8 @@ _options = [
         'empty': b'',
         'objects': [float(x) for x in range(5)],
         'extra_kwargs': {},
-        'datatype': {'type': 'float'},
+        'datatype': {'type': 'scalar', 'subtype': 'float',
+                     'precision': 8},
         'dtype': None}}]
 
 
@@ -92,5 +93,5 @@ class TestDefaultSerialize(base_class):
         compatible."""
         if (len(instance_kwargs) == 0) and (class_name == 'DefaultSerialize'):
             instance.initialize_from_message(np.int64(1))
-            with pytest.raises(RuntimeError):
+            with pytest.raises(rapidjson.ComparisonError):
                 instance.update_serializer(datatype={'type': 'ply'})

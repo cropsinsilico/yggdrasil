@@ -507,7 +507,8 @@ class FortranModelDriver(CompiledModelDriver):
             str: The native type.
 
         """
-        out = super(FortranModelDriver, cls).get_native_type(**kwargs)
+        out, json_type = super(FortranModelDriver, cls).get_native_type(
+            return_json=True, **kwargs)
         intent_regex = r'(,\s*intent\(.+?\))'
         for x in re.finditer(intent_regex, out):
             out = out.replace(x.group(0), '')
@@ -530,13 +531,6 @@ class FortranModelDriver(CompiledModelDriver):
             if out.startswith('ygg'):
                 out = 'type(%s)' % out
             return out
-        json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
-        if isinstance(json_type, str):  # pragma: no cover
-            json_type = {'type': json_type}
-        if 'type' in kwargs:  # pragma: no cover
-            json_type.update(kwargs)
-        assert isinstance(json_type, dict)
-        json_type = rapidjson.normalize(json_type, {'type': 'schema'})
         if out == '*':
             dim_str = ''
             if json_type['type'] == '1darray':

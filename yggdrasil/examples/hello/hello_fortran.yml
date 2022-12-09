@@ -6,18 +6,17 @@ model:
   args: ./src/hello.f90  # compile the Fortran code with necessary libraries
 
   inputs:
-    - inFile
+    - name: inFile
+      default_file: ./Input/input.txt
     - helloQueueIn
   outputs:
     - helloQueueOut
-    - outFile
+    - name: outFile
+      default_file:
+        name: output_hello.txt
+        in_temp: True
 
 connections:
-  - input: ./Input/input.txt
-    output: inFile
   - input: helloQueueOut
     output: helloQueueIn
     onexit: printStatus
-  - input: outFile
-    output: output_hello.txt
-    in_temp: True

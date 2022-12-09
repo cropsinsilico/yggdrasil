@@ -712,7 +712,7 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc, va_list_t ap) {
   if (is_empty_dtype(send_comm->datatype)) {
     send_nargs = 1;
   } else {
-    send_nargs = nargs_exp_dtype(send_comm->datatype);
+    send_nargs = nargs_exp_dtype(send_comm->datatype, 0);
   }
   size_t recv_nargs = ap.nargs[0] - send_nargs;
   ap.nargs = &send_nargs;

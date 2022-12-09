@@ -516,9 +516,7 @@ void* generic_map_get_keys_f(generic_t x, void* n_keys_f, void* key_size_f) {
   }
   for (i = 0; i < n_keys; i++) {
     memcpy(keys_f + (i * max_key_size), keys_c[i], strlen(keys_c[i]));
-    free(keys_c[i]);
   }
-  free(keys_c);
   ((size_t*)n_keys_f)[0] = n_keys;
   ((size_t*)key_size_f)[0] = max_key_size;
   return (void*)keys_f;

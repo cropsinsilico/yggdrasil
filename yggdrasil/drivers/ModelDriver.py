@@ -3791,12 +3791,14 @@ class ModelDriver(Driver):
         return var
 
     @classmethod
-    def get_native_type(cls, **kwargs):
+    def get_native_type(cls, return_json=False, **kwargs):
         r"""Get the native type.
 
         Args:
             type (str, optional): Name of |yggdrasil| extended JSON
                 type or JSONSchema dictionary defining a datatype.
+            return_json (bool, optional): If True, the returned value will
+                also include the JSON datatype.
             **kwargs: Additional keyword arguments may be used in determining
                 the precise declaration that should be used.
 
@@ -3805,6 +3807,8 @@ class ModelDriver(Driver):
 
         """
         if 'native_type' in kwargs:
+            if return_json:
+                return kwargs['native_type'], kwargs.get('json_type', kwargs)
             return kwargs['native_type']
         assert 'json_type' not in kwargs
         json_type = kwargs.get('datatype', kwargs)
@@ -3825,6 +3829,14 @@ class ModelDriver(Driver):
         # TODO: Default length type?
         if kwargs.get('is_length_var', False) and 'length' in cls.type_map:
             type_name = 'length'
+        if return_json:
+            json_type.setdefault('type', type_name)
+            if not (any(x in ['comm', 'dtype', '1darray_pointer',
+                              'ndarray_pointer', 'flag']
+                        for x in [json_type.get('subtype', None),
+                                  json_type['type']])):
+                json_type = rapidjson.normalize(json_type, {'type': 'schema'})
+            return cls.type_map[type_name], json_type
         return cls.type_map[type_name]
 
     @classmethod

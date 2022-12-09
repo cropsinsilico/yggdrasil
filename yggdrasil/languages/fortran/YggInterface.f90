@@ -222,7 +222,7 @@ module fygg
   !> @param[in] key Key string for value that should be set.
   !> @param[in] ... Additional variables contain information about the item.
   interface generic_map_set
-     module procedure generic_map_get_generic
+     module procedure generic_map_set_generic
      module procedure generic_map_set_boolean
      ! module procedure generic_map_set_integer
      module procedure generic_map_set_null
@@ -996,6 +996,7 @@ module fygg
   type, bind(c) :: ygggeneric
      character(kind=c_char) :: prefix !< Character used to identify generic objects
      type(c_ptr) :: obj !< Pointer to C generic object
+     type(c_ptr) :: allocator !< Pointer to allocator for generic object
   end type ygggeneric
   !> @brief Wrapper for C NULL object.
   type :: yggnull
@@ -2430,7 +2431,8 @@ contains
        end do
        if (args(i)%array) then
           if (args(i)%ndim.gt.1) then
-             if (is_next_size_t(args, i).and.is_next_size_t(args, i+1, req_array=.true.)) then
+             if (is_next_size_t(args, i).and. &
+                  is_next_size_t(args, i+1, req_array=.true.)) then
                 ! Do nothing, vars already exist
              else if (is_next_size_t(args, i, req_array=.true.)) then
                 if (args(i)%alloc) then
@@ -2577,6 +2579,7 @@ contains
           if ((args(i)%type.eq."character").or. &
                (args(i)%type.eq."unicode")) then
              nargs = nargs + 1  ! For the string length
+             c_nargs = c_nargs + 1
           end if
        else if ((args(i)%type.eq."character").or. &
             (args(i)%type.eq."unicode")) then

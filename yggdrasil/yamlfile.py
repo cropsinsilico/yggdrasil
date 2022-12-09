@@ -574,6 +574,9 @@ def parse_model(yml, existing):
 
     """
     yml = backward_compat_models(yml, existing)
+    if ((yml.get('driver', None) == 'GCCModelDriver'
+         and any(x.endswith('.cpp') for x in yml.get('args', [])))):
+        yml['language'] = 'cpp'
     language = yml.pop('language')
     yml['driver'] = constants.COMPONENT_REGISTRY['model']['subtypes'][language]
     # Add server input

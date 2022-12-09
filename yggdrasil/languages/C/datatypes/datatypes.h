@@ -35,7 +35,8 @@ typedef struct dtype_t {
 /*! @brief C-friendly wrapper for rapidjson::Document. */
 typedef struct generic_t {
   char prefix; //!< Prefix character for limited verification.
-  void *obj; //!< Pointer to rapidjson::Document class.
+  void *obj; //!< Pointer to rapidjson::Document or rapidjson::Value.
+  void *allocator; //!< Allocator for rapidjson::Value stored in obj.
 } generic_t;
 
 /*! @brief C-friendly definition of vector object. */
@@ -151,6 +152,12 @@ const char* dtype2name(dtype_t* type_struct);
   @returns generic_t New generic object structure.
  */
 generic_t init_generic();
+  
+/*!
+  @brief Initialize an empty generic object with a null JSON document
+  @returns generic_t New generic object structure.
+ */
+generic_t init_generic_null();
   
 /*!
   @brief Initialize an empty array of mixed types with generic wrappers.
@@ -1050,7 +1057,7 @@ int update_dtype_from_generic_ap(dtype_t* dtype1, va_list_t ap);
   @param[in] new_precision size_t New precision.
   @returns: int 0 if free was successfull, -1 if there was an error.
 */
-int update_precision_dtype(const dtype_t* dtype,
+int update_precision_dtype(dtype_t* dtype,
 			   const size_t new_precision);
 
 /*!
@@ -1094,9 +1101,11 @@ int serialize_dtype(const dtype_t *dtype, char **buf, size_t *buf_siz,
 
 /*!
   @brief Wrapper for determining how many arguments a data type expects.
-  @param[in] dtype dtype_t* Wrapper struct for C++ rapidjson::Document.
+  @param[in] dtype Wrapper struct for C++ rapidjson::Document.
+  @param[in] for_fortran_recv If 1, additional variables passed by the 
+     Fortran interface during receive calls will be considered.
 */
-size_t nargs_exp_dtype(const dtype_t *dtype);
+size_t nargs_exp_dtype(const dtype_t *dtype, const int for_fortran_recv);
 
 
 #define free_generic destroy_generic

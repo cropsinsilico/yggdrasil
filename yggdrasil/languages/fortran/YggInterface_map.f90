@@ -148,7 +148,7 @@ subroutine generic_map_get_integer2(x, key, out)
   character(len=*) :: key
   integer(kind=2), pointer, intent(out) :: out
   type(c_ptr) :: c_out
-  c_out = generic_map_get_scalar(x, key, "int", 8 * 2)
+  c_out = generic_map_get_scalar(x, key, "int", 2)
   call c_f_pointer(c_out, out)
 end subroutine generic_map_get_integer2
 subroutine generic_map_get_integer4(x, key, out)
@@ -157,7 +157,7 @@ subroutine generic_map_get_integer4(x, key, out)
   character(len=*) :: key
   integer(kind=4), pointer, intent(out) :: out
   type(c_ptr) :: c_out
-  c_out = generic_map_get_scalar(x, key, "int", 8 * 4)
+  c_out = generic_map_get_scalar(x, key, "int", 4)
   call c_f_pointer(c_out, out)
 end subroutine generic_map_get_integer4
 subroutine generic_map_get_integer8(x, key, out)
@@ -166,7 +166,7 @@ subroutine generic_map_get_integer8(x, key, out)
   character(len=*) :: key
   integer(kind=8), pointer, intent(out) :: out
   type(c_ptr) :: c_out
-  c_out = generic_map_get_scalar(x, key, "int", 8 * 8)
+  c_out = generic_map_get_scalar(x, key, "int", 8)
   call c_f_pointer(c_out, out)
 end subroutine generic_map_get_integer8
 ! Get scalar uint
@@ -177,7 +177,7 @@ subroutine generic_map_get_unsigned1(x, key, out)
   type(ygguint1), intent(out) :: out
   integer(kind=1), pointer :: temp
   type(c_ptr) :: c_out
-  c_out = generic_map_get_scalar(x, key, "uint", 8 * 1)
+  c_out = generic_map_get_scalar(x, key, "uint", 1)
   call c_f_pointer(c_out, temp)
   out%x = temp
   deallocate(temp)
@@ -189,7 +189,7 @@ subroutine generic_map_get_unsigned2(x, key, out)
   type(ygguint2), intent(out) :: out
   integer(kind=2), pointer :: temp
   type(c_ptr) :: c_out
-  c_out = generic_map_get_scalar(x, key, "uint", 8 * 2)
+  c_out = generic_map_get_scalar(x, key, "uint", 2)
   call c_f_pointer(c_out, temp)
   out%x = temp
   deallocate(temp)
@@ -201,7 +201,7 @@ subroutine generic_map_get_unsigned4(x, key, out)
   type(ygguint4), intent(out) :: out
   integer(kind=4), pointer :: temp
   type(c_ptr) :: c_out
-  c_out = generic_map_get_scalar(x, key, "uint", 8 * 4)
+  c_out = generic_map_get_scalar(x, key, "uint", 4)
   call c_f_pointer(c_out, temp)
   out%x = temp
   deallocate(temp)
@@ -213,7 +213,7 @@ subroutine generic_map_get_unsigned8(x, key, out)
   type(ygguint8), intent(out) :: out
   integer(kind=8), pointer :: temp
   type(c_ptr) :: c_out
-  c_out = generic_map_get_scalar(x, key, "uint", 8 * 8)
+  c_out = generic_map_get_scalar(x, key, "uint", 8)
   call c_f_pointer(c_out, temp)
   out%x = temp
   deallocate(temp)
@@ -225,7 +225,7 @@ subroutine generic_map_get_real4(x, key, out)
   character(len=*) :: key
   real(kind=4), pointer, intent(out) :: out
   type(c_ptr) :: c_out
-  c_out = generic_map_get_scalar(x, key, "float", 8 * 4)
+  c_out = generic_map_get_scalar(x, key, "float", 4)
   call c_f_pointer(c_out, out)
 end subroutine generic_map_get_real4
 subroutine generic_map_get_real8(x, key, out)
@@ -234,7 +234,7 @@ subroutine generic_map_get_real8(x, key, out)
   character(len=*) :: key
   real(kind=8), pointer, intent(out) :: out
   type(c_ptr) :: c_out
-  c_out = generic_map_get_scalar(x, key, "float", 8 * 8)
+  c_out = generic_map_get_scalar(x, key, "float", 8)
   call c_f_pointer(c_out, out)
 end subroutine generic_map_get_real8
 ! Get scalar complex
@@ -244,7 +244,7 @@ subroutine generic_map_get_complex4(x, key, out)
   character(len=*) :: key
   complex(kind=4), pointer, intent(out) :: out
   type(c_ptr) :: c_out
-  c_out = generic_map_get_scalar(x, key, "complex", 8 * 4)
+  c_out = generic_map_get_scalar(x, key, "complex", 4)
   call c_f_pointer(c_out, out)
 end subroutine generic_map_get_complex4
 subroutine generic_map_get_complex8(x, key, out)
@@ -253,7 +253,7 @@ subroutine generic_map_get_complex8(x, key, out)
   character(len=*) :: key
   complex(kind=8), pointer, intent(out) :: out
   type(c_ptr) :: c_out
-  c_out = generic_map_get_scalar(x, key, "complex", 8 * 8)
+  c_out = generic_map_get_scalar(x, key, "complex", 8)
   call c_f_pointer(c_out, out)
 end subroutine generic_map_get_complex8
 ! Get scalar string
@@ -304,7 +304,7 @@ subroutine generic_map_get_1darray_integer2(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_map_get_1darray(x, key, "int", 8 * 2, c_out_ptr)
+  c_length = generic_map_get_1darray(x, key, "int", 2, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_integer2
@@ -319,7 +319,7 @@ subroutine generic_map_get_1darray_integer4(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_map_get_1darray(x, key, "int", 8 * 4, c_out_ptr)
+  c_length = generic_map_get_1darray(x, key, "int", 4, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_integer4
@@ -334,7 +334,7 @@ subroutine generic_map_get_1darray_integer8(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_map_get_1darray(x, key, "int", 8 * 8, c_out_ptr)
+  c_length = generic_map_get_1darray(x, key, "int", 8, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_integer8
@@ -350,7 +350,7 @@ subroutine generic_map_get_1darray_unsigned1(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_map_get_1darray(x, key, "uint", 8 * 1, c_out_ptr)
+  c_length = generic_map_get_1darray(x, key, "uint", 1, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_unsigned1
@@ -365,7 +365,7 @@ subroutine generic_map_get_1darray_unsigned2(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_map_get_1darray(x, key, "uint", 8 * 2, c_out_ptr)
+  c_length = generic_map_get_1darray(x, key, "uint", 2, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_unsigned2
@@ -380,7 +380,7 @@ subroutine generic_map_get_1darray_unsigned4(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_map_get_1darray(x, key, "uint", 8 * 4, c_out_ptr)
+  c_length = generic_map_get_1darray(x, key, "uint", 4, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_unsigned4
@@ -395,7 +395,7 @@ subroutine generic_map_get_1darray_unsigned8(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_map_get_1darray(x, key, "uint", 8 * 8, c_out_ptr)
+  c_length = generic_map_get_1darray(x, key, "uint", 8, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_unsigned8
@@ -411,7 +411,7 @@ subroutine generic_map_get_1darray_real4(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_map_get_1darray(x, key, "float", 8 * 4, c_out_ptr)
+  c_length = generic_map_get_1darray(x, key, "float", 4, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_real4
@@ -426,7 +426,7 @@ subroutine generic_map_get_1darray_real8(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_map_get_1darray(x, key, "float", 8 * 8, c_out_ptr)
+  c_length = generic_map_get_1darray(x, key, "float", 8, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_real8
@@ -442,7 +442,7 @@ subroutine generic_map_get_1darray_complex4(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_map_get_1darray(x, key, "complex", 8 * 4, c_out_ptr)
+  c_length = generic_map_get_1darray(x, key, "complex", 4, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_complex4
@@ -457,7 +457,7 @@ subroutine generic_map_get_1darray_complex8(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_map_get_1darray(x, key, "complex", 8 * 8, c_out_ptr)
+  c_length = generic_map_get_1darray(x, key, "complex", 8, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_complex8
@@ -526,7 +526,7 @@ subroutine generic_map_get_ndarray_integer2(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_map_get_ndarray(x, key, "int", 8 * 2, &
+  out%shape => generic_map_get_ndarray(x, key, "int", 2, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -541,7 +541,7 @@ subroutine generic_map_get_ndarray_integer4(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_map_get_ndarray(x, key, "int", 8 * 4, &
+  out%shape => generic_map_get_ndarray(x, key, "int", 4, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -556,7 +556,7 @@ subroutine generic_map_get_ndarray_integer8(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_map_get_ndarray(x, key, "int", 8 * 8, &
+  out%shape => generic_map_get_ndarray(x, key, "int", 8, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -572,7 +572,7 @@ subroutine generic_map_get_ndarray_unsigned1(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_map_get_ndarray(x, key, "uint", 8 * 1, &
+  out%shape => generic_map_get_ndarray(x, key, "uint", 1, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -587,7 +587,7 @@ subroutine generic_map_get_ndarray_unsigned2(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_map_get_ndarray(x, key, "uint", 8 * 2, &
+  out%shape => generic_map_get_ndarray(x, key, "uint", 2, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -602,7 +602,7 @@ subroutine generic_map_get_ndarray_unsigned4(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_map_get_ndarray(x, key, "uint", 8 * 4, &
+  out%shape => generic_map_get_ndarray(x, key, "uint", 4, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -617,7 +617,7 @@ subroutine generic_map_get_ndarray_unsigned8(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_map_get_ndarray(x, key, "uint", 8 * 8, &
+  out%shape => generic_map_get_ndarray(x, key, "uint", 8, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -633,7 +633,7 @@ subroutine generic_map_get_ndarray_real4(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_map_get_ndarray(x, key, "float", 8 * 4, &
+  out%shape => generic_map_get_ndarray(x, key, "float", 4, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -648,7 +648,7 @@ subroutine generic_map_get_ndarray_real8(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_map_get_ndarray(x, key, "float", 8 * 8, &
+  out%shape => generic_map_get_ndarray(x, key, "float", 8, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -664,7 +664,7 @@ subroutine generic_map_get_ndarray_complex4(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_map_get_ndarray(x, key, "complex", 8 * 4, &
+  out%shape => generic_map_get_ndarray(x, key, "complex", 4, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -679,7 +679,7 @@ subroutine generic_map_get_ndarray_complex8(x, key, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_map_get_ndarray(x, key, "complex", 8 * 8, &
+  out%shape => generic_map_get_ndarray(x, key, "complex", 8, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -916,7 +916,7 @@ subroutine generic_map_set_integer2(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val)
-  call generic_map_set_scalar(x, key, c_val, "int", 2 * 8, units)
+  call generic_map_set_scalar(x, key, c_val, "int", 2, units)
 end subroutine generic_map_set_integer2
 subroutine generic_map_set_integer4(x, key, val, units_in)
   implicit none
@@ -933,7 +933,7 @@ subroutine generic_map_set_integer4(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val)
-  call generic_map_set_scalar(x, key, c_val, "int", 4 * 8, units)
+  call generic_map_set_scalar(x, key, c_val, "int", 4, units)
 end subroutine generic_map_set_integer4
 subroutine generic_map_set_integer8(x, key, val, units_in)
   implicit none
@@ -950,7 +950,7 @@ subroutine generic_map_set_integer8(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val)
-  call generic_map_set_scalar(x, key, c_val, "int", 8 * 8, units)
+  call generic_map_set_scalar(x, key, c_val, "int", 8, units)
 end subroutine generic_map_set_integer8
 ! Set scalar uint
 subroutine generic_map_set_unsigned1(x, key, val, units_in)
@@ -968,7 +968,7 @@ subroutine generic_map_set_unsigned1(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x)
-  call generic_map_set_scalar(x, key, c_val, "uint", 1 * 8, units)
+  call generic_map_set_scalar(x, key, c_val, "uint", 1, units)
 end subroutine generic_map_set_unsigned1
 subroutine generic_map_set_unsigned2(x, key, val, units_in)
   implicit none
@@ -985,7 +985,7 @@ subroutine generic_map_set_unsigned2(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x)
-  call generic_map_set_scalar(x, key, c_val, "uint", 2 * 8, units)
+  call generic_map_set_scalar(x, key, c_val, "uint", 2, units)
 end subroutine generic_map_set_unsigned2
 subroutine generic_map_set_unsigned4(x, key, val, units_in)
   implicit none
@@ -1002,7 +1002,7 @@ subroutine generic_map_set_unsigned4(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x)
-  call generic_map_set_scalar(x, key, c_val, "uint", 4 * 8, units)
+  call generic_map_set_scalar(x, key, c_val, "uint", 4, units)
 end subroutine generic_map_set_unsigned4
 subroutine generic_map_set_unsigned8(x, key, val, units_in)
   implicit none
@@ -1019,7 +1019,7 @@ subroutine generic_map_set_unsigned8(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x)
-  call generic_map_set_scalar(x, key, c_val, "uint", 8 * 8, units)
+  call generic_map_set_scalar(x, key, c_val, "uint", 8, units)
 end subroutine generic_map_set_unsigned8
 ! Set scalar real
 subroutine generic_map_set_real4(x, key, val, units_in)
@@ -1037,7 +1037,7 @@ subroutine generic_map_set_real4(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val)
-  call generic_map_set_scalar(x, key, c_val, "float", 4 * 8, units)
+  call generic_map_set_scalar(x, key, c_val, "float", 4, units)
 end subroutine generic_map_set_real4
 subroutine generic_map_set_real8(x, key, val, units_in)
   implicit none
@@ -1054,7 +1054,7 @@ subroutine generic_map_set_real8(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val)
-  call generic_map_set_scalar(x, key, c_val, "float", 8 * 8, units)
+  call generic_map_set_scalar(x, key, c_val, "float", 8, units)
 end subroutine generic_map_set_real8
 ! Set scalar complex
 subroutine generic_map_set_complex4(x, key, val, units_in)
@@ -1072,7 +1072,7 @@ subroutine generic_map_set_complex4(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val)
-  call generic_map_set_scalar(x, key, c_val, "complex", 4 * 8, units)
+  call generic_map_set_scalar(x, key, c_val, "complex", 4, units)
 end subroutine generic_map_set_complex4
 subroutine generic_map_set_complex8(x, key, val, units_in)
   implicit none
@@ -1089,7 +1089,7 @@ subroutine generic_map_set_complex8(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val)
-  call generic_map_set_scalar(x, key, c_val, "complex", 8 * 8, units)
+  call generic_map_set_scalar(x, key, c_val, "complex", 8, units)
 end subroutine generic_map_set_complex8
 ! Set scalar string
 subroutine generic_map_set_bytes(x, key, val, units_in)
@@ -1145,7 +1145,7 @@ subroutine generic_map_set_1darray_integer2(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_map_set_1darray(x, key, c_val, "int", 2 * 8, &
+  call generic_map_set_1darray(x, key, c_val, "int", 2, &
        size(val), units)
 end subroutine generic_map_set_1darray_integer2
 subroutine generic_map_set_1darray_integer4(x, key, val, units_in)
@@ -1163,7 +1163,7 @@ subroutine generic_map_set_1darray_integer4(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_map_set_1darray(x, key, c_val, "int", 4 * 8, &
+  call generic_map_set_1darray(x, key, c_val, "int", 4, &
        size(val), units)
 end subroutine generic_map_set_1darray_integer4
 subroutine generic_map_set_1darray_integer8(x, key, val, units_in)
@@ -1181,7 +1181,7 @@ subroutine generic_map_set_1darray_integer8(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_map_set_1darray(x, key, c_val, "int", 8 * 8, &
+  call generic_map_set_1darray(x, key, c_val, "int", 8, &
        size(val), units)
 end subroutine generic_map_set_1darray_integer8
 ! Set 1darray uint
@@ -1200,7 +1200,7 @@ subroutine generic_map_set_1darray_unsigned1(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_map_set_1darray(x, key, c_val, "uint", 1 * 8, &
+  call generic_map_set_1darray(x, key, c_val, "uint", 1, &
        size(val), units)
 end subroutine generic_map_set_1darray_unsigned1
 subroutine generic_map_set_1darray_unsigned2(x, key, val, units_in)
@@ -1218,7 +1218,7 @@ subroutine generic_map_set_1darray_unsigned2(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_map_set_1darray(x, key, c_val, "uint", 2 * 8, &
+  call generic_map_set_1darray(x, key, c_val, "uint", 2, &
        size(val), units)
 end subroutine generic_map_set_1darray_unsigned2
 subroutine generic_map_set_1darray_unsigned4(x, key, val, units_in)
@@ -1236,7 +1236,7 @@ subroutine generic_map_set_1darray_unsigned4(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_map_set_1darray(x, key, c_val, "uint", 4 * 8, &
+  call generic_map_set_1darray(x, key, c_val, "uint", 4, &
        size(val), units)
 end subroutine generic_map_set_1darray_unsigned4
 subroutine generic_map_set_1darray_unsigned8(x, key, val, units_in)
@@ -1254,7 +1254,7 @@ subroutine generic_map_set_1darray_unsigned8(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_map_set_1darray(x, key, c_val, "uint", 8 * 8, &
+  call generic_map_set_1darray(x, key, c_val, "uint", 8, &
        size(val), units)
 end subroutine generic_map_set_1darray_unsigned8
 ! Set 1darray real
@@ -1273,7 +1273,7 @@ subroutine generic_map_set_1darray_real4(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_map_set_1darray(x, key, c_val, "float", 4 * 8, &
+  call generic_map_set_1darray(x, key, c_val, "float", 4, &
        size(val), units)
 end subroutine generic_map_set_1darray_real4
 subroutine generic_map_set_1darray_real8(x, key, val, units_in)
@@ -1291,7 +1291,7 @@ subroutine generic_map_set_1darray_real8(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_map_set_1darray(x, key, c_val, "float", 8 * 8, &
+  call generic_map_set_1darray(x, key, c_val, "float", 8, &
        size(val), units)
 end subroutine generic_map_set_1darray_real8
 ! Set 1darray complex
@@ -1310,7 +1310,7 @@ subroutine generic_map_set_1darray_complex4(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_map_set_1darray(x, key, c_val, "complex", 4 * 8, &
+  call generic_map_set_1darray(x, key, c_val, "complex", 4, &
        size(val), units)
 end subroutine generic_map_set_1darray_complex4
 subroutine generic_map_set_1darray_complex8(x, key, val, units_in)
@@ -1328,7 +1328,7 @@ subroutine generic_map_set_1darray_complex8(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_map_set_1darray(x, key, c_val, "complex", 8 * 8, &
+  call generic_map_set_1darray(x, key, c_val, "complex", 8, &
        size(val), units)
 end subroutine generic_map_set_1darray_complex8
 ! Set 1darray string
@@ -1387,7 +1387,7 @@ subroutine generic_map_set_ndarray_integer2(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_map_set_ndarray(x, key, c_val, "int", 2 * 8, &
+  call generic_map_set_ndarray(x, key, c_val, "int", 2, &
        val%shape, units)
 end subroutine generic_map_set_ndarray_integer2
 subroutine generic_map_set_ndarray_integer4(x, key, val, units_in)
@@ -1405,7 +1405,7 @@ subroutine generic_map_set_ndarray_integer4(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_map_set_ndarray(x, key, c_val, "int", 4 * 8, &
+  call generic_map_set_ndarray(x, key, c_val, "int", 4, &
        val%shape, units)
 end subroutine generic_map_set_ndarray_integer4
 subroutine generic_map_set_ndarray_integer8(x, key, val, units_in)
@@ -1423,7 +1423,7 @@ subroutine generic_map_set_ndarray_integer8(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_map_set_ndarray(x, key, c_val, "int", 8 * 8, &
+  call generic_map_set_ndarray(x, key, c_val, "int", 8, &
        val%shape, units)
 end subroutine generic_map_set_ndarray_integer8
 ! Get ndarray uint
@@ -1442,7 +1442,7 @@ subroutine generic_map_set_ndarray_unsigned1(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_map_set_ndarray(x, key, c_val, "uint", 1 * 8, &
+  call generic_map_set_ndarray(x, key, c_val, "uint", 1, &
        val%shape, units)
 end subroutine generic_map_set_ndarray_unsigned1
 subroutine generic_map_set_ndarray_unsigned2(x, key, val, units_in)
@@ -1460,7 +1460,7 @@ subroutine generic_map_set_ndarray_unsigned2(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_map_set_ndarray(x, key, c_val, "uint", 2 * 8, &
+  call generic_map_set_ndarray(x, key, c_val, "uint", 2, &
        val%shape, units)
 end subroutine generic_map_set_ndarray_unsigned2
 subroutine generic_map_set_ndarray_unsigned4(x, key, val, units_in)
@@ -1478,7 +1478,7 @@ subroutine generic_map_set_ndarray_unsigned4(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_map_set_ndarray(x, key, c_val, "uint", 4 * 8, &
+  call generic_map_set_ndarray(x, key, c_val, "uint", 4, &
        val%shape, units)
 end subroutine generic_map_set_ndarray_unsigned4
 subroutine generic_map_set_ndarray_unsigned8(x, key, val, units_in)
@@ -1496,7 +1496,7 @@ subroutine generic_map_set_ndarray_unsigned8(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_map_set_ndarray(x, key, c_val, "uint", 8 * 8, &
+  call generic_map_set_ndarray(x, key, c_val, "uint", 8, &
        val%shape, units)
 end subroutine generic_map_set_ndarray_unsigned8
 ! Set ndarray real
@@ -1515,7 +1515,7 @@ subroutine generic_map_set_ndarray_real4(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_map_set_ndarray(x, key, c_val, "float", 4 * 8, &
+  call generic_map_set_ndarray(x, key, c_val, "float", 4, &
        val%shape, units)
 end subroutine generic_map_set_ndarray_real4
 subroutine generic_map_set_ndarray_real8(x, key, val, units_in)
@@ -1533,7 +1533,7 @@ subroutine generic_map_set_ndarray_real8(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_map_set_ndarray(x, key, c_val, "float", 8 * 8, &
+  call generic_map_set_ndarray(x, key, c_val, "float", 8, &
        val%shape, units)
 end subroutine generic_map_set_ndarray_real8
 ! Set ndarray complex
@@ -1552,7 +1552,7 @@ subroutine generic_map_set_ndarray_complex4(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_map_set_ndarray(x, key, c_val, "complex", 4 * 8, &
+  call generic_map_set_ndarray(x, key, c_val, "complex", 4, &
        val%shape, units)
 end subroutine generic_map_set_ndarray_complex4
 subroutine generic_map_set_ndarray_complex8(x, key, val, units_in)
@@ -1570,7 +1570,7 @@ subroutine generic_map_set_ndarray_complex8(x, key, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_map_set_ndarray(x, key, c_val, "complex", 8 * 8, &
+  call generic_map_set_ndarray(x, key, c_val, "complex", 8, &
        val%shape, units)
 end subroutine generic_map_set_ndarray_complex8
 ! Set ndarray string

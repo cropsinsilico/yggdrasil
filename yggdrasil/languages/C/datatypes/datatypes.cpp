@@ -22,6 +22,25 @@
     }
 
 // C++ functions
+rapidjson::Document::AllocatorType& generic_allocator(generic_t& x) {
+  if (x.allocator)
+    return ((rapidjson::Document::AllocatorType*)(x.allocator))[0];
+  if (x.obj == NULL)
+    ygglog_throw_error("generic_allocator: Not initialized");
+  return ((rapidjson::Document*)(x.obj))->GetAllocator();
+};
+
+rapidjson::Document::AllocatorType& dtype_allocator(dtype_t& x) {
+  rapidjson::Document* s = NULL;
+  if (x.metadata != NULL)
+    s = (rapidjson::Document*)(x.metadata);
+  else if (x.schema != NULL)
+    s = (rapidjson::Document*)(x.schema);
+  else
+    ygglog_throw_error("dtype_allocator: Not initialized");
+  return s->GetAllocator();
+};
+
 rapidjson::Document* type_from_doc(const rapidjson::Value &type_doc) {
   if (!(type_doc.IsObject()))
     ygglog_throw_error("type_from_doc: Parsed document is not an object.");
@@ -230,7 +249,7 @@ bool add_dtype(rapidjson::Document* d,
   return d->EndObject(N);
 }
 
-rapidjson::Document* copy_document(rapidjson::Document* rhs) {
+rapidjson::Document* copy_document(rapidjson::Value* rhs) {
   rapidjson::Document* out = NULL;
   if (rhs != NULL) {
     out = new rapidjson::Document();
@@ -243,18 +262,24 @@ rapidjson::Document* copy_document(rapidjson::Document* rhs) {
   return out;
 }
 
-void display_document(rapidjson::Value* rhs, const char* indent="") {
+std::string document2string(rapidjson::Value* rhs, const char* indent="") {
   if (rhs == NULL) {
-    ygglog_error("display_document: NULL document");
-    return;
+    ygglog_error("document2string: NULL document");
+    return std::string("");
   }
   rapidjson::StringBuffer sb;
   rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb, 0, strlen(indent));
+  writer.SetYggdrasilMode(true);
   if (!rhs->Accept(writer)) {
-    ygglog_error("display_document: Error in Accept(writer)");
-    return;
+    ygglog_error("document2string: Error in Accept(writer)");
+    return std::string("");
   }
-  printf("%s\n", sb.GetString());
+  return std::string(sb.GetString());
+}
+
+void display_document(rapidjson::Value* rhs, const char* indent="") {
+  std::string s = document2string(rhs, indent);
+  printf("%s\n", s.c_str());
 }
 
 rapidjson::Document* create_dtype_format_class(const char *format_str,
@@ -683,7 +708,8 @@ size_t is_schema_format_array(rapidjson::Value* d,
 };
 
 int schema_count_vargs(rapidjson::Value& schema, size_t& count,
-		       size_t table_nelements = 0) {
+		       size_t table_nelements = 0,
+		       int for_fortran_recv = 0) {
   if (!(schema.IsObject() && schema.HasMember("type") && schema["type"].IsString()))
     return 0;
   bool use_generic = false;
@@ -758,7 +784,8 @@ int schema_count_vargs(rapidjson::Value& schema, size_t& count,
       else
 	count += 2; // ndim & shape
     }
-    if ((!table_nelements) && (schema_subtype == std::string("string"))) {
+    if ((for_fortran_recv || !table_nelements) &&
+	(schema_subtype == std::string("string"))) {
       count++; // precision
     }
   } else {
@@ -1044,7 +1071,7 @@ int document_get_vargs(rapidjson::Value& document,
     size_t src_nbytes = 0;
 #define CASE_NDARRAY_(subtype, precision, type)				\
     if (schema_subtype == std::string(#subtype) && schema_precision == precision) { \
-      type* tmp;							\
+      type* tmp = NULL;							\
       src_nbytes = precision;						\
       if (!pop_va_list(ap, tmp)) {					\
 	return 0;							\
@@ -1166,7 +1193,7 @@ int document_set_vargs(rapidjson::Value& document,
     type* dst = (type*)mem;						\
     type** dst_ref = (type**)mem_ref;					\
     type* src = (type*)tmp;						\
-    if (!set_va_list_mem(dst, dst_ref, mem_len[0],			\
+    if (!set_va_list_mem(ap, dst, dst_ref, mem_len[0],			\
 			 src, tmp_len / sizeof(type), allow_realloc)) {	\
       return 0;								\
     }									\
@@ -1182,7 +1209,7 @@ int document_set_vargs(rapidjson::Value& document,
     return 0;								\
   if (!pop_va_list_mem(ap, mem_len, mem_len_ref))			\
     return 0;								\
-  if (!set_va_list_mem(mem, mem_ref, mem_len[0], tmp, tmp_len, allow_realloc)) \
+  if (!set_va_list_mem(ap, mem, mem_ref, mem_len[0], tmp, tmp_len, allow_realloc)) \
     return 0
   bool use_generic = false;
   if (schema.HasMember("use_generic") &&
@@ -1248,10 +1275,12 @@ int document_set_vargs(rapidjson::Value& document,
       } else if (type == rapidjson::Document::Get1DArrayString() ||
 		 type == rapidjson::Document::GetNDArrayString()) {
 	bool has_shape = false;
-	if (schema.HasMember("length") && schema["length"].IsInt()) {
-	  has_shape = true;
-	} else if (schema.HasMember("shape") && schema["shape"].IsArray()) {
-	  has_shape = true;
+	if (!ap.for_fortran) {
+	  if (schema.HasMember("length") && schema["length"].IsInt()) {
+	    has_shape = true;
+	  } else if (schema.HasMember("shape") && schema["shape"].IsArray()) {
+	    has_shape = true;
+	  }
 	}
 	const char* tmp = document.GetString();
 	size_t tmp_len = (size_t)(document.GetNBytes()); // StringLength());
@@ -1286,7 +1315,7 @@ int document_set_vargs(rapidjson::Value& document,
 		 it != document.GetShape().End(); it++, i++) {
 	      src_shape[i] = (size_t)(it->GetUint());
 	    }
-	    if (!set_va_list_mem(mem_shape, mem_shape_ref, mem_ndim[0],
+	    if (!set_va_list_mem(ap, mem_shape, mem_shape_ref, mem_ndim[0],
 				 src_shape, src_shape_len, allow_realloc))
 	      return 0;
 	    free(src_shape);
@@ -1314,7 +1343,10 @@ int document_set_vargs(rapidjson::Value& document,
 	else if (subtype == rapidjson::kYggStringSubType) {
 	  // TODO: Encoding?
 	  len = 0; // mem_len[0] * precision;
-	  if (!table_nelements) {
+	  if (ap.for_fortran || !table_nelements) {
+	    // Always assume that precision is in C list when called from
+	    //   fortran API to ensure that elements in the array of strings
+	    //   have a length
 	    size_t* mem_prec = NULL;
 	    size_t** mem_prec_ref = NULL;
 	    if (!pop_va_list_mem(ap, mem_prec, mem_prec_ref))
@@ -1323,7 +1355,7 @@ int document_set_vargs(rapidjson::Value& document,
 	    mem_prec[0] = precision;
 	  }
 	  mem_len = &len;
-	  if (!set_va_list_mem(mem, mem_ref, len, tmp, tmp_len, allow_realloc))
+	  if (!set_va_list_mem(ap, mem, mem_ref, len, tmp, tmp_len, allow_realloc))
 	    return 0;
 	  mem_len_alt[0] = len / precision;
 	} else {
@@ -1547,6 +1579,9 @@ int document_skip_vargs(rapidjson::Value& schema,
       schema_ndim = (int)(schema["shape"].Size());
       has_shape = true;
     }
+    if (pointers && ap.for_fortran) {
+      has_shape = false;
+    }
     if (schema_ndim == 0 && schema.HasMember("ndim") && schema["ndim"].IsInt())
       schema_ndim = schema["ndim"].GetInt();
 #define CASE_NDARRAY_(subtype, precision, type)				\
@@ -1589,7 +1624,7 @@ int document_skip_vargs(rapidjson::Value& schema,
 	}
       }
     }
-    if (!table_nelements && is_string) {
+    if (((pointers && ap.for_fortran) || !table_nelements) && is_string) {
       if (!skip_va_list<size_t>(ap, pointers)) {
 	return 0;
       }
@@ -1614,15 +1649,14 @@ int document_skip_vargs(rapidjson::Value& schema,
   return 1;
 };
 
-int args2document(rapidjson::Document* document, rapidjson::Document* schema,
+int args2document(rapidjson::Document* document, rapidjson::Value* schema,
 		  va_list_t& ap) {
   if (schema == NULL)
     ygglog_throw_error("args2document: schema is NULL");
   if (document == NULL)
     ygglog_throw_error("args2document: document is NULL");
   if (!document_get_vargs(*((rapidjson::Value*)document),
-			  *((rapidjson::Value*)schema),
-			  ap, *document))
+			  *schema, ap, *document))
     return 0;
   return 1;
 };
@@ -1652,46 +1686,6 @@ const char* schema2name(rapidjson::Document* schema) {
     return "";
   return (*schema)["type"].GetString();
 };
-
-// class SetArgsHandler {
-// public:
-//   SetArgsHandler(va_list_t &ap) : ap_(&ap) {}
-  
-// #define CASE_STD_(method, args, src)		\
-//   bool method args {				\
-//     return set_va_list(*ap_, src);		\
-//   }
-//   bool Null() {
-//     void* src = NULL;
-//     return set_va_list(*ap_, src);
-//   }
-//   CASE_STD_(Bool, (bool b), b)
-//   CASE_STD_(Int, (int i), i)
-//   CASE_STD_(Uint, (unsigned u), u)
-//   CASE_STD_(Int64, (int64_t i), i)
-//   CASE_STD_(Uint64, (uint64_t u), u)
-//   CASE_STD_(Double, (double d), d)
-//   bool String(const char* str, SizeType length, bool) {
-//     // TODO: Handle realloc
-//     if (!set_va_list(*ap_, str))
-//       return false;
-//     size_t tmp = (size_t)length;
-//     return set_va_list(*ap_, length);
-//   }
-//   template <typename YggSchemaValueType>
-//   bool YggdrasilString(const Ch* str, SizeType length, bool, YggSchemaValueType& schema) {
-//     // TODO
-//   }
-//   template <typename YggSchemaValueType>
-//   bool YggdrasilStartObject(YggSchemaValueType& schema) {
-//     // TODO
-//   }
-  
-  
-// #undef CASE_STD_
-// private:
-//   va_list_t* ap_;
-// };
 
 ply_t Ply2ply(rapidjson::Ply& x) {
   ply_t out = init_ply();
@@ -1723,30 +1717,39 @@ rapidjson::ObjWavefront obj2ObjWavefront(obj_t x) {
   }
 }
 
-void document_check_type(rapidjson::Document* d, std::string& type) {
+void document_check_type(rapidjson::Value* d, std::string& type) {
   if (d == NULL) {
     ygglog_throw_error("document_check_type: Document is NULL");
   }
 #define CASE_ERROR_(name)						\
   ygglog_throw_error("document_check_type: Document type is '%s', not '%s'", name, type.c_str())
 #define CASE_(method, name)						\
-  if (!d->Is ## method()) {						\
+  if (d->Is ## method()) {						\
     if (type != std::string(#name)) {					\
       CASE_ERROR_(#name);						\
     }									\
   }
+#define CASE_SCALAR_(method, name)					\
+  if (d->Is ## method()) {						\
+    if (type != std::string(#name) && type != "scalar") {		\
+      CASE_ERROR_(#name);						\
+    }									\
+  }
   if (d->IsYggdrasil()) {
-    if (type != std::string(d->GetYggType().GetString())) {
+    if (type != std::string(d->GetYggType().GetString()) &&
+	!((type == "number" && d->IsScalar("double")) ||
+	  (type == "integer" && d->IsScalar("int")) ||
+	  (type == "1darray" && d->Is1DArray()))) {
       CASE_ERROR_(d->GetYggType().GetString());
     }
   }
   else CASE_(Null, null)
   else CASE_(Bool, boolean)
-  else CASE_(String, string)
+  else CASE_SCALAR_(String, string)
   else CASE_(Array, array)
   else CASE_(Object, object)
-  else CASE_(Double, number)
-  else CASE_(Int, integer)
+  else CASE_SCALAR_(Double, number)
+  else CASE_SCALAR_(Int, integer)
   else {
     CASE_ERROR_("unknown");
   }
@@ -1754,14 +1757,22 @@ void document_check_type(rapidjson::Document* d, std::string& type) {
 #undef CASE_
 }
 
-void document_check_yggtype(rapidjson::Document* d, std::string& type,
+void document_check_yggtype(rapidjson::Value* d, std::string& type,
 			    std::string& subtype, size_t precision) {
   document_check_type(d, type);
-  if (type != std::string(d->GetSubType().GetString())) {
-    ygglog_throw_error("document_check_yggtype: Document subtype is '%s', not '%s'", d->GetSubType().GetString(), type.c_str());
-  }
-  if (precision != (size_t)(d->GetPrecision())) {
-    ygglog_throw_error("document_check_yggtype: Document precision is %d, not %d", (int)(d->GetPrecision()), (int)precision);
+  if (d->IsYggdrasil()) {
+    if (subtype != std::string(d->GetSubType().GetString())) {
+      ygglog_throw_error("document_check_yggtype: Document subtype is '%s', not '%s'", d->GetSubType().GetString(), subtype.c_str());
+    }
+    if (precision != (size_t)(d->GetPrecision())) {
+      ygglog_throw_error("document_check_yggtype: Document precision is %d, not %d", (int)(d->GetPrecision()), (int)precision);
+    }
+  } else if (!((d->IsDouble() && subtype == "float" && precision == 8) ||
+	       (d->IsInt() && subtype == "int" && precision == 4) ||
+	       (d->IsInt64() && subtype == "int" && precision == 8) ||
+	       (d->IsUint() && subtype == "uint" && precision == 4) ||
+	       (d->IsUint64() && subtype == "uint" && precision == 8))) {
+    ygglog_throw_error("document_check_yggtype: Document is type %d, not scalar '%s' with precision %d", d->GetType(), subtype.c_str(), precision);
   }
 }
 
@@ -1826,6 +1837,14 @@ extern "C" {
     generic_t out;
     out.prefix = prefix_char;
     out.obj = NULL;
+    out.allocator = NULL;
+    return out;
+  }
+
+  generic_t init_generic_null() {
+    generic_t out = init_generic();
+    rapidjson::Document* x = new rapidjson::Document(rapidjson::kNullType);
+    out.obj = (void*)x;
     return out;
   }
 
@@ -1873,14 +1892,19 @@ extern "C" {
       if (is_generic_init(*x)) {
 	x->prefix = ' ';
 	if (x->obj != NULL) {
-	  try {
-	    rapidjson::Document* obj = (rapidjson::Document*)(x->obj);
-	    delete obj;
+	  if (x->allocator != NULL) {
 	    x->obj = NULL;
-	  } catch (...) {
-	    ygglog_error("destroy_generic: C++ exception thrown in destructor for rapidjson::Document.");
-	    ret = -1;
+	  } else {
+	    try {
+	      rapidjson::Document* obj = (rapidjson::Document*)(x->obj);
+	      delete obj;
+	      x->obj = NULL;
+	    } catch (...) {
+	      ygglog_error("destroy_generic: C++ exception thrown in destructor for rapidjson::Document.");
+	      ret = -1;
+	    }
 	  }
+	  x->allocator = NULL;
 	}
       }
     }
@@ -1896,7 +1920,7 @@ extern "C" {
       if (src.obj == NULL) {
 	ygglog_throw_error("copy_generic: Generic object class is NULL.");
       }
-      out.obj = (void*)copy_document((rapidjson::Document*)(src.obj));
+      out.obj = (void*)copy_document((rapidjson::Value*)(src.obj));
     } catch(...) {
       ygglog_error("copy_generic: C++ exception thrown.");
       destroy_generic(&out);
@@ -1914,73 +1938,6 @@ extern "C" {
     }
   }
 
-  // generic_t get_generic_va(size_t nargs, va_list_t ap) {
-  //   generic_t out;
-  //   if (nargs != 1)
-  //     return out;
-  //   va_list_t ap_copy = copy_va_list(ap);
-  //   if (ap.using_ptrs) {
-  //     CSafe(out = ((generic_t*)get_va_list_ptr_cpp(&ap_copy))[0])
-  //   } else {
-  //     out = va_arg(ap_copy.va, generic_t);
-  //   }
-  //   return out;
-  // }
-
-  // generic_t* get_generic_va_ptr(size_t nargs, va_list_t ap) {
-  //   if (nargs != 1)
-  //     return NULL;
-  //   generic_t *out;
-  //   va_list_t ap_copy = copy_va_list(ap);
-  //   if (ap.using_ptrs) {
-  //     CSafe(out = (generic_t*)get_va_list_ptr_cpp(&ap_copy))
-  //   } else {
-  //     out = va_arg(ap_copy.va, generic_t*);
-  //   }
-  //   if ((out != NULL) || (is_generic_init(*out))) {
-  //     return out;
-  //   } else {
-  //     return NULL;
-  //   }
-  // }
-
-  // generic_t pop_generic_va(size_t* nargs, va_list_t* ap) {
-  //   generic_t out;
-  //   if ((*nargs) < 1) {
-  //     ygglog_error("pop_generic_va: Not enough args (nargs = %lu).", *nargs);
-  //     return out;
-  //   }
-  //   (*nargs)--;
-  //   if (ap->using_ptrs) {
-  //     CSafe(out = ((generic_t*)get_va_list_ptr_cpp(ap))[0])
-  //   } else {
-  //     out = va_arg(ap->va, generic_t);
-  //   }
-  //   return out;
-  // }
-
-  // generic_t* pop_generic_va_ptr(size_t* nargs, va_list_t* ap) {
-  //   if ((*nargs) < 1) {
-  //     ygglog_error("pop_generic_va_ptr: Not enough args (nargs = %lu).", *nargs);
-  //     return NULL;
-  //   }
-  //   (*nargs)--;
-  //   generic_t *out;
-  //   if (ap->using_ptrs) {
-  //     CSafe(out = (generic_t*)get_va_list_ptr_cpp(ap))
-  //   } else {
-  //     out = va_arg(ap->va, generic_t*);
-  //   }
-  //   if (out == NULL) {
-  //     ygglog_error("pop_generic_va_ptr: Object is NULL.");
-  //     return NULL;
-  //   } else if (!(is_generic_init(*out))) {
-  //     ygglog_error("pop_generic_va_ptr: Generic object not intialized.");
-  //     return NULL;
-  //   }
-  //   return out;
-  // }
-
 #define GENERIC_SUCCESS_ 0
 #define GENERIC_ERROR_ -1
 
@@ -1993,7 +1950,7 @@ extern "C" {
       if (x.obj == NULL) {
 	ygglog_throw_error("generic_get_item: Object is NULL.");
       }
-      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Value* x_obj = (rapidjson::Value*)(x.obj);
       std::string typeS(type);
       document_check_type(x_obj, typeS);
       bool requires_freeing = false;
@@ -2013,7 +1970,7 @@ extern "C" {
       if (x.obj == NULL) {
 	ygglog_throw_error("generic_get_item_nbytes: Object is NULL.");
       }
-      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Value* x_obj = (rapidjson::Value*)(x.obj);
       std::string typeS(type);
       document_check_type(x_obj, typeS);
       out = x_obj->GetNBytes();
@@ -2032,7 +1989,7 @@ extern "C" {
       if (x.obj == NULL) {
 	ygglog_throw_error("generic_set_item: Object is NULL.");
       }
-      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Value* x_obj = (rapidjson::Value*)(x.obj);
       std::string typeS(type);
 #define CASE_(name, method)			\
       if (typeS == std::string(#name)) {	\
@@ -2047,14 +2004,15 @@ extern "C" {
       else CASE_(boolean, SetBool(((bool*)value)[0]))
       else CASE_(number, SetDouble(((double*)value)[0]))
       else CASE_(integer, SetInt(((int*)value)[0]))
-      else CASE_(string, SetString(((char*)value), strlen((char*)value), x_obj->GetAllocator())) // Shouuld this be cast to char**?
+      else CASE_(string, SetString(((char*)value), strlen((char*)value),
+				   generic_allocator(x))) // Shouuld this be cast to char**?
       else if (typeS == std::string("any") ||
 	       typeS == std::string("instance") ||
 	       typeS == std::string("schema") ||
 	       typeS == std::string("array") ||
 	       typeS == std::string("object")) {
 	generic_t tmp = init_generic();
-	tmp.obj = copy_document((rapidjson::Document*)value);
+	tmp.obj = copy_document((rapidjson::Value*)value);
       }
       else if (typeS == std::string("class") ||
 	       typeS == std::string("function")) {
@@ -2080,7 +2038,7 @@ extern "C" {
     try {
       std::string typeS("scalar");
       std::string subtypeS(subtype);
-      document_check_yggtype((rapidjson::Document*)(x.obj), typeS, subtypeS, precision);
+      document_check_yggtype((rapidjson::Value*)(x.obj), typeS, subtypeS, precision);
     } catch(...) {
       ygglog_error("generic_get_scalar: C++ exception thrown");
       return NULL;
@@ -2092,14 +2050,14 @@ extern "C" {
     try {
       std::string typeS("1darray");
       std::string subtypeS(subtype);
-      document_check_yggtype((rapidjson::Document*)(x.obj), typeS, subtypeS, precision);
+      document_check_yggtype((rapidjson::Value*)(x.obj), typeS, subtypeS, precision);
       void* new_data = generic_get_item(x, "1darray");
       if (new_data == NULL)
 	return 0;
       size_t nbytes = generic_get_item_nbytes(x, "1darray");
       if (nbytes == 0)
 	return 0;
-      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Value* x_obj = (rapidjson::Value*)(x.obj);
       new_length = (size_t)(x_obj->GetNElements());
       data[0] = (void*)realloc(data[0], nbytes);
       if (data[0] == NULL) {
@@ -2117,14 +2075,14 @@ extern "C" {
     try {
       std::string typeS("ndarray");
       std::string subtypeS(subtype);
-      document_check_yggtype((rapidjson::Document*)(x.obj), typeS, subtypeS, precision);
+      document_check_yggtype((rapidjson::Value*)(x.obj), typeS, subtypeS, precision);
       void* new_data = generic_get_item(x, "ndarray");
       if (new_data == NULL)
 	return 0;
       size_t nbytes = generic_get_item_nbytes(x, "ndarray");
       if (nbytes == 0)
 	return 0;
-      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Value* x_obj = (rapidjson::Value*)(x.obj);
       data[0] = (void*)realloc(data[0], nbytes);
       if (data[0] == NULL) {
 	ygglog_throw_error("generic_get_ndarray: Failed to reallocate array.");
@@ -2157,7 +2115,7 @@ extern "C" {
       if (x.obj == NULL) {
 	ygglog_throw_error("generic_set_scalar: Object is NULL.");
       }
-      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Value* x_obj = (rapidjson::Value*)(x.obj);
       rapidjson::Document schema(rapidjson::kObjectType);
       schema.AddMember(rapidjson::Document::GetTypeString(),
 		       rapidjson::Value("scalar", 6,
@@ -2177,8 +2135,9 @@ extern "C" {
 			 schema.GetAllocator());
       }
       x_obj->SetYggdrasilString((char*)value, precision,
-				x_obj->GetAllocator(),
+				generic_allocator(x),
 				schema);
+      out = GENERIC_SUCCESS_;
     } catch(...) {
       ygglog_error("generic_set_scalar: C++ exception thrown");
       return GENERIC_ERROR_;
@@ -2196,7 +2155,7 @@ extern "C" {
       if (x.obj == NULL) {
 	ygglog_throw_error("generic_set_1darray: Object is NULL.");
       }
-      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Value* x_obj = (rapidjson::Value*)(x.obj);
       rapidjson::Document schema(rapidjson::kObjectType);
       schema.AddMember(rapidjson::Document::GetTypeString(),
 		       rapidjson::Value("1darray", 7,
@@ -2221,8 +2180,9 @@ extern "C" {
       schema.AddMember(rapidjson::Document::GetShapeString(), rjshape,
 		       schema.GetAllocator());
       x_obj->SetYggdrasilString((char*)value, precision,
-				x_obj->GetAllocator(),
+				generic_allocator(x),
 				schema);
+      out = GENERIC_SUCCESS_;
     } catch(...) {
       ygglog_error("generic_set_1darray: C++ exception thrown");
       return GENERIC_ERROR_;
@@ -2240,7 +2200,7 @@ extern "C" {
       if (x.obj == NULL) {
 	ygglog_throw_error("generic_set_ndarray: Object is NULL.");
       }
-      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Value* x_obj = (rapidjson::Value*)(x.obj);
       rapidjson::Document schema(rapidjson::kObjectType);
       schema.AddMember(rapidjson::Document::GetTypeString(),
 		       rapidjson::Value("ndarray", 7,
@@ -2267,8 +2227,9 @@ extern "C" {
       schema.AddMember(rapidjson::Document::GetShapeString(), rjshape,
 		       schema.GetAllocator());
       x_obj->SetYggdrasilString((char*)data, precision,
-				x_obj->GetAllocator(),
+				generic_allocator(x),
 				schema);
+      out = GENERIC_SUCCESS_;
     } catch(...) {
       ygglog_error("generic_set_ndarray: C++ exception thrown");
       return GENERIC_ERROR_;
@@ -2359,7 +2320,7 @@ extern "C" {
 				      const size_t precision,		\
 				      const char *units) {		\
     try {								\
-      generic_t tmp;							\
+      generic_t tmp = init_generic_null();				\
       if (generic_set_scalar(tmp, value, subtype, precision, units) != GENERIC_SUCCESS_) { \
         return GENERIC_ERROR_;						\
       }									\
@@ -2368,7 +2329,7 @@ extern "C" {
       }									\
       destroy_generic(&tmp);						\
     } catch(...) {							\
-      ygglog_error("generic_" #base "_set_scalar: C++ exception thrown");	\
+      ygglog_error("generic_" #base "_set_scalar: C++ exception thrown"); \
       return GENERIC_ERROR_;						\
     }									\
     return GENERIC_SUCCESS_;						\
@@ -2380,7 +2341,7 @@ extern "C" {
 				       const size_t length,		\
 				       const char *units) {		\
     try {								\
-      generic_t tmp;							\
+      generic_t tmp = init_generic_null();				\
       if (generic_set_1darray(tmp, value, subtype, precision, length, units) != GENERIC_SUCCESS_) { \
         return GENERIC_ERROR_;						\
       }									\
@@ -2402,7 +2363,7 @@ extern "C" {
 				       const size_t* shape,		\
 				       const char *units) {		\
     try {								\
-      generic_t tmp;							\
+      generic_t tmp = init_generic_null();				\
       if (generic_set_ndarray(tmp, value, subtype, precision, ndim, shape, units) != GENERIC_SUCCESS_) { \
         return GENERIC_ERROR_;						\
       }									\
@@ -2437,13 +2398,13 @@ extern "C" {
       if (x.obj == NULL) {
 	ygglog_throw_error("add_generic_array: New element is NULL.");
       }
-      rapidjson::Document* arr_obj = (rapidjson::Document*)(arr.obj);
-      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Value* arr_obj = (rapidjson::Value*)(arr.obj);
+      rapidjson::Value* x_obj = (rapidjson::Value*)(x.obj);
       if (!arr_obj->IsArray()) {
 	ygglog_throw_error("add_generic_array: Document is not an array.");
       }
-      rapidjson::Value cpy(*x_obj, arr_obj->GetAllocator(), true);
-      arr_obj->PushBack(cpy, arr_obj->GetAllocator());
+      rapidjson::Value cpy(*x_obj, generic_allocator(arr), true);
+      arr_obj->PushBack(cpy, generic_allocator(arr));
     } catch (...) {
       ygglog_error("add_generic_array: C++ exception thrown.");
       out = GENERIC_ERROR_;
@@ -2466,18 +2427,18 @@ extern "C" {
       if (x.obj == NULL) {
 	ygglog_throw_error("set_generic_array: New element is NULL.");
       }
-      rapidjson::Document* arr_obj = (rapidjson::Document*)(arr.obj);
-      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Value* arr_obj = (rapidjson::Value*)(arr.obj);
+      rapidjson::Value* x_obj = (rapidjson::Value*)(x.obj);
       if (!arr_obj->IsArray()) {
 	ygglog_throw_error("set_generic_array: Document is not an array.");
       }
       if (arr_obj->Size() > i) {
 	(*arr_obj)[i].CopyFrom(*((rapidjson::Value*)x_obj),
-			       arr_obj->GetAllocator(), true);
+			       generic_allocator(arr), true);
       } else {
 	rapidjson::Value cpy(*((rapidjson::Value*)x_obj),
-			     arr_obj->GetAllocator(), true);
-	arr_obj->PushBack(cpy, arr_obj->GetAllocator());
+			     generic_allocator(arr), true);
+	arr_obj->PushBack(cpy, generic_allocator(arr));
       }
     } catch (...) {
       ygglog_error("set_generic_array: C++ exception thrown.");
@@ -2496,7 +2457,7 @@ extern "C" {
       if (arr.obj == NULL) {
 	ygglog_throw_error("get_generic_array: Array is NULL.");
       }
-      rapidjson::Document* arr_obj = (rapidjson::Document*)(arr.obj);
+      rapidjson::Value* arr_obj = (rapidjson::Value*)(arr.obj);
       if (!arr_obj->IsArray()) {
 	ygglog_throw_error("get_generic_array: Document is not an array.");
       }
@@ -2512,6 +2473,7 @@ extern "C" {
 	x[0].obj = (void*)cpy;
       } else {
 	x[0].obj = (void*)(&((*arr_obj)[i]));
+	x[0].allocator = (void*)(&generic_allocator(arr));
       }
     } catch (...) {
       ygglog_error("get_generic_array: C++ exception thrown.");
@@ -2535,19 +2497,19 @@ extern "C" {
       if (x.obj == NULL) {
 	ygglog_throw_error("set_generic_object: New element is NULL.");
       }
-      rapidjson::Document* arr_obj = (rapidjson::Document*)(arr.obj);
-      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Value* arr_obj = (rapidjson::Value*)(arr.obj);
+      rapidjson::Value* x_obj = (rapidjson::Value*)(x.obj);
       if (!arr_obj->IsObject()) {
 	ygglog_throw_error("set_generic_object: Document is not an object.");
       }
       if (arr_obj->HasMember(k)) {
 	(*arr_obj)[k].CopyFrom(*((rapidjson::Value*)x_obj),
-			       arr_obj->GetAllocator(), true);
+			       generic_allocator(arr), true);
       } else {
-	rapidjson::Value key(k, strlen(k), arr_obj->GetAllocator());
+	rapidjson::Value key(k, strlen(k), generic_allocator(arr));
 	rapidjson::Value cpy(*((rapidjson::Value*)x_obj),
-			     arr_obj->GetAllocator(), true);
-	arr_obj->AddMember(key, cpy, arr_obj->GetAllocator());
+			     generic_allocator(arr), true);
+	arr_obj->AddMember(key, cpy, generic_allocator(arr));
       }
     } catch (...) {
       ygglog_error("set_generic_object: C++ exception thrown.");
@@ -2566,7 +2528,7 @@ extern "C" {
       if (arr.obj == NULL) {
 	ygglog_throw_error("get_generic_object: Object is NULL.");
       }
-      rapidjson::Document* arr_obj = (rapidjson::Document*)(arr.obj);
+      rapidjson::Value* arr_obj = (rapidjson::Value*)(arr.obj);
       if (!arr_obj->IsObject()) {
 	ygglog_throw_error("get_generic_object: Document is not an object.");
       }
@@ -2582,6 +2544,7 @@ extern "C" {
 	x[0].obj = (void*)cpy;
       } else {
 	x[0].obj = (void*)(&((*arr_obj)[k]));
+	x[0].allocator = (void*)(&generic_allocator(arr));
       }
     } catch (...) {
       ygglog_error("get_generic_object: C++ exception thrown.");
@@ -2592,9 +2555,7 @@ extern "C" {
 
 #define NESTED_BASE_SET_(base, idx, idxType, name, args, ...)	\
   int generic_ ## base ## _set_ ## name(generic_t x, idxType idx, __VA_ARGS__) { \
-    generic_t item = init_generic();					\
-    rapidjson::Document* item_x = new rapidjson::Document(rapidjson::kNullType); \
-    item.obj = (void*)item_x;						\
+    generic_t item = init_generic_null();				\
     if (generic_set_ ## name (item, UNPACK_MACRO args) != GENERIC_SUCCESS_) { \
       return GENERIC_ERROR_;						\
     }									\
@@ -2658,7 +2619,7 @@ extern "C" {
       ygglog_error("Generic object is NULL");				\
       return out;							\
     }									\
-    rapidjson::Document* d = (rapidjson::Document*)(x.obj);		\
+    rapidjson::Value* d = (rapidjson::Value*)(x.obj);		\
     if (!isMethod) {							\
       display_document(d);						\
       ygglog_error("Generic object is not " #name);			\
@@ -2672,7 +2633,7 @@ extern "C" {
       ygglog_error("Generic object is not initialized");		\
       return GENERIC_ERROR_;						\
     }									\
-    rapidjson::Document* d = (rapidjson::Document*)(x.obj);		\
+    rapidjson::Value* d = (rapidjson::Value*)(x.obj);		\
     setMethod;								\
     return GENERIC_SUCCESS_;						\
   }									\
@@ -2685,7 +2646,7 @@ extern "C" {
       ygglog_error("Generic object is NULL");				\
       return out;							\
     }									\
-    rapidjson::Document* d = (rapidjson::Document*)(x.obj);		\
+    rapidjson::Value* d = (rapidjson::Value*)(x.obj);		\
     if (!isMethod) {							\
       ygglog_error("Generic object is not " #name);			\
       return out;							\
@@ -2698,7 +2659,7 @@ extern "C" {
       ygglog_error("Generic object is not initialized");		\
       return GENERIC_ERROR_;						\
     }									\
-    rapidjson::Document* d = (rapidjson::Document*)(x.obj);		\
+    rapidjson::Value* d = (rapidjson::Value*)(x.obj);		\
     setMethod;								\
     return GENERIC_SUCCESS_;						\
   }									\
@@ -2716,13 +2677,13 @@ extern "C" {
       ygglog_error("Generic object is NULL");				\
       return 0;								\
     }									\
-    rapidjson::Document* d = (rapidjson::Document*)(x.obj);		\
+    rapidjson::Value* d = (rapidjson::Value*)(x.obj);			\
     if (!d->Is1DArray<rjtype>()) {					\
       ygglog_error("Generic object is not " #name);			\
       return 0;								\
     }									\
     rapidjson::SizeType nelements = 0;					\
-    data[0] = (type*)(d->Get1DArray<rjtype>(nelements, d->GetAllocator())); \
+    data[0] = (type*)(d->Get1DArray<rjtype>(nelements, generic_allocator(x))); \
     return (size_t)nelements;						\
   }									\
   size_t generic_get_ndarray_ ## name(generic_t x, type** data, size_t** shape) { \
@@ -2730,19 +2691,19 @@ extern "C" {
       ygglog_error("Generic object is NULL");				\
       return 0;								\
     }									\
-    rapidjson::Document* d = (rapidjson::Document*)(x.obj);		\
+    rapidjson::Value* d = (rapidjson::Value*)(x.obj);		\
     if (!d->IsNDArray<rjtype>()) {					\
       ygglog_error("Generic object is not " #name);			\
       return 0;								\
     }									\
     rapidjson::SizeType ndim = 0;					\
     rapidjson::SizeType* rjshape = NULL;				\
-    data[0] = (type*)(d->GetNDArray<rjtype>(rjshape, ndim, d->GetAllocator())); \
-    shape[0] = (size_t*)(d->GetAllocator().Malloc(ndim * sizeof(size_t))); \
+    data[0] = (type*)(d->GetNDArray<rjtype>(rjshape, ndim, generic_allocator(x))); \
+    shape[0] = (size_t*)(generic_allocator(x).Malloc(ndim * sizeof(size_t))); \
     for (rapidjson::SizeType i = 0; i < ndim; i++) {			\
       (*shape)[i] = rjshape[i];						\
     }									\
-    d->GetAllocator().Free(rjshape);					\
+    generic_allocator(x).Free(rjshape);					\
     return (size_t)ndim;						\
   }									\
   int generic_set_1darray_ ## name(generic_t x, type* value, const size_t length, const char* units) { \
@@ -2750,7 +2711,7 @@ extern "C" {
       ygglog_error("Generic object is not initialized");		\
       return GENERIC_ERROR_;						\
     }									\
-    rapidjson::Document* d = (rapidjson::Document*)(x.obj);		\
+    rapidjson::Value* d = (rapidjson::Value*)(x.obj);		\
     d->Set1DArray((rjtype*)value, (rapidjson::SizeType)length, units);	\
     return GENERIC_SUCCESS_;						\
   }									\
@@ -2759,13 +2720,13 @@ extern "C" {
       ygglog_error("Generic object is not initialized");		\
       return GENERIC_ERROR_;						\
     }									\
-    rapidjson::Document* d = (rapidjson::Document*)(x.obj);		\
-    rapidjson::SizeType* rjshape = (rapidjson::SizeType*)(d->GetAllocator().Malloc(ndim * sizeof(rapidjson::SizeType))); \
+    rapidjson::Value* d = (rapidjson::Value*)(x.obj);		\
+    rapidjson::SizeType* rjshape = (rapidjson::SizeType*)(generic_allocator(x).Malloc(ndim * sizeof(rapidjson::SizeType))); \
     for (size_t i = 0; i < ndim; i++) {					\
       rjshape[i] = (rapidjson::SizeType)(shape[i]);			\
     }									\
     d->SetNDArray((rjtype*)value, rjshape, (rapidjson::SizeType)ndim, units); \
-    d->GetAllocator().Free(rjshape);					\
+    generic_allocator(x).Free(rjshape);					\
     return GENERIC_SUCCESS_;						\
   }									\
   NESTED_GET_(1darray_ ## name, size_t, 0, (data), type** data)		\
@@ -2787,7 +2748,7 @@ extern "C" {
       ygglog_error("Generic object is NULL");				\
       return out;							\
     }									\
-    rapidjson::Document* d = (rapidjson::Document*)(x.obj);		\
+    rapidjson::Value* d = (rapidjson::Value*)(x.obj);		\
     if (!d->IsScalar<std::complex<subtype>>()) {			\
       ygglog_error("Generic object is not " #name);			\
       return out;							\
@@ -2802,7 +2763,7 @@ extern "C" {
       ygglog_error("Generic object is not initialized");		\
       return GENERIC_ERROR_;						\
     }									\
-    rapidjson::Document* d = (rapidjson::Document*)(x.obj);		\
+    rapidjson::Value* d = (rapidjson::Value*)(x.obj);		\
     std::complex<subtype> tmp(value.re, value.im);			\
     d->SetScalar(tmp, units);						\
     return GENERIC_SUCCESS_;						\
@@ -2817,7 +2778,7 @@ extern "C" {
   STD_JSON_(integer, int, Int, 0);
   STD_JSON_BASE_(null, void*, d->IsNull(), out = NULL, d->SetNull(), NULL);
   STD_JSON_(number, double, Double, 0.0);
-  STD_JSON_BASE_(string, const char*, d->IsString(), out = d->GetString(), d->SetString(value, strlen(value), d->GetAllocator()), 0);
+  STD_JSON_BASE_(string, const char*, d->IsString(), out = d->GetString(), d->SetString(value, strlen(value), generic_allocator(x)), 0);
   STD_JSON_NESTED_(object);
   STD_JSON_NESTED_(array);
   STD_JSON_NESTED_(any);
@@ -2878,7 +2839,7 @@ extern "C" {
       if (x.obj == NULL) {
 	ygglog_throw_error("generic_array_get_size: Object is NULL.");
       }
-      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Value* x_obj = (rapidjson::Value*)(x.obj);
       if (!x_obj->IsArray()) {
 	ygglog_throw_error("generic_array_get_size: Document is not an array.");
       }
@@ -2899,7 +2860,7 @@ extern "C" {
       if (x.obj == NULL) {
 	ygglog_throw_error("generic_map_get_size: Object is NULL.");
       }
-      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Value* x_obj = (rapidjson::Value*)(x.obj);
       if (!x_obj->IsObject()) {
 	ygglog_throw_error("generic_map_get_size: Document is not an object.");
       }
@@ -2918,7 +2879,7 @@ extern "C" {
       if (x.obj == NULL) {
 	ygglog_throw_error("generic_map_has_key: Object is NULL.");
       }
-      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Value* x_obj = (rapidjson::Value*)(x.obj);
       if (!x_obj->IsObject()) {
 	ygglog_throw_error("generic_map_has_key: Document is not an object.");
       }
@@ -2939,20 +2900,21 @@ extern "C" {
       if (x.obj == NULL) {
 	ygglog_throw_error("generic_map_get_keys: Object is NULL.");
       }
-      rapidjson::Document* x_obj = (rapidjson::Document*)(x.obj);
+      rapidjson::Value* x_obj = (rapidjson::Value*)(x.obj);
       if (!x_obj->IsObject()) {
 	ygglog_throw_error("generic_map_get_keys: Document is not an object.");
       }
       out = (size_t)(x_obj->MemberCount());
-      keys[0] = (char**)(x_obj->GetAllocator().Malloc(out * sizeof(char*)));
+      keys[0] = (char**)(generic_allocator(x).Malloc(out * sizeof(char*)));
       size_t i = 0;
       for (rapidjson::Document::ConstMemberIterator it = x_obj->MemberBegin();
 	   it != x_obj->MemberEnd(); it++, i++) {
-	keys[0][i] = (char*)(x_obj->GetAllocator().Malloc(sizeof(char) * (it->name.GetStringLength() + 1)));
+	keys[0][i] = (char*)(generic_allocator(x).Malloc(sizeof(char) * (it->name.GetStringLength() + 1)));
 	strcpy(keys[0][i], it->name.GetString());
       }
     } catch (...) {
       ygglog_error("generic_map_get_keys: C++ exception thrown.");
+      out = 0;
     }
     return out;
   }
@@ -2991,7 +2953,7 @@ extern "C" {
       return 0;
     }
     return document_skip_vargs(((rapidjson::Value*)(dtype->schema))[0], *ap,
-			       pointers);
+				 pointers);
   }
   
   int is_empty_dtype(const dtype_t* dtype) {
@@ -3001,7 +2963,7 @@ extern "C" {
     if (dtype->schema == NULL) {
       return 1;
     }
-    rapidjson::Document* s = (rapidjson::Document*)(dtype->schema);
+    rapidjson::Value* s = (rapidjson::Value*)(dtype->schema);
     if (!s->HasMember("type")) {
       return 1;
     }
@@ -3013,7 +2975,7 @@ extern "C" {
       ygglog_error("dtype_name: Empty dtype.");
       return "";
     }
-    rapidjson::Document* s = (rapidjson::Document*)(type_struct->schema);
+    rapidjson::Value* s = (rapidjson::Value*)(type_struct->schema);
     if (!(s->IsObject() && s->HasMember("type"))) {
       ygglog_error("dtype_name: type information not in schema");
       return "";
@@ -3026,7 +2988,7 @@ extern "C" {
       if (strcmp(dtype_name(type_struct), "scalar") != 0) {
 	ygglog_throw_error("dtype_subtype: Only scalars have subtype.");
       }
-      rapidjson::Document* s = (rapidjson::Document*)(type_struct->schema);
+      rapidjson::Value* s = (rapidjson::Value*)(type_struct->schema);
       if (!(s->IsObject() && s->HasMember("subtype"))) {
 	ygglog_throw_error("dtype_subtype: No subtype in schema.");
       }
@@ -3042,7 +3004,7 @@ extern "C" {
       if (strcmp(dtype_name(type_struct), "scalar") != 0) {
 	ygglog_throw_error("dtype_precision: Only scalars have precision.");
       }
-      rapidjson::Document* s = (rapidjson::Document*)(type_struct->schema);
+      rapidjson::Value* s = (rapidjson::Value*)(type_struct->schema);
       if (!(s->IsObject() && s->HasMember("precision"))) {
 	ygglog_throw_error("dtype_precision: No precision in schema.");
       }
@@ -3058,12 +3020,12 @@ extern "C" {
       ygglog_error("set_dtype_name: data type structure is NULL.");
       return -1;
     }
-    rapidjson::Document* s = (rapidjson::Document*)(dtype->schema);
+    rapidjson::Value* s = (rapidjson::Value*)(dtype->schema);
     if (s->IsObject() && s->HasMember("type")) {
-      (*s)["type"].SetString(name, strlen(name), s->GetAllocator());
+      (*s)["type"].SetString(name, strlen(name), dtype_allocator(*dtype));
     } else {
-      rapidjson::Value v(name, strlen(name), s->GetAllocator());
-      s->AddMember(rapidjson::Document::GetTypeString(), v, s->GetAllocator());
+      rapidjson::Value v(name, strlen(name), dtype_allocator(*dtype));
+      s->AddMember(rapidjson::Document::GetTypeString(), v, dtype_allocator(*dtype));
     }
     return 0;
   }
@@ -3504,23 +3466,13 @@ extern "C" {
     }
   }
 
-  // void* dtype_ascii_table(const dtype_t* dtype) {
-  //   try {
-  //     AsciiTableMetaschemaType *table_type = dynamic_cast<AsciiTableMetaschemaType*>(dtype2class(dtype));
-  //     return (void*)(table_type->table());
-  //   } catch (...) {
-  //     ygglog_error("dtype_ascii_table: C++ exception thrown.");
-  //     return NULL;
-  //   }
-  // }
-
   dtype_t* copy_dtype(const dtype_t* dtype) {
     if (dtype == NULL) {
       return NULL;
     }
     dtype_t* out = NULL;
     try {
-      rapidjson::Document* s_old = (rapidjson::Document*)(dtype->schema);
+      rapidjson::Value* s_old = (rapidjson::Value*)(dtype->schema);
       rapidjson::Document* s_new = copy_document(s_old);
       return create_dtype(s_new, false);
     } catch (...) {
@@ -3553,12 +3505,18 @@ extern "C" {
       } else if (is_empty_dtype(dtype1)) {
 	bool use_generic = false;
 	if (dtype1->schema != NULL) {
+	  // TODO: preserve metadata
 	  use_generic = dtype_uses_generic(dtype1);
-	  dtype1->schema = NULL;
-	  rapidjson::Document* s_old = (rapidjson::Document*)(dtype1->schema);
+	  rapidjson::Document* s_old = NULL;
+	  if (dtype1->metadata != NULL)
+	    s_old = (rapidjson::Document*)(dtype1->metadata);
+	  else
+	    s_old = (rapidjson::Document*)(dtype1->schema);
 	  delete s_old;
+	  dtype1->schema = NULL;
+	  dtype1->metadata = NULL;
 	}
-	rapidjson::Document* s_new = copy_document((rapidjson::Document*)(schema2));
+	rapidjson::Document* s_new = copy_document((rapidjson::Value*)(schema2));
 	if (use_generic) {
 	  s_new->AddMember(rapidjson::Value("use_generic", 11, s_new->GetAllocator()).Move(),
 			   rapidjson::Value(true).Move(),
@@ -3596,7 +3554,7 @@ extern "C" {
 	if (gen_arg.obj == NULL) {
 	  ygglog_throw_error("update_dtype_from_generic_ap: Type in generic class is NULL.");
 	}
-	rapidjson::Document* type_class = encode_schema((rapidjson::Document*)(gen_arg.obj));
+	rapidjson::Document* type_class = encode_schema((rapidjson::Value*)(gen_arg.obj));
 	dtype2.schema = (void*)(type_class);
 	if (update_dtype(dtype1, dtype2.schema) < 0) {
 	  return -1;
@@ -3610,14 +3568,14 @@ extern "C" {
     return 0;
   }
   
-  int update_precision_dtype(const dtype_t* dtype,
+  int update_precision_dtype(dtype_t* dtype,
 			     const size_t new_precision) {
-    rapidjson::Document* s = (rapidjson::Document*)(dtype->schema);
+    rapidjson::Value* s = (rapidjson::Value*)(dtype->schema);
     if (s == NULL || !s->IsObject()) {
       ygglog_error("update_precision_dtype: No datatype schema.");
       return -1;
     }
-    typename rapidjson::Document::MemberIterator it = s->FindMember(rapidjson::Document::GetTypeString());
+    typename rapidjson::Value::MemberIterator it = s->FindMember(rapidjson::Document::GetTypeString());
     if (it == s->MemberEnd()) {
       ygglog_error("update_precision_dtype: No 'type' information in schema.");
       return -1;
@@ -3629,7 +3587,7 @@ extern "C" {
     it = s->FindMember(rapidjson::Document::GetPrecisionString());
     if (it == s->MemberEnd()) {
       rapidjson::Value v((uint64_t)new_precision);
-      s->AddMember(rapidjson::Document::GetPrecisionString(), v, s->GetAllocator());
+      s->AddMember(rapidjson::Document::GetPrecisionString(), v, dtype_allocator(*dtype));
     } else {
       it->value.SetUint64((uint64_t)new_precision);
     }
@@ -3694,7 +3652,7 @@ extern "C" {
 		      const int allow_realloc, va_list_t ap) {
     try {
       rapidjson::Document d;
-      if (!args2document(&d, (rapidjson::Document*)(dtype->schema), ap))
+      if (!args2document(&d, (rapidjson::Value*)(dtype->schema), ap))
 	return -1;
       if (!serialize_document(buf, buf_siz, (void*)(&d)))
 	return -1;
@@ -3710,12 +3668,12 @@ extern "C" {
     display_document(s, indent);
   }
 
-  size_t nargs_exp_dtype(const dtype_t *dtype) {
-    rapidjson::Document* s = (rapidjson::Document*)(dtype->schema);
+  size_t nargs_exp_dtype(const dtype_t *dtype, const int for_fortran_recv) {
+    rapidjson::Value* s = (rapidjson::Value*)(dtype->schema);
     if (s == NULL)
       return 0;
     size_t count = 0;
-    if (!schema_count_vargs(*s, count))
+    if (!schema_count_vargs(*s, count, 0, for_fortran_recv))
       return 0;
     return count;
   }

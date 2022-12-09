@@ -1,6 +1,5 @@
 import uuid
 import copy
-import pprint
 import numpy as np
 import warnings
 from yggdrasil import tools, units, serialize, constants, rapidjson, datatypes
@@ -549,12 +548,7 @@ class SerializeBase(tools.YggClass):
                                                     {'type': 'schema'})
             # Check to see if new datatype is compatible with new one
             if old_datatype != self.default_datatype and datatype:
-                if not rapidjson.compare_schemas(self.datatype, old_datatype,
-                                                 dont_raise=True):
-                    raise RuntimeError(
-                        f"Updated datatype is not compatible with the existing one."
-                        f"    New:\n{pprint.pformat(self.datatype)}\n"
-                        f"    Old:\n{pprint.pformat(old_datatype)}\n")
+                rapidjson.compare_schemas(self.datatype, old_datatype)
         # Enfore that strings used with messages are in bytes
         for k in self._attr_conv:
             v = getattr(self, k, None)
