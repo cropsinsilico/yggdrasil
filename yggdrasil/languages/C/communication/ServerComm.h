@@ -49,44 +49,44 @@ requests_t* server_new_requests(const dtype_t* datatype) {
 */
 static inline
 void server_free_requests(requests_t** x) {
-  if (x[0] != NULL) {
-    if (x[0]->comms != NULL) {
-      for (size_t i = 0; i < x[0]->ncomm; i++) {
-	if (x[0]->comms[i] != NULL) {
-	  free_default_comm(x[0]->comms[i]);
-	  free_comm_base(x[0]->comms[i]);
-	  x[0]->comms[i] = NULL;
-	}
-      }
-      free(x[0]->comms);
-      x[0]->comms = NULL;
+    if (x[0] != NULL) {
+        if (x[0]->comms != NULL) {
+            for (size_t i = 0; i < x[0]->ncomm; i++) {
+                if (x[0]->comms[i] != NULL) {
+                    free_default_comm(x[0]->comms[i]);
+                    free_comm_base(x[0]->comms[i]);
+                    x[0]->comms[i] = NULL;
+                }
+            }
+            free(x[0]->comms);
+            x[0]->comms = NULL;
+        }
+        x[0]->ncomm = 0;
+        if (x[0]->response_id != NULL) {
+            for (size_t i = 0; i < x[0]->nreq; i++) {
+                if (x[0]->response_id[i] != NULL) {
+                    free(x[0]->response_id[i]);
+                    x[0]->response_id[i] = NULL;
+                }
+            }
+            free(x[0]->response_id);
+            x[0]->response_id = NULL;
+        }
+        if (x[0]->request_id != NULL) {
+            for (size_t i = 0; i < x[0]->nreq; i++) {
+                if (x[0]->request_id[i] != NULL) {
+                    free(x[0]->request_id[i]);
+                    x[0]->request_id[i] = NULL;
+                }
+            }
+            free(x[0]->request_id);
+            x[0]->request_id = NULL;
+        }
+        if (x[0]->comm_idx != NULL) free(x[0]->comm_idx);
+        x[0]->nreq = 0;
+        free(x[0]);
+        x[0] = NULL;
     }
-    x[0]->ncomm = 0;
-    if (x[0]->response_id != NULL) {
-      for (size_t i = 0; i < x[0]->nreq; i++) {
-	if (x[0]->response_id[i] != NULL) {
-	  free(x[0]->response_id[i]);
-	  x[0]->response_id[i] = NULL;
-	}
-      }
-      free(x[0]->response_id);
-      x[0]->response_id = NULL;
-    }
-    if (x[0]->request_id != NULL) {
-      for (size_t i = 0; i < x[0]->nreq; i++) {
-	if (x[0]->request_id[i] != NULL) {
-	  free(x[0]->request_id[i]);
-	  x[0]->request_id[i] = NULL;
-	}
-      }
-      free(x[0]->request_id);
-      x[0]->request_id = NULL;
-    }
-    if (x[0]->comm_idx != NULL) free(x[0]->comm_idx);
-    x[0]->nreq = 0;
-    free(x[0]);
-    x[0] = NULL;
-  }
 };
 
 /*!
@@ -291,40 +291,40 @@ int new_server_address(comm_t *comm) {
  */
 static inline
 int init_server_comm(comm_t *comm) {
-  int ret = 0;
-  // Called to create temp comm for send/recv
-  if ((strlen(comm->name) == 0) && (strlen(comm->address) > 0)) {
-    comm->type = _default_comm;
-    return init_default_comm(comm);
-  }
-  // Called to initialize/create server comm
-  dtype_t *dtype_in = create_dtype_format(comm->direction, 0, false);
-  if (dtype_in == NULL) {
-    ygglog_error("init_server_comm: Failed to create dtype_in.");
-    return -1;
-  }
-  comm_t *handle;
-  if (strlen(comm->name) == 0) {
-    handle = new_comm_base(comm->address, "recv", _default_comm, dtype_in);
-    sprintf(handle->name, "server_request.%s", comm->address);
-  } else {
-    handle = init_comm_base(comm->name, "recv", _default_comm, dtype_in);
-  }
-  handle->flags = handle->flags | COMM_FLAG_SERVER;
-  ret = init_default_comm(handle);
-  strcpy(comm->address, handle->address);
-  // printf("init_server_comm: name = %s, type=%d, address = %s\n",
-  // 	 handle->name, handle->type, handle->address);
-  strcpy(comm->direction, "recv");
-  comm->handle = (void*)handle;
-  comm->flags = comm->flags | COMM_ALWAYS_SEND_HEADER;
-  requests_t* info = server_new_requests(comm->datatype);
-  if (info == NULL) {
-    ygglog_error("init_server_comm: Failed to malloc info.");
-    return -1;
-  }
-  comm->info = (void*)info;
-  return ret;
+    int ret = 0;
+    // Called to create temp comm for send/recv
+    if ((strlen(comm->name) == 0) && (strlen(comm->address) > 0)) {
+        comm->type = _default_comm;
+        return init_default_comm(comm);
+    }
+    // Called to initialize/create server comm
+    dtype_t *dtype_in = create_dtype_format(comm->direction, 0, false);
+    if (dtype_in == NULL) {
+        ygglog_error("init_server_comm: Failed to create dtype_in.");
+        return -1;
+    }
+    comm_t *handle;
+    if (strlen(comm->name) == 0) {
+        handle = new_comm_base(comm->address, "recv", _default_comm, dtype_in);
+        sprintf(handle->name, "server_request.%s", comm->address);
+    } else {
+        handle = init_comm_base(comm->name, "recv", _default_comm, dtype_in);
+    }
+    handle->flags = handle->flags | COMM_FLAG_SERVER;
+    ret = init_default_comm(handle);
+    strcpy(comm->address, handle->address);
+    // printf("init_server_comm: name = %s, type=%d, address = %s\n",
+    // 	 handle->name, handle->type, handle->address);
+    strcpy(comm->direction, "recv");
+    comm->handle = (void*)handle;
+    comm->flags = comm->flags | COMM_ALWAYS_SEND_HEADER;
+    requests_t* info = server_new_requests(comm->datatype);
+    if (info == NULL) {
+        ygglog_error("init_server_comm: Failed to malloc info.");
+        return -1;
+    }
+    comm->info = (void*)info;
+    return ret;
 };
 
 /*!

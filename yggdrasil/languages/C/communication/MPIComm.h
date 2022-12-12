@@ -129,7 +129,7 @@ int mpi_comm_source_id(const comm_t *x) {
   }
   return 0;
 };
-  
+
   
 /*!
   @brief Get number of messages in the comm.
@@ -170,7 +170,7 @@ int mpi_comm_send(const comm_t *x, const char *data, const size_t len) {
   }
   mpi_registry_t* reg = (mpi_registry_t*)(x->handle);
   int len_int = (int)(len);
-  int address = reg->procs[tag % reg->nproc];
+  int address = reg->procs[reg->tag % reg->nproc];
   if (MPI_Send(&len_int, 1, MPI_INT, address, reg->tag, reg->comm)) {
     ygglog_error("mpi_comm_send(%s): Error sending message size for tag = %d.",
 		 x->name, reg->tag);

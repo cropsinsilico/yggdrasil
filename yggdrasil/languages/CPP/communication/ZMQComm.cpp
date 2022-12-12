@@ -1,8 +1,62 @@
 #include "ZMQComm.hpp"
 
 #ifdef ZMQINSTALLED
+using namespace communicator;
+#include <zmq.hpp>
 #include "datatypes.hpp"
-void* ZMQComm::ygg_s_process_ctx = nullptr;
+
+#ifdef _OPENMP
+zmq::context_t ygg_sock_t::ygg_s_process_ctx = zmq::context_t();
+bool ygg_sock_t::ctx_valid = true;
+
+void ygg_sock_t::shutdown() {
+#pragma omp critical (zmq)
+    {
+        if (ctx_valid) {
+            ygg_s_process_ctx.shutdown();
+            ygg_s_process_ctx.close();
+            ctx_valid = false;
+        }
+    }
+}
+
+zmq::context_t &ygg_sock_t::get_context() {
+    if (!ctx_valid) {
+        ygg_s_process_ctx = zmq::context_t();
+        ctx_valid = true;
+    }
+    return ygg_s_process_ctx;
+}
+
+// TODO??  #pragma omp critical (zmq)
+
+ygg_sock_t::ygg_sock_t(int type) : zmq::socket_t(get_context(), type), tag(0xcafe0004), type(type) {
+#else
+    zmq::context_t &ygg_sock_t::get_context() {
+        zqm::context ctx;
+        return ctx;
+    }
+
+    void ygg_sock_t::shutdown() {
+
+    }
+    ygg_sock_t::ygg_sock_t(int type) : zmq::socket_t(get_context(), type) {
+#endif
+    set(zmq::sockopt::linger, 0);
+    set(zmq::sockopt::immediate, 1);
+}
+
+//#ifdef _OPENMP
+//}
+//#endif
+
+ygg_sock_t::~ygg_sock_t() {
+#ifdef _OPENMP
+    // Recreation of czmq zsock_destroy that is OMP aware
+    tag = 0xDeadBeef;
+#else
+#endif
+}
 
 /*!
   @brief Initialize a ZeroMQ communicator.
@@ -12,44 +66,13 @@ void* ZMQComm::ygg_s_process_ctx = nullptr;
 ZMQComm::ZMQComm(const std::string &name, Address *address, const Direction direction, DataType* datatype) :
         CommBase(address, direction, IPC_COMM, datatype) {
     sock = nullptr;
-
     if (!(flags & COMM_FLAG_VALID))
         return;
-    msgBufSize = 100;
-    if (flags & (COMM_FLAG_SERVER | COMM_ALLOW_MULTIPLE_COMMS)) {
-        handle = create_zsock(ZMQ_DEALER);
+    if (address == nullptr || !address->valid()) {
+        _valid = create_new();
     } else {
-        handle = create_zsock(ZMQ_PAIR);
+        _valid = connect_to_existing();
     }
-    if (handle == nullptr) {
-        ygglog_error("init_zmq_address: Could not initialize empty socket.");
-        flags &= ~COMM_FLAG_VALID;
-        return;
-    }
-    int ret = zsock_connect(handle, "%s", this->address->address().c_str());
-    if (ret == -1) {
-        ygglog_error("init_zmq_address: Could not connect socket to address = %s",
-                     this->address->address().c_str());
-#ifdef _OPENMP
-        ygg_zsock_destroy(&handle);
-#else
-        zsock_destroy(&handle);
-#endif
-        flags &= ~COMM_FLAG_VALID;
-        return;
-    }
-    ygglog_debug("init_zmq_address: Connected socket to %s", this->address->address().c_str());
-    if (this->name.empty()) {
-        if (name.empty()) {
-            this->name = "tempinitZMQ-" + this->address->address();
-        }
-        else {
-            this->name = name;
-        }
-    }
-    // Asign to void pointer
-    init_reply();
-    flags |= COMM_ALWAYS_SEND_HEADER;
 }
 
 void ZMQComm::init_reply() {
@@ -59,102 +82,16 @@ void ZMQComm::init_reply() {
     reply->n_msg = 0;
     reply->n_rep = 0;
 }
-/*!
-  @brief Initialize zeromq.
-  @returns A zeromq context.
-*/
-#ifdef _OPENMP
-void ZMQComm::init() {
-#pragma omp critical (zmq)
-    {
-        if (ZMQComm::ygg_s_process_ctx == nullptr) {
-            if (get_thread_id() == 0) {
-                ygglog_debug("ygg_zsys_init: Creating ZMQ context.");
-                ZMQComm::ygg_s_process_ctx = zsys_init();
-                if (ZMQComm::ygg_s_process_ctx == nullptr) {
-                    ygglog_error("ygg_zsys_init: ZMQ context is nullptr.");
-                }
-            } else {
-                ygglog_error("ygg_zsys_init: Can only initialize the "
-                             "zeromq context on the main thread. Call ygg_init "
-                             "before the threaded portion of your model.");
-            }
-        }
-    }
-}
-#else
-#define ygg_zsys_init zsys_init
-#endif
-
-
-/*!
-  @brief Shutdown zeromq.
- */
-void ZMQComm::shutdown() {
-#ifdef _OPENMP
-#pragma omp critical (zmq)
-    {
-        zsys_shutdown();
-        ZMQComm::ygg_s_process_ctx = nullptr;
-    }
-#else
-    zsys_shutdown();
-#endif
-}
-
-/*!
-  @brief Get a new socket, using the exising context.
-  @param[in] type int Socket type.
-  @returns zsock_t* CZMQ socket wrapper struct.
-*/
-zsock_t* ZMQComm::new_zsock(const int &type) {
-#ifdef _OPENMP
-    // Recreation of czmq zsock_new that is OMP aware
-    auto *self = new ygg_zsock_t();
-    self->tag = 0xcafe0004;
-    self->type = type;
-    ZMQComm::init();
-    if (ZMQComm::ygg_s_process_ctx == nullptr) {
-        ygglog_error("ygg_zsock_new: Context is nullptr.");
-        freen(self);
-    }
-#pragma omp critical (zmq)
-    {
-        self->handle = zmq_socket (ZMQComm::ygg_s_process_ctx, type);
-    }
-    if (!(self->handle)) {
-        ygglog_error("ygg_zsock_new: Error creating new socket.");
-        delete self;
-        return nullptr;
-    }
-    return (zsock_t*)(self);
-#else
-    return zsock_new(type);
-#endif
-}
-
-zsock_t* ZMQComm::create_zsock(const int &type) {
-    zsock_t* out = new_zsock(type);
-    zsock_set_linger(out, 0);
-    zsock_set_immediate(out, 1);
-    return out;
-}
-
 
 /*!
   @brief Add empty reply structure information to comm.
-  @param[in] comm comm_t * Comm to initialize reply for.
-  @returns int 0 if successfull, -1 otherwise.
  */
 
 void ZMQComm::init_zmq_reply() {
     if (reply == nullptr)
         reply = new zmq_reply_t();
     else {
-        reply->sockets.clear();
-        reply->addresses.clear();
-        reply->n_msg = 0;
-        reply->n_rep = 0;
+        reply->clear();
     }
 }
 
@@ -204,16 +141,15 @@ int ZMQComm::do_reply_send() {
     // Poll
     ygglog_debug("do_reply_send(%s): address=%s, begin", name.c_str(),
                  reply->addresses[0]->address().c_str());
+
 #if defined(__cplusplus) && defined(_WIN32)
     // TODO: There seems to be an error in the poller when using it in C++
 #else
-    zpoller_t *poller = zpoller_new(sock, nullptr);
-    if (!(poller)) {
-        ygglog_error("do_reply_send(%s): Could not create poller", name.c_str());
-        return -1;
-    }
-    assert(poller);
+    zmq::poller_t<> poller;
+    poller.add(*sock, zmq::event_flags::pollout);
+    std::vector<zmq::poller_event<>> events(1);
     ygglog_debug("do_reply_send(%s): waiting on poller...", name.c_str());
+    const auto nin = poller.wait_all(events, -1);
     void *p = zpoller_wait(poller, -1);
     //void *p = zpoller_wait(poller, 1000);
     ygglog_debug("do_reply_send(%s): poller returned", name.c_str());
@@ -524,7 +460,7 @@ int ZMQComm::check_reply_recv(std::string &data, const size_t &len) {
   @param[in] comm comm_t * Comm structure initialized with new_comm_base.
   @returns int -1 if the address could not be created.
 */
-int ZMQComm::new_zmq_address() {
+bool ZMQComm::create_new() {
     // TODO: Get protocol/host from input
     std::string protocol = "tcp";
     std::string host = "localhost";
@@ -581,14 +517,15 @@ int ZMQComm::new_zmq_address() {
         handle = create_zsock(ZMQ_PAIR);
     }
     if (handle == nullptr) {
-        ygglog_error("new_zmq_address: Could not initialize empty socket.");
-        return -1;
+        ygglog_error("create_new: Could not initialize empty socket.");
+        return false;
     }
-    int port = zsock_bind(handle, "%s", adr->address().c_str());
+    void* libzmq_socket = handle.handle();
+    int port = zmq_bind(libzmq_socket, adr->address().c_str());
     if (port == -1) {
-        ygglog_error("new_zmq_address: Could not bind socket to address = %s",
+        ygglog_error("create_new: Could not bind socket to address = %s",
                      adr->address().c_str());
-        return -1;
+        return false;
     }
     // Add port to address
 #ifdef _OPENMP
@@ -605,15 +542,14 @@ int ZMQComm::new_zmq_address() {
     if (address == nullptr)
         delete address;
     address = adr;
-    ygglog_debug("new_zmq_address: Bound socket to %s", address->address().c_str());
+    ygglog_debug("create_new: Bound socket to %s", address->address().c_str());
     if (name.empty())
         name = "tempnewZMQ-" + std::to_string(port);
 
     // Init reply
     init_zmq_reply();
-    return 0;
-};
-
+    return true;
+}
 
 
 ZMQComm::~ZMQComm() {
@@ -883,7 +819,44 @@ int ZMQComm::recv(std::string &data) {
     return ret;
 };
 
+bool ZMQComm::connect_to_existing() {
+    msgBufSize = 100;
+    if (flags & (COMM_FLAG_SERVER | COMM_ALLOW_MULTIPLE_COMMS)) {
+        handle = create_zsock(ZMQ_DEALER);
+    } else {
+        handle = create_zsock(ZMQ_PAIR);
+    }
+    if (handle == nullptr) {
+        ygglog_error("init_zmq_address: Could not initialize empty socket.");
+        flags &= ~COMM_FLAG_VALID;
+        return;
+    }
+    int ret = zsock_connect(handle, "%s", this->address->address().c_str());
+    if (ret == -1) {
+        ygglog_error("init_zmq_address: Could not connect socket to address = %s",
+                     this->address->address().c_str());
+#ifdef _OPENMP
+        ygg_zsock_destroy(&handle);
+#else
+        zsock_destroy(&handle);
+#endif
+        flags &= ~COMM_FLAG_VALID;
+        return;
+    }
+    ygglog_debug("init_zmq_address: Connected socket to %s", this->address->address().c_str());
+    if (this->name.empty()) {
+        if (name.empty()) {
+            this->name = "tempinitZMQ-" + this->address->address();
+        }
+        else {
+            this->name = name;
+        }
+    }
+    // Asign to void pointer
+    init_reply();
+    flags |= COMM_ALWAYS_SEND_HEADER;
 
+}
 // Definitions in the case where ZMQ libraries not installed
 #else /*ZMQINSTALLED*/
 

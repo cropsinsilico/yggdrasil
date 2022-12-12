@@ -6,7 +6,7 @@
 #include "../datatypes/datatypes.h"
 
 #ifdef ZMQINSTALLED
-#include <czmq.h>
+#include <zmq.h>
 #endif
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
@@ -28,134 +28,6 @@ static int _zmq_sleeptime = 10000;
 static void *ygg_s_process_ctx = NULL;
 
 
-typedef struct ygg_zsock_t {
-  uint32_t tag;               //  Object tag for runtime detection
-  void *handle;               //  The libzmq socket handle
-  char *endpoint;             //  Last bound endpoint, if any
-  char *cache;                //  Holds last zsock_brecv strings
-  int type;                   //  Socket type
-  size_t cache_size;          //  Current size of cache
-  uint32_t routing_id;        //  Routing ID for server sockets
-} ygg_zsock_t;
-
-
-/*!
-  @brief Initialize zeromq.
-  @returns A zeromq context.
-*/
-#ifdef _OPENMP
-static inline
-void* ygg_zsys_init() {
-#pragma omp critical (zmq)
-  {
-    if (!(ygg_s_process_ctx)) {
-      if (get_thread_id() == 0) {
-	ygglog_debug("ygg_zsys_init: Creating ZMQ context.");
-	ygg_s_process_ctx = zsys_init();
-	if (!(ygg_s_process_ctx)) {
-	  ygglog_error("ygg_zsys_init: ZMQ context is NULL.");
-	}
-      } else {
-	ygglog_error("ygg_zsys_init: Can only initialize the "
-		     "zeromq context on the main thread. Call ygg_init "
-		     "before the threaded portion of your model.");
-      }
-    }
-  }
-  return ygg_s_process_ctx;
-};
-#else
-#define ygg_zsys_init zsys_init
-#endif
-
-
-/*!
-  @brief Shutdown zeromq.
- */
-#ifdef _OPENMP
-static
-void ygg_zsys_shutdown() {
-#pragma omp critical (zmq)
-  {
-    ygg_s_process_ctx = NULL;
-    zsys_shutdown();
-  }    
-};
-#else
-#define ygg_zsys_shutdown zsys_shutdown
-#endif
-
-
-/*!
-  @brief Destroy a socket in thread safe way.
-  @param[in] self_p zsock_t** Pointer to a CZMQ socket wrapper struct.
-*/
-#ifdef _OPENMP
-static inline
-void ygg_zsock_destroy(zsock_t **self_p) {
-  // Recreation of czmq zsock_destroy that is OMP aware
-  /* assert(self_p); */
-  if (*self_p) {
-    ygg_zsock_t *self = (ygg_zsock_t*)(*self_p);
-    /* assert (zsock_is (*self_p)); */
-    self->tag = 0xDeadBeef;
-    zmq_close (self->handle);
-    freen (self->endpoint);
-    freen (self->cache);
-    freen (self);
-    *self_p = NULL;
-  }
-};
-#else
-#define ygg_zsock_destroy zsock_destroy
-#endif
-
-
-/*!
-  @brief Get a new socket, using the exising context.
-  @param[in] type int Socket type.
-  @returns zsock_t* CZMQ socket wrapper struct.
-*/
-#ifdef _OPENMP
-static inline
-zsock_t *
-ygg_zsock_new(int type) {
-  // Recreation of czmq zsock_new that is OMP aware
-  ygg_zsock_t *self = (ygg_zsock_t *) zmalloc (sizeof (ygg_zsock_t));
-  if (!(self)) {
-    ygglog_error("ygg_zsock_new: Error allocating for new socket.");
-    return NULL;
-  }
-  self->tag = 0xcafe0004;
-  self->type = type;
-  void* ctx = ygg_zsys_init();
-  if (!(ctx)) {
-    ygglog_error("ygg_zsock_new: Context is NULL.");
-    freen(self);
-    return NULL;
-  }
-#pragma omp critical (zmq)
-  {
-    self->handle = zmq_socket (ctx, type);
-  }
-  if (!(self->handle)) {
-    ygglog_error("ygg_zsock_new: Error creating new socket.");
-    freen(self);
-    return NULL;
-  }
-  return (zsock_t*)(self);
-};
-#else
-#define ygg_zsock_new zsock_new
-#endif
-
-static inline
-zsock_t* create_zsock(int type) {
-  zsock_t* out = ygg_zsock_new(type);
-  zsock_set_linger(out, 0);
-  zsock_set_immediate(out, 1);
-  return out;
-};
 
 
 /*! 
@@ -646,98 +518,6 @@ int check_reply_recv(const comm_t *comm, char *data, const size_t len) {
 };
 
 /*!
-  @brief Create a new socket.
-  @param[in] comm comm_t * Comm structure initialized with new_comm_base.
-  @returns int -1 if the address could not be created.
-*/
-static inline
-int new_zmq_address(comm_t *comm) {
-  // TODO: Get protocol/host from input
-  char protocol[50] = "tcp";
-  char host[50] = "localhost";
-  char address[100];
-  comm->msgBufSize = 100;
-  if (strcmp(host, "localhost") == 0)
-    strncpy(host, "127.0.0.1", 50);
-  if ((strcmp(protocol, "inproc") == 0) ||
-      (strcmp(protocol, "ipc") == 0)) {
-    // TODO: small chance of reusing same number
-    int key = 0;
-#ifdef _OPENMP
-#pragma omp critical (zmqport)
-  {
-#endif
-    if (!(_zmq_rand_seeded)) {
-      srand(ptr2seed(comm));
-      _zmq_rand_seeded = 1;
-    }
-#ifdef _OPENMP
-  }
-#endif
-    while (key == 0) key = rand();
-    if (strlen(comm->name) == 0)
-      sprintf(comm->name, "tempnewZMQ-%d", key);
-    sprintf(address, "%s://%s", protocol, comm->name);
-  } else {
-#ifdef _OPENMP
-#pragma omp critical (zmqport)
-  {
-#endif
-     if (_last_port_set == 0) {
-      ygglog_debug("model_index = %s", getenv("YGG_MODEL_INDEX"));
-      _last_port = 49152 + 1000 * atoi(getenv("YGG_MODEL_INDEX"));
-      _last_port_set = 1;
-      ygglog_debug("_last_port = %d", _last_port);
-    }
-   sprintf(address, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
-#ifdef _OPENMP
-  }
-#endif
-    /* strcat(address, ":!"); // For random port */
-  }
-  // Bind
-  zsock_t *s = NULL;
-  if (comm->flags & COMM_FLAG_CLIENT_RESPONSE) {
-    s = create_zsock(ZMQ_ROUTER);
-  } else if (comm->flags & COMM_ALLOW_MULTIPLE_COMMS) {
-    s = create_zsock(ZMQ_DEALER);
-  } else {
-    s = create_zsock(ZMQ_PAIR);
-  }
-  if (s == NULL) {
-    ygglog_error("new_zmq_address: Could not initialize empty socket.");
-    return -1;
-  }
-  int port = zsock_bind(s, "%s", address);
-  if (port == -1) {
-    ygglog_error("new_zmq_address: Could not bind socket to address = %s",
-		 address);
-    return -1;
-  }
-  // Add port to address
-#ifdef _OPENMP
-#pragma omp critical (zmqport)
-  {
-#endif
-  if ((strcmp(protocol, "inproc") != 0) &&
-      (strcmp(protocol, "ipc") != 0)) {
-    _last_port = port;
-    sprintf(address, "%s://%s:%d", protocol, host, port);
-  }
-#ifdef _OPENMP
-  }
-#endif
-  strncpy(comm->address, address, COMM_ADDRESS_SIZE);
-  ygglog_debug("new_zmq_address: Bound socket to %s", comm->address);
-  if (strlen(comm->name) == 0)
-    sprintf(comm->name, "tempnewZMQ-%d", port);
-  comm->handle = (void*)s;
-  // Init reply
-  int ret = init_zmq_reply(comm);
-  return ret;
-};
-
-/*!
   @brief Initialize a ZeroMQ communicator.
   @param[in] comm comm_t * Comm structure initialized with init_comm_base.
   @returns int -1 if the comm could not be initialized.
@@ -782,51 +562,51 @@ int init_zmq_comm(comm_t *comm) {
 */
 static inline
 int free_zmq_comm(comm_t *x) {
-    int ret = 0;
-    if (x == NULL)
-        return ret;
-    // Drain input
-    if ((is_recv(x->direction)) && (x->flags & COMM_FLAG_VALID)
-        && (!(x->const_flags[0] & COMM_EOF_RECV))) {
-        if (_ygg_error_flag == 0) {
-            size_t data_len = 100;
-            char *data = (char*)malloc(data_len);
-            comm_head_t head;
-            bool is_eof_flag = false;
-            while (zmq_comm_nmsg(x) > 0) {
-                ret = zmq_comm_recv(x, &data, data_len, 1);
-                if (ret >= 0) {
-                    head = parse_comm_header(data, ret);
-                    if (strncmp(YGG_MSG_EOF, data + head.bodybeg, strlen(YGG_MSG_EOF)) == 0)
-                        is_eof_flag = true;
-                    destroy_header(&head);
-                    if ((head.flags & HEAD_FLAG_VALID) && is_eof_flag) {
-                        x->const_flags[0] = x->const_flags[0] | COMM_EOF_RECV;
-                        break;
-                    }
-                }
-            }
-            free(data);
-        }
-    }
-    // Free reply
-    if (x->reply != NULL) {
-        zmq_reply_t *zrep = (zmq_reply_t*)(x->reply);
-        // Free reply
-        ret = free_zmq_reply(zrep);
-        free(x->reply);
-        x->reply = NULL;
-    }
-    if (x->handle != NULL) {
-        zsock_t *s = (zsock_t*)(x->handle);
-        if (s != NULL) {
-            ygglog_debug("Destroying socket: %s", x->address);
-            ygg_zsock_destroy(&s);
-        }
-        x->handle = NULL;
-    }
-    ygglog_debug("free_zmq_comm: finished");
+  int ret = 0;
+  if (x == NULL)
     return ret;
+  // Drain input
+  if ((is_recv(x->direction)) && (x->flags & COMM_FLAG_VALID)
+      && (!(x->const_flags[0] & COMM_EOF_RECV))) {
+    if (_ygg_error_flag == 0) {
+      size_t data_len = 100;
+      char *data = (char*)malloc(data_len);
+      comm_head_t head;
+      bool is_eof_flag = false;
+      while (zmq_comm_nmsg(x) > 0) {
+        ret = zmq_comm_recv(x, &data, data_len, 1);
+	if (ret >= 0) {
+	  head = parse_comm_header(data, ret);
+	  if (strncmp(YGG_MSG_EOF, data + head.bodybeg, strlen(YGG_MSG_EOF)) == 0)
+	    is_eof_flag = true;
+	  destroy_header(&head);
+	  if ((head.flags & HEAD_FLAG_VALID) && is_eof_flag) {
+	    x->const_flags[0] = x->const_flags[0] | COMM_EOF_RECV;
+	    break;
+	  }
+	}
+      }
+      free(data);
+    }
+  }
+  // Free reply
+  if (x->reply != NULL) {
+    zmq_reply_t *zrep = (zmq_reply_t*)(x->reply);
+    // Free reply
+    ret = free_zmq_reply(zrep);
+    free(x->reply);
+    x->reply = NULL;
+  }
+  if (x->handle != NULL) {
+    zsock_t *s = (zsock_t*)(x->handle);
+    if (s != NULL) {
+      ygglog_debug("Destroying socket: %s", x->address);
+      ygg_zsock_destroy(&s);
+    }
+    x->handle = NULL;
+  }
+  ygglog_debug("free_zmq_comm: finished");
+  return ret;
 };
 
 /*!
@@ -983,88 +763,88 @@ zframe_t * zmq_comm_recv_zframe(const comm_t* x) {
  */
 static inline
 int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
-                  const int allow_realloc) {
-    int ret = -1;
-    ygglog_debug("zmq_comm_recv(%s)", x->name);
-    zsock_t *s = (zsock_t*)(x->handle);
-    if (s == NULL) {
-        ygglog_error("zmq_comm_recv(%s): socket handle is NULL", x->name);
-        return ret;
+		  const int allow_realloc) {
+  int ret = -1;
+  ygglog_debug("zmq_comm_recv(%s)", x->name);
+  zsock_t *s = (zsock_t*)(x->handle);
+  if (s == NULL) {
+    ygglog_error("zmq_comm_recv(%s): socket handle is NULL", x->name);
+    return ret;
+  }
+  zframe_t *out = zmq_comm_recv_zframe(x);
+  if (out == NULL) {
+    ygglog_debug("zmq_comm_recv(%s): did not receive", x->name);
+    return ret;
+  }
+  // Check for server signon and respond
+  while (strncmp((char*)zframe_data(out), "ZMQ_SERVER_SIGNING_ON::", 23) == 0) {
+    ygglog_debug("zmq_comm_recv(%s): Received sign-on", x->name);
+    char* client_address = (char*)zframe_data(out) + 23;
+    // create a DEALER socket and connect to address
+    zsock_t *client_socket = create_zsock(ZMQ_DEALER);
+    if (client_socket == NULL) {
+      ygglog_error("zmq_comm_recv(%s): Could not initalize the client side of the proxy socket to confirm signon", x->name);
+      zframe_destroy(&out);
+      return ret;
     }
-    zframe_t *out = zmq_comm_recv_zframe(x);
-    if (out == NULL) {
-        ygglog_debug("zmq_comm_recv(%s): did not receive", x->name);
-        return ret;
+    zsock_set_sndtimeo(client_socket, _zmq_sleeptime);
+    zsock_set_immediate(client_socket, 1);
+    zsock_set_linger(client_socket, _zmq_sleeptime);
+    if (zsock_connect(client_socket, "%s", client_address) < 0) {
+      ygglog_error("zmq_comm_recv(%s): Error when connecting to the client proxy socket to respond to signon: %s", x->name, client_address);
+      zframe_destroy(&out);
+      ygg_zsock_destroy(&client_socket);
+      return ret;
     }
-    // Check for server signon and respond
-    while (strncmp((char*)zframe_data(out), "ZMQ_SERVER_SIGNING_ON::", 23) == 0) {
-        ygglog_debug("zmq_comm_recv(%s): Received sign-on", x->name);
-        char* client_address = (char*)zframe_data(out) + 23;
-        // create a DEALER socket and connect to address
-        zsock_t *client_socket = create_zsock(ZMQ_DEALER);
-        if (client_socket == NULL) {
-            ygglog_error("zmq_comm_recv(%s): Could not initalize the client side of the proxy socket to confirm signon", x->name);
-            zframe_destroy(&out);
-            return ret;
-        }
-        zsock_set_sndtimeo(client_socket, _zmq_sleeptime);
-        zsock_set_immediate(client_socket, 1);
-        zsock_set_linger(client_socket, _zmq_sleeptime);
-        if (zsock_connect(client_socket, "%s", client_address) < 0) {
-            ygglog_error("zmq_comm_recv(%s): Error when connecting to the client proxy socket to respond to signon: %s", x->name, client_address);
-            zframe_destroy(&out);
-            ygg_zsock_destroy(&client_socket);
-            return ret;
-        }
-        zframe_t *response = zframe_new(zframe_data(out), zframe_size(out));
-        if (response == NULL) {
-            ygglog_error("zmq_comm_recv(%s): Error creating response message frame.", x->name);
-            zframe_destroy(&out);
-            zframe_destroy(&response);
-            ygg_zsock_destroy(&client_socket);
-            return ret;
-        }
-        if (zframe_send(&response, client_socket, 0) < 0) {
-            ygglog_error("zmq_comm_recv(%s): Error sending response message.", x->name);
-            zframe_destroy(&out);
-            zframe_destroy(&response);
-            ygg_zsock_destroy(&client_socket);
-            return ret;
-        }
-        zframe_destroy(&response);
-        ygg_zsock_destroy(&client_socket);
-        zframe_destroy(&out);
-        out = zmq_comm_recv_zframe(x);
-        if (out == NULL) {
-            ygglog_debug("zmq_comm_recv(%s): did not receive", x->name);
-            return ret;
-        }
+    zframe_t *response = zframe_new(zframe_data(out), zframe_size(out));
+    if (response == NULL) {
+      ygglog_error("zmq_comm_recv(%s): Error creating response message frame.", x->name);
+      zframe_destroy(&out);
+      zframe_destroy(&response);
+      ygg_zsock_destroy(&client_socket);
+      return ret;
     }
-    // Realloc and copy data
-    size_t len_recv = zframe_size(out) + 1;
-    // size_t len_recv = (size_t)ret + 1;
-    if (len_recv > len) {
-        if (allow_realloc) {
-            ygglog_debug("zmq_comm_recv(%s): reallocating buffer from %d to %d bytes.",
-                         x->name, len, len_recv);
-            (*data) = (char*)realloc(*data, len_recv);
-            if (*data == NULL) {
-                ygglog_error("zmq_comm_recv(%s): failed to realloc buffer.", x->name);
-                zframe_destroy(&out);
-                return -1;
-            }
-        } else {
-            ygglog_error("zmq_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
-                         x->name, len, len_recv);
-            zframe_destroy(&out);
-            return -((int)(len_recv - 1));
-        }
+    if (zframe_send(&response, client_socket, 0) < 0) {
+      ygglog_error("zmq_comm_recv(%s): Error sending response message.", x->name);
+      zframe_destroy(&out);
+      zframe_destroy(&response);
+      ygg_zsock_destroy(&client_socket);
+      return ret;
     }
-    memcpy(*data, zframe_data(out), len_recv - 1);
+    zframe_destroy(&response);
+    ygg_zsock_destroy(&client_socket);
     zframe_destroy(&out);
-    (*data)[len_recv-1] = '\0';
-    ret = (int)len_recv - 1;
-    /*
+    out = zmq_comm_recv_zframe(x);
+    if (out == NULL) {
+      ygglog_debug("zmq_comm_recv(%s): did not receive", x->name);
+      return ret;
+    }
+  }
+  // Realloc and copy data
+  size_t len_recv = zframe_size(out) + 1;
+  // size_t len_recv = (size_t)ret + 1;
+  if (len_recv > len) {
+    if (allow_realloc) {
+      ygglog_debug("zmq_comm_recv(%s): reallocating buffer from %d to %d bytes.",
+		   x->name, len, len_recv);
+      (*data) = (char*)realloc(*data, len_recv);
+      if (*data == NULL) {
+	ygglog_error("zmq_comm_recv(%s): failed to realloc buffer.", x->name);
+	zframe_destroy(&out);
+	return -1;
+      }
+    } else {
+      ygglog_error("zmq_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
+		   x->name, len, len_recv);
+      zframe_destroy(&out);
+      return -((int)(len_recv - 1));
+    }
+  }
+  memcpy(*data, zframe_data(out), len_recv - 1);
+  zframe_destroy(&out);
+  (*data)[len_recv-1] = '\0';
+  ret = (int)len_recv - 1;
+  /*
   if (strlen(*data) != ret) {
     ygglog_error("zmq_comm_recv(%s): Size of string (%d) doesn't match expected (%d)",
 		 x->name, strlen(*data), ret);
@@ -1072,13 +852,13 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
   }
   */
   // Check reply
-    ret = check_reply_recv(x, *data, ret);
-    if (ret < 0) {
-        ygglog_error("zmq_comm_recv(%s): failed to check for reply socket.", x->name);
-        return ret;
-    }
-    ygglog_debug("zmq_comm_recv(%s): returning %d", x->name, ret);
+  ret = check_reply_recv(x, *data, ret);
+  if (ret < 0) {
+    ygglog_error("zmq_comm_recv(%s): failed to check for reply socket.", x->name);
     return ret;
+  }
+  ygglog_debug("zmq_comm_recv(%s): returning %d", x->name, ret);
+  return ret;
 };
 
 

@@ -679,6 +679,7 @@ public:
     bool operator==(const Address &adr) {
         return this->_address == adr._address;
     }
+    bool valid() const {return _valid;}
 private:
     std::string _address;
     int _key;

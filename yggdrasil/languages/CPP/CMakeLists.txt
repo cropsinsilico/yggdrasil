@@ -35,7 +35,11 @@ find_package(cppzmq)
 #ELSE (libzmq_FOUND)
 #    message("libzmq not found." )
 #ENDIF (libzmq_FOUND)
-IF ()
+IF (cppzmq_FOUND)
+    message("Found cppzmq   ${ZeroMQ_INCLUDE_DIRS}  XX")
+    include_directories("/opt/anaconda3/include")
+    set(YGG_BUILD_FLAGS = "${YGG_BUILD_FLAGS} -DZMQ_BUILD_DRAFT_API")
+ENDIF()
 
 ########################################################################
 # LIBCZMQ dependency
@@ -57,7 +61,7 @@ ENDIF (libczmq_FOUND)
 
 find_package(OpenMP)
 if (OpenMP_FOUND)
-    set(YGG_BUILD_FLAGS "${YGG_BUILD_FLAGS} -D_OPENMP")
+    set(YGG_BUILD_FLAGS "${YGG_BUILD_FLAGS} -D_OPENMP -DMPIINSTALLED")
 endif()
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development NumPy)

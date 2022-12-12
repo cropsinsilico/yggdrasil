@@ -325,22 +325,22 @@ int ipc_comm_send(const comm_t *x, const char *data, const size_t len) {
 static inline
 int ipc_comm_recv(const comm_t *x, char **data, const size_t len,
 		  const int allow_realloc) {
-  ygglog_debug("ipc_comm_recv(%s)", x->name);
-  msgbuf_t t;
-  t.mtype = 1;
-  int ret = -1;
-  int len_recv = -1;
-  while (1) {
-    ret = msgrcv(((int*)(x->handle))[0], &t, YGG_MSG_MAX, 0, IPC_NOWAIT);
-    if (ret == -1 && errno == ENOMSG) {
-      ygglog_debug("ipc_comm_recv(%s): no input, sleep", x->name);
-      usleep(YGG_SLEEP_TIME);
-    } else {
-      ygglog_debug("ipc_comm_recv(%s): received input: %d bytes, ret=%d",
-		   x->name, strlen(t.data), ret);
-      break;
+    ygglog_debug("ipc_comm_recv(%s)", x->name);
+    msgbuf_t t;
+    t.mtype = 1;
+    int ret = -1;
+    int len_recv = -1;
+    while (1) {
+        ret = msgrcv(((int*)(x->handle))[0], &t, YGG_MSG_MAX, 0, IPC_NOWAIT);
+        if (ret == -1 && errno == ENOMSG) {
+            ygglog_debug("ipc_comm_recv(%s): no input, sleep", x->name);
+            usleep(YGG_SLEEP_TIME);
+        } else {
+            ygglog_debug("ipc_comm_recv(%s): received input: %d bytes, ret=%d",
+                         x->name, strlen(t.data), ret);
+            break;
+        }
     }
-  }
   if (ret <= 0) {
     ygglog_debug("ipc_comm_recv: msgrecv(%d, %p, %d, 0, IPC_NOWAIT): %s",
 		 (int*)(x->handle), &t, (int)YGG_MSG_MAX, strerror(errno));

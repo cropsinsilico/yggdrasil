@@ -1,5 +1,7 @@
 #include "IPCComm.hpp"
 
+using namespace communicator;
+
 unsigned IPCComm::_yggChannelsUsed = 0;
 bool IPCComm::_ipc_rand_seeded = false;
 

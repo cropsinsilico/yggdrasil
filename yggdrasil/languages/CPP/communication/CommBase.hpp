@@ -22,39 +22,54 @@
 
 /*! @brief Set if the comm is the receiving comm for a client/server request connection */
 #define COMM_FLAG_RPC     COMM_FLAG_SERVER | COMM_FLAG_CLIENT
-
-
-/*! @brief Communicator types. */
-enum comm_enum { NULL_COMM, IPC_COMM, ZMQ_COMM,
-    SERVER_COMM, CLIENT_COMM,
-    ASCII_FILE_COMM, ASCII_TABLE_COMM, ASCII_TABLE_ARRAY_COMM };
-enum Direction {SEND, NONE, RECV};
-typedef enum comm_enum comm_type;
 #define COMM_NAME_SIZE 100
 #define COMM_DIR_SIZE 100
 
+namespace communicator {
+
+/*! @brief Communicator types. */
+enum comm_enum {
+    NULL_COMM, IPC_COMM, ZMQ_COMM,
+    SERVER_COMM, CLIENT_COMM,
+    ASCII_FILE_COMM, ASCII_TABLE_COMM, ASCII_TABLE_ARRAY_COMM
+};
+enum Direction {
+    SEND, NONE, RECV
+};
+typedef enum comm_enum comm_type;
+
 /*!
-  @brief Communication structure.
- */
-template <typename H, typename R>
+      @brief Communication structure.
+     */
+template<typename H, typename R>
 class CommBase {
 public:
     CommBase(Address *address, const Direction direction,
-             const comm_type &t, DataType* datatype);
+             const comm_type &t, DataType *datatype);
+
     explicit CommBase(const std::string &name, const Direction direction = NONE,
-                      const comm_type &t = NULL_COMM, DataType* datatype = nullptr);
+                      const comm_type &t = NULL_COMM, DataType *datatype = nullptr);
+
     ~CommBase();
+
     //void display_other(CommBase* other);
     //void empty();
-    virtual int send(const std::string &data);
-    virtual int send_nolimit(const std::string &data);
-    virtual int recv(std::string &data);
-    virtual void open();
-    virtual void close();
-    virtual int comm_nmsg();
+    virtual int send(const std::string &data) = 0;
 
+    virtual int send_nolimit(const std::string &data) = 0;
+
+    virtual int recv(std::string &data) = 0;
+
+    //virtual void open();
+
+    //virtual void close();
+
+    virtual int comm_nmsg() = 0;
+
+    bool valid() const {return _valid;}
 protected:
     int check(const std::string &data) const;
+
     comm_type type; //!< Comm type.
     //void *other; //!< Pointer to additional information for the comm.
     std::string name; //!< Comm name.
@@ -71,23 +86,24 @@ protected:
     time_t *last_send; //!< Clock output at time of last send.
     R *reply; //!< Reply information.
     int thread_id; //!< ID for the thread that created the comm.
+    bool _valid;
 };
 
 /*inline
-CommBase<void>* new_comm_base(const Address &address, const Direction direction, const comm_type &t,
-                        DataType* datatype) {
-    return new CommBase<void>("", address, direction, t, datatype);
-}
+    CommBase<void>* new_comm_base(const Address &address, const Direction direction, const comm_type &t,
+                            DataType* datatype) {
+        return new CommBase<void>("", address, direction, t, datatype);
+    }
 
-inline
-CommBase<void>* init_comm_base(const std::string &name, const Direction direction, const comm_type &t,
-                         DataType* datatype) {
-    return new CommBase<void>(name, Address(), direction, t, datatype);
-}*/
+    inline
+    CommBase<void>* init_comm_base(const std::string &name, const Direction direction, const comm_type &t,
+                             DataType* datatype) {
+        return new CommBase<void>(name, Address(), direction, t, datatype);
+    }*/
 
-template <typename H, typename R>
-CommBase<H, R>::CommBase(Address *address, const Direction direction, const comm_type &t, DataType* datatype) :
-        address(address),type(t) {
+template<typename H, typename R>
+CommBase<H, R>::CommBase(Address *address, const Direction direction, const comm_type &t, DataType *datatype) :
+        address(address), type(t), _valid(false) {
     type = NULL_COMM;
     //other = NULL_ptr;
     name = "";
@@ -95,6 +111,7 @@ CommBase<H, R>::CommBase(Address *address, const Direction direction, const comm
     flags |= COMM_FLAG_VALID;
     if (direction == NONE) {
         flags &= ~COMM_FLAG_VALID;
+        this->direction = NONE;
     } else {
         this->direction = direction;
     }
@@ -117,9 +134,10 @@ CommBase<H, R>::CommBase(Address *address, const Direction direction, const comm
     reply = nullptr;
 }
 
-template <typename H, typename R>
-CommBase<H, R>::CommBase(const std::string &name, const Direction direction, const comm_type &t, DataType* datatype) :
-        CommBase(new Address(), direction, t, datatype){
+template<typename H, typename R>
+CommBase<H, R>::CommBase(const std::string &name, const Direction direction, const comm_type &t,
+                         DataType *datatype) :
+        CommBase(new Address(), direction, t, datatype) {
     std::string full_name;
     if (!name.empty()) {
         full_name = name;
@@ -132,8 +150,8 @@ CommBase<H, R>::CommBase(const std::string &name, const Direction direction, con
                 full_name += "_IN";
             }
         }
-        char* model_name = getenv("YGG_MODEL_NAME");
-        char* addr = std::getenv(full_name.c_str());
+        char *model_name = getenv("YGG_MODEL_NAME");
+        char *addr = std::getenv(full_name.c_str());
         if (addr == nullptr && model_name != nullptr) {
             std::string prefix(model_name);
             prefix += ":";
@@ -172,7 +190,7 @@ CommBase<H, R>::CommBase(const std::string &name, const Direction direction, con
     ygglog_debug("init_comm_base(%s): Done", name.c_str());
 }
 
-template <typename H, typename R>
+template<typename H, typename R>
 CommBase<H, R>::~CommBase() {
     ygglog_debug("~CommBase: Started");
     if (last_send != nullptr)
@@ -187,18 +205,13 @@ CommBase<H, R>::~CommBase() {
 }
 
 /*void CommBase::display_other(CommBase* x) {
-    if (x->other != NULL_ptr) {
-        comm_t* other = (comm_t*)(x->other);
-        printf("type(%s) = %d\n", other->name, (int)(other->type));
-    }
-}*/
+        if (x->other != NULL_ptr) {
+            comm_t* other = (comm_t*)(x->other);
+            printf("type(%s) = %d\n", other->name, (int)(other->type));
+        }
+    }*/
 
-template <typename H, typename R>
-int CommBase<H, R>::send(const std::string &data) {
-    return check(data);
-}
-
-template <typename H, typename R>
+template<typename H, typename R>
 int CommBase<H, R>::check(const std::string &data) const {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
@@ -211,6 +224,8 @@ int CommBase<H, R>::check(const std::string &data) const {
         return -1;
     }
     return 0;
+}
+
 }
 
 #endif //YGGDRASIL_COMMBASE_HPP

@@ -1,5 +1,4 @@
-#ifndef YGGINTERFACEP_IPCCOMM_HPP
-#define YGGINTERFACEP_IPCCOMM_HPP
+#pragma once
 
 //#define IPCINSTALLED
 
@@ -19,6 +18,9 @@
 
 /*! @brief Maximum number of channels. */
 #define _yggTrackChannels 256
+
+namespace communicator {
+
 /*!
   @brief Message buffer structure.
 */
@@ -28,19 +30,29 @@ typedef struct msgbuf_t {
 } msgbuf_t;
 
 
-class IPCComm : public CommBase<int,void> {
+class IPCComm : public communicator::CommBase<int, void> {
 public:
     explicit IPCComm(const std::string &name = "", Address *address = new Address(), const Direction direction = NONE,
-                     DataType* datatype = nullptr);
+                     DataType *datatype = nullptr);
+
     ~IPCComm();
+
     int check_channels();
+
     void add_channel();
+
     int remove_comm(bool close_comm);
+
     int new_address();
+
     int comm_nmsg() override;
+
     int send(const std::string &data) override;
+
     int recv(std::string &data) override;
+
     int send_nolimit(const std::string &data) override;
+
 private:
     /*! @brief Names of channels in use. */
     static int _yggChannelNames[_yggTrackChannels];
@@ -49,4 +61,5 @@ private:
     static bool _ipc_rand_seeded;
 };
 
-#endif //YGGINTERFACEP_IPCCOMM_HPP
+}
+

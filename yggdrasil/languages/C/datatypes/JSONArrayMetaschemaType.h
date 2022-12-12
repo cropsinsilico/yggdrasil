@@ -445,50 +445,50 @@ public:
     @returns size_t Number of arguments in ap consumed.
    */
   size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
-    size_t i, iout;
-    size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
-    if (use_generic())
-      return out;
-    if ((all_arrays()) && (*nargs >= (nitems() + 1))) {
-      size_t nrows;
-      if (ap.using_ptrs) {
-	nrows = ((size_t*)get_va_list_ptr_cpp(&ap))[0];
-      } else {
-	nrows = va_arg(ap.va, size_t);
+      size_t i, iout;
+      size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
+      if (use_generic())
+          return out;
+      if ((all_arrays()) && (*nargs >= (nitems() + 1))) {
+          size_t nrows;
+          if (ap.using_ptrs) {
+              nrows = ((size_t*)get_va_list_ptr_cpp(&ap))[0];
+          } else {
+              nrows = va_arg(ap.va, size_t);
+          }
+          skip_before_.push_back(sizeof(size_t));
+          out++;
+          for (i = 0; i < items_.size(); i++) {
+              if (items_[i]->type_code() != T_1DARRAY) {
+                  ygglog_throw_error("JSONArrayMetaschemaType::update_from_serialization_args: "
+                                     "Item %lu is of type %s, but the all_arrays"
+                                     "parameter is set, indicating it should "
+                                     "be \"1darray\".", i, items_[i]->type());
+              }
+              items_[i]->set_length(nrows, true);
+              items_[i]->set_variable_length(false);
+          }
       }
-      skip_before_.push_back(sizeof(size_t));
-      out++;
+      size_t new_nargs;
       for (i = 0; i < items_.size(); i++) {
-	if (items_[i]->type_code() != T_1DARRAY) {
-	  ygglog_throw_error("JSONArrayMetaschemaType::update_from_serialization_args: "
-			     "Item %lu is of type %s, but the all_arrays"
-			     "parameter is set, indicating it should "
-			     "be \"1darray\".", i, items_[i]->type());
-	}
-	items_[i]->set_length(nrows, true);
-	items_[i]->set_variable_length(false);
+          new_nargs = nargs[0] - out;
+          iout = items_[i]->update_from_serialization_args(&new_nargs, ap);
+          if (iout == 0) {
+              iout += items_[i]->nargs_exp();
+              // Can't use void* because serialization uses non-pointer arguments
+              std::vector<size_t> iva_skip = items_[i]->nbytes_va();
+              if (iva_skip.size() != iout) {
+                  ygglog_throw_error("JSONArrayMetaschemaType::update_from_serialization_args: nargs = %lu, size(skip) = %lu",
+                                     iout, iva_skip.size());
+              }
+              size_t iskip;
+              for (iskip = 0; iskip < iva_skip.size(); iskip++) {
+                  va_list_t_skip(&ap, iva_skip[iskip]);
+              }
+          }
+          out = out + iout;
       }
-    }
-    size_t new_nargs;
-    for (i = 0; i < items_.size(); i++) {
-      new_nargs = nargs[0] - out;
-      iout = items_[i]->update_from_serialization_args(&new_nargs, ap);
-      if (iout == 0) {
-	iout += items_[i]->nargs_exp();
-	// Can't use void* because serialization uses non-pointer arguments
-	std::vector<size_t> iva_skip = items_[i]->nbytes_va();
-	if (iva_skip.size() != iout) {
-	  ygglog_throw_error("JSONArrayMetaschemaType::update_from_serialization_args: nargs = %lu, size(skip) = %lu",
-			     iout, iva_skip.size());
-	}
-	size_t iskip;
-	for (iskip = 0; iskip < iva_skip.size(); iskip++) {
-	  va_list_t_skip(&ap, iva_skip[iskip]);
-	}
-      }
-      out = out + iout;
-    }
-    return out;
+      return out;
   }
   /*!
     @brief Update the type object with info from provided variable arguments for deserialization.
