@@ -696,7 +696,10 @@ def itemize_deps(method, for_development=False,
             numpy_ver = new_numpy_ver
         except (ImportError, ModuleNotFoundError, DependencyNotFound):
             pass
-        out['conda'].insert(0, numpy_ver.replace('==', '>='))
+        if fallback_to_conda:
+            out['conda'].insert(0, numpy_ver)  # .replace('==', '>='))
+        else:
+            out['pip'].insert(0, numpy_ver)
         out['skip'].append('libroadrunner')
     if install_opts['astropy'] and fallback_to_conda and _on_travis:
         out['conda'].insert(0, 'astropy>=4.1')
@@ -973,10 +976,6 @@ def install_pkg(method, python=None, without_build=False,
     else:
         method_base = method
         for_development = False
-    if not without_build:
-        cmds += build_pkg(method_base, python=python,
-                          return_commands=True, verbose=verbose)
-        cmds += SUMMARY_CMDS
     if not without_deps:
         cmds += install_deps(method_base, return_commands=True, verbose=verbose,
                              for_development=for_development,
@@ -988,6 +987,11 @@ def install_pkg(method, python=None, without_build=False,
                              conda_env=conda_env, always_yes=always_yes,
                              only_python=only_python,
                              fallback_to_conda=fallback_to_conda)
+        cmds += SUMMARY_CMDS
+    # TODO: Verify that build can be called after
+    if not without_build:
+        cmds += build_pkg(method_base, python=python,
+                          return_commands=True, verbose=verbose)
         cmds += SUMMARY_CMDS
     # Install yggdrasil
     if method == 'conda':
