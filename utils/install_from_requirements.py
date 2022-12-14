@@ -214,7 +214,7 @@ def install_from_requirements(method, fname_in, conda_env=None,
                               verbose=False, verbose_prune=False,
                               additional_packages=[], skip_packages=[],
                               return_cmds=False, append_cmds=None,
-                              temp_file=None):
+                              temp_file=None, use_mamba=False):
     r"""Install packages via pip or conda from one or more pip-style
     requirements file(s).
 
@@ -251,8 +251,12 @@ def install_from_requirements(method, fname_in, conda_env=None,
             is returned. This keyword will be ignored if return_cmds is True.
         temp_file (str, optional): File where pruned requirements list should
             be stored. Defaults to None and one will be created.
+        use_mamba (bool, optional): If True, use mamba in place of conda.
 
     """
+    if method == 'mamba':
+        use_mamba = True
+        method = 'conda'
     if verbose:
         verbose_prune = True
     return_temp = (return_cmds or isinstance(append_cmds, list))
@@ -260,7 +264,7 @@ def install_from_requirements(method, fname_in, conda_env=None,
     if python_cmd is None:
         python_cmd = PYTHON_CMD
     if conda_env:
-        python_cmd = locate_conda_exe(conda_env, 'python')
+        python_cmd = locate_conda_exe(conda_env, 'python', use_mamba=use_mamba)
     if method == 'pip':
         excl_method = 'conda'
     elif method == 'conda':
@@ -278,8 +282,11 @@ def install_from_requirements(method, fname_in, conda_env=None,
                       skip_packages=skip_packages)
     try:
         if method == 'conda':
-            assert(CONDA_CMD)
-            args = [CONDA_CMD, 'install', '-y']
+            if use_mamba:
+                args = ['mamba', 'install', '-y']
+            else:
+                assert(CONDA_CMD)
+                args = [CONDA_CMD, 'install', '-y']
             if verbose:
                 args.append('-vvv')
             else:
@@ -320,7 +327,7 @@ def install_from_requirements(method, fname_in, conda_env=None,
         if isinstance(append_cmds, list):
             return temp_file
         if os.path.isfile(temp_file):
-            print(call_conda_command(args))
+            print(call_conda_command(args, use_mamba=use_mamba))
     except BaseException:
         if os.path.isfile(temp_file):
             with open(temp_file, 'r') as fd:
@@ -336,14 +343,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         "Install dependencies via pip or conda from one or more "
         "pip-style requirements files.")
-    parser.add_argument('method', choices=['conda', 'pip'],
+    parser.add_argument('method', choices=['conda', 'mamba', 'pip'],
                         help=("Method that should be used to install the "
                               "dependencies."))
     parser.add_argument('files', nargs='+',
                         help='One or more pip-style requirements files.')
     parser.add_argument('--conda-env', default=None,
-                        help=('Conda environment that requirements should be '
-                              'installed into.'))
+                        help=('Conda/Mamba environment that requirements '
+                              'should be installed into.'))
     parser.add_argument('--user', action='store_true',
                         help=('Install in user mode.'))
     parser.add_argument('--unique-to-method', action='store_true',
@@ -353,6 +360,8 @@ if __name__ == "__main__":
                         help="Turn up verbosity of output.")
     parser.add_argument('--additional-packages', nargs='+',
                         help="Additional packages that should be installed.")
+    parser.add_argument('--use-mamba', action='store_true',
+                        help="Use mamba in place of conda")
     for k, v in install_opts.items():
         if v:
             parser.add_argument(
@@ -373,4 +382,5 @@ if __name__ == "__main__":
     install_from_requirements(args.method, args.files, conda_env=args.conda_env,
                               user=args.user, unique_to_method=args.unique_to_method,
                               install_opts=install_opts, verbose=args.verbose,
-                              additional_packages=args.additional_packages)
+                              additional_packages=args.additional_packages,
+                              use_mamba=args.use_mamba)

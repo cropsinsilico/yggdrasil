@@ -68,7 +68,7 @@ jobs:
       with:
         submodules: true
     - name: Set C installation based on matrix value
-      if: matrix.install-c != true && matrix.install-method != 'conda'
+      if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method != 'mamba'
       run: echo "INSTALLC=0" >> $GITHUB_ENV
       shell: bash -l {0}
     - name: Set MPI installation based on matrix value
@@ -157,11 +157,11 @@ jobs:
     # ========================================================
 
     # ========================================================
-    # Conda specific installation steps
+    # Conda/Mamba specific installation steps
     # ========================================================
     # - name: (CONDA) Cache conda
     #   uses: actions/cache@v1
-    #   if: matrix.install-method == 'conda'
+    #   if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
     #   env:
     #     # Increase this value to reset cache if file not changed
     #     CACHE_NUMBER: 0
@@ -172,7 +172,7 @@ jobs:
     #       hashFiles('recipe/meta.yaml') }}
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
-      if: matrix.install-method == 'conda' && runner.os == 'Windows'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'Windows'
       with:
         channels: conda-forge
         use-only-tar-bz2: true
@@ -185,7 +185,7 @@ jobs:
     # conda?
     - name: (WINDOWS,CONDA) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      if: matrix.install-method == 'conda' && runner.os == 'Windows' && env.INSTALLC == 1
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'Windows' && env.INSTALLC == 1
       with:
         toolset: 14.0
     # This step and the next allows conda to be called before the
@@ -193,33 +193,33 @@ jobs:
     # test environment so that the package can be built in the base
     # environment.
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: matrix.install-method == 'conda' && runner.os != 'Windows'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba) && runner.os != 'Windows'
       run: |
         echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
         echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
       shell: bash -l {0}
     - name: (MACOS,CONDA) Change ownership of conda on MacOS
-      if: matrix.install-method == 'conda' && runner.os == 'macOS'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'macOS'
       run: sudo chown -R $(whoami) $CONDA
       shell: bash
     - name: (CONDA) Build package in base environment
       id: conda_build
       continue-on-error: true
-      if: matrix.install-method == 'conda'
+      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }}
       shell: bash --noprofile --norc -eo pipefail {0}
     - name: (CONDA) Build package in base environment (re-attempt)
-      if: ${{ steps.conda_build.outcome == 'failure' && matrix.install-method == 'conda'}}
+      if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')}}
       run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }}
       shell: bash --noprofile --norc -eo pipefail {0}
     - name: (UNIX,CONDA) Remove miniconda bin to path
-      if: matrix.install-method == 'conda' && runner.os != 'Windows'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os != 'Windows'
       run: |
         echo "PATH=$NON_CONDA_PATH" >> $GITHUB_ENV
       shell: bash -l {0}
     - name: (CONDA) Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
-      if: matrix.install-method == 'conda'
+      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       with:
         # TODO: Move autoupdate into script?
         auto-update-conda: true
@@ -228,21 +228,21 @@ jobs:
         use-only-tar-bz2: true
         channel-priority: strict
     - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda llvm (7)
-      if: runner.os == 'macOS' && matrix.install-method == 'conda'
+      if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       run: ./utils/setup_old_mac_sdk.sh
     - name: (CONDA) Install dependencies & package from existing build
       id: conda_install
       continue-on-error: true
-      if: matrix.install-method == 'conda'
+      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (CONDA) Install dependencies & package from existing build (re-attempt)
-      if: ${{ steps.conda_install.outcome == 'failure' && matrix.install-method == 'conda'}}
+      if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (MACOS,CONDA) Set allow_multiple_omp config
-      if: matrix.install-method == 'conda' && runner.os == 'macOS'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'macOS'
       run: yggconfig --allow-multiple-omp
     # ========================================================
-    
+
     - name: Verify installation
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
@@ -301,7 +301,7 @@ jobs:
         # ls .*
         coverage combine --append
     - name: (CONDA) Generate XML version of coverage report
-      if: matrix.install-method == 'conda'
+      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: |
         # ls .*
         coverage xml

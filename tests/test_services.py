@@ -26,7 +26,8 @@ def test_call_integration_remote():
     yamls.remove(test_yml)
     yamls.remove(copy_yml)
     yamls.append(remote_yml)
-    address = 'https://model-service-demo.herokuapp.com/'
+    # address = 'https://model-service-demo.herokuapp.com/'
+    address = "https://model-service-demo.fly.dev/"
     service_type = 'flask'
     cli = IntegrationServiceManager(service_type=service_type,
                                     for_request=True,
