@@ -39,6 +39,7 @@ build:
 requirements:
   host:
     - czmq
+    - lz4
     - pip
     - python
     - r-base
@@ -56,14 +57,16 @@ requirements:
     - chevron
     - cmake  # [not win]
     - czmq
+    - lz4
     - flaky
     - flask
     - git
+    - curl==7.85.0  # [osx]
     - GitPython <=3.1.20  # [py==36]
     - GitPython  # [py>36]
     - jsonschema==3.2.0
     - matplotlib-base
-    - numpy >=1.13.0
+    - numpy
     - pandas
     - pyperf
     - pint  # [py2k]

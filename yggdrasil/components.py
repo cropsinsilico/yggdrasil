@@ -8,7 +8,6 @@ import contextlib
 import weakref
 from collections import OrderedDict
 from yggdrasil.doctools import docs2args
-from yggdrasil import rapidjson
 
 
 _registry = {}
@@ -575,6 +574,7 @@ class ComponentBase(ComponentBaseUnregistered):
                     if k in s['properties']:
                         del s['properties'][k]
                 # Validate and normalize
+                from yggdrasil import rapidjson
                 rapidjson.validate(kwargs, s)
                 # TODO: Normalization performance needs improvement
                 # import pprint

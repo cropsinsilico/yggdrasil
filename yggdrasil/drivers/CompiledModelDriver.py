@@ -764,7 +764,7 @@ class CompilationToolBase(object):
         """
         if flags is None:
             flags = []
-        flags = kwargs.pop('%s_flags' % cls.tooltype, flags)
+        flags = kwargs.pop(f'{cls.tooltype}_flags', flags)
         out = copy.deepcopy(flags)
         if not isinstance(out, list):
             out = [out]
@@ -910,7 +910,8 @@ class CompilationToolBase(object):
                 else:  # pragma: debug
                     arch = 'x86-windows'
                     raise NotImplementedError("Not yet tested on 32bit Python")
-                if (libtype in typ2dir) and os.path.isdir(vcpkg_dir):
+                if (libtype in typ2dir) and os.path.isdir(os.path.join(vcpkg_dir,
+                                                                       'installed')):
                     paths.append(os.path.join(vcpkg_dir, 'installed', arch,
                                               typ2dir[libtype]))
                     if not os.path.isdir(paths[-1]):  # pragma: debug
@@ -2528,7 +2529,7 @@ class CompiledModelDriver(ModelDriver):
             # Get tool
             kwargs = {'flags': tool_flags}
             kwargs['executable'] = cls.cfg.get(cls.language,
-                                               '%s_executable' % toolname,
+                                               f'{toolname}_executable',
                                                toolname)
             if tooltype == 'compiler':
                 kwargs.update(
