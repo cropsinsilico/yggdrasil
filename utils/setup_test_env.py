@@ -90,6 +90,7 @@ def get_summary_commands(use_mamba=False):
     out = [f"{PYTHON_CMD} --version",
            f"{PYTHON_CMD} -m pip list"]
     if CONDA_ENV:
+        conda_exe_config = CONDA_CMD
         if use_mamba:
             conda_exe = 'mamba'
         else:
@@ -97,7 +98,7 @@ def get_summary_commands(use_mamba=False):
         out += [f"echo 'CONDA_PREFIX={CONDA_PREFIX}'",
                 f"{conda_exe} info",
                 f"{conda_exe} list",
-                f"{conda_exe} config --show-sources"]
+                f"{conda_exe_config} config --show-sources"]
     return out
 
 
@@ -120,13 +121,15 @@ def call_conda_command(args, use_mamba=False, **kwargs):
     return subprocess.check_output(args, **kwargs).decode("utf-8")
 
 
-def call_script(lines, force_bash=False):
+def call_script(lines, force_bash=False, verbose=False):
     r"""Write lines to a script and call it.
 
     Args:
         lines (list): Lines that should be written to the script.
         force_bash (bool, optional): If True, bash will be used, even
             on windows. Defaults to False.
+        verbose (bool, optional): If True, each line will be printed before
+            it is executed.
 
     """
     if not lines:
@@ -144,6 +147,10 @@ def call_script(lines, force_bash=False):
         allow_failure = lines[0].endswith('# [ALLOW FAIL]')
         if allow_failure:
             lines = [lines[0].split('#')[0].strip()]
+        if verbose:
+            for i in range(len(lines) - 1, 0, -1):
+                line_str = lines[i].replace('"', '\\"')
+                lines.insert(i, f'echo "CALLING: {line_str}"')
         if _is_win and (not force_bash):  # pragma: windows
             script_ext = '.bat'
             error_check = 'if %errorlevel% neq 0 exit /b %errorlevel%'
@@ -215,7 +222,7 @@ def locate_conda_exe(conda_env, name, use_mamba=False):
         str: Full path to the executable.
 
     """
-    assert(CONDA_ROOT)
+    assert CONDA_ROOT
     conda_prefix = os.path.join(CONDA_ROOT, 'envs')
     if (sys.platform in ['win32', 'cygwin']):
         if not name.endswith('.exe'):
@@ -228,7 +235,7 @@ def locate_conda_exe(conda_env, name, use_mamba=False):
     else:
         out = os.path.join(conda_prefix, conda_env, 'bin', name)
     try:
-        assert(os.path.isfile(out))
+        assert os.path.isfile(out)
     except AssertionError:
         out = os.path.expanduser(os.path.join('~', '.conda', 'envs', name))
         if not os.path.isfile(out):
@@ -331,7 +338,7 @@ def add_install_opts_args(parser):
 
 
 def create_env(method, python, name=None, packages=None, init=_on_ci,
-               use_mamba=False):
+               use_mamba=False, verbose=False):
     r"""Setup a test environment on a CI resource.
 
     Args:
@@ -345,11 +352,13 @@ def create_env(method, python, name=None, packages=None, init=_on_ci,
         packages (list, optional): Packages that should be installed in the new
             environment. Defaults to None and is ignored.
         init (bool, optional): If True, the environment management program is
-            first configured as if it is one CI so that, some interactive
+            first configured as if it is on CI so that some interactive
             aspects will be disabled. Default is set based on the presence of
             CI environment variables (it currently checks for Github Actions,
-            Travis CI, and Appveyor)
+            Travis CI, and Appveyor).
         use_mamba (bool, optional): If True, use mamba in place of conda.
+        verbose (bool, optional): If True, each line will be printed before
+            it is executed.
 
     Raises:
         ValueError: If method is not 'conda', 'mamba', or 'pip'.
@@ -361,14 +370,15 @@ def create_env(method, python, name=None, packages=None, init=_on_ci,
         name = method + python.replace('.', '')
     if packages is None:
         packages = []
-    if 'requests' not in packages:
-        # Not strictly required, but useful for determine the versions of
-        # dependencies required by packages during testing
-        packages.append('requests')
+    # if 'requests' not in packages:
+    #     # Not strictly required, but useful for determine the versions of
+    #     # dependencies required by packages during testing
+    #     packages.append('requests')
     if method == 'mamba':
         use_mamba = True
         method = 'conda'
     if method == 'conda':
+        conda_exe_config = CONDA_CMD
         if use_mamba:
             conda_exe = 'mamba'
         else:
@@ -379,11 +389,11 @@ def create_env(method, python, name=None, packages=None, init=_on_ci,
         if init:
             cmds += [
                 # Configure conda
-                f"{conda_exe} config --set always_yes yes --set changeps1 no",
-                f"{conda_exe} config --set channel_priority strict",
-                f"{conda_exe} config --add channels conda-forge",
-                f"{conda_exe} update -q {method}",
-                # f"{conda_exe} config --set allow_conda_downgrades true",
+                f"{conda_exe_config} config --set always_yes yes --set changeps1 no",
+                f"{conda_exe_config} config --set channel_priority strict",
+                f"{conda_exe_config} config --add channels conda-forge",
+                f"{conda_exe_config} update -q {method}",
+                # f"{conda_exe_config} config --set allow_conda_downgrades true",
                 # f"{conda_exe} install -n root conda=4.9",
             ]
         cmds += [
@@ -415,7 +425,7 @@ def create_env(method, python, name=None, packages=None, init=_on_ci,
             cmds.append(f"{python_cmd} -m pip install " + ' '.join(packages))
     else:  # pragma: debug
         raise ValueError(f"Unsupport environment management method: '{method}'")
-    call_script(cmds)
+    call_script(cmds, verbose=verbose)
 
 
 def build_pkg(method, python=None, return_commands=False,
@@ -448,6 +458,7 @@ def build_pkg(method, python=None, return_commands=False,
         use_mamba = True
         method = 'conda'
     if method == 'conda':
+        conda_exe_config = CONDA_CMD
         if use_mamba:
             conda_exe = 'mamba'
             conda_env = CONDA_ENV  # TODO: What should this be?
@@ -468,11 +479,11 @@ def build_pkg(method, python=None, return_commands=False,
         # version of Python used in the environment)
         # https://github.com/conda/conda/issues/9124
         # https://github.com/conda/conda/issues/7758#issuecomment-660328841
-        assert(conda_env == 'base')
-        assert(conda_idx)
+        assert conda_env == 'base'
+        assert conda_idx
         if _on_gha:
             cmds += [
-                f"{conda_exe} config --add channels conda-forge",
+                f"{conda_exe_config} config --add channels conda-forge",
                 f"{conda_exe} update -q {method}",
             ]
         if _is_win and _on_gha:
@@ -484,14 +495,13 @@ def build_pkg(method, python=None, return_commands=False,
             f"{conda_exe} clean --all"]  # Might invalidate cache
         if not (_is_win and _on_gha):
             cmds += [
-                # f"{conda_exe} deactivate",
                 f"{conda_exe} update --all"]
         cmds += [
             f"{conda_exe} install -q -n base " + ' '.join(build_pkgs),
-            f"{conda_build} recipe --python {python} {build_flags}",
-            f"{conda_exe} index {conda_idx}",
-            # f"{conda_exe} activate {conda_env}",
+            f"{conda_build} recipe --python {python} {build_flags}"
         ]
+        # if not use_mamba:
+        cmds.append(f"{conda_exe} index {conda_idx}")
     elif method == 'pip':
         if verbose:
             build_flags = ''
@@ -506,11 +516,11 @@ def build_pkg(method, python=None, return_commands=False,
         return cmds
     summary_cmds = get_summary_commands(use_mamba=use_mamba)
     cmds = summary_cmds + cmds + summary_cmds
-    if use_mamba:
+    if use_mamba and not shutil.which('mamba'):
         cmds.insert(0, f"{CONDA_CMD} install mamba -c conda-forge")
-    call_script(cmds)
-    if method == 'conda':
-        assert(conda_idx and os.path.isdir(conda_idx))
+    call_script(cmds, verbose=verbose)
+    if method == 'conda':  # and not use_mamba:
+        assert (conda_idx and os.path.isdir(conda_idx))
 
 
 def create_env_yaml(filename='environment.yml', name='env', channels=None,
@@ -778,7 +788,7 @@ def itemize_deps(method, for_development=False,
 def install_deps(method, return_commands=False, verbose=False,
                  install_opts=None, conda_env=None,
                  always_yes=False, only_python=False, fallback_to_conda=None,
-                 use_mamba=False, **kwargs):
+                 use_mamba=False, dont_remove_numpy=False, **kwargs):
     r"""Install the package dependencies.
     
     Args:
@@ -803,6 +813,8 @@ def install_deps(method, return_commands=False, verbose=False,
             to install non-python dependencies and Python dependencies that
             cannot be installed via pip. Defaults to False.
         use_mamba (bool, optional): If True, use mamba in place of conda.
+        dont_remove_numpy (bool, optional): If True, numpy (and matplotlib)
+            will not be removed.
         **kwargs: Additional keyword arguments are passed to itemize_deps.
 
     """
@@ -819,6 +831,7 @@ def install_deps(method, return_commands=False, verbose=False,
         conda_flags += f' --name {conda_env}'
     if always_yes:
         conda_flags += ' -y'
+    conda_exe_config = CONDA_CMD
     if use_mamba:
         conda_exe = 'mamba'
         conda_env = CONDA_ENV  # TODO: What should this be?
@@ -839,16 +852,18 @@ def install_deps(method, return_commands=False, verbose=False,
     pprint.pprint(pkgs)
     # Uninstall default numpy and matplotlib to allow installation
     # of specific versions
-    cmds = [f"{python_cmd} -m pip uninstall -y numpy matplotlib"]
+    cmds = []
+    if not dont_remove_numpy:
+        cmds += [f"{python_cmd} -m pip uninstall -y numpy matplotlib"]
     # Refresh channel
     # https://github.com/conda/conda/issues/8051
     if fallback_to_conda and _on_gha:
         cmds += [
-            f"{conda_exe} config --set channel_priority strict",
+            f"{conda_exe_config} config --set channel_priority strict",
             # f"{conda_exe} install -n root conda=4.9",// different for mamba
-            # f"{conda_exe} config --set allow_conda_downgrades true",
-            f"{conda_exe} config --remove channels conda-forge",
-            f"{conda_exe} config --add channels conda-forge",
+            # f"{conda_exe_config} config --set allow_conda_downgrades true",
+            f"{conda_exe_config} config --remove channels conda-forge",
+            f"{conda_exe_config} config --add channels conda-forge",
         ]
     if fallback_to_conda:
         cmds.append(f"{conda_exe} update --all")
@@ -976,7 +991,7 @@ def install_deps(method, return_commands=False, verbose=False,
         return cmds
     summary_cmds = get_summary_commands(use_mamba=use_mamba)
     cmds = summary_cmds + cmds + summary_cmds
-    call_script(cmds)
+    call_script(cmds, verbose=verbose)
 
 
 def install_pkg(method, python=None, without_build=False,
@@ -1053,30 +1068,32 @@ def install_pkg(method, python=None, without_build=False,
                           return_commands=True, verbose=verbose,
                           use_mamba=use_mamba)
         cmds += summary_cmds
+    cmds_deps = []
     if not without_deps:
-        cmds += install_deps(method_base, return_commands=True, verbose=verbose,
-                             for_development=for_development,
-                             skip_test_deps=skip_test_deps,
-                             include_dev_deps=include_dev_deps,
-                             include_doc_deps=include_doc_deps,
-                             install_opts=install_opts,
-                             windows_package_manager=windows_package_manager,
-                             conda_env=conda_env, always_yes=always_yes,
-                             only_python=only_python,
-                             fallback_to_conda=fallback_to_conda,
-                             use_mamba=use_mamba)
-        cmds += summary_cmds
+        cmds_deps += install_deps(method_base, return_commands=True,
+                                  verbose=verbose,
+                                  for_development=for_development,
+                                  skip_test_deps=skip_test_deps,
+                                  include_dev_deps=include_dev_deps,
+                                  include_doc_deps=include_doc_deps,
+                                  install_opts=install_opts,
+                                  windows_package_manager=windows_package_manager,
+                                  conda_env=conda_env, always_yes=always_yes,
+                                  only_python=only_python,
+                                  fallback_to_conda=fallback_to_conda,
+                                  use_mamba=use_mamba,
+                                  dont_remove_numpy=(method_base == 'conda'))
+        cmds_deps += summary_cmds
     # Install yggdrasil
     if method == 'conda':
+        conda_exe_config = CONDA_CMD
         if use_mamba:
             conda_exe = 'mamba'
-            conda_env = CONDA_ENV  # TODO: What should this be?
-            conda_idx = CONDA_INDEX  # TODO: What should this be?
+            conda_idx = CONDA_INDEX  # 'local'
         else:
             conda_exe = CONDA_CMD
-            conda_env = CONDA_ENV
             conda_idx = CONDA_INDEX
-        assert(conda_idx and os.path.isdir(conda_idx))
+        assert (conda_idx and os.path.isdir(conda_idx))
         # Install from conda build
         # Assumes that the target environment is active
         if verbose:
@@ -1084,15 +1101,20 @@ def install_pkg(method, python=None, without_build=False,
         else:
             install_flags = '-q'
         install_flags += conda_flags
+        # if use_mamba:
+        #     index_channel = 'local'
+        # else:
+        if not use_mamba:
+            install_flags += ' --update-deps'
         if _is_win:
             index_channel = conda_idx
         else:
             index_channel = f"file:/{conda_idx}"
         cmds += [
-            f"{conda_exe} config --add channels {index_channel}",
+            f"{conda_exe_config} config --add channels {index_channel}",
             # Related issues if this stops working again
             # https://github.com/conda/conda/issues/466#issuecomment-378050252
-            f"{conda_exe} install {install_flags} --update-deps -c"
+            f"{conda_exe} install {install_flags} -c"
             f" {index_channel} yggdrasil"
             # Required for non-strict channel priority
             # https://github.com/conda-forge/conda-forge.github.io/pull/670
@@ -1103,7 +1125,11 @@ def install_pkg(method, python=None, without_build=False,
         ]
         if _is_win and install_opts['mpi']:
             cmds[-1] = cmds[-1] + ' mpi4py # [ALLOW FAIL]'
+        # Install deps after yggdrasil
+        cmds += cmds_deps
     elif method == 'pip':
+        # Install deps before yggdrasil
+        cmds += cmds_deps
         if verbose:
             install_flags = '--verbose'
         else:
@@ -1130,11 +1156,11 @@ def install_pkg(method, python=None, without_build=False,
     if not YGG_CMD_WHICH:
         summary_cmds = get_summary_commands(use_mamba=use_mamba)
         cmds = summary_cmds + cmds + summary_cmds
-        call_script(cmds)
+        call_script(cmds, verbose=verbose)
         if method.endswith('-dev'):
             print(call_conda_command([python_cmd, '-m', 'pip', 'install',
                                       '--editable', '.'],
-                                     cwd=_pkg_dir), use_mamba=use_mamba)
+                                     cwd=_pkg_dir, use_mamba=use_mamba))
     # Follow up if on Unix as R installation may require sudo
     if install_opts['R'] and _is_unix:
         R_cmd = ["ygginstall", "r"]
@@ -1192,8 +1218,8 @@ def verify_pkg(install_opts=None):
                            "\tSource version: %s\n\tBuild  version: %s"
                            % (src_version, bld_version))
     if install_opts['R']:
-        assert(shutil.which("R"))
-        assert(shutil.which("Rscript"))
+        assert shutil.which("R")
+        assert shutil.which("Rscript")
     subprocess.check_call(["flake8", "yggdrasil"], cwd=src_dir)
     if not os.path.isfile(".coveragerc"):
         raise RuntimeError(".coveragerc file dosn't exist.")
@@ -1236,9 +1262,9 @@ def verify_pkg(install_opts=None):
                              "expected\n\t%s" % "\n\t".join(errors))
     if _is_win:  # pragma: windows
         if os.environ.get('HOMEDRIVE', None):
-            assert(os.path.expanduser('~').startswith(os.environ['HOMEDRIVE']))
+            assert os.path.expanduser('~').startswith(os.environ['HOMEDRIVE'])
         else:
-            assert(os.path.expanduser('~').lower().startswith('c:'))
+            assert os.path.expanduser('~').lower().startswith('c:')
 
 
 def log_environment(new_filename='new_environment_log.txt',
@@ -1270,7 +1296,7 @@ def log_environment(new_filename='new_environment_log.txt',
     if shutil.which('mamba'):
         cmds.append(f"mamba list >> {new_filename}")
     call_script(cmds)
-    assert(os.path.isfile(new_filename))
+    assert os.path.isfile(new_filename)
     if os.path.isfile(old_filename):
         with open(new_filename, 'r') as fd:
             new_contents = fd.read()

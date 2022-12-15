@@ -285,7 +285,7 @@ def install_from_requirements(method, fname_in, conda_env=None,
             if use_mamba:
                 args = ['mamba', 'install', '-y']
             else:
-                assert(CONDA_CMD)
+                assert CONDA_CMD
                 args = [CONDA_CMD, 'install', '-y']
             if verbose:
                 args.append('-vvv')
@@ -296,9 +296,9 @@ def install_from_requirements(method, fname_in, conda_env=None,
             args += ['--file', temp_file]
             if user:
                 args.append('--user')
-            args.append('--update-all')
+            # args.append('--update-all')
         elif method == 'pip':
-            assert(python_cmd)
+            assert python_cmd
             args = [python_cmd, '-m', 'pip', 'install']
             if verbose:
                 args.append('--verbose')

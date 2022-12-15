@@ -337,7 +337,7 @@ jobs:
       matrix:
         os-base: [ubuntu, macos, windows]
         python-version: [3.7]
-        install-method: [conda]
+        install-method: [mamba]
         test-flags1: [--long-running --mpi-script=run_mpi.sh]
         test-flags2: [--suite=examples --parametrize-example-name=backwards]
         install-c: [true]
@@ -345,28 +345,28 @@ jobs:
         include:
           - os-base: ubuntu
             python-version: 3.6
-            install-method: conda
+            install-method: mamba
             test-flags1: --long-running
             test-flags2: ""
             install-c: true
             install-mpi: false
           - os-base: ubuntu
             python-version: 3.8
-            install-method: conda
+            install-method: mamba
             test-flags1: --long-running
             test-flags2: ""
             install-c: true
             install-mpi: false
           - os-base: ubuntu
             python-version: 3.9
-            install-method: conda
+            install-method: mamba
             test-flags1: --long-running
             test-flags2: ""
             install-c: true
             install-mpi: false
           - os-base: macos
             python-version: 3.8
-            install-method: conda
+            install-method: mamba
             test-flags1: --suites examples top --parametrize-example-name=rpc_lesson3
             test-flags2: tests/test_tools.py
             install-c: true
@@ -416,7 +416,7 @@ jobs:
       matrix:
         os-base: [ubuntu]
         python-version: [3.7]
-        install-method: [conda]
+        install-method: [mamba]
         test-flags1: [--long-running --languages python R matlab]
         test-flags2: [tests/test_services.py --nocapture]
         install-c: [true]
