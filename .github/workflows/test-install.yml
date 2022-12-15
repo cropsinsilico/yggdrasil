@@ -195,7 +195,7 @@ jobs:
       with:
         toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba) &&
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os != 'Windows'
       run: 'echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
 
@@ -513,7 +513,7 @@ jobs:
       with:
         toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba) &&
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os != 'Windows'
       run: 'echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
 
@@ -807,7 +807,7 @@ jobs:
       with:
         toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba) &&
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os != 'Windows'
       run: 'echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
 
@@ -1103,7 +1103,7 @@ jobs:
       with:
         toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba) &&
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os != 'Windows'
       run: 'echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
 
@@ -1398,7 +1398,7 @@ jobs:
       with:
         toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba) &&
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os != 'Windows'
       run: 'echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
 
