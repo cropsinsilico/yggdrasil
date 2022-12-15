@@ -132,6 +132,8 @@ def call_script(lines, force_bash=False, verbose=False):
             it is executed.
 
     """
+    if _on_gha:
+        verbose = True
     if not lines:
         return
     # Split lines that should be allowed to fail
