@@ -391,7 +391,7 @@ def create_env(method, python, name=None, packages=None, init=_on_ci,
                 # Configure conda
                 f"{conda_exe_config} config --set always_yes yes --set changeps1 no",
                 f"{conda_exe_config} config --set channel_priority strict",
-                f"{conda_exe_config} config --add channels conda-forge",
+                f"{conda_exe_config} config --prepend channels conda-forge",
                 f"{conda_exe_config} update -q {method}",
                 # f"{conda_exe_config} config --set allow_conda_downgrades true",
                 # f"{conda_exe} install -n root conda=4.9",
@@ -483,7 +483,7 @@ def build_pkg(method, python=None, return_commands=False,
         assert conda_idx
         if _on_gha:
             cmds += [
-                f"{conda_exe_config} config --add channels conda-forge",
+                f"{conda_exe_config} config --prepend channels conda-forge",
                 f"{conda_exe} update -q {method}",
             ]
         if _is_win and _on_gha:
@@ -862,7 +862,7 @@ def install_deps(method, return_commands=False, verbose=False,
             # f"{conda_exe} install -n root conda=4.9",// different for mamba
             # f"{conda_exe_config} config --set allow_conda_downgrades true",
             f"{conda_exe_config} config --remove channels conda-forge",
-            f"{conda_exe_config} config --add channels conda-forge",
+            f"{conda_exe_config} config --prepend channels conda-forge",
         ]
     if fallback_to_conda:
         cmds.append(f"{conda_exe} update --all")
@@ -1110,7 +1110,7 @@ def install_pkg(method, python=None, without_build=False,
         else:
             index_channel = f"file:/{conda_idx}"
         cmds += [
-            f"{conda_exe_config} config --add channels {index_channel}",
+            f"{conda_exe_config} config --prepend channels {index_channel}",
             # Related issues if this stops working again
             # https://github.com/conda/conda/issues/466#issuecomment-378050252
             f"{conda_exe} install {install_flags} -c"
