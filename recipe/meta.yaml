@@ -1,5 +1,5 @@
 {% set name = "yggdrasil" %}
-{% set version = "1.8.3" %}
+{% set version = "1.8.4" %}
 
 package:
   name: {{ name|lower }}

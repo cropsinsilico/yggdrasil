@@ -520,6 +520,7 @@ def build_pkg(method, python=None, return_commands=False,
         cmds.insert(0, f"{CONDA_CMD} install mamba -c conda-forge")
     call_script(cmds, verbose=verbose)
     if method == 'conda':  # and not use_mamba:
+        print(f"CONDA_IDX = {conda_idx}")
         assert (conda_idx and os.path.isdir(conda_idx))
 
 
@@ -834,10 +835,8 @@ def install_deps(method, return_commands=False, verbose=False,
     conda_exe_config = CONDA_CMD
     if use_mamba:
         conda_exe = 'mamba'
-        conda_env = CONDA_ENV  # TODO: What should this be?
     else:
         conda_exe = CONDA_CMD
-        conda_env = CONDA_ENV
     conda_prefix = '$CONDA_PREFIX'
     conda_root = CONDA_ROOT
     # Determine if conda should be used for base dependencies
