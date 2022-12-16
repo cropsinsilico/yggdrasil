@@ -952,10 +952,10 @@ def preinstall_deps(method, return_commands=False, verbose=False,
         ]
         if setup_param.method == 'conda':
             pre_conda += pre_default
-        elif setup_param.method == 'pip':
+        elif setup_param.method == 'pip' and pre_default:
             cmds += [f"{setup_param.python_cmd} -m pip install"
                      f" {' '.join(pre_default)}"]
-        if setup_param.fallback_to_conda:
+        if setup_param.fallback_to_conda and pre_conda:
             cmds += [f"{setup_param.conda_exe} install"
                      f" {setup_param.conda_flags} {' '.join(pre_conda)}"]
         cmds += get_summary_commands(use_mamba=setup_param.use_mamba)
