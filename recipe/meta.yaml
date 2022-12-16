@@ -59,7 +59,7 @@ requirements:
     - czmq
     - flaky
     - flask
-    - fortran-compiler  # [not win]
+    # - fortran-compiler  # [not win]
     - git
     - jsonschema==3.2.0
     - lz4

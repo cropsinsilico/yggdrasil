@@ -925,10 +925,11 @@ def preinstall_deps(method, return_commands=False, verbose=False,
         #  a conflict when installing LPy
         pre_conda += ['scipy', 'numpy']
         pre_default += ['matplotlib', 'jsonschema']
-        cmds += [f"{setup_param.python_cmd} -m pip uninstall -y "
-                 + ' '.join(pre_conda + pre_default)]
+        if setup_param.method != 'conda':
+            cmds += [f"{setup_param.python_cmd} -m pip uninstall -y "
+                     + ' '.join(pre_conda + pre_default)]
         pre_conda = [os.environ[k.upper()] for k in pre_conda
-                     if k == 'numpy' or os.environ.get(k.upper(), k) != k]
+                     if os.environ.get(k.upper(), k) != k]
         pre_default = [os.environ[k.upper()] for k in pre_default
                        if os.environ.get(k.upper(), k) != k]
     # Refresh channel
