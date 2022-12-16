@@ -927,9 +927,10 @@ def preinstall_deps(method, return_commands=False, verbose=False,
         pre_default += ['matplotlib', 'jsonschema']
         cmds += [f"{setup_param.python_cmd} -m pip uninstall -y "
                  + ' '.join(pre_conda + pre_default)]
-        pre_conda = [os.environ.get(k.upper(), k) for k in pre_conda]
+        pre_conda = [os.environ[k.upper()] for k in pre_conda
+                     if k == 'numpy' or os.environ.get(k.upper(), k) != k]
         pre_default = [os.environ[k.upper()] for k in pre_default
-                       if k.upper() in os.environ]
+                       if os.environ.get(k.upper(), k) != k]
     # Refresh channel
     # https://github.com/conda/conda/issues/8051
     if setup_param.fallback_to_conda and _on_gha:
