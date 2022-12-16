@@ -1135,7 +1135,7 @@ def install_pkg(method, python=None, without_build=False,
                 skip_test_deps=False, include_dev_deps=False, include_doc_deps=False,
                 windows_package_manager='vcpkg', install_opts=None, conda_env=None,
                 always_yes=False, only_python=False, fallback_to_conda=None,
-                use_mamba=False, install_deps_after=True):
+                use_mamba=False, install_deps_before=False):
     r"""Build and install the package and its dependencies on a CI
     resource.
 
@@ -1175,8 +1175,10 @@ def install_pkg(method, python=None, without_build=False,
             via pip. Defaults to False.
         use_mamba (bool, optional): If True, use mamba in place of conda.
             Defaults to False.
-        install_deps_after (bool, optional): If True, install deps after the
-            package is installed. Defaults to True.
+        install_deps_before (bool, optional): If True, install deps before the
+            package is installed. Set to true in the case of pip or dev
+            environments to handle non-Python dependencies before yggdrasil
+            is installed. Defaults to False.
 
     Raises:
         ValueError: If method is not 'conda' or 'pip'.
@@ -1193,6 +1195,10 @@ def install_pkg(method, python=None, without_build=False,
     install_opts = setup_param.install_opts
     fallback_to_conda = setup_param.fallback_to_conda
     use_mamba = setup_param.use_mamba
+    if setup_param.method != 'conda' and not only_python:
+        # For pip and dev environments, non-Python deps should be installed
+        #   before yggdrasil
+        install_deps_before = True
     cmds = []
     if setup_param.for_development:
         without_build = True
@@ -1203,6 +1209,11 @@ def install_pkg(method, python=None, without_build=False,
                           use_mamba=setup_param.use_mamba)
         cmds += summary_cmds
     cmds_deps = []
+    cmds += preinstall_deps(setup_param.method_base, return_commands=True,
+                            verbose=verbose, install_opts=install_opts,
+                            conda_env=conda_env, always_yes=always_yes,
+                            fallback_to_conda=fallback_to_conda,
+                            use_mamba=setup_param.use_mamba)
     if not without_deps:
         cmds_deps += install_deps(setup_param.method_base,
                                   return_commands=True, verbose=verbose,
@@ -1216,12 +1227,7 @@ def install_pkg(method, python=None, without_build=False,
                                   only_python=only_python,
                                   fallback_to_conda=fallback_to_conda,
                                   use_mamba=setup_param.use_mamba)
-    cmds += preinstall_deps(setup_param.method_base, return_commands=True,
-                            verbose=verbose, install_opts=install_opts,
-                            conda_env=conda_env, always_yes=always_yes,
-                            fallback_to_conda=fallback_to_conda,
-                            use_mamba=setup_param.use_mamba)
-    if not install_deps_after:
+    if install_deps_before:
         cmds += cmds_deps
     # Install yggdrasil
     if method == 'conda':
@@ -1281,7 +1287,7 @@ def install_pkg(method, python=None, without_build=False,
         pass
     else:  # pragma: debug
         raise ValueError(f"Invalid method: '{setup_param.method}'")
-    if install_deps_after:
+    if not install_deps_before:
         cmds += cmds_deps
     # Print summary of what was installed
     if not YGG_CMD_WHICH:
