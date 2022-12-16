@@ -1003,7 +1003,7 @@ def install_pkg(method, python=None, without_build=False,
                 skip_test_deps=False, include_dev_deps=False, include_doc_deps=False,
                 windows_package_manager='vcpkg', install_opts=None, conda_env=None,
                 always_yes=False, only_python=False, fallback_to_conda=None,
-                use_mamba=False):
+                use_mamba=False, install_deps_after=False):
     r"""Build and install the package and its dependencies on a CI
     resource.
 
@@ -1017,7 +1017,7 @@ def install_pkg(method, python=None, without_build=False,
         without_build (bool, optional): If True, the package will not be
             built prior to install. Defaults to False.
         without_deps (bool, optional): If True the package dependencies will
-            no be installed prior to installing the package. Defaults to
+            not be installed prior to installing the package. Defaults to
             False.
         verbose (bool, optional): If True, setup steps are run with verbosity
             turned up. Defaults to False.
@@ -1042,6 +1042,9 @@ def install_pkg(method, python=None, without_build=False,
             non-python dependencies and Python dependencies that cannot be installed
             via pip. Defaults to False.
         use_mamba (bool, optional): If True, use mamba in place of conda.
+            Defaults to False.
+        install_deps_after (bool, optional): If True, install deps after the
+            package is installed. Defaults to False.
 
     Raises:
         ValueError: If method is not 'conda' or 'pip'.
@@ -1086,9 +1089,11 @@ def install_pkg(method, python=None, without_build=False,
                                   only_python=only_python,
                                   fallback_to_conda=fallback_to_conda,
                                   use_mamba=use_mamba,
-                                  dont_remove_numpy=(method_base == 'conda'),
-                                  dont_update=(method == 'conda'))
+                                  dont_remove_numpy=(not install_deps_after),
+                                  dont_update=(not install_deps_after))
         cmds_deps += summary_cmds
+    if not install_deps_after:
+        cmds += cmds_deps
     # Install yggdrasil
     if method == 'conda':
         conda_exe_config = CONDA_CMD
@@ -1104,7 +1109,8 @@ def install_pkg(method, python=None, without_build=False,
         if verbose:
             install_flags = '-vvv'
         else:
-            install_flags = '-q'
+            install_flags = ''
+            # install_flags = '-q'
         install_flags += conda_flags
         # if use_mamba:
         #     index_channel = 'local'
@@ -1131,11 +1137,7 @@ def install_pkg(method, python=None, without_build=False,
         ]
         if _is_win and install_opts['mpi']:
             cmds[-1] = cmds[-1] + ' mpi4py # [ALLOW FAIL]'
-        # Install deps after yggdrasil
-        cmds += cmds_deps
     elif method == 'pip':
-        # Install deps before yggdrasil
-        cmds += cmds_deps
         if verbose:
             install_flags = '--verbose'
         else:
@@ -1158,6 +1160,8 @@ def install_pkg(method, python=None, without_build=False,
         pass
     else:  # pragma: debug
         raise ValueError("Invalid method: '%s'" % method)
+    if install_deps_after:
+        cmds += cmds_deps
     # Print summary of what was installed
     if not YGG_CMD_WHICH:
         summary_cmds = get_summary_commands(use_mamba=use_mamba)
@@ -1332,7 +1336,7 @@ if __name__ == "__main__":
         'python',
         help="Version of python that should be tested.")
     parser_env.add_argument(
-        '--env-name', default=None,
+        '-n', '--env-name', default=None,
         help="Name that should be used for the environment.")
     parser_env.add_argument('--use-mamba', action='store_true',
                             help="Use mamba in place of conda")

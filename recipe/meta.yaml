@@ -41,6 +41,7 @@ requirements:
   host:
     - czmq
     - lz4
+    - numpy>=1.13.0
     - pip
     - python
     - r-base
@@ -51,27 +52,26 @@ requirements:
     - r-zeallot
     - sysv_ipc  # [unix]
     - zeromq
-    - numpy
   run:
+    - GitPython
     - chevron
     - cmake  # [not win]
     - czmq
-    - lz4
     - flaky
     - flask
+    - fortran-compiler  # [not win]
     - git
-    # - curl==7.85.0  # [osx]
-    - GitPython <=3.1.20  # [py==36]
-    - GitPython  # [py>36]
     - jsonschema==3.2.0
+    - lz4
+    - m2w64-gcc-fortran  # [win]
+    - m2w64-toolchain_win-64  # [win]
     - matplotlib-base
-    - numpy
+    - numpy>=1.13.0
     - pandas
-    - pyperf
-    - pint  # [py2k]
     - psutil
+    - pyperf
     - python
-    - python-rapidjson  # [not py2k]
+    - python-rapidjson
     - pyyaml
     - pyzmq
     - r-base
@@ -83,15 +83,12 @@ requirements:
     - requests
     - scipy
     - six
-    - sysv_ipc  # [unix]
-    - unyt  # [not py2k]
+    - sysv_ipc  # [not win]
+    - unyt
     - zeromq
     - {{ compiler('c') }}  # [win]
     - {{ compiler('cxx') }}  # [win]
     - {{ compiler('fortran') }}  # [not win]
-    # - fortran-compiler  # [not win]
-    - m2w64-gcc-fortran  # [win]
-    - m2w64-toolchain_win-64  # [win]
 
 test:
   imports:
