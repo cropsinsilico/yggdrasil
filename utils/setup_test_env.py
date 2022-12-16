@@ -62,19 +62,97 @@ if CONDA_PREFIX:
 if CONDA_CMD_WHICH:
     if _is_win:
         CONDA_CMD = 'call conda'
+        MAMBA_CMD = 'call mamba'
     else:
         CONDA_CMD = 'conda'
+        MAMBA_CMD = 'mamba'
     CONDA_ROOT = os.path.dirname(os.path.dirname(CONDA_CMD_WHICH))
 elif os.environ.get('CONDA', None):
     if _is_win:
         CONDA_CMD = 'call %s' % os.path.join(os.environ['CONDA'],
                                              'condabin', 'conda.bat')
+        MAMBA_CMD = 'call %s' % os.path.join(os.environ['CONDA'],
+                                             'condabin', 'mamba.bat')
     else:
         CONDA_CMD = os.path.join(os.environ['CONDA'], 'bin', 'conda')
+        MAMBA_CMD = os.path.join(os.environ['CONDA'], 'bin', 'mamba')
     CONDA_ROOT = os.environ['CONDA']
 else:
     CONDA_CMD = None
+    MAMBA_CMD = None
 PYTHON_CMD = sys.executable
+
+
+class SetupParam(object):
+    r"""Storage for setup parameters.
+
+    Args:
+        method (str): Method that should be used to build and install
+            the package. Valid values include 'conda' and 'pip'.
+        python (str, optional): Version of Python that package should be
+            built for. Defaults to None if not provided and the current
+            version of Python will be used. This will be ignored if
+            without_build is True.
+        verbose (bool, optional): If True, setup steps are run with verbosity
+            turned up. Defaults to False.
+        install_opts (dict, optional): Mapping from language/package to bool
+            specifying whether or not the language/package should be installed.
+            If not provided, get_install_opts is used to create it.
+        conda_env (str, optional): Name of the conda environment that packages
+            should be installed in. Defaults to None and is ignored.
+        always_yes (bool, optional): If True, conda commands are called with -y flag
+            so that user interaction is not required. Defaults to False.
+        fallback_to_conda (bool, optional): If True, conda will be used to install
+            non-python dependencies and Python dependencies that cannot be installed
+            via pip. Defaults to False.
+        use_mamba (bool, optional): If True, use mamba in place of conda.
+            Defaults to False.
+        **kwargs: Additional keyword arguments are stored.
+
+    """
+
+    def __init__(self, method='conda-dev', python=None, verbose=False,
+                 install_opts=None, conda_env=None, always_yes=False,
+                 fallback_to_conda=None, use_mamba=False, **kwargs):
+        self.method = method
+        self.python = python
+        self.verbose = verbose
+        self.install_opts = get_install_opts(install_opts)
+        self.conda_env = conda_env
+        self.always_yes = always_yes
+        self.fallback_to_conda = fallback_to_conda
+        self.use_mamba = use_mamba
+        self.kwargs = kwargs
+        self.python_cmd = PYTHON_CMD
+        self.conda_flags = ''
+        self.pip_flags = ''
+        if self.method.startswith('mamba'):
+            self.use_mamba = True
+            self.method = self.method.replace('mamba', 'conda')
+        if self.conda_env:
+            self.python_cmd = locate_conda_exe(conda_env, 'python',
+                                               use_mamba=self.use_mamba)
+            self.conda_flags += f' --name {self.conda_env}'
+        if self.always_yes:
+            self.conda_flags += ' -y'
+            self.pip_flags += ' -y'
+        if self.method.endswith('-dev'):
+            self.method_base = self.method.split('-dev')[0]
+            self.for_development = True
+        else:
+            self.method_base = self.method
+            self.for_development = False
+
+    @classmethod
+    def from_args(cls, args, install_opts):
+        args_to_copy = [
+            'python', 'verbose', 'conda_env', 'always_yes',
+            'fallback_to_conda', 'use_mamba']
+        kwargs = {}
+        for k in args_to_copy:
+            if hasattr(args, k):
+                kwargs[k] = getattr(args, k)
+        return cls(args.method, install_opts=install_opts, **kwargs)
 
 
 def get_summary_commands(use_mamba=False):
@@ -92,7 +170,7 @@ def get_summary_commands(use_mamba=False):
     if CONDA_ENV:
         conda_exe_config = CONDA_CMD
         if use_mamba:
-            conda_exe = 'mamba'
+            conda_exe = MAMBA_CMD
         else:
             conda_exe = CONDA_CMD
         out += [f"echo 'CONDA_PREFIX={CONDA_PREFIX}'",
@@ -132,8 +210,8 @@ def call_script(lines, force_bash=False, verbose=False):
             it is executed.
 
     """
-    if _on_gha:
-        verbose = True
+    # if _on_gha:
+    verbose = True
     if not lines:
         return
     # Split lines that should be allowed to fail
@@ -198,7 +276,7 @@ def conda_env_exists(name, use_mamba=False):
 
     """
     if use_mamba:
-        cmd = 'mamba'
+        cmd = MAMBA_CMD
     else:
         cmd = CONDA_CMD
     args = [cmd, 'info', '--envs']
@@ -382,7 +460,7 @@ def create_env(method, python, name=None, packages=None, init=_on_ci,
     if method == 'conda':
         conda_exe_config = CONDA_CMD
         if use_mamba:
-            conda_exe = 'mamba'
+            conda_exe = MAMBA_CMD
         else:
             conda_exe = CONDA_CMD
         if conda_env_exists(name, use_mamba=use_mamba):
@@ -462,7 +540,7 @@ def build_pkg(method, python=None, return_commands=False,
     if method == 'conda':
         conda_exe_config = CONDA_CMD
         if use_mamba:
-            conda_exe = 'mamba'
+            conda_exe = MAMBA_CMD
             conda_env = CONDA_ENV  # TODO: What should this be?
             conda_idx = CONDA_INDEX  # TODO: What should this be?
             conda_build = f"{CONDA_CMD} mambabuild"
@@ -788,11 +866,90 @@ def itemize_deps(method, for_development=False,
     return out
 
 
-def install_deps(method, return_commands=False, verbose=False,
+def preinstall_deps(method, return_commands=False, verbose=False,
+                    install_opts=None, conda_env=None, always_yes=False,
+                    fallback_to_conda=None, use_mamba=False,
+                    no_packages=False):
+    r"""Pre-install packages with test specific versions.
+
+    """
+    install_opts = get_install_opts(install_opts)
+    python_cmd = PYTHON_CMD
+    conda_flags = ''
+    if method == 'mamba':
+        use_mamba = True
+        method = 'conda'
+    if conda_env:
+        python_cmd = locate_conda_exe(conda_env, 'python',
+                                      use_mamba=use_mamba)
+        conda_flags += f' --name {conda_env}'
+    if always_yes:
+        conda_flags += ' -y'
+    conda_exe_config = CONDA_CMD
+    if use_mamba:
+        conda_exe = MAMBA_CMD
+    else:
+        conda_exe = CONDA_CMD
+    conda_prefix = '$CONDA_PREFIX'
+    conda_root = CONDA_ROOT
+    cmds = []
+    # Determine if conda should be used for base dependencies
+    if fallback_to_conda is None:
+        fallback_to_conda = ((method == 'conda')
+                             or (_is_win and _on_appveyor)
+                             or install_opts['lpy'])
+    # Uninstall default numpy and matplotlib to allow installation
+    # of specific versions
+    if not no_packages:
+        cmds += [f"{python_cmd} -m pip uninstall -y numpy matplotlib"]
+    # Refresh channel
+    # https://github.com/conda/conda/issues/8051
+    if fallback_to_conda and _on_gha:
+        cmds += [
+            f"{conda_exe_config} config --set channel_priority strict",
+            # f"{conda_exe} install -n root conda=4.9",// different for mamba
+            # f"{conda_exe_config} config --set allow_conda_downgrades true",
+            f"{conda_exe_config} config --remove channels conda-forge",
+            f"{conda_exe_config} config --prepend channels conda-forge",
+        ]
+    if fallback_to_conda and not no_packages:
+        cmds.append(f"{conda_exe} update --all")
+    if _on_gha and _is_linux and fallback_to_conda:
+        if conda_env:
+            conda_prefix = os.path.join(conda_root, 'envs', conda_env)
+        # Do both to ensure that the path is set for the installation
+        # and in following steps
+        cmds += [
+            f"export LD_LIBRARY_PATH={conda_prefix}/lib:$LD_LIBRARY_PATH",
+            "echo -n \"LD_LIBRARY_PATH=\" >> $GITHUB_ENV",
+            f"echo {conda_prefix}/lib:$LD_LIBRARY_PATH >> $GITHUB_ENV"
+        ]
+    if not no_packages:
+        pre_conda = ['scipy', os.environ.get('NUMPY', 'numpy')]
+        pre_default = []
+        for k in ['matplotlib', 'jsonschema']:
+            if os.environ.get(k.upper(), k) != k:
+                pre_default.append(os.environ[k.upper()])
+        if method == 'conda':
+            pre_conda += pre_default
+        elif method == 'pip':
+            cmds += [f"{python_cmd} -m pip install {' '.join(pre_default)}"]
+        if fallback_to_conda:
+            cmds += [f"{conda_exe} install {conda_flags} {' '.join(pre_conda)}"]
+        cmds += get_summary_commands(use_mamba=use_mamba)
+    if return_commands:
+        return cmds
+    call_script(cmds, verbose=verbose)
+
+
+def install_deps(method, return_commands=False, only_python=False,
+                 do_preinstall=False,
+                 verbose=False,
                  install_opts=None, conda_env=None,
-                 always_yes=False, only_python=False, fallback_to_conda=None,
-                 use_mamba=False, dont_remove_numpy=False,
-                 dont_update=False, **kwargs):
+                 always_yes=False,
+                 fallback_to_conda=None,
+                 use_mamba=False,
+                 **kwargs):
     r"""Install the package dependencies.
     
     Args:
@@ -817,10 +974,8 @@ def install_deps(method, return_commands=False, verbose=False,
             to install non-python dependencies and Python dependencies that
             cannot be installed via pip. Defaults to False.
         use_mamba (bool, optional): If True, use mamba in place of conda.
-        dont_remove_numpy (bool, optional): If True, numpy (and matplotlib)
-            will not be removed.
-        dont_update (bool, optional): If True, update will not be called
-            before install.
+        do_preinstall (bool, optional): If True, steps are taken to prepare
+            for installation. Defaults to False.
         **kwargs: Additional keyword arguments are passed to itemize_deps.
 
     """
@@ -837,13 +992,11 @@ def install_deps(method, return_commands=False, verbose=False,
         conda_flags += f' --name {conda_env}'
     if always_yes:
         conda_flags += ' -y'
-    conda_exe_config = CONDA_CMD
     if use_mamba:
-        conda_exe = 'mamba'
+        conda_exe = MAMBA_CMD
     else:
         conda_exe = CONDA_CMD
-    conda_prefix = '$CONDA_PREFIX'
-    conda_root = CONDA_ROOT
+    cmds = []
     # Determine if conda should be used for base dependencies
     if fallback_to_conda is None:
         fallback_to_conda = ((method == 'conda')
@@ -854,23 +1007,13 @@ def install_deps(method, return_commands=False, verbose=False,
                         install_opts=install_opts, use_mamba=use_mamba,
                         **kwargs)
     pprint.pprint(pkgs)
-    # Uninstall default numpy and matplotlib to allow installation
-    # of specific versions
-    cmds = []
-    if not dont_remove_numpy:
-        cmds += [f"{python_cmd} -m pip uninstall -y numpy matplotlib"]
-    # Refresh channel
-    # https://github.com/conda/conda/issues/8051
-    if fallback_to_conda and _on_gha:
-        cmds += [
-            f"{conda_exe_config} config --set channel_priority strict",
-            # f"{conda_exe} install -n root conda=4.9",// different for mamba
-            # f"{conda_exe_config} config --set allow_conda_downgrades true",
-            f"{conda_exe_config} config --remove channels conda-forge",
-            f"{conda_exe_config} config --prepend channels conda-forge",
-        ]
-    if fallback_to_conda and not dont_update:
-        cmds.append(f"{conda_exe} update --all")
+    # Prepare env
+    if do_preinstall:
+        cmds += preinstall_deps(method, return_commands=True, verbose=verbose,
+                                install_opts=install_opts,
+                                conda_env=conda_env, always_yes=always_yes,
+                                fallback_to_conda=fallback_to_conda,
+                                use_mamba=use_mamba)
     # if install_opts['R'] and (not fallback_to_conda) and (not only_python):
     #     # TODO: Test split installation where r-base is installed from
     #     # conda and the R dependencies are installed from CRAN?
@@ -899,16 +1042,6 @@ def install_deps(method, return_commands=False, verbose=False,
     #     else:
     #         raise NotImplementedError("Could not determine "
     #                                   "ZeroMQ installation method.")
-    if _on_gha and _is_linux and fallback_to_conda:
-        if conda_env:
-            conda_prefix = os.path.join(conda_root, 'envs', conda_env)
-        # Do both to ensure that the path is set for the installation
-        # and in following steps
-        cmds += [
-            f"export LD_LIBRARY_PATH={conda_prefix}/lib:$LD_LIBRARY_PATH",
-            "echo -n \"LD_LIBRARY_PATH=\" >> $GITHUB_ENV",
-            f"echo {conda_prefix}/lib:$LD_LIBRARY_PATH >> $GITHUB_ENV"
-        ]
     # Install dependencies using package manager(s)
     if not only_python:
         if pkgs['apt']:
@@ -973,8 +1106,8 @@ def install_deps(method, return_commands=False, verbose=False,
             install_flags = '-q'
         install_flags += conda_flags
         if fallback_to_conda:
-            cmds += ["%s install %s openalea.lpy boost=1.66.0 -c openalea"
-                     % (CONDA_CMD, install_flags)]
+            cmds += [f"{conda_exe} install {install_flags} openalea.lpy"
+                     f" boost=1.66.0 -c openalea"]
         else:  # pragma: debug
             raise RuntimeError("Could not detect conda environment. "
                                "Cannot proceed with a conda deployment "
@@ -990,11 +1123,12 @@ def install_deps(method, return_commands=False, verbose=False,
     #     # an error message when called inside a Python subprocess. This seems
     #     # to occur during cleanup for the installation process as the mpi4py
     #     # installation is functional. Possibly triggered by the activation script?
-    #     cmds += ["%s install %s mpi4py # [ALLOW FAIL]" % (CONDA_CMD, install_flags)]
+    #     cmds += [f"{conda_exe} install {install_flags} mpi4py # [ALLOW FAIL]"]
+    summary_cmds = get_summary_commands(use_mamba=use_mamba)
+    cmds += summary_cmds
     if return_commands:
         return cmds
-    summary_cmds = get_summary_commands(use_mamba=use_mamba)
-    cmds = summary_cmds + cmds + summary_cmds
+    cmds = summary_cmds + cmds
     call_script(cmds, verbose=verbose)
 
 
@@ -1003,7 +1137,7 @@ def install_pkg(method, python=None, without_build=False,
                 skip_test_deps=False, include_dev_deps=False, include_doc_deps=False,
                 windows_package_manager='vcpkg', install_opts=None, conda_env=None,
                 always_yes=False, only_python=False, fallback_to_conda=None,
-                use_mamba=False, install_deps_after=False):
+                use_mamba=False, install_deps_after=True):
     r"""Build and install the package and its dependencies on a CI
     resource.
 
@@ -1044,7 +1178,7 @@ def install_pkg(method, python=None, without_build=False,
         use_mamba (bool, optional): If True, use mamba in place of conda.
             Defaults to False.
         install_deps_after (bool, optional): If True, install deps after the
-            package is installed. Defaults to False.
+            package is installed. Defaults to True.
 
     Raises:
         ValueError: If method is not 'conda' or 'pip'.
@@ -1088,17 +1222,19 @@ def install_pkg(method, python=None, without_build=False,
                                   conda_env=conda_env, always_yes=always_yes,
                                   only_python=only_python,
                                   fallback_to_conda=fallback_to_conda,
-                                  use_mamba=use_mamba,
-                                  dont_remove_numpy=(not install_deps_after),
-                                  dont_update=(not install_deps_after))
-        cmds_deps += summary_cmds
+                                  use_mamba=use_mamba)
+    cmds += preinstall_deps(method_base, return_commands=True,
+                            verbose=verbose, install_opts=install_opts,
+                            conda_env=conda_env, always_yes=always_yes,
+                            fallback_to_conda=fallback_to_conda,
+                            use_mamba=use_mamba)
     if not install_deps_after:
         cmds += cmds_deps
     # Install yggdrasil
     if method == 'conda':
         conda_exe_config = CONDA_CMD
         if use_mamba:
-            conda_exe = 'mamba'
+            conda_exe = MAMBA_CMD
             conda_idx = CONDA_INDEX  # 'local'
         else:
             conda_exe = CONDA_CMD
@@ -1303,8 +1439,6 @@ def log_environment(new_filename='new_environment_log.txt',
             "%s -m pip list >> %s" % (PYTHON_CMD, new_filename)]
     if shutil.which('conda'):
         cmds.append(f"{CONDA_CMD} list >> {new_filename}")
-    if shutil.which('mamba'):
-        cmds.append(f"mamba list >> {new_filename}")
     call_script(cmds)
     assert os.path.isfile(new_filename)
     if os.path.isfile(old_filename):
@@ -1517,7 +1651,8 @@ if __name__ == "__main__":
                      windows_package_manager=args.windows_package_manager,
                      install_opts=install_opts,
                      conda_env=args.conda_env, always_yes=args.always_yes,
-                     only_python=args.only_python, use_mamba=args.use_mamba)
+                     only_python=args.only_python, use_mamba=args.use_mamba,
+                     preinstall_deps=True)
     elif args.operation == 'install':
         install_pkg(args.method, python=args.python,
                     without_build=args.without_build,
