@@ -791,7 +791,8 @@ def itemize_deps(method, for_development=False,
 def install_deps(method, return_commands=False, verbose=False,
                  install_opts=None, conda_env=None,
                  always_yes=False, only_python=False, fallback_to_conda=None,
-                 use_mamba=False, dont_remove_numpy=False, **kwargs):
+                 use_mamba=False, dont_remove_numpy=False,
+                 dont_update=False, **kwargs):
     r"""Install the package dependencies.
     
     Args:
@@ -818,6 +819,8 @@ def install_deps(method, return_commands=False, verbose=False,
         use_mamba (bool, optional): If True, use mamba in place of conda.
         dont_remove_numpy (bool, optional): If True, numpy (and matplotlib)
             will not be removed.
+        dont_update (bool, optional): If True, update will not be called
+            before install.
         **kwargs: Additional keyword arguments are passed to itemize_deps.
 
     """
@@ -866,7 +869,7 @@ def install_deps(method, return_commands=False, verbose=False,
             f"{conda_exe_config} config --remove channels conda-forge",
             f"{conda_exe_config} config --prepend channels conda-forge",
         ]
-    if fallback_to_conda:
+    if fallback_to_conda and not dont_update:
         cmds.append(f"{conda_exe} update --all")
     # if install_opts['R'] and (not fallback_to_conda) and (not only_python):
     #     # TODO: Test split installation where r-base is installed from
@@ -1083,7 +1086,8 @@ def install_pkg(method, python=None, without_build=False,
                                   only_python=only_python,
                                   fallback_to_conda=fallback_to_conda,
                                   use_mamba=use_mamba,
-                                  dont_remove_numpy=(method_base == 'conda'))
+                                  dont_remove_numpy=(method_base == 'conda'),
+                                  dont_update=(method == 'conda'))
         cmds_deps += summary_cmds
     # Install yggdrasil
     if method == 'conda':
