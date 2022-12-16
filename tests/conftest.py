@@ -107,7 +107,7 @@ def setup_ci(args):
         package_dir = os.path.join(x, 'yggdrasil')
         if os.path.isdir(package_dir):
             break
-    assert(os.path.isdir(package_dir))
+    assert os.path.isdir(package_dir)
     args += ['-v',
              '--import-mode=importlib',
              f'--cov={package_dir}',
@@ -115,8 +115,8 @@ def setup_ci(args):
              '--cov-config=.coveragerc',
              '--ignore=yggdrasil/rapidjson/']
     # f'--rootdir={package_dir}']
-    if not any(x.startswith('--with-mpi') for x in args):
-        args += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
+    # if not any(x.startswith('--with-mpi') for x in args):
+    #     args += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
     # Additional checks
     if not os.path.isfile('setup.cfg'):
         raise RuntimeError("The CI tests must be run from the root "
@@ -234,7 +234,7 @@ def pytest_cmdline_preparse(args, dont_exit=False):
         # for k in x_args_copy:
         #     if k.split('=')[0] not in x_args_keys:
         #         x_args.append(k)
-        assert(any((k.split('=', 1)[0] == '--write-script') for k in x_args))
+        assert (any((k.split('=', 1)[0] == '--write-script') for k in x_args))
         if not pargs.second_attempt:
             pytest_cmdline_preparse(x_args, dont_exit=True)
     # Run test in separate process
@@ -708,7 +708,7 @@ def get_service_manager_skips(service_type, partial_commtype=None,
     out.append(
         (not cls.is_installed(),
          f"Service type '{service_type}' not installed."))
-    assert(not check_running)
+    assert not check_running
     # if check_running and cls.is_installed():
     #     cli = IntegrationServiceManager(service_type=service_type,
     #                                     commtype=partial_commtype,
@@ -775,7 +775,7 @@ def running_service(pytestconfig, check_service_manager_settings,
             if partial_commtype is not None:
                 lines[-1] += f'commtype=\'{partial_commtype}\''
             lines[-1] += ')'
-            lines += ['assert(not srv.is_running)',
+            lines += ['assert not srv.is_running',
                       f'srv.start_server(with_coverage={with_coverage},',
                       f'                 log_level={log_level},'
                       f'                 model_repository=\'{model_repo}\')']
@@ -790,14 +790,14 @@ def running_service(pytestconfig, check_service_manager_settings,
                                         commtype=partial_commtype,
                                         for_request=True)
         if verify_flask:
-            assert(cli.service_type == 'flask')
-        assert(not cli.is_running)
+            assert cli.service_type == 'flask'
+        assert not cli.is_running
         p = subprocess.Popen(args, **process_kws)
         try:
             cli.wait_for_server()
             yield cli
             cli.stop_server()
-            assert(not cli.is_running)
+            assert not cli.is_running
             p.wait(10)
         finally:
             if p.returncode is None:  # pragma: debug
@@ -916,11 +916,11 @@ def recv_message_list(timeout, wait_on_function, nested_approx):
                     return True
                 msg_list.append(msg_recv)
             else:
-                assert(msg_recv == recv_inst.eof_msg)
+                assert msg_recv == recv_inst.eof_msg
             return (not flag)
         wait_on_function(recv_element, timeout=timeout)
         if expected_result is not None:
-            assert(msg_list == nested_approx(expected_result))
+            assert msg_list == nested_approx(expected_result)
         return msg_list
     return wrapped_recv_message_list
 
@@ -1178,7 +1178,7 @@ def close_comm():
     def close_comm_w(comm):
         comm.close()
         comm.disconnect()
-        assert(comm.is_closed)
+        assert comm.is_closed
         del comm
     return close_comm_w
 
@@ -1395,7 +1395,7 @@ def new_mpi_exchange():
 def adv_global_mpi_tag():
     def adv_global_mpi_tag_w(value=1):
         global _mpi_error_exchange
-        assert(_mpi_error_exchange is not None)
+        assert _mpi_error_exchange is not None
         out = _mpi_error_exchange.global_tag
         _mpi_error_exchange.global_tag += value
         return out
@@ -1406,7 +1406,7 @@ def adv_global_mpi_tag():
 def sync_mpi_exchange():
     def sync_mpi_exchange_w(*args, **kwargs):
         global _mpi_error_exchange
-        assert(_mpi_error_exchange is not None)
+        assert _mpi_error_exchange is not None
         return _mpi_error_exchange.sync(*args, **kwargs)
     return sync_mpi_exchange_w
 
