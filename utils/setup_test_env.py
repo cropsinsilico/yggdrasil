@@ -918,9 +918,13 @@ def preinstall_deps(method, return_commands=False, verbose=False,
     cmds = []
     # Uninstall default numpy and matplotlib to allow installation
     # of specific versions
-    pre_conda = ['scipy', 'numpy']
-    pre_default = ['matplotlib', 'jsonschema']
+    pre_conda = []
+    pre_default = []
     if not no_packages:
+        # Installing via pip causes import error on Windows and
+        #  a conflict when installing LPy
+        pre_conda += ['scipy', 'numpy']
+        pre_default += ['matplotlib', 'jsonschema']
         cmds += [f"{setup_param.python_cmd} -m pip uninstall -y "
                  + ' '.join(pre_conda + pre_default)]
         pre_conda = [os.environ.get(k.upper(), k) for k in pre_conda]
@@ -950,14 +954,15 @@ def preinstall_deps(method, return_commands=False, verbose=False,
             "echo -n \"LD_LIBRARY_PATH=\" >> $GITHUB_ENV",
             f"echo {conda_prefix}/lib:$LD_LIBRARY_PATH >> $GITHUB_ENV"
         ]
-        if setup_param.method == 'conda':
-            pre_conda += pre_default
-        elif setup_param.method == 'pip' and pre_default:
-            cmds += [f"{setup_param.python_cmd} -m pip install"
-                     f" {' '.join(pre_default)}"]
-        if setup_param.fallback_to_conda and pre_conda:
-            cmds += [f"{setup_param.conda_exe} install"
-                     f" {setup_param.conda_flags} {' '.join(pre_conda)}"]
+        if not no_packages:
+            if setup_param.method == 'conda':
+                pre_conda += pre_default
+            elif setup_param.method == 'pip' and pre_default:
+                cmds += [f"{setup_param.python_cmd} -m pip install"
+                         f" {' '.join(pre_default)}"]
+            if setup_param.fallback_to_conda and pre_conda:
+                cmds += [f"{setup_param.conda_exe} install"
+                         f" {setup_param.conda_flags} {' '.join(pre_conda)}"]
         cmds += get_summary_commands(use_mamba=setup_param.use_mamba)
     if return_commands:
         return cmds

@@ -12,9 +12,6 @@ name: Test of package installation & execution
   - cron: 0 10 * * 1
 env:
   NUMPY: numpy
-  MATPLOTLIB: matplotlib
-  MPLBACKEND: agg
-  JSONSCHEMA: jsonschema
   INSTALLR: 1
   INSTALLC: 1
   INSTALLFORTRAN: 1

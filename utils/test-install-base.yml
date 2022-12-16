@@ -11,9 +11,9 @@ name: Test of package installation & execution
 
 env:
   NUMPY: numpy
-  MATPLOTLIB: matplotlib
-  MPLBACKEND: agg
-  JSONSCHEMA: jsonschema
+  # MATPLOTLIB: matplotlib
+  # MPLBACKEND: agg
+  # JSONSCHEMA: jsonschema
   INSTALLR: 1
   INSTALLC: 1
   INSTALLFORTRAN: 1
