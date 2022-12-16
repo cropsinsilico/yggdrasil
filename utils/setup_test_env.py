@@ -521,9 +521,9 @@ def build_pkg(method, python=None, return_commands=False,
     if use_mamba and not shutil.which('mamba'):
         cmds.insert(0, f"{CONDA_CMD} install mamba -c conda-forge")
     call_script(cmds, verbose=verbose)
-    if method == 'conda':  # and not use_mamba:
-        print(f"CONDA_IDX = {conda_idx}")
-        assert (conda_idx and os.path.isdir(conda_idx))
+    # if method == 'conda':  # and not use_mamba:
+    #     print(f"CONDA_IDX = {conda_idx}")
+    #     assert (conda_idx and os.path.isdir(conda_idx))
 
 
 def create_env_yaml(filename='environment.yml', name='env', channels=None,
@@ -1120,7 +1120,8 @@ def install_pkg(method, python=None, without_build=False,
             # Related issues if this stops working again
             # https://github.com/conda/conda/issues/466#issuecomment-378050252
             f"{conda_exe} install {install_flags} -c"
-            f" {index_channel} yggdrasil"
+            f" {index_channel} yggdrasil",
+            f"{conda_exe} list"
             # Required for non-strict channel priority
             # https://github.com/conda-forge/conda-forge.github.io/pull/670
             # https://conda.io/projects/conda/en/latest/user-guide/concepts/ ...
