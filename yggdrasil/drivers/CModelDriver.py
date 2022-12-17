@@ -236,8 +236,10 @@ class ClangCompiler(CCompilerBase):
         out = super(ClangCompiler, cls).get_flags(*args, **kwargs)
         if '-fopenmp' in out:
             idx = out.index('-fopenmp')
-            if (idx > 0) and (out[idx - 1] != '-Xpreprocessor'):
-                out.insert(idx, '-Xpreprocessor')
+            # new_flag = '-Xpreprocessor'
+            new_flag = '-Xclang'
+            if (idx > 0) and (out[idx - 1] != new_flag):
+                out.insert(idx, new_flag)
         return out
         
 
@@ -410,6 +412,10 @@ class ClangLinker(LDLinker):
             out.append('-lstdc++')
         if '-fopenmp' in out:
             out[out.index('-fopenmp')] = '-lomp'
+            if 'conda' not in cls.get_executable(full_path=True):
+                out = subprocess.check_output(
+                    "find /usr/local -xdev -name '*libomp*'", shell=True)
+                print("LOOKING FOR LIBOMP: ", out)
         return out
 
 

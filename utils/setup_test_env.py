@@ -1263,8 +1263,7 @@ def install_pkg(method, python=None, without_build=False,
             # Related issues if this stops working again
             # https://github.com/conda/conda/issues/466#issuecomment-378050252
             f"{conda_exe} install {install_flags} -c"
-            f" {index_channel} yggdrasil",
-            f"{conda_exe} list"
+            f" {index_channel} yggdrasil"
             # Required for non-strict channel priority
             # https://github.com/conda-forge/conda-forge.github.io/pull/670
             # https://conda.io/projects/conda/en/latest/user-guide/concepts/ ...
@@ -1274,6 +1273,7 @@ def install_pkg(method, python=None, without_build=False,
         ]
         if _is_win and install_opts['mpi']:
             cmds[-1] = cmds[-1] + ' mpi4py # [ALLOW FAIL]'
+        cmds += [f"{conda_exe} list"]
     elif method == 'pip':
         if _is_win:  # pragma: windows
             cmds += [
