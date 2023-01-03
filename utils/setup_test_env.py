@@ -950,7 +950,7 @@ def preinstall_deps(method, return_commands=False, verbose=False,
         ]
     if setup_param.fallback_to_conda and not no_packages:
         cmds.append(f"{setup_param.conda_exe} update --all")
-    if _on_gha and _is_linux and setup_param.fallback_to_conda:
+    if _on_gha and _is_unix and setup_param.fallback_to_conda:
         if conda_env:
             conda_prefix = os.path.join(conda_root, 'envs', conda_env)
         # Do both to ensure that the path is set for the installation
