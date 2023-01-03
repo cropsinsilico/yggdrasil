@@ -195,8 +195,9 @@ jobs:
     - name: (UNIX,CONDA) Add miniconda bin to path
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os != 'Windows'
       run: |
-        echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
-        echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
+        echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
+        # echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
+        # echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
       shell: bash -l {0}
     - name: (MACOS,CONDA) Change ownership of conda on MacOS
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'macOS'
@@ -212,11 +213,11 @@ jobs:
       if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')}}
       run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }}
       shell: bash --noprofile --norc -eo pipefail {0}
-    - name: (UNIX,CONDA) Remove miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os != 'Windows'
-      run: |
-        echo "PATH=$NON_CONDA_PATH" >> $GITHUB_ENV
-      shell: bash -l {0}
+    # - name: (UNIX,CONDA) Remove miniconda bin from path
+    #   if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os != 'Windows'
+    #   run: |
+    #     echo "PATH=$NON_CONDA_PATH" >> $GITHUB_ENV
+    #   shell: bash -l {0}
     - name: (CONDA) Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'

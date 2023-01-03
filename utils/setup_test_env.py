@@ -11,6 +11,10 @@ import copy
 from datetime import datetime
 PYVER = ('%s.%s' % sys.version_info[:2])
 PY2 = (sys.version_info[0] == 2)
+if os.environ.get('PRE_CONDA_BIN', False):
+    os.environ['PATH'] = (os.environ['PRE_CONDA_BIN']
+                          + os.pathsep
+                          + os.environ['PATH'])
 _is_osx = (sys.platform == 'darwin')
 _is_linux = ('linux' in sys.platform)
 _is_win = (sys.platform in ['win32', 'cygwin'])
@@ -1332,6 +1336,7 @@ def verify_pkg(install_opts=None):
             If not provided, get_install_opts is used to create it.
 
     """
+    call_script(get_summary_commands())
     install_opts = get_install_opts(install_opts)
     if _is_win and (not install_opts['zmq']):
         install_opts['c'] = False

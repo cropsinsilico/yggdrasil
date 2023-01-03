@@ -693,8 +693,9 @@ class ygginfo(SubCommand):
                     vardict.append(
                         (curr_prefix + k, os.environ.get(k, None)))
                 curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
-                # Git location
-                vardict.append(('Git Location:', shutil.which('git')))
+                # Locations of executables
+                for x in ['git', 'mpiexec']:
+                    vardict.append((f'{x} Location:', shutil.which(x)))
                 # Conda info
                 if os.environ.get('CONDA_PREFIX', ''):
                     if platform._is_win:  # pragma: windows

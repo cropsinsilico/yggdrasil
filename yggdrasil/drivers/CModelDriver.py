@@ -413,9 +413,16 @@ class ClangLinker(LDLinker):
         if '-fopenmp' in out:
             out[out.index('-fopenmp')] = '-lomp'
             if 'conda' not in cls.get_executable(full_path=True):
-                out = subprocess.check_output(
-                    "find /usr/local -xdev -name '*libomp*'", shell=True)
-                print("LOOKING FOR LIBOMP: ", out)
+                result = subprocess.check_output(
+                    "find /usr/local -xdev -name '*libomp*'",
+                    shell=True).splitlines()
+                print("LOOKING FOR LIBOMP: ", result)
+                for x in result:
+                    x_dir, x_file = os.path.split(x)
+                    if x_file.endswith(('libomp.dylib', 'libomp.a')):
+                        print(f"ADDING LIBOMP: -L{x_dir}")
+                        out.append(f'-L{x_dir}')
+                        break
         return out
 
 
