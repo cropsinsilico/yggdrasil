@@ -1351,10 +1351,11 @@ def mpi_flavor():
     if shutil.which('mpicc'):
         result = subprocess.check_output("mpicc -v", shell=True).decode(
             "utf-8")
+        print('mpi_flavor', result)
         if "MPICH" in result:
             return 'mpich'
-        elif "Open MPI" in result:
-            return 'openmpi'
+        # elif "Open MPI" in result:
+        return 'openmpi'
     return None
 
 
