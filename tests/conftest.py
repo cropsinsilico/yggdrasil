@@ -193,6 +193,7 @@ def pytest_cmdline_preparse(args, dont_exit=False):
         remove_option(args, 'mpi_nproc')
         run_process = True
         prefix = ['mpiexec', '-n', str(pargs.mpi_nproc)]
+        print(mpi_flavor())
         if ((os.environ.get('CI', False) and platform._is_linux
              and mpi_flavor() == 'openmpi')):
             prefix.append('--oversubscribe')
@@ -1356,6 +1357,14 @@ def mpi_flavor():
             return 'mpich'
         # elif "Open MPI" in result:
         return 'openmpi'
+    else:
+        conda_prefix = os.environ.get("CONDA_PREFIX", None)
+        if conda_prefix:
+            for k in ['mpiexec', 'mpirun', 'mpicc']:
+                result = subprocess.check_output(
+                    f"find {conda_prefix} -xdev -name '*{k}*'",
+                    shell=True).decode("utf-8")
+                print(f'{k} search: {result}')
     return None
 
 
