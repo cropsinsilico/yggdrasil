@@ -11,9 +11,6 @@ name: Test of package installation & execution
 
 env:
   NUMPY: numpy
-  # MATPLOTLIB: matplotlib
-  # MPLBACKEND: agg
-  # JSONSCHEMA: jsonschema
   INSTALLR: 1
   INSTALLC: 1
   INSTALLFORTRAN: 1
@@ -197,8 +194,6 @@ jobs:
       run: |
         echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
         echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
-        # echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
-        # echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
       shell: bash -l {0}
     - name: (UNIX,CONDA) Add miniconda bin to path
       if: (matrix.install-method != 'conda' && matrix.install-method != 'mamba') || runner.os == 'Windows'
@@ -218,11 +213,6 @@ jobs:
       if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')}}
       run: $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }}
       shell: bash --noprofile --norc -eo pipefail {0}
-    # - name: (UNIX,CONDA) Remove miniconda bin from path
-    #   if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os != 'Windows'
-    #   run: |
-    #     echo "PATH=$NON_CONDA_PATH" >> $GITHUB_ENV
-    #   shell: bash -l {0}
     - name: (CONDA) Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'

@@ -198,10 +198,6 @@ jobs:
 
         echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
 
-        # echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
-
-        # echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
-
         '
       shell: bash -l {0}
     - name: (UNIX,CONDA) Add miniconda bin to path
@@ -519,10 +515,6 @@ jobs:
 
         echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
 
-        # echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
-
-        # echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
-
         '
       shell: bash -l {0}
     - name: (UNIX,CONDA) Add miniconda bin to path
@@ -815,10 +807,6 @@ jobs:
       run: 'echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
 
         echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
-
-        # echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
-
-        # echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
 
         '
       shell: bash -l {0}
@@ -1115,10 +1103,6 @@ jobs:
 
         echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
 
-        # echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
-
-        # echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
-
         '
       shell: bash -l {0}
     - name: (UNIX,CONDA) Add miniconda bin to path
@@ -1412,10 +1396,6 @@ jobs:
       run: 'echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
 
         echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
-
-        # echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
-
-        # echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
 
         '
       shell: bash -l {0}
