@@ -418,7 +418,7 @@ class ClangLinker(LDLinker):
                     shell=True).splitlines()
                 print("LOOKING FOR LIBOMP: ", result)
                 for x in result:
-                    x_dir, x_file = os.path.split(x)
+                    x_dir, x_file = os.path.split(x.decode("utf-8"))
                     if x_file.endswith(('libomp.dylib', 'libomp.a')):
                         print(f"ADDING LIBOMP: -L{x_dir}")
                         out.append(f'-L{x_dir}')

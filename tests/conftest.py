@@ -193,7 +193,8 @@ def pytest_cmdline_preparse(args, dont_exit=False):
         remove_option(args, 'mpi_nproc')
         run_process = True
         prefix = ['mpiexec', '-n', str(pargs.mpi_nproc)]
-        if os.environ.get('CI', False) and platform._is_linux:
+        if ((os.environ.get('CI', False) and platform._is_linux
+             and mpi_flavor() == 'openmpi')):
             prefix.append('--oversubscribe')
         if '--with-mpi' not in args:
             args.append('--with-mpi')
@@ -1343,6 +1344,18 @@ def cleanup_communicators(communicator_types):
 # MPI utilities
 _global_tag = 0
 _mpi_error_exchange = None
+
+
+def mpi_flavor():
+    r"""Return the MPI flavor."""
+    if shutil.which('mpicc'):
+        result = subprocess.check_output("mpicc -v", shell=True).decode(
+            "utf-8")
+        if "MPICH" in result:
+            return 'mpich'
+        elif "Open MPI" in result:
+            return 'openmpi'
+    return None
 
 
 @pytest.fixture(scope="session")
