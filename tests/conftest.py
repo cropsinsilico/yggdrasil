@@ -1349,6 +1349,17 @@ _mpi_error_exchange = None
 
 def mpi_flavor():
     r"""Return the MPI flavor."""
+    paths = ["/usr/local"]
+    for x in ["CONDA_PREFIX", "CONDA"]:
+        conda_prefix = os.environ.get(x, None)
+        if conda_prefix:
+            paths.append(conda_prefix)
+    for x in paths:
+        for k in ['mpiexec', 'mpirun', 'mpicc']:
+            result = subprocess.check_output(
+                f"find {x} -xdev -name '*{k}*'",
+                shell=True).decode("utf-8")
+            print(f'{x}: {k} search: {result}')
     if shutil.which('mpicc'):
         result = subprocess.check_output("mpicc -v", shell=True).decode(
             "utf-8")
@@ -1357,14 +1368,6 @@ def mpi_flavor():
             return 'mpich'
         # elif "Open MPI" in result:
         return 'openmpi'
-    else:
-        conda_prefix = os.environ.get("CONDA_PREFIX", None)
-        if conda_prefix:
-            for k in ['mpiexec', 'mpirun', 'mpicc']:
-                result = subprocess.check_output(
-                    f"find {conda_prefix} -xdev -name '*{k}*'",
-                    shell=True).decode("utf-8")
-                print(f'{k} search: {result}')
     return None
 
 

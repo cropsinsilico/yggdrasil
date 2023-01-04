@@ -241,6 +241,18 @@ jobs:
 
     - name: Verify installation
       run: python utils/setup_test_env.py verify
+    - name: Check mpiexec in shell 1
+      if: matrix.install-method == 'mamba' && startsWith(runner.os, 'macOS')
+      shell: bash -l {0}
+      run: which mpiexec
+    - name: Check mpiexec in shell 2
+      if: matrix.install-method == 'mamba' && startsWith(runner.os, 'macOS')
+      shell: bash
+      run: which mpiexec
+    - name: Check mpiexec in shell 2
+      if: matrix.install-method == 'mamba' && startsWith(runner.os, 'macOS')
+      shell: bash --noprofile --norc -eo pipefail {0}
+      run: which mpiexec
     - name: Compile libraries
       run: yggcompile
     - name: Run cmake test in command prompt
