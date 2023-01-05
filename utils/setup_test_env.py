@@ -315,6 +315,28 @@ def conda_env_exists(name, use_mamba=False):
     return (name in envs)
 
 
+def locate_conda_bin(conda_env, use_mamba=False):
+    r"""Determine the full path to the bin directory in a specific
+    conda environment.
+
+    Args:
+        conda_env (str): Name of conda environment that executable should be
+            returned for.
+        use_mamba (bool, optional): If True, use mamba in place of conda.
+
+    Returns:
+        str: Full path to the directory.
+
+    """
+    assert CONDA_ROOT
+    conda_prefix = os.path.join(CONDA_ROOT, 'envs')
+    if sys.platform in ['win32', 'cygwin']:
+        out = os.path.join(conda_prefix, conda_env, 'Scripts')
+    else:
+        out = os.path.join(conda_prefix, conda_env, 'bin')
+    return out
+
+
 def locate_conda_exe(conda_env, name, use_mamba=False):
     r"""Determine the full path to an executable in a specific conda environment.
 
@@ -328,18 +350,12 @@ def locate_conda_exe(conda_env, name, use_mamba=False):
         str: Full path to the executable.
 
     """
-    assert CONDA_ROOT
-    conda_prefix = os.path.join(CONDA_ROOT, 'envs')
-    if (sys.platform in ['win32', 'cygwin']):
-        if not name.endswith('.exe'):
-            name += '.exe'
-        if name.startswith('python'):
-            out = os.path.join(conda_prefix, conda_env, name)
-        else:
-            out = os.path.join(conda_prefix, conda_env,
-                               'Scripts', name)
-    else:
-        out = os.path.join(conda_prefix, conda_env, 'bin', name)
+    if sys.platform in ['win32', 'cygwin'] and not name.endswith('.exe'):
+        name += '.exe'
+    out = os.path.join(
+        locate_conda_bin(conda_env, use_mamba=use_mamba), name)
+    if sys.platform in ['win32', 'cygwin'] and name.startswith('python'):
+        out = os.path.dirname(out)
     try:
         assert os.path.isfile(out)
     except AssertionError:
@@ -1409,8 +1425,10 @@ def verify_pkg(install_opts=None):
         elif (not flag) and is_comm_installed(name, language=language):
             errors.append("Comm '%s' should NOT be installed, but is." % name)
     if install_opts['mpi'] and not shutil.which('mpiexec'):
+        paths = ["/usr/local", os.environ.get('CONDA', False),
+                 os.environ.get('CONDA_PREFIX', False)]
         cmds = []
-        for x in ["/usr/local", CONDA_PREFIX, os.environ.get('CONDA', False)]:
+        for x in paths:
             if not x:
                 continue
             cmds.append(f"ls {os.path.join(x, 'bin')}")
