@@ -760,7 +760,7 @@ def running_service(pytestconfig, check_service_manager_settings,
         if partial_commtype is not None:
             args.append(f"--commtype={partial_commtype}")
         args += ["start", f"--model-repository={model_repo}",
-                 f"--log-level={log_level}", '--track-memory']
+                 f"--log-level={log_level}"]
         process_kws = {}
         if with_coverage:
             script_path = os.path.expanduser(os.path.join('~', 'run_server.py'))
@@ -780,13 +780,12 @@ def running_service(pytestconfig, check_service_manager_settings,
             lines += ['assert not srv.is_running',
                       f'srv.start_server(with_coverage={with_coverage},',
                       f'                 log_level={log_level},'
-                      f'                 model_repository=\'{model_repo}\','
-                      f'                 track_memory=True)']
+                      f'                 model_repository=\'{model_repo}\')']
             with open(script_path, 'w') as fd:
                 fd.write('\n'.join(lines))
             args = [sys.executable, script_path]
-            args = 'ulimit -v 256000; ' + ' '.join(args)
-            process_kws['shell'] = True
+            # args = 'ulimit -v 256000; ' + ' '.join(args)
+            # process_kws['shell'] = True
         verify_flask = (service_type == 'flask')
         if verify_flask:
             # Flask is the default, verify that it is selected

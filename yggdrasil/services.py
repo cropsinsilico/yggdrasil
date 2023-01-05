@@ -12,7 +12,8 @@ import threading
 import logging
 from yggdrasil import runner
 from yggdrasil import platform
-from yggdrasil.multitasking import wait_on_function, ValueEvent
+from yggdrasil.multitasking import (
+    wait_on_function, ValueEvent, MemoryTracker)
 from yggdrasil.tools import YggClass, kill
 from yggdrasil.config import ygg_cfg
 
@@ -27,15 +28,6 @@ if platform._is_win:  # pragma: windows
     _shutdown_signal = signal.SIGBREAK
 else:
     _shutdown_signal = signal.SIGTERM
-
-
-def check_memory_usage(pid=None):
-    r"""Return the memory used by the current process."""
-    import psutil
-    if pid is None:
-        pid = os.getpid()
-    process = psutil.Process(os.getpid())
-    return process.memory_info().rss / 1024 ** 2
 
 
 class ClientError(BaseException):
@@ -181,13 +173,15 @@ class ServiceBase(YggClass):
             #     pass
         self._is_running = True
         if track_memory:
-            print(f"Before starting the server: {check_memory_usage()} MB")
+            track_memory = MemoryTracker(os.getpid())
+            track_memory.start()
         try:
             self.run_server()
         finally:
             self._is_running = False
         if track_memory:
-            print(f"After starting the server: {check_memory_usage()} MB")
+            track_memory.terminate()
+            print(f"Max memory usage: {track_memory.max_memory} MB")
 
     def run_server(self):
         r"""Begin listening for requests."""
