@@ -760,7 +760,7 @@ def running_service(pytestconfig, check_service_manager_settings,
         if partial_commtype is not None:
             args.append(f"--commtype={partial_commtype}")
         args += ["start", f"--model-repository={model_repo}",
-                 f"--log-level={log_level}"]
+                 f"--log-level={log_level}", '--track-memory']
         process_kws = {}
         if with_coverage:
             script_path = os.path.expanduser(os.path.join('~', 'run_server.py'))
@@ -780,10 +780,13 @@ def running_service(pytestconfig, check_service_manager_settings,
             lines += ['assert not srv.is_running',
                       f'srv.start_server(with_coverage={with_coverage},',
                       f'                 log_level={log_level},'
-                      f'                 model_repository=\'{model_repo}\')']
+                      f'                 model_repository=\'{model_repo}\','
+                      f'                 track_memory=True)']
             with open(script_path, 'w') as fd:
                 fd.write('\n'.join(lines))
             args = [sys.executable, script_path]
+            args = 'ulimit -v 256000; ' + ' '.join(args)
+            process_kws['shell'] = True
         verify_flask = (service_type == 'flask')
         if verify_flask:
             # Flask is the default, verify that it is selected
@@ -1349,17 +1352,6 @@ _mpi_error_exchange = None
 
 def mpi_flavor():
     r"""Return the MPI flavor."""
-    paths = ["/usr/local"]
-    for x in ["CONDA_PREFIX", "CONDA"]:
-        conda_prefix = os.environ.get(x, None)
-        if conda_prefix:
-            paths.append(conda_prefix)
-    for x in paths:
-        for k in ['mpiexec', 'mpirun', 'mpicc']:
-            result = subprocess.check_output(
-                f"find {x} -xdev -name '*{k}*'",
-                shell=True).decode("utf-8")
-            print(f'{x}: {k} search: {result}')
     if shutil.which('mpicc'):
         result = subprocess.check_output("mpicc -v", shell=True).decode(
             "utf-8")

@@ -29,6 +29,15 @@ else:
     _shutdown_signal = signal.SIGTERM
 
 
+def check_memory_usage(pid=None):
+    r"""Return the memory used by the current process."""
+    import psutil
+    if pid is None:
+        pid = os.getpid()
+    process = psutil.Process(os.getpid())
+    return process.memory_info().rss / 1024 ** 2
+
+
 class ClientError(BaseException):
     r"""Error raised by errors when calling the server from the client."""
     pass
@@ -129,7 +138,8 @@ class ServiceBase(YggClass):
         logging.basicConfig(level=log_level)
 
     def start_server(self, remote_url=None, with_coverage=False,
-                     log_level=None, model_repository=None):
+                     log_level=None, model_repository=None,
+                     track_memory=False):
         r"""Start the server.
 
         Args:
@@ -145,6 +155,9 @@ class ServiceBase(YggClass):
             model_repository (str, optional): URL of directory in a Git
                 repository containing YAMLs that should be added to the model
                 registry. Defaults to None and is ignored.
+            track_memory (boolean, optional): If True, the memory used
+                by the server will be reported at shutdown. Defaults
+                to False.
 
         """
         if remote_url is None:
@@ -167,10 +180,14 @@ class ServiceBase(YggClass):
             # except ImportError:  # pragma: debug
             #     pass
         self._is_running = True
+        if track_memory:
+            print(f"Before starting the server: {check_memory_usage()} MB")
         try:
             self.run_server()
         finally:
             self._is_running = False
+        if track_memory:
+            print(f"After starting the server: {check_memory_usage()} MB")
 
     def run_server(self):
         r"""Begin listening for requests."""

@@ -341,6 +341,10 @@ class integration_service_manager(SubCommand):
                           'help': ('URL for a directory in a Git repository '
                                    'containing models that should be loaded '
                                    'into the service manager registry.')}),
+                        (('--track-memory', ),
+                         {'action': 'store_true',
+                          'help': ('Track the memory used by the '
+                                   'service manager.')}),
                         (('--log-level', ),
                          {'type': int,
                           'help': ('Level of logging that should be '
@@ -425,7 +429,8 @@ class integration_service_manager(SubCommand):
                         with_coverage=getattr(args, 'with_coverage', False),
                         model_repository=getattr(args, 'model_repository',
                                                  None),
-                        log_level=getattr(args, 'log_level', None))
+                        log_level=getattr(args, 'log_level', None),
+                        track_memory=getattr(args, 'track_memory', False))
             else:
                 x.send_request(integration_name,
                                yamls=integration_yamls,
