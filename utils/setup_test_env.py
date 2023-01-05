@@ -1408,6 +1408,16 @@ def verify_pkg(install_opts=None):
             errors.append("Comm '%s' should be installed, but is not." % name)
         elif (not flag) and is_comm_installed(name, language=language):
             errors.append("Comm '%s' should NOT be installed, but is." % name)
+    if install_opts['mpi'] and not shutil.which('mpiexec'):
+        cmds = []
+        for x in ["/usr/local", CONDA_PREFIX, os.environ.get('CONDA', False)]:
+            if not x:
+                continue
+            cmds.append(f"ls {os.path.join(x, 'bin')}")
+            for k in ['mpiexec', 'mpirun', 'mpicc']:
+                cmds.append(f"find {x} -xdev -name '*{k}*'")
+        call_script(cmds)
+        errors.append("mpiexec could not be found")
     if errors:
         raise AssertionError("One or more languages was not installed as "
                              "expected\n\t%s" % "\n\t".join(errors))
