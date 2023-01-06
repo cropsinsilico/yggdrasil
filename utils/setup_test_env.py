@@ -1308,7 +1308,7 @@ def install_pkg(method, python=None, without_build=False,
             # f"{conda_exe} install {install_flags} --update-deps -c
             #   {index_channel} yggdrasil \"blas=*=openblas\""
         ]
-        if skipped_mpi and _is_win:
+        if skipped_mpi:
             assert ' install ' in cmds[-1]
             cmds[-1] = (f"{cmds[-1]} {' '.join(skipped_mpi)}"
                         f"# [ALLOW FAIL]")
@@ -1347,13 +1347,13 @@ def install_pkg(method, python=None, without_build=False,
         cmds = []
     if not install_deps_before:
         cmds += cmds_deps
-    if skipped_mpi and not _is_win:
-        # Do not install MPI with mamba as it seems to fallback
-        # on the empty mpich (external_*) on macOS currently. See:
-        #   https://github.com/mamba-org/mamba/issues/924
-        cmds.append(
-            f"{CONDA_CMD} install {setup_param.conda_flags}"
-            f" {' '.join(skipped_mpi)}")
+    # if skipped_mpi and not _is_win:
+    #     # Do not install MPI with mamba as it seems to fallback
+    #     # on the empty mpich (external_*) on macOS currently. See:
+    #     #   https://github.com/mamba-org/mamba/issues/924
+    #     cmds.append(
+    #         f"{CONDA_CMD} install {setup_param.conda_flags}"
+    #         f" {' '.join(skipped_mpi)}")
     # Print summary of what was installed
     if cmds:
         cmds = summary_cmds + cmds + summary_cmds
@@ -1473,7 +1473,9 @@ def verify_pkg(install_opts=None):
             cmds.append(f"ls {os.path.join(x, 'bin')}")
             for k in ['mpiexec', 'mpirun', 'mpicc']:
                 cmds.append(f"find {x} -xdev -name '*{k}*'")
-        cmds += ['conda-tree whoneeds -t mpich']
+        cmds += ['conda-tree whoneeds -t mpich',
+                 'conda-tree whoneeds -t mpi4py',
+                 'conda-tree whoneeds -t libgfortran']
         call_script(cmds)
         errors.append("mpiexec could not be found")
     if errors:

@@ -131,7 +131,7 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
     new_lines = []
     orig_lines = copy.copy(additional_packages)
     skip_mpi = ('mpi4py' in skip_packages)
-    mpi_pkgs = ['mpi4py', 'openmpi', 'mpich', 'msmpi']
+    mpi_pkgs = ['mpi4py', 'openmpi', 'mpich', 'msmpi', 'pytest-mpi']
     if skip_mpi:
         if not isinstance(skipped_mpi, list):
             skipped_mpi = []
