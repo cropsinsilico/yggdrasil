@@ -35,7 +35,7 @@ jobs:
       os-versions: ${{ steps.set-os-versions.outputs.versions }}
     steps:
       - id: set-os-versions
-        run: echo "::set-output name=versions::{\"ubuntu\":\"latest\", \"macos\":\"macos-11\", \"windows\":\"2019\"}"
+        run: echo "::set-output name=versions::{\"ubuntu\":\"latest\", \"macos\":\"macos-12\", \"windows\":\"2019\"}"
   test_pip:
     needs: params
     name: Test (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method }}, ${{ matrix.test-flags1 }}, ${{ matrix.test-flags2 }}), Install C = ${{ matrix.install-c }}
