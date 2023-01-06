@@ -289,6 +289,8 @@ def install_from_requirements(method, fname_in, conda_env=None,
                 args = [CONDA_CMD, 'install', '-y']
             if verbose:
                 args.append('-vvv')
+            else:
+                args.append('-v')
             # else:
             #     args.append('-q')
             if conda_env:

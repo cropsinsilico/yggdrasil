@@ -1120,6 +1120,8 @@ def install_deps(method, return_commands=False, verbose=False,
     # Remove so that they are not installed twice
     pkgs.pop(setup_param.method, None)
     if fallback_to_conda:
+        # TODO: Install requirements_optional here to catch optional
+        #   conda packages
         install_from_requirements('conda', pkgs['requirements_conda'],
                                   additional_packages=pkgs.get('conda', []),
                                   unique_to_method=True, **req_kwargs)
