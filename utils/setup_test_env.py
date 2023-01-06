@@ -1255,7 +1255,7 @@ def install_pkg(method, python=None, without_build=False,
                             conda_env=conda_env, always_yes=always_yes,
                             fallback_to_conda=fallback_to_conda,
                             use_mamba=setup_param.use_mamba)
-    cmds_mpi = []
+    skipped_mpi = []
     if not without_deps:
         skipped_mpi = []
         cmds_deps += install_deps(setup_param.method_base,
@@ -1271,13 +1271,6 @@ def install_pkg(method, python=None, without_build=False,
                                   fallback_to_conda=fallback_to_conda,
                                   use_mamba=setup_param.use_mamba,
                                   skipped_mpi=skipped_mpi)
-        if skipped_mpi:
-            # Do not install MPI with mamba as it seems to fallback
-            # on the empty mpich (external_*) on macOS currently. See:
-            #   https://github.com/mamba-org/mamba/issues/924
-            cmds_mpi.append(
-                f"{CONDA_CMD} install {setup_param.conda_flags}"
-                f" {' '.join(skipped_mpi)}")
     if install_deps_before:
         cmds += cmds_deps
     # Install yggdrasil
@@ -1315,6 +1308,11 @@ def install_pkg(method, python=None, without_build=False,
             # f"{conda_exe} install {install_flags} --update-deps -c
             #   {index_channel} yggdrasil \"blas=*=openblas\""
         ]
+        if skipped_mpi and _is_win:
+            assert ' install ' in cmds[-1]
+            cmds[-1] = (f"{cmds[-1]} {' '.join(skipped_mpi)}"
+                        f"# [ALLOW FAIL]")
+            
         # if install_opts['mpi'] and skipped_mpi:
         #     if _is_win:
         #         assert ' install ' in cmds[-1]
@@ -1345,19 +1343,27 @@ def install_pkg(method, python=None, without_build=False,
         pass
     else:  # pragma: debug
         raise ValueError(f"Invalid method: '{setup_param.method}'")
+    if YGG_CMD_WHICH:
+        cmds = []
     if not install_deps_before:
         cmds += cmds_deps
-    cmds += cmds_mpi
+    if skipped_mpi and not _is_win:
+        # Do not install MPI with mamba as it seems to fallback
+        # on the empty mpich (external_*) on macOS currently. See:
+        #   https://github.com/mamba-org/mamba/issues/924
+        cmds.append(
+            f"{CONDA_CMD} install {setup_param.conda_flags}"
+            f" {' '.join(skipped_mpi)}")
     # Print summary of what was installed
-    if not YGG_CMD_WHICH:
+    if cmds:
         cmds = summary_cmds + cmds + summary_cmds
         call_script(cmds, verbose=verbose)
-        if method.endswith('-dev'):
-            print(call_conda_command([setup_param.python_cmd,
-                                      '-m', 'pip', 'install',
-                                      '--editable', '.'],
-                                     cwd=_pkg_dir,
-                                     use_mamba=setup_param.use_mamba))
+    if not YGG_CMD_WHICH and method.endswith('-dev'):
+        print(call_conda_command([setup_param.python_cmd,
+                                  '-m', 'pip', 'install',
+                                  '--editable', '.'],
+                                 cwd=_pkg_dir,
+                                 use_mamba=setup_param.use_mamba))
     # Follow up if on Unix as R installation may require sudo
     if install_opts['R'] and _is_unix:
         R_cmd = ["ygginstall", "r"]
