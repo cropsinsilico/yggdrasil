@@ -1426,7 +1426,8 @@ def verify_pkg(install_opts=None):
             errors.append("Comm '%s' should NOT be installed, but is." % name)
     if install_opts['mpi'] and not shutil.which('mpiexec'):
         paths = ["/usr/local", os.environ.get('CONDA', False),
-                 os.environ.get('CONDA_PREFIX', False)]
+                 os.environ.get('CONDA_PREFIX', False),
+                 '/Library/Frameworks/Python.framework/Versions/Current']
         cmds = []
         for x in paths:
             if not x:
