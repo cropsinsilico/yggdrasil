@@ -79,7 +79,7 @@ def get_pip_dependency_version(pkg, dep):
 def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
           install_opts=None, additional_packages=[], skip_packages=[],
           verbose=False, return_list=False, dont_evaluate_markers=False,
-          environment=None):
+          environment=None, skipped_mpi=None):
     r"""Prune a requirements.txt file to remove/select dependencies that are
     dependent on the current environment.
 
@@ -112,6 +112,9 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
         environment (dict, optional): Environment properties that should be
             used to evaluate pip-style markers. Defaults to None and the
             current environment will be used.
+        skipped_mpi (list, optional): Existing list that skipped mpi
+            packages should be added to. Defaults to False and is
+            ignored.
 
     Returns:
         str: Full path to created file.
@@ -127,14 +130,29 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
     packages = []
     new_lines = []
     orig_lines = copy.copy(additional_packages)
+    skip_mpi = ('mpi4py' in skip_packages)
+    mpi_pkgs = ['mpi4py', 'openmpi', 'mpich', 'msmpi']
+    if skip_mpi:
+        if not isinstance(skipped_mpi, list):
+            skipped_mpi = []
+        for x in mpi_pkgs:
+            if x in skip_packages:
+                skip_packages.remove(x)
+
+    def add_package(p, line):
+        if skip_mpi and p in mpi_pkgs:
+            skipped_mpi.append(p)
+        else:
+            packages.append(p)
+            new_lines.append(line)
+
     for line in additional_packages:
         pkg = isolate_package_name(line)
         if pkg in packages:
             continue
         if pkg in skip_packages:
             continue
-        new_lines.append(line)
-        packages.append(pkg)
+        add_package(pkg, line)
     for ifname_in in fname_in:
         with open(ifname_in, 'r') as fd:
             old_lines = fd.readlines()
@@ -177,14 +195,14 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
             if skip_line:
                 continue
             if dont_evaluate_markers:
-                new_lines.append(req_name.strip())
+                add_package(pkg, req_name.strip())
                 continue
             try:
                 req = Requirement(req_name.strip())
                 if ((req.marker
                      and (not req.marker.evaluate(environment=environment)))):
                     continue
-                new_lines.append(req.name + str(req.specifier))
+                add_package(pkg, req.name + str(req.specifier))
             except InvalidRequirement as e:
                 print(e)
                 continue
@@ -214,7 +232,8 @@ def install_from_requirements(method, fname_in, conda_env=None,
                               verbose=False, verbose_prune=False,
                               additional_packages=[], skip_packages=[],
                               return_cmds=False, append_cmds=None,
-                              temp_file=None, use_mamba=False):
+                              temp_file=None, use_mamba=False,
+                              skipped_mpi=None):
     r"""Install packages via pip or conda from one or more pip-style
     requirements file(s).
 
@@ -252,6 +271,9 @@ def install_from_requirements(method, fname_in, conda_env=None,
         temp_file (str, optional): File where pruned requirements list should
             be stored. Defaults to None and one will be created.
         use_mamba (bool, optional): If True, use mamba in place of conda.
+        skipped_mpi (list, optional): Existing list that skipped mpi
+            packages should be added to. Defaults to False and is
+            ignored.
 
     """
     if method == 'mamba':
@@ -279,7 +301,8 @@ def install_from_requirements(method, fname_in, conda_env=None,
                       excl_method=excl_method, incl_method=incl_method,
                       install_opts=install_opts, verbose=verbose_prune,
                       additional_packages=additional_packages,
-                      skip_packages=skip_packages)
+                      skip_packages=skip_packages,
+                      skipped_mpi=skipped_mpi)
     try:
         if method == 'conda':
             if use_mamba:

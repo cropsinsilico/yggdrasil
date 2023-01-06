@@ -696,7 +696,8 @@ def create_env_yaml(filename='environment.yml', name='env', channels=None,
 def itemize_deps(method, for_development=False,
                  skip_test_deps=False, include_dev_deps=False, include_doc_deps=False,
                  windows_package_manager='vcpkg', install_opts=None,
-                 fallback_to_conda=None, use_mamba=False):
+                 fallback_to_conda=None, use_mamba=False,
+                 skipped_mpi=False):
     r"""Get lists of dependencies.
     
     Args:
@@ -719,6 +720,9 @@ def itemize_deps(method, for_development=False,
             non-python dependencies and Python dependencies that cannot be installed
             via pip. Defaults to False.
         use_mamba (bool, optional): If True, use mamba in place of conda.
+        skipped_mpi (list, optional): Existing list that skipped mpi
+            packages should be added to. Defaults to False and is
+            ignored.
 
     Returns:
         dict: Dependencies grouped by the package manager that should be
@@ -789,18 +793,21 @@ def itemize_deps(method, for_development=False,
             out['os'] += ['libomp', 'llvm']
         elif install_opts['os'] == 'win':
             pass
-    if install_opts['mpi'] and (not fallback_to_conda):
-        if install_opts['os'] == 'linux':
-            out['os'] += ['openmpi-bin', 'libopenmpi-dev']
-        elif install_opts['os'] == 'osx':
-            out['os'].append('openmpi')
-        elif install_opts['os'] == 'win':
-            pass
-    elif ((install_opts['os'] == 'win') and install_opts['mpi']
-          and (setup_param.method == 'conda')):
-        # Force mpi4py to be installed last on Windows to avoid
-        # conflicts
-        out['skip'].append('mpi4py')
+    if install_opts['mpi']:
+        if not fallback_to_conda:
+            if install_opts['os'] == 'linux':
+                out['os'] += ['openmpi-bin', 'libopenmpi-dev']
+            elif install_opts['os'] == 'osx':
+                out['os'].append('openmpi')
+            elif install_opts['os'] == 'win':
+                pass
+        elif setup_param.method == 'conda':
+            if install_opts['os'] == 'win':
+                # Force mpi4py to be installed last on Windows to
+                # avoid conflicts
+                out['skip'] += ['mpi4py', 'msmpi']
+            elif install_opts['os'] == 'osx' and setup_param.use_mamba:
+                out['skip'] += ['mpi4py', 'openmpi', 'mpich']
     if install_opts['fortran'] and (not fallback_to_conda):
         # Fortran is not installed via conda on linux/macos
         if install_opts['os'] == 'linux':
@@ -993,8 +1000,9 @@ def preinstall_deps(method, return_commands=False, verbose=False,
 
 def install_deps(method, return_commands=False, verbose=False,
                  install_opts=None, conda_env=None, always_yes=False,
-                 only_python=False, fallback_to_conda=None, use_mamba=False,
-                 do_preinstall=False, **kwargs):
+                 only_python=False, fallback_to_conda=None,
+                 use_mamba=False, do_preinstall=False,
+                 skipped_mpi=False, **kwargs):
     r"""Install the package dependencies.
     
     Args:
@@ -1021,6 +1029,9 @@ def install_deps(method, return_commands=False, verbose=False,
         use_mamba (bool, optional): If True, use mamba in place of conda.
         do_preinstall (bool, optional): If True, steps are taken to prepare
             for installation. Defaults to False.
+        skipped_mpi (list, optional): Existing list that skipped mpi
+            packages should be added to. Defaults to False and is
+            ignored.
         **kwargs: Additional keyword arguments are passed to itemize_deps.
 
     """
@@ -1113,7 +1124,8 @@ def install_deps(method, return_commands=False, verbose=False,
                       python_cmd=setup_param.python_cmd,
                       install_opts=install_opts, append_cmds=cmds,
                       skip_packages=pkgs['skip'], verbose=verbose,
-                      verbose_prune=True, use_mamba=setup_param.use_mamba)
+                      verbose_prune=True, use_mamba=setup_param.use_mamba,
+                      skipped_mpi=skipped_mpi)
     install_from_requirements(setup_param.method, pkgs['requirements'],
                               additional_packages=pkgs['default'],
                               **req_kwargs)
@@ -1243,7 +1255,9 @@ def install_pkg(method, python=None, without_build=False,
                             conda_env=conda_env, always_yes=always_yes,
                             fallback_to_conda=fallback_to_conda,
                             use_mamba=setup_param.use_mamba)
+    cmds_mpi = []
     if not without_deps:
+        skipped_mpi = []
         cmds_deps += install_deps(setup_param.method_base,
                                   return_commands=True, verbose=verbose,
                                   for_development=setup_param.for_development,
@@ -1255,7 +1269,15 @@ def install_pkg(method, python=None, without_build=False,
                                   conda_env=conda_env, always_yes=always_yes,
                                   only_python=only_python,
                                   fallback_to_conda=fallback_to_conda,
-                                  use_mamba=setup_param.use_mamba)
+                                  use_mamba=setup_param.use_mamba,
+                                  skipped_mpi=skipped_mpi)
+        if skipped_mpi:
+            # Do not install MPI with mamba as it seems to fallback
+            # on the empty mpich (external_*) on macOS currently. See:
+            #   https://github.com/mamba-org/mamba/issues/924
+            cmds_mpi.append(
+                f"{CONDA_CMD} install {setup_param.conda_flags}"
+                f" {' '.join(skipped_mpi)}")
     if install_deps_before:
         cmds += cmds_deps
     # Install yggdrasil
@@ -1293,8 +1315,15 @@ def install_pkg(method, python=None, without_build=False,
             # f"{conda_exe} install {install_flags} --update-deps -c
             #   {index_channel} yggdrasil \"blas=*=openblas\""
         ]
-        if _is_win and install_opts['mpi']:
-            cmds[-1] = cmds[-1] + ' mpi4py # [ALLOW FAIL]'
+        # if install_opts['mpi'] and skipped_mpi:
+        #     if _is_win:
+        #         assert ' install ' in cmds[-1]
+        #         cmds[-1] = (f"{cmds[-1]} {' '.join(skipped_mpi)}"
+        #                     f"# [ALLOW FAIL]")
+        #     elif install_opts['os'] == 'osx' and setup_param.use_mamba:
+        #         cmds.append(
+        #             f"{conda_exe_config} install {install_flags}"
+        #             f" {' '.join(skipped_mpi)}")
         cmds += [f"{conda_exe} list"]
     elif method == 'pip':
         if _is_win:  # pragma: windows
@@ -1318,6 +1347,7 @@ def install_pkg(method, python=None, without_build=False,
         raise ValueError(f"Invalid method: '{setup_param.method}'")
     if not install_deps_before:
         cmds += cmds_deps
+    cmds += cmds_mpi
     # Print summary of what was installed
     if not YGG_CMD_WHICH:
         cmds = summary_cmds + cmds + summary_cmds
@@ -1437,6 +1467,7 @@ def verify_pkg(install_opts=None):
             cmds.append(f"ls {os.path.join(x, 'bin')}")
             for k in ['mpiexec', 'mpirun', 'mpicc']:
                 cmds.append(f"find {x} -xdev -name '*{k}*'")
+        cmds += ['conda-tree whoneeds -t mpich']
         call_script(cmds)
         errors.append("mpiexec could not be found")
     if errors:

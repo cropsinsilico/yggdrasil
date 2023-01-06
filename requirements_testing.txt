@@ -1,4 +1,5 @@
 codecov
+conda-tree  # [conda]
 coverage
 flake8
 flaky
