@@ -38,7 +38,8 @@ def create_recipe():
         raise ValueError(f"Could not find indices to replace: "
                          f"[{idx_ver_beg}, {idx_ver_end}, {idx_ver_end},"
                          f" {idx_req_end}]")
-    skip = ['matplotlib']  # do matplotlib-base on conda
+    skip = ['matplotlib',        # do matplotlib-base on conda
+            'fortran-compiler']  # covered by compiler('fortran')
     deps_tot = ['python']
     for x in deps_all:
         if x in skip:
