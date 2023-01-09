@@ -1302,7 +1302,7 @@ def install_pkg(method, python=None, without_build=False,
         if install_opts['fortran']:
             ygg_pkgs += ['yggdrasil.fortran']
         if install_opts['R']:
-            ygg_pkgs += ['yggdrasil.R']
+            ygg_pkgs += ['yggdrasil.r']
         if install_opts['mpi']:
             ygg_pkgs += ['yggdrasil.mpi']
         if install_opts['rmq']:

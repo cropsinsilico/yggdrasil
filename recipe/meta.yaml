@@ -95,11 +95,11 @@ outputs:
         - zeromq
         - {{ compiler('c') }}  # [win]
         - {{ compiler('cxx') }}  # [win]
-  - name: yggdrasil.R
+  - name: yggdrasil.r
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.R') }}
+        - {{ pin_subpackage('yggdrasil.r') }}
     requirements:
       host:
         - r-base
