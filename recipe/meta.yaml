@@ -85,6 +85,7 @@ outputs:
         - {{ pin_subpackage('yggdrasil.c') }}
     requirements:
       host:
+        - python
         - czmq
         - lz4
         - zeromq
@@ -104,6 +105,7 @@ outputs:
         - {{ pin_subpackage('yggdrasil.r') }}
     requirements:
       host:
+        - python
         - r-base
         - r-bit64
         - r-r6
@@ -124,6 +126,8 @@ outputs:
       run_exports:
         - {{ pin_subpackage('yggdrasil.fortran') }}
     requirements:
+      host:
+        - python
       run:
         - {{ pin_subpackage('yggdrasil.c', exact=True) }}
         - m2w64-gcc-fortran  # [win]
@@ -132,6 +136,8 @@ outputs:
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
     requirements:
+      host:
+        - python
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - mpi4py
@@ -141,6 +147,8 @@ outputs:
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
     requirements:
+      host:
+        - python
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - pika>=1.0.0
