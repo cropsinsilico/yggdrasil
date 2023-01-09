@@ -807,6 +807,7 @@ def itemize_deps(method, for_development=False,
                 # avoid conflicts
                 out['skip'] += ['mpi4py', 'msmpi']
             elif install_opts['os'] == 'osx' and setup_param.use_mamba:
+                out['os'].append('openmpi')
                 out['skip'] += ['mpi4py', 'openmpi', 'mpich']
     if install_opts['fortran'] and (not fallback_to_conda):
         # Fortran is not installed via conda on linux/macos
@@ -1312,16 +1313,6 @@ def install_pkg(method, python=None, without_build=False,
             assert ' install ' in cmds[-1]
             cmds[-1] = (f"{cmds[-1]} {' '.join(skipped_mpi)}"
                         f"# [ALLOW FAIL]")
-            
-        # if install_opts['mpi'] and skipped_mpi:
-        #     if _is_win:
-        #         assert ' install ' in cmds[-1]
-        #         cmds[-1] = (f"{cmds[-1]} {' '.join(skipped_mpi)}"
-        #                     f"# [ALLOW FAIL]")
-        #     elif install_opts['os'] == 'osx' and setup_param.use_mamba:
-        #         cmds.append(
-        #             f"{conda_exe_config} install {install_flags}"
-        #             f" {' '.join(skipped_mpi)}")
         cmds += [f"{conda_exe} list"]
     elif method == 'pip':
         if _is_win:  # pragma: windows
@@ -1475,7 +1466,9 @@ def verify_pkg(install_opts=None):
                 cmds.append(f"find {x} -xdev -name '*{k}*'")
         cmds += ['conda-tree whoneeds -t mpich',
                  'conda-tree whoneeds -t mpi4py',
-                 'conda-tree whoneeds -t libgfortran']
+                 'conda-tree whoneeds -t libgfortran',
+                 'conda-tree whoneeds -t clang',
+                 'conda-tree depends -t yggdrasil']
         call_script(cmds)
         errors.append("mpiexec could not be found")
     if errors:
