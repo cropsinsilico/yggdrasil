@@ -10,6 +10,9 @@ source:
 
 build:
   number: 0
+  string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+  run_exports:
+    - {{ pin_subpackage('yggdrasil', max_pin='x.x.x') }}
   script: '{{ PYTHON }} -m pip install . --no-deps --ignore-installed --no-cache-dir -vvv '
   skip: true  # [(win and vc<14) or py<35]
   entry_points:
@@ -39,31 +42,17 @@ build:
 
 requirements:
   host:
-    - czmq
-    - lz4
     - numpy>=1.13.0
     - pip
     - python
-    - r-base
-    - r-bit64
-    - r-r6
-    - r-reticulate
-    - r-units
-    - r-zeallot
-    - sysv_ipc  # [unix]
-    - zeromq
+    - sysv_ipc  # [not win]
   run:
     - GitPython
     - chevron
-    - cmake  # [not win]
-    - czmq
     - flaky
     - flask
     - git
     - jsonschema==3.2.0
-    - lz4
-    - m2w64-gcc-fortran  # [win]
-    - m2w64-toolchain_win-64  # [win]
     - matplotlib-base
     - numpy>=1.13.0
     - pandas
@@ -73,27 +62,86 @@ requirements:
     - python-rapidjson
     - pyyaml
     - pyzmq
-    - r-base
-    - r-bit64
-    - r-r6
-    - r-reticulate
-    - r-units
-    - r-zeallot
     - requests
     - scipy
     - six
     - sysv_ipc  # [not win]
     - unyt
-    - zeromq
-    - {{ compiler('c') }}  # [win]
-    - {{ compiler('cxx') }}  # [win]
-    - {{ compiler('fortran') }}  # [not win]
 
 test:
   imports:
     - yggdrasil
   commands:
     - yggrun -h
+
+outputs:
+  - name: yggdrasil
+  - name: yggdrasil.c
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.c') }}
+    requirements:
+      host:
+        - czmq
+        - lz4
+        - zeromq
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - cmake  # [not win]
+        - czmq
+        - lz4
+        - m2w64-toolchain_win-64  # [win]
+        - zeromq
+        - {{ compiler('c') }}  # [win]
+        - {{ compiler('cxx') }}  # [win]
+  - name: yggdrasil.R
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.R') }}
+    requirements:
+      host:
+        - r-base
+        - r-bit64
+        - r-r6
+        - r-reticulate
+        - r-units
+        - r-zeallot
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - r-base
+        - r-bit64
+        - r-r6
+        - r-reticulate
+        - r-units
+        - r-zeallot
+  - name: yggdrasil.fortran
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.fortran') }}
+    requirements:
+      run:
+        - {{ pin_subpackage('yggdrasil.c', exact=True) }}
+        - m2w64-gcc-fortran  # [win]
+        - {{ compiler('fortran') }}  # [not win]
+  - name: yggdrasil.mpi
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+    requirements:
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - mpi4py
+        - mpich  # [unix]
+        - msmpi  # [win]
+  - name: yggdrasil.rmq
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+    requirements:
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - pika>=1.0.0
 
 about:
   home: https://github.com/cropsinsilico/yggdrasil

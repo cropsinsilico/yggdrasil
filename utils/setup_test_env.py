@@ -1296,12 +1296,23 @@ def install_pkg(method, python=None, without_build=False,
             index_channel = conda_idx
         else:
             index_channel = f"file:/{conda_idx}"
+        ygg_pkgs = ['yggdrasil']
+        if install_opts['c']:
+            ygg_pkgs += ['yggdrasil.c']
+        if install_opts['fortran']:
+            ygg_pkgs += ['yggdrasil.fortran']
+        if install_opts['R']:
+            ygg_pkgs += ['yggdrasil.R']
+        if install_opts['mpi']:
+            ygg_pkgs += ['yggdrasil.mpi']
+        if install_opts['rmq']:
+            ygg_pkgs += ['yggdrasil.rmq']
         cmds += [
             f"{conda_exe_config} config --prepend channels {index_channel}",
             # Related issues if this stops working again
             # https://github.com/conda/conda/issues/466#issuecomment-378050252
             f"{conda_exe} install {install_flags} -c"
-            f" {index_channel} yggdrasil"
+            f" {index_channel} {' '.join(ygg_pkgs)}"
             # Required for non-strict channel priority
             # https://github.com/conda-forge/conda-forge.github.io/pull/670
             # https://conda.io/projects/conda/en/latest/user-guide/concepts/ ...
