@@ -1,14 +1,13 @@
 codecov
-conda-tree  # [conda]
+conda-tree       # [conda]
 coverage
 flake8
 flaky
 nose
 pytest
 pytest-cov
-pytest-timeout
-pytest-mpi
 pytest-drop-dup-tests  # [pip]
-pytest-rerunfailures
-pytest-repeat
 pytest-mpi
+pytest-repeat
+pytest-rerunfailures
+pytest-timeout

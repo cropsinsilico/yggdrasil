@@ -86,18 +86,24 @@ outputs:
     requirements:
       host:
         - python
-        - czmq
-        - lz4
-        - zeromq
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - cmake  # [not win]
-        - czmq
-        - lz4
-        - m2w64-toolchain_win-64  # [win]
-        - zeromq
         - {{ compiler('c') }}  # [win]
         - {{ compiler('cxx') }}  # [win]
+  - name: yggdrasil.fortran
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.fortran') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil.c', exact=True) }}
+        - m2w64-gcc-fortran  # [win]
+        - m2w64-toolchain_win-64  # [win]
+        - {{ compiler('fortran') }}  # [not win]
   - name: yggdrasil.r
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
@@ -120,38 +126,153 @@ outputs:
         - r-reticulate
         - r-units
         - r-zeallot
-  - name: yggdrasil.fortran
+  - name: yggdrasil.zmq
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.fortran') }}
+        - {{ pin_subpackage('yggdrasil.zmq') }}
     requirements:
       host:
+        - czmq
+        - lz4
         - python
+        - zeromq
       run:
         - {{ pin_subpackage('yggdrasil.c', exact=True) }}
-        - m2w64-gcc-fortran  # [win]
-        - {{ compiler('fortran') }}  # [not win]
+        - czmq
+        - lz4
+        - zeromq
   - name: yggdrasil.mpi
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.mpi') }}
     requirements:
       host:
         - python
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - mpi4py
-        - mpich  # [unix]
+        - mpich  # [not win]
         - msmpi  # [win]
+  - name: yggdrasil.omp
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.omp') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
   - name: yggdrasil.rmq
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.rmq') }}
     requirements:
       host:
         - python
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - pika>=1.0.0
+  - name: yggdrasil.sbml
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.sbml') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+  - name: yggdrasil.testing
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.testing') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - codecov
+        - conda-tree
+        - coverage
+        - flake8
+        - flaky
+        - nose
+        - pytest
+        - pytest-cov
+        - pytest-mpi
+        - pytest-repeat
+        - pytest-rerunfailures
+        - pytest-timeout
+  - name: yggdrasil.docs
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.docs') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - breathe
+        - doxygen
+        - pypandoc
+        - r-roxygen2
+        - sphinx
+        - sphinx-argparse
+        - sphinx_rtd_theme
+  - name: yggdrasil.dev
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.dev') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - PyGithub
+        - black
+        - git
+        - ipython
+  - name: yggdrasil.astropy
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.astropy') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - astropy
+  - name: yggdrasil.pygments
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.pygments') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - pygments
+  - name: yggdrasil.trimesh
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.trimesh') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - trimesh
+
 
 about:
   home: https://github.com/cropsinsilico/yggdrasil

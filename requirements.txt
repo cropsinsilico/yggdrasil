@@ -1,12 +1,13 @@
+GitPython
 chevron
-flask
 flaky
+flask
 jsonschema==3.2.0
-matplotlib
+matplotlib       # [pip]
 numpy>=1.13.0
 pandas
-pyperf
 psutil
+pyperf
 python-rapidjson
 pyyaml
 pyzmq
@@ -15,4 +16,3 @@ scipy
 six
 sysv_ipc; platform_system != 'Windows'
 unyt
-GitPython

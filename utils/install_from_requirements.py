@@ -88,8 +88,9 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
             should be read.
         fname_out (str, optional): Full path to requirements file that should be
             created. Defaults to None and is set to <fname_in[0]>_pruned.txt.
-        excl_method (str, optional): Installation method (pip or conda) that
-            should be ignored. Defaults to None and is ignored.
+        excl_method (str, list, optional): Installation method(s) (pip
+            or conda) that should be ignored. Defaults to None and is
+            ignored.
         incl_method (str, optional): Installation method (pip or conda) that
             should be installed (requirements with without an installation method
             or with a different method will be ignored). Defaults to None and is
@@ -132,6 +133,8 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
     orig_lines = copy.copy(additional_packages)
     skip_mpi = ('mpi4py' in skip_packages)
     mpi_pkgs = ['mpi4py', 'openmpi', 'mpich', 'msmpi', 'pytest-mpi']
+    if isinstance(excl_method, str):
+        excl_method = [excl_method]
     if skip_mpi:
         if not isinstance(skipped_mpi, list):
             skipped_mpi = []
@@ -177,7 +180,7 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
                     if verbose:
                         print('line: %s, values = %s, excl = %s, incl = %s'
                               % (line, values, excl_method, incl_method))
-                    if excl_method and (excl_method in values):
+                    if excl_method and any(x in values for x in excl_method):
                         continue
                     if incl_method and (incl_method not in values):
                         continue
