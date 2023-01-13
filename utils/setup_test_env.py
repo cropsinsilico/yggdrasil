@@ -1,5 +1,6 @@
 import os
 import sys
+import glob
 import argparse
 import uuid
 import pprint
@@ -857,7 +858,7 @@ def build_pkg(method, param=None, python=None, return_commands=False,
         if param.use_mamba and not shutil.which('mamba'):
             cmds.insert(
                 0, f"{CONDA_CMD} install mamba -c conda-forge")
-            cmds = summary_cmds + cmds
+            cmds += summary_cmds + cmds
         call_script(cmds, verbose=param.verbose,
                     dry_run=param.dry_run)
     if param.method == 'conda':  # and not param.use_mamba:
@@ -1441,8 +1442,12 @@ def install_pkg(method, param=None, python=None, without_build=False,
             sdist = "%YGGSDIST%"
         else:
             sdist = "dist/*.tar.gz"
-        # if extras:
-        #     sdist += f"[{','.join(extras)}]"
+            res = glob.glob(sdist)
+            print('sdist glob', res)
+            if res:
+                sdist = res[0]
+        if extras:
+            sdist += f"[{','.join(extras)}]"
         cmds += [
             f"{param.python_cmd} -m pip install"
             f" {param.pip_flags} {sdist}",
