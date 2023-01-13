@@ -176,6 +176,8 @@ extras:
           add: [libopenmpi-dev]
         - name: openmpi
           method: brew
+          flags:
+            method_validate: conda_supp
   omp:
     - libomp:
         - name: libomp-dev

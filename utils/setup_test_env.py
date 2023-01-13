@@ -234,6 +234,7 @@ class SetupParam(object):
                           f'{self.method_base}_skip']:
                     if k in self.valid_methods:
                         self.valid_methods.remove(k)
+                self.valid_methods.append(f"{self.method_base}_supp")
         elif self.deps_method == 'unique':
             self.valid_methods += [f'{self.method_base}_skip',
                                    self.method_base]
@@ -244,8 +245,8 @@ class SetupParam(object):
             for k in ['cran', 'apt', 'brew', 'choco', 'vcpkg']:
                 if k in self.valid_methods:
                     self.valid_methods.remove(k)
-        # print(f"deps_method = {self.deps_method}, "
-        #       f"valid_methods = {self.valid_methods}")
+        print(f"deps_method = {self.deps_method}, "
+              f"valid_methods = {self.valid_methods}")
 
     @classmethod
     def from_args(cls, args, install_opts):
@@ -841,10 +842,14 @@ def build_pkg(method, param=None, python=None, return_commands=False,
             build_flags = ''
         else:
             build_flags = ''  # --quiet'
+        dist_dir = os.path.join(os.getcwd(), 'dist')
+        print(f"dist_dir = {dist_dir}")
+        build_flags += f'--dist-dir={dist_dir}'
         # Install from source dist
         cmds += [f"{param.python_cmd} -m pip install --upgrade "
                  + ' '.join(upgrade_pkgs)]
         cmds += [f"{param.python_cmd} setup.py {build_flags} sdist"]
+        cmds += [f"ls {dist_dir}"]
     else:  # pragma: debug
         raise ValueError(f"Method must be 'conda', 'mamba', or 'pip', not"
                          f" '{param.method}'")
@@ -1449,7 +1454,7 @@ def install_pkg(method, param=None, python=None, without_build=False,
             sdist = "dist/*.tar.gz"
             sdist_glob = os.path.join(os.getcwd(), sdist)
             res = glob.glob(sdist_glob)
-            print('sdist dir', glob.glob(os.path.join(os.getcwd(), '*')))
+            print('sdist dir', os.getcwd(), glob.glob(os.path.join(os.getcwd(), '*')))
             print('sdist glob', sdist_glob, res)
             if res:
                 sdist = res[0]

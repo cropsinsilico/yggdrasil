@@ -339,7 +339,10 @@
           },
           {
             "name": "openmpi",
-            "method": "brew"
+            "method": "brew",
+            "flags": {
+              "method_validate": "conda_supp"
+            }
           }
         ]
       }

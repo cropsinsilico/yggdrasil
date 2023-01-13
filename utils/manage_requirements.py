@@ -843,7 +843,6 @@ class YggRequirement(object):
             method = param.method_base
         args = []
         install_param = {}
-        assert method in param.valid_methods
         if method == 'pip':
             install_param['file_flag'] = '-r'
             args += [param.python_cmd, '-m', 'pip', 'install']
@@ -1125,7 +1124,10 @@ class YggRequirement(object):
         if ((param.only_python
              and self.method not in ['python', 'pip', 'conda'])):
             return False
-        return self.method in param.valid_methods
+        methods = [self.method]
+        if 'method_validate' in self.flags:
+            methods.append(self.flags['method_validate'])
+        return any(x in param.valid_methods for x in methods)
 
     def flags_selected(self, select_flags=None, deselect_flags=None,
                        required_flags=None):
@@ -1296,6 +1298,8 @@ class YggRequirement(object):
                 out += f', os={self.os}'
             if self.method is not None:
                 out += f', method={self.method}'
+            if self.flags:
+                out += f', flags={self.flags}'
             out += ')'
             return out
         return str({self.name: self.options})
