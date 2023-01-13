@@ -840,7 +840,7 @@ def build_pkg(method, param=None, python=None, return_commands=False,
         if param.verbose:
             build_flags = ''
         else:
-            build_flags = '--quiet'
+            build_flags = ''  # --quiet'
         # Install from source dist
         cmds += [f"{param.python_cmd} -m pip install --upgrade "
                  + ' '.join(upgrade_pkgs)]
@@ -858,7 +858,7 @@ def build_pkg(method, param=None, python=None, return_commands=False,
         if param.use_mamba and not shutil.which('mamba'):
             cmds.insert(
                 0, f"{CONDA_CMD} install mamba -c conda-forge")
-            cmds += summary_cmds + cmds
+            cmds = get_summary_commands() + cmds
         call_script(cmds, verbose=param.verbose,
                     dry_run=param.dry_run)
     if param.method == 'conda':  # and not param.use_mamba:
@@ -1442,8 +1442,9 @@ def install_pkg(method, param=None, python=None, without_build=False,
             sdist = "%YGGSDIST%"
         else:
             sdist = "dist/*.tar.gz"
-            res = glob.glob(sdist)
-            print('sdist glob', res)
+            sdist_glob = os.path.join(os.getcwd(), sdist)
+            res = glob.glob(sdist_glob)
+            print('sdist glob', sdist_glob, res)
             if res:
                 sdist = res[0]
         if extras:
