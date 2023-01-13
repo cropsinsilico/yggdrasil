@@ -844,11 +844,11 @@ def build_pkg(method, param=None, python=None, return_commands=False,
             build_flags = ''  # --quiet'
         dist_dir = os.path.join(os.getcwd(), 'dist')
         print(f"dist_dir = {dist_dir}")
-        build_flags += f'--dist-dir={dist_dir}'
         # Install from source dist
         cmds += [f"{param.python_cmd} -m pip install --upgrade "
                  + ' '.join(upgrade_pkgs)]
-        cmds += [f"{param.python_cmd} setup.py {build_flags} sdist"]
+        cmds += [f"{param.python_cmd} setup.py {build_flags} sdist"
+                 f" --dist-dir={dist_dir}"]
         cmds += [f"ls {dist_dir}"]
     else:  # pragma: debug
         raise ValueError(f"Method must be 'conda', 'mamba', or 'pip', not"
