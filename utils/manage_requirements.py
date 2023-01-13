@@ -878,13 +878,13 @@ class YggRequirement(object):
             if _on_travis and self.flags.get('from_src_on_travis', False):
                 args.append('--build-from-source')
         elif method == 'apt':
-            if param.install_opts['no_sudo']:
+            if not param.install_opts['no_sudo']:
                 args += ['sudo']
             args += ['apt']
             if param.always_yes and not param.install_opts['no_sudo']:
                 args += ['-y']
             args += ['update;']
-            if param.install_opts['no_sudo']:
+            if not param.install_opts['no_sudo']:
                 args += ['sudo']
             args += ['apt-get']
             if param.always_yes and not param.install_opts['no_sudo']:

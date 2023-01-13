@@ -716,8 +716,6 @@ def create_env(method, python, name=None, packages=None, init=_on_ci,
                              dry_run=dry_run)
     if packages is None:
         packages = []
-    if 'pyyaml' not in packages:  # Required to load requirements
-        packages.append('pyyaml')
     # if 'requests' not in packages:
     #     # Not strictly required, but useful for determine the versions of
     #     # dependencies required by packages during testing
