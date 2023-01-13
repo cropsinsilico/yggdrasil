@@ -317,7 +317,12 @@
         "mpi": [
           {
             "name": "mpich",
-            "os": "unix",
+            "os": "linux",
+            "method": "conda"
+          },
+          {
+            "name": "openmpi",
+            "os": "osx",
             "method": "conda"
           },
           {

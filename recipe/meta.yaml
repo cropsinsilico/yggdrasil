@@ -153,8 +153,9 @@ outputs:
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - mpi4py
-        - mpich  # [not win]
+        - mpich  # [linux]
         - msmpi  # [win]
+        - openmpi  # [osx]
   - name: yggdrasil.rmq
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

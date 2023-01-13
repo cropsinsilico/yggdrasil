@@ -859,6 +859,7 @@ def build_pkg(method, param=None, python=None, return_commands=False,
         if param.use_mamba and not shutil.which('mamba'):
             cmds.insert(
                 0, f"{CONDA_CMD} install mamba -c conda-forge")
+            cmds = summary_cmds + cmds
         call_script(cmds, verbose=param.verbose,
                     dry_run=param.dry_run)
     if param.method == 'conda':  # and not param.use_mamba:
