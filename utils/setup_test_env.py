@@ -856,8 +856,13 @@ def build_pkg(method, param=None, python=None, return_commands=False,
     if cmds:
         cmds = summary_cmds + cmds
         if param.use_mamba and not shutil.which('mamba'):
-            cmds.insert(
-                0, f"{CONDA_CMD} install mamba -c conda-forge")
+            cmds = [
+                f"{CONDA_CMD} config --prepend channels conda-forge",
+                f"{CONDA_CMD} config --remove channels defaults",
+                f"{CONDA_CMD} config --set channel_priority strict",
+                f"{CONDA_CMD} update --all",
+                f"{CONDA_CMD} install mamba -c conda-forge"
+            ] + cmds
             cmds = get_summary_commands() + cmds
         call_script(cmds, verbose=param.verbose,
                     dry_run=param.dry_run)
@@ -1444,6 +1449,7 @@ def install_pkg(method, param=None, python=None, without_build=False,
             sdist = "dist/*.tar.gz"
             sdist_glob = os.path.join(os.getcwd(), sdist)
             res = glob.glob(sdist_glob)
+            print('sdist dir', glob.glob(os.path.join(os.getcwd(), '*')))
             print('sdist glob', sdist_glob, res)
             if res:
                 sdist = res[0]
@@ -1451,7 +1457,7 @@ def install_pkg(method, param=None, python=None, without_build=False,
             sdist += f"[{','.join(extras)}]"
         cmds += [
             f"{param.python_cmd} -m pip install"
-            f" {param.pip_flags} {sdist}",
+            f" {param.pip_flags} \'{sdist}\'",
             f"{param.python_cmd} create_coveragerc.py"
         ]
         cmds += summary_cmds
