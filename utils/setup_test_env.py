@@ -1442,8 +1442,8 @@ def install_pkg(method, param=None, python=None, without_build=False,
             sdist = "%YGGSDIST%"
         else:
             sdist = "dist/*.tar.gz"
-        if extras:
-            sdist += f"[{','.join(extras)}]"
+        # if extras:
+        #     sdist += f"[{','.join(extras)}]"
         cmds += [
             f"{param.python_cmd} -m pip install"
             f" {param.pip_flags} {sdist}",
