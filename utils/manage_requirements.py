@@ -609,7 +609,6 @@ class YggRequirementsList(UserList):
             x.format(**kwargs) for x in selected if not x.host_only]
         out = sorted(list(set(out)))
         if standard == 'conda':
-            # TODO: Add additional information for conda varients
             req = out
             out = OrderedDict()
             host_req = [
@@ -684,11 +683,11 @@ class YggRequirementsList(UserList):
                 if not kargs:
                     continue
                 if kargs not in mapping:
-                    kparam['requirements'] = []
                     mapping[kargs] = kparam
-                mapping[kargs]['requirements'].append(
-                    x.format(name_only=True))
+                else:
+                    mapping[kargs]['requirements'] += kparam['requirements']
             for k, v in mapping.items():
+                v['requirements'] = list(set(v['requirements']))
                 if v.get('individually'):
                     for x in v['requirements']:
                         cmds.append(f"{k} {x} {v.get('suffix', '')}")
@@ -800,11 +799,14 @@ class YggRequirement(object):
             out[k] = getattr(self, k)
         return out
 
-    def install(self, param, **kwargs):
+    def install(self, param, return_commands=False, **kwargs):
         r"""Install this requirement.
 
         Args:
             param (SetupParam) Parameters defining the setup.
+            return_commands (bool, optional): If True, the script
+                is assembled (including any temporary files containing
+                requirements), but not executed. Defaults to False.
             **kwargs: Additional keyword arguments are passed to
                 the install_command_prefix method.
 
@@ -813,13 +815,15 @@ class YggRequirement(object):
 
         """
         cmds = []
-        args, install_param = self.install_command_prefix(
-            param, **kwargs)
-        if not args:
+        k, v = self.install_command_prefix(param, **kwargs)
+        if not k:
             return cmds
-        # TODO: Call
-        if True:
-            raise NotImplementedError
+        cmds.append(f"{k} {' '.join(v['requirements'])}")
+        if not return_commands:
+            summary_cmds = get_summary_commands(param=param)
+            cmds = summary_cmds + cmds + summary_cmds
+        if not (param.dry_run or return_commands):
+            call_script(cmds, verbose=param.verbose)
         return cmds
 
     def install_command_prefix(self, param):
@@ -879,7 +883,7 @@ class YggRequirement(object):
             args += ['apt']
             if param.always_yes and not param.install_opts['no_sudo']:
                 args += ['-y']
-            args += ['update;', 'apt-get']
+            args += ['update;']
             if param.install_opts['no_sudo']:
                 args += ['sudo']
             args += ['apt-get']
@@ -899,6 +903,9 @@ class YggRequirement(object):
             raise NotImplementedError(method)
         if 'install_flags' in self.flags:
             args += self.flags['install_flags']
+        if args:
+            install_param['requirements'] = [
+                self.format(name_only=True)]
         return ' '.join(args), install_param
 
     @property
