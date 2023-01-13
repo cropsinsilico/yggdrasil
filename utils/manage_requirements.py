@@ -4,13 +4,20 @@ import pprint
 import argparse
 import shutil
 import uuid
+import json
+import copy
 from collections import UserList, UserDict, OrderedDict
 from setup_test_env import (
     SetupParam, get_install_opts, _on_travis, call_script,
     get_summary_commands)
+try:
+    import yaml
+except ImportError:
+    yaml = None
 _pip_os_map = {'osx': 'Darwin',
                'win': 'Windows',
                'linux': 'Linux'}
+_req_dir = os.path.join(os.path.dirname(__file__), 'requirements')
 
 
 class NoValidRequirementOptions(Exception):
@@ -23,7 +30,9 @@ class YggRequirements(UserDict):
     circumstances."""
 
     def __init__(self, *args, **kwargs):
+        raw_data = copy.deepcopy(dict(*args, **kwargs))
         super(YggRequirements, self).__init__(*args, **kwargs)
+        self.raw_data = raw_data
         self.data['general'] = YggRequirementsList(
             self.data['general'])
         for k in self.data['extras'].keys():
@@ -34,22 +43,31 @@ class YggRequirements(UserDict):
                 [k], extras=[k])
     
     @classmethod
-    def from_yaml(cls, yamlfile):
+    def from_file(cls, fname=None, force_yaml=False):
         r"""Load requirements from a file.
 
         Args:
-            yamlfile (str, optional): Path to YAML file containing
-                requirements. Defaults to 'yggdrasil/requirements.yaml'.
+            fname (str, optional): Path to YAML/JSON file containing
+                requirements. Defaults to 'yggdrasil/requirements.yaml'
+                unless pyyaml is not installed and then json will be
+                used (unless force_yaml is True).
+            force_yaml (bool, optional): If True and fname is None,
+                the YAML file will be used even if pyyaml is not
+                installed (causing an ImportError). Defaults to False.
 
         Returns:
             YggRequirements: Requirements instance.
 
         """
-        import yaml
-        if yamlfile is None:
-            yamlfile = os.path.join(os.path.dirname(os.path.dirname(
-                __file__)), 'requirements.yaml')
-        out = yaml.load(open(yamlfile, 'r').read(), yaml.SafeLoader)
+        if fname is None:
+            ext = 'yaml'
+            if yaml is None and not force_yaml:
+                ext = 'json'
+            fname = os.path.join(_req_dir, f'requirements.{ext}')
+        if fname.endswith(('.yml', '.yaml')):
+            out = yaml.load(open(fname, 'r').read(), yaml.SafeLoader)
+        else:
+            out = json.load(open(fname, 'r'))
         return cls(out)
 
     @property
@@ -124,11 +142,12 @@ class YggRequirements(UserDict):
             param = SetupParam(install_opts=install_opts, **kwargs)
         if save and fname is None:
             if varient is None:
-                fname = 'requirements.txt'
+                fname = os.path.join(
+                    os.path.dirname(os.path.dirname(__file__)),
+                    'requirements.txt')
             else:
-                fname = f'requirements_{varient}.txt'
-            fname = os.path.join(
-                os.path.dirname(os.path.dirname(__file__)), fname)
+                fname = os.path.join(
+                    _req_dir, f'requirements_{varient}.txt')
         reqs = self.select_extra(varient).select(
             param, allow_multiple=True, allow_missing=True,
             ignore_existing=True,
@@ -159,8 +178,7 @@ class YggRequirements(UserDict):
                 k, format_kws=format_kws)
         lines = sorted(lines)
         fname_opt = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            'requirements_optional.txt')
+            _req_dir, 'requirements_optional.txt')
         with open(fname_opt, 'w') as fd:
             fd.write('\n'.join(lines) + '\n')
         lines_str = '\n\t'.join(lines)
@@ -175,7 +193,7 @@ class YggRequirements(UserDict):
                           'included_methods': [method],
                           'excluded_methods': [excluded, 'python']}
             fname = os.path.join(
-                os.path.dirname(os.path.dirname(__file__)),
+                _req_dir,
                 f'requirements_{method}only.txt')
             lines = []
             if method == 'conda':
@@ -230,7 +248,6 @@ class YggRequirements(UserDict):
 
     def create_conda_recipe(self):
         r"""Create a conda recipe file."""
-        import yaml
         fname = os.path.join(
             os.path.dirname(os.path.dirname(__file__)),
             'recipe', 'meta.yaml')
@@ -292,9 +309,7 @@ class YggRequirements(UserDict):
     def create_extras_require(self):
         r"""Create a config file containing extras_require."""
         import configparser
-        fname = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            'requirements_extras.ini')
+        fname = os.path.join(_req_dir, 'requirements_extras.ini')
         extras = {}
         format_kws = {'include_method': False, 'include_extra': False}
         for k in self.extras:
@@ -331,7 +346,7 @@ class YggRequirementsList(UserList):
                     extras.append(k)
         super(YggRequirementsList, self).__init__(*args, **kwargs)
         self.extras = extras
-        self.data = [YggRequirement.from_yaml(x, extras=extras)
+        self.data = [YggRequirement.from_file(x, extras=extras)
                      for x in self.data]
 
     def flatten(self):
@@ -483,7 +498,6 @@ class YggRequirementsList(UserList):
                 out['requirements']['host'] = sorted(host_req)
             out['requirements']['run'] = req
             if fname is not None:
-                import yaml
                 with open(fname, 'w') as fd:
                     yaml.write(fd, out)
         else:
@@ -1127,7 +1141,7 @@ class YggRequirement(object):
         return out
 
     @classmethod
-    def from_yaml(cls, src, parent=None, extras=None):
+    def from_file(cls, src, parent=None, extras=None):
         name = None
         kwargs = {}
         if isinstance(src, str):
@@ -1173,22 +1187,23 @@ class YggRequirement(object):
             for x in kwargs['options']:
                 for k, v in inherit_kwargs.items():
                     x.setdefault(k, v)
-                opts.append(YggRequirement.from_yaml(x, parent=name,
+                opts.append(YggRequirement.from_file(x, parent=name,
                                                      extras=extras))
             kwargs['options'] = opts
         return cls(name, **kwargs)
 
 
-def select_requirements(param, yamlfile=None, req=None, **kwargs):
+def select_requirements(param, fname=None, req=None, **kwargs):
     r"""Select requirements that are valid for the provided
     installation options.
 
     Args:
         param (SetupParam): Setup parameters instance.
-        yamlfile (str, optional): Path to YAML file containing
-            requirements. Defaults to 'yggdrasil/requirements.yaml'.
+        fname (str, optional): Path to YAML/JSON file containing
+            requirements. Defaults to 'yggdrasil/requirements.yaml'
+            unless pyyaml is not installed and then json will be used.
         req (list, optional): Pre-loaded list of requirements. If not
-            provided, requirements will be loaded from yamlfile.
+            provided, requirements will be loaded from fname.
         **kwargs: Additional keyword arguments are passed to
             YggRequirements.select.
 
@@ -1197,27 +1212,28 @@ def select_requirements(param, yamlfile=None, req=None, **kwargs):
 
     """
     if req is None:
-        req = YggRequirements.from_yaml(yamlfile)
+        req = YggRequirements.from_file(fname)
     return req.select(param, **kwargs).sorted_by_method(
         format_names=True)
 
 
-def create_requirements(standard, yamlfile=None, req=None):
+def create_requirements(standard, fname=None, req=None):
     r"""Create requirements files for all available varients.
 
     Args:
         standard (str): Standard that should be used to format lines
             in the file.
-        yamlfile (str, optional): Path to YAML file containing
-            requirements. Defaults to 'yggdrasil/requirements.yaml'.
+        fname (str, optional): Path to YAML/JSON file containing
+            requirements. Defaults to 'yggdrasil/requirements.yaml'
+            unless pyyaml is not installed and then json will be used.
         req (list, optional): Pre-loaded list of requirements. If not
-            provided, requirements will be loaded from yamlfile.
+            provided, requirements will be loaded from fname.
 
     """
     if req is None:
-        req = YggRequirements.from_yaml(yamlfile)
+        req = YggRequirements.from_file(fname, force_yaml=True)
     if standard == 'all':
-        for k in ['pip', 'conda', 'extras_require']:
+        for k in ['pip', 'conda', 'extras_require', 'json']:
             create_requirements(k, req=req)
     elif standard == 'pip':
         req.create_requirements_files()
@@ -1225,20 +1241,25 @@ def create_requirements(standard, yamlfile=None, req=None):
         req.create_conda_recipe()
     elif standard == 'extras_require':
         req.create_extras_require()
+    elif standard == 'json':
+        fname = os.path.join(_req_dir, 'requirements.json')
+        with open(fname, 'w') as fd:
+            json.dump(req.raw_data, fd, indent=2)
     else:
         raise NotImplementedError(standard)
 
 
-def install_requirements(param, yamlfile=None, req=None,
+def install_requirements(param, fname=None, req=None,
                          dry_run=False, **kwargs):
     r"""Install selected requirements on the current machine.
 
     Args:
         param (SetupParam): Setup parameters instance.
-        yamlfile (str, optional): Path to YAML file containing
-            requirements. Defaults to 'yggdrasil/requirements.yaml'.
+        fname (str, optional): Path to YAML/JSON file containing
+            requirements. Defaults to 'yggdrasil/requirements.yaml'
+            unless pyyaml is not installed and then json will be used.
         req (list, optional): Pre-loaded list of requirements. If not
-            provided, requirements will be loaded from yamlfile.
+            provided, requirements will be loaded from fname.
         dry_run (bool, optional): If True, don't actually run any
             commands. Defaults to False.
         **kwargs: Additional keyword arguments are passed to
@@ -1249,9 +1270,9 @@ def install_requirements(param, yamlfile=None, req=None,
 
     """
     if req is None:
-        req = YggRequirements.from_yaml(yamlfile)
-    return req.select(param, for_setup=True,
-                      **kwargs).install(param, dry_run=dry_run)
+        req = YggRequirements.from_file(fname)
+    kwargs.setdefault('for_setup', True)
+    return req.select(param, **kwargs).install(param, dry_run=dry_run)
 
 
 if __name__ == "__main__":
@@ -1283,7 +1304,9 @@ if __name__ == "__main__":
     parser_cre = subparsers.add_parser(
         'create', help="Create requirements files.")
     parser_cre.add_argument(
-        'standard', choices=['conda', 'pip', 'extras_require', 'all'])
+        'standard',
+        choices=['conda', 'pip', 'extras_require', 'json', 'all'],
+        help="Type of requirements file to create.")
     # Install requirements
     parser_ins = subparsers.add_parser(
         'install', help="Install required dependencies.")

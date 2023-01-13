@@ -50,15 +50,16 @@ else:
 
 
 # Create requirements list based on platform
+req_dir = os.path.join("utils", "requirements")
 with open("requirements.txt", 'r') as fd:
     requirements = fd.read().splitlines()
-with open("requirements_testing.txt", 'r') as fd:
+with open(os.path.join(req_dir, "requirements_testing.txt"), 'r') as fd:
     test_requirements = fd.read().splitlines()
 extras_config = configparser.ConfigParser(allow_no_value=True)
-extras_config.read("requirements_extras.ini")
+extras_config.read(os.path.join(req_dir, "requirements_extras.ini"))
 extras_requirements = {s: list(extras_config.options(s))
                        for s in extras_config.sections()}
-# with open("requirements_optional.txt", 'r') as fd:
+# with open(os.path.join(req_dir, "requirements_optional.txt"), 'r') as fd:
 #     optional_requirements = fd.read().splitlines()
 with open("console_scripts.txt", 'r') as fd:
     console_scripts = fd.read().splitlines()
