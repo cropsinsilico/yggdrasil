@@ -11,71 +11,6 @@ from setup_test_env import (
     PYTHON_CMD, CONDA_CMD, _is_win)
 
 
-class DependencyNotFound(BaseException):
-    r"""Exception raised when a dependency cannot be located."""
-    pass
-
-
-def isolate_package_name(entry):
-    r"""Get the package name without any constraints or conditions.
-
-    Args:
-        entry (str): Requirements entry.
-
-    Returns:
-        str: Package name.
-
-    """
-    keys = ['<', '>', '=', ';', '#']
-    out = entry
-    for k in keys:
-        out = out.split(k)[0].strip()
-    return out.strip()
-
-
-def get_pip_dependencies(pkg):
-    r"""Get the dependencies required by a package via pip.
-
-    Args:
-        pkg (str): The name of a pip-installable package.
-
-    Returns:
-        list: The package's dependencies.
-
-    """
-    import requests
-    url = 'https://pypi.org/pypi/{}/json'
-    json = requests.get(url.format(pkg)).json()
-    return json['info']['requires_dist']
-
-
-def get_pip_dependency_version(pkg, dep):
-    r"""Get the version of a dependency required by a pip-installable
-    package.
-
-    Args:
-        pkg (str): The name of a pip-installable package.
-        dep (str): The name of a dependency of pkg.
-
-    Returns:
-        str: The version of the dependency required by the package.
-
-    """
-    reqs = get_pip_dependencies(pkg)
-    dep_regex = r'%s(?:\s*\((?P<ver>[^\)]+)\))?' % dep
-    for x in reqs:
-        m = re.fullmatch(dep_regex, x)
-        if m:
-            ver = ''
-            if m.group('ver'):
-                ver = m.group('ver').strip()
-            return dep + ver
-    raise DependencyNotFound(
-        ("Could not locate the dependency '%s' "
-         "in the list of requirements for package '%s': %s")
-        % (dep, pkg, reqs))
-
-
 def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
           install_opts=None, additional_packages=[], skip_packages=[],
           verbose=False, return_list=False, dont_evaluate_markers=False,
@@ -121,6 +56,7 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
         str: Full path to created file.
 
     """
+    from manage_requirements import isolate_package_name
     regex_constrain = r'(?:(?:pip)|(?:conda)|(?:[a-zA-Z][a-zA-Z0-9]*))'
     regex_comment = r'\s*\[\s*(?P<vals>%s(?:\s*\,\s*%s)*)\s*\]\s*' % (
         regex_constrain, regex_constrain)

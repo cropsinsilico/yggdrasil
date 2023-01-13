@@ -1,5 +1,6 @@
 # https://www.python.org/dev/peps/pep-0508/
 import os
+import re
 import pprint
 import argparse
 import shutil
@@ -17,6 +18,7 @@ except ImportError:
 _pip_os_map = {'osx': 'Darwin',
                'win': 'Windows',
                'linux': 'Linux'}
+_rev_pip_os_map = {v.lower(): k for k, v in _pip_os_map.items()}
 _req_dir = os.path.join(os.path.dirname(__file__), 'requirements')
 
 
@@ -25,14 +27,82 @@ class NoValidRequirementOptions(Exception):
     pass
 
 
+class DependencyNotFound(BaseException):
+    r"""Exception raised when a dependency cannot be located."""
+    pass
+
+
+def isolate_package_name(entry):
+    r"""Get the package name without any constraints or conditions.
+
+    Args:
+        entry (str): Requirements entry.
+
+    Returns:
+        str: Package name.
+
+    """
+    keys = ['<', '>', '=', ';', '#']
+    out = entry
+    for k in keys:
+        out = out.split(k)[0].strip()
+    return out.strip()
+
+
+def get_pip_dependencies(pkg):
+    r"""Get the dependencies required by a package via pip.
+
+    Args:
+        pkg (str): The name of a pip-installable package.
+
+    Returns:
+        list: The package's dependencies.
+
+    """
+    import requests
+    url = 'https://pypi.org/pypi/{}/json'
+    json = requests.get(url.format(pkg)).json()
+    return json['info']['requires_dist']
+
+
+def get_pip_dependency_version(pkg, dep):
+    r"""Get the version of a dependency required by a pip-installable
+    package.
+
+    Args:
+        pkg (str): The name of a pip-installable package.
+        dep (str): The name of a dependency of pkg.
+
+    Returns:
+        str: The version of the dependency required by the package.
+
+    """
+    reqs = get_pip_dependencies(pkg)
+    dep_regex = r'%s(?:\s*\((?P<ver>[^\)]+)\))?' % dep
+    for x in reqs:
+        m = re.fullmatch(dep_regex, x)
+        if m:
+            ver = ''
+            if m.group('ver'):
+                ver = m.group('ver').strip()
+            return dep + ver
+    raise DependencyNotFound(
+        ("Could not locate the dependency '%s' "
+         "in the list of requirements for package '%s': %s")
+        % (dep, pkg, reqs))
+
+
 class YggRequirements(UserDict):
     r"""Structure outlining requirements for yggdrasil under different
     circumstances."""
 
     def __init__(self, *args, **kwargs):
+        add = kwargs.pop('add', None)
         raw_data = copy.deepcopy(dict(*args, **kwargs))
         super(YggRequirements, self).__init__(*args, **kwargs)
         self.raw_data = raw_data
+        if add:
+            self.data['general'] += add
         self.data['general'] = YggRequirementsList(
             self.data['general'])
         for k in self.data['extras'].keys():
@@ -43,7 +113,7 @@ class YggRequirements(UserDict):
                 [k], extras=[k])
     
     @classmethod
-    def from_file(cls, fname=None, force_yaml=False):
+    def from_file(cls, fname=None, force_yaml=False, add=None):
         r"""Load requirements from a file.
 
         Args:
@@ -54,6 +124,9 @@ class YggRequirements(UserDict):
             force_yaml (bool, optional): If True and fname is None,
                 the YAML file will be used even if pyyaml is not
                 installed (causing an ImportError). Defaults to False.
+            add (list, optional): Additional packages that should be
+                added to the general list. Defaults to None and is
+                ignored.
 
         Returns:
             YggRequirements: Requirements instance.
@@ -68,12 +141,26 @@ class YggRequirements(UserDict):
             out = yaml.load(open(fname, 'r').read(), yaml.SafeLoader)
         else:
             out = json.load(open(fname, 'r'))
-        return cls(out)
+        return cls(out, add=add)
 
-    @property
-    def extras(self):
-        r"""str: Yggdrasil build varients."""
-        return list(self.data['extras'].keys())
+    def extras(self, methods=None):
+        r"""Get the list of extras.
+
+        Args:
+            method (list, optional): List of methods that should
+               be present in an extra's requirements for it to be
+               returned. Defaults to None and is ignored.
+
+        Returns:
+            str: Yggdrasil build varients.
+
+        """
+        out = list(self.data['extras'].keys())
+        if methods:
+            for k, v in self.data['extras'].items():
+                if not v.has_method(methods):
+                    out.remove(k)
+        return out
 
     def select_extra(self, extra):
         r"""Select the requirements for an extra.
@@ -171,7 +258,7 @@ class YggRequirements(UserDict):
         format_kws = {'include_extra': True,
                       'excluded_methods': ['conda', 'pip']}
         lines = []
-        for k in self.extras:
+        for k in self.extras():
             if k in extras_sep:
                 continue
             lines += self.create_requirements_file_varient(
@@ -199,7 +286,7 @@ class YggRequirements(UserDict):
             if method == 'conda':
                 lines += self.create_requirements_file_varient(
                     format_kws=format_kws)
-            for k in self.extras:
+            for k in self.extras():
                 if k in extras_sep:
                     continue
                 lines += self.create_requirements_file_varient(
@@ -233,8 +320,8 @@ class YggRequirements(UserDict):
             if varient is not None:
                 for x in self.data['extras'][varient].extras:
                     install_opts[x] = True
-            param = SetupParam(install_opts=install_opts)
-            param.deps_methods += ['conda_recipe', 'conda_skip']
+            param = SetupParam('conda', install_opts=install_opts,
+                               deps_method='conda_recipe')
         if format_kws is None:
             format_kws = {}
         format_kws.setdefault('included_methods', ['conda_recipe'])
@@ -296,7 +383,7 @@ class YggRequirements(UserDict):
         new_lines += lines[idx_req_end:idx_ext_beg]
         # Varients
         extra_deps = {'outputs': [{'name': 'yggdrasil'}]}
-        for k in self.extras:
+        for k in self.extras():
             k_out = self.create_conda_recipe_varient(k)
             if k_out:
                 extra_deps['outputs'].append(k_out)
@@ -312,9 +399,7 @@ class YggRequirements(UserDict):
         fname = os.path.join(_req_dir, 'requirements_extras.ini')
         extras = {}
         format_kws = {'include_method': False, 'include_extra': False}
-        for k in self.extras:
-            if k in ['dev', 'testing', 'docs']:
-                continue
+        for k in self.extras():
             extras[k] = self.create_requirements_file_varient(
                 k, format_kws=format_kws)
         config = configparser.ConfigParser(allow_no_value=True)
@@ -349,6 +434,44 @@ class YggRequirementsList(UserList):
         self.data = [YggRequirement.from_file(x, extras=extras)
                      for x in self.data]
 
+    @classmethod
+    def from_files(cls, fname, skip=None, add=None):
+        r"""Read a list of requirements from one or more pip-style
+        files.
+
+        Args:
+            fname (str, list): One or more file names.
+            skip (list, optional): Names of packages to skip. Defaults
+                to None and is ignored.
+            add (list, optional): Additional packages that should be
+                added to the list. Defaults to None and is ignored.
+
+        Returns:
+            YggRequirementsList: Requirements list.
+
+        """
+        if not isinstance(fname, list):
+            fname = [fname]
+        out = YggRequirementsList()
+        lines = []
+        packages = []
+        for ifname in fname:
+            with open(ifname, 'r') as fd:
+                lines += fd.readlines()
+        if add:
+            lines += add
+        for x in lines:
+            x = x.strip()
+            if x.startswith('#'):
+                continue
+            pkg = YggRequirement.from_pip_requirement(x)
+            pkg_name = pkg.base_name
+            if (skip and pkg_name in skip) or pkg_name in packages:
+                continue
+            out.append(pkg)
+            packages.append(pkg_name)
+        return out
+
     def flatten(self):
         r"""Return a list of requirements that is flattened so that
         members do not have any 'add' members.
@@ -363,6 +486,23 @@ class YggRequirementsList(UserList):
         for x in self.data:
             out += x.flatten()
         return out
+
+    def has_method(self, methods):
+        r"""Determine if one or more methods is present in any of the
+        member requirements.
+
+        Args:
+            methods (list): Methods to check for.
+
+        Returns:
+            bool: True if any of the specified methods are present,
+                False otherwise.
+
+        """
+        for x in self.data:
+            if x.has_method(methods):
+                return True
+        return False
 
     def select_method(self, included_methods=None,
                       excluded_methods=None):
@@ -506,14 +646,11 @@ class YggRequirementsList(UserList):
                     fd.write('\n'.join(out) + '\n')
         return out
 
-    def install(self, param, dry_run=False, return_commands=False,
-                **kwargs):
+    def install(self, param, return_commands=False, **kwargs):
         r"""Install requirements in this list.
 
         Args:
             param (SetupParam) Parameters defining the setup.
-            dry_run (bool, optional): If True, return the list of
-                commands without running them. Defaults to False.
             return_commands (bool, optional): If True, the script
                 is assembled (including any temporary files containing
                 requirements), but not executed. Defaults to False.
@@ -527,10 +664,11 @@ class YggRequirementsList(UserList):
         """
         cmds = []
         reqs = self.sorted_by_method()
-        if param.method_base == 'pip':
-            reqs['pip'] += reqs.pop('python')
-        else:
-            reqs['conda'] += reqs.pop('python')
+        if 'python' in reqs:
+            if param.method_base == 'pip':
+                reqs['pip'] += reqs.pop('python')
+            else:
+                reqs['conda'] += reqs.pop('python')
         # Do non-python first
         order = [k for k in reqs.keys() if k not in
                  ['python', 'pip', 'conda']]
@@ -557,7 +695,7 @@ class YggRequirementsList(UserList):
                 elif ((v.get('file_flag', False)
                        and len(v['requirements']) > 1)):
                     ifile = f"requirements_{uuid.uuid4()}.txt"
-                    if dry_run:
+                    if param.dry_run:
                         req_str = '\n\t'.join(v['requirements'])
                         print(f"Temporary file: {ifile}\n\t{req_str}")
                     else:
@@ -580,9 +718,10 @@ class YggRequirementsList(UserList):
                     f"if os.path.isfile(\"{x}\"): "
                     f"os.remove(\"{x}\")\'"
                     for x in temp_files]
-        summary_cmds = get_summary_commands(use_mamba=param.use_mamba)
-        cmds = summary_cmds + cmds + summary_cmds
-        if not (dry_run or return_commands):
+        if not return_commands:
+            summary_cmds = get_summary_commands(param=param)
+            cmds = summary_cmds + cmds + summary_cmds
+        if not (param.dry_run or return_commands):
             try:
                 call_script(cmds, verbose=param.verbose)
             finally:
@@ -661,13 +800,11 @@ class YggRequirement(object):
             out[k] = getattr(self, k)
         return out
 
-    def install(self, param, dry_run=False, **kwargs):
+    def install(self, param, **kwargs):
         r"""Install this requirement.
 
         Args:
             param (SetupParam) Parameters defining the setup.
-            dry_run (bool, optional): If True, return the list of
-                commands without running them. Defaults to False.
             **kwargs: Additional keyword arguments are passed to
                 the install_command_prefix method.
 
@@ -685,14 +822,12 @@ class YggRequirement(object):
             raise NotImplementedError
         return cmds
 
-    def install_command_prefix(self, param, user=False):
+    def install_command_prefix(self, param):
         r"""Get the arguments in the installation command for a given
         method.
 
         Args:
             param (SetupParam) Parameters defining the setup.
-            user (bool, optional): If True, the install command will
-                be user specific if possible. Defaults to False.
 
         Returns:
             list, dict: Installation commands and some parameters for
@@ -704,13 +839,13 @@ class YggRequirement(object):
             method = param.method_base
         args = []
         install_param = {}
-        assert method in param.deps_methods
+        assert method in param.valid_methods
         if method == 'pip':
             install_param['file_flag'] = '-r'
             args += [param.python_cmd, '-m', 'pip', 'install']
             if param.verbose:
                 args.append('--verbose')
-            if user:
+            if param.user:
                 args.append('--user')
         elif method == 'conda':
             install_param['file_flag'] = '--file'
@@ -724,7 +859,7 @@ class YggRequirement(object):
                 # args.append('-q')
             if param.conda_env:
                 args += ['--name', param.conda_env]
-            if user:
+            if param.user:
                 args.append('--user')
         elif param.only_python or method.endswith('skip'):
             pass
@@ -765,6 +900,11 @@ class YggRequirement(object):
         if 'install_flags' in self.flags:
             args += self.flags['install_flags']
         return ' '.join(args), install_param
+
+    @property
+    def base_name(self):
+        r"""str: Base name of the package."""
+        return isolate_package_name(self.full_name)
 
     @property
     def full_name(self):
@@ -817,6 +957,8 @@ class YggRequirement(object):
             else:
                 assert self.os in _pip_os_map
                 out += f" == '{_pip_os_map[self.os]}'"
+            if 'pip_markers' in self.flags:
+                out += ' ' + '; '.join(self.flags['pip_markers'])
         varients = []
         if include_method and self.method != 'python':
             varients.append(self.method)
@@ -875,6 +1017,27 @@ class YggRequirement(object):
         """
         return f"# [{','.join(varients)}]"
 
+    def has_method(self, methods):
+        r"""Determine if one or more methods is present in any of the
+        requirement's options.
+
+        Args:
+            methods (list): Methods to check for.
+
+        Returns:
+            bool: True if any of the specified methods are present,
+                False otherwise.
+
+        """
+        if self.options:
+            for x in self.options:
+                if x.has_method(methods):
+                    return True
+            return False
+        if not isinstance(methods, (list, tuple)):
+            methods = [methods]
+        return self.method in methods
+        
     def add_padded_suffix(self, name, suffix, padding=0):
         r"""Add a suffix with padding so that first character of
         suffix lands at padding or greater.
@@ -941,6 +1104,21 @@ class YggRequirement(object):
                  or param.install_opts['os'] == 'any'
                  or (self.os == 'unix' and (param.install_opts['os']
                                             in ['osx', 'linux']))))
+
+    def method_selected(self, param):
+        r"""Returns True if the method requirement is met.
+
+        Args:
+            param (SetupParam) Parameters defining the setup.
+
+        Returns:
+            bool: True if the method requirement is met.
+
+        """
+        if ((param.only_python
+             and self.method not in ['python', 'pip', 'conda'])):
+            return False
+        return self.method in param.valid_methods
 
     def flags_selected(self, select_flags=None, deselect_flags=None,
                        required_flags=None):
@@ -1014,19 +1192,14 @@ class YggRequirement(object):
 
         """
         # print(self.name, not self.os_matches(param),
-        #       self.method not in param.deps_methods,
-        #       ((param.only_python
-        #         and self.method not in ['python', 'pip', 'conda'])),
+        #       not self.method_selected(param)
         #       not self.flags_selected(select_flags=select_flags,
         #                               deselect_flags=deselect_flags,
         #                               required_flags=required_flags),
         #       ((not ignore_existing) and self.executable_exists()))
         if not self.os_matches(param):
             return False
-        if self.method not in param.deps_methods:
-            return False
-        if ((param.only_python
-             and self.method not in ['python', 'pip', 'conda'])):
+        if not self.method_selected(param):
             return False
         if not self.flags_selected(select_flags=select_flags,
                                    deselect_flags=deselect_flags,
@@ -1070,6 +1243,8 @@ class YggRequirement(object):
                 is_selected and add_option calls for child options.
 
         """
+        if param.deps_method == 'supplemental':
+            allow_missing = True
         kwargs.update(os_covered=os_covered,
                       allow_multiple=allow_multiple)
         if self.extras and not all([param.install_opts[x]
@@ -1083,7 +1258,8 @@ class YggRequirement(object):
                 solf = YggRequirement(**solf_kws)
             if not solf.is_selected(param, **kwargs):
                 return False
-            out.append(solf)
+            if not solf.method.endswith('skip'):
+                out.append(solf)
             return True
         else:
             os_covered = {'win': False, 'linux': False, 'osx': False}
@@ -1141,7 +1317,86 @@ class YggRequirement(object):
         return out
 
     @classmethod
+    def from_pip_requirement(cls, src, verbose=False):
+        r"""Create a requirement from a pip-style string.
+
+        Args:
+            src (str): Pip-style requirement string.
+            verbose (bool, optional): If True, setup steps are run
+                with verbosity turned up. Defaults to False.
+
+        Returns:
+            YggRequirement: Pip requirement.
+
+        """
+        regex_constrain = r'(?:(?:pip)|(?:conda)|(?:[a-zA-Z][a-zA-Z0-9]*))'
+        regex_comment = r'\s*\[\s*(?P<vals>%s(?:\s*\,\s*%s)*)\s*\]\s*' % (
+            regex_constrain, regex_constrain)
+        regex_marker = (r'(?P<name>[a-zA-Z][a-zA-Z0-9_]*)\s*'
+                        r'(?P<op>[=!<>]+)\s*'
+                        r'(?:\'|\")(?P<val>[a-zA-Z0-9_.]+)(?:\'|\")')
+        name = src
+        kwargs = {}
+        if '#' in name:
+            name, comment = name.split('#')
+            m = re.fullmatch(regex_comment, comment)
+            if m:
+                values = []
+                for x in m.group('vals').split(','):
+                    v = x.strip()
+                    values.append(v)
+                    if v in ['pip', 'conda']:
+                        assert 'method' not in kwargs
+                        kwargs['method'] = v
+                    elif v in ['win', 'osx', 'linux', 'unix']:
+                        assert 'os' not in kwargs
+                        kwargs['os'] = v
+                    else:
+                        kwargs.setdefault('extras', [])
+                        kwargs['extras'].append(v)
+                if verbose:
+                    print(f'src = {src}, values = {values}')
+        if ';' in name:
+            markers = [x.strip() for x in name.split(';')]
+            name = markers[0]
+            del markers[0]
+            for x in markers:
+                m = re.fullmatch(regex_marker, x)
+                assert m
+                if m.group('name') == 'sys_platform':
+                    assert 'os' not in kwargs
+                    kwargs['os'] = _rev_pip_os_map[m.group('val')]
+                    if m.group('op') == '==':
+                        pass
+                    elif m.group('op') == '!=':
+                        assert kwargs['os'] == 'win'
+                        kwargs['os'] = 'unix'
+                    else:
+                        raise NotImplementedError(m.group('op'))
+                else:
+                    kwargs.setdefault('flags', {})
+                    kwargs['flags'].setdefault('pip_markers', [])
+                    kwargs['flags']['pip_markers'].append(x)
+        return cls(name.strip(), **kwargs)
+
+    @classmethod
     def from_file(cls, src, parent=None, extras=None):
+        r"""Create a requirement from information loaded from the
+        requirements.yaml or requirements.json file.
+
+        Args:
+            src (str, dict): Requirement information.
+            parent (str, optional): Name of parent requirement if this
+                is a requirement option. Defaults to None and is
+                ignored.
+            extras (list, optional): Build varients that are required
+                for this requirement to be installed. Defaults to None
+                and is ignored.
+
+        Returns:
+            YggRequirement: New requirement instance.
+
+        """
         name = None
         kwargs = {}
         if isinstance(src, str):
@@ -1226,8 +1481,8 @@ def create_requirements(standard, fname=None, req=None):
         fname (str, optional): Path to YAML/JSON file containing
             requirements. Defaults to 'yggdrasil/requirements.yaml'
             unless pyyaml is not installed and then json will be used.
-        req (list, optional): Pre-loaded list of requirements. If not
-            provided, requirements will be loaded from fname.
+        req (YggRequirements, optional): Existing set of requirements
+            to use. If not provided, one will be created from fname.
 
     """
     if req is None:
@@ -1249,8 +1504,8 @@ def create_requirements(standard, fname=None, req=None):
         raise NotImplementedError(standard)
 
 
-def install_requirements(param, fname=None, req=None,
-                         dry_run=False, **kwargs):
+def install_requirements(param, fname=None, req=None, add=None,
+                         return_commands=False, **kwargs):
     r"""Install selected requirements on the current machine.
 
     Args:
@@ -1258,10 +1513,14 @@ def install_requirements(param, fname=None, req=None,
         fname (str, optional): Path to YAML/JSON file containing
             requirements. Defaults to 'yggdrasil/requirements.yaml'
             unless pyyaml is not installed and then json will be used.
-        req (list, optional): Pre-loaded list of requirements. If not
-            provided, requirements will be loaded from fname.
-        dry_run (bool, optional): If True, don't actually run any
-            commands. Defaults to False.
+        req (YggRequirements, optional): Existing set of requirements
+            to use. If not provided, one will be created from fname
+            and add.
+        add (list, optional): Additional packages that should be
+            installed. Defaults to None and is ignored.
+        return_commands (bool, optional): If True, the commands
+            necessary to install the dependencies are returned instead
+            of running them. Defaults to False.
         **kwargs: Additional keyword arguments are passed to
             YggRequirements.select.
 
@@ -1270,9 +1529,129 @@ def install_requirements(param, fname=None, req=None,
 
     """
     if req is None:
-        req = YggRequirements.from_file(fname)
+        file_kwargs = {'add': add}
+        if ((isinstance(fname, list)
+             or (isinstance(fname, str) and fname.endswith('.txt')))):
+            req = YggRequirements.from_files(fname, **file_kwargs)
+        else:
+            req = YggRequirements.from_file(fname, **file_kwargs)
     kwargs.setdefault('for_setup', True)
-    return req.select(param, **kwargs).install(param, dry_run=dry_run)
+    return req.select(param, **kwargs).install(
+        param, return_commands=return_commands)
+
+
+def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
+          install_opts=None, additional_packages=[], skip_packages=[],
+          verbose=False, return_list=False, dont_evaluate_markers=False,
+          environment=None, skipped_mpi=None, param=None, **kwargs):
+    r"""Prune a requirements.txt file to remove/select dependencies
+    that are dependent on the current environment.
+
+    Args:
+        fname_in (str, list): Full path to one or more requirements
+            files that should be read.
+        fname_out (str, optional): Full path to requirements file that
+            should be created. Defaults to None and is set to
+            <fname_in[0]>_pruned.txt.
+        excl_method (str, list, optional): Installation method(s) (pip
+            or conda) that should be ignored. Defaults to None and is
+            ignored.
+        incl_method (str, list, optional): Installation method(s) (pip
+            or conda) that should be installed (requirements without
+            an installation method or with a different method will be
+            ignored). Defaults to None and is ignored.
+        additional_packages (list, optional): Additional packages that
+            should be installed. Defaults to empty list. Versions
+            specified here take precedence over versions in the
+            provided files.
+        skip_packages (list, optional): A list of packages that should
+            not be added to the pruned list. Defaults to an empty
+            list.
+        verbose (bool, optional): If True, setup steps are run with
+            verbosity turned up. Defaults to False.
+        return_list (bool, optional): If True, return the list of
+            requirements rather than writing it to a file. Defaults to
+            False.
+        dont_evaluate_markers (bool, optional): If True, don't check
+            the pip-style markers when pruning (only those based on
+            install_opts). Defaults to False.
+        environment (dict, optional): Environment properties that
+            should be used to evaluate pip-style markers. Defaults to
+            None and the current environment will be used.
+        skipped_mpi (list, optional): Existing list that skipped mpi
+            packages should be added to. Defaults to False and is
+            ignored.
+        **kwargs: Additional keyword arguments are passed to
+            SetupParam if param not provided.
+
+    Returns:
+        str: Full path to created file.
+
+    """
+    if param is None:
+        if incl_method:
+            kwargs.setdefault('method', incl_method)
+        param = SetupParam(**kwargs)
+    if not isinstance(fname_in, (list, tuple)):
+        fname_in = [fname_in]
+    skip_mpi = ('mpi4py' in skip_packages)
+    mpi_pkgs = ['mpi4py', 'openmpi', 'mpich', 'msmpi', 'pytest-mpi']
+    if isinstance(excl_method, str):
+        excl_method = [excl_method]
+    if skip_mpi:
+        if not isinstance(skipped_mpi, list):
+            skipped_mpi = []
+        for x in mpi_pkgs:
+            if x in skip_packages:
+                skip_packages.remove(x)
+    reqs = YggRequirementsList.from_files(
+        fname_in, skip=skip_packages, add=additional_packages).select(
+            param)
+    if excl_method and not isinstance(excl_method, list, tuple):
+        excl_method = [excl_method]
+    if incl_method:
+        if not isinstance(incl_method, (list, tuple)):
+            incl_method = [incl_method]
+        if not any(x == 'python' for x in incl_method):
+            if not excl_method:
+                excl_method = []
+            excl_method.append('python')
+    format_kws = dict(included_methods=incl_method,
+                      excluded_methods=excl_method,
+                      include_os=True, include_extra=True,
+                      include_method=True)
+    if skip_mpi:
+        cpy = YggRequirementsList()
+        mpi = YggRequirementsList()
+        for x in reqs:
+            if x.base_name in mpi_pkgs:
+                mpi.append(x)
+            else:
+                cpy.append(x)
+        skipped_mpi += mpi.format(**format_kws)
+        reqs = cpy
+    new_lines = reqs.format(**format_kws)
+    if return_list:
+        return new_lines
+    # Write file
+    if fname_out is None:
+        if fname_in:
+            fname_out = ('_pruned%s' % str(uuid.uuid4())).join(
+                os.path.splitext(fname_in[0]))
+        else:
+            fname_out = ('pruned%s.txt' % str(uuid.uuid4()))
+    if new_lines:
+        with open(fname_out, 'w') as fd:
+            fd.write('\n'.join(new_lines))
+    if verbose:
+        orig_lines = copy.copy(additional_packages)
+        for x in fname_in:
+            orig_lines += open(x, 'r').readlines()
+        print(f'INSTALL OPTS:\n{pprint.pformat(install_opts)}')
+        print('ORIGINAL DEP LIST:\n\t%s\nPRUNED DEP LIST:\n\t%s'
+              % ('\n\t'.join([x.strip() for x in orig_lines]),
+                 '\n\t'.join(new_lines)))
+    return fname_out
 
 
 if __name__ == "__main__":
@@ -1315,10 +1694,17 @@ if __name__ == "__main__":
                            'conda-dev', 'pip-dev', 'mamba-dev'],
         help="Method that will be used to install yggdrasil.")
     parser_ins.add_argument(
-        '--dry-run', action='store_true',
-        help="Don't actually run any commands")
+        '--files', nargs='+',
+        help='One or more pip-style requirements files')
+    parser_ins.add_argument(
+        '--additional-packages', nargs='+',
+        help="Additional packages that should be installed.")
+    parser_ins.add_argument(
+        '--allow-missing', action='store_true',
+        help="Ignore requirements with no valid options")
     SetupParam.add_parser_args(parser_ins, install_opts=install_opts,
-                               skip=['target-os'])
+                               skip=['target-os'],
+                               deps_method_default="supplemental")
     # Call methods
     args = parser.parse_args()
     if args.operation == 'select':
@@ -1332,7 +1718,9 @@ if __name__ == "__main__":
         # Use the version that takes the environment into account
         install_opts = get_install_opts()
         param = SetupParam.from_args(args, install_opts)
-        x = install_requirements(param, dry_run=args.dry_run)
+        x = install_requirements(
+            param, fname=args.files, add=args.additional_packages,
+            allow_missing=args.allow_missing)
         pprint.pprint(x)
     else:
         raise NotImplementedError(args.operation)
