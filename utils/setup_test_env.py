@@ -1,6 +1,5 @@
 import os
 import sys
-import glob
 import argparse
 import uuid
 import pprint
@@ -843,15 +842,11 @@ def build_pkg(method, param=None, python=None, return_commands=False,
         if param.verbose:
             build_flags = ''
         else:
-            build_flags = ''  # --quiet'
-        dist_dir = os.path.join(os.getcwd(), 'dist')
-        print(f"dist_dir = {dist_dir}")
+            build_flags = '--quiet'
         # Install from source dist
         cmds += [f"{param.python_cmd} -m pip install --upgrade "
                  + ' '.join(upgrade_pkgs)]
-        cmds += [f"{param.python_cmd} setup.py {build_flags} sdist"
-                 f" --dist-dir={dist_dir}"]
-        cmds += [f"ls {dist_dir}"]
+        cmds += [f"{param.python_cmd} setup.py {build_flags} sdist"]
     else:  # pragma: debug
         raise ValueError(f"Method must be 'conda', 'mamba', or 'pip', not"
                          f" '{param.method}'")
@@ -1454,14 +1449,8 @@ def install_pkg(method, param=None, python=None, without_build=False,
             sdist = "%YGGSDIST%"
         else:
             sdist = "dist/*.tar.gz"
-            sdist_glob = os.path.join(os.getcwd(), sdist)
-            res = glob.glob(sdist_glob)
-            print('sdist dir', os.getcwd(), glob.glob(os.path.join(os.getcwd(), '*')))
-            print('sdist glob', sdist_glob, res)
-            if res:
-                sdist = res[0]
-        if extras:
-            sdist += f"[{','.join(extras)}]"
+        # if extras:
+        #     sdist += f"[{','.join(extras)}]"
         cmds += [
             f"{param.python_cmd} -m pip install"
             f" {param.pip_flags} \'{sdist}\'",
