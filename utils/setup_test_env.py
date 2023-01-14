@@ -1453,7 +1453,7 @@ def install_pkg(method, param=None, python=None, without_build=False,
         #     sdist += f"[{','.join(extras)}]"
         cmds += [
             f"{param.python_cmd} -m pip install"
-            f" {param.pip_flags} \'{sdist}\'",
+            f" {param.pip_flags} {sdist}",
             f"{param.python_cmd} create_coveragerc.py"
         ]
         cmds += summary_cmds
