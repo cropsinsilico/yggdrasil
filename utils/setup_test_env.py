@@ -228,12 +228,14 @@ class SetupParam(object):
                     self.valid_methods.append('brew')
                 elif self.install_opts['os'] == 'win':
                     self.valid_methods.append(self.windows_package_manager)
-            if ((self.deps_method == 'supplemental'
-                 and not self.for_development)):
-                for k in ['python', self.method_base,
-                          f'{self.method_base}_skip']:
-                    if k in self.valid_methods:
-                        self.valid_methods.remove(k)
+            if self.deps_method == 'supplemental':
+                if not (self.for_development or self.method == 'pip'):
+                    # Pip extras installed directly as extras do not
+                    # seem to work when installing from a sdist
+                    for k in ['python', self.method_base,
+                              f'{self.method_base}_skip']:
+                        if k in self.valid_methods:
+                            self.valid_methods.remove(k)
                 self.valid_methods.append(f"{self.method_base}_supp")
         elif self.deps_method == 'unique':
             self.valid_methods += [f'{self.method_base}_skip',
