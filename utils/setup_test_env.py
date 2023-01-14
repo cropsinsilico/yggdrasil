@@ -227,6 +227,8 @@ class SetupParam(object):
                     self.valid_methods.append('brew')
                 elif self.install_opts['os'] == 'win':
                     self.valid_methods.append(self.windows_package_manager)
+                    if 'vcpkg' not in self.valid_methods:
+                        self.valid_methods.append('vcpkg')
             if self.deps_method == 'supplemental':
                 if not (self.for_development or self.method == 'pip'):
                     # Pip extras installed directly as extras do not

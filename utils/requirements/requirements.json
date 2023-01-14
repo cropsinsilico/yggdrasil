@@ -342,7 +342,8 @@
             "method": "brew",
             "flags": {
               "method_validate": "conda_supp"
-            }
+            },
+            "os": "osx"
           }
         ]
       }
