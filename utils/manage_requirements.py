@@ -687,23 +687,8 @@ class YggRequirementsList(UserList):
                 else:
                     mapping[kargs]['requirements'] += kparam['requirements']
             for k, v in mapping.items():
-                v['requirements'] = list(set(v['requirements']))
-                if v.get('individually'):
-                    for x in v['requirements']:
-                        cmds.append(f"{k} {x} {v.get('suffix', '')}")
-                elif ((v.get('file_flag', False)
-                       and len(v['requirements']) > 1)):
-                    ifile = f"requirements_{uuid.uuid4()}.txt"
-                    if param.dry_run:
-                        req_str = '\n\t'.join(v['requirements'])
-                        print(f"Temporary file: {ifile}\n\t{req_str}")
-                    else:
-                        with open(ifile, 'w') as fd:
-                            fd.write('\n'.join(v['requirements']))
-                    temp_files.append(ifile)
-                    cmds.append(f"{k} {v['file_flag']} {ifile}")
-                else:
-                    cmds.append(f"{k} {' '.join(v['requirements'])}")
+                cmds += YggRequirement.format_install_commands(
+                    k, v, param, temp_files=temp_files)
         if temp_files:
             if param.install_opts['os'] == 'win':
                 cmds += [
@@ -818,12 +803,54 @@ class YggRequirement(object):
         k, v = self.install_command_prefix(param, **kwargs)
         if not k:
             return cmds
-        cmds.append(f"{k} {' '.join(v['requirements'])}")
+        cmds += YggRequirement.format_install_commands(k, v, param)
         if not return_commands:
             summary_cmds = get_summary_commands(param=param)
             cmds = summary_cmds + cmds + summary_cmds
         if not (param.dry_run or return_commands):
             call_script(cmds, verbose=param.verbose)
+        return cmds
+
+    @staticmethod
+    def format_install_commands(args, kwargs, param, temp_files=None):
+        r"""Format installation commands.
+
+        Args:
+            args (str): Installation arguments.
+            kwargs (dict): Additional parameters controlling
+                the installation.
+            param (SetupParam) Parameters defining the setup.
+            temp_files (list, optional): Existing list that generated
+                files should be added to so that they can be removed
+                after installation is complete.
+
+        Returns:
+            list: Commands resulting in installation.
+
+        """
+        cmds = []
+        print(args, kwargs)
+        req = list(set(kwargs['requirements']))
+        if len(req) > 1:
+            if kwargs.get('individually'):
+                for x in req:
+                    ikwargs = dict(kwargs, requirements=[x])
+                    cmds += YggRequirement.format_install_commands(
+                        args, ikwargs, param, temp_files=temp_files)
+                return cmds
+            if kwargs.get('file_flag', False):
+                ifile = f"requirements_{uuid.uuid4()}.txt"
+                if param.dry_run:
+                    req_str = '\n\t'.join(req)
+                    print(f"Temporary file: {ifile}\n\t{req_str}")
+                else:
+                    with open(ifile, 'w') as fd:
+                        fd.write('\n'.join(req))
+                temp_files.append(ifile)
+                args += f" {kwargs['file_flag']} "
+                req = [ifile]
+        cmds.append(f"{args} {' '.join(req)} "
+                    f"{' '.join(kwargs.get('suffix', ''))}")
         return cmds
 
     def install_command_prefix(self, param):
