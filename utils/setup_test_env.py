@@ -248,8 +248,8 @@ class SetupParam(object):
             for k in ['cran', 'apt', 'brew', 'choco', 'vcpkg']:
                 if k in self.valid_methods:
                     self.valid_methods.remove(k)
-        print(f"deps_method = {self.deps_method}, "
-              f"valid_methods = {self.valid_methods}")
+        # print(f"deps_method = {self.deps_method}, "
+        #       f"valid_methods = {self.valid_methods}")
 
     @classmethod
     def from_args(cls, args, install_opts):
