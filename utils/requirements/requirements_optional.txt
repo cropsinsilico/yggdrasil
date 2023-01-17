@@ -1,0 +1,5 @@
+astropy          # [astropy]
+mpi4py           # [mpi]
+pika>=1.0.0      # [rmq]
+pygments         # [pygments]
+trimesh          # [trimesh]

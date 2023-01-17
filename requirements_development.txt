@@ -1,4 +1,0 @@
-black
-git  # [conda]
-PyGithub
-pre-commit

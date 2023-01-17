@@ -1,0 +1,4 @@
+PyGithub
+black
+git              # [conda]
+ipython

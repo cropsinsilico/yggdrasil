@@ -1,11 +1,14 @@
+GitPython
 chevron
 deprecation
+flaky
 flask
-matplotlib
+jsonschema==3.2.0
+matplotlib       # [pip]
 numpy>=1.13.0
 pandas
-pyperf
 psutil
+pyperf
 pyyaml
 pyzmq
 requests
@@ -13,4 +16,3 @@ scipy
 six
 sysv_ipc; platform_system != 'Windows'
 unyt
-GitPython

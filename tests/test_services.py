@@ -13,7 +13,7 @@ def _make_ids(ids):
     return ','.join([str(x) for x in ids])
 
 
-@pytest.mark.skip("heroku app disabled")
+# @pytest.mark.skip("web service app disabled")
 @pytest.mark.language('c')
 @pytest.mark.language('c++')
 def test_call_integration_remote():
@@ -26,14 +26,16 @@ def test_call_integration_remote():
     yamls.remove(test_yml)
     yamls.remove(copy_yml)
     yamls.append(remote_yml)
-    address = 'https://model-service-demo.herokuapp.com/'
+    # address = 'https://model-service-demo.herokuapp.com/'
+    # address = "https://model-service-demo.fly.dev/"
+    address = "https://model-service-demo.onrender.com/"
     service_type = 'flask'
     cli = IntegrationServiceManager(service_type=service_type,
                                     for_request=True,
                                     address=address)
-    cli.wait_for_server()
+    cli.wait_for_server(timeout=60.0)
     if not cli.is_running:  # pragma: debug
-        pytest.skip("Heroku app is not running.")
+        pytest.skip("Web service app is not running.")
     try:
         shutil.copy(copy_yml, remote_yml)
         with open(remote_yml, 'a') as fd:

@@ -11,75 +11,10 @@ from setup_test_env import (
     PYTHON_CMD, CONDA_CMD, _is_win)
 
 
-class DependencyNotFound(BaseException):
-    r"""Exception raised when a dependency cannot be located."""
-    pass
-
-
-def isolate_package_name(entry):
-    r"""Get the package name without any constraints or conditions.
-
-    Args:
-        entry (str): Requirements entry.
-
-    Returns:
-        str: Package name.
-
-    """
-    keys = ['<', '>', '=', ';', '#']
-    out = entry
-    for k in keys:
-        out = out.split(k)[0].strip()
-    return out.strip()
-
-
-def get_pip_dependencies(pkg):
-    r"""Get the dependencies required by a package via pip.
-
-    Args:
-        pkg (str): The name of a pip-installable package.
-
-    Returns:
-        list: The package's dependencies.
-
-    """
-    import requests
-    url = 'https://pypi.org/pypi/{}/json'
-    json = requests.get(url.format(pkg)).json()
-    return json['info']['requires_dist']
-
-
-def get_pip_dependency_version(pkg, dep):
-    r"""Get the version of a dependency required by a pip-installable
-    package.
-
-    Args:
-        pkg (str): The name of a pip-installable package.
-        dep (str): The name of a dependency of pkg.
-
-    Returns:
-        str: The version of the dependency required by the package.
-
-    """
-    reqs = get_pip_dependencies(pkg)
-    dep_regex = r'%s(?:\s*\((?P<ver>[^\)]+)\))?' % dep
-    for x in reqs:
-        m = re.fullmatch(dep_regex, x)
-        if m:
-            ver = ''
-            if m.group('ver'):
-                ver = m.group('ver').strip()
-            return dep + ver
-    raise DependencyNotFound(
-        ("Could not locate the dependency '%s' "
-         "in the list of requirements for package '%s': %s")
-        % (dep, pkg, reqs))
-
-
 def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
           install_opts=None, additional_packages=[], skip_packages=[],
           verbose=False, return_list=False, dont_evaluate_markers=False,
-          environment=None):
+          environment=None, skipped_mpi=None):
     r"""Prune a requirements.txt file to remove/select dependencies that are
     dependent on the current environment.
 
@@ -88,8 +23,9 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
             should be read.
         fname_out (str, optional): Full path to requirements file that should be
             created. Defaults to None and is set to <fname_in[0]>_pruned.txt.
-        excl_method (str, optional): Installation method (pip or conda) that
-            should be ignored. Defaults to None and is ignored.
+        excl_method (str, list, optional): Installation method(s) (pip
+            or conda) that should be ignored. Defaults to None and is
+            ignored.
         incl_method (str, optional): Installation method (pip or conda) that
             should be installed (requirements with without an installation method
             or with a different method will be ignored). Defaults to None and is
@@ -112,11 +48,15 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
         environment (dict, optional): Environment properties that should be
             used to evaluate pip-style markers. Defaults to None and the
             current environment will be used.
+        skipped_mpi (list, optional): Existing list that skipped mpi
+            packages should be added to. Defaults to False and is
+            ignored.
 
     Returns:
         str: Full path to created file.
 
     """
+    from manage_requirements import isolate_package_name
     regex_constrain = r'(?:(?:pip)|(?:conda)|(?:[a-zA-Z][a-zA-Z0-9]*))'
     regex_comment = r'\s*\[\s*(?P<vals>%s(?:\s*\,\s*%s)*)\s*\]\s*' % (
         regex_constrain, regex_constrain)
@@ -127,14 +67,31 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
     packages = []
     new_lines = []
     orig_lines = copy.copy(additional_packages)
+    skip_mpi = ('mpi4py' in skip_packages)
+    mpi_pkgs = ['mpi4py', 'openmpi', 'mpich', 'msmpi', 'pytest-mpi']
+    if isinstance(excl_method, str):
+        excl_method = [excl_method]
+    if skip_mpi:
+        if not isinstance(skipped_mpi, list):
+            skipped_mpi = []
+        for x in mpi_pkgs:
+            if x in skip_packages:
+                skip_packages.remove(x)
+
+    def add_package(p, line):
+        if skip_mpi and p in mpi_pkgs:
+            skipped_mpi.append(p)
+        else:
+            packages.append(p)
+            new_lines.append(line)
+
     for line in additional_packages:
         pkg = isolate_package_name(line)
         if pkg in packages:
             continue
         if pkg in skip_packages:
             continue
-        new_lines.append(line)
-        packages.append(pkg)
+        add_package(pkg, line)
     for ifname_in in fname_in:
         with open(ifname_in, 'r') as fd:
             old_lines = fd.readlines()
@@ -159,7 +116,7 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
                     if verbose:
                         print('line: %s, values = %s, excl = %s, incl = %s'
                               % (line, values, excl_method, incl_method))
-                    if excl_method and (excl_method in values):
+                    if excl_method and any(x in values for x in excl_method):
                         continue
                     if incl_method and (incl_method not in values):
                         continue
@@ -177,14 +134,14 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
             if skip_line:
                 continue
             if dont_evaluate_markers:
-                new_lines.append(req_name.strip())
+                add_package(pkg, req_name.strip())
                 continue
             try:
                 req = Requirement(req_name.strip())
                 if ((req.marker
                      and (not req.marker.evaluate(environment=environment)))):
                     continue
-                new_lines.append(req.name + str(req.specifier))
+                add_package(pkg, req.name + str(req.specifier))
             except InvalidRequirement as e:
                 print(e)
                 continue
@@ -214,7 +171,8 @@ def install_from_requirements(method, fname_in, conda_env=None,
                               verbose=False, verbose_prune=False,
                               additional_packages=[], skip_packages=[],
                               return_cmds=False, append_cmds=None,
-                              temp_file=None):
+                              temp_file=None, use_mamba=False,
+                              skipped_mpi=None):
     r"""Install packages via pip or conda from one or more pip-style
     requirements file(s).
 
@@ -251,8 +209,15 @@ def install_from_requirements(method, fname_in, conda_env=None,
             is returned. This keyword will be ignored if return_cmds is True.
         temp_file (str, optional): File where pruned requirements list should
             be stored. Defaults to None and one will be created.
+        use_mamba (bool, optional): If True, use mamba in place of conda.
+        skipped_mpi (list, optional): Existing list that skipped mpi
+            packages should be added to. Defaults to False and is
+            ignored.
 
     """
+    if method == 'mamba':
+        use_mamba = True
+        method = 'conda'
     if verbose:
         verbose_prune = True
     return_temp = (return_cmds or isinstance(append_cmds, list))
@@ -260,7 +225,7 @@ def install_from_requirements(method, fname_in, conda_env=None,
     if python_cmd is None:
         python_cmd = PYTHON_CMD
     if conda_env:
-        python_cmd = locate_conda_exe(conda_env, 'python')
+        python_cmd = locate_conda_exe(conda_env, 'python', use_mamba=use_mamba)
     if method == 'pip':
         excl_method = 'conda'
     elif method == 'conda':
@@ -275,23 +240,29 @@ def install_from_requirements(method, fname_in, conda_env=None,
                       excl_method=excl_method, incl_method=incl_method,
                       install_opts=install_opts, verbose=verbose_prune,
                       additional_packages=additional_packages,
-                      skip_packages=skip_packages)
+                      skip_packages=skip_packages,
+                      skipped_mpi=skipped_mpi)
     try:
         if method == 'conda':
-            assert(CONDA_CMD)
-            args = [CONDA_CMD, 'install', '-y']
+            if use_mamba:
+                args = ['mamba', 'install', '-y']
+            else:
+                assert CONDA_CMD
+                args = [CONDA_CMD, 'install', '-y']
             if verbose:
                 args.append('-vvv')
             else:
-                args.append('-q')
+                args.append('-v')
+            # else:
+            #     args.append('-q')
             if conda_env:
                 args += ['--name', conda_env]
             args += ['--file', temp_file]
             if user:
                 args.append('--user')
-            args.append('--update-all')
+            # args.append('--update-all')
         elif method == 'pip':
-            assert(python_cmd)
+            assert python_cmd
             args = [python_cmd, '-m', 'pip', 'install']
             if verbose:
                 args.append('--verbose')
@@ -320,7 +291,7 @@ def install_from_requirements(method, fname_in, conda_env=None,
         if isinstance(append_cmds, list):
             return temp_file
         if os.path.isfile(temp_file):
-            print(call_conda_command(args))
+            print(call_conda_command(args, use_mamba=use_mamba))
     except BaseException:
         if os.path.isfile(temp_file):
             with open(temp_file, 'r') as fd:
@@ -336,14 +307,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         "Install dependencies via pip or conda from one or more "
         "pip-style requirements files.")
-    parser.add_argument('method', choices=['conda', 'pip'],
+    parser.add_argument('method', choices=['conda', 'mamba', 'pip'],
                         help=("Method that should be used to install the "
                               "dependencies."))
     parser.add_argument('files', nargs='+',
                         help='One or more pip-style requirements files.')
     parser.add_argument('--conda-env', default=None,
-                        help=('Conda environment that requirements should be '
-                              'installed into.'))
+                        help=('Conda/Mamba environment that requirements '
+                              'should be installed into.'))
     parser.add_argument('--user', action='store_true',
                         help=('Install in user mode.'))
     parser.add_argument('--unique-to-method', action='store_true',
@@ -353,6 +324,8 @@ if __name__ == "__main__":
                         help="Turn up verbosity of output.")
     parser.add_argument('--additional-packages', nargs='+',
                         help="Additional packages that should be installed.")
+    parser.add_argument('--use-mamba', action='store_true',
+                        help="Use mamba in place of conda")
     for k, v in install_opts.items():
         if v:
             parser.add_argument(
@@ -373,4 +346,5 @@ if __name__ == "__main__":
     install_from_requirements(args.method, args.files, conda_env=args.conda_env,
                               user=args.user, unique_to_method=args.unique_to_method,
                               install_opts=install_opts, verbose=args.verbose,
-                              additional_packages=args.additional_packages)
+                              additional_packages=args.additional_packages,
+                              use_mamba=args.use_mamba)
