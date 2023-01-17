@@ -3,11 +3,6 @@ general:
   # - cmake:  # This may need to be removed from base conda recipe
   #     method: conda
   #     os: unix
-  - ccache:
-      method: conda
-      os: unix
-      flags:
-        not_in_recipe: true
   - flask
   - flaky
   - git:  # This may need to be removed from conda recipe
@@ -220,6 +215,21 @@ extras:
     - pytest-rerunfailures
     - pytest-repeat
     - pytest-timeout
+    # Split these into another section?
+    - ccache:
+        method: conda
+        os: unix
+        flags:
+          method_validate: conda_supp
+          not_in_recipe: true
+    - strace:
+        method: apt
+        flags:
+          method_validate: conda_supp
+    - valgrind:
+        method: apt
+        flags:
+          method_validate: conda_supp
   docs:
     - breathe
     - doxygen:

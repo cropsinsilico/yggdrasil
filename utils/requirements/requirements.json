@@ -1,15 +1,6 @@
 {
   "general": [
     "chevron",
-    {
-      "ccache": {
-        "method": "conda",
-        "os": "unix",
-        "flags": {
-          "not_in_recipe": true
-        }
-      }
-    },
     "flask",
     "flaky",
     {
@@ -423,7 +414,33 @@
       },
       "pytest-rerunfailures",
       "pytest-repeat",
-      "pytest-timeout"
+      "pytest-timeout",
+      {
+        "ccache": {
+          "method": "conda",
+          "os": "unix",
+          "flags": {
+            "method_validate": "conda_supp",
+            "not_in_recipe": true
+          }
+        }
+      },
+      {
+        "strace": {
+          "method": "apt",
+          "flags": {
+            "method_validate": "conda_supp"
+          }
+        }
+      },
+      {
+        "valgrind": {
+          "method": "apt",
+          "flags": {
+            "method_validate": "conda_supp"
+          }
+        }
+      }
     ],
     "docs": [
       "breathe",

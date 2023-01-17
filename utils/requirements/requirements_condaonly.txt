@@ -1,4 +1,3 @@
-ccache; platform_system != 'Windows'  # [conda]
 cmake; platform_system != 'Windows'  # [conda,c]
 czmq             # [conda,zmq,c]
 fortran-compiler; platform_system != 'Windows'  # [conda,fortran,c]

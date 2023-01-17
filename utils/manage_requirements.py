@@ -829,7 +829,6 @@ class YggRequirement(object):
 
         """
         cmds = []
-        print(args, kwargs)
         req = list(set(kwargs['requirements']))
         if len(req) > 1:
             if kwargs.get('individually'):

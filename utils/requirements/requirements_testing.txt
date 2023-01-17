@@ -1,3 +1,4 @@
+ccache; platform_system != 'Windows'  # [conda]
 codecov
 conda-tree       # [conda]
 coverage
