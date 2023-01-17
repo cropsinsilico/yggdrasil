@@ -368,7 +368,7 @@ jobs:
           - os-base: ubuntu
             python-version: 3.9
             install-method: mamba
-            test-flags1: --long-running
+            test-flags1: --long-running --remote-service
             test-flags2: ""
             install-c: true
             install-mpi: false

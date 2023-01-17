@@ -27,7 +27,9 @@ _markers = [
      "tests that take a long time to run", None),
     ("extra_example", "--extra-examples",
      "tests for superfluous examples", None),
-    ("production_run", "--production-run", None)
+    ("production_run", "--production-run", None),
+    ("remote_service", "--remote-service",
+     "tests that must connect to a running remote service", None)
 ]
 _params = {
     "example_name": [],
