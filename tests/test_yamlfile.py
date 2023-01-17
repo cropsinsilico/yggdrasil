@@ -2,7 +2,6 @@ import pytest
 import tempfile
 import os
 import yaml
-import flaky
 import io as sio
 from jsonschema.exceptions import ValidationError
 from yggdrasil import yamlfile
@@ -29,17 +28,17 @@ def test_load_yaml():
     try:
         # Dictionary
         out = yamlfile.load_yaml(dict_write)
-        assert(out == dict_read)
+        assert out == dict_read
         # File name
         out = yamlfile.load_yaml(fname)
-        assert(out == dict_read)
+        assert out == dict_read
         # Open file object
         with open(fname, 'r') as fd:
             out = yamlfile.load_yaml(fd)
-            assert(out == dict_read)
+            assert out == dict_read
         # Open stream
         out = yamlfile.load_yaml(sio.StringIO(contents))
-        assert(out == dict_read)
+        assert out == dict_read
     finally:
         # Remove file
         if os.path.isfile(fname):
@@ -60,16 +59,16 @@ def test_parse_component_error():
         yamlfile.parse_component({}, 'invalid', 'invalid')
 
 
-@flaky.flaky(max_runs=3)
+@pytest.mark.flaky_optin(max_runs=3)
 def test_load_yaml_git():
     r"""Test loading a yaml from a remote git repository."""
     import git
     yml = "https://github.com/cropsinsilico/example-fakemodel/fakemodel.yml"
     with pytest.raises(Exception):
         yamlfile.load_yaml(yml)
-    assert('model' in yamlfile.load_yaml('git:' + yml))
+    assert 'model' in yamlfile.load_yaml('git:' + yml)
     yml = "cropsinsilico/example-fakemodel/fakemodel.yml"
-    assert('model' in yamlfile.load_yaml('git:' + yml))
+    assert 'model' in yamlfile.load_yaml('git:' + yml)
     git.rmtree("cropsinsilico")
     
 

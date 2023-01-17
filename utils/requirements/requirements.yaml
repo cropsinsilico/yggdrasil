@@ -4,7 +4,6 @@ general:
   #     method: conda
   #     os: unix
   - flask
-  - flaky
   - git:  # This may need to be removed from conda recipe
       method: conda
   - jsonschema==3.2.0
@@ -224,10 +223,12 @@ extras:
           not_in_recipe: true
     - strace:
         method: apt
+        os: linux
         flags:
           method_validate: conda_supp
     - valgrind:
         method: apt
+        os: linux
         flags:
           method_validate: conda_supp
   docs:

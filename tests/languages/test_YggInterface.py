@@ -1,7 +1,6 @@
 import pytest
 import os
 import numpy as np
-import flaky
 import copy
 from yggdrasil.communication import get_comm
 from yggdrasil.interface import YggInterface
@@ -40,17 +39,17 @@ class ModelEnv(object):
 
 def test_maxMsgSize():
     r"""Test max message size."""
-    assert(YggInterface.maxMsgSize() == YGG_MSG_MAX)
+    assert YggInterface.maxMsgSize() == YGG_MSG_MAX
 
 
 def test_eof_msg():
     r"""Test eof message signal."""
-    assert(YggInterface.eof_msg() == constants.YGG_MSG_EOF)
+    assert YggInterface.eof_msg() == constants.YGG_MSG_EOF
 
 
 def test_bufMsgSize():
     r"""Test buf message size."""
-    assert(YggInterface.bufMsgSize() == constants.YGG_MSG_BUF)
+    assert YggInterface.bufMsgSize() == constants.YGG_MSG_BUF
 
 
 def test_init():
@@ -103,8 +102,8 @@ def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), np.int32(2)]
             o.send_eof()
             o.close(linger=True)
             # Input
-            assert(i.recv() == (True, converter(msg)))
-            assert(i.recv() == (False, converter(constants.YGG_MSG_EOF)))
+            assert i.recv() == (True, converter(msg))
+            assert i.recv() == (False, converter(constants.YGG_MSG_EOF))
     finally:
         iodrv.terminate()
 
@@ -125,12 +124,12 @@ def test_YggInit_backwards():
 
 def test_YggInit_variables():
     r"""Test Matlab interface for variables."""
-    assert(YggInterface.YggInit('YGG_MSG_MAX') == YGG_MSG_MAX)
-    assert(YggInterface.YggInit('YGG_MSG_EOF') == constants.YGG_MSG_EOF)
-    assert(YggInterface.YggInit('YGG_MSG_EOF')
-           == YggInterface.YggInit('CIS_MSG_EOF'))
-    assert(YggInterface.YggInit('YGG_MSG_EOF')
-           == YggInterface.YggInit('PSI_MSG_EOF'))
+    assert YggInterface.YggInit('YGG_MSG_MAX') == YGG_MSG_MAX
+    assert YggInterface.YggInit('YGG_MSG_EOF') == constants.YGG_MSG_EOF
+    assert (YggInterface.YggInit('YGG_MSG_EOF')
+            == YggInterface.YggInit('CIS_MSG_EOF'))
+    assert (YggInterface.YggInit('YGG_MSG_EOF')
+            == YggInterface.YggInit('PSI_MSG_EOF'))
 
 
 class TestYggClass(base_class):
@@ -294,7 +293,7 @@ class TestYggClass(base_class):
         if filecomm and (direction == 'input'):
             with open(filename, 'wb') as fd:
                 fd.write(testing_options['contents'])
-            assert(os.path.isfile(filename))
+            assert os.path.isfile(filename)
         try:
             yield
         finally:
@@ -374,42 +373,42 @@ class TestYggClass(base_class):
             if filecomm:
                 for msg_recv in testing_options['recv']:
                     msg_flag, msg_recv0 = instance.recv(timeout)
-                    assert(msg_flag)
-                    assert(msg_recv0 == nested_approx(msg_recv))
+                    assert msg_flag
+                    assert msg_recv0 == nested_approx(msg_recv)
                 msg_flag, msg_recv0 = instance.recv(timeout)
-                assert(not msg_flag)
+                assert not msg_flag
             else:
                 for msg_send, msg_recv in zip(testing_options['send'],
                                               testing_options['recv']):
                     msg_flag = test_comm.send(msg_send)
-                    assert(msg_flag)
+                    assert msg_flag
                     msg_flag, msg_recv0 = instance.recv(timeout)
-                    assert(msg_flag)
-                    assert(msg_recv0 == nested_approx(msg_recv))
+                    assert msg_flag
+                    assert msg_recv0 == nested_approx(msg_recv)
         else:
             if filecomm:
                 for msg in testing_options['send']:
                     msg_flag = instance.send(msg)
-                    assert(msg_flag)
+                    assert msg_flag
                 instance.send_eof()
                 # Read temp file
                 wait_on_function(lambda: not iodriver.ocomm.is_open)
-                assert(os.path.isfile(filename))
+                assert os.path.isfile(filename)
                 if testing_options.get('exact_contents', True):
                     with open(filename, 'rb') as fd:
                         res = fd.read()
-                        assert(res == testing_options['contents'])
+                        assert res == testing_options['contents']
             else:
                 for msg_send, msg_recv in zip(testing_options['send'],
                                               testing_options['recv']):
                     msg_flag = instance.send(msg_send)
-                    assert(msg_flag)
+                    assert msg_flag
                     msg_flag, msg_recv0 = test_comm.recv(timeout)
-                    assert(msg_flag)
-                    assert(msg_recv0 == nested_approx(msg_recv))
+                    assert msg_flag
+                    assert msg_recv0 == nested_approx(msg_recv)
 
 
-@flaky.flaky
+@pytest.mark.flaky_optin
 class TestYggRpcClient(TestYggClass):
     r"""Test client-side RPC communication with Python."""
 
@@ -506,7 +505,7 @@ class TestYggRpcClient(TestYggClass):
         for msg_send, msg_recv in zip(testing_options['send'],
                                       testing_options['recv']):
             msg_flag = send_comm.send(msg_send)
-            assert(msg_flag)
+            assert msg_flag
             msg_flag, msg_recv0 = recv_comm.recv(timeout)
-            assert(msg_flag)
-            assert(msg_recv0 == nested_approx(msg_recv))
+            assert msg_flag
+            assert msg_recv0 == nested_approx(msg_recv)

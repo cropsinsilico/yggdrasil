@@ -320,6 +320,8 @@ def add_options_to_parser(parser):
                      help="Don't capture output or log messages from tests.")
     parser.addoption('--end-yggdrasil-opts', action="store_true",
                      help="Internal use only")
+    parser.addoption('--rerun-flaky', action="store_true",
+                     help="Re-run flaky tests.")
 
 
 def pytest_configure(config):
@@ -340,6 +342,11 @@ def pytest_configure(config):
         "markers", ("related_language(name): mark test as being related "
                     "to a language. The language may or may not be "
                     "installed, but must be enabled for the test to run."))
+    config.addinivalue_line(
+        "markers", ("flaky_optin(name,condition=None,reruns=1,"
+                    "reruns_delay=0): mark test as "
+                    "flaky without automatically re-running on "
+                    "failure unless --rerun-flaky is specified."))
 
 
 # def pytest_runtest_setup(item):
@@ -375,6 +382,7 @@ def pytest_collection_modifyitems(config, items):
     selected_suites = config.getoption('--suite')
     enabled = config.getoption("--language")
     disabled = config.getoption("--skip-language")
+    rerun_flaky = config.getoption("--rerun-flaky")
     for item in items:
         # Suites
         suites = [mark.args[0] for mark in item.iter_markers(name="suite")]
@@ -442,6 +450,11 @@ def pytest_collection_modifyitems(config, items):
                     pytest.mark.skip(
                         reason=(f"test requires languages {absent_langs!r} "
                                 f"NOT be installed")))
+        # Flaky markers
+        if rerun_flaky:
+            for mark in item.iter_markers(name="flaky_optin"):
+                item.add_marker(
+                    pytest.mark.flaky(*mark.args, **mark.kwargs))
 
 
 def pytest_generate_tests(metafunc):
@@ -642,6 +655,9 @@ def config_env(pytestconfig):
     if second_attempt:
         production_run = False
         debug = True
+    if pytestconfig.getoption("--rerun-flaky"):
+        print("HERE")
+        os.environ['YGGDRASIL_RERUN_FLAKY'] = '1'
     from yggdrasil import config
     with config.temp_config(production_run=production_run,
                             debug=debug, default_comm=default_comm,

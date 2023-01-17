@@ -51,7 +51,6 @@ requirements:
   run:
     - GitPython
     - chevron
-    - flaky
     - flask
     - git
     - jsonschema==3.2.0

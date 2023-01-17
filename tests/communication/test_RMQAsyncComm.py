@@ -1,12 +1,11 @@
 import pytest
-import flaky
 from tests.communication.test_CommBase import TestComm as base_class
 from yggdrasil.communication import new_comm
 from yggdrasil.communication.RMQComm import RMQComm
 from tests import timeout_decorator
 
 
-@flaky.flaky
+@pytest.mark.flaky_optin
 @timeout_decorator(timeout=60)
 class TestRMQAsyncComm(base_class):
     r"""Test for RMQAsyncComm communication class."""
@@ -29,8 +28,8 @@ class TestRMQAsyncComm(base_class):
                                    reply_text="Test shutdown")
         recv_comm._reconnecting.started.wait(5)
         recv_comm._reconnecting.stopped.wait(5)
-        assert(recv_comm.times_connected > 1)
-        assert(recv_comm._reconnecting.has_stopped())
+        assert recv_comm.times_connected > 1
+        assert recv_comm._reconnecting.has_stopped()
         recv_comm._opening.stopped.wait(5)
         do_send_recv(send_comm, recv_comm)
         send_comm.printStatus()
@@ -82,8 +81,8 @@ class TestRMQAsyncCommNamedQueue(TestRMQAsyncComm):
                                    reply_text="Test shutdown")
         send_comm._reconnecting.started.wait(5)
         send_comm._reconnecting.stopped.wait(10)
-        assert(send_comm.times_connected > 1)
-        assert(send_comm._reconnecting.has_stopped())
+        assert send_comm.times_connected > 1
+        assert send_comm._reconnecting.has_stopped()
         do_send_recv(send_comm, recv_comm)
         send_comm.printStatus()
         recv_comm.printStatus()
