@@ -606,13 +606,17 @@ class YggRequirementsList(UserList):
             excluded_methods=excluded_methods).flatten()
         kwargs['standard'] = standard
         out = [
-            x.format(**kwargs) for x in selected if not x.host_only]
+            x.format(**kwargs) for x in selected
+            if not (x.host_only or x.flags.get('build_only', False))]
         out = sorted(list(set(out)))
         if standard == 'conda':
             req = out
             out = OrderedDict()
             host_req = [
                 x.format(**kwargs) for x in selected if x.host]
+            build_req = [
+                x.format(**kwargs) for x in selected
+                if x.flags.get('build', False)]
             if self.extras:
                 host_req.append('python')
                 name = self.extras[0]
@@ -635,6 +639,8 @@ class YggRequirementsList(UserList):
             out['requirements'] = OrderedDict()
             if host_req:
                 out['requirements']['host'] = sorted(host_req)
+            if build_req:
+                out['requirements']['build'] = sorted(build_req)
             out['requirements']['run'] = req
             if fname is not None:
                 with open(fname, 'w') as fd:

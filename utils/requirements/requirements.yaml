@@ -3,6 +3,7 @@ general:
   # - cmake:  # This may need to be removed from base conda recipe
   #     method: conda
   #     os: unix
+  - deprecation
   - flask
   - flaky
   - git:  # This may need to be removed from conda recipe
@@ -17,8 +18,9 @@ general:
       - name: matplotlib
         method: pip
   - numpy>=1.13.0:
-      host: True
+      host: true
       flags:
+        build: true
         from_env: NUMPY
         method_in_setup: conda
   - pandas
@@ -31,7 +33,6 @@ general:
   - python:
       method: conda_recipe
       host: True
-  - python-rapidjson
   - pyyaml
   - pyzmq
   - requests

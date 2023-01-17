@@ -1,6 +1,7 @@
 {
   "general": [
     "chevron",
+    "deprecation",
     "flask",
     "flaky",
     {
@@ -30,6 +31,7 @@
       "numpy>=1.13.0": {
         "host": true,
         "flags": {
+          "build": true,
           "from_env": "NUMPY",
           "method_in_setup": "conda"
         }
@@ -51,7 +53,6 @@
         "host": true
       }
     },
-    "python-rapidjson",
     "pyyaml",
     "pyzmq",
     "requests",

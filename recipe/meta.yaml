@@ -52,6 +52,7 @@ requirements:
   run:
     - GitPython
     - chevron
+    - deprecation
     - flaky
     - flask
     - git
