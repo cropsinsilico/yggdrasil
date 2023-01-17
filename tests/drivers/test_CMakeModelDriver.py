@@ -218,7 +218,7 @@ class TestCMakeModelDriver_wd(TestCMakeModelDriver):
     
     # Disable instance args?
 
-    @pytest.mark.skip(reason="determine what lines this is testing")
+    # @pytest.mark.skip(reason="determine what lines this is testing")
     def test_call_compiler(self, python_class, instance):
         r"""Test call_compiler without full path."""
         # instance.cleanup()

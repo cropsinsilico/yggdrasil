@@ -11,71 +11,6 @@ from setup_test_env import (
     PYTHON_CMD, CONDA_CMD, _is_win)
 
 
-class DependencyNotFound(BaseException):
-    r"""Exception raised when a dependency cannot be located."""
-    pass
-
-
-def isolate_package_name(entry):
-    r"""Get the package name without any constraints or conditions.
-
-    Args:
-        entry (str): Requirements entry.
-
-    Returns:
-        str: Package name.
-
-    """
-    keys = ['<', '>', '=', ';', '#']
-    out = entry
-    for k in keys:
-        out = out.split(k)[0].strip()
-    return out.strip()
-
-
-def get_pip_dependencies(pkg):
-    r"""Get the dependencies required by a package via pip.
-
-    Args:
-        pkg (str): The name of a pip-installable package.
-
-    Returns:
-        list: The package's dependencies.
-
-    """
-    import requests
-    url = 'https://pypi.org/pypi/{}/json'
-    json = requests.get(url.format(pkg)).json()
-    return json['info']['requires_dist']
-
-
-def get_pip_dependency_version(pkg, dep):
-    r"""Get the version of a dependency required by a pip-installable
-    package.
-
-    Args:
-        pkg (str): The name of a pip-installable package.
-        dep (str): The name of a dependency of pkg.
-
-    Returns:
-        str: The version of the dependency required by the package.
-
-    """
-    reqs = get_pip_dependencies(pkg)
-    dep_regex = r'%s(?:\s*\((?P<ver>[^\)]+)\))?' % dep
-    for x in reqs:
-        m = re.fullmatch(dep_regex, x)
-        if m:
-            ver = ''
-            if m.group('ver'):
-                ver = m.group('ver').strip()
-            return dep + ver
-    raise DependencyNotFound(
-        ("Could not locate the dependency '%s' "
-         "in the list of requirements for package '%s': %s")
-        % (dep, pkg, reqs))
-
-
 def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
           install_opts=None, additional_packages=[], skip_packages=[],
           verbose=False, return_list=False, dont_evaluate_markers=False,
@@ -88,8 +23,9 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
             should be read.
         fname_out (str, optional): Full path to requirements file that should be
             created. Defaults to None and is set to <fname_in[0]>_pruned.txt.
-        excl_method (str, optional): Installation method (pip or conda) that
-            should be ignored. Defaults to None and is ignored.
+        excl_method (str, list, optional): Installation method(s) (pip
+            or conda) that should be ignored. Defaults to None and is
+            ignored.
         incl_method (str, optional): Installation method (pip or conda) that
             should be installed (requirements with without an installation method
             or with a different method will be ignored). Defaults to None and is
@@ -120,6 +56,7 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
         str: Full path to created file.
 
     """
+    from manage_requirements import isolate_package_name
     regex_constrain = r'(?:(?:pip)|(?:conda)|(?:[a-zA-Z][a-zA-Z0-9]*))'
     regex_comment = r'\s*\[\s*(?P<vals>%s(?:\s*\,\s*%s)*)\s*\]\s*' % (
         regex_constrain, regex_constrain)
@@ -132,6 +69,8 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
     orig_lines = copy.copy(additional_packages)
     skip_mpi = ('mpi4py' in skip_packages)
     mpi_pkgs = ['mpi4py', 'openmpi', 'mpich', 'msmpi', 'pytest-mpi']
+    if isinstance(excl_method, str):
+        excl_method = [excl_method]
     if skip_mpi:
         if not isinstance(skipped_mpi, list):
             skipped_mpi = []
@@ -177,7 +116,7 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
                     if verbose:
                         print('line: %s, values = %s, excl = %s, incl = %s'
                               % (line, values, excl_method, incl_method))
-                    if excl_method and (excl_method in values):
+                    if excl_method and any(x in values for x in excl_method):
                         continue
                     if incl_method and (incl_method not in values):
                         continue
