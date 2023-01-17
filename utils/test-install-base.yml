@@ -61,7 +61,7 @@ jobs:
       fail-fast: false
 
     steps: &steps
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
     - name: Set C installation based on matrix value
@@ -94,14 +94,14 @@ jobs:
       uses: mpi4py/setup-mpi@v1
       if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI == 1
     - name: Install R
-      uses: r-lib/actions/setup-r@v1
+      uses: r-lib/actions/setup-r@v2
       if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR == 1
     # - name: (WINDOWS,PIP) Set VCPKG_ROOT on Windows
     #   if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC == 1
     #   run: echo "VCPKG_ROOT=C:\\vcpkg" >> $GITHUB_ENV
     #   shell: bash -l {0}
     - name: (LINUX,PIP) Cache pip
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
       with:
         path: ~/.cache/pip
@@ -109,7 +109,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
     - name: (MACOS,PIP) Cache pip
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
       with:
         path: ~/Library/Caches/pip
@@ -117,7 +117,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
     - name: (WINDOWS,PIP) Cache pip
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
       with:
         path: ~\AppData\Local\pip\Cache
@@ -125,7 +125,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
     - name: (PIP) Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
@@ -157,7 +157,7 @@ jobs:
     # Conda/Mamba specific installation steps
     # ========================================================
     # - name: (CONDA) Cache conda
-    #   uses: actions/cache@v1
+    #   uses: actions/cache@v3
     #   if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
     #   env:
     #     # Increase this value to reset cache if file not changed
@@ -330,7 +330,7 @@ jobs:
     - name: Create a log of Python package versions
       if: ${{ always() }}
       run: python utils/setup_test_env.py log
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       if: ${{ success() }}
       with:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
@@ -469,11 +469,11 @@ jobs:
     env:
       BUILDDOCS: 1
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.8
     - name: Install dependencies
@@ -498,11 +498,11 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.8
     - name: Install dependencies
@@ -526,11 +526,11 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.9
     - name: Login to DockerHub
@@ -549,11 +549,11 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.8
     - name: Install dependencies
