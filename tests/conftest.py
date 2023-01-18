@@ -764,7 +764,8 @@ def running_service(pytestconfig, check_service_manager_settings,
             break
 
     @contextlib.contextmanager
-    def running_service_w(service_type, partial_commtype=None):
+    def running_service_w(service_type, partial_commtype=None,
+                          track_memory=False):
         from yggdrasil.services import (
             IntegrationServiceManager)
         if ((((service_type, partial_commtype) == ('flask', 'rmq'))
@@ -779,6 +780,8 @@ def running_service(pytestconfig, check_service_manager_settings,
             args.append(f"--commtype={partial_commtype}")
         args += ["start", f"--model-repository={model_repo}",
                  f"--log-level={log_level}"]
+        if track_memory:
+            args.append("--track-memory")
         process_kws = {}
         if with_coverage:
             script_path = os.path.expanduser(os.path.join('~', 'run_server.py'))
@@ -798,7 +801,8 @@ def running_service(pytestconfig, check_service_manager_settings,
             lines += ['assert not srv.is_running',
                       f'srv.start_server(with_coverage={with_coverage},',
                       f'                 log_level={log_level},'
-                      f'                 model_repository=\'{model_repo}\')']
+                      f'                 model_repository=\'{model_repo}\','
+                      f'                 track_memory={track_memory})']
             with open(script_path, 'w') as fd:
                 fd.write('\n'.join(lines))
             args = [sys.executable, script_path]

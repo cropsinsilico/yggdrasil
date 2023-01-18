@@ -960,12 +960,6 @@ class CMakeModelDriver(BuildModelDriver):
                 linker_flag_kwargs['use_library_path_internal'], [])
             internal_library_flags = linker_flag_kwargs[
                 linker_flag_kwargs['use_library_path_internal']]
-        # Add python flags
-        python_flags = sysconfig.get_config_var('LIBS')
-        if python_flags:
-            for x in python_flags.split():
-                if x.startswith(('-L', '-l')) and (x not in target_linker_flags):
-                    target_linker_flags.append(x)
         # Link local lib on MacOS because on Mac >=10.14 setting sysroot
         # clobbers the default paths.
         # https://stackoverflow.com/questions/54068035/linking-not-working-in
@@ -985,6 +979,14 @@ class CMakeModelDriver(BuildModelDriver):
                                + internal_library_flags),
                 external_library_flags=external_library_flags,
                 internal_library_flags=internal_library_flags)
+        # Add python flags
+        if out['compiler'].env_matches_tool(use_sysconfig=True):
+            python_flags = sysconfig.get_config_var('LIBS')
+            if python_flags:
+                for x in python_flags.split():
+                    if ((x.startswith(('-L', '-l'))
+                         and (x not in target_linker_flags))):
+                        target_linker_flags.append(x)
         for k in constants.LANGUAGES['compiled']:
             if k == out['driver'].language:
                 continue

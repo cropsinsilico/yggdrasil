@@ -58,7 +58,10 @@ class TestServices(object):
     @pytest.fixture(params=itertools.product(['flask', 'rmq'], [None, 'rmq']),
                     ids=_make_ids, scope="class", autouse=True)
     def running_service(self, request, running_service):
-        with running_service(request.param[0], request.param[1]) as cli:
+        track_memory = (request.param[0] == 'flask'
+                        and request.param[1] is None)
+        with running_service(request.param[0], request.param[1],
+                             track_memory=track_memory) as cli:
             self.cli = cli
             yield cli
             self.cli = None
