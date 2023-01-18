@@ -3452,7 +3452,7 @@ class CompiledModelDriver(ModelDriver):
         """
         out = super(CompiledModelDriver, cls).configuration_steps()
         for k in cls.get_external_libraries():
-            out[k] = cls.is_library_installed(k)
+            out[str(k)] = cls.is_library_installed(k)
         return out
         
     @classmethod
