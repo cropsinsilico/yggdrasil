@@ -51,10 +51,10 @@ extras:
         os: unix
     - "{{ compiler('c') }}":
         method: conda_recipe
-        os: win
+        # os: win
     - "{{ compiler('cxx') }}":
         method: conda_recipe
-        os: win
+        # os: win
   fortran:
     requires_extras: [c]
     requirements:
