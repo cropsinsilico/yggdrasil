@@ -8,6 +8,7 @@ import subprocess
 import shutil
 import contextlib
 import threading
+import sysconfig
 from collections import OrderedDict
 from yggdrasil import platform, tools, scanf
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_products
@@ -398,10 +399,11 @@ class CompilationToolBase(object):
         for k in attr_list:
             # Copy so that list modification is not propagated to subclasses
             setattr(cls, k, copy.deepcopy(getattr(cls, k, [])))
-        # Set attributes based on environment variables
-        if cls.env_matches_tool():
-            cls.default_executable = os.environ[cls.default_executable_env].split(
-                'ccache ')[-1]
+        # Set attributes based on environment variables or sysconfig
+        cls.default_executable = cls.env_matches_tool()
+        if cls.default_executable is None:
+            cls.default_executable = cls.env_matches_tool(
+                sysconfig.get_config_vars())
         # Set default_executable to name
         if cls.default_executable is None:
             cls.default_executable = cls.toolname
@@ -673,14 +675,20 @@ class CompilationToolBase(object):
         return (exec_path is not None)
 
     @classmethod
-    def env_matches_tool(cls):
+    def env_matches_tool(cls, env=None):
         r"""Determine if the executable pointed to by any environment
         variable matches this compilation tool.
+
+        Args:
+            env (dict, optional): Dictionary of environment variables.
+                If not provided, os.environ will be used.
 
         Returns:
             bool: True if the environment variable matches, False otherwise.
 
         """
+        if env is None:
+            env = os.environ
         tool_base = cls.aliases.copy()
         envi_base = ''
         if isinstance(cls.toolname, str):
@@ -689,12 +697,12 @@ class CompilationToolBase(object):
             tool_base.append(cls.default_executable)
         if isinstance(cls.default_executable_env, str):
             envi_base = os.path.basename(
-                os.environ.get(cls.default_executable_env, '').split('ccache ')[-1])
+                env.get(cls.default_executable_env, '').split('ccache ')[-1])
         if os.environ.get('PATHEXT', ''):
             tool_base = [x.split(os.environ['PATHEXT'])[0]
                          for x in tool_base]
             envi_base = envi_base.split(os.environ['PATHEXT'])[0]
-        out = False
+        out = None
         regex_literal = '-+*$%#@!^&(){}[]<>,.;:'
         regex_pathsep = r'(?:[\-\_\.0-9])'
         if tool_base and envi_base:
@@ -707,6 +715,8 @@ class CompilationToolBase(object):
                     out = True
                     break
             # out = envi_base.endswith(tuple(tool_base))
+        if out:
+            return env[cls.default_executable_env].split('ccache ')[-1]
         return out
 
     @classmethod

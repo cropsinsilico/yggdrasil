@@ -7,6 +7,7 @@ import subprocess
 import argparse
 import pprint
 import shutil
+import sysconfig
 from yggdrasil import constants
 LANGUAGES = getattr(constants, 'LANGUAGES', {})
 LANGUAGES_WITH_ALIASES = getattr(constants, 'LANGUAGES_WITH_ALIASES', {})
@@ -689,7 +690,8 @@ class ygginfo(SubCommand):
                 # Environment variabless
                 env_vars = ['CONDA_PREFIX', 'CONDA', 'SDKROOT', 'CC',
                             'CXX', 'FC', 'GFORTRAN', 'DISPLAY', 'CL',
-                            '_CL_']
+                            '_CL_', 'LD', 'CFLAGS', 'CXXFLAGS',
+                            'LDFLAGS']
                 if platform._is_win:  # pragma: windows
                     env_vars += ['VCPKG_ROOT']
                 vardict.append(('Environment variables:', ''))
@@ -832,6 +834,12 @@ class ygginfo(SubCommand):
                              curr_prefix + prefix,
                              ("\n" + curr_prefix + prefix).join(
                                  out.splitlines(False)))))
+                # System config vars
+                vardict.append(('Sysconfig Vars:', ''))
+                curr_prefix += prefix
+                for k, v in sysconfig.get_config_vars().items():
+                    vardict.append((curr_prefix + k, v))
+                curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
         finally:
             # Print things
             max_len = max(len(x[0]) for x in vardict)

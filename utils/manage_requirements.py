@@ -1740,7 +1740,6 @@ if __name__ == "__main__":
         '--allow-missing', action='store_true',
         help="Ignore requirements with no valid options")
     SetupParam.add_parser_args(parser_ins, install_opts=install_opts,
-                               skip=['target-os'],
                                deps_method_default="supplemental")
     # Call methods
     args = parser.parse_args()
