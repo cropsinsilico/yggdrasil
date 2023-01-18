@@ -628,12 +628,13 @@ class ygginfo(SubCommand):
                          drv.is_interface_installed()))
                     vardict.append((curr_prefix + "Comm Installed",
                                     drv.is_comm_installed()))
-                    if drv.is_configured():
-                        vardict.append((curr_prefix + "Configured",
-                                        True))
-                    else:
+                    vardict.append((curr_prefix + "Configured",
+                                    drv.is_configured()))
+                    if not vardict[-1][1]:
+                        curr_prefix += prefix
                         for k, v in drv.configuration_steps().items():
                             vardict.append((curr_prefix + k, v))
+                        curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
                     curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
                 curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
             # Add comm information
