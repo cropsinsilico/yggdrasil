@@ -400,7 +400,8 @@ class CompilationToolBase(object):
             # Copy so that list modification is not propagated to subclasses
             setattr(cls, k, copy.deepcopy(getattr(cls, k, [])))
         # Set attributes based on environment variables or sysconfig
-        cls.default_executable = cls.env_matches_tool()
+        if cls.default_executable is None:
+            cls.default_executable = cls.env_matches_tool()
         if cls.default_executable is None:
             cls.default_executable = cls.env_matches_tool(
                 use_sysconfig=True)
@@ -701,8 +702,6 @@ class CompilationToolBase(object):
             env = {}
         if use_sysconfig:
             env.update(sysconfig.get_config_vars())
-            if platform._is_win:  # pragma: windows
-                return None
         else:
             env.update(os.environ)
         tool_base = cls.aliases.copy()
@@ -3436,26 +3435,26 @@ class CompiledModelDriver(ModelDriver):
                 continue
             if not out:  # pragma: no cover
                 break
-            lib_opt = '%s_%s' % (lib, lib_typ)
+            lib_opt = f'{lib}_{lib_typ}'
             out = (cfg.get(dep_lang, lib_opt, None) is not None)
         return out
         
     @classmethod
-    def is_configured(cls):
-        r"""Determine if the appropriate configuration has been performed (e.g.
-        installation of supporting libraries etc.)
+    def configuration_steps(cls):
+        r"""Get a list of configuration steps with tuples of flags and
+        boolean values.
 
         Returns:
-            bool: True if the language has been configured.
+            OrderedDict: Pairs of descriptions and states for
+                different steps in the configuration all steps must be
+                True for the language to be configured.
 
         """
-        out = super(CompiledModelDriver, cls).is_configured()
+        out = super(CompiledModelDriver, cls).configuration_steps()
         for k in cls.get_external_libraries():
-            if not out:  # pragma: no cover
-                break
-            out = cls.is_library_installed(k)
+            out[k] = cls.is_library_installed(k)
         return out
-
+        
     @classmethod
     def is_tool_installed(cls, tooltype):
         r"""Determine if a compilation tool of a certain is installed for

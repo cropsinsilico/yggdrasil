@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import shutil
 from yggdrasil.components import import_component
 from yggdrasil.drivers.ModelDriver import ModelDriver
@@ -44,15 +45,17 @@ class MPIPartnerModel(ModelDriver):
         return (MPI is not None)
 
     @classmethod
-    def is_configured(cls):
-        r"""Determine if the appropriate configuration has been performed (e.g.
-        installation of supporting libraries etc.)
+    def configuration_steps(cls):
+        r"""Get a list of configuration steps with tuples of flags and
+        boolean values.
 
         Returns:
-            bool: True if the language has been configured.
+            OrderedDict: Pairs of descriptions and states for
+                different steps in the configuration all steps must be
+                True for the language to be configured.
 
         """
-        return True
+        return OrderedDict()
 
     @classmethod
     def is_comm_installed(cls, **kwargs):
