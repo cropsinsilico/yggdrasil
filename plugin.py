@@ -159,8 +159,7 @@ def remove_option(args, options, remove_file_or_dir=False):
     # print("AFTER ", args, set(args_copy) - set(args))
 
 
-# def pytest_load_initial_conftests(args):
-def pytest_cmdline_preparse(args, dont_exit=False):
+def pytest_load_initial_conftests(args, dont_exit=False):
     r"""Adjust the pytest arguments before testing."""
     # Check for run in separate process before adding CI args
     parser = DummyParser()
@@ -240,7 +239,7 @@ def pytest_cmdline_preparse(args, dont_exit=False):
         #         x_args.append(k)
         assert (any((k.split('=', 1)[0] == '--write-script') for k in x_args))
         if not pargs.second_attempt:
-            pytest_cmdline_preparse(x_args, dont_exit=True)
+            pytest_load_initial_conftests(x_args, dont_exit=True)
     # Run test in separate process
     if run_process:
         flag = subprocess.call(prefix + ['pytest'] + args)

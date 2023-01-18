@@ -112,7 +112,8 @@ setup(
         "Development Status :: 5 - Production/Stable",
     ],
     entry_points={
-        'console_scripts': console_scripts,
+        "console_scripts": console_scripts,
+        "pytest11": ["yggtest = plugin"]
     },
     license="BSD",
     python_requires='>=3.5',
