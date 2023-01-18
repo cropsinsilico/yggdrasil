@@ -2464,11 +2464,10 @@ class CommBase(tools.YggClass):
         return_message_object = kwargs.pop('return_message_object', False)
         kwargs['return_message_object'] = True
         msg = self.recv(*args, **kwargs)
+        msg_dict = msg.args
         if msg.flag == FLAG_SUCCESS:
             msg_dict = self.coerce_to_dict(msg.args, key_order,
                                            copy.deepcopy(msg.header))
-        else:
-            msg_dict = msg.args
         out = copy.deepcopy(msg)
         out.args = msg_dict
         if not return_message_object:

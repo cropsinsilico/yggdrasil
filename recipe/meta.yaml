@@ -53,7 +53,6 @@ requirements:
     - GitPython
     - chevron
     - deprecation
-    - flaky
     - flask
     - git
     - jsonschema==3.2.0
@@ -90,8 +89,8 @@ outputs:
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - cmake  # [not win]
-        - {{ compiler('c') }}  # [win]
-        - {{ compiler('cxx') }}  # [win]
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
   - name: yggdrasil.fortran
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

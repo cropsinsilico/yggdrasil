@@ -29,7 +29,9 @@ _markers = [
      "tests that take a long time to run", None),
     ("extra_example", "--extra-examples",
      "tests for superfluous examples", None),
-    ("production_run", "--production-run", None)
+    ("production_run", "--production-run", None),
+    ("remote_service", "--remote-service",
+     "tests that must connect to a running remote service", None)
 ]
 _params = {
     "example_name": [],
@@ -322,6 +324,8 @@ def add_options_to_parser(parser):
                      help="Don't capture output or log messages from tests.")
     parser.addoption('--end-yggdrasil-opts', action="store_true",
                      help="Internal use only")
+    parser.addoption('--rerun-flaky', action="store_true",
+                     help="Re-run flaky tests.")
 
 
 def pytest_configure(config):
@@ -342,6 +346,11 @@ def pytest_configure(config):
         "markers", ("related_language(name): mark test as being related "
                     "to a language. The language may or may not be "
                     "installed, but must be enabled for the test to run."))
+    config.addinivalue_line(
+        "markers", ("flaky_optin(name,condition=None,reruns=1,"
+                    "reruns_delay=0): mark test as "
+                    "flaky without automatically re-running on "
+                    "failure unless --rerun-flaky is specified."))
 
 
 # def pytest_runtest_setup(item):
@@ -377,6 +386,7 @@ def pytest_collection_modifyitems(config, items):
     selected_suites = config.getoption('--suite')
     enabled = config.getoption("--language")
     disabled = config.getoption("--skip-language")
+    rerun_flaky = config.getoption("--rerun-flaky")
     for item in items:
         # Suites
         suites = [mark.args[0] for mark in item.iter_markers(name="suite")]
@@ -444,6 +454,11 @@ def pytest_collection_modifyitems(config, items):
                     pytest.mark.skip(
                         reason=(f"test requires languages {absent_langs!r} "
                                 f"NOT be installed")))
+        # Flaky markers
+        if rerun_flaky:
+            for mark in item.iter_markers(name="flaky_optin"):
+                item.add_marker(
+                    pytest.mark.flaky(*mark.args, **mark.kwargs))
 
 
 def pytest_generate_tests(metafunc):
@@ -644,6 +659,9 @@ def config_env(pytestconfig):
     if second_attempt:
         production_run = False
         debug = True
+    if pytestconfig.getoption("--rerun-flaky"):
+        print("HERE")
+        os.environ['YGGDRASIL_RERUN_FLAKY'] = '1'
     from yggdrasil import config
     with config.temp_config(production_run=production_run,
                             debug=debug, default_comm=default_comm,
@@ -748,7 +766,8 @@ def running_service(pytestconfig, check_service_manager_settings,
             break
 
     @contextlib.contextmanager
-    def running_service_w(service_type, partial_commtype=None):
+    def running_service_w(service_type, partial_commtype=None,
+                          track_memory=False):
         from yggdrasil.services import (
             IntegrationServiceManager)
         if ((((service_type, partial_commtype) == ('flask', 'rmq'))
@@ -763,6 +782,8 @@ def running_service(pytestconfig, check_service_manager_settings,
             args.append(f"--commtype={partial_commtype}")
         args += ["start", f"--model-repository={model_repo}",
                  f"--log-level={log_level}"]
+        if track_memory:
+            args.append("--track-memory")
         process_kws = {}
         if with_coverage:
             script_path = os.path.expanduser(os.path.join('~', 'run_server.py'))
@@ -782,7 +803,8 @@ def running_service(pytestconfig, check_service_manager_settings,
             lines += ['assert not srv.is_running',
                       f'srv.start_server(with_coverage={with_coverage},',
                       f'                 log_level={log_level},'
-                      f'                 model_repository=\'{model_repo}\')']
+                      f'                 model_repository=\'{model_repo}\','
+                      f'                 track_memory={track_memory})']
             with open(script_path, 'w') as fd:
                 fd.write('\n'.join(lines))
             args = [sys.executable, script_path]

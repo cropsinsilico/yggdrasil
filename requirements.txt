@@ -1,7 +1,6 @@
 GitPython
 chevron
 deprecation
-flaky
 flask
 jsonschema==3.2.0
 matplotlib       # [pip]

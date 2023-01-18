@@ -158,7 +158,7 @@ class GCCCompiler(CCompilerBase):
             + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
             + [('library_rpath', '-Wl,-rpath')]))
     toolset = 'gnu'
-    aliases = ['gnu-cc']
+    aliases = ['gnu-cc', 'gnu-gcc']
 
     @classmethod
     def is_installed(cls):

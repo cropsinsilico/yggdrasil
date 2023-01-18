@@ -216,13 +216,13 @@ jobs:
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }}
-        --python ${{ matrix.python-version }}
+        --python ${{ matrix.python-version }} --use-mamba
       shell: bash --noprofile --norc -eo pipefail {0}
     - name: (CONDA) Build package in base environment (re-attempt)
       if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
         'conda' || matrix.install-method == 'mamba')}}
       run: $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }}
-        --python ${{ matrix.python-version }}
+        --python ${{ matrix.python-version }} --use-mamba
       shell: bash --noprofile --norc -eo pipefail {0}
     - name: (CONDA) Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
@@ -243,10 +243,12 @@ jobs:
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
     - name: (CONDA) Install dependencies & package from existing build (re-attempt)
       if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method ==
         'conda' || matrix.install-method == 'mamba')}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os == 'macOS'
@@ -352,7 +354,7 @@ jobs:
         python-version:
         - 3.7
         install-method:
-        - mamba
+        - conda
         test-flags1:
         - --long-running --mpi-script=run_mpi.sh
         test-flags2:
@@ -364,28 +366,28 @@ jobs:
         include:
         - os-base: ubuntu
           python-version: 3.6
-          install-method: mamba
+          install-method: conda
           test-flags1: --long-running
           test-flags2: ''
           install-c: true
           install-mpi: false
         - os-base: ubuntu
           python-version: 3.8
-          install-method: mamba
+          install-method: conda
           test-flags1: --long-running
           test-flags2: ''
           install-c: true
           install-mpi: false
         - os-base: ubuntu
           python-version: 3.9
-          install-method: mamba
-          test-flags1: --long-running
+          install-method: conda
+          test-flags1: --long-running --remote-service
           test-flags2: ''
           install-c: true
           install-mpi: false
         - os-base: macos
           python-version: 3.8
-          install-method: mamba
+          install-method: conda
           test-flags1: --suites examples top --parametrize-example-name=rpc_lesson3
           test-flags2: tests/test_tools.py
           install-c: true
@@ -535,13 +537,13 @@ jobs:
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }}
-        --python ${{ matrix.python-version }}
+        --python ${{ matrix.python-version }} --use-mamba
       shell: bash --noprofile --norc -eo pipefail {0}
     - name: (CONDA) Build package in base environment (re-attempt)
       if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
         'conda' || matrix.install-method == 'mamba')}}
       run: $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }}
-        --python ${{ matrix.python-version }}
+        --python ${{ matrix.python-version }} --use-mamba
       shell: bash --noprofile --norc -eo pipefail {0}
     - name: (CONDA) Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
@@ -562,10 +564,12 @@ jobs:
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
     - name: (CONDA) Install dependencies & package from existing build (re-attempt)
       if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method ==
         'conda' || matrix.install-method == 'mamba')}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os == 'macOS'
@@ -830,13 +834,13 @@ jobs:
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }}
-        --python ${{ matrix.python-version }}
+        --python ${{ matrix.python-version }} --use-mamba
       shell: bash --noprofile --norc -eo pipefail {0}
     - name: (CONDA) Build package in base environment (re-attempt)
       if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
         'conda' || matrix.install-method == 'mamba')}}
       run: $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }}
-        --python ${{ matrix.python-version }}
+        --python ${{ matrix.python-version }} --use-mamba
       shell: bash --noprofile --norc -eo pipefail {0}
     - name: (CONDA) Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
@@ -857,10 +861,12 @@ jobs:
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
     - name: (CONDA) Install dependencies & package from existing build (re-attempt)
       if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method ==
         'conda' || matrix.install-method == 'mamba')}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os == 'macOS'
@@ -966,7 +972,7 @@ jobs:
         python-version:
         - 3.7
         install-method:
-        - mamba
+        - conda
         test-flags1:
         - --long-running --languages python R matlab
         test-flags2:
@@ -1127,13 +1133,13 @@ jobs:
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }}
-        --python ${{ matrix.python-version }}
+        --python ${{ matrix.python-version }} --use-mamba
       shell: bash --noprofile --norc -eo pipefail {0}
     - name: (CONDA) Build package in base environment (re-attempt)
       if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
         'conda' || matrix.install-method == 'mamba')}}
       run: $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }}
-        --python ${{ matrix.python-version }}
+        --python ${{ matrix.python-version }} --use-mamba
       shell: bash --noprofile --norc -eo pipefail {0}
     - name: (CONDA) Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
@@ -1154,10 +1160,12 @@ jobs:
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
     - name: (CONDA) Install dependencies & package from existing build (re-attempt)
       if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method ==
         'conda' || matrix.install-method == 'mamba')}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os == 'macOS'
@@ -1423,13 +1431,13 @@ jobs:
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }}
-        --python ${{ matrix.python-version }}
+        --python ${{ matrix.python-version }} --use-mamba
       shell: bash --noprofile --norc -eo pipefail {0}
     - name: (CONDA) Build package in base environment (re-attempt)
       if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
         'conda' || matrix.install-method == 'mamba')}}
       run: $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }}
-        --python ${{ matrix.python-version }}
+        --python ${{ matrix.python-version }} --use-mamba
       shell: bash --noprofile --norc -eo pipefail {0}
     - name: (CONDA) Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
@@ -1450,10 +1458,12 @@ jobs:
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
     - name: (CONDA) Install dependencies & package from existing build (re-attempt)
       if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method ==
         'conda' || matrix.install-method == 'mamba')}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os == 'macOS'

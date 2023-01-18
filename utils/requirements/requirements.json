@@ -3,7 +3,6 @@
     "chevron",
     "deprecation",
     "flask",
-    "flaky",
     {
       "git": {
         "method": "conda"
@@ -83,14 +82,12 @@
       },
       {
         "{{ compiler('c') }}": {
-          "method": "conda_recipe",
-          "os": "win"
+          "method": "conda_recipe"
         }
       },
       {
         "{{ compiler('cxx') }}": {
-          "method": "conda_recipe",
-          "os": "win"
+          "method": "conda_recipe"
         }
       }
     ],
@@ -429,6 +426,7 @@
       {
         "strace": {
           "method": "apt",
+          "os": "linux",
           "flags": {
             "method_validate": "conda_supp"
           }
@@ -437,6 +435,7 @@
       {
         "valgrind": {
           "method": "apt",
+          "os": "linux",
           "flags": {
             "method_validate": "conda_supp"
           }

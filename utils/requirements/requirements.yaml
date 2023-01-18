@@ -5,7 +5,6 @@ general:
   #     os: unix
   - deprecation
   - flask
-  - flaky
   - git:  # This may need to be removed from conda recipe
       method: conda
   - jsonschema==3.2.0
@@ -53,10 +52,10 @@ extras:
         os: unix
     - "{{ compiler('c') }}":
         method: conda_recipe
-        os: win
+        # os: win
     - "{{ compiler('cxx') }}":
         method: conda_recipe
-        os: win
+        # os: win
   fortran:
     requires_extras: [c]
     requirements:
@@ -225,10 +224,12 @@ extras:
           not_in_recipe: true
     - strace:
         method: apt
+        os: linux
         flags:
           method_validate: conda_supp
     - valgrind:
         method: apt
+        os: linux
         flags:
           method_validate: conda_supp
   docs:
