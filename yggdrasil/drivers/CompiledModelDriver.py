@@ -715,6 +715,7 @@ class CompilationToolBase(object):
         if isinstance(cls.default_executable_env, str):
             envi_full = env.get(cls.default_executable_env, '').split(
                 'ccache ')[-1]
+        if envi_full:
             envi_base = os.path.basename(envi_full.split(maxsplit=1)[0])
         if os.environ.get('PATHEXT', ''):
             tool_base = [x.split(os.environ['PATHEXT'])[0]
