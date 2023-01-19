@@ -113,7 +113,7 @@ setup(
     ],
     entry_points={
         "console_scripts": console_scripts,
-        "pytest11": ["yggtest = plugin"]
+        "pytest11": ["yggtest = yggdrasil.pytest_plugin"]
     },
     license="BSD",
     python_requires='>=3.5',

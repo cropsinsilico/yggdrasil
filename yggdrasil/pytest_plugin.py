@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-_test_directory = os.path.dirname(__file__)
 _test_registry = []
 _weakref_registry = []
 _markers = [
@@ -169,6 +168,20 @@ def pytest_load_initial_conftests(args, dont_exit=False):
     for k in ['separate_tests', 'suite']:
         if getattr(pargs, k, None) is None:
             setattr(pargs, k, [])
+    # Test directory
+    _test_directory = None
+    for x in pargs.file_or_dir:
+        xx = x
+        while xx:
+            xprev = xx
+            xx, x_tail = os.path.split(xx)
+            if x_tail == "tests":
+                _test_directory = xprev
+                break
+        if _test_directory:
+            break
+    assert _test_directory is not None
+    print('ARGS', args, _test_directory)
     # Disable output capture
     if pargs.nocapture:
         remove_option(args, 'nocapture')
