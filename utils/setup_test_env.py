@@ -865,6 +865,7 @@ def build_pkg(method, param=None, python=None, return_commands=False,
                 f"{CONDA_CMD} config --prepend channels conda-forge",
                 f"{CONDA_CMD} config --remove channels defaults",
                 f"{CONDA_CMD} config --set channel_priority strict",
+                f"{CONDA_CMD} update --all",
                 f"{CONDA_CMD} install mamba -c conda-forge",
             ] + cmds
             cmds = get_summary_commands() + cmds
