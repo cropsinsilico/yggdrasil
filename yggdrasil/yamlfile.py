@@ -6,7 +6,7 @@ import yaml
 import json
 import git
 import io as sio
-from yggdrasil import constants
+from yggdrasil import constants, rapidjson
 from yggdrasil.schema import get_schema
 from urllib.parse import urlparse
 from yaml.constructor import (
@@ -180,9 +180,14 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None,
     if verbose:  # pragma: no cover
         print('un-normalized')
         pprint.pprint(yamlparsed)
-    yml_norm = s.normalize(
-        yamlparsed, partial=True,
-        norm_kws={'relative_path_root': yamlparsed['working_dir']})
+    try:
+        yml_norm = s.normalize(
+            yamlparsed, partial=True,
+            norm_kws={'relative_path_root': yamlparsed['working_dir']})
+    except rapidjson.NormalizationError:
+        print('un-normalized:')
+        pprint.pprint(yamlparsed)
+        raise
     if verbose:  # pragma: no cover
         print('normalized')
         pprint.pprint(yml_norm)
