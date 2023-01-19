@@ -7,6 +7,7 @@ from yggdrasil import yamlfile, rapidjson
 from yaml.constructor import ConstructorError
 from tests import TestBase as base_class
 _yaml_env = 'TEST_YAML_FILE'
+_func_prefix = __file__
 
 
 def direct_translate(msg):  # pragma: no cover
@@ -240,18 +241,18 @@ class TestYamlIODrivers(YamlTestBase):
                   '    inputs:',
                   '      - name: inputA',
                   '        driver: FileInputDriver',
-                  '        translator: %s:direct_translate' % __name__,
+                  '        translator: %s:direct_translate' % _func_prefix,
                   '        onexit: printStatus',
                   '        args: {{ %s }}' % _yaml_env,
                   '    outputs:',
                   '      - name: outputA',
                   '        driver: FileOutputDriver',
-                  '        translator: %s:direct_translate' % __name__,
+                  '        translator: %s:direct_translate' % _func_prefix,
                   '        onexit: printStatus',
                   '        args: fileA.txt',
                   '      - name: outputA2',
                   '        driver: OutputDriver',
-                  '        translator: %s:direct_translate' % __name__,
+                  '        translator: %s:direct_translate' % _func_prefix,
                   '        onexit: printStatus',
                   '        args: A_to_B'],
                  ['model:',
@@ -399,7 +400,7 @@ class TestYamlConnectionTranslator(YamlTestBase):
                   'connections:',
                   '  - input: outputB',
                   '    output: inputA',
-                  '    translator: %s:direct_translate' % __name__],
+                  '    translator: %s:direct_translate' % _func_prefix],
                  ['models:',
                   '  - name: modelB',
                   '    driver: GCCModelDriver',

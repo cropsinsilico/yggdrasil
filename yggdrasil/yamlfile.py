@@ -966,15 +966,17 @@ def backward_compat_model_io(io, instance, iodict, model):
                 instance.pop('driver')
                 break
         else:
-            iodict[f'{io}_drivers'].append((instance['args'], instance['name']))
+            key = instance['args']
             if 'filetype' in instance:
                 cpy = copy.deepcopy(instance)
                 instance.clear()
                 instance['name'] = cpy['name']
                 cpy['name'] = cpy['args']
-                iodict[opp_map[io]][cpy['name']] = cpy
+                key += f"_{instance['name']}"
+                iodict[opp_map[io]][key] = cpy
                 cpy.pop('args')
                 cpy.pop('driver')
+            iodict[f'{io}_drivers'].append((key, instance['name']))
     return instance
 
 

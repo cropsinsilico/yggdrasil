@@ -1,6 +1,6 @@
 import pprint
 import numpy as np
-from yggdrasil.metaschema.datatypes import get_type_class
+from yggdrasil import rapidjson
 
 
 def get_test_data(typename):
@@ -13,8 +13,7 @@ def get_test_data(typename):
         object: Example of specified datatype.
 
     """
-    typeclass = get_type_class(typename)
-    return typeclass.get_test_data()
+    return rapidjson.generate_data({'type': typename})
 
 
 def check_received_data(typename, x_recv):
@@ -38,4 +37,4 @@ def check_received_data(typename, x_recv):
     if isinstance(x_sent, np.ndarray):
         np.testing.assert_array_equal(x_recv, x_sent)
     else:
-        assert(x_recv == x_sent)
+        assert x_recv == x_sent
