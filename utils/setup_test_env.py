@@ -18,7 +18,6 @@ if os.environ.get('PRE_CONDA_BIN', False):
 _is_osx = (sys.platform == 'darwin')
 _is_linux = ('linux' in sys.platform)
 _is_win = (sys.platform in ['win32', 'cygwin', 'msys'])
-print(f'setup_test_env: sys.platform = {sys.platform}')
 _is_unix = (_is_osx or _is_linux)
 _on_gha = bool(os.environ.get('GITHUB_ACTIONS', False))
 _on_travis = bool(os.environ.get('TRAVIS_OS_NAME', False))
@@ -861,14 +860,17 @@ def build_pkg(method, param=None, python=None, return_commands=False,
     if cmds:
         cmds = summary_cmds + cmds
         if param.use_mamba and not shutil.which('mamba'):
-            cmds = [
+            cmds_after = cmds
+            cmds = get_summary_commands()
+            cmds += [
                 f"{CONDA_CMD} config --prepend channels conda-forge",
                 f"{CONDA_CMD} config --remove channels defaults",
                 f"{CONDA_CMD} config --set channel_priority strict",
-                f"{CONDA_CMD} update --all",
-                f"{CONDA_CMD} install mamba -c conda-forge",
-            ] + cmds
-            cmds = get_summary_commands() + cmds
+            ]
+            if not (_is_win and _on_gha):
+                cmds += [f"{CONDA_CMD} update --all"]
+            cmds += [f"{CONDA_CMD} install mamba -c conda-forge"]
+            cmds += cmds_after
         call_script(cmds, verbose=param.verbose,
                     dry_run=param.dry_run)
     if param.method == 'conda':  # and not param.use_mamba:

@@ -836,8 +836,19 @@ class YggRequirement(object):
         """
         cmds = []
         req = list(set(kwargs['requirements']))
-        if len(req) > 1:
-            if kwargs.get('individually'):
+        if len(req) == 0:
+            return cmds
+        elif len(req) == 1:
+            if kwargs.get('quote_constraints', False):
+                quoted_req = []
+                for x in req:
+                    if any(y in x for y in '!=<>'):
+                        quoted_req.append(f'"{x}"')
+                    else:
+                        quoted_req.append(x)
+                req = quoted_req
+        else:
+            if kwargs.get('individually', False):
                 for x in req:
                     ikwargs = dict(kwargs, requirements=[x])
                     cmds += YggRequirement.format_install_commands(
@@ -877,6 +888,7 @@ class YggRequirement(object):
         install_param = {}
         if method == 'pip':
             install_param['file_flag'] = '-r'
+            install_param['quote_constraints'] = True
             args += [param.python_cmd, '-m', 'pip', 'install']
             if param.verbose:
                 args.append('--verbose')
