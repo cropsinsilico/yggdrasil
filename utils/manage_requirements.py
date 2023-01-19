@@ -829,7 +829,7 @@ class YggRequirement(object):
 
         """
         cmds = []
-        req = list(set(kwargs['requirements']))
+        req = sorted(list(set(kwargs['requirements'])))
         if len(req) == 0:
             return cmds
         elif len(req) == 1:
