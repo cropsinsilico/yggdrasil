@@ -754,8 +754,7 @@ class CompilationToolBase(object):
             exe = cls.env_matches_tool(env=env_dict, with_flags=True,
                                        use_sysconfig=True)
         if exe and env_dict:
-            if ' ' in exe:
-                out += exe.split()[1:]
+            out += exe.split()[1:]
             env = getattr(cls, 'default_flags_env', None)
             if env is not None:
                 if not isinstance(env, list):

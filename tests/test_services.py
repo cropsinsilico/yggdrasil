@@ -33,7 +33,7 @@ def test_call_integration_remote():
     cli = IntegrationServiceManager(service_type=service_type,
                                     for_request=True,
                                     address=address)
-    cli.wait_for_server(timeout=60.0)
+    cli.wait_for_server(timeout=600.0)
     if not cli.is_running:  # pragma: debug
         pytest.skip("Web service app is not running.")
     try:

@@ -1829,7 +1829,7 @@ class MemoryTracker(YggTaskLoop):
 
     def record_memory(self):
         import psutil
-        if not psutil.pid_exists(self.track_pid):
+        if not psutil.pid_exists(self.track_pid):  # pragma: debug
             self.set_break_flag()
             return
         process = psutil.Process(self.track_pid)
