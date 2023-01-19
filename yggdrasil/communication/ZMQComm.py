@@ -478,7 +478,7 @@ class ZMQComm(CommBase.CommBase):
                 socket_action = 'bind'
             else:
                 socket_action = 'connect'
-        if new_process:
+        if new_process:  # pragma: sbml
             self.context = zmq.Context()
             set_context_opts(self.context)
         else:

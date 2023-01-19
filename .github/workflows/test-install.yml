@@ -66,6 +66,8 @@ jobs:
         - true
         install-mpi:
         - true
+        install-sbml:
+        - false
         include:
         - os-base: windows
           python-version: 3.7
@@ -74,6 +76,7 @@ jobs:
           test-flags2: ''
           install-c: false
           install-mpi: false
+          install-sbml: false
       fail-fast: false
     steps:
     - uses: actions/checkout@v3
@@ -87,6 +90,10 @@ jobs:
     - name: Set MPI installation based on matrix value
       if: matrix.install-mpi != true
       run: echo "INSTALLMPI=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Set SBML installation based on matrix value
+      if: matrix.install-sbml == true
+      run: echo "INSTALLSBML=1" >> $GITHUB_ENV
       shell: bash -l {0}
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
@@ -361,6 +368,8 @@ jobs:
         - true
         install-mpi:
         - true
+        install-sbml:
+        - false
         include:
         - os-base: ubuntu
           python-version: 3.6
@@ -369,6 +378,7 @@ jobs:
           test-flags2: ''
           install-c: true
           install-mpi: false
+          install-sbml: false
         - os-base: ubuntu
           python-version: 3.8
           install-method: conda
@@ -376,13 +386,15 @@ jobs:
           test-flags2: ''
           install-c: true
           install-mpi: false
+          install-sbml: false
         - os-base: ubuntu
           python-version: 3.9
           install-method: conda
           test-flags1: --long-running --remote-service
-          test-flags2: ''
+          test-flags2: --suites examples --parametrize-language=sbml
           install-c: true
           install-mpi: false
+          install-sbml: true
         - os-base: macos
           python-version: 3.8
           install-method: conda
@@ -390,6 +402,7 @@ jobs:
           test-flags2: tests/test_tools.py
           install-c: true
           install-mpi: false
+          install-sbml: false
       fail-fast: false
     defaults:
       run:
@@ -406,6 +419,10 @@ jobs:
     - name: Set MPI installation based on matrix value
       if: matrix.install-mpi != true
       run: echo "INSTALLMPI=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Set SBML installation based on matrix value
+      if: matrix.install-sbml == true
+      run: echo "INSTALLSBML=1" >> $GITHUB_ENV
       shell: bash -l {0}
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
@@ -681,6 +698,8 @@ jobs:
         - true
         install-mpi:
         - false
+        install-sbml:
+        - false
       fail-fast: false
     services:
       rabbitmq:
@@ -701,6 +720,10 @@ jobs:
     - name: Set MPI installation based on matrix value
       if: matrix.install-mpi != true
       run: echo "INSTALLMPI=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Set SBML installation based on matrix value
+      if: matrix.install-sbml == true
+      run: echo "INSTALLSBML=1" >> $GITHUB_ENV
       shell: bash -l {0}
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
@@ -975,6 +998,8 @@ jobs:
         - true
         install-mpi:
         - false
+        install-sbml:
+        - false
       fail-fast: false
     services:
       rabbitmq:
@@ -998,6 +1023,10 @@ jobs:
     - name: Set MPI installation based on matrix value
       if: matrix.install-mpi != true
       run: echo "INSTALLMPI=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Set SBML installation based on matrix value
+      if: matrix.install-sbml == true
+      run: echo "INSTALLSBML=1" >> $GITHUB_ENV
       shell: bash -l {0}
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
@@ -1281,6 +1310,8 @@ jobs:
         - false
         install-mpi:
         - false
+        install-sbml:
+        - false
       fail-fast: false
     steps:
     - uses: actions/checkout@v3
@@ -1294,6 +1325,10 @@ jobs:
     - name: Set MPI installation based on matrix value
       if: matrix.install-mpi != true
       run: echo "INSTALLMPI=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Set SBML installation based on matrix value
+      if: matrix.install-sbml == true
+      run: echo "INSTALLSBML=1" >> $GITHUB_ENV
       shell: bash -l {0}
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
