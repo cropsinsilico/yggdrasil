@@ -164,6 +164,7 @@ class ServiceBase(YggClass):
             self.set_log_level(log_level)
         if with_coverage:  # pragma: testing
             def handle_shutdown(sig, frame):
+                self.cleanup_server(track_memory=track_memory)
                 sys.exit()
             signal.signal(_shutdown_signal, handle_shutdown)
             # try:
@@ -178,10 +179,20 @@ class ServiceBase(YggClass):
         try:
             self.run_server()
         finally:
-            self._is_running = False
-        if track_memory:
+            self.cleanup_server(track_memory=track_memory)
+
+    def cleanup_server(self, track_memory=False):
+        r"""Cleanup server process after it finishes.
+
+        Args:
+            track_memory (MemoryTracker, optional): If provided,
+                print information about memory usage.
+
+        """
+        if track_memory and self._is_running:
             track_memory.terminate()
             print(f"Max memory usage: {track_memory.max_memory} MB")
+        self._is_running = False
 
     def run_server(self):
         r"""Begin listening for requests."""
