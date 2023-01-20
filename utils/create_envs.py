@@ -20,11 +20,11 @@ def create_devenv(env_type, python='3.6', name=None, **kwargs):
         **kwargs: Additional keyword arguments are passed to create_env.
 
     """
-    assert(env_type in ['pip', 'conda'])
+    assert env_type in ['pip', 'conda', 'mamba']
     if name is None:
         name = '%s%s' % (env_type, python.replace('.', ''))
     create_env('conda', python=python, name=name, **kwargs)
-    install_pkg('%s-dev' % env_type, python=python,
+    install_pkg(f'{env_type}-dev', python=python,
                 conda_env=name, always_yes=True, only_python=True,
                 fallback_to_conda=True)
     # python_cmd = locate_conda_exe(name, 'python')
@@ -56,22 +56,22 @@ if __name__ == "__main__":
         "Create dev environments for matrix of installation methods "
         "and Python versions.")
     parser.add_argument('--method', '--methods',
-                        nargs='+', default=['conda', 'pip'],
-                        choices=['conda', 'pip'],
+                        nargs='+', default=['conda', 'pip', 'mamba'],
+                        choices=['conda', 'pip', 'mamba'],
                         help=("Method(s) that should be used to install the "
                               "dependencies."))
     parser.add_argument('--version', '--versions', '--python', '--pythons',
-                        nargs='+', default=['3.6'],
-                        choices=['3.6', '3.7', '3.8', '3.9'],
+                        nargs='+', default=['3.7'],
+                        choices=['3.7', '3.8', '3.9'],
                         help=("Python version(s) to create environments for."))
     parser.add_argument('--name', default=None,
                         help=("Name of the conda env that should be created or "
                               "updated. If provided, 'method' will default to "
-                              "'conda' and 'version' will default to '3.6'."))
+                              "'conda' and 'version' will default to '3.7'."))
     args = parser.parse_args()
     if args.name:
         args.method = ['conda']
-        args.version = ['3.6']
+        args.version = ['3.7']
     for env_type in args.method:
         for python in args.version:
             create_devenv(env_type, python=python, name=args.name)
