@@ -10,8 +10,7 @@ Development of |yggdrasil| should be done on branches and/or forks that
 are then merged in via pull request after passing linting (via
 `flake8 <http://flake8.pycqa.org/en/latest/>`_), testing (via
 continuous integration on
-`travis <https://travis-ci.org/cropsinsilico/yggdrasil>`_ and
-`appveyor <https://ci.appveyor.com/project/langmm/yggdrasil>`_),
+`Github Actions <https://github.com/cropsinsilico/yggdrasil/actions>`_),
 and code review. Prior to beginning new development,
 developers should open a Github issue on the repository that describes
 the proposed changes and/or features so that discussion can help identify
@@ -36,36 +35,40 @@ The following is only one method for setting up a development environment. You a
 
      $ conda config --add channels conda-forge
 
+#. [OPTIONAL] Install mamba. Mamba is a drop in replacement for conda that is often much faster. If you don't install mamba, replace mamba with conda in the following commands.::
+
+     $ conda install mamba
+
 #. Create a fork of the |yggdrasil| Github repository for you Github account (``Fork`` button located in the upper right corner of the |yggdrasil| `Github repository <https://github.com/cropsinsilico/yggdrasil>`_).
-#. Clone your fork of the |yggdrasil| repository using git and then change directory into the cloned repository. NOTE: If you do not have ``git`` you can either `install it yourself <https://git-scm.com/book/en/v2/Getting-Started-Installing-Git>`_ or using conda (``conda install git``).::
+#. Clone your fork of the |yggdrasil| repository using git and then change directory into the cloned repository. NOTE: If you do not have ``git`` you can either `install it yourself <https://git-scm.com/book/en/v2/Getting-Started-Installing-Git>`_ or using mamba/conda (``mamba install git``).::
 
      $ git clone --recurse-submodules https://github.com/<your Github username>/yggdrasil.git
      $ cd yggdrasil
 
 #. [OPTIONAL] Create a conda environment for development and activate that environment. You can create an environment using any of the supported versions of Python and may need more than one for testing.::
 
-     $ conda create -n ygg python=3.6
+     $ mamba create -n ygg python=3.7
      $ conda activate ygg
      
-   |yggdrasil| provides a python script, ``utils/create_envs.py`` for creating development environments and installing yggdrasil in develoment mode for a combination of dependency installation methods (pip vs. conda) and versions of Python. For example, to create a conda environment with Python 3.6 (as above) and install |yggdrasil|'s dependencies using conda, the following commands can
+   |yggdrasil| provides a python script, ``utils/setup_test_env.py`` for creating development environments and installing yggdrasil in develoment mode for a combination of dependency installation methods (pip vs. conda) and versions of Python. For example, to create a conda environment with Python 3.7 (as above) and install |yggdrasil|'s dependencies using mamba, the following commands can
    be executed from the root directory of your local |yggdrasil| repository.::
 
-     $ python utils/create_envs.py --name=ygg
+     $ python utils/setup_test_env.py devenv mamba 3.7 --name=ygg
      $ conda activate ygg
 
    .. note::
       **If you use ``utils/create_envs.py`` to create your dev environment, you can skip to the last step.**
-#. Install the requirements using conda via the helper script ``utils/install_from_requirements.py``::
+#. Install the requirements using mamba/conda via the helper script ``utils/install_from_requirements.py``::
 
-     $ python utils/install_from_requirements.py conda requirements.txt requirements_condaonly.txt requirements_testing.txt
+     $ python utils/manage_requirements.py install mamba --for-development
 
-   Alternatively, if you did not install conda, you can install the Python dependencies using ``pip`` via the same script.::
+   Alternatively, if you did not install mamba or conda, you can install the Python dependencies using ``pip`` via the same script. This script will attempt to install non-python dependencies via a package manager like ``apt``, ``brew``, or ``vcpkg`` unless ``--python-only`` is passed.::
 
-     $ python utils/install_from_requirements.py pip requirements.txt requirements_testing.txt
+     $ python utils/manage_requirements.py install pip --for-development
 
-   However, if you use this method, you will need to manually install the non-Python dependencies as described :ref:`here <manual_install_rst>`. This should be done BEFORE installing |yggdrasil| in the next step.
+   If you use this method with the ``--python-only`` flag, you will need to manually install the non-Python dependencies as described :ref:`here <manual_install_rst>`. This should be done BEFORE installing |yggdrasil| in the next step.
 
-   There are also two additional requirements files, ``requirements_documentation.txt`` and ``requirements_optional.txt``, that can optionally be added to the end of either of these commands. ``requirements_documentation.txt`` includes packages required for building the documentation and ``requirements_optional.txt`` includes packages required for optional |yggdrasil| features (e.g. using ``astropy`` table parsing or ``pika`` for RabbitMQ communication).
+   There are additional optional requirements that can be enabled via various command line flags. To see what these options are, take a look at the help information for the ``utils/manage_requirements.py install`` script by passing ``-h`` or ``--help``.
 #. Run the |yggdrasil| installation script in development mode.::
 
      $ python setup.py develop
@@ -98,4 +101,4 @@ the module directory containing the class being tested. In some cases
 attributes and/or methods are defined (e.g. serialization, communication,
 and connection driver classes).
 
-Tests can be run using the ``yggtest`` command. If no arguments are provided, ``yggtest`` will run all of the tests (excluding the examples). If you only want to run some tests, you can provide the path to file or directory containing the tests you would like to run; these paths can be absolute, relative to the current directory, or relative to the top level directory of the |yggdrasil| source tree. To also run example tests, include the ``--with-examples`` flag.
+Tests can be run by passing the tests directory to the ``pytest`` command. If no other arguments are provided, ``pytest`` will run all of the tests (excluding the examples). If you only want to run some tests, you can provide the path to file or directory containing the tests you would like to run; these paths can be absolute, relative to the current directory, or relative to the top level directory of the |yggdrasil| source tree. To also run example tests, include the ``--with-examples`` flag.

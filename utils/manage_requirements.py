@@ -1553,6 +1553,51 @@ def create_requirements(standard, fname=None, req=None):
         raise NotImplementedError(standard)
 
 
+def create_environment_file(param, fname=None, req=None, add=None,
+                            channels=None,
+                            fname_out='environment.yml', **kwargs):
+    r"""Create an yaml file describing a conda environment.
+
+    Args:
+        param (SetupParam): Setup parameters instance.
+        fname (str, optional): Path to YAML/JSON file containing
+            requirements. Defaults to 'yggdrasil/requirements.yaml'
+            unless pyyaml is not installed and then json will be used.
+        req (YggRequirements, optional): Existing set of requirements
+            to use. If not provided, one will be created from fname
+            and add.
+        add (list, optional): Additional packages that should be
+            installed. Defaults to None and is ignored.
+        channels (list, optional): Conda channels that should be used
+            in the environment file. Defaults to []. 'conda-forge'
+            will be added if it is not already present.
+        fname_out (str, optional): Path where the generate file should
+            be saved. Defaults to 'environment.yml'.
+        **kwargs: Additional keyword arguments are passed to
+            YggRequirements.select.
+
+    """
+    if req is None:
+        file_kwargs = {'add': add}
+        if ((isinstance(fname, list)
+             or (isinstance(fname, str) and fname.endswith('.txt')))):
+            req = YggRequirements.from_files(fname, **file_kwargs)
+        else:
+            req = YggRequirements.from_file(fname, **file_kwargs)
+    kwargs.setdefault('for_setup', True)
+    deps = req.select(param, **kwargs).format(name_only=True)
+    if channels is None:
+        channels = []
+    if 'conda-forge' not in channels:
+        channels.append('conda-forge')
+    out = {'name': param.conda_env,
+           'channels': channels,
+           'dependencies': deps}
+    with open(fname_out, 'w') as fd:
+        yaml.dump(out, fd, Dumper=yaml.SafeDumper)
+    return out
+
+
 def install_requirements(param, fname=None, req=None, add=None,
                          return_commands=False, **kwargs):
     r"""Install selected requirements on the current machine.
@@ -1713,46 +1758,68 @@ if __name__ == "__main__":
     # List requirements
     parser_req = subparsers.add_parser(
         'select', help="Determine what dependencies are required.")
-    parser_req.add_argument(
-        'method', choices=['conda', 'pip', 'mamba',
-                           'conda-dev', 'pip-dev', 'mamba-dev'],
-        help="Method that will be used to install yggdrasil.")
-    parser_req.add_argument(
-        '--allow-missing', action='store_true',
-        help="Ignore requirements with no valid options")
-    parser_req.add_argument(
-        '--target-os', choices=['any', 'win', 'osx', 'linux'],
-        default='any',
-        help=("Operating system that environment should target if "
-              "different from the current OS."))
-    SetupParam.add_parser_args(parser_req, install_opts=install_opts,
-                               skip=['conda-env', 'target-os'],
-                               no_install=True)
+    SetupParam.add_parser_args(
+        parser_req, install_opts=install_opts,
+        skip=['conda-env', 'python'],
+        skip_types=['install'],
+        method_choices=['conda', 'pip', 'mamba',
+                        'conda-dev', 'pip-dev', 'mamba-dev'],
+        target_os_choices=['any', 'win', 'osx', 'linux'],
+        target_os_default='any',
+        additional_args=[
+            (('--allow-missing', ),
+             {'action': 'store_true',
+              'help': "Ignore requirements with no valid options"}),
+        ])
     # Create requirements
     parser_cre = subparsers.add_parser(
         'create', help="Create requirements files.")
     parser_cre.add_argument(
         'standard',
-        choices=['conda', 'pip', 'extras_require', 'json', 'all'],
+        choices=['conda', 'pip', 'extras_require', 'json',
+                 'env', 'all'],
         help="Type of requirements file to create.")
+    # Create a conda environment file
+    parser_env = subparsers.add_parser(
+        'env', help="Create a conda environment file.")
+    SetupParam.add_parser_args(
+        parser_env, install_opts=install_opts,
+        conda_env_args=('--conda-env', '--name', '-n'),
+        conda_env_default='env',
+        skip_types=['run'],
+        skip=['method', 'windows_package_manager', 'only_python',
+              'use_mamba', 'fallback_to_conda', 'deps_method'],
+        additional_args=[
+            (('--filename', ),
+             {'default': "environment.yml",
+              'help': ("File where the environment yaml should be "
+                       "saved.")}),
+            (('--channels', '--channel', '-c'),
+             {'nargs': '*',
+              'help': "Name of conda channels that should be used."}),
+            (('--additional-packages', ),
+             {'nargs': '+',
+              'help': "Additional packages that should be installed."}),
+        ])
     # Install requirements
     parser_ins = subparsers.add_parser(
         'install', help="Install required dependencies.")
-    parser_ins.add_argument(
-        'method', choices=['conda', 'pip', 'mamba',
-                           'conda-dev', 'pip-dev', 'mamba-dev'],
-        help="Method that will be used to install yggdrasil.")
-    parser_ins.add_argument(
-        '--files', nargs='+',
-        help='One or more pip-style requirements files')
-    parser_ins.add_argument(
-        '--additional-packages', nargs='+',
-        help="Additional packages that should be installed.")
-    parser_ins.add_argument(
-        '--allow-missing', action='store_true',
-        help="Ignore requirements with no valid options")
-    SetupParam.add_parser_args(parser_ins, install_opts=install_opts,
-                               deps_method_default="supplemental")
+    SetupParam.add_parser_args(
+        parser_ins, install_opts=install_opts,
+        method_choices=['conda', 'pip', 'mamba',
+                        'conda-dev', 'pip-dev', 'mamba-dev'],
+        deps_method_default="supplemental",
+        additional_args=[
+            (('--files', ),
+             {'nargs': '+',
+              'help': 'One or more pip-style requirements files'}),
+            (('--additional-packages', ),
+             {'nargs': '+',
+              'help': "Additional packages that should be installed."}),
+            (('--allow-missing', ),
+             {'action': 'store_true',
+              'help': "Ignore requirements with no valid options"}),
+        ])
     # Call methods
     args = parser.parse_args()
     if args.operation == 'select':
@@ -1762,6 +1829,14 @@ if __name__ == "__main__":
         pprint.pprint(x)
     elif args.operation == 'create':
         create_requirements(args.standard)
+    elif args.operation == 'env':
+        args.method = 'conda'
+        args.deps_method = 'env'
+        param = SetupParam.from_args(args, install_opts,
+                                     env_created=True)
+        create_environment_file(param, add=args.additional_packages,
+                                channels=args.channels,
+                                fname_out=args.filename)
     elif args.operation == 'install':
         # Use the version that takes the environment into account
         install_opts = get_install_opts()
