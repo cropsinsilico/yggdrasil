@@ -1095,17 +1095,29 @@ class ygginstall(SubCommand):
 
     name = "install"
     help = "Complete yggdrasil installation for one or more languages."
+    arguments = (
+        [(('languages', ),
+          {'nargs': '*',
+           # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
+           'default': [],
+           'help': 'One or more languages that should be configured.'}),
+         (('--no-import', ),
+          {'action': 'store_true',
+           'help': ('Don\'t import the yggdrasil package in '
+                    'calling the installation script.')}),
+         ]
+    )
 
     @classmethod
-    def get_parser(cls, **kwargs):
+    def add_arguments(cls, parser, **kwargs):
         from yggdrasil.languages import install_languages
-        # TODO: Migrate
-        return install_languages.update_argparser()
+        super(ygginstall, cls).add_arguments(parser, **kwargs)
+        install_languages.update_argparser(parser=parser)
 
     @classmethod
     def func(cls, args):
         from yggdrasil.languages import install_languages
-        languages = args.language
+        languages = args.languages
         if (((isinstance(languages, str) and (languages == 'all'))
              or (isinstance(languages, list) and ('all' in languages)))):
             languages = [x.lower() for x in
