@@ -43,24 +43,28 @@ def normalize_objects(patch_equality, functions_equality):
              'language': 'c',
              'args': ['model.c'],
              'inputs': [{'commtype': 'default',
-                         'datatype': {'type': 'bytes'},
+                         'datatype': {'type': 'scalar',
+                                      'subtype': 'string'},
                          'is_default': True,
                          'name': 'input'}],
              'outputs': [{'name': 'outputA',
                           'commtype': 'default',
-                          'datatype': {'type': 'bytes'},
+                          'datatype': {'type': 'scalar',
+                                       'subtype': 'string'},
                           'filter': {
                               'function': filter_func_ex2},
                           'field_names': ['a', 'b'],
                           'field_units': ['cm', 'g']},
                          {'name': 'outputB',
                           'commtype': 'default',
-                          'datatype': {'type': 'bytes'}}],
+                          'datatype': {'type': 'scalar',
+                                       'subtype': 'string'}}],
              'working_dir': os.getcwd()}],
           'connections': [
               {'inputs': [
                   {'name': 'outputA',
-                   'datatype': {'type': 'bytes'},
+                   'datatype': {'type': 'scalar',
+                                'subtype': 'string'},
                    'commtype': 'default',
                    'working_dir': os.getcwd()}],
                'outputs': [
@@ -71,7 +75,8 @@ def normalize_objects(patch_equality, functions_equality):
                'working_dir': os.getcwd()},
               {'inputs': [
                   {'name': 'outputB',
-                   'datatype': {'type': 'bytes'},
+                   'datatype': {'type': 'scalar',
+                                'subtype': 'string'},
                    'commtype': 'default',
                    'working_dir': os.getcwd()}],
                'outputs': [
@@ -86,7 +91,7 @@ def test_get_json_schema():
     r"""Test getting pure JSON version of schema."""
     test_file = 'strict_json_schema.json'
     schema.get_json_schema(test_file)
-    assert(os.path.isfile(test_file))
+    assert os.path.isfile(test_file)
     os.remove(test_file)
     
 
@@ -95,7 +100,7 @@ def test_SchemaRegistry():
     with pytest.raises(ValueError):
         schema.SchemaRegistry({})
     x = schema.SchemaRegistry()
-    assert((x == 0) is False)
+    assert (x == 0) is False
     fname = os.path.join(tempfile.gettempdir(), 'temp.yml')
     with open(fname, 'w') as fd:
         fd.write('')
@@ -107,14 +112,14 @@ def test_SchemaRegistry():
 def test_default_schema():
     r"""Test getting default schema."""
     s = schema.get_schema()
-    assert(s is not None)
+    assert s is not None
     schema.clear_schema()
-    assert(schema._schema is None)
+    assert schema._schema is None
     s = schema.get_schema()
-    assert(s is not None)
+    assert s is not None
     for k in s.keys():
-        assert(isinstance(s[k].subtypes, list))
-        assert(isinstance(s[k].classes, list))
+        assert isinstance(s[k].subtypes, list)
+        assert isinstance(s[k].classes, list)
         for ksub in s[k].classes:
             s[k].get_subtype_properties(ksub)
             s[k].default_subtype
@@ -138,8 +143,8 @@ def test_create_schema():
         subprocess.check_call(['yggschema'])
         new_schema = open(f_schema, 'r').read()
         new_consts = open(f_consts, 'r').read()
-        assert(new_consts == old_consts)
-        assert(new_schema == old_schema)
+        assert new_consts == old_consts
+        assert new_schema == old_schema
     finally:
         open(f_schema, 'w').write(old_schema)
         open(f_consts, 'w').write(old_consts)
@@ -153,21 +158,21 @@ def test_save_load_schema():
     # Test saving/loading schema
     s0 = schema.load_schema()
     s0.save(fname)
-    assert(s0 is not None)
-    assert(os.path.isfile(fname))
+    assert s0 is not None
+    assert os.path.isfile(fname)
     s1 = schema.get_schema(fname)
-    assert(s1.schema == s0.schema)
-    # assert(s1 == s0)
+    assert s1.schema == s0.schema
+    # assert s1 == s0
     os.remove(fname)
     # Test getting schema
     s2 = schema.load_schema(fname)
-    assert(os.path.isfile(fname))
-    assert(s2.schema == s0.schema)
-    assert(s2 == s0)
+    assert os.path.isfile(fname)
+    assert s2.schema == s0.schema
+    assert s2 == s0
     os.remove(fname)
 
 
-def test_normalize(normalize_objects):
+def test_normalize(normalize_objects, display_diff):
     r"""Test normalization of legacy formats."""
     s = schema.get_schema()
     for x, y in normalize_objects:
@@ -180,12 +185,13 @@ def test_normalize(normalize_objects):
             pprint.pprint(y)
             raise
         try:
-            assert(a == y)
+            assert a == y
         except BaseException:  # pragma: debug
             print("Unexpected Normalization:\n\nA:")
             pprint.pprint(a)
             print('\nB:')
             pprint.pprint(y)
+            display_diff(a, y)
             raise
 
 
@@ -217,13 +223,13 @@ def test_get_model_form_schema():
     fname = os.path.join(tempfile.gettempdir(), 'temp.json')
     try:
         schema.get_model_form_schema(fname_dst=fname)
-        assert(os.path.isfile(fname))
+        assert os.path.isfile(fname)
     finally:
         if os.path.isfile(fname):
             os.remove(fname)
 
 
-def test_update_constants(project_dir):
+def test_update_constants(project_dir, display_diff):
     r"""Test script to update constants and check that they have not changed."""
     filename = os.path.join(project_dir, 'constants.py')
     with open(filename, 'r') as fd:
@@ -232,7 +238,10 @@ def test_update_constants(project_dir):
         schema.update_constants()
         with open(filename, 'r') as fd:
             new = fd.read()
-        assert(old == new)
+        assert old == new
+    except AssertionError:
+        display_diff(old, new)
+        raise
     finally:
         with open(filename, 'w') as fd:
             fd.write(old)

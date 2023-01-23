@@ -4,6 +4,9 @@ definitions:
     allOf:
     - additionalProperties: false
       allowSingular: name
+      dependencies:
+        driver:
+        - args
       description: Base schema for all subtypes of comm components.
       properties:
         address:
@@ -23,6 +26,7 @@ definitions:
         client_id:
           type: string
         commtype:
+          default: default
           description: Communication mechanism that should be used.
           enum:
           - buffer
@@ -71,8 +75,16 @@ definitions:
           deprecated: true
           description: '[DEPRECATED] Name of driver class that should be used.'
           enum:
+          - IPCInputDriver
+          - IPCOutputDriver
           - InputDriver
           - OutputDriver
+          - RMQAsyncInputDriver
+          - RMQAsyncOutputDriver
+          - RMQInputDriver
+          - RMQOutputDriver
+          - ZMQInputDriver
+          - ZMQOutputDriver
           type: string
         field_names:
           aliases:
@@ -226,6 +238,12 @@ definitions:
             enum:
             - buffer
             type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - ''
+            type: string
           name:
             description: Name used for component in log messages.
             pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
@@ -273,6 +291,12 @@ definitions:
             enum:
             - mpi
             type: string
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - ''
+            type: string
           name:
             description: Name used for component in log messages.
             pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
@@ -296,6 +320,12 @@ definitions:
           cookies:
             description: Cookies to send to the server. Defaults to None and is ignored.
             type: object
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - ''
+            type: string
           host:
             default: http://localhost:{port}
             type: string
@@ -384,6 +414,12 @@ definitions:
           count:
             default: 1
             type: integer
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - ''
+            type: string
           name:
             description: Name used for component in log messages.
             pattern: ^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
@@ -809,7 +845,6 @@ definitions:
           deprecated: true
           description: '[DEPRECATED] Name of driver class that should be used.'
           enum:
-          - ''
           - AsciiFileInputDriver
           - AsciiFileOutputDriver
           - AsciiMapInputDriver
@@ -855,6 +890,7 @@ definitions:
             type: string
           type: array
         filetype:
+          default: binary
           description: The type of file that will be read from or written to.
           enum:
           - ascii
@@ -2086,6 +2122,7 @@ definitions:
             type: string
           type: array
         language:
+          default: executable
           description: The programming language that the model is written in. A list
             of available languages can be found :ref:`here <schema_table_model_subtype_rst>`.
           enum:
@@ -3329,7 +3366,6 @@ definitions:
               type: string
             type: array
           language:
-            default: timesync
             description: Model is dedicated to synchronizingtimesteps between other
               models.
             enum:
@@ -3489,6 +3525,7 @@ definitions:
             Defaults to False.
           type: boolean
         seritype:
+          default: default
           description: Serializer type.
           enum:
           - default

@@ -101,6 +101,7 @@ class TimeSyncModelDriver(DSLModelDriver):
         'args': {'type': 'array', 'default': [],
                  'items': {'type': ['string', 'number']},
                  'allowSingular': True}}
+    _schema_no_default_subtype = True
     language = 'timesync'
     executable_type = 'other'
 

@@ -483,6 +483,8 @@ class ComponentBase(ComponentBaseUnregistered):
         _dont_register (bool): If True, the component class will be be registered
             and the before_registration class method will not be called. Defaults
             to False.
+        _schema_no_default_subtype (bool): If True, the subtype schema
+            will not have a default subtype set. Defaults to False.
         
 
     """
@@ -501,6 +503,7 @@ class ComponentBase(ComponentBaseUnregistered):
     _schema_additional_kwargs = {}
     _schema_additional_kwargs_base = {}
     _schema_additional_kwargs_no_inherit = {}
+    _schema_no_default_subtype = False
     _dont_register = False
 
     def __new__(cls, *args, **kwargs):

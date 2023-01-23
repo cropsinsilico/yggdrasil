@@ -1499,3 +1499,18 @@ def finalize_mpi(request, on_mpi, mpi_comm, mpi_rank, mpi_size):
             return True
 
         plugin._is_worker = new_is_worker
+
+
+@pytest.fixture
+def display_diff():
+
+    def wrapped(a, b):
+        import pprint
+        import difflib
+        a_str = pprint.pformat(a)
+        b_str = pprint.pformat(b)
+        diff = difflib.ndiff(a_str.splitlines(),
+                             b_str.splitlines())
+        print('\n'.join(diff))
+
+    return wrapped
