@@ -227,8 +227,6 @@ class SetupParam(object):
             self.conda_exe = CONDA_CMD
             # self.conda_build = f"{CONDA_CMD} build"
             # self.build_pkgs = ["conda-build", "conda-verify"]
-        # self.conda_env = CONDA_ENV
-        # self.conda_idx = CONDA_INDEX
         if self.fallback_to_conda is None:
             self.fallback_to_conda = ((self.method_base == 'conda')
                                       or (_is_win and _on_appveyor)
@@ -569,6 +567,8 @@ def locate_conda_bin(conda_env, use_mamba=False):
         str: Full path to the directory.
 
     """
+    if conda_env is None:
+        conda_env = CONDA_ENV
     assert CONDA_ROOT
     conda_prefix = os.path.join(CONDA_ROOT, 'envs')
     if sys.platform in ['win32', 'cygwin']:
