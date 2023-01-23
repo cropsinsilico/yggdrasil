@@ -320,14 +320,16 @@ class SetupParam(object):
                   require_conda_env=False, **kwargs):
         if env_created:
             require_conda_env = True
+        method = getattr(args, 'method', None)
         if require_conda_env and getattr(args, 'conda_env', None) is None:
-            args.conda_env = args.method + args.python.replace('.', '')
+            assert method is not None
+            args.conda_env = method + args.python.replace('.', '')
         cls.extract_install_opts_from_args(args, install_opts)
         for k in cls.args_to_copy():
             if hasattr(args, k):
                 kwargs[k] = getattr(args, k)
         kwargs['env_created'] = env_created
-        return cls(args.method, install_opts=install_opts, **kwargs)
+        return cls(method=method, install_opts=install_opts, **kwargs)
 
     @staticmethod
     def extract_install_opts_from_args(args, install_opts):
