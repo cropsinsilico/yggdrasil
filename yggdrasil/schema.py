@@ -161,13 +161,11 @@ def convert_extended2base(s):
                 elif s['type'] in type_map:
                     s['type'] = type_map[s['type']]
                     s.pop('class', None)
-                else:
-                    assert s['type'] not in ['scalar']
-                # Scalars not currently included in the schema
-                # elif s['type'] in ['scalar']:
-                #     s.pop("precision", None)
-                #     s.pop("units", None)
-                #     s['type'] = type_map[s.pop('subtype')]
+                elif s['type'] in ['scalar']:
+                    s.pop("precision", None)
+                    s.pop("units", None)
+                    s['type'] = s.pop('subtype')
+                    s['type'] = type_map.get(s['type'], s['type'])
             elif isinstance(s['type'], list):
                 assert 'schema' not in s['type']
                 assert 'scalar' not in s['type']
