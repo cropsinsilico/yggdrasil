@@ -7,7 +7,7 @@ from yggdrasil import yamlfile, rapidjson
 from yaml.constructor import ConstructorError
 from tests import TestBase as base_class
 _yaml_env = 'TEST_YAML_FILE'
-_func_prefix = __file__
+_func_prefix = __name__  # __file__
 
 
 def direct_translate(msg):  # pragma: no cover

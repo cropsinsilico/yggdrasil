@@ -55,14 +55,20 @@ MacOS Errors
     
     ld: warning: ignoring file /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/lib/libSystem.tbd, file was built for unsupported file format ( 0x2D 0x2D 0x2D 0x20 0x21 0x74 0x61 0x70 0x69 0x2D 0x74 0x62 0x64 0x2D 0x76 0x33 ) which is not the architecture being linked (x86_64): /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/lib/libSystem.tbd
 
+  or you get an error about a missing ``locale.h`` header like::
+
+    /Users/langmm/miniconda3/envs/pyrj/bin/../include/c++/v1/locale.h:46:15: fatal error: 'locale.h' file not found
+    #include_next <locale.h>
+
   ..
     
-    **Possible Cause:** You are trying to use the conda-forge supplied compilers on a newer Mac OS (see discussion `here <https://github.com/conda-forge/compilers-feedstock/issues/6>`_). The newer Mac SDKs cannot be packaged by conda-forge due to licensing issues. As a result, the libraries are not correctly linked and you will get the above warning and ``Undefined symbol`` errors.
+    **Possible Cause:** You are trying to use the conda-forge supplied compilers on a newer Mac OS (see discussion `here <https://github.com/conda-forge/compilers-feedstock/issues/6>`_). The newer Mac SDKs cannot be packaged by conda-forge due to licensing issues. As a result, the libraries are not correctly linked and you will get the above warning and ``Undefined symbol`` or missing header errors.
 
     **Solution:** Download an older SDK (10.9 works well) and point the conda compilers to it using the steps below.::
 
       $ export MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET:-10.9}
       $ export CONDA_BUILD_SYSROOT="$(xcode-select -p)/SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk"
+      $ export SDKROOT=$CONDA_BUILD_SYSROOT
       $ curl -L -O https://github.com/phracker/MacOSX-SDKs/releases/download/10.13/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz
       $ tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz -C "$(dirname "$CONDA_BUILD_SYSROOT")"  # This may require sudo
 

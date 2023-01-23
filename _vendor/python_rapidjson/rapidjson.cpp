@@ -1927,7 +1927,7 @@ struct PyHandler {
 	    return NULL;
 	}
 	PyObject* cls = import_python_object(PyUnicode_AsUTF8(cls_name),
-					     "dict2instance");
+					     "dict2instance: ", true);
 	Py_DECREF(cls_name);
 	if (cls == NULL) {
 	    Py_DECREF(args);
