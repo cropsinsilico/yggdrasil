@@ -63,7 +63,8 @@ class SerializeBase(tools.YggClass):
     is_framed = False
     concats_as_str = True
     
-    def __init__(self, **kwargs):
+    def __init__(self, partial_datatype=None, **kwargs):
+        self.partial_datatype = partial_datatype
         if ('format_str' in kwargs):
             drv = tools.get_subprocess_language_driver()
             if drv.decode_format is not None:
@@ -544,11 +545,16 @@ class SerializeBase(tools.YggClass):
             # Update datatype from oldstyle keywords in extra_kwargs
             datatype = self.update_typedef_from_oldstyle(datatype)
             if 'type' in datatype:
+                # TODO: Fix push/pull of schema properties
+                if ((self.partial_datatype
+                     and datatype != self.default_datatype)):
+                    datatype.update(self.partial_datatype)
                 self.datatype = rapidjson.normalize(datatype,
                                                     {'type': 'schema'})
             # Check to see if new datatype is compatible with new one
             if old_datatype != self.default_datatype and datatype:
                 rapidjson.compare_schemas(self.datatype, old_datatype)
+                self.partial_datatype = None
         # Enfore that strings used with messages are in bytes
         for k in self._attr_conv:
             v = getattr(self, k, None)

@@ -7,7 +7,7 @@ import types
 import time
 import collections
 import numpy as np
-from yggdrasil import tools, multitasking, constants
+from yggdrasil import tools, multitasking, constants, rapidjson
 from yggdrasil.communication import (
     new_comm, get_comm, determine_suffix, TemporaryCommunicationError,
     import_comm, check_env_for_address)
@@ -741,6 +741,15 @@ class CommBase(tools.YggClass):
         seri_kws = kwargs.pop('serializer_kwargs', {})
         if ('datatype' in self._schema_properties) and (self.datatype is not None):
             seri_kws.setdefault('datatype', self.datatype)
+            # TODO: Fix push/pull of schema properties
+            if self.datatype == constants.DEFAULT_DATATYPE:
+                partial_datatype = {
+                    k: kwargs[k] for k in list(
+                        rapidjson.get_metaschema()['properties'].keys())
+                    if k in kwargs and k not in ['pattern']}
+                if partial_datatype:
+                    seri_kws.setdefault('partial_datatype',
+                                        partial_datatype)
         if ((('serializer' not in self._schema_properties)
              and (not hasattr(self, 'serializer')))):
             self.serializer = self._default_serializer

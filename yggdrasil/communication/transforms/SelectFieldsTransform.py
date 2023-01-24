@@ -41,7 +41,8 @@ class SelectFieldsTransform(TransformBase):
                 self.original_order = [x.get('title', 'f%d' % i) for i, x in
                                        enumerate(self.original_datatype['items'])]
             elif datatype['type'] == 'object':
-                self.original_order = list(datatype['properties'].keys())
+                self.original_order = sorted(
+                    list(datatype['properties'].keys()))
 
     @property
     def as_single(self):

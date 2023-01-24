@@ -16,6 +16,7 @@ class TransformBase(ComponentBase):
     _schema_type = 'transform'
     _schema_subtype_key = 'transformtype'
     _schema_properties = {'original_datatype': {'type': 'schema'}}
+    _schema_additional_kwargs = {'allowSingular': 'transformtype'}
 
     def __init__(self, *args, **kwargs):
         self._state = {}

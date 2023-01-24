@@ -921,6 +921,8 @@ class ConnectionDriver(Driver):
             if isinstance_component(t, 'transform'):
                 t.set_original_datatype(msg.stype)
                 msg.stype = t.transformed_datatype
+        if self.transform:
+            msg.sinfo = {}
         # This can be removed if send_message is set up to update and send the
         # received message rather than create a new one by sending msg.args
         self.ocomm.update_serializer_from_message(msg)

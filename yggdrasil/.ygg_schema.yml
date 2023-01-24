@@ -3896,6 +3896,7 @@ definitions:
   transform:
     allOf:
     - additionalProperties: false
+      allowSingular: transformtype
       description: Base schema for all subtypes of transform components.
       properties:
         field_names:
@@ -3912,6 +3913,13 @@ definitions:
             is the name of the function. The function should take the message as input
             and return the transformed message.
           type: function
+        index:
+          default: 0
+          description: Array index or dictionary key to select. Defaults to selecting
+            the first element in an array or the first key alphabetically.
+          type:
+          - integer
+          - string
         map:
           additionalProperties:
             type: string
@@ -3953,11 +3961,13 @@ definitions:
           - map_fields
           - pandas
           - select_fields
+          - select_scalar
           - statement
       title: transform_base
       type: object
     - anyOf:
       - additionalProperties: true
+        allowSingular: transformtype
         description: Schema for transform component ['array'] subtype.
         properties:
           field_names:
@@ -3971,6 +3981,7 @@ definitions:
         title: yggdrasil.communication.transforms.ArrayTransform.ArrayTransform
         type: object
       - additionalProperties: true
+        allowSingular: transformtype
         description: Schema for transform component ['direct'] subtype.
         properties:
           transformtype:
@@ -3980,6 +3991,7 @@ definitions:
         title: yggdrasil.communication.transforms.DirectTransform.DirectTransform
         type: object
       - additionalProperties: true
+        allowSingular: transformtype
         description: Schema for transform component ['filter'] subtype.
         properties:
           filter:
@@ -3993,6 +4005,7 @@ definitions:
         title: yggdrasil.communication.transforms.FilterTransform.FilterTransform
         type: object
       - additionalProperties: true
+        allowSingular: transformtype
         description: Schema for transform component ['function'] subtype.
         properties:
           function:
@@ -4012,6 +4025,7 @@ definitions:
         title: yggdrasil.communication.transforms.FunctionTransform.FunctionTransform
         type: object
       - additionalProperties: true
+        allowSingular: transformtype
         description: Schema for transform component ['iterate'] subtype.
         properties:
           transformtype:
@@ -4021,6 +4035,7 @@ definitions:
         title: yggdrasil.communication.transforms.IterateTransform.IterateTransform
         type: object
       - additionalProperties: true
+        allowSingular: transformtype
         description: Schema for transform component ['map_fields'] subtype.
         properties:
           map:
@@ -4037,6 +4052,7 @@ definitions:
         title: yggdrasil.communication.transforms.MapFieldsTransform.MapFieldsTransform
         type: object
       - additionalProperties: true
+        allowSingular: transformtype
         description: Schema for transform component ['pandas'] subtype.
         properties:
           field_names:
@@ -4050,6 +4066,7 @@ definitions:
         title: yggdrasil.communication.transforms.PandasTransform.PandasTransform
         type: object
       - additionalProperties: true
+        allowSingular: transformtype
         description: Schema for transform component ['select_fields'] subtype.
         properties:
           original_order:
@@ -4077,6 +4094,30 @@ definitions:
         title: yggdrasil.communication.transforms.SelectFieldsTransform.SelectFieldsTransform
         type: object
       - additionalProperties: true
+        allowSingular: transformtype
+        description: Schema for transform component ['select_scalar'] subtype.
+        properties:
+          index:
+            default: 0
+            description: Array index or dictionary key to select. Defaults to selecting
+              the first element in an array or the first key alphabetically.
+            type:
+            - integer
+            - string
+          original_order:
+            description: The original order of fields that should be used for selecting
+              from lists/tuples.
+            items:
+              type: string
+            type: array
+          transformtype:
+            default: select_scalar
+            enum:
+            - select_scalar
+        title: yggdrasil.communication.transforms.SelectScalarTransform.SelectScalarTransform
+        type: object
+      - additionalProperties: true
+        allowSingular: transformtype
         description: Schema for transform component ['statement'] subtype.
         properties:
           statement:

@@ -617,13 +617,13 @@ class ComponentSchema(object):
                     subt_props.add(k)
                 elif k in schema['allOf'][0].get('required', []):
                     subt_required_by_subtype.add(k)
-        if subt_singular in subt_overlap:
-            subt_overlap.remove(subt_singular)
         if 'driver' in subt_overlap:
             subt_overlap.remove('driver')
         # if 'driver' in subt_required_by_subtype:
         #     subt_props.add('driver')
         #     subt_required_by_subtype.remove('driver')
+        if len(subt_overlap) > 1 and subt_singular in subt_overlap:
+            subt_overlap.remove(subt_singular)
         assert len(subt_overlap) == 1
         subtype_key = list(subt_overlap)[0]
         assert subtype_key in schema['allOf'][0]['properties']
@@ -633,7 +633,6 @@ class ComponentSchema(object):
         if 'default' in out._base_schema['properties'][subtype_key]:
             out.default_subtype = out._base_schema[
                 'properties'][subtype_key].pop('default')
-        # out.default_subtype = subt_schema[0]['properties'][subtype_key]['default']
         for v in subt_schema:
             v_class_name = v['title'].split('.')[-1]
             out._storage[v_class_name] = v

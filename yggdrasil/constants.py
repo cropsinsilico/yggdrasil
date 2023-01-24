@@ -226,6 +226,7 @@ COMPONENT_REGISTRY = {
             'map_fields': 'MapFieldsTransform',
             'pandas': 'PandasTransform',
             'select_fields': 'SelectFieldsTransform',
+            'select_scalar': 'SelectScalarTransform',
             'statement': 'StatementTransform',
         },
     },
