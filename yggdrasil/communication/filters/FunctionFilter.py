@@ -1,5 +1,5 @@
 import numpy as np
-from yggdrasil import units
+from yggdrasil import units, rapidjson
 from yggdrasil.communication.filters.FilterBase import FilterBase
 
 
@@ -30,8 +30,11 @@ class FunctionFilter(FilterBase):
             bool: True if the message will pass through the filter, False otherwise.
 
         """
-        return self.function(x)
-    
+        try:
+            return self.function(x)
+        except rapidjson.units.UnitsError:
+            return self.function(x.value)
+
     @classmethod
     def get_testing_options(cls):
         r"""Get testing options for the filter class.
