@@ -578,7 +578,7 @@ class ComponentBase(ComponentBaseUnregistered):
                         del s['properties'][k]
                 # Validate and normalize
                 from yggdrasil import rapidjson
-                rapidjson.validate(kwargs, s)
+                kwargs = rapidjson.normalize(kwargs, s)
                 # TODO: Normalization performance needs improvement
                 # import pprint
                 # print('before')
@@ -589,6 +589,10 @@ class ComponentBase(ComponentBaseUnregistered):
                 # pprint.pprint(kwargs_comp)
         else:
             props = self._schema_properties.keys()
+            for k in props:
+                for x in self._schema_properties[k].get('aliases', []):
+                    if x in kwargs:
+                        kwargs.setdefault(k, kwargs.pop(x))
         # Set attributes based on properties
         for k in props:
             if k in self._schema_excluded_from_class:
