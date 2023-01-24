@@ -637,13 +637,11 @@ definitions:
         - onexit
         - read_meth
         - write_meth
-        - in_temp
         '!$properties/outputs/items/anyOf/1':
         - transform
         - onexit
         - read_meth
         - write_meth
-        - in_temp
         $properties/inputs/items/anyOf/1/allOf/1/anyOf/0/properties/serializer: true
         $properties/outputs/items/anyOf/1/allOf/1/anyOf/0/properties/serializer: true
       required:

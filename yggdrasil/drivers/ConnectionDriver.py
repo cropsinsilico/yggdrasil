@@ -253,11 +253,9 @@ class ConnectionDriver(Driver):
     _schema_additional_kwargs_base = {
         'pushProperties': {
             '!$properties/inputs/items': ['transform', 'onexit',
-                                          'read_meth', 'write_meth',
-                                          'in_temp'],
+                                          'read_meth', 'write_meth'],
             '!$properties/outputs/items/anyOf/1': ['transform', 'onexit',
-                                                   'read_meth', 'write_meth',
-                                                   'in_temp'],
+                                                   'read_meth', 'write_meth'],
             ('$properties/inputs/items/anyOf/1/allOf/1/anyOf/0/'
              'properties/serializer'): True,
             ('$properties/outputs/items/anyOf/1/allOf/1/anyOf/0/'
