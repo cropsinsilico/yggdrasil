@@ -181,6 +181,8 @@ jobs:
         use-only-tar-bz2: true
         activate-environment: ''
         # auto-activate-base: false
+        miniforge-variant: Mambaforge
+        use-mamba: true
     # The compiler must be initialized after the base environment for
     # conda so that it dosn't interfere with the base environment
     # initialization
@@ -223,12 +225,15 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       with:
+        # Default env name is test
         # TODO: Move autoupdate into script?
         auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         channels: conda-forge
         use-only-tar-bz2: true
         channel-priority: strict
+        miniforge-variant: Mambaforge
+        use-mamba: true
     - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda llvm (7)
       if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       run: ./utils/setup_old_mac_sdk.sh
