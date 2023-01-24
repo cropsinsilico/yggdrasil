@@ -232,7 +232,7 @@ class ConnectionDriver(Driver):
                            'default': 'broadcast'},
         'transform': {'type': 'array',
                       'items': {'oneOf': [
-                          {'type': 'function'},
+                          {'type': ['function', 'string']},
                           {'$ref': '#/definitions/transform'}]},
                       'allowSingular': True,
                       'aliases': ['transforms', 'translator',

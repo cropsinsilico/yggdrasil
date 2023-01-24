@@ -604,7 +604,9 @@ definitions:
             that will be called on the messages in the order they are provided.
           items:
             oneOf:
-            - type: function
+            - type:
+              - function
+              - string
             - $ref: '#/definitions/transform'
           type: array
         working_dir:
