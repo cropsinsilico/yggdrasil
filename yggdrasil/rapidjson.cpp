@@ -857,6 +857,7 @@ static unsigned check_expectsString(Document& d) {
 	Value::ConstMemberIterator it = d.FindMember("subtype");
 	if ((it != d.MemberEnd()) && it->value.IsString()) {
 	    if ((strcmp(it->value.GetString(), "bytes") == 0) ||
+		(strcmp(it->value.GetString(), "string") == 0) ||
 		(strcmp(it->value.GetString(), "unicode") == 0))
 		return 1;
 	}
@@ -3388,10 +3389,18 @@ static bool python2document(PyObject* jsonObject, Document& d,
         Py_BEGIN_ALLOW_THREADS
         error = d.Parse(jsonStr).HasParseError();
         Py_END_ALLOW_THREADS
+	if (error && expectsString) {
+	    error = (!PythonAccept(&d, jsonObject, numberMode, datetimeMode,
+				   uuidMode, bytesMode, iterableMode,
+				   mappingMode, yggdrasilMode));
+	    d.FinalizeFromStack();
+	    if (error)
+		return false;
+	}
     }
 
     if (error) {
-        PyErr_SetString(decode_error, "Invalid JSON");
+        PyErr_Format(decode_error, "Invalid JSON when creating a document (expectsString = %d)", (int)expectsString);
 	return false;
     }
     return true;
@@ -4962,7 +4971,7 @@ static PyObject* validator_call(PyObject* self, PyObject* args, PyObject* kwargs
 
     if (!accept) {
 	if (isEmptyString) {
-	    PyErr_SetString(decode_error, "Invalid JSON");
+	    PyErr_SetString(decode_error, "Invalid empty JSON document");
 	    return NULL;
 	}
 	set_validation_error(validator);
@@ -5968,7 +5977,7 @@ static PyObject* normalizer_call(PyObject* self, PyObject* args, PyObject* kwarg
 
     if (!accept) {
 	if (isEmptyString) {
-	    PyErr_SetString(decode_error, "Invalid JSON");
+	    PyErr_SetString(decode_error, "Invalid empty JSON document");
 	    return NULL;
 	}
 	set_validation_error(normalizer, normalization_error);
@@ -6145,7 +6154,7 @@ static PyObject* normalizer_validate(PyObject* self, PyObject* args, PyObject* k
 
     if (!accept) {
 	if (isEmptyString) {
-	    PyErr_SetString(decode_error, "Invalid JSON");
+	    PyErr_SetString(decode_error, "Invalid empty JSON document");
 	    return NULL;
 	}
 	set_validation_error(validator);
