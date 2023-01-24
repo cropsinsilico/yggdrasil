@@ -100,6 +100,11 @@ class SetupParam(object):
         ('method', [], {
             'choices': ['conda', 'pip', 'mamba'],
             'help': "Method that should be used to install packages"}),
+        (('--env-method', ), ['auto'], {
+            'choices': ['conda', 'mamba', 'virtualenv', None],
+            'default': None,
+            'help': ("Method that should be used to create an "
+                     "environment")}),
         (('--python', '--python-version'), [], {
             'type': str,
             'help': "Python version that should be installed"}),
@@ -117,10 +122,10 @@ class SetupParam(object):
             'default': 'vcpkg',
             'choices': ['vcpkg', 'choco'],
             'help': "Package manager that should be used on Windows."}),
-        (('--conda-env', '-n'), [], {
+        (('--env-name', '-n', '--name'), [], {
             'default': None,
-            'help': ("Conda environment that packages should be "
-                     "installed in.")}),
+            'help': ("Conda or virtualenv environment that packages "
+                     "should be installed in.")}),
         ('--verbose', ['run'], {
             'action': 'store_true',
             'help': "Turn up verbosity of output."}),
@@ -191,6 +196,10 @@ class SetupParam(object):
         if self.method is None:
             if self.use_mamba:
                 self.method = 'conda'
+            elif self.env_method in ('conda', 'mamba'):
+                self.method = self.env_method
+            elif self.env_method == 'virtualenv':
+                self.method = 'pip'
             elif CONDA_ENV:
                 self.method = 'conda'
             else:
@@ -198,13 +207,6 @@ class SetupParam(object):
         elif self.method.startswith('mamba'):
             self.use_mamba = True
             self.method = self.method.replace('mamba', 'conda')
-        self.python_cmd = PYTHON_CMD
-        if self.conda_env:
-            self.python_cmd = locate_conda_exe(
-                self.conda_env, 'python',
-                allow_missing=env_created,
-                use_mamba=self.use_mamba)
-            self.conda_flags += f' --name {self.conda_env}'
         if self.always_yes:
             self.conda_flags += ' -y'
             # self.pip_flags += ' -y'
@@ -227,16 +229,29 @@ class SetupParam(object):
             self.conda_exe = CONDA_CMD
             # self.conda_build = f"{CONDA_CMD} build"
             # self.build_pkgs = ["conda-build", "conda-verify"]
-        # self.conda_env = CONDA_ENV
-        # self.conda_idx = CONDA_INDEX
         if self.fallback_to_conda is None:
             self.fallback_to_conda = ((self.method_base == 'conda')
                                       or (_is_win and _on_appveyor)
                                       or self.install_opts['lpy'])
-        self.kwargs = {}
-        for k in ['verbose', 'install_opts', 'conda_env', 'always_yes',
-                  'fallback_to_conda', 'use_mamba']:
-            self.kwargs[k] = getattr(self, k)
+        if self.env_method is None:
+            if self.fallback_to_conda:
+                if self.use_mamba:
+                    self.env_method = 'mamba'
+                else:
+                    self.env_method = 'conda'
+            else:
+                self.env_method = 'virtualenv'
+        if self.env_name and self.env_method in ('conda', 'mamba'):
+            self.conda_env = self.env_name
+        else:
+            self.conda_env = None
+        self.python_cmd = PYTHON_CMD
+        if self.conda_env:
+            self.python_cmd = locate_conda_exe(
+                self.conda_env, 'python',
+                allow_missing=env_created,
+                use_mamba=self.use_mamba)
+            self.conda_flags += f' --name {self.conda_env}'
         if self.for_development:
             self.install_opts['dev'] = True
         # Methods that can be used to install deps
@@ -317,13 +332,13 @@ class SetupParam(object):
 
     @classmethod
     def from_args(cls, args, install_opts, env_created=False,
-                  require_conda_env=False, **kwargs):
+                  require_env_name=False, **kwargs):
         if env_created:
-            require_conda_env = True
+            require_env_name = True
         method = getattr(args, 'method', None)
-        if require_conda_env and getattr(args, 'conda_env', None) is None:
+        if require_env_name and getattr(args, 'env_name', None) is None:
             assert method is not None
-            args.conda_env = method + args.python.replace('.', '')
+            args.env_name = method + args.python.replace('.', '')
         cls.extract_install_opts_from_args(args, install_opts)
         for k in cls.args_to_copy():
             if hasattr(args, k):
@@ -345,8 +360,9 @@ class SetupParam(object):
     
     @staticmethod
     def add_parser_args(parser, skip=None, skip_types=None,
-                        skip_all=False, install_opts=None,
-                        additional_args=None, **kwargs):
+                        skip_all=False, include=None,
+                        install_opts=None, additional_args=None,
+                        **kwargs):
         r"""Add arguments to a parser for installation options.
 
         Args:
@@ -357,6 +373,8 @@ class SetupParam(object):
                 Defaults to an empty list.
             skip_types (list, optional): Type of argument that should
                 be skipped. Defaults to an empty list.
+            include (list, optional): Arguments that should be included
+                even if the type if skipped. Defaults to an empty list.
             install_opts (dict, optional): Existing installation options
                 that should be used to set the flags. Create using
                 get_install_opts if not provided.
@@ -370,12 +388,21 @@ class SetupParam(object):
             skip = []
         if skip_types is None:
             skip_types = []
+        skip_types.append('auto')
+        if include is None:
+            include = []
 
-        def add_argument(*a_args, **a_kwargs):
+        def args_match(a_args, match):
             for x in a_args:
                 x = x.strip('-')
-                if x in skip or x.replace('-', '_') in skip:
-                    return
+                if x in match or x.replace('-', '_') in match:
+                    return True
+            return False
+
+        args_req = []
+        args_opt = []
+
+        def add_argument(*a_args, **a_kwargs):
             base = a_args[0].lstrip('-').replace('-', '_')
             if f"{base}_args" in kwargs:
                 a_args = kwargs.pop(f"{base}_args")
@@ -389,19 +416,40 @@ class SetupParam(object):
             if kwargs.pop(f"{base}_required", False):
                 assert all(x.startswith('--') for x in a_args)
                 a_args = (base, )
-            if additional_args and a_args[0].startswith('--'):
-                for kk, vv in additional_args:
-                    parser.add_argument(*kk, **vv)
-                additional_args.clear()
-            parser.add_argument(*a_args, **a_kwargs)
+            # if additional_args and a_args[0].startswith('--'):
+            #     for kk, vv in additional_args:
+            #         parser.add_argument(*kk, **vv)
+            #     additional_args.clear()
+            if a_args[0].startswith('--'):
+                args_opt.append((a_args, a_kwargs))
+            else:
+                args_req.append((a_args, a_kwargs))
+            # parser.add_argument(*a_args, **a_kwargs)
 
-        if not skip_all:
+        if skip_all:
+            if include:
+                for k, types, v in SetupParam._args:
+                    if not isinstance(k, tuple):
+                        k = (k, )
+                    if args_match(k, include):
+                        add_argument(*k, **v)
+        else:
             for k, types, v in SetupParam._args:
-                if any(x in types for x in skip_types):
-                    continue
                 if not isinstance(k, tuple):
                     k = (k, )
+                if (((any(x in types for x in skip_types)
+                      or args_match(k, skip))
+                     and not args_match(k, include))):
+                    continue
                 add_argument(*k, **v)
+        if additional_args:
+            for k, v in additional_args:
+                if k[0].startswith('--'):
+                    args_opt.append((k, v))
+                else:
+                    args_req.append((k, v))
+        for k, v in args_req + args_opt:
+            parser.add_argument(*k, **v)
         if kwargs:
             pprint.pprint(kwargs)
         assert not kwargs  # Use all keyword arguments
@@ -569,6 +617,8 @@ def locate_conda_bin(conda_env, use_mamba=False):
         str: Full path to the directory.
 
     """
+    if conda_env is None:
+        conda_env = CONDA_ENV
     assert CONDA_ROOT
     conda_prefix = os.path.join(CONDA_ROOT, 'envs')
     if sys.platform in ['win32', 'cygwin']:
@@ -760,12 +810,12 @@ def add_install_opts_args(parser, install_opts=None):
                 help=("Install %s" % k))
 
 
-def create_env(method, python, param=None, name=None, packages=None,
+def create_env(env_method, python, param=None, name=None, packages=None,
                init=_on_ci, populate=False, **kwargs):
     r"""Setup an environment for yggdrasil installation.
 
     Args:
-        method (str): Method that should be used to create an
+        env_method (str): Method that should be used to create an
             environment. Supported values currently include 'conda',
             'mamba', and 'virtualenv'.
         python (str): Version of Python that should be tested.
@@ -787,14 +837,15 @@ def create_env(method, python, param=None, name=None, packages=None,
     """
     if param is None:
         if name:
-            kwargs['conda_env'] = name
-        param = SetupParam(method, python=python, **kwargs)
+            kwargs['env_name'] = name
+        param = SetupParam(env_method=env_method, python=python,
+                           **kwargs)
     python = param.python
     if name is None:
-        name = param.conda_env
+        name = param.env_name
     if name is None:
-        name = method + python.replace('.', '')
-    cmds = [f"echo Creating test environment using {method}..."]
+        name = env_method + python.replace('.', '')
+    cmds = [f"echo Creating test environment using {env_method}..."]
     major, minor = [int(x) for x in python.split('.')][:2]
     if packages is None:
         packages = []
@@ -802,10 +853,11 @@ def create_env(method, python, param=None, name=None, packages=None,
     #     # Not strictly required, but useful for determine the versions of
     #     # dependencies required by packages during testing
     #     packages.append('requests')
-    if param.method == 'conda':
+    if param.env_method in ('conda', 'mamba'):
         conda_exe_config = param.conda_exe_config
         conda_exe = param.conda_exe
-        if conda_env_exists(name, use_mamba=param.use_mamba):
+        if (((not param.dry_run)
+             and conda_env_exists(name, use_mamba=param.use_mamba))):
             print(f"Conda env with name '{name}' already exists.")
             if not populate:
                 return
@@ -816,7 +868,7 @@ def create_env(method, python, param=None, name=None, packages=None,
                     f"{conda_exe_config} config --set always_yes yes --set changeps1 no",
                     f"{conda_exe_config} config --set channel_priority strict",
                     f"{conda_exe_config} config --prepend channels conda-forge",
-                    f"{conda_exe_config} update -q {param.method}",
+                    f"{conda_exe_config} update -q {param.env_method}",
                     # f"{conda_exe_config} config --set allow_conda_downgrades true",
                     # f"{conda_exe} install -n root conda=4.9",
                 ]
@@ -824,7 +876,7 @@ def create_env(method, python, param=None, name=None, packages=None,
                 (f"{conda_exe} create -q -n {name} python={python} "
                  + ' '.join(packages))
             ]
-    elif param.method == 'virtualenv':
+    elif param.env_method == 'virtualenv':
         python_cmd = param.python_cmd
         if (sys.version_info[0] != major) or (sys.version_info[1] != minor):
             if _is_osx:
@@ -848,11 +900,16 @@ def create_env(method, python, param=None, name=None, packages=None,
             f"{python_cmd} -m pip install --upgrade pip virtualenv",
             f"virtualenv -p {python_cmd} {name}"
         ]
+        if populate or packages:
+            if param.target_os == 'win':
+                cmds.append(f".\\{name}\\Scripts\\activate")
+            else:
+                cmds.append(f"source {name}/bin/activate")
         if packages:
             cmds.append(f"{python_cmd} -m pip install " + ' '.join(packages))
     else:  # pragma: debug
-        raise ValueError(f"Unsupport environment management method:"
-                         f" '{param.method}'")
+        raise ValueError(f"Unsupported environment management method:"
+                         f" '{param.env_method}'")
     if populate:
         cmds += install_pkg(param.method, param=param,
                             return_commands=True)
@@ -1399,13 +1456,11 @@ if __name__ == "__main__":
         'env', help="Setup an environment for testing.")
     SetupParam.add_parser_args(
         parser_env,
-        method_choices=['conda', 'virtualenv', 'mamba'],
-        method_help=("Method that should be used to create an "
-                     "environment."),
+        env_method_required=True,
         python_required=True,
-        conda_env_args=('-n', '--env-name', '--name'),
-        conda_env_help="Name that should be used for the environment.",
-        skip=['target_os'],
+        env_name_help="Name that should be used for the environment.",
+        include=['env_method'],
+        skip=['target_os', 'method'],
         skip_types=['install'])
     # Development environment setup
     parser_dev = subparsers.add_parser(
@@ -1414,27 +1469,26 @@ if __name__ == "__main__":
               "for testing yggdrasil."))
     SetupParam.add_parser_args(
         parser_dev,
-        method_choices=['conda', 'virtualenv', 'mamba'],
-        method_help=("Method that should be used to create an "
-                     "environment."),
         python_required=True,
-        conda_env_args=('-n', '--env-name', '--name'),
-        conda_env_help="Name that should be used for the environment.",
-        skip=['for_development', 'deps_method', 'user',
-              'fallback_to_conda'])
+        include=['env_method'],
+        env_method_default='mamba',
+        env_name_help="Name that should be used for the environment.",
+        skip=['for_development', 'deps_method', 'user'])
     # Multiple env creation
     parser_devmat = subparsers.add_parser(
         'devenv-matrix', help="Setup a matrix of environments.")
     SetupParam.add_parser_args(
         parser_devmat,
+        include=['env_method'],
+        env_method_default='mamba',
         skip=['for_development', 'deps_method', 'user',
-              'fallback_to_conda', 'method', 'python', 'conda_env'],
+              'method', 'python', 'env_name'],
         additional_args=[
             (('--method', '--methods'),
              {'nargs': '+', 'default': ['mamba', 'pip'],
               'choices': ['conda', 'pip', 'mamba'],
-              'help': ("Method(s) that should be used to create the "
-                       "environment and install dependencies.")}),
+              'help': ("Method(s) that should be used to "
+                       "install dependencies in the environments.")}),
             (('--python', '--pythons', '--version', '--versions'),
              {'nargs': '+', 'default': ['3.7'],
               'help': "Python version(s) for environments."}),
@@ -1443,7 +1497,7 @@ if __name__ == "__main__":
     parser_bld = subparsers.add_parser(
         'build', help="Build the package.")
     SetupParam.add_parser_args(parser_bld,
-                               skip=['target_os', 'conda_env'],
+                               skip=['target_os', 'env_name'],
                                skip_types=['install'])
     # Install dependencies
     parser_dep = subparsers.add_parser(
@@ -1491,13 +1545,13 @@ if __name__ == "__main__":
     if args.operation in ['env', 'setup']:
         param = SetupParam.from_args(args, install_opts,
                                      env_created=True)
-        create_env(args.method, args.python, param=param)
+        create_env(args.env_method, args.python, param=param)
     elif args.operation == 'devenv':
         args.for_development = True
         args.deps_method = 'env'
         param = SetupParam.from_args(args, install_opts,
                                      env_created=True)
-        create_env(args.method, args.python, param=param,
+        create_env(args.env_method, args.python, param=param,
                    populate=True)
     elif args.operation == 'devenv-matrix':
         args.for_development = True
@@ -1508,10 +1562,10 @@ if __name__ == "__main__":
             for python in pythons:
                 args.method = method
                 args.python = python
-                args.conda_env = None
+                args.env_name = None
                 param = SetupParam.from_args(args, install_opts,
                                              env_created=True)
-                create_env(args.method, args.python, param=param,
+                create_env(args.env_method, args.python, param=param,
                            populate=True)
     elif args.operation == 'build':
         param = SetupParam.from_args(args, install_opts)

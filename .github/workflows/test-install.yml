@@ -192,6 +192,8 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         activate-environment: ''
+        miniforge-variant: Mambaforge
+        use-mamba: true
     - name: (WINDOWS,CONDA) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
@@ -240,6 +242,8 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         channel-priority: strict
+        miniforge-variant: Mambaforge
+        use-mamba: true
     - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
         llvm (7)
       if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
@@ -523,6 +527,8 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         activate-environment: ''
+        miniforge-variant: Mambaforge
+        use-mamba: true
     - name: (WINDOWS,CONDA) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
@@ -571,6 +577,8 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         channel-priority: strict
+        miniforge-variant: Mambaforge
+        use-mamba: true
     - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
         llvm (7)
       if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
@@ -826,6 +834,8 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         activate-environment: ''
+        miniforge-variant: Mambaforge
+        use-mamba: true
     - name: (WINDOWS,CONDA) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
@@ -874,6 +884,8 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         channel-priority: strict
+        miniforge-variant: Mambaforge
+        use-mamba: true
     - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
         llvm (7)
       if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
@@ -1131,6 +1143,8 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         activate-environment: ''
+        miniforge-variant: Mambaforge
+        use-mamba: true
     - name: (WINDOWS,CONDA) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
@@ -1179,6 +1193,8 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         channel-priority: strict
+        miniforge-variant: Mambaforge
+        use-mamba: true
     - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
         llvm (7)
       if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
@@ -1435,6 +1451,8 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         activate-environment: ''
+        miniforge-variant: Mambaforge
+        use-mamba: true
     - name: (WINDOWS,CONDA) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
@@ -1483,6 +1501,8 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         channel-priority: strict
+        miniforge-variant: Mambaforge
+        use-mamba: true
     - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
         llvm (7)
       if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
