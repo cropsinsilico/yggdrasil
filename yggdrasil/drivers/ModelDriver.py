@@ -3035,10 +3035,14 @@ class ModelDriver(Driver):
                 try_vals += v
         # This last transform is used because the others are assumed
         # to be applied by the connection driver
-        if try_vals and isinstance(try_vals[-1], str):
-            try_key = '%s_%s' % (try_vals[-1], key)
-            if ((('python_interface' in cls.function_param)
-                 and (try_key in cls.python_interface))):
+        if try_vals:
+            transform_type = try_vals[-1]
+            if isinstance(transform_type, dict):
+                transform_type = transform_type.get('transformtype', None)
+            try_key = f"{transform_type}_{key}"
+            if ((isinstance(transform_type, str)
+                 and 'python_interface' in cls.function_param
+                 and try_key in cls.python_interface)):
                 kwargs['python_interface'] = cls.python_interface[try_key]
                 if ((('format_str' in kwargs)
                      and ('python_interface_format' in cls.function_param))):
