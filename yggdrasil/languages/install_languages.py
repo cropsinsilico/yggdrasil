@@ -160,8 +160,8 @@ def update_argparser(parser=None, language=None, no_import=None,
             language = get_language_directories()
     else:
         args = parser.parse_known_args(args=arglist)[0]
-        if hasattr(args, 'languages'):
-            args.language = args.languages
+        args.language = getattr(
+            args, 'languages', getattr(args, 'language', None))
         if no_import is None:
             no_import = args.no_import
         if language is None:
