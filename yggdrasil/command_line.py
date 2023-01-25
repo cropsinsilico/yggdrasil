@@ -1301,16 +1301,21 @@ class regen_schema(SubCommand):
         (('--only-constants', ),
          {'action': 'store_true',
           'help': ('Only update the constants.py file without updating '
-                   'the schema.')})]
+                   'the schema.')}),
+        (('--filename', ),
+         {'type': str,
+          'help': 'Name where schema should be saved.'})]
 
     @classmethod
     def func(cls, args):
         from yggdrasil import schema
         if not args.only_constants:
-            if os.path.isfile(schema._schema_fname):
-                os.remove(schema._schema_fname)
+            if args.filename is None:
+                args.filename = schema._schema_fname
+            if os.path.isfile(args.filename):
+                os.remove(args.filename)
             schema.clear_schema()
-            schema.init_schema()
+            schema.init_schema(fname=args.filename)
         else:
             schema.update_constants()
 
