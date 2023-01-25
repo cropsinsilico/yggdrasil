@@ -177,12 +177,15 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')  #  && runner.os == 'Windows'
       with:
+        auto-update-conda: true
+        python-version: ${{ matrix.python-version }}
         channels: conda-forge
         use-only-tar-bz2: true
-        activate-environment: ''
-        auto-activate-base: true
+        channel-priority: strict
         miniforge-variant: Mambaforge
         use-mamba: true
+        # activate-environment: ''
+        # auto-activate-base: true
     # The compiler must be initialized after the base environment for
     # conda so that it dosn't interfere with the base environment
     # initialization
@@ -198,15 +201,18 @@ jobs:
     # test environment so that the package can be built in the base
     # environment.
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')  #  && runner.os != 'Windows'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os != 'Windows'
       run: |
         echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
-        echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method != 'conda' && matrix.install-method != 'mamba')  #  || runner.os == 'Windows'
-      run: |
         echo "BUILD_PYTHON=python" >> $GITHUB_ENV
+        # echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: (WINDOWS,CONDA) Add miniconda bin to path
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'Windows'
+      run: |
+        echo "PRE_CONDA_BIN=$CONDA\\Scripts" >> $GITHUB_ENV
+        echo "BUILD_PYTHON=python" >> $GITHUB_ENV
+        # echo "BUILD_PYTHON=$CONDA\\Scripts\\python" >> $GITHUB_ENV
     # - name: (MACOS,CONDA) Change ownership of conda on MacOS
     #   if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'macOS'
     #   run: sudo chown -R $(whoami) $CONDA
@@ -215,25 +221,29 @@ jobs:
       id: conda_build
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }} --use-mamba
-      shell: bash --noprofile --norc -eo pipefail {0}
+      run: |
+        conda activate base
+        $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }} --use-mamba
+      # shell: bash --noprofile --norc -eo pipefail {0}
     - name: (CONDA) Build package in base environment (re-attempt)
       if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')}}
-      run: $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }} --use-mamba
-      shell: bash --noprofile --norc -eo pipefail {0}
-    - name: (CONDA) Set up miniconda test environment
-      uses: conda-incubator/setup-miniconda@v2
-      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      with:
-        # Default env name is test
-        # TODO: Move autoupdate into script?
-        auto-update-conda: true
-        python-version: ${{ matrix.python-version }}
-        channels: conda-forge
-        use-only-tar-bz2: true
-        channel-priority: strict
-        miniforge-variant: Mambaforge
-        use-mamba: true
+      run: |
+        conda activate base
+        $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }} --use-mamba
+      # shell: bash --noprofile --norc -eo pipefail {0}
+    # - name: (CONDA) Set up miniconda test environment
+    #   uses: conda-incubator/setup-miniconda@v2
+    #   if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
+    #   with:
+    #     # Default env name is test
+    #     # TODO: Move autoupdate into script?
+    #     auto-update-conda: true
+    #     python-version: ${{ matrix.python-version }}
+    #     channels: conda-forge
+    #     use-only-tar-bz2: true
+    #     channel-priority: strict
+    #     miniforge-variant: Mambaforge
+    #     use-mamba: true
     - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda llvm (7)
       if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       run: ./utils/setup_old_mac_sdk.sh
