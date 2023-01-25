@@ -15,8 +15,9 @@ import create_coveragerc  # noqa: E402
 ygg_ver = versioneer.get_version()
 
 
-print("In setup.py", sys.argv)
-logging.critical("In setup.py: %s" % sys.argv)
+print(f"In setup.py: sys.argv={sys.argv}, PYRJ_PATH={PYRJ_PATH}")
+logging.critical(
+    f"In setup.py: sys.argv={sys.argv}, PYRJ_PATH={PYRJ_PATH}")
 
 
 # Get extension options for the vendored python-rapidjson
@@ -34,12 +35,15 @@ try:
 finally:
     sys.path.pop(0)
     os.chdir(pwd)
+print(f"pyrj_ext = {pyrj_ext}")
+logging.critical(f"pyrj_ext = {pyrj_ext}")
 
 
 # Don't do coverage or installation of packages for use with other languages
 # when building a source distribution
 if ((('sdist' not in sys.argv) and ('egg_info' not in sys.argv)
-     and ('bdist' not in sys.argv) and ('dist_info' not in sys.argv))):
+     and ('bdist' not in sys.argv) and ('dist_info' not in sys.argv)
+     and ('bdist_wheel' not in sys.argv))):
     print(f"Installing languages: {sys.argv}")
     logging.critical(f"Installing languages: {sys.argv}")
     sys.path.insert(0, LANG_PATH)

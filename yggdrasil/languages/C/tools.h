@@ -1,6 +1,11 @@
 #ifndef YGGTOOLS_H_
 #define YGGTOOLS_H_
 
+// Required for M_PI on MSVC
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
+
 #ifdef _MSC_VER
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS 1
