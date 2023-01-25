@@ -2,7 +2,7 @@ import os
 import sys
 import logging
 import warnings
-from setuptools import setup, find_packages, Extension
+from setuptools import setup, find_namespace_packages, Extension
 from distutils.sysconfig import get_python_lib
 import configparser
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
@@ -13,14 +13,6 @@ sys.path.insert(0, ROOT_PATH)
 import versioneer  # noqa: E402
 import create_coveragerc  # noqa: E402
 ygg_ver = versioneer.get_version()
-
-
-# Import script from inside package
-sys.path.insert(0, LANG_PATH)
-try:
-    import install_languages
-finally:
-    sys.path.pop(0)
 
 
 print("In setup.py", sys.argv)
@@ -47,7 +39,14 @@ finally:
 # Don't do coverage or installation of packages for use with other languages
 # when building a source distribution
 if ((('sdist' not in sys.argv) and ('egg_info' not in sys.argv)
-     and ('dist_info' not in sys.argv))):
+     and ('bdist' not in sys.argv) and ('dist_info' not in sys.argv))):
+    print(f"Installing languages: {sys.argv}")
+    logging.critical(f"Installing languages: {sys.argv}")
+    sys.path.insert(0, LANG_PATH)
+    try:
+        import install_languages
+    finally:
+        sys.path.pop(0)
     # Attempt to install languages
     installed_languages = install_languages.install_all_languages(from_setup=True)
     # Set coverage options in .coveragerc
@@ -99,7 +98,8 @@ if '--user' in sys.argv:
     
 setup(
     name="yggdrasil-framework",
-    packages=find_packages(),
+    packages=find_namespace_packages(
+        exclude=["_vendor", "_vendor.*"]),
     include_package_data=True,
     version=ygg_ver,
     cmdclass=versioneer.get_cmdclass(),

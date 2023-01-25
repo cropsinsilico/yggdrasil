@@ -105,6 +105,12 @@ class SetupParam(object):
             'default': None,
             'help': ("Method that should be used to create an "
                      "environment")}),
+        (('--build-method', ), ['auto'], {
+            'choices': ['conda', 'mamba', 'sdist', 'bdist',
+                        'wheel', 'bdist_wheel', None],
+            'default': None,
+            'help': ("Method that should be used to build "
+                     "yggdrasil")}),
         (('--python', '--python-version'), [], {
             'type': str,
             'help': "Python version that should be installed"}),
@@ -200,6 +206,11 @@ class SetupParam(object):
                 self.method = self.env_method
             elif self.env_method == 'virtualenv':
                 self.method = 'pip'
+            elif self.build_method in ('conda', 'mamba'):
+                self.method = self.build_method
+            elif self.build_method in ('sdist', 'bdist', 'wheel',
+                                       'bdist_wheel'):
+                self.method = 'pip'
             elif CONDA_ENV:
                 self.method = 'conda'
             else:
@@ -220,6 +231,10 @@ class SetupParam(object):
             self.for_development = True
         else:
             self.method_base = self.method
+        if (((self.env_method == 'mamba'
+              or self.build_method == 'mamba')
+             and self.method_base != 'conda')):
+            self.use_mamba = True
         self.conda_exe_config = CONDA_CMD
         if self.use_mamba:
             self.conda_exe = MAMBA_CMD
@@ -241,6 +256,14 @@ class SetupParam(object):
                     self.env_method = 'conda'
             else:
                 self.env_method = 'virtualenv'
+        if self.build_method is None:
+            if self.fallback_to_conda:
+                if self.use_mamba:
+                    self.build_method = 'mamba'
+                else:
+                    self.build_method = 'conda'
+            else:
+                self.build_method = 'wheel'
         if self.env_name and self.env_method in ('conda', 'mamba'):
             self.conda_env = self.env_name
         else:
@@ -277,7 +300,8 @@ class SetupParam(object):
             if self.deps_method == 'supplemental':
                 if not (self.for_development or self.method == 'pip'):
                     # Pip extras installed directly as extras do not
-                    # seem to work when installing from a sdist
+                    # seem to work when installing from a sdist, but
+                    # maybe they will work with bdist?
                     for k in ['python', self.method_base,
                               f'{self.method_base}_skip']:
                         if k in self.valid_methods:
@@ -811,7 +835,8 @@ def add_install_opts_args(parser, install_opts=None):
 
 
 def create_env(env_method, python, param=None, name=None, packages=None,
-               init=_on_ci, populate=False, **kwargs):
+               init=_on_ci, populate=False, allow_missing=False,
+               **kwargs):
     r"""Setup an environment for yggdrasil installation.
 
     Args:
@@ -833,6 +858,10 @@ def create_env(env_method, python, param=None, name=None, packages=None,
             checks for Github Actions, Travis CI, and Appveyor).
         populate (bool, optional): If True, the environment will be
             populated. Defaults to False.
+        allow_missing (bool, optional): If True, requirements
+            without valid options will be ignored. Defaults to
+            False.
+
 
     """
     if param is None:
@@ -912,7 +941,8 @@ def create_env(env_method, python, param=None, name=None, packages=None,
                          f" '{param.env_method}'")
     if populate:
         cmds += install_pkg(param.method, param=param,
-                            return_commands=True)
+                            return_commands=True,
+                            allow_missing=allow_missing)
     call_script(cmds, verbose=param.verbose,
                 dry_run=param.dry_run)
 
@@ -933,13 +963,13 @@ def build_pkg(method, param=None, return_commands=False, **kwargs):
 
     """
     if param is None:
-        param = SetupParam(method, **kwargs)
+        param = SetupParam(build_method=method, **kwargs)
     cmds = []
     # Upgrade pip and setuptools and wheel to get clean install
     upgrade_pkgs = ['wheel', 'setuptools']
     if not _is_win:
         upgrade_pkgs.insert(0, 'pip')
-    if param.method == 'conda':
+    if param.build_method in ('conda', 'mamba'):
         conda_env = CONDA_ENV
         conda_idx = CONDA_INDEX
         if param.use_mamba:
@@ -962,7 +992,7 @@ def build_pkg(method, param=None, return_commands=False, **kwargs):
             cmds += [
                 f"{param.conda_exe_config} config --prepend channels"
                 f" conda-forge",
-                f"{param.conda_exe} update -q {param.method}",
+                f"{param.conda_exe} update -q {param.build_method}",
             ]
         if _is_win and _on_gha:
             # The tests issue a command that is too long for the
@@ -978,18 +1008,25 @@ def build_pkg(method, param=None, return_commands=False, **kwargs):
             f"{conda_build} recipe --python {param.python} {build_flags}"
         ]
         cmds.append(f"{param.conda_exe} index {conda_idx}")
-    elif param.method == 'pip':
+    elif param.build_method in ('sdist', 'bdist',
+                                'wheel', 'bdist_wheel'):
+        build_method = param.build_method
+        if build_method == 'wheel':
+            # pip wheel . --no-deps
+            build_method = 'bdist_wheel'
         if param.verbose:
             build_flags = ''
         else:
-            build_flags = '--quiet'
+            # build_flags = '--quiet'
+            build_flags = ''
         # Install from source dist
         cmds += [f"{param.python_cmd} -m pip install --upgrade "
                  + ' '.join(upgrade_pkgs)]
-        cmds += [f"{param.python_cmd} setup.py {build_flags} sdist"]
+        cmds += [f"{param.python_cmd} setup.py {build_flags} {build_method}"]
     else:  # pragma: debug
-        raise ValueError(f"Method must be 'conda', 'mamba', or 'pip', not"
-                         f" '{param.method}'")
+        raise ValueError(f"Method must be 'conda', 'mamba', 'sdist',"
+                         f" 'bdist', or 'wheel', not"
+                         f" '{param.build_method}'")
     summary_cmds = get_summary_commands(param)
     if cmds:
         cmds += summary_cmds
@@ -1011,7 +1048,7 @@ def build_pkg(method, param=None, return_commands=False, **kwargs):
             cmds += cmds_after
         call_script(cmds, verbose=param.verbose,
                     dry_run=param.dry_run)
-    if param.method == 'conda':  # and not param.use_mamba:
+    if param.build_method in ('conda', 'mamba'):
         print(f"CONDA_IDX = {conda_idx}")
         assert (conda_idx and os.path.isdir(conda_idx))
 
@@ -1085,7 +1122,8 @@ def preinstall_deps(method, param=None, return_commands=False,
 
 
 def install_deps(method, param=None, return_commands=False,
-                 do_preinstall=False, req=None, **kwargs):
+                 do_preinstall=False, req=None,
+                 allow_missing=False, **kwargs):
     r"""Install the package dependencies.
     
     Args:
@@ -1101,6 +1139,9 @@ def install_deps(method, param=None, return_commands=False,
             prepare for installation. Defaults to False.
         req (YggRequirements, optional): Existing set of requirements
             to use.
+        allow_missing (bool, optional): If True, requirements
+            without valid options will be ignored. Defaults to
+            False.
         **kwargs: Additional keyword arguments are passed to
             SetupParam.
 
@@ -1117,6 +1158,7 @@ def install_deps(method, param=None, return_commands=False,
             cmds += get_summary_commands(param)
     cmds += install_requirements(param,
                                  return_commands=True,
+                                 allow_missing=allow_missing,
                                  req=req)
     summary_cmds = get_summary_commands(param=param)
     if cmds:
@@ -1132,7 +1174,7 @@ def install_deps(method, param=None, return_commands=False,
 
 def install_pkg(method, param=None, without_build=False,
                 without_deps=False, install_deps_before=False,
-                return_commands=False, **kwargs):
+                return_commands=False, allow_missing=False, **kwargs):
     r"""Build and install the package and its dependencies on a CI
     resource.
 
@@ -1154,6 +1196,9 @@ def install_pkg(method, param=None, without_build=False,
         return_commands (bool, optional): If True, the commands
             necessary to install the package are returned instead of
             running them. Defaults to False.
+        allow_missing (bool, optional): If True, requirements
+            without valid options will be ignored. Defaults to
+            False.
         **kwargs: Additional keyword arguments are passed to
             SetupParam.
 
@@ -1173,7 +1218,7 @@ def install_pkg(method, param=None, without_build=False,
     if param.for_development:
         without_build = True
     if not without_build:
-        cmds += build_pkg(param.method, param=param,
+        cmds += build_pkg(param.build_method, param=param,
                           return_commands=True)
     cmds_deps = []
     cmds += preinstall_deps(param.method_base,
@@ -1182,7 +1227,8 @@ def install_pkg(method, param=None, without_build=False,
     req = YggRequirements.from_file()
     if not without_deps:
         cmds_deps += install_deps(param.method_base, param=param,
-                                  return_commands=True, req=req)
+                                  return_commands=True, req=req,
+                                  allow_missing=allow_missing)
     if install_deps_before:
         cmds += cmds_deps
     extras = [
@@ -1233,19 +1279,27 @@ def install_pkg(method, param=None, without_build=False,
             cmds[-1] += " # [ALLOW FAIL]"
         cmds += summary_cmds
     elif param.method == 'pip':
+        build_ext = None
+        build_dir = 'dist'
+        if param.build_method in ('sdist', 'bdist'):
+            build_ext = '.tar.gz'
+        elif param.build_method in ('bdist_wheel', 'wheel'):
+            build_ext = '.whl'
+        else:
+            raise NotImplementedError(param.build_method)
+        build_dist = os.path.join(build_dir, f"*{build_ext}")
         if _is_win:  # pragma: windows
             cmds += [
-                "for %%a in (\"dist\\*.tar.gz\") do set YGGSDIST=%%a",
+                f"for %%a in (\"{build_dist}\")"
+                f" do set YGGSDIST=%%a",
                 "echo %YGGSDIST%"
             ]
-            sdist = "%YGGSDIST%"
-        else:
-            sdist = "dist/*.tar.gz"
+            build_dist = "%YGGSDIST%"
         # if extras:
-        #     sdist += f"[{','.join(extras)}]"
+        #     build_dist += f"[{','.join(extras)}]"
         cmds += [
             f"{param.python_cmd} -m pip install"
-            f" {param.pip_flags} {sdist}",
+            f" {param.pip_flags} {build_dist}",
             f"{param.python_cmd} create_coveragerc.py"
         ]
         cmds += summary_cmds
@@ -1463,7 +1517,29 @@ if __name__ == "__main__":
         env_name_help="Name that should be used for the environment.",
         include=['env_method'],
         skip=['target_os', 'method'],
-        skip_types=['install'])
+        skip_types=['install'],
+        additional_args=[
+            (('--allow-missing', ),
+             {'action': 'store_true',
+              'help': "Ignore requirements with no valid options"}),
+        ])
+    # Production environment setup
+    parser_pro = subparsers.add_parser(
+        'proenv',
+        help=("Create and populate a production environment "
+              "for testing yggdrasil."))
+    SetupParam.add_parser_args(
+        parser_pro,
+        python_required=True,
+        include=['env_method', 'build_method'],
+        env_method_default='mamba',
+        env_name_help="Name that should be used for the environment.",
+        skip=['for_development', 'deps_method', 'user'],
+        additional_args=[
+            (('--allow-missing', ),
+             {'action': 'store_true',
+              'help': "Ignore requirements with no valid options"}),
+        ])
     # Development environment setup
     parser_dev = subparsers.add_parser(
         'devenv',
@@ -1475,7 +1551,12 @@ if __name__ == "__main__":
         include=['env_method'],
         env_method_default='mamba',
         env_name_help="Name that should be used for the environment.",
-        skip=['for_development', 'deps_method', 'user'])
+        skip=['for_development', 'deps_method', 'user'],
+        additional_args=[
+            (('--allow-missing', ),
+             {'action': 'store_true',
+              'help': "Ignore requirements with no valid options"}),
+        ])
     # Multiple env creation
     parser_devmat = subparsers.add_parser(
         'devenv-matrix', help="Setup a matrix of environments.")
@@ -1494,18 +1575,29 @@ if __name__ == "__main__":
             (('--python', '--pythons', '--version', '--versions'),
              {'nargs': '+', 'default': ['3.7'],
               'help': "Python version(s) for environments."}),
+            (('--allow-missing', ),
+             {'action': 'store_true',
+              'help': "Ignore requirements with no valid options"}),
         ])
     # Build package
     parser_bld = subparsers.add_parser(
         'build', help="Build the package.")
     SetupParam.add_parser_args(parser_bld,
-                               skip=['target_os', 'env_name'],
-                               skip_types=['install'])
+                               skip=['target_os', 'env_name',
+                                     'method'],
+                               skip_types=['install'],
+                               include=['build_method'])
     # Install dependencies
     parser_dep = subparsers.add_parser(
         'deps', help="Install the package dependencies.")
-    SetupParam.add_parser_args(parser_dep, skip=['python'],
-                               deps_method_default="supplemental")
+    SetupParam.add_parser_args(
+        parser_dep, skip=['python'],
+        deps_method_default="supplemental",
+        additional_args=[
+            (('--allow-missing', ),
+             {'action': 'store_true',
+              'help': "Ignore requirements with no valid options"}),
+        ])
     # Install package
     parser_pkg = subparsers.add_parser(
         'install', help="Install the package.")
@@ -1515,6 +1607,7 @@ if __name__ == "__main__":
         method_choices=['conda', 'pip', 'mamba',
                         'conda-dev', 'pip-dev', 'mamba-dev'],
         method_help="Method that should be used to install yggdrasil.",
+        include=['build_method'],
         additional_args=[
             (('--without-build', ),
              {'action': 'store_true',
@@ -1526,6 +1619,9 @@ if __name__ == "__main__":
               'help': ("Perform installation steps without installing "
                        "dependencies first (assuming the depdnencies "
                        "were already installed).")}),
+            (('--allow-missing', ),
+             {'action': 'store_true',
+              'help': "Ignore requirements with no valid options"}),
         ])
     # Installation verification
     parser_ver = subparsers.add_parser(
@@ -1548,13 +1644,19 @@ if __name__ == "__main__":
         param = SetupParam.from_args(args, install_opts,
                                      env_created=True)
         create_env(args.env_method, args.python, param=param)
+    elif args.operation == 'proenv':
+        args.deps_method = 'env'
+        param = SetupParam.from_args(args, install_opts,
+                                     env_created=True)
+        create_env(args.env_method, args.python, param=param,
+                   populate=True, allow_missing=args.allow_missing)
     elif args.operation == 'devenv':
         args.for_development = True
         args.deps_method = 'env'
         param = SetupParam.from_args(args, install_opts,
                                      env_created=True)
         create_env(args.env_method, args.python, param=param,
-                   populate=True)
+                   populate=True, allow_missing=args.allow_missing)
     elif args.operation == 'devenv-matrix':
         args.for_development = True
         args.deps_method = 'env'
@@ -1568,18 +1670,20 @@ if __name__ == "__main__":
                 param = SetupParam.from_args(args, install_opts,
                                              env_created=True)
                 create_env(args.env_method, args.python, param=param,
-                           populate=True)
+                           populate=True, allow_missing=args.allow_missing)
     elif args.operation == 'build':
         param = SetupParam.from_args(args, install_opts)
-        build_pkg(args.method, param=param)
+        build_pkg(args.build_method, param=param)
     elif args.operation == 'deps':
         param = SetupParam.from_args(args, install_opts)
-        install_deps(args.method, param=param, do_preinstall=True)
+        install_deps(args.method, param=param, do_preinstall=True,
+                     allow_missing=args.allow_missing)
     elif args.operation == 'install':
         param = SetupParam.from_args(args, install_opts)
         install_pkg(args.method, param=param, python=args.python,
                     without_build=args.without_build,
-                    without_deps=args.without_deps)
+                    without_deps=args.without_deps,
+                    allow_missing=args.allow_missing)
     elif args.operation == 'verify':
         param = SetupParam.from_args(args, install_opts)
         verify_pkg(install_opts=param.install_opts)
