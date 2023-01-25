@@ -186,12 +186,12 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'Windows'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       with:
         channels: conda-forge
         use-only-tar-bz2: true
         activate-environment: ''
+        auto-activate-base: true
         miniforge-variant: Mambaforge
         use-mamba: true
     - name: (WINDOWS,CONDA) Set up MSVC Compiler
@@ -201,8 +201,7 @@ jobs:
       with:
         toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os != 'Windows'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       run: 'echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
 
         echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
@@ -210,16 +209,10 @@ jobs:
         '
       shell: bash -l {0}
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method != 'conda' && matrix.install-method != 'mamba') ||
-        runner.os == 'Windows'
+      if: (matrix.install-method != 'conda' && matrix.install-method != 'mamba')
       run: 'echo "BUILD_PYTHON=python" >> $GITHUB_ENV
 
         '
-    - name: (MACOS,CONDA) Change ownership of conda on MacOS
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'macOS'
-      run: sudo chown -R $(whoami) $CONDA
-      shell: bash
     - name: (CONDA) Build package in base environment
       id: conda_build
       continue-on-error: true
@@ -519,12 +512,12 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'Windows'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       with:
         channels: conda-forge
         use-only-tar-bz2: true
         activate-environment: ''
+        auto-activate-base: true
         miniforge-variant: Mambaforge
         use-mamba: true
     - name: (WINDOWS,CONDA) Set up MSVC Compiler
@@ -534,8 +527,7 @@ jobs:
       with:
         toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os != 'Windows'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       run: 'echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
 
         echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
@@ -543,16 +535,10 @@ jobs:
         '
       shell: bash -l {0}
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method != 'conda' && matrix.install-method != 'mamba') ||
-        runner.os == 'Windows'
+      if: (matrix.install-method != 'conda' && matrix.install-method != 'mamba')
       run: 'echo "BUILD_PYTHON=python" >> $GITHUB_ENV
 
         '
-    - name: (MACOS,CONDA) Change ownership of conda on MacOS
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'macOS'
-      run: sudo chown -R $(whoami) $CONDA
-      shell: bash
     - name: (CONDA) Build package in base environment
       id: conda_build
       continue-on-error: true
@@ -824,12 +810,12 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'Windows'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       with:
         channels: conda-forge
         use-only-tar-bz2: true
         activate-environment: ''
+        auto-activate-base: true
         miniforge-variant: Mambaforge
         use-mamba: true
     - name: (WINDOWS,CONDA) Set up MSVC Compiler
@@ -839,8 +825,7 @@ jobs:
       with:
         toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os != 'Windows'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       run: 'echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
 
         echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
@@ -848,16 +833,10 @@ jobs:
         '
       shell: bash -l {0}
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method != 'conda' && matrix.install-method != 'mamba') ||
-        runner.os == 'Windows'
+      if: (matrix.install-method != 'conda' && matrix.install-method != 'mamba')
       run: 'echo "BUILD_PYTHON=python" >> $GITHUB_ENV
 
         '
-    - name: (MACOS,CONDA) Change ownership of conda on MacOS
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'macOS'
-      run: sudo chown -R $(whoami) $CONDA
-      shell: bash
     - name: (CONDA) Build package in base environment
       id: conda_build
       continue-on-error: true
@@ -1131,12 +1110,12 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'Windows'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       with:
         channels: conda-forge
         use-only-tar-bz2: true
         activate-environment: ''
+        auto-activate-base: true
         miniforge-variant: Mambaforge
         use-mamba: true
     - name: (WINDOWS,CONDA) Set up MSVC Compiler
@@ -1146,8 +1125,7 @@ jobs:
       with:
         toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os != 'Windows'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       run: 'echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
 
         echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
@@ -1155,16 +1133,10 @@ jobs:
         '
       shell: bash -l {0}
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method != 'conda' && matrix.install-method != 'mamba') ||
-        runner.os == 'Windows'
+      if: (matrix.install-method != 'conda' && matrix.install-method != 'mamba')
       run: 'echo "BUILD_PYTHON=python" >> $GITHUB_ENV
 
         '
-    - name: (MACOS,CONDA) Change ownership of conda on MacOS
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'macOS'
-      run: sudo chown -R $(whoami) $CONDA
-      shell: bash
     - name: (CONDA) Build package in base environment
       id: conda_build
       continue-on-error: true
@@ -1437,12 +1409,12 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'Windows'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       with:
         channels: conda-forge
         use-only-tar-bz2: true
         activate-environment: ''
+        auto-activate-base: true
         miniforge-variant: Mambaforge
         use-mamba: true
     - name: (WINDOWS,CONDA) Set up MSVC Compiler
@@ -1452,8 +1424,7 @@ jobs:
       with:
         toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os != 'Windows'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       run: 'echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
 
         echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
@@ -1461,16 +1432,10 @@ jobs:
         '
       shell: bash -l {0}
     - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method != 'conda' && matrix.install-method != 'mamba') ||
-        runner.os == 'Windows'
+      if: (matrix.install-method != 'conda' && matrix.install-method != 'mamba')
       run: 'echo "BUILD_PYTHON=python" >> $GITHUB_ENV
 
         '
-    - name: (MACOS,CONDA) Change ownership of conda on MacOS
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'macOS'
-      run: sudo chown -R $(whoami) $CONDA
-      shell: bash
     - name: (CONDA) Build package in base environment
       id: conda_build
       continue-on-error: true

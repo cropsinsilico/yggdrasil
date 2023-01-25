@@ -1201,6 +1201,8 @@ def install_pkg(method, param=None, without_build=False,
         else:
             conda_exe = CONDA_CMD
             conda_idx = CONDA_INDEX
+        if not (conda_idx and os.path.isdir(conda_idx)):
+            print(f"conda_idx = {conda_idx}")
         assert (conda_idx and os.path.isdir(conda_idx))
         # Install from conda build
         # Assumes that the target environment is active
