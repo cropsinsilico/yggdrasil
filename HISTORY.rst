@@ -2,7 +2,7 @@
 History
 =======
 
-2.0.0 (2022-XX-XX) Migrate to using extended version of rapidjson/python-rapidjson
+2.0.0 (2023-XX-XX) Migrate to using extended version of rapidjson/python-rapidjson
 ------------------
 
 * Drop support for Python 3.5
@@ -12,14 +12,38 @@ History
 * Updated yggdrasil to use the vendored rapidjson for serialization, validation, normalization, and units
 * Removed C and C++ API for AsciiFile and AsciiTable
 * Change how tables are parsed such that rows in single column tables will be read as arrays unless otherwise specified via the YAML option 'transform: select_scalar'
+* Update utility scripts and package parameters to build extension
 
 TODO:
 ~~~~~
 
-* Add generate method to validator/normalizer
+* Fix bug where datatype parameters in communicators are not passed to the datatype during normalization (currently handle on python side)
 
+1.8.4 (2023-01-25) Update CI to use mamba, improve dev utilities, & various bug fixes
+------------------
+* Update utility scripts so that requirements can be maintained in a single file with pip requirements.txt file and conda recipe generated via utils/manage_requirements.py
+* Consolidate CLI utilities for creating environments
+* Add cron job to build docker images periodically to ensure that there is always one available
+* Migrate CI to use mamba instead of conda for improved performance
+* Update documents to encourage use of mamba and reflect updates to development utilities
+* Manage optional dependencies through pip extras and additional conda builds
+* Disable flaky tests by default on CI so that tests that fail in teardown are re-run in the second attempt. They can be enabled via the pytest plugin flag "--rerun-flaky"
+* Add utility for tracking memory usage of multitasking processes
+* Update remote integration tests to use render.io instance and only run on one CI job to prevent overtaxing it
+* Handle failure on CI where MPI was not being installed
+* Various updates to comply with updated PEP8 standards
+* Add option to track memory usage to integration services manager
+* Expand output of ygginfo to include python configuration variables, common executables, and environment variables as well as providing more detailed information when a language is marked as not configured
+* Limit SBML testing to single CI job
+* Use sysconfig options for compiled languages if they match selected compilation tools
+* Fix bug where loading a yaml file with "model_only=True" yielded a result with default inputs and outputs
 
-1.8.2 (2021-03-18) Migrate tests out of package into pytest fixtures & various bug fixes
+1.8.3 (2022-07-18) Minor bug fixes for the R interface and CI
+------------------
+* Fix bug in R interface resulting from calling "is.na" on vectors
+* Stop using specific installations of R from apt on linux CI
+
+1.8.2 (2022-03-18) Migrate tests out of package into pytest fixtures & various bug fixes
 ------------------
 
 * Move tests out of package to take advantage of pytest conftest.py structure and reduce the size of the package

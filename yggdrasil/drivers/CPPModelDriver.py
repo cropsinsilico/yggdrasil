@@ -539,6 +539,6 @@ class CPPModelDriver(CModelDriver):
             else:
                 out['deps'].append('doxygen')
         out['write_try_except_kwargs'] = {'error_type': '...'}
-        out['kwargs'].setdefault('compiler_flags', [])
-        out['kwargs']['compiler_flags'].append('-std=c++11')
+        # out['kwargs'].setdefault('compiler_flags', [])
+        # out['kwargs']['compiler_flags'].append('-std=c++11')
         return out
