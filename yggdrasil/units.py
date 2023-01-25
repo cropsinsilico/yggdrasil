@@ -3,8 +3,12 @@ import numpy as np
 import pandas as pd
 import deprecation
 from collections import OrderedDict
-from yggdrasil import tools, constants, __version__
+from ._version import get_versions
+from yggdrasil import tools, constants
 from yggdrasil.rapidjson import units as units_
+# Use get_versions to prevent circular import from importing it
+#   from yggdrasil's __init__
+__version__ = get_versions()['version']
 # TODO: This import fails saying yggdrasil.rapidjson is not a package so
 # we need to find a work around
 # from yggdrasil.rapidjson.units import Quantity, QuantityArray, Units, UnitsError
