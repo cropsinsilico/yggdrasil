@@ -8,6 +8,7 @@ name: Test of package installation & execution
       - '*'
   schedule:
     - cron: "0 10 * * 1"  # 3AM PST
+    - cron: "0 10 1 * *"  # 3AM PST once a month
 
 env:
   NUMPY: numpy
@@ -102,10 +103,6 @@ jobs:
     - name: Install R
       uses: r-lib/actions/setup-r@v2
       if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR == 1
-    # - name: (WINDOWS,PIP) Set VCPKG_ROOT on Windows
-    #   if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC == 1
-    #   run: echo "VCPKG_ROOT=C:\\vcpkg" >> $GITHUB_ENV
-    #   shell: bash -l {0}
     - name: (LINUX,PIP) Cache pip
       uses: actions/cache@v3
       if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
@@ -137,7 +134,6 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
-      # uses: syphar/restore-virtualenv@v1
       run: |
         python utils/setup_test_env.py env virtualenv ${{ matrix.python-version }} --env-name=test
         echo "source activate ygg" > ~/.bashrc
@@ -184,8 +180,6 @@ jobs:
         channel-priority: strict
         miniforge-variant: Mambaforge
         use-mamba: true
-        # activate-environment: ''
-        # auto-activate-base: true
     # The compiler must be initialized after the base environment for
     # conda so that it dosn't interfere with the base environment
     # initialization
@@ -196,54 +190,27 @@ jobs:
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'Windows' && env.INSTALLC == 1
       with:
         toolset: 14.0
-    # This step and the next allows conda to be called before the
-    # conda-incubator/setup-miniconda@v2 action is used to create the
-    # test environment so that the package can be built in the base
-    # environment.
-    - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os != 'Windows'
-      run: |
-        echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
-        echo "BUILD_PYTHON=python" >> $GITHUB_ENV
-        # echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: (WINDOWS,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'Windows'
-      run: |
-        echo "PRE_CONDA_BIN=$CONDA\\Scripts" >> $GITHUB_ENV
-        echo "BUILD_PYTHON=python" >> $GITHUB_ENV
-        # echo "BUILD_PYTHON=$CONDA\\Scripts\\python" >> $GITHUB_ENV
-    # - name: (MACOS,CONDA) Change ownership of conda on MacOS
-    #   if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'macOS'
-    #   run: sudo chown -R $(whoami) $CONDA
-    #   shell: bash
+    # - name: (UNIX,CONDA) Add miniconda bin to path
+    #   if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os != 'Windows'
+    #   run: |
+    #     echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
+    #   shell: bash -l {0}
+    # - name: (WINDOWS,CONDA) Add miniconda bin to path
+    #   if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'Windows'
+    #   run: |
+    #     echo "PRE_CONDA_BIN=$CONDA\\Scripts" >> $GITHUB_ENV
     - name: (CONDA) Build package in base environment
       id: conda_build
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: |
         conda activate base
-        $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }} --use-mamba
-      # shell: bash --noprofile --norc -eo pipefail {0}
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }} --use-mamba
     - name: (CONDA) Build package in base environment (re-attempt)
       if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')}}
       run: |
         conda activate base
-        $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }} --use-mamba
-      # shell: bash --noprofile --norc -eo pipefail {0}
-    # - name: (CONDA) Set up miniconda test environment
-    #   uses: conda-incubator/setup-miniconda@v2
-    #   if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-    #   with:
-    #     # Default env name is test
-    #     # TODO: Move autoupdate into script?
-    #     auto-update-conda: true
-    #     python-version: ${{ matrix.python-version }}
-    #     channels: conda-forge
-    #     use-only-tar-bz2: true
-    #     channel-priority: strict
-    #     miniforge-variant: Mambaforge
-    #     use-mamba: true
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }} --use-mamba
     - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda llvm (7)
       if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       run: ./utils/setup_old_mac_sdk.sh
@@ -262,18 +229,6 @@ jobs:
 
     - name: Verify installation
       run: python utils/setup_test_env.py verify
-    # - name: Check mpiexec in shell 1
-    #   if: matrix.install-method == 'mamba' && startsWith(runner.os, 'macOS')
-    #   shell: bash -l {0}
-    #   run: which mpiexec
-    # - name: Check mpiexec in shell 2
-    #   if: matrix.install-method == 'mamba' && startsWith(runner.os, 'macOS')
-    #   shell: bash
-    #   run: which mpiexec
-    # - name: Check mpiexec in shell 2
-    #   if: matrix.install-method == 'mamba' && startsWith(runner.os, 'macOS')
-    #   shell: bash --noprofile --norc -eo pipefail {0}
-    #   run: which mpiexec
     - name: Compile libraries
       run: yggcompile
     - name: Run cmake test in command prompt
@@ -552,7 +507,7 @@ jobs:
   docker:
     name: Build and Publish Docker images
     needs: [test_pip, test_conda, test_rmq_pip, test_rmq_conda, test_stripped, docs]
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags')) || github.event.schedule == '0 10 1 * *'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3

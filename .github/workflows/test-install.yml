@@ -10,6 +10,7 @@ name: Test of package installation & execution
     - '*'
   schedule:
   - cron: 0 10 * * 1
+  - cron: 0 10 1 * *
 env:
   NUMPY: numpy
   INSTALLR: 1
@@ -201,34 +202,13 @@ jobs:
         runner.os == 'Windows' && env.INSTALLC == 1
       with:
         toolset: 14.0
-    - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os != 'Windows'
-      run: 'echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
-
-        echo "BUILD_PYTHON=python" >> $GITHUB_ENV
-
-        # echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
-
-        '
-      shell: bash -l {0}
-    - name: (WINDOWS,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'Windows'
-      run: 'echo "PRE_CONDA_BIN=$CONDA\\Scripts" >> $GITHUB_ENV
-
-        echo "BUILD_PYTHON=python" >> $GITHUB_ENV
-
-        # echo "BUILD_PYTHON=$CONDA\\Scripts\\python" >> $GITHUB_ENV
-
-        '
     - name: (CONDA) Build package in base environment
       id: conda_build
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: 'conda activate base
 
-        $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
 
         '
@@ -237,7 +217,7 @@ jobs:
         'conda' || matrix.install-method == 'mamba')}}
       run: 'conda activate base
 
-        $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
 
         '
@@ -531,34 +511,13 @@ jobs:
         runner.os == 'Windows' && env.INSTALLC == 1
       with:
         toolset: 14.0
-    - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os != 'Windows'
-      run: 'echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
-
-        echo "BUILD_PYTHON=python" >> $GITHUB_ENV
-
-        # echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
-
-        '
-      shell: bash -l {0}
-    - name: (WINDOWS,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'Windows'
-      run: 'echo "PRE_CONDA_BIN=$CONDA\\Scripts" >> $GITHUB_ENV
-
-        echo "BUILD_PYTHON=python" >> $GITHUB_ENV
-
-        # echo "BUILD_PYTHON=$CONDA\\Scripts\\python" >> $GITHUB_ENV
-
-        '
     - name: (CONDA) Build package in base environment
       id: conda_build
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: 'conda activate base
 
-        $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
 
         '
@@ -567,7 +526,7 @@ jobs:
         'conda' || matrix.install-method == 'mamba')}}
       run: 'conda activate base
 
-        $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
 
         '
@@ -833,34 +792,13 @@ jobs:
         runner.os == 'Windows' && env.INSTALLC == 1
       with:
         toolset: 14.0
-    - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os != 'Windows'
-      run: 'echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
-
-        echo "BUILD_PYTHON=python" >> $GITHUB_ENV
-
-        # echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
-
-        '
-      shell: bash -l {0}
-    - name: (WINDOWS,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'Windows'
-      run: 'echo "PRE_CONDA_BIN=$CONDA\\Scripts" >> $GITHUB_ENV
-
-        echo "BUILD_PYTHON=python" >> $GITHUB_ENV
-
-        # echo "BUILD_PYTHON=$CONDA\\Scripts\\python" >> $GITHUB_ENV
-
-        '
     - name: (CONDA) Build package in base environment
       id: conda_build
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: 'conda activate base
 
-        $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
 
         '
@@ -869,7 +807,7 @@ jobs:
         'conda' || matrix.install-method == 'mamba')}}
       run: 'conda activate base
 
-        $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
 
         '
@@ -1137,34 +1075,13 @@ jobs:
         runner.os == 'Windows' && env.INSTALLC == 1
       with:
         toolset: 14.0
-    - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os != 'Windows'
-      run: 'echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
-
-        echo "BUILD_PYTHON=python" >> $GITHUB_ENV
-
-        # echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
-
-        '
-      shell: bash -l {0}
-    - name: (WINDOWS,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'Windows'
-      run: 'echo "PRE_CONDA_BIN=$CONDA\\Scripts" >> $GITHUB_ENV
-
-        echo "BUILD_PYTHON=python" >> $GITHUB_ENV
-
-        # echo "BUILD_PYTHON=$CONDA\\Scripts\\python" >> $GITHUB_ENV
-
-        '
     - name: (CONDA) Build package in base environment
       id: conda_build
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: 'conda activate base
 
-        $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
 
         '
@@ -1173,7 +1090,7 @@ jobs:
         'conda' || matrix.install-method == 'mamba')}}
       run: 'conda activate base
 
-        $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
 
         '
@@ -1440,34 +1357,13 @@ jobs:
         runner.os == 'Windows' && env.INSTALLC == 1
       with:
         toolset: 14.0
-    - name: (UNIX,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os != 'Windows'
-      run: 'echo "PRE_CONDA_BIN=$CONDA/bin" >> $GITHUB_ENV
-
-        echo "BUILD_PYTHON=python" >> $GITHUB_ENV
-
-        # echo "BUILD_PYTHON=$CONDA/bin/python" >> $GITHUB_ENV
-
-        '
-      shell: bash -l {0}
-    - name: (WINDOWS,CONDA) Add miniconda bin to path
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'Windows'
-      run: 'echo "PRE_CONDA_BIN=$CONDA\\Scripts" >> $GITHUB_ENV
-
-        echo "BUILD_PYTHON=python" >> $GITHUB_ENV
-
-        # echo "BUILD_PYTHON=$CONDA\\Scripts\\python" >> $GITHUB_ENV
-
-        '
     - name: (CONDA) Build package in base environment
       id: conda_build
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: 'conda activate base
 
-        $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
 
         '
@@ -1476,7 +1372,7 @@ jobs:
         'conda' || matrix.install-method == 'mamba')}}
       run: 'conda activate base
 
-        $BUILD_PYTHON utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
 
         '
@@ -1658,7 +1554,8 @@ jobs:
     - test_rmq_conda
     - test_stripped
     - docs
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags')) || github.event.schedule
+      == '0 10 1 * *'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
