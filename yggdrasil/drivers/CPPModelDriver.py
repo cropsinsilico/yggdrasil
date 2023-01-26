@@ -34,30 +34,20 @@ class CPPCompilerBase(CCompilerBase):
         return -1
 
     @classmethod
-    def add_standard_flag(cls, flags):
-        r"""Add a standard flag to the list of flags.
+    def handle_standard_flag(cls, flags, skip_standard_flag=False):
+        r"""Add or remove standard flag from a list of flags.
 
         Args:
             flags (list): Compilation flags.
+            skip_standard_flag (bool, optional): If True, the C++
+                standard flag will not be added. Defaults to False.
 
         """
         std_flag_idx = cls.find_standard_flag(flags)
-        if std_flag_idx == -1:
-            flags.append('-std=%s' % cls.cpp_std)
-        return flags
-
-    @classmethod
-    def remove_standard_flag(cls, flags):
-        r"""Remove the standard flag from a list of flags if one is
-        present.
-
-        Args:
-            flags (list): Compilation flags.
-
-        """
-        std_flag_idx = cls.find_standard_flag(flags)
-        if std_flag_idx != -1:
+        if skip_standard_flag and (std_flag_idx != -1):
             del flags[std_flag_idx]
+        elif (not skip_standard_flag) and (std_flag_idx == -1):
+            flags.append('-std=%s' % cls.cpp_std)
         return flags
 
 
@@ -82,10 +72,7 @@ class GPPCompiler(CPPCompilerBase, GCCCompiler):
         """
         out = super(GPPCompiler, cls).get_flags(**kwargs)
         # Add/remove standard library flag
-        if skip_standard_flag:
-            out = cls.remove_standard_flag(out)
-        else:
-            out = cls.add_standard_flag(out)
+        out = cls.handle_standard_flag(out, skip_standard_flag)
         return out
 
 
@@ -123,10 +110,7 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
         """
         out = super(ClangPPCompiler, cls).get_flags(**kwargs)
         # Add/remove standard library flag
-        if skip_standard_flag:
-            out = cls.remove_standard_flag(out)
-        else:
-            out = cls.add_standard_flag(out)
+        out = cls.handle_standard_flag(out, skip_standard_flag)
         return out
         
     @classmethod

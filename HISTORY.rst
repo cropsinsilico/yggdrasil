@@ -2,7 +2,7 @@
 History
 =======
 
-1.8.4 (2023-01-25) Update CI to use mamba, improve dev utilities, & various bug fixes
+1.8.4 (2023-01-27) Update CI to use mamba, improve dev utilities, & various bug fixes
 ------------------
 * Update utility scripts so that requirements can be maintained in a single file with pip requirements.txt file and conda recipe generated via utils/manage_requirements.py
 * Consolidate CLI utilities for creating environments
