@@ -231,9 +231,9 @@ class ConnectionDriver(Driver):
                            'enum': ['cycle', 'broadcast', 'scatter'],
                            'default': 'broadcast'},
         'transform': {'type': 'array',
-                      'items': {'oneOf': [
-                          {'type': ['function', 'string']},
-                          {'$ref': '#/definitions/transform'}]},
+                      'items': {'anyOf': [
+                          {'$ref': '#/definitions/transform'},
+                          {'type': ['function', 'string']}]},
                       'allowSingular': True,
                       'aliases': ['transforms', 'translator',
                                   'translators']},

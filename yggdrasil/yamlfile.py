@@ -18,6 +18,19 @@ class YAMLSpecificationError(RuntimeError):
     pass
 
 
+def __display_progress(verbose, obj, msg):
+    r"""Display progress if verbosity turned on.
+
+    Args:
+        verbose (bool): If false, nothing will be displayed.
+        msg (str): Message to display.
+        obj (dict): Dictionary to display.
+
+    """
+    if verbose:  # pragma: no cover
+        print(f"{msg}:\n{pprint.pformat(obj)}")
+
+
 def no_duplicates_constructor(loader, node, deep=False):
     # https://gist.github.com/pypt/94d747fe5180851196eb
     """Check for duplicate keys."""
@@ -177,20 +190,15 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None,
     if model_submission:
         yamlparsed['connections'] = []
         return yamlparsed
-    if verbose:  # pragma: no cover
-        print('un-normalized')
-        pprint.pprint(yamlparsed)
+    __display_progress(verbose, yamlparsed, 'un-normalized')
     try:
         yml_norm = s.normalize(
             yamlparsed, partial=True,
             norm_kws={'relative_path_root': yamlparsed['working_dir']})
     except rapidjson.NormalizationError:
-        print('un-normalized:')
-        pprint.pprint(yamlparsed)
+        __display_progress(True, yamlparsed, 'un-normalized')
         raise
-    if verbose:  # pragma: no cover
-        print('normalized')
-        pprint.pprint(yml_norm)
+    __display_progress(verbose, yml_norm, 'normalized')
     return yml_norm
 
 
@@ -318,9 +326,7 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
                          directory_for_clones=directory_for_clones,
                          model_submission=model_submission,
                          verbose=verbose)
-    if verbose:  # pragma: no cover
-        print('prepped')
-        pprint.pprint(yml_norm)
+    __display_progress(verbose, yml_norm, "prepped")
     if model_submission:
         models = []
         for yml in yml_norm['models']:
@@ -374,8 +380,10 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
     for yml in yml_norm['models']:
         existing = parse_component(yml, 'model', existing=existing)
     backward_compat(yml_norm, existing)
+    __display_progress(verbose, existing, "After parsing models")
     for yml in yml_norm['connections']:
         existing = parse_component(yml, 'connection', existing=existing)
+    __display_progress(verbose, existing, "After parsing connections")
     # Exit early
     if model_only:
         for x in yml_norm['models']:
@@ -388,6 +396,8 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
     if complete_partial:
         existing = complete_partial_integration(
             existing, complete_partial, partial_commtype=partial_commtype)
+        __display_progress(verbose, existing,
+                           "After completing partial integration")
     # Create server/client connections
     for srv, srv_info in existing['server'].items():
         clients = srv_info['clients']
@@ -422,10 +432,10 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
                 if s not in existing['model']:
                     missing_servers.append(s)
                 if missing_servers:
-                    print(list(existing['model'].keys()))
                     raise YAMLSpecificationError(
-                        "Servers %s do not exist, but '%s' is a client of them."
-                        % (missing_servers, v['name']))
+                        f"Servers {missing_servers} do not exist, "
+                        f"but '{v['name']}' is a client of them. "
+                        f"(models: {list(existing['model'].keys())})")
     # Make sure that I/O channels initialized
     opp_map = {'input': 'output', 'output': 'input'}
     for io in ['input', 'output']:
@@ -464,11 +474,11 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
                         existing['model'][m][io + 's'].pop(i)
                         break
             existing[io].pop(k)
+    __display_progress(verbose, existing,
+                       "After initializing model IO")
     # Link io drivers back to models
     existing = link_model_io(existing)
-    if verbose:  # pragma: no cover
-        print('drivers')
-        pprint.pprint(existing)
+    __display_progress(verbose, existing, "Finalized yaml info")
     return existing
 
 

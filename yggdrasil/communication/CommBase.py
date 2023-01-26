@@ -1133,7 +1133,6 @@ class CommBase(tools.YggClass):
         else:
             kwargs['direction'] = 'send'
         if for_yaml:
-            kwargs['datatype'] = kwargs['datatype']._typedef
             for k in ['use_async', 'allow_multiple_comms', 'direction',
                       'comment', 'newline', 'seritype']:
                 kwargs.pop(k, None)

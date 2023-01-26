@@ -603,11 +603,11 @@ definitions:
             messages are passed directly. This can also be a list of functions/strings
             that will be called on the messages in the order they are provided.
           items:
-            oneOf:
+            anyOf:
+            - $ref: '#/definitions/transform'
             - type:
               - function
               - string
-            - $ref: '#/definitions/transform'
           type: array
         working_dir:
           description: Working directory. If not provided, the current working directory
