@@ -885,6 +885,8 @@ class ModelDriver(Driver):
         if package_manager is None:
             if tools.get_conda_prefix():
                 package_manager = 'conda'
+                if shutil.which('mamba'):
+                    package_manager = 'mamba'
             elif platform._is_mac:
                 package_manager = 'brew'
             elif platform._is_linux:
@@ -895,11 +897,11 @@ class ModelDriver(Driver):
         cmd_kwargs = {}
         if command:
             cmd = copy.copy(command)
-        elif package_manager == 'conda':
-            cmd = ['conda', 'install'] + package
+        elif package_manager in ('conda', 'mamba'):
+            cmd = [package_manager, 'install'] + package
             if platform._is_win:  # pragma: windows
-                # Conda commands must be run on the shell on windows as it
-                # is implemented as a batch script
+                # Conda/mamba commands must be run on the shell on
+                # windows as it is implemented as a batch script
                 cmd.insert(0, 'call')
                 cmd_kwargs['shell'] = True
             yes_cmd = ['-y']
