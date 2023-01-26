@@ -580,16 +580,17 @@ class CModelDriver(CompiledModelDriver):
         'dtype': 'dtype_t*',
         'int': 'intX_t',
         'float': 'double',
-        'string': 'string_t',
+        'string': 'char*',  # string_t',
         'array': 'json_array_t',
         'object': 'json_object_t',
         'integer': 'int',
+        'number': 'double',
         'boolean': 'bool',
         'length': 'size_t',
         'null': 'void*',
         'uint': 'uintX_t',
         'complex': 'complex_X',
-        'bytes': 'char*',
+        'bytes': 'string_t',  # char*',
         'unicode': 'unicode_t',
         '1darray': '*',
         'ndarray': '*',
@@ -1056,7 +1057,7 @@ class CModelDriver(CompiledModelDriver):
                 x['datatype']['shape'] = [
                     int(float(s.strip('[]')))
                     for s in x.pop('shape').split('][')]
-                assert x['datatype']['subtype'] in constants.VALID_TYPES
+                assert x['datatype']['subtype'] in constants.SCALAR_TYPES
                 if len(x['datatype']['shape']) == 1:
                     x['datatype']['length'] = x['datatype'].pop(
                         'shape')[0]
@@ -1129,7 +1130,9 @@ class CModelDriver(CompiledModelDriver):
                         if 'iter_datatype' not in v:  # pragma: debug
                             raise RuntimeError("Length must be defined for "
                                                "arrays.")
-                    elif v['datatype'].get('subtype', v['datatype']['type']) == 'bytes':
+                    elif ((v['datatype'].get('subtype',
+                                             v['datatype']['type'])
+                           in ['bytes', 'string'])):
                         v['length_var'] = 'strlen(%s)' % v['name']
                     else:
                         v['length_var'] = 'strlen4(%s)' % v['name']
@@ -1297,7 +1300,7 @@ class CModelDriver(CompiledModelDriver):
             else:
                 out = out.replace('X', str(8 * precision))
         elif out == 'double':
-            if json_type['precision'] == 4:
+            if json_type.get('precision', 8) == 4:
                 out = 'float'
         return out.replace(' ', '')
         
@@ -1319,7 +1322,7 @@ class CModelDriver(CompiledModelDriver):
             out['precision'] = int(grp['precision'])
             grp['type'] = grp['type'].replace(grp['precision'], 'X')
         if grp['type'] == 'char':
-            out['type'] = 'bytes'
+            out['type'] = 'string'
         elif grp['type'] == 'void':
             out['type'] = 'null'
         elif grp['type'].startswith('complex'):
@@ -1350,7 +1353,7 @@ class CModelDriver(CompiledModelDriver):
             if nptr > 0:
                 out['subtype'] = out['type']
                 out['type'] = '1darray'
-        if out['type'] in constants.VALID_TYPES:
+        if out['type'] in constants.SCALAR_TYPES:
             out['subtype'] = out['type']
             out['type'] = 'scalar'
         return out
@@ -1823,7 +1826,7 @@ class CModelDriver(CompiledModelDriver):
                     raise RuntimeError("Length must be set in order "
                                        "to write array assignments.")
                 elif (dst_var['datatype'].get('subtype', dst_var['datatype']['type'])
-                      in ['bytes']):
+                      in ['bytes', 'string']):
                     src_var_length = '(strlen(%s)+1)' % src_var['name']
                 else:
                     src_var_length = '(strlen4(%s)+1)' % src_var['name']
@@ -1934,11 +1937,13 @@ class CModelDriver(CompiledModelDriver):
                 nele = 1
                 for s in dst_var['datatype']['shape']:
                     nele *= s
+                dst_var_type = cls.get_native_type(**dst_var)
                 kwargs.update(copy=True, N=nele,
-                              native_type=dst_var['datatype']['subtype'])
+                              native_type=dst_var_type)
             elif 'length' in dst_var.get('datatype', {}):
+                dst_var_type = cls.get_native_type(**dst_var)
                 kwargs.update(copy=True, N=dst_var['datatype']['length'],
-                              native_type=dst_var['datatype']['subtype'])
+                              native_type=dst_var_type)
         if outputs_in_inputs and (cls.language != 'c++'):
             if isinstance(dst_var, dict):
                 dst_var = dict(dst_var,

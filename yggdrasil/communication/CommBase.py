@@ -538,7 +538,8 @@ class CommBase(tools.YggClass):
                           'name': {'type': 'string'},
                           'datatype': {'type': 'schema',
                                        'default': constants.DEFAULT_DATATYPE}},
-                      'allowSingular': 'name'}},
+                      'allowSingular': 'name'},
+            'allowSingular': True},
         'length_map': {
             'type': 'object',
             'additionalProperties': {'type': 'string'}},

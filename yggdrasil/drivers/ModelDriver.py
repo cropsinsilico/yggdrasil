@@ -2971,13 +2971,15 @@ class ModelDriver(Driver):
                 keys['ndim'] = 0
                 keys['shape'] = cls.function_param['null']
             keys['units'] = datatype.get('units', '')
-        elif (typename == 'scalar') or (typename in constants.VALID_TYPES):
+        elif (typename == 'scalar') or (typename in constants.SCALAR_TYPES):
             keys['subtype'] = datatype.get('subtype', datatype['type'])
             keys['units'] = datatype.get('units', '')
             if keys['subtype'] in ['bytes', 'string', 'unicode']:
                 keys['precision'] = int(datatype.get('precision', 0))
-            else:
+            elif 'precision' in datatype:
                 keys['precision'] = int(datatype['precision'])
+            else:  # pragma: debug
+                raise NotImplementedError(str(datatype))
             typename = 'scalar'
         elif datatype['type'] in ['boolean', 'null', 'number',
                                   'integer', 'string']:
@@ -3843,7 +3845,9 @@ class ModelDriver(Driver):
         if (type_name == 'flag') and (type_name not in cls.type_map):
             type_name = 'boolean'
         # TODO: Default length type?
-        if kwargs.get('is_length_var', False) and 'length' in cls.type_map:
+        if ((kwargs.get('is_length_var', False)
+             and 'length' in cls.type_map
+             and type_name != '1darray')):
             type_name = 'length'
         if return_json:
             json_type.setdefault('type', type_name)

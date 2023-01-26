@@ -169,6 +169,7 @@ class TestExampleTypes(base_class):
         kwargs = {}
         assign_kws = {}
         if language in ['c', 'c++', 'cpp']:
+            language = language.replace('+', 'p')
             # dont_add_lengths is only valid for C/C++
             kwargs['dont_add_lengths'] = dont_add_lengths
             kwargs['use_length_prefix'] = length_prefix
@@ -232,7 +233,7 @@ class TestExampleTypes(base_class):
                           '  name: %s' % io]
                 if yaml_fields['vars']:
                     lines.append(
-                        '  vars: %s' % self.get_varstr(
+                        '  vars: [%s]' % self.get_varstr(
                             io_vars, language,
                             using_pointers=using_pointers,
                             length_prefix=length_prefix,

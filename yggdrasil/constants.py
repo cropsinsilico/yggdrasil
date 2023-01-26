@@ -19,6 +19,7 @@ NUMPY_STRING_TYPES = [
     'str',
 ]
 NUMPY_TYPES = NUMPY_NUMERIC_TYPES + NUMPY_STRING_TYPES
+SCALAR_TYPES = [x for x in NUMPY_TYPES if x != 'str']
 FLEXIBLE_TYPES = [
     'string',
     'bytes',

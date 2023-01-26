@@ -51,6 +51,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'boolean': 'logical',
         'null': 'NA',
         'uint': 'integer',
+        'number': 'double',
         'complex': 'complex',
         'bytes': 'char (utf-8)',
         'unicode': 'char',

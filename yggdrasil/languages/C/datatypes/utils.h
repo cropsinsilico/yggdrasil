@@ -214,7 +214,7 @@ bool set_va_list_mem(const va_list_t &ap,
 		     int allow_realloc = 0) {
   if (src_len > dst_len || dst == NULL) {
     if (!allow_realloc)
-      ygglog_throw_error("set_va_list_mem: Buffer is not large enough");
+      ygglog_throw_error("set_va_list_mem: Buffer is not large enough (dst_len = %zu, src_len = %zu)", dst_len, src_len);
     // if (!ap.for_fortran)
     dst = (T*)realloc(dst, src_len * sizeof(T));
     dst_ref[0] = dst;
@@ -230,7 +230,7 @@ bool set_va_list_mem(const va_list_t &ap,
 		     int allow_realloc) {
   if ((src_len + 1) > dst_len || dst == NULL) {
     if (!allow_realloc)
-      ygglog_throw_error("set_va_list_mem: Buffer is not large enough");
+      ygglog_throw_error("set_va_list_mem: Buffer is not large enough (dst_len = %zu, src_len = %zu)", dst_len, src_len);
     size_t src_len_alloc = src_len;
     if (!ap.for_fortran)
       src_len_alloc++;

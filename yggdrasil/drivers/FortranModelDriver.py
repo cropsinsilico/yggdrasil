@@ -182,6 +182,7 @@ class FortranModelDriver(CompiledModelDriver):
         'array': 'yggarr',
         'object': 'yggmap',
         'integer': 'integer',
+        'number': 'real(kind = 8)',
         'boolean': 'logical(kind = X)',
         'null': 'yggnull',
         'uint': 'ygguintX',  # Fortran has no unsigned int
@@ -490,7 +491,7 @@ class FortranModelDriver(CompiledModelDriver):
 
         """
         out = super(FortranModelDriver, cls).get_inverse_type_map()
-        out['yggchar_r'] = 'bytes'
+        out['yggchar_r'] = 'string'
         return out
         
     @classmethod
@@ -634,7 +635,7 @@ class FortranModelDriver(CompiledModelDriver):
                 out['type'] = 'ndarray'
                 if shape[0] not in '*:':
                     out['shape'] = [int(i) for i in shape]
-        if out['type'] in constants.VALID_TYPES:
+        if out['type'] in constants.SCALAR_TYPES:
             out['subtype'] = out['type']
             out['type'] = 'scalar'
         return out
@@ -932,7 +933,7 @@ class FortranModelDriver(CompiledModelDriver):
                 if isinstance(datatype, str):
                     datatype = {'type': datatype}
                 if (((datatype.get('subtype', datatype.get('type', None))
-                      in ['bytes', 'unicode'])
+                      in constants.FLEXIBLE_TYPES)
                      and ('precision' not in datatype))):
                     return True
                 elif (((datatype.get('type', None) == '1darray')
@@ -1087,12 +1088,8 @@ class FortranModelDriver(CompiledModelDriver):
             list: Lines printing the specified variable.
 
         """
-        if isinstance(var, dict):
-            datatype = var.get('datatype', var)
-            typename = datatype.get('type', None)
-            if ((((typename == '1darray') and ('length' not in datatype))
-                 or ((typename == 'ndarray') and ('shape' not in datatype)))):
-                return []
+        if cls.allows_realloc(var):
+            return []
         return super(FortranModelDriver, cls).write_print_var(
             var, **kwargs)
 
@@ -1119,10 +1116,10 @@ class FortranModelDriver(CompiledModelDriver):
                 datatype = dict(datatype, shape=[])
             if 'ndim' not in datatype:
                 datatype = dict(datatype, ndim=len(datatype['shape']))
-        if datatype.get('subtype', datatype['type']) in ['bytes', 'unicode']:
+        if datatype.get('subtype', datatype['type']) in constants.FLEXIBLE_TYPES:
             if 'precision' not in datatype:
                 datatype = dict(datatype, precision=0)
-        elif datatype.get('subtype', datatype['type']) in constants.VALID_TYPES:
+        elif datatype.get('subtype', datatype['type']) in constants.SCALAR_TYPES:
             datatype.setdefault('precision', 4)
         out = super(FortranModelDriver, cls).write_type_def(
             name, datatype, **kwargs)

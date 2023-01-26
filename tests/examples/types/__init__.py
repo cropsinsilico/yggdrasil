@@ -3,6 +3,23 @@ import numpy as np
 from yggdrasil import rapidjson
 
 
+class ExampleClass(object):
+
+    def __init__(self, *args, **kwargs):
+        self._input_args = args
+        self._input_kwargs = kwargs
+
+    def __str__(self):
+        return str((self._input_args, self._input_kwargs))
+
+    def __eq__(self, solf):
+        if not isinstance(solf, ExampleClass):
+            return False
+        if not self._input_kwargs == solf._input_kwargs:
+            return False
+        return self._input_args == solf._input_args
+
+
 def get_test_data(typename):
     r"""Determine a test data set for the specified type.
 
@@ -13,7 +30,19 @@ def get_test_data(typename):
         object: Example of specified datatype.
 
     """
-    return rapidjson.generate_data({'type': typename})
+    x = {'type': typename}
+    prop_names = 'abcdefghijklmnopqrstuvwxyg'
+    prop_types = [{'type': 'number'}, {'type': 'string'}]
+    if typename == 'array':
+        x['items'] = prop_types
+    elif typename == 'object':
+        x['properties'] = {
+            k: xx for k, xx in zip(prop_names, prop_types)}
+    elif typename == 'class':
+        return ExampleClass
+    elif typename == 'instance':
+        return ExampleClass(1, 'b', c=2, d='d')
+    return rapidjson.generate_data(x)
 
 
 def check_received_data(typename, x_recv):

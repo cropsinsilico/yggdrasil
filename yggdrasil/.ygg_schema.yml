@@ -173,6 +173,7 @@ definitions:
               - string
           type: array
         vars:
+          allowSingular: true
           description: Names of variables to be sent/received by this comm. Defaults
             to [].
           items:
@@ -1023,6 +1024,7 @@ definitions:
             type: string
           type: array
         vars:
+          allowSingular: true
           description: Names of variables to be sent/received by this comm. Defaults
             to [].
           items:

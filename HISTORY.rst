@@ -11,8 +11,9 @@ History
 * Removed jsonschema requirement
 * Updated yggdrasil to use the vendored rapidjson for serialization, validation, normalization, and units
 * Removed C and C++ API for AsciiFile and AsciiTable
-* Change how tables are parsed such that rows in single column tables will be read as arrays unless otherwise specified via the YAML option 'transform: select_scalar'
-* Update utility scripts and package parameters to build extension
+* Changed how tables are parsed such that rows in single column tables will be read as arrays unless otherwise specified via the YAML option 'transform: select_scalar'
+* Updated utility scripts and package parameters to build extension
+* Changed native string types in languages to be used for JSON string values
 
 TODO:
 ~~~~~
