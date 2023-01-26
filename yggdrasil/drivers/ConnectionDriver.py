@@ -11,12 +11,6 @@ from yggdrasil.components import create_component, isinstance_component
 from yggdrasil.drivers.DuplicatedModelDriver import DuplicatedModelDriver
 
 
-def _translate_list2element(arr):
-    if isinstance(arr, (list, tuple)):
-        arr = arr[0]
-    return arr
-
-
 class TaskThreadError(RuntimeError):
     pass
 
@@ -924,13 +918,6 @@ class ConnectionDriver(Driver):
         # This can be removed if send_message is set up to update and send the
         # received message rather than create a new one by sending msg.args
         self.ocomm.update_serializer_from_message(msg)
-        if (((msg.stype['type'] == 'array')
-             and (self.ocomm.serializer.datatype['type'] != 'array')
-             and (len(msg.stype['items']) == 1))):
-            # if (((self.icomm.serializer.datatype['type'] == 'array')
-            #      and (self.ocomm.serializer.datatype['type'] != 'array')
-            #      and (len(self.icomm.serializer.datatype['items']) == 1))):
-            self.transform.insert(0, _translate_list2element)
         self.debug('After update:\n  icomm:\n%s\n  ocomm:\n%s\n'
                    % ("\n".join(self.icomm.get_status_message(nindent=1)[0][1:]),
                       "\n".join(self.ocomm.get_status_message(nindent=1)[0][1:])))

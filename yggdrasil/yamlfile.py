@@ -793,7 +793,8 @@ def parse_connection(yml, existing):
             xx['inputs'].append(y)
         else:
             new = existing['output'][y['name']]
-            new.update(y)
+            for k, v in y.items():
+                new.setdefault(k, v)
             xx['inputs'].append(new)
             xx['src_models'] += existing['output'][y['name']]['model_driver']
             new.setdefault('__connection_count', 0)
@@ -803,7 +804,8 @@ def parse_connection(yml, existing):
             xx['outputs'].append(y)
         else:
             new = existing['input'][y['name']]
-            new.update(y)
+            for k, v in y.items():
+                new.setdefault(k, v)
             xx['outputs'].append(new)
             xx['dst_models'] += existing['input'][y['name']]['model_driver']
             new.setdefault('__connection_count', 0)
