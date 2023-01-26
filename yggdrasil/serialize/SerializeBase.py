@@ -721,7 +721,13 @@ class SerializeBase(tools.YggClass):
 
         """
         if self.initialized:
-            args = rapidjson.normalize(args, self.datatype)
+            try:
+                args = rapidjson.normalize(args, self.datatype)
+            except rapidjson.NormalizationError:
+                # TODO: Replace this with allowNested
+                if isinstance(args, (list, tuple)) and len(args) == 1:
+                    return rapidjson.normalize(args[0], self.datatype)
+                raise
         return args
 
     def encode_schema(self, msg, minimal=False, normalize=False):

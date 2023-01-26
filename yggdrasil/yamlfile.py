@@ -269,6 +269,7 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None,
             x.setdefault('for_request', True)
             cli = IntegrationServiceManager(**x)
             response = cli.send_request(**request)
+            response['working_dir'] = os.getcwd()
             assert response.pop('status') == 'complete'
             y['models'].append(response)
     # Combine models & connections
