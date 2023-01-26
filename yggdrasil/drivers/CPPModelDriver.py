@@ -116,7 +116,7 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
             str: Output to stdout from the command execution.
 
         """
-        if platform._is_win:  # pragma: windows
+        if platform._is_win or platform._is_mac:
             for a in args:
                 if a.endswith('.c'):
                     kwargs['skip_standard_flag'] = True

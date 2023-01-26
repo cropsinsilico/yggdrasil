@@ -1,12 +1,8 @@
 general:
   - chevron
-  # - cmake:  # This may need to be removed from base conda recipe
-  #     method: conda
-  #     os: unix
-  - deprecation
   - flask
-  - git:  # This may need to be removed from conda recipe
-      method: conda
+  # - git:  # This may need to be removed from conda recipe
+  #     method: conda
   - jsonschema==3.2.0
   - matplotlib:
       flags:
@@ -50,12 +46,13 @@ extras:
     - cmake:
         method: conda
         os: unix
+    - make:
+        method: conda
+        os: unix
     - "{{ compiler('c') }}":
         method: conda_recipe
-        # os: win
     - "{{ compiler('cxx') }}":
         method: conda_recipe
-        # os: win
   fortran:
     requires_extras: [c]
     requirements:
@@ -80,6 +77,7 @@ extras:
                 reinstall: true
         - name: mingw
           method: choco
+        # Alternate source for windows
         # - name: vcpkg-gfortran
         #   method: vcpkg
   r:
@@ -157,12 +155,6 @@ extras:
         - name: openmpi
           os: osx
           method: conda
-        # - name: mpich
-        #   os: linux
-        #   method: conda
-        # - name: openmpi
-        #   os: osx
-        #   method: conda
         - name: msmpi
           os: win
           method: conda
@@ -206,7 +198,6 @@ extras:
     - coverage
     - flake8
     - flaky
-    - nose
     - pytest
     - pytest-cov
     - pytest-mpi

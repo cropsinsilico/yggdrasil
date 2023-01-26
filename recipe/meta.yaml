@@ -56,7 +56,6 @@ requirements:
     - chevron
     - deprecation
     - flask
-    - git
     - jsonschema==3.2.0
     - matplotlib-base
     - numpy>=1.13.0
@@ -91,6 +90,7 @@ outputs:
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - cmake  # [not win]
+        - make  # [not win]
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
   - name: yggdrasil.fortran
@@ -184,7 +184,6 @@ outputs:
         - coverage
         - flake8
         - flaky
-        - nose
         - pytest
         - pytest-cov
         - pytest-mpi
