@@ -18,6 +18,22 @@ class CPPCompilerBase(CCompilerBase):
     default_executable = None
 
     @classmethod
+    def find_standard_flag(cls, flags):
+        r"""Locate the standard flag in a list of flags.
+
+        Args:
+            flags (list): Compilation flags.
+
+        Returns:
+            int: Index of the standard flag. -1 if not present.
+
+        """
+        for i, a in enumerate(flags):
+            if a.startswith('-std='):
+                return i
+        return -1
+
+    @classmethod
     def add_standard_flag(cls, flags):
         r"""Add a standard flag to the list of flags.
 
@@ -25,13 +41,23 @@ class CPPCompilerBase(CCompilerBase):
             flags (list): Compilation flags.
 
         """
-        std_flag = None
-        for i, a in enumerate(flags):
-            if a.startswith('-std='):
-                std_flag = i
-                break
-        if std_flag is None:
+        std_flag_idx = cls.find_standard_flag(flags)
+        if std_flag_idx == -1:
             flags.append('-std=%s' % cls.cpp_std)
+        return flags
+
+    @classmethod
+    def remove_standard_flag(cls, flags):
+        r"""Remove the standard flag from a list of flags if one is
+        present.
+
+        Args:
+            flags (list): Compilation flags.
+
+        """
+        std_flag_idx = cls.find_standard_flag(flags)
+        if std_flag_idx != -1:
+            del flags[std_flag_idx]
         return flags
 
 
@@ -55,8 +81,10 @@ class GPPCompiler(CPPCompilerBase, GCCCompiler):
 
         """
         out = super(GPPCompiler, cls).get_flags(**kwargs)
-        # Add standard library flag
-        if not skip_standard_flag:
+        # Add/remove standard library flag
+        if skip_standard_flag:
+            out = cls.remove_standard_flag(out)
+        else:
             out = cls.add_standard_flag(out)
         return out
 
@@ -94,8 +122,10 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
 
         """
         out = super(ClangPPCompiler, cls).get_flags(**kwargs)
-        # Add standard library flag
-        if not skip_standard_flag:
+        # Add/remove standard library flag
+        if skip_standard_flag:
+            out = cls.remove_standard_flag(out)
+        else:
             out = cls.add_standard_flag(out)
         return out
         
