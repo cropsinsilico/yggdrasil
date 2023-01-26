@@ -339,20 +339,21 @@ class YggRequirements(UserDict):
             os.path.dirname(os.path.dirname(__file__)),
             'recipe', 'meta.yaml')
         lines = open(fname, 'r').read()
-        idx_ver_beg = (lines.find('{% set version = "')
-                       + len('{% set version = "'))
-        idx_ver_end = lines.find('"', idx_ver_beg)
-        idx_req_beg = lines.find('\nrequirements:')
-        idx_req_end = lines.find('\ntest:')
-        idx_ext_beg = lines.find('\noutputs:')
-        idx_ext_end = lines.find('\nabout:')
-        if any(x == -1 for x in [idx_ver_beg, idx_ver_end,
-                                 idx_req_beg, idx_req_end,
-                                 idx_ext_beg, idx_ext_end]):
+        bound_defs = {
+            'version': ('{% set version = "', '"'),
+            'entry_points': ('\n  entry_points:', '\nrequirements:'),
+            'requirements': ('\nrequirements:', '\ntest:'),
+            'extras': ('\noutputs:', '\nabout:')}
+        bounds = {}
+        for k, v in bound_defs.items():
+            idx_beg = lines.find(v[0])
+            if k in ['version', 'entry_points']:
+                idx_beg += len(v[0])
+            idx_end = lines.find(v[1], idx_beg)
+            bounds[k] = (idx_beg, idx_end)
+        if any(x[0] == -1 or x[1] == -1 for x in bounds.values()):
             raise ValueError(f"Could not find indices to replace: "
-                             f"[{idx_ver_beg}, {idx_ver_end},"
-                             f" {idx_req_beg}, {idx_req_end},"
-                             f" {idx_ext_beg}, {idx_ext_end}]")
+                             f"{bounds}")
         
         class OrderedDumper(yaml.SafeDumper):
 
@@ -377,10 +378,18 @@ class YggRequirements(UserDict):
                     'default_flow_style': False,
                     'width': 1000}
         # Base package
+        fname_entry_points = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            'console_scripts.txt')
+        entry_points = open(fname_entry_points, 'r').read()
+        entry_points = entry_points.replace('=', ' = ').splitlines()
         deps = self.create_conda_recipe_varient()
-        new_lines = lines[:idx_req_beg]
+        new_lines = lines[:bounds['entry_points'][0]]
+        new_lines += '\n    - ' + '\n    - '.join(entry_points) + '\n'
+        new_lines += lines[bounds['entry_points'][1]:bounds['requirements'][0]]
         new_lines += '\n' + yaml.dump(deps, **yaml_kws)
-        new_lines += lines[idx_req_end:idx_ext_beg]
+        new_lines += lines[bounds['requirements'][1]:
+                           bounds['extras'][0]]
         # Varients
         extra_deps = {'outputs': [{'name': 'yggdrasil'}]}
         for k in self.extras():
@@ -388,7 +397,7 @@ class YggRequirements(UserDict):
             if k_out:
                 extra_deps['outputs'].append(k_out)
         new_lines += '\n' + yaml.dump(extra_deps, **yaml_kws)
-        new_lines += '\n' + lines[idx_ext_end:]
+        new_lines += '\n' + lines[bounds['extras'][1]:]
         with open(fname, 'w') as fd:
             fd.write(new_lines)
         print(f"Created '{fname}':\n{new_lines}")
@@ -1790,8 +1799,7 @@ if __name__ == "__main__":
         'env', help="Create a conda environment file.")
     SetupParam.add_parser_args(
         parser_env, install_opts=install_opts,
-        conda_env_args=('--conda-env', '--name', '-n'),
-        conda_env_default='env',
+        env_name_default='env',
         skip_types=['run'],
         skip=['method', 'windows_package_manager', 'only_python',
               'use_mamba', 'fallback_to_conda', 'deps_method'],
