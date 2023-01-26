@@ -658,7 +658,6 @@ def config_env(pytestconfig):
         production_run = False
         debug = True
     if pytestconfig.getoption("--rerun-flaky"):
-        print("HERE")
         os.environ['YGGDRASIL_RERUN_FLAKY'] = '1'
     from yggdrasil import config
     with config.temp_config(production_run=production_run,
