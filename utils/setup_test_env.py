@@ -1329,11 +1329,11 @@ def install_pkg(method, param=None, without_build=False,
             f"{param.python_cmd} -m pip install --editable {src}",
             f"cd {os.getcwd()}"]
     # Follow up if on Unix as R installation may require sudo
-    # if param.install_opts['r'] and _is_unix:
-    #     R_cmd = f"{param.python_cmd} -m yggdrasil install r"
-    #     if not param.install_opts['no_sudo']:
-    #         R_cmd += ' --sudoR'
-    #     cmds.append(R_cmd)
+    if param.install_opts['r'] and _is_unix:
+        R_cmd = f"{param.python_cmd} -m yggdrasil install r"
+        if not param.install_opts['no_sudo']:
+            R_cmd += ' --sudoR'
+        cmds.append(R_cmd)
     call_kws = {}
     if param.method == 'conda':
         env = copy.copy(os.environ)
