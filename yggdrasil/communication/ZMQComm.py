@@ -1225,7 +1225,7 @@ class ZMQComm(CommBase.CommBase):
                     self.special_debug(("Socket could not receive. "
                                         "(errno=%d)"), e.errno)  # pragma: debug
                     self.info("zmq error: %s", e)  # pragma: debug
-                    raise
+                    raise  # pragma: debug
             # Check for server sign-on
             if total_msg.startswith(ZMQProxy.server_signon_msg):
                 if self.cli_address is None:
