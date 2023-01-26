@@ -4,7 +4,6 @@ conda-tree       # [conda]
 coverage
 flake8
 flaky
-nose
 pytest
 pytest-cov
 pytest-drop-dup-tests  # [pip]

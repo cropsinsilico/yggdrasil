@@ -1276,6 +1276,7 @@ def install_pkg(method, param=None, without_build=False,
             f"cd {os.getcwd()}"]
     # Follow up if on Unix as R installation may require sudo
     if param.install_opts['r'] and _is_unix:
+        # TODO: Fix location of R executable
         R_cmd = f"{param.python_cmd} -m yggdrasil install r"
         if not param.install_opts['no_sudo']:
             R_cmd += ' --sudoR'

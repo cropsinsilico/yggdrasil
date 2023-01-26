@@ -2,11 +2,6 @@
   "general": [
     "chevron",
     "flask",
-    {
-      "git": {
-        "method": "conda"
-      }
-    },
     "jsonschema==3.2.0",
     {
       "matplotlib": {
@@ -75,6 +70,12 @@
     "c": [
       {
         "cmake": {
+          "method": "conda",
+          "os": "unix"
+        }
+      },
+      {
+        "make": {
           "method": "conda",
           "os": "unix"
         }
@@ -400,7 +401,6 @@
       "coverage",
       "flake8",
       "flaky",
-      "nose",
       "pytest",
       "pytest-cov",
       "pytest-mpi",
