@@ -46,6 +46,7 @@ class CPPCompilerBase(CCompilerBase):
             flags.append('-std=%s' % cls.cpp_std)
         return flags
 
+    @classmethod
     def remove_standard_flag(cls, flags):
         r"""Remove the standard flag from a list of flags if one is
         present.
