@@ -1809,3 +1809,38 @@ class YggTaskLoop(YggTask):
         self.debug("terminate")
         self.set_break_flag()
         super(YggTaskLoop, self).terminate(*args, **kwargs)
+
+
+class MemoryTracker(YggTaskLoop):
+    r"""Class to track the memory used by another process.
+
+    Args:
+        pid (int): Process ID for the process that should be tracked.
+        interval (float, optional): Time (in seconds) that should be
+            waiting between memory usage checks. Defaults to 1 second.
+
+    """
+
+    def __init__(self, pid, interval=1.0):
+        self.track_pid = pid
+        self.track_interval = interval
+        self.record = []
+        super(MemoryTracker, self).__init__(target=self.record_memory)
+
+    def record_memory(self):
+        import psutil
+        if not psutil.pid_exists(self.track_pid):  # pragma: debug
+            self.set_break_flag()
+            return
+        process = psutil.Process(self.track_pid)
+        children = process.children(recursive=True)
+        total_mem = process.memory_info().rss / 1024 ** 2
+        child_mem = 0
+        for x in children:
+            child_mem += x.memory_info().rss / 1024 ** 2
+        self.record.append(total_mem + child_mem)
+        sleep(self.track_interval)
+
+    @property
+    def max_memory(self):
+        return max(self.record)

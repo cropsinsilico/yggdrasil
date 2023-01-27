@@ -7,6 +7,7 @@ import subprocess
 import argparse
 import pprint
 import shutil
+import sysconfig
 from yggdrasil import constants
 LANGUAGES = getattr(constants, 'LANGUAGES', {})
 LANGUAGES_WITH_ALIASES = getattr(constants, 'LANGUAGES_WITH_ALIASES', {})
@@ -341,6 +342,10 @@ class integration_service_manager(SubCommand):
                           'help': ('URL for a directory in a Git repository '
                                    'containing models that should be loaded '
                                    'into the service manager registry.')}),
+                        (('--track-memory', ),
+                         {'action': 'store_true',
+                          'help': ('Track the memory used by the '
+                                   'service manager.')}),
                         (('--log-level', ),
                          {'type': int,
                           'help': ('Level of logging that should be '
@@ -425,7 +430,8 @@ class integration_service_manager(SubCommand):
                         with_coverage=getattr(args, 'with_coverage', False),
                         model_repository=getattr(args, 'model_repository',
                                                  None),
-                        log_level=getattr(args, 'log_level', None))
+                        log_level=getattr(args, 'log_level', None),
+                        track_memory=getattr(args, 'track_memory', False))
             else:
                 x.send_request(integration_name,
                                yamls=integration_yamls,
@@ -624,8 +630,11 @@ class ygginfo(SubCommand):
                                     drv.is_comm_installed()))
                     vardict.append((curr_prefix + "Configured",
                                     drv.is_configured()))
-                    vardict.append((curr_prefix + "Disabled",
-                                    drv.is_disabled()))
+                    if not vardict[-1][1]:
+                        curr_prefix += prefix
+                        for k, v in drv.configuration_steps().items():
+                            vardict.append((curr_prefix + k, v))
+                        curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
                     curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
                 curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
             # Add comm information
@@ -684,7 +693,8 @@ class ygginfo(SubCommand):
                 # Environment variabless
                 env_vars = ['CONDA_PREFIX', 'CONDA', 'SDKROOT', 'CC',
                             'CXX', 'FC', 'GFORTRAN', 'DISPLAY', 'CL',
-                            '_CL_']
+                            '_CL_', 'LD', 'CFLAGS', 'CXXFLAGS',
+                            'LDFLAGS']
                 if platform._is_win:  # pragma: windows
                     env_vars += ['VCPKG_ROOT']
                 vardict.append(('Environment variables:', ''))
@@ -693,8 +703,9 @@ class ygginfo(SubCommand):
                     vardict.append(
                         (curr_prefix + k, os.environ.get(k, None)))
                 curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
-                # Git location
-                vardict.append(('Git Location:', shutil.which('git')))
+                # Locations of executables
+                for x in ['git', 'mpiexec', 'mpicc']:
+                    vardict.append((f'{x} Location:', shutil.which(x)))
                 # Conda info
                 if os.environ.get('CONDA_PREFIX', ''):
                     if platform._is_win:  # pragma: windows
@@ -826,6 +837,12 @@ class ygginfo(SubCommand):
                              curr_prefix + prefix,
                              ("\n" + curr_prefix + prefix).join(
                                  out.splitlines(False)))))
+                # System config vars
+                vardict.append(('Sysconfig Vars:', ''))
+                curr_prefix += prefix
+                for k, v in sysconfig.get_config_vars().items():
+                    vardict.append((curr_prefix + k, v))
+                curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
         finally:
             # Print things
             max_len = max(len(x[0]) for x in vardict)
@@ -1076,17 +1093,29 @@ class ygginstall(SubCommand):
 
     name = "install"
     help = "Complete yggdrasil installation for one or more languages."
+    arguments = (
+        [(('languages', ),
+          {'nargs': '*',
+           # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
+           'default': [],
+           'help': 'One or more languages that should be configured.'}),
+         (('--no-import', ),
+          {'action': 'store_true',
+           'help': ('Don\'t import the yggdrasil package in '
+                    'calling the installation script.')}),
+         ]
+    )
 
     @classmethod
-    def get_parser(cls, **kwargs):
+    def add_arguments(cls, parser, **kwargs):
         from yggdrasil.languages import install_languages
-        # TODO: Migrate
-        return install_languages.update_argparser()
+        super(ygginstall, cls).add_arguments(parser, **kwargs)
+        install_languages.update_argparser(parser=parser)
 
     @classmethod
     def func(cls, args):
         from yggdrasil.languages import install_languages
-        languages = args.language
+        languages = args.languages
         if (((isinstance(languages, str) and (languages == 'all'))
              or (isinstance(languages, list) and ('all' in languages)))):
             languages = [x.lower() for x in

@@ -329,6 +329,11 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
             existing = parse_component(yml, k[:-1], existing=existing)
     # Exit early
     if model_only:
+        for x in yml_norm['models']:
+            for io in ['inputs', 'outputs']:
+                x[io] = [z for z in x[io] if not z.get('is_default', False)]
+                if not x[io]:
+                    del x[io]
         return yml_norm
     # Add stand-in model that uses unpaired channels
     if complete_partial:

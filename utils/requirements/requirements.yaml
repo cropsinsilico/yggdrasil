@@ -1,0 +1,257 @@
+general:
+  - chevron
+  - flask
+  # - git:  # This may need to be removed from conda recipe
+  #     method: conda
+  - jsonschema==3.2.0
+  - matplotlib:
+      flags:
+        from_env: MATPLOTLIB
+      options:
+      - name: matplotlib-base
+        method: conda
+      - name: matplotlib
+        method: pip
+  - numpy>=1.13.0:
+      host: True
+      flags:
+        from_env: NUMPY
+        method_in_setup: conda
+  - pandas
+  - pip:
+      method: conda_recipe
+      host: True
+      host_only: True
+  - psutil
+  - pyperf
+  - python:
+      method: conda_recipe
+      host: True
+  - python-rapidjson
+  - pyyaml
+  - pyzmq
+  - requests
+  - scipy:
+      flags:
+        method_in_setup: conda
+  - six
+  - unyt
+  - GitPython
+  - sysv_ipc:
+      os: unix
+      host: True
+  
+extras:
+  c:
+    - cmake:
+        method: conda
+        os: unix
+    - make:
+        method: conda
+        os: unix
+    - "{{ compiler('c') }}":
+        method: conda_recipe
+    - "{{ compiler('cxx') }}":
+        method: conda_recipe
+  fortran:
+    requires_extras: [c]
+    requirements:
+    - gfortran:
+        - name: "{{ compiler('fortran') }}"
+          method: conda_recipe
+          os: unix
+        - name: fortran-compiler
+          os: unix
+          method: conda
+        - name: m2w64-gcc-fortran
+          os: win
+          method: conda
+          add: [m2w64-toolchain_win-64]
+        - name: gfortran
+          method: apt
+        - name: gfortran
+          method: brew
+          add:
+            - name: gcc
+              flags:
+                reinstall: true
+        - name: mingw
+          method: choco
+        # Alternate source for windows
+        # - name: vcpkg-gfortran
+        #   method: vcpkg
+  r:
+    - r-base:
+        executable: R
+        options:
+        - method: conda
+          host: True
+        - method: apt
+          add: [r-base-dev]
+        - name: r
+          method: brew
+    - r-bit64:
+        - method: conda
+          host: True
+        - method: cran
+    - r-r6:
+        - method: conda
+          host: True
+        - method: cran
+    - r-reticulate:
+        - method: conda
+          host: True
+        - method: cran
+    - r-zeallot:
+        - method: conda
+          host: True
+        - method: cran
+    - r-units:
+        - method: conda
+          host: True
+        - method: cran
+    - udunits:
+        - name: libudunits2-dev
+          method: apt
+        - name: udunits
+          method: brew
+        - method: skip
+          os: win
+        - method: conda_skip
+  zmq:
+    requires_extras: [c]
+    requirements:
+    - czmq:
+        - method: conda
+          host: True
+        - name: libczmq-dev
+          method: apt
+        - method: brew
+          flags:
+            from_src_on_travis: true
+        - method: vcpkg
+    - lz4:
+        - name: lz4
+          method: conda
+          host: True
+        - name: lz4
+          method: pip_skip
+    - zeromq:
+        - method: conda
+          host: True
+        - name: libzmq3-dev
+          method: apt
+        - name: zmq
+          method: brew
+          flags:
+            from_src_on_travis: true
+        - method: vcpkg
+  mpi:
+    - mpi4py
+    - mpi:
+        - name: mpich
+          os: linux
+          method: conda
+        - name: openmpi
+          os: osx
+          method: conda
+        - name: msmpi
+          os: win
+          method: conda
+        - name: openmpi-bin
+          method: apt
+          add: [libopenmpi-dev]
+        - name: openmpi
+          method: brew
+          flags:
+            method_validate: conda_supp
+          os: osx
+  omp:
+    - libomp:
+        - name: libomp-dev
+          method: apt
+        - method: brew
+          add: [llvm]  # LLVM clang required to work with omp
+        - method: skip
+          os: win
+        - method: conda_skip
+  rmq:
+    - pika>=1.0.0
+  sbml:
+    - name: libroadrunner<2.0.7
+      method: pip
+      flags:
+        install_flags: [--no-dependencies]
+  lpy:
+    - name: lpy
+      method: conda
+      add:
+        - boost==1.66.0
+      flags:
+        install_flags: [-c, openalea]
+        not_in_recipe: true
+        not_in_txt: true
+  testing:
+    - codecov
+    - conda-tree:
+        method: conda
+    - coverage
+    - flake8
+    - flaky
+    - pytest
+    - pytest-cov
+    - pytest-mpi
+    - pytest-drop-dup-tests:
+        method: pip
+    - pytest-rerunfailures
+    - pytest-repeat
+    - pytest-timeout
+    # Split these into another section?
+    - ccache:
+        method: conda
+        os: unix
+        flags:
+          method_validate: conda_supp
+          not_in_recipe: true
+    - strace:
+        method: apt
+        os: linux
+        flags:
+          method_validate: conda_supp
+    - valgrind:
+        method: apt
+        os: linux
+        flags:
+          method_validate: conda_supp
+  docs:
+    - breathe
+    - doxygen:
+        - method: conda
+        - method: apt
+        - method: brew
+        - method: choco
+        - method: vcpkg
+    - pandoc:
+        - method: apt
+        - name: pandoc-citeproc
+          method: brew
+          add: [Caskroom/cask/mactex]
+        - method: skip
+          os: win
+        - method: conda_skip
+    - pypandoc
+    - r-roxygen2:
+        method: conda
+    - sphinx
+    - sphinx_rtd_theme
+    - sphinx-argparse
+  dev:
+    - black
+    - git:
+        method: conda
+    - ipython
+    - PyGithub
+bespoke_extras:
+- astropy
+- pygments
+- trimesh

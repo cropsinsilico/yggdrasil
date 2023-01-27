@@ -158,7 +158,7 @@ class GCCCompiler(CCompilerBase):
             + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
             + [('library_rpath', '-Wl,-rpath')]))
     toolset = 'gnu'
-    aliases = ['gnu-cc']
+    aliases = ['gnu-cc', 'gnu-gcc']
 
     @classmethod
     def is_installed(cls):
@@ -236,8 +236,10 @@ class ClangCompiler(CCompilerBase):
         out = super(ClangCompiler, cls).get_flags(*args, **kwargs)
         if '-fopenmp' in out:
             idx = out.index('-fopenmp')
-            if (idx > 0) and (out[idx - 1] != '-Xpreprocessor'):
-                out.insert(idx, '-Xpreprocessor')
+            # new_flag = '-Xpreprocessor'
+            new_flag = '-Xclang'
+            if (idx > 0) and (out[idx - 1] != new_flag):
+                out.insert(idx, new_flag)
         return out
         
 
@@ -410,6 +412,15 @@ class ClangLinker(LDLinker):
             out.append('-lstdc++')
         if '-fopenmp' in out:
             out[out.index('-fopenmp')] = '-lomp'
+            if 'conda' not in cls.get_executable(full_path=True):
+                result = subprocess.check_output(
+                    "find /usr/local -xdev -name '*libomp*'",
+                    shell=True).splitlines()
+                for x in result:
+                    x_dir, x_file = os.path.split(x.decode("utf-8"))
+                    if x_file.endswith(('libomp.dylib', 'libomp.a')):
+                        out.append(f'-L{x_dir}')
+                        break
         return out
 
 

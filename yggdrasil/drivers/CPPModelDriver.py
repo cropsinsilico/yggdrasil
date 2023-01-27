@@ -18,19 +18,35 @@ class CPPCompilerBase(CCompilerBase):
     default_executable = None
 
     @classmethod
-    def add_standard_flag(cls, flags):
-        r"""Add a standard flag to the list of flags.
+    def find_standard_flag(cls, flags):
+        r"""Locate the standard flag in a list of flags.
 
         Args:
             flags (list): Compilation flags.
 
+        Returns:
+            int: Index of the standard flag. -1 if not present.
+
         """
-        std_flag = None
         for i, a in enumerate(flags):
             if a.startswith('-std='):
-                std_flag = i
-                break
-        if std_flag is None:
+                return i
+        return -1
+
+    @classmethod
+    def handle_standard_flag(cls, flags, skip_standard_flag=False):
+        r"""Add or remove standard flag from a list of flags.
+
+        Args:
+            flags (list): Compilation flags.
+            skip_standard_flag (bool, optional): If True, the C++
+                standard flag will not be added. Defaults to False.
+
+        """
+        std_flag_idx = cls.find_standard_flag(flags)
+        if skip_standard_flag and (std_flag_idx != -1):
+            del flags[std_flag_idx]
+        elif (not skip_standard_flag) and (std_flag_idx == -1):
             flags.append('-std=%s' % cls.cpp_std)
         return flags
 
@@ -55,9 +71,8 @@ class GPPCompiler(CPPCompilerBase, GCCCompiler):
 
         """
         out = super(GPPCompiler, cls).get_flags(**kwargs)
-        # Add standard library flag
-        if not skip_standard_flag:
-            out = cls.add_standard_flag(out)
+        # Add/remove standard library flag
+        out = cls.handle_standard_flag(out, skip_standard_flag)
         return out
 
 
@@ -94,9 +109,8 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
 
         """
         out = super(ClangPPCompiler, cls).get_flags(**kwargs)
-        # Add standard library flag
-        if not skip_standard_flag:
-            out = cls.add_standard_flag(out)
+        # Add/remove standard library flag
+        out = cls.handle_standard_flag(out, skip_standard_flag)
         return out
         
     @classmethod
@@ -116,7 +130,7 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
             str: Output to stdout from the command execution.
 
         """
-        if platform._is_win:  # pragma: windows
+        if platform._is_win or platform._is_mac:
             for a in args:
                 if a.endswith('.c'):
                     kwargs['skip_standard_flag'] = True
@@ -539,6 +553,6 @@ class CPPModelDriver(CModelDriver):
             else:
                 out['deps'].append('doxygen')
         out['write_try_except_kwargs'] = {'error_type': '...'}
-        out['kwargs'].setdefault('compiler_flags', [])
-        out['kwargs']['compiler_flags'].append('-std=c++11')
+        # out['kwargs'].setdefault('compiler_flags', [])
+        # out['kwargs']['compiler_flags'].append('-std=c++11')
         return out

@@ -885,6 +885,8 @@ class ModelDriver(Driver):
         if package_manager is None:
             if tools.get_conda_prefix():
                 package_manager = 'conda'
+                if shutil.which('mamba'):
+                    package_manager = 'mamba'
             elif platform._is_mac:
                 package_manager = 'brew'
             elif platform._is_linux:
@@ -895,11 +897,11 @@ class ModelDriver(Driver):
         cmd_kwargs = {}
         if command:
             cmd = copy.copy(command)
-        elif package_manager == 'conda':
-            cmd = ['conda', 'install'] + package
+        elif package_manager in ('conda', 'mamba'):
+            cmd = [package_manager, 'install'] + package
             if platform._is_win:  # pragma: windows
-                # Conda commands must be run on the shell on windows as it
-                # is implemented as a batch script
+                # Conda/mamba commands must be run on the shell on
+                # windows as it is implemented as a batch script
                 cmd.insert(0, 'call')
                 cmd_kwargs['shell'] = True
             yes_cmd = ['-y']
@@ -1269,6 +1271,27 @@ class ModelDriver(Driver):
         return (cls.cfg.get(cls.language, 'disable', 'false').lower() == 'true')
 
     @classmethod
+    def configuration_steps(cls):
+        r"""Get a list of configuration steps with tuples of flags and
+        boolean values.
+
+        Returns:
+            OrderedDict: Pairs of descriptions and states for
+                different steps in the configuration all steps must be
+                True for the language to be configured.
+
+        """
+        out = OrderedDict([
+            ('Not Disabled', not cls.is_disabled()),
+            ('Config Section', cls.cfg.has_section(cls.language))])
+        config_keys = list(cls._config_keys)
+        if out['Config Section'] and len(cls.base_languages) == 0:
+            config_keys.insert(0, 'commtypes')
+        for k in config_keys:
+            out[k] = (cls.cfg.get(cls.language, k, None) is not None)
+        return out
+
+    @classmethod
     def is_configured(cls):
         r"""Determine if the appropriate configuration has been performed (e.g.
         installation of supporting libraries etc.)
@@ -1277,18 +1300,7 @@ class ModelDriver(Driver):
             bool: True if the language has been configured.
 
         """
-        # Check for section & diable
-        disable_flag = cls.is_disabled()
-        out = (cls.cfg.has_section(cls.language) and (not disable_flag))
-        # Check for commtypes
-        if out and (len(cls.base_languages) == 0):
-            out = (cls.cfg.get(cls.language, 'commtypes', None) is not None)
-        # Check for config keys
-        for k in cls._config_keys:
-            if not out:  # pragma: no cover
-                break
-            out = (cls.cfg.get(cls.language, k, None) is not None)
-        return out
+        return all(v for v in cls.configuration_steps().values())
 
     @classmethod
     def is_comm_installed(cls, commtype=None, skip_config=False, **kwargs):

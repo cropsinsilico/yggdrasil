@@ -1,0 +1,7 @@
+breathe
+doxygen          # [conda]
+pypandoc
+r-roxygen2       # [conda]
+sphinx
+sphinx-argparse
+sphinx_rtd_theme

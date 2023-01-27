@@ -1,0 +1,13 @@
+ccache; platform_system != 'Windows'  # [conda]
+codecov
+conda-tree       # [conda]
+coverage
+flake8
+flaky
+pytest
+pytest-cov
+pytest-drop-dup-tests  # [pip]
+pytest-mpi
+pytest-repeat
+pytest-rerunfailures
+pytest-timeout

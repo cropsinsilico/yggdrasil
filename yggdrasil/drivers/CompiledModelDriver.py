@@ -8,6 +8,7 @@ import subprocess
 import shutil
 import contextlib
 import threading
+import sysconfig
 from collections import OrderedDict
 from yggdrasil import platform, tools, scanf
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_products
@@ -398,10 +399,12 @@ class CompilationToolBase(object):
         for k in attr_list:
             # Copy so that list modification is not propagated to subclasses
             setattr(cls, k, copy.deepcopy(getattr(cls, k, [])))
-        # Set attributes based on environment variables
-        if cls.env_matches_tool():
-            cls.default_executable = os.environ[cls.default_executable_env].split(
-                'ccache ')[-1]
+        # Set attributes based on environment variables or sysconfig
+        if cls.default_executable is None:
+            cls.default_executable = cls.env_matches_tool()
+        if cls.default_executable is None:
+            cls.default_executable = cls.env_matches_tool(
+                use_sysconfig=True)
         # Set default_executable to name
         if cls.default_executable is None:
             cls.default_executable = cls.toolname
@@ -488,12 +491,16 @@ class CompilationToolBase(object):
             existing = {}
             existing.update(os.environ)
         if not cls.env_matches_tool():
+            config_vars = {}
+            cls.env_matches_tool(use_sysconfig=True, env=config_vars)
             env = getattr(cls, 'default_flags_env', None)
             if env is not None:
                 if not isinstance(env, list):
                     env = [env]
                 for ienv in env:
                     existing.pop(ienv, [])
+                    if ienv in config_vars:
+                        existing[ienv] = config_vars[ienv]
         return existing
 
     @classmethod
@@ -673,40 +680,63 @@ class CompilationToolBase(object):
         return (exec_path is not None)
 
     @classmethod
-    def env_matches_tool(cls):
+    def env_matches_tool(cls, use_sysconfig=False, env=None,
+                         with_flags=False):
         r"""Determine if the executable pointed to by any environment
         variable matches this compilation tool.
+
+        Args:
+            use_sysconfig (bool, optional): If True, check the
+                sysconfig variables, otherwise check os.environ.
+                Defaults to False.
+            env (dict, optional): Existing dictionary that should be
+                updated with variables. Defaults to None and is ignored.
+            with_flags (bool, optional): If True, preserve any flags
+                included in the environment variable. Defaults to False.
 
         Returns:
             bool: True if the environment variable matches, False otherwise.
 
         """
+        if env is None:
+            env = {}
+        if use_sysconfig:
+            env.update(sysconfig.get_config_vars())
+        else:
+            env.update(os.environ)
         tool_base = cls.aliases.copy()
         envi_base = ''
+        envi_full = ''
         if isinstance(cls.toolname, str):
             tool_base.append(cls.toolname)
         if isinstance(cls.default_executable, str):
             tool_base.append(cls.default_executable)
         if isinstance(cls.default_executable_env, str):
-            envi_base = os.path.basename(
-                os.environ.get(cls.default_executable_env, '').split('ccache ')[-1])
+            envi_full = env.get(cls.default_executable_env, '').split(
+                'ccache ')[-1]
+        if envi_full:
+            envi_base = os.path.basename(envi_full.split(maxsplit=1)[0])
         if os.environ.get('PATHEXT', ''):
             tool_base = [x.split(os.environ['PATHEXT'])[0]
                          for x in tool_base]
             envi_base = envi_base.split(os.environ['PATHEXT'])[0]
-        out = False
+        out = None
         regex_literal = '-+*$%#@!^&(){}[]<>,.;:'
         regex_pathsep = r'(?:[\-\_\.0-9])'
         if tool_base and envi_base:
             for x in tool_base:
                 for k in regex_literal:
                     x = x.replace(k, '\\' + k)
-                regex = r'(?:(?:^)|%s)%s(?:(?:$)|%s)' % (regex_pathsep, x,
-                                                         regex_pathsep)
+                regex = r'(?:(?:^)|%s)%s(?:(?:$)|%s)' % (
+                    regex_pathsep, x, regex_pathsep)
                 if re.search(regex, envi_base):
                     out = True
                     break
             # out = envi_base.endswith(tuple(tool_base))
+        if out:
+            if not with_flags:
+                envi_full = envi_full.split(maxsplit=1)[0]
+            return envi_full
         return out
 
     @classmethod
@@ -718,13 +748,19 @@ class CompilationToolBase(object):
 
         """
         out = []
-        if cls.env_matches_tool():
+        env_dict = {}
+        exe = cls.env_matches_tool(env=env_dict, with_flags=True)
+        if not exe:
+            exe = cls.env_matches_tool(env=env_dict, with_flags=True,
+                                       use_sysconfig=True)
+        if exe and env_dict:
+            out += exe.split()[1:]
             env = getattr(cls, 'default_flags_env', None)
             if env is not None:
                 if not isinstance(env, list):
                     env = [env]
                 for ienv in env:
-                    new_val = os.environ.get(ienv, '').split()
+                    new_val = env_dict.get(ienv, '').split()
                     out += [v for v in new_val if v not in out]
         return out
 
@@ -818,11 +854,12 @@ class CompilationToolBase(object):
             out = cls.default_executable
             if cls.languages:
                 out = ygg_cfg.get(cls.languages[0],
-                                  '%s_executable' % cls.toolname,
+                                  f'{cls.toolname}_executable',
                                   out)
         if out is None:
-            raise NotImplementedError("Executable not set for %s '%s'."
-                                      % (cls.tooltype, cls.toolname))
+            raise NotImplementedError(f"Executable not set for "
+                                      f"{cls.tooltype} "
+                                      f"'{cls.tooltype}'.")
         if full_path:
             out = shutil.which(out)
         return out
@@ -3394,26 +3431,26 @@ class CompiledModelDriver(ModelDriver):
                 continue
             if not out:  # pragma: no cover
                 break
-            lib_opt = '%s_%s' % (lib, lib_typ)
+            lib_opt = f'{lib}_{lib_typ}'
             out = (cfg.get(dep_lang, lib_opt, None) is not None)
         return out
         
     @classmethod
-    def is_configured(cls):
-        r"""Determine if the appropriate configuration has been performed (e.g.
-        installation of supporting libraries etc.)
+    def configuration_steps(cls):
+        r"""Get a list of configuration steps with tuples of flags and
+        boolean values.
 
         Returns:
-            bool: True if the language has been configured.
+            OrderedDict: Pairs of descriptions and states for
+                different steps in the configuration all steps must be
+                True for the language to be configured.
 
         """
-        out = super(CompiledModelDriver, cls).is_configured()
+        out = super(CompiledModelDriver, cls).configuration_steps()
         for k in cls.get_external_libraries():
-            if not out:  # pragma: no cover
-                break
-            out = cls.is_library_installed(k)
+            out[str(k)] = cls.is_library_installed(k)
         return out
-
+        
     @classmethod
     def is_tool_installed(cls, tooltype):
         r"""Determine if a compilation tool of a certain is installed for

@@ -478,7 +478,7 @@ class ZMQComm(CommBase.CommBase):
                 socket_action = 'bind'
             else:
                 socket_action = 'connect'
-        if new_process:
+        if new_process:  # pragma: sbml
             self.context = zmq.Context()
             set_context_opts(self.context)
         else:
@@ -1232,7 +1232,7 @@ class ZMQComm(CommBase.CommBase):
                     self.special_debug(("Socket could not receive. "
                                         "(errno=%d)"), e.errno)  # pragma: debug
                     self.info("zmq error: %s", e)  # pragma: debug
-                    raise
+                    raise  # pragma: debug
             # Check for server sign-on
             if total_msg.startswith(ZMQProxy.server_signon_msg):
                 if self.cli_address is None:

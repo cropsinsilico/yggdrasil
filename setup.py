@@ -6,6 +6,7 @@ from setuptools import setup, find_packages
 from distutils.sysconfig import get_python_lib
 import versioneer
 import create_coveragerc
+import configparser
 ygg_ver = versioneer.get_version()
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
 LANG_PATH = os.path.join(ROOT_PATH, 'yggdrasil', 'languages')
@@ -49,11 +50,16 @@ else:
 
 
 # Create requirements list based on platform
+req_dir = os.path.join("utils", "requirements")
 with open("requirements.txt", 'r') as fd:
     requirements = fd.read().splitlines()
-with open("requirements_testing.txt", 'r') as fd:
+with open(os.path.join(req_dir, "requirements_testing.txt"), 'r') as fd:
     test_requirements = fd.read().splitlines()
-# with open("requirements_optional.txt", 'r') as fd:
+extras_config = configparser.ConfigParser(allow_no_value=True)
+extras_config.read(os.path.join(req_dir, "requirements_extras.ini"))
+extras_requirements = {s: list(extras_config.options(s))
+                       for s in extras_config.sections()}
+# with open(os.path.join(req_dir, "requirements_optional.txt"), 'r') as fd:
 #     optional_requirements = fd.read().splitlines()
 with open("console_scripts.txt", 'r') as fd:
     console_scripts = fd.read().splitlines()
@@ -87,6 +93,7 @@ setup(
     keywords=["plants", "simulation", "models", "framework"],
     install_requires=requirements,
     tests_require=test_requirements,
+    extras_require=extras_requirements,
     classifiers=[
         "Programming Language :: C",
         "Programming Language :: C++",
