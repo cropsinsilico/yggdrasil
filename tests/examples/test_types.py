@@ -149,6 +149,8 @@ class TestExampleTypes(base_class):
         for v in vars_list:
             out.append(v['name'])
             typename = v['datatype']['type']
+            if typename == 'scalar':
+                typename = v['datatype']['subtype']
             if (language == 'c') and (not dont_add_lengths):
                 if using_pointers:
                     if typename in ['string', 'bytes',

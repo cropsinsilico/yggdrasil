@@ -3823,5 +3823,13 @@ contains
        stop "Error setting ndarray element in map."
     end if
   end subroutine generic_map_set_ndarray
+  subroutine init_python_API()
+    implicit none
+    integer(kind=c_int) :: c_out
+    c_out = init_python_API_c();
+    if (c_out.lt.0) then
+       stop "Error initializing Python."
+    end if
+  end subroutine init_python_API
   
 end module fygg

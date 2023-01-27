@@ -1275,10 +1275,17 @@ int document_set_vargs(rapidjson::Value& document,
       } else if (type == rapidjson::Document::Get1DArrayString() ||
 		 type == rapidjson::Document::GetNDArrayString()) {
 	bool has_shape = false;
+	size_t len = 1;
 	if (!ap.for_fortran) {
 	  if (schema.HasMember("length") && schema["length"].IsInt()) {
+	    len = static_cast<size_t>(schema["length"].GetInt());
 	    has_shape = true;
 	  } else if (schema.HasMember("shape") && schema["shape"].IsArray()) {
+	    len = 1;
+	    for (rapidjson::Value::ConstValueIterator it = schema["shape"].Begin();
+		 it != schema["shape"].End(); it++) {
+	      len *= static_cast<size_t>(it->GetUint());
+	    }
 	    has_shape = true;
 	  }
 	}
@@ -1286,13 +1293,14 @@ int document_set_vargs(rapidjson::Value& document,
 	size_t tmp_len = (size_t)(document.GetNBytes()); // StringLength());
 	char* mem = NULL;
 	char** mem_ref = NULL;
-	size_t len = 1;
 	size_t* mem_len = NULL;
 	size_t** mem_len_ref = NULL;
 	if (!pop_va_list_mem(ap, mem, mem_ref, allow_realloc))
 	  return 0;
 	if (has_shape || table_nelements) {
-	  len = 0;
+	  if (table_nelements)
+	    len = table_nelements;
+	  // len = 0;
 	  mem_len = &len;
 	  mem_len_ref = &mem_len;
 	} else {
@@ -3227,19 +3235,23 @@ extern "C" {
 	ygglog_throw_error("create_dtype_json_array: %d items expected, but the items parameter is NULL.", nitems);
       }
       obj = new rapidjson::Document();
+      size_t nprops = 1;
       obj->StartObject();
       obj->Key("type", 4, true);
       obj->String("array", 5, true);
-      obj->Key("items", 5, true);
-      obj->StartArray();
-      for (i = 0; i < nitems; i++) {
-	rapidjson::Document* iSchema = (rapidjson::Document*)(items[i]->schema);
-	if (!iSchema->Accept(*obj)) {
-	  ygglog_throw_error("create_dtype_json_array: Error adding element %d.", i);
+      if (nitems > 0) {
+	nprops++;
+	obj->Key("items", 5, true);
+	obj->StartArray();
+	for (i = 0; i < nitems; i++) {
+	  rapidjson::Document* iSchema = (rapidjson::Document*)(items[i]->schema);
+	  if (!iSchema->Accept(*obj)) {
+	    ygglog_throw_error("create_dtype_json_array: Error adding element %d.", i);
+	  }
 	}
+	obj->EndArray(nitems);
       }
-      obj->EndArray(nitems);
-      obj->EndObject(2);
+      obj->EndObject(nprops);
       obj->FinalizeFromStack();
       return create_dtype(obj, use_generic);
     } catch(...) {
@@ -3833,6 +3845,17 @@ extern "C" {
   void display_ply(ply_t p) {
     return display_ply_indent(p, "");
   }
+
+  int init_python_API() {
+    try {
+      rapidjson::init_python_API();
+    } catch(...) {
+      ygglog_error("init_python_API: C++ exception thrown.");
+      return 1;
+    }
+    return 0;
+  }
+  
 }
 
 // Local Variables:

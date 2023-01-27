@@ -180,7 +180,7 @@ int generic_map_set_ndarray_f(generic_t x, const char* key,
 			      const size_t precision,
 			      const size_t ndim, const void* shape,
 			      const char* units);
-
+int init_python_API_f();
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */

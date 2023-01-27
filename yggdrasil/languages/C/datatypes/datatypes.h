@@ -1211,7 +1211,13 @@ void display_ply_indent(ply_t p, const char* indent);
  */
 void display_ply(ply_t p);
 
-  
+/*!
+  @brief Initialize Python if it is not initialized.
+  @returns int 0 if successful, other values indicate errors.
+ */
+int init_python_API();
+
+
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }
 #endif

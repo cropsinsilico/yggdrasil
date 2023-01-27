@@ -723,6 +723,7 @@ class CModelDriver(CompiledModelDriver):
         'exec_begin': 'int main() {',
         'exec_end': '  return 0;\n}',
         'exec_prefix': '#include <stdbool.h>',
+        'python_init': 'init_python_API();',
         'free': 'if ({variable} != NULL) {{ free({variable}); {variable} = NULL; }}',
         'function_def_begin': '{output_type} {function_name}({input_var}) {{',
         'return': 'return {output_var};',

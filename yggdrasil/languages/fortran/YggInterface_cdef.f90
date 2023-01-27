@@ -996,6 +996,12 @@
        character(kind=c_char), dimension(*), intent(in) :: units
        integer(kind=c_int) :: out
      end function generic_map_set_ndarray_c
+     function init_python_API_c() result(out) &
+          bind(c, name="init_python_API_f")
+       use, intrinsic :: iso_c_binding, only: c_int
+       implicit none
+       integer(kind=c_int) :: out
+     end function init_python_API_c
 
   end interface
 #endif ! DOXYGEN_SHOULD_SKIP_THIS

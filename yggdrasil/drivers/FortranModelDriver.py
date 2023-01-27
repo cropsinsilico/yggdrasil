@@ -327,6 +327,7 @@ class FortranModelDriver(CompiledModelDriver):
         'break': 'EXIT',
         'exec_begin': 'PROGRAM main\n   use iso_c_binding\n   use fygg',
         'exec_end': '   stop\nEND PROGRAM main',
+        'python_init': 'call init_python_API()',
         'free': 'DEALLOCATE({variable})',
         'function_def_begin': (
             'FUNCTION {function_name}({input_var}) '

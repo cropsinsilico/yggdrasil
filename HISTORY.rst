@@ -14,6 +14,7 @@ History
 * Changed how tables are parsed such that rows in single column tables will be read as arrays unless otherwise specified via the YAML option 'transform: select_scalar'
 * Updated utility scripts and package parameters to build extension
 * Changed native string types in languages to be used for JSON string values
+* In C, C++, and Fortran, if Python objects will be sent/received the model must initialize Python via "init_python_API()" (a subroutine in Fortran). If a model is a wrapped function, this will be added automatically.
 
 TODO:
 ~~~~~

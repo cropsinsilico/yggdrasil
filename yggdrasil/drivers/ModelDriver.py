@@ -2025,10 +2025,10 @@ class ModelDriver(Driver):
         if outputs_in_inputs is None:
             outputs_in_inputs = cls.outputs_in_inputs
         assert io in ['inputs', 'outputs']
-        if ('%s_def_regex' % io) not in cls.function_param:  # pragma: debug
+        if f'{io}_def_regex' not in cls.function_param:  # pragma: debug
             raise NotImplementedError(
-                ("'%s_def_regex' not defined for "
-                 "language %s.") % (io, cls.language))
+                f"'{io}_def_regex' not defined for "
+                f"language {cls.language}.")
         if 'multiple_outputs' in cls.function_param:
             multi_re = cls.function_param['multiple_outputs']
             for x in '[]()':
@@ -2038,7 +2038,7 @@ class ModelDriver(Driver):
             if match is not None:
                 value = match.group(1)
         new_val = []
-        io_re = cls.format_function_param('%s_def_regex' % io)
+        io_re = cls.format_function_param(f'{io}_def_regex')
         for i, ivar in enumerate(cls.split_variables(value)):
             igrp = {'name': ivar}
             x = re.search(io_re, ivar)
@@ -2424,7 +2424,6 @@ class ModelDriver(Driver):
                     for v in x['vars']:
                         if k + '_var' in v:
                             v[k + '_var'] = info_map[io][v[k + '_var']]
-                            # v[k + '_var']['is_' + k + '_var'] = True
                             v[k + '_var']['is_length_var'] = True
                         else:
                             v[k + '_var'] = False
@@ -2610,6 +2609,9 @@ class ModelDriver(Driver):
                         v, definitions=definitions,
                         requires_freeing=free_vars)
             lines += definitions
+        if 'python_init' in cls.function_param:
+            # TODO: Check if python is used?
+            lines += [cls.function_param['python_init'], '']
         nline_preamble = len(lines)
         lines.append(cls.format_function_param(
             'assign', name=flag_var['name'],
@@ -2994,9 +2996,9 @@ class ModelDriver(Driver):
         elif typename in ['schema']:
             keys['use_generic'] = cls.function_param['true']
         else:  # pragma: debug
-            raise ValueError("Cannot create %s version of type '%s'"
-                             % (cls.language, typename))
-        fmt = cls.format_function_param('init_type_%s' % typename, **keys)
+            raise ValueError(f"Cannot create {cls.language} version "
+                             f"of type '{typename}'")
+        fmt = cls.format_function_param(f'init_type_{typename}', **keys)
         out.append(cls.format_function_param('assign', name=name,
                                              value=fmt))
         return out
@@ -3844,7 +3846,6 @@ class ModelDriver(Driver):
                     type_name = 'unicode'
         if (type_name == 'flag') and (type_name not in cls.type_map):
             type_name = 'boolean'
-        # TODO: Default length type?
         if ((kwargs.get('is_length_var', False)
              and 'length' in cls.type_map
              and type_name != '1darray')):
@@ -3855,7 +3856,10 @@ class ModelDriver(Driver):
                               'ndarray_pointer', 'flag']
                         for x in [json_type.get('subtype', None),
                                   json_type['type']])):
+                length = json_type.pop('length', None)
                 json_type = rapidjson.normalize(json_type, {'type': 'schema'})
+                if length is not None:
+                    json_type['length'] = length
             return cls.type_map[type_name], json_type
         return cls.type_map[type_name]
 

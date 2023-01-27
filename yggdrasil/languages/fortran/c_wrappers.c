@@ -577,4 +577,9 @@ int generic_map_set_ndarray_f(generic_t x, const char* key,
   return generic_map_set_ndarray(x, key, data, subtype, precision,
 				 ndim, (const size_t*)shape, units);
 }
+
+int init_python_API_f() {
+  return init_python_API();
+}
+
 #endif // DOXYGEN_SHOULD_SKIP_THIS
