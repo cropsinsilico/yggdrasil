@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema.datatypes.FixedMetaschemaType &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.FixedMetaschemaType &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -82,11 +83,11 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
-          <li><a href="../datatypes.html">yggdrasil.metaschema.datatypes</a> &raquo;</li>
-      <li>yggdrasil.metaschema.datatypes.FixedMetaschemaType</li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../metaschema.html">yggdrasil.metaschema</a></li>
+          <li class="breadcrumb-item"><a href="../datatypes.html">yggdrasil.metaschema.datatypes</a></li>
+      <li class="breadcrumb-item active">yggdrasil.metaschema.datatypes.FixedMetaschemaType</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -105,7 +106,7 @@
 
 <div class="viewcode-block" id="create_fixed_type_class"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FixedMetaschemaType.create_fixed_type_class">[docs]</a><span class="k">def</span> <span class="nf">create_fixed_type_class</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">fixed_properties</span><span class="p">,</span>
                             <span class="n">target_globals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">class_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a fixed class.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a fixed class.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str); Name of the fixed type.</span>
@@ -150,7 +151,7 @@
 
 
 <div class="viewcode-block" id="FixedMetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">FixedMetaschemaType</span><span class="p">(</span><span class="n">MetaschemaType</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class that should be used to alias another type, but with certain</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class that should be used to alias another type, but with certain</span>
 <span class="sd">    properties fixed.</span>
 
 <span class="sd">    Arguments:</span>
@@ -169,12 +170,12 @@
 
 <div class="viewcode-block" id="FixedMetaschemaType.base"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.base">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">base</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the type that this type is a fixed version of.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the type that this type is a fixed version of.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="FixedMetaschemaType.typedef_base2fixed"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.typedef_base2fixed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">typedef_base2fixed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Transform a type definition from the unfixed base type to the fixed</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Transform a type definition from the unfixed base type to the fixed</span>
 <span class="sd">        type alias by removing fixed properties.</span>
 
 <span class="sd">        Args:</span>
@@ -203,7 +204,7 @@
 
 <div class="viewcode-block" id="FixedMetaschemaType.typedef_fixed2base"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.typedef_fixed2base">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">typedef_fixed2base</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Transform a type definition from the fixed alias to the unfixed base by</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Transform a type definition from the fixed alias to the unfixed base by</span>
 <span class="sd">        setting the fixed properties if they are not already present.</span>
 
 <span class="sd">        Args:</span>
@@ -219,7 +220,7 @@
                 <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;type&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">base</span><span class="p">()</span><span class="o">.</span><span class="n">properties</span><span class="p">):</span>
                     <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
-                    <span class="k">assert</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">v</span><span class="p">)</span>
+                    <span class="k">assert</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">v</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">base</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>
@@ -233,7 +234,7 @@
 
 <div class="viewcode-block" id="FixedMetaschemaType.issubtype"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.issubtype">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">issubtype</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this type is a subclass of the provided type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this type is a subclass of the provided type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            t (str): Type name to check against.</span>
@@ -250,7 +251,7 @@
 
 <div class="viewcode-block" id="FixedMetaschemaType.updated_fixed_properties"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.updated_fixed_properties">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">updated_fixed_properties</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the fixed properties schema that includes information</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the fixed properties schema that includes information</span>
 <span class="sd">        from the object.</span>
 
 <span class="sd">        Args:</span>
@@ -265,7 +266,7 @@
 
 <div class="viewcode-block" id="FixedMetaschemaType.validate"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.validate">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object to check if it could be of this type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object to check if it could be of this type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to validate.</span>
@@ -331,7 +332,7 @@
 
 <div class="viewcode-block" id="FixedMetaschemaType.check_encoded"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.check_encoded">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">check_encoded</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Checks if the metadata for an encoded object matches the type</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Checks if the metadata for an encoded object matches the type</span>
 <span class="sd">        definition.</span>
 
 <span class="sd">        Args:</span>
@@ -361,7 +362,7 @@
 
 <div class="viewcode-block" id="FixedMetaschemaType.extract_typedef"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.extract_typedef">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">extract_typedef</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Extract the minimum typedef required for this type from the provided</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Extract the minimum typedef required for this type from the provided</span>
 <span class="sd">        metadata.</span>
 
 <span class="sd">        Args:</span>
@@ -376,7 +377,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="FixedMetaschemaType.update_typedef"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.update_typedef">[docs]</a>    <span class="k">def</span> <span class="nf">update_typedef</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update the current typedef with new values.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update the current typedef with new values.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: All keyword arguments are considered to be new type</span>
@@ -396,7 +397,7 @@
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_generate_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            typedef (dict): Type definition.</span>

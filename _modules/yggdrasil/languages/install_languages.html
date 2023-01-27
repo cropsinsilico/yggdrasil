@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.languages.install_languages &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.languages.install_languages &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../languages.html">yggdrasil.languages</a> &raquo;</li>
-      <li>yggdrasil.languages.install_languages</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../languages.html">yggdrasil.languages</a></li>
+      <li class="breadcrumb-item active">yggdrasil.languages.install_languages</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -109,7 +110,7 @@
 
 
 <div class="viewcode-block" id="is_path"><a class="viewcode-back" href="../../../yggdrasil.languages.html#yggdrasil.languages.install_languages.is_path">[docs]</a><span class="k">def</span> <span class="nf">is_path</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a path is valid in a case-sensitive manner.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a path is valid in a case-sensitive manner.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fpath (str): Full path to be tested.</span>
@@ -119,11 +120,11 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">pdir</span><span class="p">,</span> <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
-    <span class="k">return</span><span class="p">(</span><span class="n">base</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">pdir</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="p">(</span><span class="n">base</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">pdir</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="is_file"><a class="viewcode-back" href="../../../yggdrasil.languages.html#yggdrasil.languages.install_languages.is_file">[docs]</a><span class="k">def</span> <span class="nf">is_file</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a file is valid in a case-sensitive manner.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a file is valid in a case-sensitive manner.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fname (str): Full file path to be tested.</span>
@@ -138,7 +139,7 @@
 
 
 <div class="viewcode-block" id="is_dir"><a class="viewcode-back" href="../../../yggdrasil.languages.html#yggdrasil.languages.install_languages.is_dir">[docs]</a><span class="k">def</span> <span class="nf">is_dir</span><span class="p">(</span><span class="n">fdir</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a directory is valid in a case-sensitive manner.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a directory is valid in a case-sensitive manner.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fdir (str): Full directory path to be tested.</span>
@@ -153,7 +154,7 @@
 
 
 <div class="viewcode-block" id="get_language_directories"><a class="viewcode-back" href="../../../yggdrasil.languages.html#yggdrasil.languages.install_languages.get_language_directories">[docs]</a><span class="k">def</span> <span class="nf">get_language_directories</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get language directories.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get language directories.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        list: Language directories.</span>
@@ -172,7 +173,7 @@
 
 <div class="viewcode-block" id="import_language_install"><a class="viewcode-back" href="../../../yggdrasil.languages.html#yggdrasil.languages.install_languages.import_language_install">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
 <span class="k">def</span> <span class="nf">import_language_install</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">no_import</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Temporarily import a language installation script.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Temporarily import a language installation script.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        language (str): Name of language that installation script should be</span>
@@ -212,7 +213,7 @@
 
 <div class="viewcode-block" id="update_argparser"><a class="viewcode-back" href="../../../yggdrasil.languages.html#yggdrasil.languages.install_languages.update_argparser">[docs]</a><span class="k">def</span> <span class="nf">update_argparser</span><span class="p">(</span><span class="n">parser</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">no_import</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">from_setup</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">arglist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update argument parser with language specific arguments.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update argument parser with language specific arguments.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        parser (argparse.ArgumentParser, optional): Existing argument parser</span>
@@ -257,6 +258,8 @@
             <span class="n">language</span> <span class="o">=</span> <span class="n">get_language_directories</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">arglist</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+            <span class="n">args</span><span class="p">,</span> <span class="s1">&#39;languages&#39;</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">no_import</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">no_import</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">no_import</span>
         <span class="k">if</span> <span class="n">language</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -275,7 +278,7 @@
 
 <div class="viewcode-block" id="install_language"><a class="viewcode-back" href="../../../yggdrasil.languages.html#yggdrasil.languages.install_languages.install_language">[docs]</a><span class="k">def</span> <span class="nf">install_language</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">results</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">no_import</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">arglist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call install for a specific language.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call install for a specific language.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        language (str): Name of language that should be checked.</span>
@@ -316,7 +319,7 @@
 
 
 <div class="viewcode-block" id="install_all_languages"><a class="viewcode-back" href="../../../yggdrasil.languages.html#yggdrasil.languages.install_languages.install_all_languages">[docs]</a><span class="k">def</span> <span class="nf">install_all_languages</span><span class="p">(</span><span class="n">from_setup</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">arglist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call install.py for all languages that have one and return a dictionary</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call install.py for all languages that have one and return a dictionary</span>
 <span class="sd">    mapping from language name to the installation state (True if install was</span>
 <span class="sd">    successful, False otherwise).</span>
 

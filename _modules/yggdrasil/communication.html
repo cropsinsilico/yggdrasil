@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.communication &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -82,9 +83,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>yggdrasil.communication</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">yggdrasil.communication</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -106,7 +107,7 @@
 
 
 <span class="k">class</span> <span class="nc">TemporaryCommunicationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raised when the comm is open, but send/recv is temporarily disabled.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raised when the comm is open, but send/recv is temporarily disabled.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        msg (str): Error message.</span>
@@ -129,7 +130,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">max_consecutive_allowed</span> <span class="o">=</span> <span class="n">max_consecutive_allowed</span>
         <span class="k">if</span> <span class="n">max_consecutive_allowed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">global</span> <span class="n">_temp_error_registry</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">registry_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">registry_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="n">_temp_error_registry</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">registry_key</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">_temp_error_registry</span><span class="p">[</span><span class="n">registry_key</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="p">((</span><span class="n">_temp_error_registry</span><span class="p">[</span><span class="n">registry_key</span><span class="p">]</span>
@@ -138,23 +139,23 @@
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">registry_key</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Reset the registry for a TemporaryCommunicationError.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Reset the registry for a TemporaryCommunicationError.&quot;&quot;&quot;</span>
         <span class="k">global</span> <span class="n">_temp_error_registry</span>
         <span class="n">_temp_error_registry</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">registry_key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">NoMessages</span><span class="p">(</span><span class="n">TemporaryCommunicationError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raised when the comm is open, but there are no messages waiting.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raised when the comm is open, but there are no messages waiting.&quot;&quot;&quot;</span>
     <span class="k">pass</span>
 
 
 <span class="k">class</span> <span class="nc">FatalCommunicationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raised when the comm cannot recover.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raised when the comm cannot recover.&quot;&quot;&quot;</span>
     <span class="k">pass</span>
 
 
 <span class="k">def</span> <span class="nf">check_env_for_address</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for a channel name in a dictionary of environment variables.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for a channel name in a dictionary of environment variables.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        env (dict): Environment variables to check.</span>
@@ -177,7 +178,7 @@
 
 
 <span class="k">def</span> <span class="nf">import_comm</span><span class="p">(</span><span class="n">commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import a comm class from its component subtype.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import a comm class from its component subtype.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        commtype (str, optional): Communication class subtype. Defaults to</span>
@@ -194,7 +195,7 @@
 
 <span class="k">def</span> <span class="nf">determine_suffix</span><span class="p">(</span><span class="n">no_suffix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reverse_names</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                      <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the suffix that should be used for the comm name.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the suffix that should be used for the comm name.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        no_suffix (bool, optional): If True, the suffix will be an empty</span>
@@ -228,7 +229,7 @@
 
 
 <div class="viewcode-block" id="new_comm"><a class="viewcode-back" href="../../yggdrasil.communication.html#yggdrasil.communication.new_comm">[docs]</a><span class="k">def</span> <span class="nf">new_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_async</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a new communicator, creating necessary components for</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a new communicator, creating necessary components for</span>
 <span class="sd">    communication (queues, sockets, channels, etc.).</span>
 
 <span class="sd">    Args:</span>
@@ -246,7 +247,7 @@
 <span class="sd">        Comm: Communicator of given class.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="s1">&#39;comm&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">commtype</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">commtype</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">commtype</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -277,7 +278,7 @@
 
 
 <div class="viewcode-block" id="get_comm"><a class="viewcode-back" href="../../yggdrasil.communication.html#yggdrasil.communication.get_comm">[docs]</a><span class="k">def</span> <span class="nf">get_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return communicator for existing comm components.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return communicator for existing comm components.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): Communicator name.</span>
@@ -293,7 +294,7 @@
 
 <span class="nd">@contextmanager</span>
 <span class="k">def</span> <span class="nf">open_file_comm</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s1">&#39;binary&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Context manager to open a file comm in a way similar to how</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Context manager to open a file comm in a way similar to how</span>
 <span class="sd">    Python opens file descriptors.</span>
 
 <span class="sd">    Args:</span>
@@ -326,7 +327,7 @@
 
 
 <span class="k">def</span> <span class="nf">get_open_fds</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    return the number of open file descriptors for current process</span>
 <span class="sd">    </span>
 <span class="sd">    .. warning: will only work on UNIX-like os-es.</span>

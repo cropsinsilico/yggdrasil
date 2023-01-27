@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema.datatypes.PlyMetaschemaType &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.PlyMetaschemaType &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -82,11 +83,11 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
-          <li><a href="../datatypes.html">yggdrasil.metaschema.datatypes</a> &raquo;</li>
-      <li>yggdrasil.metaschema.datatypes.PlyMetaschemaType</li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../metaschema.html">yggdrasil.metaschema</a></li>
+          <li class="breadcrumb-item"><a href="../datatypes.html">yggdrasil.metaschema.datatypes</a></li>
+      <li class="breadcrumb-item active">yggdrasil.metaschema.datatypes.PlyMetaschemaType</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -140,7 +141,7 @@
 
 
 <div class="viewcode-block" id="create_schema"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.create_schema">[docs]</a><span class="k">def</span> <span class="nf">create_schema</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Creates a file containing the Ply schema.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Creates a file containing the Ply schema.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        overwrite (bool, optional): If True and a file already exists, the</span>
@@ -235,7 +236,7 @@
 
 
 <div class="viewcode-block" id="get_schema"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.get_schema">[docs]</a><span class="k">def</span> <span class="nf">get_schema</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the Ply schema, initializing it if necessary.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the Ply schema, initializing it if necessary.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Ply schema.</span>
@@ -253,7 +254,7 @@
     
 
 <div class="viewcode-block" id="translate_ply2fmt"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.translate_ply2fmt">[docs]</a><span class="k">def</span> <span class="nf">translate_ply2fmt</span><span class="p">(</span><span class="n">type_ply</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the corresponding type string for a Ply type string.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the corresponding type string for a Ply type string.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        type_ply (str): Ply type string.</span>
@@ -272,7 +273,7 @@
 
 
 <div class="viewcode-block" id="translate_ply2py"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.translate_ply2py">[docs]</a><span class="k">def</span> <span class="nf">translate_ply2py</span><span class="p">(</span><span class="n">type_ply</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the corresponding Python type for the Ply type string.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the corresponding Python type for the Ply type string.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        type_ply (str): Ply type string.</span>
@@ -290,7 +291,7 @@
 
 
 <div class="viewcode-block" id="translate_py2ply"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.translate_py2ply">[docs]</a><span class="k">def</span> <span class="nf">translate_py2ply</span><span class="p">(</span><span class="n">py_obj</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the correpsonding Ply type string for the provided Python object.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the correpsonding Ply type string for the provided Python object.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        py_obj (object): Python object.</span>
@@ -310,7 +311,7 @@
 
 
 <div class="viewcode-block" id="singular2plural"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.singular2plural">[docs]</a><span class="k">def</span> <span class="nf">singular2plural</span><span class="p">(</span><span class="n">e_sing</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the plural version of a singular element name. If the singular</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the plural version of a singular element name. If the singular</span>
 <span class="sd">    version ends with the suffix &#39;ex&#39; it is replaced with the plural suffix</span>
 <span class="sd">    &#39;ices&#39;. Otherwise, an &#39;s&#39; is appended to the singular name to make it</span>
 <span class="sd">    plural.</span>
@@ -331,7 +332,7 @@
 
 
 <div class="viewcode-block" id="plural2singular"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.plural2singular">[docs]</a><span class="k">def</span> <span class="nf">plural2singular</span><span class="p">(</span><span class="n">e_plur</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the singular version of a plural element name. If the plural version</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the singular version of a plural element name. If the plural version</span>
 <span class="sd">    ends with the suffix &#39;ices&#39;, it is replaced with the singular suffix &#39;ex&#39;.</span>
 <span class="sd">    If the plural version ends with an &#39;s&#39;, it is removed.</span>
 
@@ -356,7 +357,7 @@
 
 
 <div class="viewcode-block" id="PlyDict"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict">[docs]</a><span class="k">class</span> <span class="nc">PlyDict</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Enhanced dictionary class for storing Ply information.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Enhanced dictionary class for storing Ply information.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">PlyDict</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -365,56 +366,56 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_type_class</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PlyDict.convert_arrays"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict.convert_arrays">[docs]</a>    <span class="k">def</span> <span class="nf">convert_arrays</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check fields and convert arrays to nested structures.&quot;&quot;&quot;</span></div>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check fields and convert arrays to nested structures.&quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="PlyDict.from_dict"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">in_dict</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the object from a dictionary.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the object from a dictionary.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">in_dict</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="PlyDict.as_dict"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict.as_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the object as a pure dictionary.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the object as a pure dictionary.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="PlyDict.from_array_dict"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict.from_array_dict">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_array_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">in_dict</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the object from a dictionary of arrays.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the object from a dictionary of arrays.&quot;&quot;&quot;</span>
         <span class="n">kws</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;material&#39;</span><span class="p">,</span> <span class="s1">&#39;vertices&#39;</span><span class="p">,</span> <span class="s1">&#39;edges&#39;</span><span class="p">,</span> <span class="s1">&#39;faces&#39;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">in_dict</span><span class="p">:</span>
                 <span class="n">kws</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">in_dict</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kws</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;vertices&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">old_vert</span> <span class="o">=</span> <span class="n">kws</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;vertices&#39;</span><span class="p">)</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">old_vert</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">old_vert</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span>
             <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">old_vert</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="s1">&#39;xyz&#39;</span><span class="p">)}</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">old_vert</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;vertex_colors&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">old_colr</span> <span class="o">=</span> <span class="n">in_dict</span><span class="p">[</span><span class="s1">&#39;vertex_colors&#39;</span><span class="p">]</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">old_colr</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kws</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]),</span> <span class="mi">3</span><span class="p">))</span>
+            <span class="k">assert</span> <span class="n">old_colr</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kws</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]),</span> <span class="mi">3</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">old_colr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                 <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">]):</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">old_colr</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]):</span>
                         <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">old_colr</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kws</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;edges&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">old_edge</span> <span class="o">=</span> <span class="n">kws</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;edges&#39;</span><span class="p">)</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">old_edge</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">old_edge</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span>
             <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;edges&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">old_edge</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span>
                  <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s1">&#39;vertex1&#39;</span><span class="p">,</span> <span class="s1">&#39;vertex2&#39;</span><span class="p">])}</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">old_edge</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;edge_colors&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">old_colr</span> <span class="o">=</span> <span class="n">in_dict</span><span class="p">[</span><span class="s1">&#39;edge_colors&#39;</span><span class="p">]</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">old_colr</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kws</span><span class="p">[</span><span class="s1">&#39;edges&#39;</span><span class="p">]),</span> <span class="mi">3</span><span class="p">))</span>
+            <span class="k">assert</span> <span class="n">old_colr</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kws</span><span class="p">[</span><span class="s1">&#39;edges&#39;</span><span class="p">]),</span> <span class="mi">3</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">old_colr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                 <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">]):</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">old_colr</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]):</span>
                         <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;edges&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">old_colr</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kws</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;faces&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">old_face</span> <span class="o">=</span> <span class="n">kws</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;faces&#39;</span><span class="p">)</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">old_face</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">old_face</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">3</span>
             <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="p">[</span>
                     <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">old_face</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span>
@@ -423,7 +424,7 @@
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">old_face</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;face_colors&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">old_colr</span> <span class="o">=</span> <span class="n">in_dict</span><span class="p">[</span><span class="s1">&#39;face_colors&#39;</span><span class="p">]</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">old_colr</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kws</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]),</span> <span class="mi">3</span><span class="p">))</span>
+            <span class="k">assert</span> <span class="n">old_colr</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kws</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]),</span> <span class="mi">3</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">old_colr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                 <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">]):</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">old_colr</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]):</span>
@@ -431,7 +432,7 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">kws</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PlyDict.as_array_dict"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict.as_array_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_array_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the object as a dictionary of arrays.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the object as a dictionary of arrays.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;material&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;material&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;material&#39;</span><span class="p">]</span>
@@ -474,7 +475,7 @@
 
 <div class="viewcode-block" id="PlyDict.from_trimesh"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict.from_trimesh">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_trimesh</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">in_mesh</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the object from a trimesh class.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the object from a trimesh class.&quot;&quot;&quot;</span>
         <span class="n">kws</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">vertices</span><span class="o">=</span><span class="n">in_mesh</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span>
                    <span class="n">vertex_colors</span><span class="o">=</span><span class="n">in_mesh</span><span class="o">.</span><span class="n">visual</span><span class="o">.</span><span class="n">vertex_colors</span><span class="p">,</span>
                    <span class="n">faces</span><span class="o">=</span><span class="n">in_mesh</span><span class="o">.</span><span class="n">faces</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int32&#39;</span><span class="p">))</span>
@@ -482,7 +483,7 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_array_dict</span><span class="p">(</span><span class="n">kws</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PlyDict.as_trimesh"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict.as_trimesh">[docs]</a>    <span class="k">def</span> <span class="nf">as_trimesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the object as a trimesh class.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the object as a trimesh class.&quot;&quot;&quot;</span>
         <span class="n">kws0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_array_dict</span><span class="p">()</span>
         <span class="n">kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="n">kws0</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;vertices&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
                <span class="s1">&#39;vertex_colors&#39;</span><span class="p">:</span> <span class="n">kws0</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;vertex_colors&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
@@ -491,7 +492,7 @@
         <span class="k">return</span> <span class="n">trimesh</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">Trimesh</span><span class="p">(</span><span class="o">**</span><span class="n">kws</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="PlyDict.count_elements"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict.count_elements">[docs]</a>    <span class="k">def</span> <span class="nf">count_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element_name</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the count of a certain element in the dictionary.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the count of a certain element in the dictionary.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            element_name (str): Name of the element to count.</span>
@@ -509,17 +510,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nvert</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of vertices.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of vertices.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_elements</span><span class="p">(</span><span class="s1">&#39;vertices&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nface</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of faces.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of faces.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_elements</span><span class="p">(</span><span class="s1">&#39;faces&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Mins/maxs of vertices in each dimension.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Mins/maxs of vertices in each dimension.&quot;&quot;&quot;</span>
         <span class="n">mins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;float64&#39;</span><span class="p">)</span>
         <span class="n">maxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;float64&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="s1">&#39;xyz&#39;</span><span class="p">):</span>
@@ -529,7 +530,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Vertices for each face in the structure.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Vertices for each face in the structure.&quot;&quot;&quot;</span>
         <span class="n">mesh</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">count_elements</span><span class="p">(</span><span class="s1">&#39;faces&#39;</span><span class="p">)):</span>
             <span class="n">imesh</span> <span class="o">=</span> <span class="p">[]</span>
@@ -541,7 +542,7 @@
 
 <div class="viewcode-block" id="PlyDict.from_shape"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict.from_shape">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_shape</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">_as_obj</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a ply dictionary from a PlantGL shape and descritizer.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a ply dictionary from a PlantGL shape and descritizer.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            scene (openalea.plantgl.scene): Scene that should be descritized.</span>
@@ -589,7 +590,7 @@
 
 <div class="viewcode-block" id="PlyDict.from_scene"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict.from_scene">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_scene</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">scene</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a ply dictionary from a PlantGL scene and descritizer.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a ply dictionary from a PlantGL scene and descritizer.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            scene (openalea.plantgl.scene): Scene that should be descritized.</span>
@@ -613,7 +614,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="PlyDict.to_scene"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict.to_scene">[docs]</a>    <span class="k">def</span> <span class="nf">to_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a PlantGL scene from a Ply dictionary.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a PlantGL scene from a Ply dictionary.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            conversion (float, optional): Conversion factor that should be</span>
@@ -642,7 +643,7 @@
         <span class="k">return</span> <span class="n">scn</span></div>
 
 <div class="viewcode-block" id="PlyDict.to_geom_args"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict.to_geom_args">[docs]</a>    <span class="k">def</span> <span class="nf">to_geom_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_as_obj</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get arguments for creating a PlantGL geometry.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get arguments for creating a PlantGL geometry.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            conversion (float, optional): Conversion factor that should be</span>
@@ -695,7 +696,7 @@
         <span class="k">return</span> <span class="n">smb_class</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span></div>
 
 <div class="viewcode-block" id="PlyDict.append"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solf</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append new ply information to this dictionary.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append new ply information to this dictionary.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            solf (PlyDict): Another ply to append to this one.</span>
@@ -721,7 +722,7 @@
                 <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;edges&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iedge</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PlyDict.merge"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict.merge">[docs]</a>    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ply_list</span><span class="p">,</span> <span class="n">no_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Merge a list of ply dictionaries.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Merge a list of ply dictionaries.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            ply_list (list): Ply dictionaries.</span>
@@ -747,7 +748,7 @@
 <div class="viewcode-block" id="PlyDict.apply_scalar_map"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict.apply_scalar_map">[docs]</a>    <span class="k">def</span> <span class="nf">apply_scalar_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar_arr</span><span class="p">,</span> <span class="n">color_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                          <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
                          <span class="n">scale_by_area</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">_as_obj</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the color of faces in a 3D object based on a scalar map.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the color of faces in a 3D object based on a scalar map.</span>
 <span class="sd">        This creates a copy unless no_copy is True.</span>
 
 <span class="sd">        Args:</span>
@@ -841,7 +842,7 @@
 
 
 <div class="viewcode-block" id="get_key_order"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.get_key_order">[docs]</a><span class="k">def</span> <span class="nf">get_key_order</span><span class="p">(</span><span class="n">all_keys</span><span class="p">,</span> <span class="n">default_order</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the order of keys based on the keys and default order. Keys</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the order of keys based on the keys and default order. Keys</span>
 <span class="sd">    are added first in the default order and then alphabetically.</span>
 
 <span class="sd">    Args:</span>
@@ -875,7 +876,7 @@
 <span class="c1"># but is set to JSONObjectMetaschemaType here for transparancy since this is</span>
 <span class="c1"># what the base class is determined to be on loading the schema</span>
 <div class="viewcode-block" id="PlyMetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">PlyMetaschemaType</span><span class="p">(</span><span class="n">JSONObjectMetaschemaType</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Ply 3D structure map.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Ply 3D structure map.&quot;&quot;&quot;</span>
 
     <span class="n">_empty_msg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="p">[]}</span>
     <span class="n">python_types</span> <span class="o">=</span> <span class="n">python_types</span>
@@ -886,7 +887,7 @@
     <span class="k">def</span> <span class="nf">encode_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">,</span> <span class="n">element_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">property_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">default_rgb</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">comments</span><span class="o">=</span><span class="p">[],</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span>
                     <span class="n">plyformat</span><span class="o">=</span><span class="s1">&#39;ascii 1.0&#39;</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s data.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s data.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to encode.</span>
@@ -929,7 +930,7 @@
             <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">element_order</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">e</span> <span class="o">==</span> <span class="s1">&#39;material&#39;</span><span class="p">:</span>
                     <span class="k">continue</span>
-                <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">e</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)))</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">e</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">e</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="n">property_order</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_key_order</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">e</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
@@ -940,7 +941,7 @@
         <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">element_order</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">e</span> <span class="o">==</span> <span class="s1">&#39;material&#39;</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">e</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)))</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">e</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span>
             <span class="n">type_map</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="n">size_map</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">e</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">size_map</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -990,7 +991,7 @@
         
 <div class="viewcode-block" id="PlyMetaschemaType.encode_data_readable"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyMetaschemaType.encode_data_readable">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">encode_data_readable</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s data in a readable format.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s data in a readable format.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to encode.</span>
@@ -1005,7 +1006,7 @@
     
 <div class="viewcode-block" id="PlyMetaschemaType.decode_data"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyMetaschemaType.decode_data">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">decode_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode an object.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode an object.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (string): Encoded object to decode.</span>
@@ -1078,7 +1079,7 @@
                         <span class="n">prop_type</span> <span class="o">=</span> <span class="n">translate_ply2py</span><span class="p">(</span><span class="n">type_map</span><span class="p">[</span><span class="n">e</span><span class="p">][</span><span class="n">p</span><span class="p">])</span>
                         <span class="n">new</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">prop_type</span><span class="p">(</span><span class="nb">vars</span><span class="p">[</span><span class="n">iv</span><span class="p">])</span>
                         <span class="n">iv</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">assert</span><span class="p">(</span><span class="n">iv</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">vars</span><span class="p">))</span>
+                <span class="k">assert</span> <span class="n">iv</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">vars</span><span class="p">)</span>
                 <span class="n">obj</span><span class="p">[</span><span class="n">e</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
                 <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="c1"># Check that all properties filled in</span>
@@ -1086,13 +1087,13 @@
             <span class="k">if</span> <span class="n">e</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;property_order&#39;</span><span class="p">]:</span>
                 <span class="k">continue</span>
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;property_order&#39;</span><span class="p">][</span><span class="n">e</span><span class="p">]:</span>
-                <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">e</span><span class="p">])</span> <span class="o">==</span> <span class="n">size_map</span><span class="p">[</span><span class="n">e</span><span class="p">])</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">e</span><span class="p">])</span> <span class="o">==</span> <span class="n">size_map</span><span class="p">[</span><span class="n">e</span><span class="p">]</span>
         <span class="c1"># Return</span>
         <span class="k">return</span> <span class="n">PlyDict</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PlyMetaschemaType.coerce_type"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyMetaschemaType.coerce_type">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">coerce_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Coerce objects of specific types to match the data type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Coerce objects of specific types to match the data type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to be coerced.</span>
@@ -1112,7 +1113,7 @@
         
 <div class="viewcode-block" id="PlyMetaschemaType.updated_fixed_properties"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyMetaschemaType.updated_fixed_properties">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">updated_fixed_properties</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the fixed properties schema that includes information</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the fixed properties schema that includes information</span>
 <span class="sd">        from the object.</span>
 
 <span class="sd">        Args:</span>
@@ -1136,7 +1137,7 @@
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_generate_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            typedef (dict): Type definition.</span>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.transforms.TransformBase &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.communication.transforms.TransformBase &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../../communication.html">yggdrasil.communication</a> &raquo;</li>
-      <li>yggdrasil.communication.transforms.TransformBase</li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../communication.html">yggdrasil.communication</a></li>
+      <li class="breadcrumb-item active">yggdrasil.communication.transforms.TransformBase</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -101,7 +102,7 @@
 
 
 <div class="viewcode-block" id="TransformBase"><a class="viewcode-back" href="../../../../yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.TransformBase.TransformBase">[docs]</a><span class="k">class</span> <span class="nc">TransformBase</span><span class="p">(</span><span class="n">ComponentBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for message transforms.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for message transforms.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        original_datatype (dict, optional): Datatype associated with expected</span>
@@ -122,7 +123,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">set_original_datatype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_datatype</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TransformBase.set_original_datatype"><a class="viewcode-back" href="../../../../yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.TransformBase.TransformBase.set_original_datatype">[docs]</a>    <span class="k">def</span> <span class="nf">set_original_datatype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datatype</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set datatype.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set datatype.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            datatype (dict): Datatype.</span>
@@ -133,7 +134,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">transformed_datatype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_datatype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_datatype</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TransformBase.validate_datatype"><a class="viewcode-back" href="../../../../yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.TransformBase.TransformBase.validate_datatype">[docs]</a>    <span class="k">def</span> <span class="nf">validate_datatype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datatype</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that the provided datatype is valid for this transformation.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that the provided datatype is valid for this transformation.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            datatype (dict): Datatype to validate.</span>
@@ -145,7 +146,7 @@
         <span class="k">pass</span></div>
         
 <div class="viewcode-block" id="TransformBase.transform_datatype"><a class="viewcode-back" href="../../../../yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.TransformBase.TransformBase.transform_datatype">[docs]</a>    <span class="k">def</span> <span class="nf">transform_datatype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datatype</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the datatype that will result from applying the transform</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the datatype that will result from applying the transform</span>
 <span class="sd">        to the supplied datatype.</span>
 
 <span class="sd">        Args:</span>
@@ -169,7 +170,7 @@
             <span class="k">return</span> <span class="n">datatype</span></div>
 
 <div class="viewcode-block" id="TransformBase.evaluate_transform"><a class="viewcode-back" href="../../../../yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.TransformBase.TransformBase.evaluate_transform">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">no_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call transform on the provided message.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call transform on the provided message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x (object): Message object to transform.</span>
@@ -184,7 +185,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># pragma: debug</span></div>
 
 <div class="viewcode-block" id="TransformBase.__call__"><a class="viewcode-back" href="../../../../yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.TransformBase.TransformBase.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">no_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_init</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call transform on the provided message.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call transform on the provided message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x (object): Message object to transform.</span>

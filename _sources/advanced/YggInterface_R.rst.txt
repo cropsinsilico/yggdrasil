@@ -26,21 +26,21 @@ Arguments
 +===============================+======================================+
 | ``type``                      | The name of the Python interface     |
 |                               | that should be called                |
-|                               | (e.g. `YggInput <interface_py.html#y |
-|                               | ggdrasil.languages.Python.YggInterfa |
-|                               | ce.YggInput>`__,                     |
-|                               | `YggOutput <interface_py.html#yggdra |
-|                               | sil.languages.Python.YggInterface.Yg |
-|                               | gOutput>`__,                         |
-|                               | `YggRpcClient <interface_py.html#ygg |
-|                               | drasil.languages.Python.YggInterface |
-|                               | .YggRpcClient>`__,                   |
-|                               | `YggRpcServer <interface_py.html#ygg |
-|                               | drasil.languages.Python.YggInterface |
-|                               | .YggRpcServer>`__,                   |
-|                               | `YggTimesync <interface_py.html#yggd |
-|                               | rasil.languages.Python.YggInterface. |
-|                               | YggTimesync>`__)                     |
+|                               | (e.g. `YggInput                      |
+|                               | <interface_py.html#yggdrasil.languag |
+|                               | es.Python.YggInterface.YggInput>`__, |
+|                               | `YggOutput <                         |
+|                               | interface_py.html#yggdrasil.language |
+|                               | s.Python.YggInterface.YggOutput>`__, |
+|                               | `YggRpcClient <int                   |
+|                               | erface_py.html#yggdrasil.languages.P |
+|                               | ython.YggInterface.YggRpcClient>`__, |
+|                               | `YggRpcServer <int                   |
+|                               | erface_py.html#yggdrasil.languages.P |
+|                               | ython.YggInterface.YggRpcServer>`__, |
+|                               | `YggTimesync <in                     |
+|                               | terface_py.html#yggdrasil.languages. |
+|                               | Python.YggInterface.YggTimesync>`__) |
 +-------------------------------+--------------------------------------+
 | ``...``                       | Additional parameters will be passed |
 |                               | to the Python interface function.    |

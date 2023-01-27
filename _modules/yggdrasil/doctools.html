@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.doctools &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.doctools &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -82,9 +83,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>yggdrasil.doctools</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">yggdrasil.doctools</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -101,7 +102,7 @@
 
 <div class="viewcode-block" id="write_table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.write_table">[docs]</a><span class="k">def</span> <span class="nf">write_table</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fname_base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fname_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table to a file.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table to a file.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fname (str, optional): Name of the file where the table should be written.</span>
@@ -142,7 +143,7 @@
 
 
 <div class="viewcode-block" id="write_comm_devnotes_table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.write_comm_devnotes_table">[docs]</a><span class="k">def</span> <span class="nf">write_comm_devnotes_table</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table containing development notes for the registered comms.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table containing development notes for the registered comms.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        **kwargs: Additional keyword arguments are passed to dict2table and</span>
@@ -175,7 +176,7 @@
 
 
 <div class="viewcode-block" id="write_datatype_mapping_table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.write_datatype_mapping_table">[docs]</a><span class="k">def</span> <span class="nf">write_datatype_mapping_table</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table containing mapping of datatypes between different</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table containing mapping of datatypes between different</span>
 <span class="sd">    languages.</span>
 
 <span class="sd">    Args:</span>
@@ -220,7 +221,7 @@
     
 
 <div class="viewcode-block" id="write_interface_mapping_table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.write_interface_mapping_table">[docs]</a><span class="k">def</span> <span class="nf">write_interface_mapping_table</span><span class="p">(</span><span class="n">split_table_for_notebook</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table containing mapping of datatypes between different</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table containing mapping of datatypes between different</span>
 <span class="sd">    languages.</span>
 
 <span class="sd">    Args:</span>
@@ -277,7 +278,7 @@
     
 
 <div class="viewcode-block" id="write_datatype_table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.write_datatype_table">[docs]</a><span class="k">def</span> <span class="nf">write_datatype_table</span><span class="p">(</span><span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table containing entries from the descriptions of datatypes.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table containing entries from the descriptions of datatypes.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        table_type (str, optional): Type of table that should be created for the</span>
@@ -303,7 +304,7 @@
     <span class="k">if</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">fname_base</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname_base&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">((</span><span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fname_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fname_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">table_type_list</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">write_datatype_table</span><span class="p">(</span><span class="n">table_type</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
@@ -337,7 +338,7 @@
     
 
 <div class="viewcode-block" id="write_classdocs_table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.write_classdocs_table">[docs]</a><span class="k">def</span> <span class="nf">write_classdocs_table</span><span class="p">(</span><span class="n">class_</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table containing entries from a section in a class&#39;s</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table containing entries from a section in a class&#39;s</span>
 <span class="sd">    documentation.</span>
 
 <span class="sd">    Args:</span>
@@ -367,7 +368,7 @@
     <span class="k">if</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">fname_base</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname_base&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">((</span><span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fname_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fname_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">table_type_list</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">write_classdocs_table</span><span class="p">(</span><span class="n">class_</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
@@ -396,7 +397,7 @@
 
 
 <div class="viewcode-block" id="write_component_table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.write_component_table">[docs]</a><span class="k">def</span> <span class="nf">write_component_table</span><span class="p">(</span><span class="n">comp</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a component table to a file.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a component table to a file.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        comp (str): Name of a component type to create a table for. Defaults to</span>
@@ -426,7 +427,7 @@
     <span class="k">if</span> <span class="n">comp</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">fname_base</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname_base&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">((</span><span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fname_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fname_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">new_out</span> <span class="o">=</span> <span class="n">write_component_table</span><span class="p">(</span><span class="n">comp</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="n">table_type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -438,7 +439,7 @@
     <span class="k">if</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">fname_base</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname_base&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">((</span><span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fname_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fname_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">table_type_list</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">write_component_table</span><span class="p">(</span><span class="n">comp</span><span class="o">=</span><span class="n">comp</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
@@ -454,7 +455,7 @@
 
 <div class="viewcode-block" id="component2table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.component2table">[docs]</a><span class="k">def</span> <span class="nf">component2table</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">table_type</span><span class="p">,</span> <span class="n">include_required</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">subtype_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a table describing a component.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a table describing a component.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        comp (str): Name of a component type to create a table for.</span>
@@ -553,7 +554,7 @@
                <span class="n">sort_on_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sort_required_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                <span class="n">last_column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prune_empty_columns</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                <span class="n">style</span><span class="o">=</span><span class="s1">&#39;simple&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a dictionary to a table.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a dictionary to a table.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        args (dict): Dictionary of entries for the table. The keys will go in</span>
@@ -764,7 +765,7 @@
 
 
 <div class="viewcode-block" id="get_docs_section"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.get_docs_section">[docs]</a><span class="k">def</span> <span class="nf">get_docs_section</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Args:&#39;</span><span class="p">,</span> <span class="s1">&#39;Arguments:&#39;</span><span class="p">],</span> <span class="n">join_lines</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get contents of a particular sections in a docstring.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get contents of a particular sections in a docstring.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        docs (str): Docstring that should be parsed.</span>
@@ -802,7 +803,7 @@
     
 
 <div class="viewcode-block" id="docs2args"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.docs2args">[docs]</a><span class="k">def</span> <span class="nf">docs2args</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Args:&#39;</span><span class="p">,</span> <span class="s1">&#39;Arguments:&#39;</span><span class="p">]):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a dictionary of arguments and argument descriptions from a docstring.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a dictionary of arguments and argument descriptions from a docstring.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        docs (str): Docstring that should be parsed.</span>
@@ -832,7 +833,7 @@
 
 
 <div class="viewcode-block" id="document_cli"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.document_cli">[docs]</a><span class="k">def</span> <span class="nf">document_cli</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">headline_char</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get documentation for all yggdrasil command line interfaces.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get documentation for all yggdrasil command line interfaces.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fname (str): Path to file where CLI documentation should be saved.</span>
@@ -880,7 +881,7 @@
 
 <div class="viewcode-block" id="document_cli_subcommand"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.document_cli_subcommand">[docs]</a><span class="k">def</span> <span class="nf">document_cli_subcommand</span><span class="p">(</span><span class="n">prog</span><span class="p">,</span> <span class="n">sub</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dummy_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                             <span class="n">headline_char</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">dummy_def</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get documentation for a command line interface.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get documentation for a command line interface.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        prog (str): Program that calls the subcommand class.</span>
@@ -912,7 +913,7 @@
                 <span class="sa">f</span><span class="s2">&quot;   :func: </span><span class="si">{</span><span class="n">sub</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.get_parser&quot;</span><span class="p">,</span>
             <span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">dummy_def</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">dummy_def</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="n">dummy_def</span> <span class="o">+=</span> <span class="p">[</span>
                 <span class="sa">f</span><span class="s2">&quot;def </span><span class="si">{</span><span class="n">prog</span><span class="si">}</span><span class="s2">():&quot;</span><span class="p">,</span>
                 <span class="sa">f</span><span class="s2">&quot;    from </span><span class="si">{</span><span class="n">sub</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s2"> import </span><span class="si">{</span><span class="n">sub</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>

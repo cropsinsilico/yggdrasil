@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.NetCDFFileComm &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.communication.NetCDFFileComm &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../communication.html">yggdrasil.communication</a> &raquo;</li>
-      <li>yggdrasil.communication.NetCDFFileComm</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../communication.html">yggdrasil.communication</a></li>
+      <li class="breadcrumb-item active">yggdrasil.communication.NetCDFFileComm</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -106,7 +107,7 @@
 
 
 <div class="viewcode-block" id="NetCDFFileComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm">[docs]</a><span class="k">class</span> <span class="nc">NetCDFFileComm</span><span class="p">(</span><span class="n">FileComm</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O from/to an netCDF file.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O from/to an netCDF file.</span>
 
 
 <span class="sd">    Args:</span>
@@ -139,7 +140,7 @@
 
 <div class="viewcode-block" id="NetCDFFileComm.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Dictionary of variables to use for testing. Key/value pairs:</span>
@@ -202,17 +203,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">concats_as_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if concatenating file contents result in a</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if concatenating file contents result in a</span>
 <span class="sd">        valid file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="NetCDFFileComm.serialize"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Don&#39;t serialize for netCDF since using a serializer</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Don&#39;t serialize for netCDF since using a serializer</span>
 <span class="sd">        is inefficient.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">obj</span></div>
 
 <div class="viewcode-block" id="NetCDFFileComm.deserialize"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Don&#39;t deserialize for netCDF since using a serializer</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Don&#39;t deserialize for netCDF since using a serializer</span>
 <span class="sd">        is inefficient.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">msg</span><span class="p">,</span> <span class="p">{}</span></div>
 
@@ -264,18 +265,18 @@
     <span class="c1"># Methods related to position in the file/series</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">file_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Current size of file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Current size of file.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_address</span><span class="p">):</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_address</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span>
         <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="NetCDFFileComm.file_tell"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.file_tell">[docs]</a>    <span class="k">def</span> <span class="nf">file_tell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Current position in the file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Current position in the file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span></div>
     
 <div class="viewcode-block" id="NetCDFFileComm.file_seek"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.file_seek">[docs]</a>    <span class="k">def</span> <span class="nf">file_seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">whence</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Move in the file to the specified position.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Move in the file to the specified position.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            pos (int): Position (in bytes) to move file to.</span>
@@ -294,7 +295,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_size</span></div>
         
 <div class="viewcode-block" id="NetCDFFileComm.file_flush"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.file_flush">[docs]</a>    <span class="k">def</span> <span class="nf">file_flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Flush the file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Flush the file.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">NetCDFFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">file_flush</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
@@ -326,7 +327,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">file_seek</span><span class="p">(</span><span class="n">prev_pos</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_file_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
                 <span class="n">dims</span> <span class="o">=</span> <span class="p">[]</span>
@@ -349,7 +350,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">remaining_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Remaining bytes in the file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Remaining bytes in the file.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_file_refresh</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">NetCDFFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">remaining_bytes</span>

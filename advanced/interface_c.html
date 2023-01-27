@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>C Interface &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>C Interface &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -31,7 +32,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -103,10 +104,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="index.html">Advanced</a> &raquo;</li>
-          <li><a href="model_interface.html">Model Interface</a> &raquo;</li>
-      <li>C Interface</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Advanced</a></li>
+          <li class="breadcrumb-item"><a href="model_interface.html">Model Interface</a></li>
+      <li class="breadcrumb-item active">C Interface</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/advanced/interface_c.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -153,16 +154,12 @@
 <li><p>One-time: Create output channel with format specifier. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggOutput_t</span> <span class="n">output_channel</span> <span class="o">=</span> <span class="n">yggOutputFmt</span><span class="p">(</span><span class="s2">&quot;out_name&quot;</span><span class="p">,</span> <span class="s2">&quot;a=</span><span class="si">%d</span><span class="s2">, b=</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Send</span><span class="p">:</span>
+</p></li>
+<li><p>Send: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">output_channel</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">output_channel</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">3.</span> <span class="n">Free</span><span class="p">:</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ygg_free</span><span class="p">(</span><span class="o">&amp;</span><span class="n">output_channel</span><span class="p">);</span>
+</p></li>
+<li><p>Free: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ygg_free</span><span class="p">(</span><span class="o">&amp;</span><span class="n">output_channel</span><span class="p">);</span>
 </pre></div>
 </div>
 </p></li>
@@ -172,16 +169,12 @@
 <li><p>One-time: Create output channel with format specifier. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggInput_t</span> <span class="n">input_channel</span> <span class="o">=</span> <span class="n">yggInput</span><span class="p">(</span><span class="s2">&quot;in_name&quot;</span><span class="p">,</span> <span class="s2">&quot;a=</span><span class="si">%d</span><span class="s2">, b=</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Prepare</span><span class="p">:</span> <span class="n">Allocate</span> <span class="n">space</span> <span class="k">for</span> <span class="n">recovered</span> <span class="n">variables</span><span class="o">.</span>
+</p></li>
+<li><p>Prepare: Allocate space for recovered variables. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">;</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">;</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">3.</span> <span class="n">Receive</span><span class="p">:</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">input_channel</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">);</span>
+</p></li>
+<li><p>Receive: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">input_channel</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">);</span>
 </pre></div>
 </div>
 </p></li>
@@ -244,29 +237,21 @@
 <li><p>One-time: Create server channels with format specifiers for input and output. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggRpc_t</span> <span class="n">srv</span> <span class="o">=</span> <span class="n">yggRpcServer</span><span class="p">(</span><span class="s2">&quot;srv_name&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Prepare</span><span class="p">:</span> <span class="n">Allocate</span> <span class="n">space</span> <span class="k">for</span> <span class="n">recovered</span> <span class="n">variables</span> <span class="kn">from</span> <span class="nn">request.</span>
+</p></li>
+<li><p>Prepare: Allocate space for recovered variables from request. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">a</span><span class="p">;</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">a</span><span class="p">;</span>
+</p></li>
+<li><p>Receive request: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">rpcRecv</span><span class="p">(</span><span class="n">srv</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">);</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">3.</span> <span class="n">Receive</span> <span class="n">request</span><span class="p">:</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">rpcRecv</span><span class="p">(</span><span class="n">srv</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">);</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">4.</span> <span class="n">Process</span><span class="p">:</span> <span class="n">Do</span> <span class="n">tasks</span> <span class="n">the</span> <span class="n">server</span> <span class="n">should</span> <span class="n">do</span> <span class="k">with</span> <span class="nb">input</span> <span class="n">to</span> <span class="n">produce</span> <span class="n">output</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="nb">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">;</span>
+</p></li>
+<li><p>Process: Do tasks the server should do with input to produce output. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="nb">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">;</span>
 <span class="nb">int</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">3</span><span class="o">*</span><span class="n">a</span><span class="p">;</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">5.</span> <span class="n">Send</span> <span class="n">response</span><span class="p">:</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ret</span> <span class="o">=</span> <span class="n">rpcSend</span><span class="p">(</span><span class="n">srv</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">);</span>
+</p></li>
+<li><p>Send response: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ret</span> <span class="o">=</span> <span class="n">rpcSend</span><span class="p">(</span><span class="n">srv</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">);</span>
 </pre></div>
 </div>
 </p></li>
@@ -276,16 +261,12 @@
 <li><p>One-time: Create client channels to desired server with format specifiers for output and input (should be the same arguments as for the server except for name). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggRpc_t</span> <span class="n">cli</span> <span class="o">=</span> <span class="n">yggRpcClient</span><span class="p">(</span><span class="s2">&quot;cli_name&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">);</span> 
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Prepare</span><span class="p">:</span> <span class="n">Allocate</span> <span class="n">space</span> <span class="k">for</span> <span class="n">recovered</span> <span class="n">variables</span> <span class="kn">from</span> <span class="nn">response.</span>
+</p></li>
+<li><p>Prepare: Allocate space for recovered variables from response. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">;</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">;</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">3.</span> <span class="n">Call</span> <span class="n">server</span><span class="p">:</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">rpcCall</span><span class="p">(</span><span class="n">cli</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">);</span>
+</p></li>
+<li><p>Call server: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">rpcCall</span><span class="p">(</span><span class="n">cli</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">);</span>
 </pre></div>
 </div>
 </p></li>
@@ -420,27 +401,20 @@
 <li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fin</span> <span class="o">=</span> <span class="n">yggAsciiFileInput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Prepare</span><span class="p">:</span> <span class="n">Get</span> <span class="n">pointer</span> <span class="k">for</span> <span class="n">line</span><span class="o">.</span>
+</p></li>
+<li><p>Prepare: Get pointer for line. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="o">*</span><span class="n">line</span><span class="p">;</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="o">*</span><span class="n">line</span><span class="p">;</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">3.</span> <span class="n">Receive</span> <span class="n">each</span> <span class="n">line</span><span class="p">,</span> <span class="n">terminating</span> <span class="n">when</span> <span class="n">receive</span> <span class="n">returns</span> <span class="o">-</span><span class="mi">1</span> <span class="p">(</span><span class="n">EOF</span> <span class="ow">or</span> <span class="n">channel</span>
-     <span class="n">closed</span><span class="p">)</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</p></li>
+<li><p>Receive each line, terminating when receive returns -1 (EOF or channel closed). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 <span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">line</span><span class="p">);</span> <span class="o">//</span> <span class="n">line</span> <span class="n">will</span> <span class="n">be</span> <span class="n">realloced</span> <span class="n">to</span> <span class="n">fit</span> <span class="n">message</span>
   <span class="o">//</span> <span class="n">Do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">line</span>
 <span class="p">}</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">4.</span> <span class="n">Cleanup</span><span class="o">.</span> <span class="n">Call</span> <span class="n">functions</span> <span class="n">to</span> <span class="n">deallocate</span> <span class="n">structures</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">free</span><span class="p">(</span><span class="n">line</span><span class="p">);</span>
+</p></li>
+<li><p>Cleanup. Call functions to deallocate structures. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">free</span><span class="p">(</span><span class="n">line</span><span class="p">);</span>
 </pre></div>
 </div>
 </p></li>
@@ -450,11 +424,8 @@
 <li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggAsciiFileOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Send</span> <span class="n">lines</span> <span class="n">to</span> <span class="n">the</span> <span class="n">file</span><span class="o">.</span> <span class="n">If</span> <span class="k">return</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">0</span><span class="p">,</span> <span class="n">the</span> <span class="n">send</span> <span class="n">was</span> <span class="ow">not</span>
-      <span class="n">succesfull</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+</p></li>
+<li><p>Send lines to the file. If return value is not 0, the send was not succesfull. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
 <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="s2">&quot;Line 1</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
 <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="s2">&quot;Line 1</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
 <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="s2">&quot;Line 2</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
@@ -483,20 +454,14 @@
 <li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fin</span> <span class="o">=</span> <span class="n">yggAsciiTableInput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Prepare</span><span class="p">:</span> <span class="n">Allocate</span> <span class="n">space</span> <span class="k">for</span> <span class="n">variables</span> <span class="ow">in</span> <span class="n">row</span> <span class="p">(</span><span class="n">the</span> <span class="nb">format</span> <span class="ow">in</span> <span class="n">this</span>
-     <span class="n">example</span> <span class="ow">is</span> <span class="s2">&quot;</span><span class="si">%5s</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="n">like</span> <span class="n">the</span> <span class="n">output</span> <span class="n">example</span> <span class="n">below</span><span class="p">)</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">];</span>
+</p></li>
+<li><p>Prepare: Allocate space for variables in row (the format in this example is “%5s %d %f\n” like the output example below). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">];</span>
 <span class="nb">int</span> <span class="n">b</span><span class="p">;</span>
 <span class="n">double</span> <span class="n">c</span><span class="p">;</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">3.</span> <span class="n">Receive</span> <span class="n">each</span> <span class="n">row</span><span class="p">,</span> <span class="n">terminating</span> <span class="n">when</span> <span class="n">receive</span> <span class="n">returns</span> <span class="o">-</span><span class="mi">1</span> <span class="p">(</span><span class="n">EOF</span> <span class="ow">or</span> <span class="n">channel</span>
-     <span class="n">closed</span><span class="p">)</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</p></li>
+<li><p>Receive each row, terminating when receive returns -1 (EOF or channel closed). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 <span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">);</span>
   <span class="o">//</span> <span class="n">Do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">row</span>
@@ -510,11 +475,8 @@
 <li><p>One-time: Create file interface by providing a channel name and a format string for rows. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggAsciiTableOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%5s</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Send</span> <span class="n">rows</span> <span class="n">to</span> <span class="n">the</span> <span class="n">file</span> <span class="n">by</span> <span class="n">providing</span> <span class="n">entries</span><span class="o">.</span> <span class="n">Formatting</span> <span class="ow">is</span> <span class="n">handled</span> <span class="n">by</span>
-     <span class="n">the</span> <span class="n">interface</span><span class="o">.</span> <span class="n">If</span> <span class="k">return</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">0</span><span class="p">,</span> <span class="n">the</span> <span class="n">send</span> <span class="n">was</span> <span class="ow">not</span> <span class="n">succesful</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+</p></li>
+<li><p>Send rows to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
 <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
 <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="s2">&quot;two&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">);</span>
 </pre></div>
@@ -532,18 +494,12 @@
 <span class="n">double</span> <span class="o">*</span><span class="n">cCol</span><span class="p">;</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">3.</span> <span class="n">Receive</span> <span class="n">entire</span> <span class="n">table</span> <span class="k">as</span> <span class="n">columns</span><span class="o">.</span> <span class="n">Return</span> <span class="n">value</span> <span class="n">will</span> <span class="n">be</span> <span class="n">the</span> <span class="n">number</span> <span class="n">of</span>
-     <span class="n">elements</span> <span class="ow">in</span> <span class="n">each</span> <span class="n">column</span> <span class="p">(</span><span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">table</span> <span class="n">rows</span><span class="p">)</span><span class="o">.</span> <span class="n">Negative</span> <span class="n">values</span>
- <span class="n">indicate</span> <span class="n">errors</span><span class="o">.</span>
+</p></li>
+<li><p>Receive entire table as columns. Return value will be the number of elements in each column (the number of table rows). Negative values indicate errors. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">);</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">);</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">4.</span> <span class="n">Cleanup</span><span class="o">.</span> <span class="n">Call</span> <span class="n">functions</span> <span class="n">to</span> <span class="n">deallocate</span> <span class="n">structures</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">free</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+</p></li>
+<li><p>Cleanup. Call functions to deallocate structures. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">free</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
 <span class="n">free</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
 <span class="n">free</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
 </pre></div>
@@ -555,12 +511,8 @@
 <li><p>One-time: Create file interface by providing a channel name and a format string for rows. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggAsciiArrayOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%5s</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Send</span> <span class="n">columns</span> <span class="n">to</span> <span class="n">the</span> <span class="n">file</span> <span class="n">by</span> <span class="n">providing</span> <span class="n">pointers</span> <span class="p">(</span><span class="ow">or</span> <span class="n">arrays</span><span class="p">)</span><span class="o">.</span> <span class="n">Formatting</span>
-     <span class="ow">is</span> <span class="n">handled</span> <span class="n">by</span> <span class="n">the</span> <span class="n">interface</span><span class="o">.</span> <span class="n">If</span> <span class="k">return</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">0</span><span class="p">,</span> <span class="n">the</span> <span class="n">send</span> <span class="n">was</span> <span class="ow">not</span>
- <span class="n">succesful</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="n">aCol</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;one  &quot;</span><span class="p">,</span> <span class="s2">&quot;two  &quot;</span><span class="p">,</span> <span class="s2">&quot;three&quot;</span><span class="p">};</span> \\ <span class="n">Each</span> <span class="nb">str</span> <span class="ow">is</span> <span class="n">of</span> <span class="nb">len</span> <span class="mi">5</span>
+</p></li>
+<li><p>Send columns to the file by providing pointers (or arrays). Formatting is handled by the interface. If return value is not 0, the send was not succesful. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="n">aCol</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;one  &quot;</span><span class="p">,</span> <span class="s2">&quot;two  &quot;</span><span class="p">,</span> <span class="s2">&quot;three&quot;</span><span class="p">};</span> \\ <span class="n">Each</span> <span class="nb">str</span> <span class="ow">is</span> <span class="n">of</span> <span class="nb">len</span> <span class="mi">5</span>
 <span class="nb">int</span> <span class="n">bCol</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">};</span>
 <span class="nb">float</span> <span class="n">cCol</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">};</span>
     <span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">);</span>
@@ -600,17 +552,12 @@
 <li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fin</span> <span class="o">=</span> <span class="n">yggPlyInput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Prepare</span><span class="p">:</span> <span class="n">Allocate</span> <span class="n">ply</span> <span class="n">structure</span><span class="o">.</span>
+</p></li>
+<li><p>Prepare: Allocate ply structure. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ply_t</span> <span class="n">p</span><span class="p">;</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ply_t</span> <span class="n">p</span><span class="p">;</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">3.</span> <span class="n">Receive</span> <span class="n">each</span> <span class="n">structure</span><span class="p">,</span> <span class="n">terminating</span> <span class="n">when</span> <span class="n">receive</span> <span class="n">returns</span> <span class="o">-</span><span class="mi">1</span> <span class="p">(</span><span class="n">EOF</span> <span class="ow">or</span> <span class="n">channel</span>
-     <span class="n">closed</span><span class="p">)</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</p></li>
+<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 <span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
   <span class="o">//</span> <span class="n">Do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">ply</span> <span class="n">structure</span>
@@ -624,11 +571,8 @@
 <li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggPlyOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Send</span> <span class="n">structure</span> <span class="n">to</span> <span class="n">the</span> <span class="n">file</span> <span class="n">by</span> <span class="n">providing</span> <span class="n">entries</span><span class="o">.</span> <span class="n">Formatting</span> <span class="ow">is</span> <span class="n">handled</span> <span class="n">by</span>
-     <span class="n">the</span> <span class="n">interface</span><span class="o">.</span> <span class="n">If</span> <span class="k">return</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">0</span><span class="p">,</span> <span class="n">the</span> <span class="n">send</span> <span class="n">was</span> <span class="ow">not</span> <span class="n">succesful</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+</p></li>
+<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
 <span class="n">ply_t</span> <span class="n">p</span><span class="p">;</span>
 <span class="o">//</span> <span class="n">Populate</span> <span class="n">the</span> <span class="n">structure</span>
 <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
@@ -656,17 +600,12 @@
 <li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fin</span> <span class="o">=</span> <span class="n">yggObjInput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Prepare</span><span class="p">:</span> <span class="n">Allocate</span> <span class="n">obj</span> <span class="n">structure</span><span class="o">.</span>
+</p></li>
+<li><p>Prepare: Allocate obj structure. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">obj_t</span> <span class="n">p</span><span class="p">;</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">obj_t</span> <span class="n">p</span><span class="p">;</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">3.</span> <span class="n">Receive</span> <span class="n">each</span> <span class="n">structure</span><span class="p">,</span> <span class="n">terminating</span> <span class="n">when</span> <span class="n">receive</span> <span class="n">returns</span> <span class="o">-</span><span class="mi">1</span> <span class="p">(</span><span class="n">EOF</span> <span class="ow">or</span> <span class="n">channel</span>
-     <span class="n">closed</span><span class="p">)</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</p></li>
+<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 <span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
   <span class="o">//</span> <span class="n">Do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">obj</span> <span class="n">structure</span>
@@ -680,11 +619,8 @@
 <li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggObjOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Send</span> <span class="n">structure</span> <span class="n">to</span> <span class="n">the</span> <span class="n">file</span> <span class="n">by</span> <span class="n">providing</span> <span class="n">entries</span><span class="o">.</span> <span class="n">Formatting</span> <span class="ow">is</span> <span class="n">handled</span> <span class="n">by</span>
-     <span class="n">the</span> <span class="n">interface</span><span class="o">.</span> <span class="n">If</span> <span class="k">return</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">0</span><span class="p">,</span> <span class="n">the</span> <span class="n">send</span> <span class="n">was</span> <span class="ow">not</span> <span class="n">succesful</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+</p></li>
+<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
 <span class="n">obj_t</span> <span class="n">p</span><span class="p">;</span>
 <span class="o">//</span> <span class="n">Populate</span> <span class="n">the</span> <span class="n">structure</span>
 <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
@@ -756,17 +692,13 @@
 <li><p>One-time: Create output channel (store in named variables) <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggOutput_t</span> <span class="n">output_channel</span> <span class="o">=</span> <span class="n">yggOutput</span><span class="p">(</span><span class="s2">&quot;out_name&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Prepare</span><span class="p">:</span> <span class="n">Format</span> <span class="n">data</span> <span class="n">to</span> <span class="n">a</span> <span class="n">character</span> <span class="n">array</span> <span class="n">buffer</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">char</span> <span class="n">buffer</span><span class="p">[</span><span class="n">YGG_MSG_BUF</span><span class="p">];</span> 
+</p></li>
+<li><p>Prepare: Format data to a character array buffer. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">char</span> <span class="n">buffer</span><span class="p">[</span><span class="n">YGG_MSG_BUF</span><span class="p">];</span> 
 <span class="n">sprintf</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="s2">&quot;a=</span><span class="si">%d</span><span class="s2">, b=</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">3.</span> <span class="n">Send</span><span class="p">:</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_send</span><span class="p">(</span><span class="n">output_channel</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buffer</span><span class="p">));</span>
+</p></li>
+<li><p>Send: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_send</span><span class="p">(</span><span class="n">output_channel</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buffer</span><span class="p">));</span>
 </pre></div>
 </div>
 </p></li>
@@ -776,16 +708,12 @@
 <li><p>One-time: Create output channel (store in named variables) <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggInput_t</span> <span class="n">input_channel</span> <span class="o">=</span> <span class="n">yggInput</span><span class="p">(</span><span class="s2">&quot;in_name&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Prepare</span><span class="p">:</span> <span class="n">Allocate</span> <span class="n">a</span> <span class="n">character</span> <span class="n">array</span> <span class="n">buffer</span><span class="o">.</span>
+</p></li>
+<li><p>Prepare: Allocate a character array buffer. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="n">buffer</span><span class="p">[</span><span class="n">YGG_MSG_BUF</span><span class="p">];</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="n">buffer</span><span class="p">[</span><span class="n">YGG_MSG_BUF</span><span class="p">];</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">3.</span> <span class="n">Receive</span><span class="p">:</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_recv</span><span class="p">(</span><span class="n">input_channel</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">YGG_MSG_BUF</span><span class="p">);</span>
+</p></li>
+<li><p>Receive: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_recv</span><span class="p">(</span><span class="n">input_channel</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">YGG_MSG_BUF</span><span class="p">);</span>
 </pre></div>
 </div>
 </p></li>
@@ -1266,17 +1194,12 @@
 <li><p>One-time: Create interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fin</span> <span class="o">=</span> <span class="n">yggGenericInput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Prepare</span><span class="p">:</span> <span class="n">Allocate</span> <span class="n">generic</span> <span class="n">structure</span><span class="o">.</span>
+</p></li>
+<li><p>Prepare: Allocate generic structure. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">generic_t</span> <span class="n">p</span><span class="p">;</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">generic_t</span> <span class="n">p</span><span class="p">;</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">3.</span> <span class="n">Receive</span> <span class="n">each</span> <span class="n">structure</span><span class="p">,</span> <span class="n">terminating</span> <span class="n">when</span> <span class="n">receive</span> <span class="n">returns</span> <span class="o">-</span><span class="mi">1</span> <span class="p">(</span><span class="n">EOF</span> <span class="ow">or</span> <span class="n">channel</span>
-     <span class="n">closed</span><span class="p">)</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</p></li>
+<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 <span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
   <span class="o">//</span> <span class="n">Do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">generic</span> <span class="n">structure</span>
@@ -1290,11 +1213,8 @@
 <li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggGenericOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Send</span> <span class="n">structure</span> <span class="n">to</span> <span class="n">the</span> <span class="n">file</span> <span class="n">by</span> <span class="n">providing</span> <span class="n">entries</span><span class="o">.</span> <span class="n">Formatting</span> <span class="ow">is</span> <span class="n">handled</span> <span class="n">by</span>
-     <span class="n">the</span> <span class="n">interface</span><span class="o">.</span> <span class="n">If</span> <span class="k">return</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">0</span><span class="p">,</span> <span class="n">the</span> <span class="n">send</span> <span class="n">was</span> <span class="ow">not</span> <span class="n">succesful</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+</p></li>
+<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
 <span class="n">generic_t</span> <span class="n">p</span><span class="p">;</span>
 <span class="o">//</span> <span class="n">Populate</span> <span class="n">the</span> <span class="n">structure</span>
 <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
@@ -1337,17 +1257,12 @@
 <li><p>One-time: Create interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fin</span> <span class="o">=</span> <span class="n">yggAnyInput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Prepare</span><span class="p">:</span> <span class="n">Allocate</span> <span class="n">generic</span> <span class="n">structure</span><span class="o">.</span>
+</p></li>
+<li><p>Prepare: Allocate generic structure. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">generic_t</span> <span class="n">p</span><span class="p">;</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">generic_t</span> <span class="n">p</span><span class="p">;</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">3.</span> <span class="n">Receive</span> <span class="n">each</span> <span class="n">structure</span><span class="p">,</span> <span class="n">terminating</span> <span class="n">when</span> <span class="n">receive</span> <span class="n">returns</span> <span class="o">-</span><span class="mi">1</span> <span class="p">(</span><span class="n">EOF</span> <span class="ow">or</span> <span class="n">channel</span>
-     <span class="n">closed</span><span class="p">)</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</p></li>
+<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 <span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
   <span class="o">//</span> <span class="n">Do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">generic</span> <span class="n">structure</span>
@@ -1361,11 +1276,8 @@
 <li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggAnyOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Send</span> <span class="n">structure</span> <span class="n">to</span> <span class="n">the</span> <span class="n">file</span> <span class="n">by</span> <span class="n">providing</span> <span class="n">entries</span><span class="o">.</span> <span class="n">Formatting</span> <span class="ow">is</span> <span class="n">handled</span> <span class="n">by</span>
-     <span class="n">the</span> <span class="n">interface</span><span class="o">.</span> <span class="n">If</span> <span class="k">return</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">0</span><span class="p">,</span> <span class="n">the</span> <span class="n">send</span> <span class="n">was</span> <span class="ow">not</span> <span class="n">succesful</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+</p></li>
+<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
 <span class="n">generic_t</span> <span class="n">p</span><span class="p">;</span>
 <span class="o">//</span> <span class="n">Populate</span> <span class="n">the</span> <span class="n">structure</span>
 <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
@@ -1408,17 +1320,12 @@
 <li><p>One-time: Create interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fin</span> <span class="o">=</span> <span class="n">yggJSONArrayInput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Prepare</span><span class="p">:</span> <span class="n">Allocate</span> <span class="n">vector</span> <span class="n">structure</span><span class="o">.</span>
+</p></li>
+<li><p>Prepare: Allocate vector structure. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">json_array_t</span> <span class="n">p</span><span class="p">;</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">json_array_t</span> <span class="n">p</span><span class="p">;</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">3.</span> <span class="n">Receive</span> <span class="n">each</span> <span class="n">structure</span><span class="p">,</span> <span class="n">terminating</span> <span class="n">when</span> <span class="n">receive</span> <span class="n">returns</span> <span class="o">-</span><span class="mi">1</span> <span class="p">(</span><span class="n">EOF</span> <span class="ow">or</span> <span class="n">channel</span>
-     <span class="n">closed</span><span class="p">)</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</p></li>
+<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 <span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
   <span class="o">//</span> <span class="n">Do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">vector</span> <span class="n">structure</span>
@@ -1432,11 +1339,8 @@
 <li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggJSONArrayOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Send</span> <span class="n">structure</span> <span class="n">to</span> <span class="n">the</span> <span class="n">file</span> <span class="n">by</span> <span class="n">providing</span> <span class="n">entries</span><span class="o">.</span> <span class="n">Formatting</span> <span class="ow">is</span> <span class="n">handled</span> <span class="n">by</span>
-     <span class="n">the</span> <span class="n">interface</span><span class="o">.</span> <span class="n">If</span> <span class="k">return</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">0</span><span class="p">,</span> <span class="n">the</span> <span class="n">send</span> <span class="n">was</span> <span class="ow">not</span> <span class="n">succesful</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+</p></li>
+<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
 <span class="n">json_array_t</span> <span class="n">p</span><span class="p">;</span>
 <span class="o">//</span> <span class="n">Populate</span> <span class="n">the</span> <span class="n">structure</span>
 <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
@@ -1479,17 +1383,12 @@
 <li><p>One-time: Create interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fin</span> <span class="o">=</span> <span class="n">yggJSONObjectInput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Prepare</span><span class="p">:</span> <span class="n">Allocate</span> <span class="nb">map</span> <span class="n">structure</span><span class="o">.</span>
+</p></li>
+<li><p>Prepare: Allocate map structure. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">json_object_t</span> <span class="n">p</span><span class="p">;</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">json_object_t</span> <span class="n">p</span><span class="p">;</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">3.</span> <span class="n">Receive</span> <span class="n">each</span> <span class="n">structure</span><span class="p">,</span> <span class="n">terminating</span> <span class="n">when</span> <span class="n">receive</span> <span class="n">returns</span> <span class="o">-</span><span class="mi">1</span> <span class="p">(</span><span class="n">EOF</span> <span class="ow">or</span> <span class="n">channel</span>
-     <span class="n">closed</span><span class="p">)</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</p></li>
+<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 <span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
   <span class="o">//</span> <span class="n">Do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="nb">map</span> <span class="n">structure</span>
@@ -1503,11 +1402,8 @@
 <li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggJSONObjectOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
 </pre></div>
 </div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="mf">2.</span> <span class="n">Send</span> <span class="n">structure</span> <span class="n">to</span> <span class="n">the</span> <span class="n">file</span> <span class="n">by</span> <span class="n">providing</span> <span class="n">entries</span><span class="o">.</span> <span class="n">Formatting</span> <span class="ow">is</span> <span class="n">handled</span> <span class="n">by</span>
-     <span class="n">the</span> <span class="n">interface</span><span class="o">.</span> <span class="n">If</span> <span class="k">return</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">0</span><span class="p">,</span> <span class="n">the</span> <span class="n">send</span> <span class="n">was</span> <span class="ow">not</span> <span class="n">succesful</span><span class="o">.</span>
-</pre></div>
-</div>
- <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+</p></li>
+<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
 <span class="n">json_object_t</span> <span class="n">p</span><span class="p">;</span>
 <span class="o">//</span> <span class="n">Populate</span> <span class="n">the</span> <span class="n">structure</span>
 <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>

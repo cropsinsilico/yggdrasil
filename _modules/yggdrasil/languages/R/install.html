@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.languages.R.install &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.languages.R.install &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../../languages.html">yggdrasil.languages</a> &raquo;</li>
-      <li>yggdrasil.languages.R.install</li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../languages.html">yggdrasil.languages</a></li>
+      <li class="breadcrumb-item active">yggdrasil.languages.R.install</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -115,7 +116,7 @@
 
 
 <div class="viewcode-block" id="update_argparser"><a class="viewcode-back" href="../../../../yggdrasil.languages.R.html#yggdrasil.languages.R.install.update_argparser">[docs]</a><span class="k">def</span> <span class="nf">update_argparser</span><span class="p">(</span><span class="n">parser</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update argument parser with language specific arguments.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update argument parser with language specific arguments.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        parser (argparse.ArgumentParser, optional): Existing argument parser</span>
@@ -140,7 +141,7 @@
 
 
 <div class="viewcode-block" id="write_makevars"><a class="viewcode-back" href="../../../../yggdrasil.languages.R.html#yggdrasil.languages.R.install.write_makevars">[docs]</a><span class="k">def</span> <span class="nf">write_makevars</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a makevars file with CC, CFLAGS, etc. values set based on the</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a makevars file with CC, CFLAGS, etc. values set based on the</span>
 <span class="sd">    environment variables of the same name.</span>
 
 <span class="sd">    Args:</span>
@@ -194,7 +195,7 @@
 
 
 <div class="viewcode-block" id="restore_makevars"><a class="viewcode-back" href="../../../../yggdrasil.languages.R.html#yggdrasil.languages.R.install.restore_makevars">[docs]</a><span class="k">def</span> <span class="nf">restore_makevars</span><span class="p">(</span><span class="n">makevars</span><span class="p">,</span> <span class="n">old_makevars</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Restore original makevars environemnt variable and remove temporary file.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Restore original makevars environemnt variable and remove temporary file.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">       makevars (str): Full path to the file where the temporary Makevars file</span>
@@ -215,7 +216,7 @@
 
 
 <div class="viewcode-block" id="install_packages"><a class="viewcode-back" href="../../../../yggdrasil.languages.R.html#yggdrasil.languages.R.install.install_packages">[docs]</a><span class="k">def</span> <span class="nf">install_packages</span><span class="p">(</span><span class="n">package_list</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">repos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Install R packages from CRAN.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Install R packages from CRAN.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        package_list (str, list): One or more R packages that should be</span>
@@ -318,7 +319,7 @@
 
             
 <div class="viewcode-block" id="call_R"><a class="viewcode-back" href="../../../../yggdrasil.languages.R.html#yggdrasil.languages.R.install.call_R">[docs]</a><span class="k">def</span> <span class="nf">call_R</span><span class="p">(</span><span class="n">R_cmd</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call R commands, checking output.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call R commands, checking output.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        R_cmd (list): List of R commands to run.</span>
@@ -344,7 +345,7 @@
 
 
 <div class="viewcode-block" id="make_call"><a class="viewcode-back" href="../../../../yggdrasil.languages.R.html#yggdrasil.languages.R.install.make_call">[docs]</a><span class="k">def</span> <span class="nf">make_call</span><span class="p">(</span><span class="n">R_cmd</span><span class="p">,</span> <span class="n">with_sudo</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call command, checking output.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call command, checking output.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        R_cmd (list): List of command line executable to call and any arguments</span>
@@ -377,7 +378,7 @@
 
 
 <div class="viewcode-block" id="requirements_from_description"><a class="viewcode-back" href="../../../../yggdrasil.languages.R.html#yggdrasil.languages.R.install.requirements_from_description">[docs]</a><span class="k">def</span> <span class="nf">requirements_from_description</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read R requirements from the Imports &amp; Depends sections of the package</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read R requirements from the Imports &amp; Depends sections of the package</span>
 <span class="sd">    description.</span>
 
 <span class="sd">    Args:</span>
@@ -392,7 +393,7 @@
     <span class="n">in_section</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="n">desc_file</span>
-    <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fd</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s1">&#39;Imports:&#39;</span><span class="p">,</span> <span class="s1">&#39;Depends:&#39;</span><span class="p">)):</span>
@@ -409,7 +410,7 @@
 
 <div class="viewcode-block" id="install"><a class="viewcode-back" href="../../../../yggdrasil.languages.R.html#yggdrasil.languages.R.install.install">[docs]</a><span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">with_sudo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip_requirements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">update_requirements</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Attempt to install the R interface.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Attempt to install the R interface.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        args (argparse.Namespace, optional): Arguments parsed from the</span>

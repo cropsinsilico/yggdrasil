@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.SBMLModelDriver &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.drivers.SBMLModelDriver &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
-      <li>yggdrasil.drivers.SBMLModelDriver</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../drivers.html">yggdrasil.drivers</a></li>
+      <li class="breadcrumb-item active">yggdrasil.drivers.SBMLModelDriver</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -100,7 +101,7 @@
 
 
 <div class="viewcode-block" id="SBMLModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.SBMLModelDriver.SBMLModelDriver">[docs]</a><span class="k">class</span> <span class="nc">SBMLModelDriver</span><span class="p">(</span><span class="n">DSLModelDriver</span><span class="p">):</span>  <span class="c1"># pragma: sbml</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running SBML models.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running SBML models.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        start_time (float, optional): Time that simulation should be</span>
@@ -149,7 +150,7 @@
 
 <div class="viewcode-block" id="SBMLModelDriver.language_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.SBMLModelDriver.SBMLModelDriver.language_version">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">language_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this language.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this language.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Keyword arguments are passed to cls.run_executable.</span>
@@ -166,12 +167,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">model_wrapper_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Positional arguments for the model wrapper.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Positional arguments for the model wrapper.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">model_wrapper_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for the model wrapper.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for the model wrapper.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SBMLModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">model_wrapper_kwargs</span>
         <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
             <span class="p">{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span>
@@ -193,7 +194,7 @@
                       <span class="n">selections</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">variable_step</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                       <span class="n">skip_start_time</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                       <span class="n">only_output_final_step</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Model wrapper.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Model wrapper.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">working_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -256,7 +257,7 @@
 <div class="viewcode-block" id="SBMLModelDriver.setup_model"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.SBMLModelDriver.SBMLModelDriver.setup_model">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">setup_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_file</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="p">[],</span> <span class="n">outputs</span><span class="o">=</span><span class="p">[],</span>
                     <span class="n">integrator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">integrator_settings</span><span class="o">=</span><span class="p">{}):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set up model class instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set up model class instance.&quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">roadrunner</span>
         <span class="kn">from</span> <span class="nn">yggdrasil.languages.Python.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
             <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span><span class="p">)</span>
@@ -282,7 +283,7 @@
     <span class="k">def</span> <span class="nf">call_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">curr_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span>
                    <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">start_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">selections</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                    <span class="n">variable_step</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call the model.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call the model.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">reset</span><span class="p">:</span>
             <span class="n">model</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
             <span class="n">curr_time</span> <span class="o">=</span> <span class="n">start_time</span>
@@ -299,7 +300,7 @@
 
 <div class="viewcode-block" id="SBMLModelDriver.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.SBMLModelDriver.SBMLModelDriver.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>

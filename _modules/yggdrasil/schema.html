@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.schema &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.schema &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -82,9 +83,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>yggdrasil.schema</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">yggdrasil.schema</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -116,14 +117,14 @@
 
 
 <div class="viewcode-block" id="SchemaDict"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaDict">[docs]</a><span class="k">class</span> <span class="nc">SchemaDict</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;OrderedDict subclass for ordering schemas on read in Python 2.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;OrderedDict subclass for ordering schemas on read in Python 2.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="ordered_load"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.ordered_load">[docs]</a><span class="k">def</span> <span class="nf">ordered_load</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">object_pairs_hook</span><span class="o">=</span><span class="n">SchemaDict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load YAML document from a file using a specified class to represent</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load YAML document from a file using a specified class to represent</span>
 <span class="sd">    mapping types that allows for ordering.</span>
 
 <span class="sd">    Args:</span>
@@ -142,7 +143,7 @@
 
 
 <div class="viewcode-block" id="ordered_dump"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.ordered_dump">[docs]</a><span class="k">def</span> <span class="nf">ordered_dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dump object as a YAML document, representing SchemaDict objects as</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dump object as a YAML document, representing SchemaDict objects as</span>
 <span class="sd">    mapping type.</span>
 
 <span class="sd">    Args:</span>
@@ -158,20 +159,20 @@
 
 
 <div class="viewcode-block" id="clear_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.clear_schema">[docs]</a><span class="k">def</span> <span class="nf">clear_schema</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clear global schema.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clear global schema.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_schema</span>
     <span class="n">_schema</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="init_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.init_schema">[docs]</a><span class="k">def</span> <span class="nf">init_schema</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize global schema.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize global schema.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_schema</span>
     <span class="k">if</span> <span class="n">_schema</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_schema</span> <span class="o">=</span> <span class="n">load_schema</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="create_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.create_schema">[docs]</a><span class="k">def</span> <span class="nf">create_schema</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new schema from the registry.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new schema from the registry.&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">init_registry</span><span class="p">,</span> <span class="n">registering</span>
     <span class="k">with</span> <span class="n">registering</span><span class="p">():</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">SchemaRegistry</span><span class="p">(</span><span class="n">init_registry</span><span class="p">(</span><span class="n">recurse</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
@@ -180,7 +181,7 @@
 
 
 <div class="viewcode-block" id="load_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.load_schema">[docs]</a><span class="k">def</span> <span class="nf">load_schema</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the yggdrasil schema for YAML options.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the yggdrasil schema for YAML options.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fname (str, optional): Full path to the file that the schema should be</span>
@@ -200,7 +201,7 @@
 
 
 <div class="viewcode-block" id="get_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.get_schema">[docs]</a><span class="k">def</span> <span class="nf">get_schema</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the yggdrasil schema for YAML options.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the yggdrasil schema for YAML options.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fname (str, optional): Full path to the file that the schema should be</span>
@@ -221,7 +222,7 @@
 
 
 <div class="viewcode-block" id="convert_extended2base"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.convert_extended2base">[docs]</a><span class="k">def</span> <span class="nf">convert_extended2base</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Covert schema from the extended form to a strictly JSON form.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Covert schema from the extended form to a strictly JSON form.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (object): Object to updated.</span>
@@ -251,15 +252,15 @@
                     <span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">type_map</span><span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]]</span>
                     <span class="n">s</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">assert</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;scalar&#39;</span><span class="p">])</span>
+                    <span class="k">assert</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;scalar&#39;</span><span class="p">]</span>
                 <span class="c1"># Scalars not currently included in the schema</span>
                 <span class="c1"># elif s[&#39;type&#39;] in [&#39;scalar&#39;]:</span>
                 <span class="c1">#     s.pop(&quot;precision&quot;, None)</span>
                 <span class="c1">#     s.pop(&quot;units&quot;, None)</span>
                 <span class="c1">#     s[&#39;type&#39;] = type_map[s.pop(&#39;subtype&#39;)]</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
-                <span class="k">assert</span><span class="p">(</span><span class="s1">&#39;schema&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
-                <span class="k">assert</span><span class="p">(</span><span class="s1">&#39;scalar&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+                <span class="k">assert</span> <span class="s1">&#39;schema&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+                <span class="k">assert</span> <span class="s1">&#39;scalar&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
                 <span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">type_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]]</span>
                 <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">t</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]]):</span>
                     <span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -271,7 +272,7 @@
 
 
 <div class="viewcode-block" id="get_json_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.get_json_schema">[docs]</a><span class="k">def</span> <span class="nf">get_json_schema</span><span class="p">(</span><span class="n">fname_dst</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the yggdrasil schema as a strictly JSON schema without</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the yggdrasil schema as a strictly JSON schema without</span>
 <span class="sd">    any of the extended datatypes.</span>
 
 <span class="sd">    Args:</span>
@@ -296,7 +297,7 @@
 
 
 <div class="viewcode-block" id="get_model_form_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.get_model_form_schema">[docs]</a><span class="k">def</span> <span class="nf">get_model_form_schema</span><span class="p">(</span><span class="n">fname_dst</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the yggdrasil schema that can be used to generate a form</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the yggdrasil schema that can be used to generate a form</span>
 <span class="sd">    for creating a model specification file.</span>
 
 <span class="sd">    Args:</span>
@@ -319,7 +320,7 @@
 
 
 <div class="viewcode-block" id="update_constants"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.update_constants">[docs]</a><span class="k">def</span> <span class="nf">update_constants</span><span class="p">(</span><span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update constants.py with info from the schema.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update constants.py with info from the schema.&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
     <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
         <span class="n">get_compilation_tool_registry</span><span class="p">)</span>
@@ -375,7 +376,7 @@
         <span class="n">drv_type</span> <span class="o">=</span> <span class="n">typemap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">executable_type</span><span class="p">,</span> <span class="n">drv</span><span class="o">.</span><span class="n">executable_type</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">drv</span><span class="o">.</span><span class="n">language_ext</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lang2ext</span><span class="p">:</span>
-                <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">language_ext</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">language_ext</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
                 <span class="n">lang2ext</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">drv</span><span class="o">.</span><span class="n">language_ext</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">ka</span> <span class="ow">in</span> <span class="n">drv</span><span class="o">.</span><span class="n">language_aliases</span><span class="p">:</span>
                 <span class="n">lang2ext</span><span class="p">[</span><span class="n">ka</span><span class="p">]</span> <span class="o">=</span> <span class="n">lang2ext</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
@@ -444,7 +445,7 @@
 
 
 <div class="viewcode-block" id="ComponentSchema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.ComponentSchema">[docs]</a><span class="k">class</span> <span class="nc">ComponentSchema</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Schema information for one component.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Schema information for one component.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        schema_type (str): The name of the component.</span>
@@ -480,7 +481,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">ComponentSchema</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
 <div class="viewcode-block" id="ComponentSchema.identify_subtype"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.ComponentSchema.identify_subtype">[docs]</a>    <span class="k">def</span> <span class="nf">identify_subtype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Identify the subtype associated with a document by validating it</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Identify the subtype associated with a document by validating it</span>
 <span class="sd">        against the schemas for the different subtypes.</span>
 
 <span class="sd">        Args:</span>
@@ -502,7 +503,7 @@
 
 <div class="viewcode-block" id="ComponentSchema.get_subtype_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.ComponentSchema.get_subtype_schema">[docs]</a>    <span class="k">def</span> <span class="nf">get_subtype_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subtype</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">relaxed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                            <span class="n">allow_instance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">for_form</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the schema for the specified subtype.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the schema for the specified subtype.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            subtype (str): Component subtype to return schema for. If &#39;base&#39;,</span>
@@ -578,7 +579,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="ComponentSchema.get_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.ComponentSchema.get_schema">[docs]</a>    <span class="k">def</span> <span class="nf">get_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relaxed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">allow_instance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">for_form</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the schema defining this component.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the schema defining this component.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            relaxed (bool, optional): If True, the returned schema (and any</span>
@@ -613,12 +614,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for this component.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for this component.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_schema</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">full_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for evaluating YAML input file that fully specifies</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for evaluating YAML input file that fully specifies</span>
 <span class="sd">        the properties for each component.&quot;&quot;&quot;</span>
         <span class="c1"># TODO: Could be simplified to just &#39;anyOf&#39; for subtypes, but need</span>
         <span class="c1"># to reconcile that with schema normalization which uses the</span>
@@ -632,7 +633,7 @@
 
 <div class="viewcode-block" id="ComponentSchema.from_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.ComponentSchema.from_schema">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="n">schema_registry</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Construct a ComponentSchema from a schema.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Construct a ComponentSchema from a schema.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            schema (dict): Schema.</span>
@@ -650,9 +651,9 @@
             <span class="n">ikeys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
             <span class="n">subt_props</span> <span class="o">|=</span> <span class="n">ikeys</span>
             <span class="n">subt_overlap</span> <span class="o">&amp;=</span> <span class="n">ikeys</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">subt_overlap</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">subt_overlap</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
         <span class="n">subtype_key</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">subt_overlap</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">subtype_key</span> <span class="ow">in</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;allOf&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="n">subtype_key</span> <span class="ow">in</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;allOf&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span>
         <span class="c1"># Initialize schema</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">schema_type</span><span class="p">,</span> <span class="n">subtype_key</span><span class="p">,</span> <span class="n">schema_registry</span><span class="o">=</span><span class="n">schema_registry</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">_base_schema</span> <span class="o">=</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;allOf&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -665,7 +666,7 @@
             <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">module</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">out</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="n">v_module</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">assert</span><span class="p">(</span><span class="n">v_module</span> <span class="o">==</span> <span class="n">out</span><span class="o">.</span><span class="n">module</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="n">v_module</span> <span class="o">==</span> <span class="n">out</span><span class="o">.</span><span class="n">module</span>
         <span class="c1"># Remove subtype specific properties</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">subt_props</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="n">out</span><span class="o">.</span><span class="n">subtype_key</span><span class="p">:</span>
@@ -681,7 +682,7 @@
 
 <div class="viewcode-block" id="ComponentSchema.from_registry"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.ComponentSchema.from_registry">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_registry</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">schema_type</span><span class="p">,</span> <span class="n">registry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Construct a ComponentSchema from a registry entry.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Construct a ComponentSchema from a registry entry.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            schema_type (str): Name of component type to build.</span>
@@ -707,11 +708,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Valid properties for this component.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Valid properties for this component.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_subtype_schema</span><span class="p">(</span><span class="s1">&#39;base&#39;</span><span class="p">)[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
 
 <div class="viewcode-block" id="ComponentSchema.get_subtype_properties"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.ComponentSchema.get_subtype_properties">[docs]</a>    <span class="k">def</span> <span class="nf">get_subtype_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subtype</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the valid properties for a specific subtype.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the valid properties for a specific subtype.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            subtype (str): Name of the subtype to get keys for.</span>
@@ -724,12 +725,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">class2subtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping from class to list of subtypes.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping from class to list of subtypes.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">subtype2class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping from subtype to class.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping from subtype to class.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">iv</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
@@ -738,14 +739,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">base_subtype_class_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of base class for the subtype.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of base class for the subtype.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_base_subtype_class_name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">base_subtype_class</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_subtype_class_name</span>
             
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">base_subtype_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;ComponentClass: Base class for the subtype.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;ComponentClass: Base class for the subtype.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_base_subtype_class&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
             <span class="n">default_class</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
             <span class="bp">cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
@@ -766,13 +767,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">default_subtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Default subtype.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Default subtype.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_schema</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">subtype_key</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">subtypes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: All subtypes for this schema type.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: All subtypes for this schema type.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">out</span> <span class="o">+=</span> <span class="n">v</span>
@@ -780,11 +781,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: All available classes for this schema.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: All available classes for this schema.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
 
 <div class="viewcode-block" id="ComponentSchema.append"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.ComponentSchema.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp_cls</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append component class to the schema.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append component class to the schema.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            comp_cls (class): Component class that should be added.</span>
@@ -792,8 +793,8 @@
 <span class="sd">                adding the component class. Defaults to False.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">comp_cls</span><span class="o">.</span><span class="n">_schema_type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_type</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">comp_cls</span><span class="o">.</span><span class="n">_schema_subtype_key</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">subtype_key</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">comp_cls</span><span class="o">.</span><span class="n">_schema_type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_type</span>
+        <span class="k">assert</span> <span class="n">comp_cls</span><span class="o">.</span><span class="n">_schema_subtype_key</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">subtype_key</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">comp_cls</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="n">fullname</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">comp_cls</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">comp_cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span>
         <span class="n">subtype_module</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comp_cls</span><span class="o">.</span><span class="vm">__module__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
@@ -803,7 +804,7 @@
             <span class="n">subtype_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">subtype_list</span><span class="p">]</span>
         <span class="n">subtype_list</span> <span class="o">+=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">comp_cls</span><span class="p">,</span> <span class="s1">&#39;_</span><span class="si">%s</span><span class="s1">_aliases&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">subtype_key</span><span class="p">,</span> <span class="p">[])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">subtype_list</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">subtype_module</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">subtype_module</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span>
         <span class="c1"># Create new schema for subtype</span>
         <span class="n">new_schema</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">fullname</span><span class="p">,</span>
                       <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Schema for </span><span class="si">%s</span><span class="s1"> component </span><span class="si">%s</span><span class="s1"> subtype.&#39;</span>
@@ -889,7 +890,7 @@
 
 
 <div class="viewcode-block" id="SchemaRegistry"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry">[docs]</a><span class="k">class</span> <span class="nc">SchemaRegistry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Registry of schema&#39;s for different integration components.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Registry of schema&#39;s for different integration components.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        registry (dict, optional): Dictionary of registered components.</span>
@@ -923,19 +924,19 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">icomp</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SchemaRegistry.add"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a new component schema to the registry.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a new component schema to the registry.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
         <span class="k">if</span> <span class="n">verify</span><span class="p">:</span>
             <span class="n">metaschema</span><span class="o">.</span><span class="n">validate_schema</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.get"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a component schema from the registry.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a component schema from the registry.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.get_definitions"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.get_definitions">[docs]</a>    <span class="k">def</span> <span class="nf">get_definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relaxed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">allow_instance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                         <span class="n">for_form</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dont_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get schema definitions for the registered components.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get schema definitions for the registered components.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            relaxed (bool, optional): If True, the returned schema (and any</span>
@@ -977,7 +978,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.get_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.get_schema">[docs]</a>    <span class="k">def</span> <span class="nf">get_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relaxed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">allow_instance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">for_form</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the schema defining this component.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the schema defining this component.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            relaxed (bool, optional): If True, the returned schema (and any</span>
@@ -1025,17 +1026,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema definitions for different components.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema definitions for different components.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_definitions</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for evaluating YAML input file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for evaluating YAML input file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_schema</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">form_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for generating a YAML form.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for generating a YAML form.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_schema</span><span class="p">(</span><span class="n">for_form</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;schema&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">metaschema</span><span class="o">.</span><span class="n">_metaschema</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">convert_extended2base</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
@@ -1043,7 +1044,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">model_form_schema_props</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Information about how properties should be modified for the</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Information about how properties should be modified for the</span>
 <span class="sd">        model form schema.&quot;&quot;&quot;</span>
         <span class="n">prop</span> <span class="o">=</span> <span class="p">{</span>
             <span class="c1"># &#39;add&#39;: {},</span>
@@ -1108,7 +1109,7 @@
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">model_form_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for generating a model YAML form.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for generating a model YAML form.&quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">constants</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_schema</span><span class="p">(</span><span class="n">for_form</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">scalar_types</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">VALID_TYPES</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -1204,7 +1205,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">full_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for evaluating YAML input file that fully specifies</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for evaluating YAML input file that fully specifies</span>
 <span class="sd">        the properties for each component.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;full_schema&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span>
@@ -1229,7 +1230,7 @@
 
 <div class="viewcode-block" id="SchemaRegistry.from_file"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.from_file">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a SchemaRegistry from a file.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a SchemaRegistry from a file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fname (str): Full path to the file the schema should be loaded from.</span>
@@ -1240,7 +1241,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.load"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load schema from a file.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load schema from a file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fname (str): Full path to the file the schema should be loaded from.</span>
@@ -1257,7 +1258,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">icomp</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.save"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Save the schema to a file.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Save the schema to a file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fname (str): Full path to the file the schema should be saved to.</span>
@@ -1269,7 +1270,7 @@
             <span class="n">ordered_dump</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">Dumper</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">SafeDumper</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.validate"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object against this schema.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object against this schema.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to valdiate.</span>
@@ -1283,7 +1284,7 @@
         <span class="k">return</span> <span class="n">metaschema</span><span class="o">.</span><span class="n">validate_instance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.validate_model_submission"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.validate_model_submission">[docs]</a>    <span class="k">def</span> <span class="nf">validate_model_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object against the schema for models submitted to</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object against the schema for models submitted to</span>
 <span class="sd">        the yggdrasil model repository.</span>
 
 <span class="sd">        Args:</span>
@@ -1296,7 +1297,7 @@
         <span class="k">return</span> <span class="n">obj</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.validate_component"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.validate_component">[docs]</a>    <span class="k">def</span> <span class="nf">validate_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp_name</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object against a specific component.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object against a specific component.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            comp_name (str): Name of the component to validate against.</span>
@@ -1309,7 +1310,7 @@
         <span class="k">return</span> <span class="n">metaschema</span><span class="o">.</span><span class="n">validate_instance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">comp_schema</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.normalize"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">backwards_compat</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object against this schema.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object against this schema.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to normalize.</span>
@@ -1342,7 +1343,7 @@
     <span class="c1">#     return True</span>
 
 <div class="viewcode-block" id="SchemaRegistry.is_valid_component"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.is_valid_component">[docs]</a>    <span class="k">def</span> <span class="nf">is_valid_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp_name</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if an object is a valid represenation of a component.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if an object is a valid represenation of a component.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            comp_name (str): Name of the component to validate against.</span>
@@ -1361,7 +1362,7 @@
 <div class="viewcode-block" id="SchemaRegistry.get_component_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.get_component_schema">[docs]</a>    <span class="k">def</span> <span class="nf">get_component_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp_name</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">relaxed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                              <span class="n">allow_instance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">allow_instance_definitions</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                              <span class="n">for_form</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the schema for a certain component.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the schema for a certain component.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            comp_name (str): Name of the component to get the schema for.</span>
@@ -1404,7 +1405,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.get_component_keys"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.get_component_keys">[docs]</a>    <span class="k">def</span> <span class="nf">get_component_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp_name</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the properties associated with a certain component.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the properties associated with a certain component.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            comp_name (str): Name of the component to return keys for.</span>
@@ -1417,7 +1418,7 @@
 
 <div class="viewcode-block" id="SchemaRegistry.register_normalizer"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.SchemaRegistry.register_normalizer">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">register_normalizer</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Register a normalizer that will be applied to elements in the</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Register a normalizer that will be applied to elements in the</span>
 <span class="sd">        instance at the specified path.</span>
 
 <span class="sd">        Args:</span>
@@ -1445,7 +1446,7 @@
 <span class="c1"># The following are function add to allow backwards compatability of older</span>
 <span class="c1"># yaml schemas</span>
 <div class="viewcode-block" id="rwmeth2filetype"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.rwmeth2filetype">[docs]</a><span class="k">def</span> <span class="nf">rwmeth2filetype</span><span class="p">(</span><span class="n">rw_meth</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the alternate properties that corresponding to the old</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the alternate properties that corresponding to the old</span>
 <span class="sd">    read_meth/write_meth keywords.</span>
 
 <span class="sd">    Args:</span>
@@ -1469,7 +1470,7 @@
 
 
 <div class="viewcode-block" id="cdriver2commtype"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.cdriver2commtype">[docs]</a><span class="k">def</span> <span class="nf">cdriver2commtype</span><span class="p">(</span><span class="n">driver</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a connection driver to a file type.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a connection driver to a file type.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        driver (str): The name of the connection driver.</span>
@@ -1494,7 +1495,7 @@
 
     
 <div class="viewcode-block" id="cdriver2filetype"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.cdriver2filetype">[docs]</a><span class="k">def</span> <span class="nf">cdriver2filetype</span><span class="p">(</span><span class="n">driver</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a connection driver to a file type.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a connection driver to a file type.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        driver (str): The name of the connection driver.</span>
@@ -1527,7 +1528,7 @@
 
 
 <div class="viewcode-block" id="migrate_keys"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.migrate_keys">[docs]</a><span class="k">def</span> <span class="nf">migrate_keys</span><span class="p">(</span><span class="n">from_dict</span><span class="p">,</span> <span class="n">to_dict</span><span class="p">,</span> <span class="n">exclude_key_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_key_list</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Migrate keys from one component to another that are not in a list</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Migrate keys from one component to another that are not in a list</span>
 <span class="sd">    of predefined keys.</span>
 
 <span class="sd">    Args:</span>
@@ -1544,7 +1545,7 @@
 <span class="sd">             to None and all keys in from_dict are included.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">to_dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">to_dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span>
     <span class="k">if</span> <span class="n">exclude_key_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1560,7 +1561,7 @@
 
 
 <div class="viewcode-block" id="standardize"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.schema.standardize">[docs]</a><span class="k">def</span> <span class="nf">standardize</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">is_singular</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">suffixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">altkeys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Standardize a component such that each key contains a list of dictionaries.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Standardize a component such that each key contains a list of dictionaries.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        instance (dict): Component to standardize.</span>
@@ -1613,7 +1614,7 @@
 
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">(</span><span class="nb">tuple</span><span class="p">())</span>
 <span class="k">def</span> <span class="nf">_normalize_root</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decorate normalizer.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decorate normalizer.&quot;&quot;&quot;</span>
     <span class="c1"># if getattr(normalizer, &#39;schema_registry&#39;, None) is None:</span>
     <span class="c1">#     normalizer.schema_registry = get_schema()</span>
     <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="s1">&#39;iodict&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1628,7 +1629,7 @@
 
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">((</span><span class="s1">&#39;models&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 <span class="k">def</span> <span class="nf">_normalize_modelio_first</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalizes set of model inputs/outputs before each input/output is normalized.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalizes set of model inputs/outputs before each input/output is normalized.&quot;&quot;&quot;</span>
     <span class="n">iodict</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="s1">&#39;iodict&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">standardize</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">])</span>
@@ -1659,7 +1660,7 @@
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">([(</span><span class="s1">&#39;models&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                                      <span class="p">(</span><span class="s1">&#39;models&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)])</span>
 <span class="k">def</span> <span class="nf">_normalize_modelio_elements</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize case of models singular.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize case of models singular.&quot;&quot;&quot;</span>
     <span class="n">io</span> <span class="o">=</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">current_schema_path</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="c1"># Register io if dict set</span>
     <span class="n">iodict</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="s1">&#39;iodict&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -1703,7 +1704,7 @@
 
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">((</span><span class="s1">&#39;connections&#39;</span><span class="p">,))</span>
 <span class="k">def</span> <span class="nf">_normalize_connio_base</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalizes list of connections, adding those represented by</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalizes list of connections, adding those represented by</span>
 <span class="sd">    multiple drivers.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">current_path</span> <span class="o">!=</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">current_schema_path</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">instance</span>
@@ -1753,7 +1754,7 @@
 
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">((</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 <span class="k">def</span> <span class="nf">_normalize_connio_first</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalizes set of connection before each connection is normalized.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalizes set of connection before each connection is normalized.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">standardize</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">],</span> <span class="n">suffixes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;_file&#39;</span><span class="p">,</span> <span class="s1">&#39;_files&#39;</span><span class="p">],</span>
                     <span class="n">altkeys</span><span class="o">=</span><span class="p">[[</span><span class="s1">&#39;from&#39;</span><span class="p">,</span> <span class="s1">&#39;to&#39;</span><span class="p">]])</span>
@@ -1806,7 +1807,7 @@
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">([(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                                      <span class="p">(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)])</span>
 <span class="k">def</span> <span class="nf">_normalize_connio_elements_comm</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize connection inputs/outputs as comms.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize connection inputs/outputs as comms.&quot;&quot;&quot;</span>
     <span class="n">io</span> <span class="o">=</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">current_schema_path</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="c1"># Check to see if is file</span>
@@ -1827,7 +1828,7 @@
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">([(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                                      <span class="p">(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)])</span>
 <span class="k">def</span> <span class="nf">_normalize_connio_elements_file</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize connection inputs/outputs as files.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize connection inputs/outputs as files.&quot;&quot;&quot;</span>
     <span class="n">io</span> <span class="o">=</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">current_schema_path</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="c1"># Check to see if is file</span>
@@ -1842,7 +1843,7 @@
 
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">((</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 <span class="k">def</span> <span class="nf">_normalize_connio_last</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize set of connections after they have been normalized.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize set of connections after they have been normalized.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="c1"># Check that files properly specified</span>
         <span class="n">s</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="s1">&#39;schema_registry&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -1867,7 +1868,7 @@
 
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">((</span><span class="s1">&#39;models&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 <span class="k">def</span> <span class="nf">_normalize_model_driver</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalizes older style of specifying driver rather than language.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalizes older style of specifying driver rather than language.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="s1">&#39;schema_registry&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1892,7 +1893,7 @@
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">([(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                                      <span class="p">(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)])</span>
 <span class="k">def</span> <span class="nf">_normalize_rwmeth</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize older style of specifying &#39;read_meth&#39; or &#39;write_meth&#39; instead</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize older style of specifying &#39;read_meth&#39; or &#39;write_meth&#39; instead</span>
 <span class="sd">    of filetype.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="c1"># Replace old read/write methd with filetype</span>
@@ -1907,7 +1908,7 @@
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">([(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                                      <span class="p">(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)])</span>
 <span class="k">def</span> <span class="nf">_normalize_ascii_table</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize the older style arguments for ascii table connections.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize the older style arguments for ascii table connections.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">alias_keys</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;column_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_names&#39;</span><span class="p">),</span>
                       <span class="p">(</span><span class="s1">&#39;column_units&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">),</span>
@@ -1921,7 +1922,7 @@
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">([(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                                      <span class="p">(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)])</span>
 <span class="k">def</span> <span class="nf">_normalize_serializer</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize the serializer if the information is in the file.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize the serializer if the information is in the file.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;serializer&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">instance</span><span class="p">)</span>
          <span class="ow">and</span> <span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;filetype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;binary&#39;</span><span class="p">]))):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="s1">&#39;schema_registry&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -1941,7 +1942,7 @@
                                      <span class="p">(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                                      <span class="p">(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)])</span>
 <span class="k">def</span> <span class="nf">_normalize_datatype</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize the datatype if the type information is in the comm.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize the datatype if the type information is in the comm.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;datatype&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">instance</span><span class="p">):</span>
             <span class="n">type_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">metaschema</span><span class="o">.</span><span class="n">get_metaschema</span><span class="p">()[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>

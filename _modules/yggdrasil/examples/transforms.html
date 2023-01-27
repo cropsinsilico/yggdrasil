@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.examples.transforms &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.examples.transforms &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,9 +83,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>yggdrasil.examples.transforms</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">yggdrasil.examples.transforms</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -102,7 +103,7 @@
 
 
 <div class="viewcode-block" id="get_test_data"><a class="viewcode-back" href="../../../yggdrasil.examples.transforms.html#yggdrasil.examples.transforms.get_test_data">[docs]</a><span class="k">def</span> <span class="nf">get_test_data</span><span class="p">(</span><span class="n">transform</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine a test data set for the specified type.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine a test data set for the specified type.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        object: Example of specified datatype.</span>
@@ -128,7 +129,7 @@
 
 
 <div class="viewcode-block" id="check_received_data"><a class="viewcode-back" href="../../../yggdrasil.examples.transforms.html#yggdrasil.examples.transforms.check_received_data">[docs]</a><span class="k">def</span> <span class="nf">check_received_data</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">x_recv</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check that the received message is equivalent to the</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check that the received message is equivalent to the</span>
 <span class="sd">    test data for the specified type.</span>
 
 <span class="sd">    Args:</span>
@@ -155,7 +156,7 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x_sent</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
         <span class="n">pd</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_frame_equal</span><span class="p">(</span><span class="n">x_recv</span><span class="p">,</span> <span class="n">x_sent</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">x_recv</span> <span class="o">==</span> <span class="n">x_sent</span><span class="p">)</span></div>
+        <span class="k">assert</span> <span class="n">x_recv</span> <span class="o">==</span> <span class="n">x_sent</span></div>
 </pre></div>
 
            </div>

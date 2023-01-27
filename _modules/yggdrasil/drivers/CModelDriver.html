@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.CModelDriver &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.drivers.CModelDriver &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
-      <li>yggdrasil.drivers.CModelDriver</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../drivers.html">yggdrasil.drivers</a></li>
+      <li class="breadcrumb-item active">yggdrasil.drivers.CModelDriver</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -120,7 +121,7 @@
 
 
 <div class="viewcode-block" id="get_OSX_SYSROOT"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.get_OSX_SYSROOT">[docs]</a><span class="k">def</span> <span class="nf">get_OSX_SYSROOT</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determin the path to the OSX SDK.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determin the path to the OSX SDK.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        str: Full path to the SDK directory if one is located. None</span>
@@ -159,7 +160,7 @@
 
 
 <div class="viewcode-block" id="CCompilerBase"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CCompilerBase">[docs]</a><span class="k">class</span> <span class="nc">CCompilerBase</span><span class="p">(</span><span class="n">CompilerBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for C compilers.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for C compilers.&quot;&quot;&quot;</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span>
     <span class="n">default_executable_env</span> <span class="o">=</span> <span class="s1">&#39;CC&#39;</span>
     <span class="n">default_flags_env</span> <span class="o">=</span> <span class="s1">&#39;CFLAGS&#39;</span>
@@ -177,7 +178,7 @@
 
 <div class="viewcode-block" id="CCompilerBase.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CCompilerBase.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
 <span class="sd">        to registration including things like platform dependent properties and</span>
 <span class="sd">        checking environment variables for default settings.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -194,7 +195,7 @@
 
 <div class="viewcode-block" id="CCompilerBase.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CCompilerBase.set_env">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set environment variables required for compilation.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set environment variables required for compilation.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            *args: Arguments are passed to the parent class&#39;s method.</span>
@@ -219,7 +220,7 @@
     
 <div class="viewcode-block" id="CCompilerBase.call"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CCompilerBase.call">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call the compiler with the provided arguments. For |yggdrasil| C</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call the compiler with the provided arguments. For |yggdrasil| C</span>
 <span class="sd">        models will always be linked using the C++ linker since some parts of</span>
 <span class="sd">        the interface library are written in C++.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dont_link&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
@@ -228,7 +229,7 @@
     
 <div class="viewcode-block" id="CCompilerBase.get_search_path"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CCompilerBase.get_search_path">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_search_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the paths searched by the tool for external library files.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the paths searched by the tool for external library files.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            *args: Additional arguments are passed to the parent</span>
@@ -244,7 +245,7 @@
 
 
 <div class="viewcode-block" id="GCCCompiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.GCCCompiler">[docs]</a><span class="k">class</span> <span class="nc">GCCCompiler</span><span class="p">(</span><span class="n">CCompilerBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for gcc compiler/linker.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for gcc compiler/linker.&quot;&quot;&quot;</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;gcc&#39;</span>
     <span class="n">platforms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MacOS&#39;</span><span class="p">,</span> <span class="s1">&#39;Linux&#39;</span><span class="p">,</span> <span class="s1">&#39;Windows&#39;</span><span class="p">]</span>
     <span class="n">default_archiver</span> <span class="o">=</span> <span class="s1">&#39;ar&#39;</span>
@@ -255,11 +256,11 @@
             <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">CCompilerBase</span><span class="o">.</span><span class="n">linker_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;flag_options&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
             <span class="o">+</span> <span class="p">[(</span><span class="s1">&#39;library_rpath&#39;</span><span class="p">,</span> <span class="s1">&#39;-Wl,-rpath&#39;</span><span class="p">)]))</span>
     <span class="n">toolset</span> <span class="o">=</span> <span class="s1">&#39;gnu&#39;</span>
-    <span class="n">aliases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gnu-cc&#39;</span><span class="p">]</span>
+    <span class="n">aliases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gnu-cc&#39;</span><span class="p">,</span> <span class="s1">&#39;gnu-gcc&#39;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="GCCCompiler.is_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.GCCCompiler.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this tool is installed by looking for the executable.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this tool is installed by looking for the executable.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if the tool is installed, False otherwise.</span>
@@ -273,7 +274,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="GCCCompiler.dll2a"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.GCCCompiler.dll2a">[docs]</a>    <span class="k">def</span> <span class="nf">dll2a</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dll</span><span class="p">,</span> <span class="n">dst</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a window&#39;s .dll library into a static library.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a window&#39;s .dll library into a static library.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            dll (str): Full path to .dll library to convert.</span>
@@ -306,12 +307,12 @@
                     <span class="p">[</span><span class="n">dlltool</span><span class="p">,</span> <span class="s1">&#39;-D&#39;</span><span class="p">,</span> <span class="n">dll</span><span class="p">,</span> <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.def&#39;</span> <span class="o">%</span> <span class="n">base</span><span class="p">,</span> <span class="s1">&#39;-l&#39;</span><span class="p">,</span> <span class="n">dst</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">dst</span> <span class="o">=</span> <span class="n">dll</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dst</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dst</span></div></div>
 
 
 <div class="viewcode-block" id="ClangCompiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.ClangCompiler">[docs]</a><span class="k">class</span> <span class="nc">ClangCompiler</span><span class="p">(</span><span class="n">CCompilerBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for clang compiler/linker.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for clang compiler/linker.&quot;&quot;&quot;</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;clang&#39;</span>
     <span class="n">platforms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MacOS&#39;</span><span class="p">,</span> <span class="s1">&#39;Linux&#39;</span><span class="p">,</span> <span class="s1">&#39;Windows&#39;</span><span class="p">]</span>
     <span class="n">default_linker</span> <span class="o">=</span> <span class="s1">&#39;clang&#39;</span>
@@ -329,17 +330,19 @@
 
 <div class="viewcode-block" id="ClangCompiler.get_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.ClangCompiler.get_flags">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of compiler flags.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of compiler flags.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ClangCompiler</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_flags</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;-fopenmp&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
             <span class="n">idx</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;-fopenmp&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">idx</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;-Xpreprocessor&#39;</span><span class="p">):</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="s1">&#39;-Xpreprocessor&#39;</span><span class="p">)</span>
+            <span class="c1"># new_flag = &#39;-Xpreprocessor&#39;</span>
+            <span class="n">new_flag</span> <span class="o">=</span> <span class="s1">&#39;-Xclang&#39;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">idx</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">new_flag</span><span class="p">):</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">new_flag</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
         
 
 <div class="viewcode-block" id="MSVCCompiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.MSVCCompiler">[docs]</a><span class="k">class</span> <span class="nc">MSVCCompiler</span><span class="p">(</span><span class="n">CCompilerBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Microsoft Visual Studio C Compiler.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Microsoft Visual Studio C Compiler.&quot;&quot;&quot;</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;cl&#39;</span>
     <span class="n">platforms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Windows&#39;</span><span class="p">]</span>
     <span class="c1"># TODO: Currently everything compiled as C++ on windows to allow use</span>
@@ -383,7 +386,7 @@
     
 <div class="viewcode-block" id="MSVCCompiler.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.MSVCCompiler.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
 <span class="sd">        to registration including things like platform dependent properties and</span>
 <span class="sd">        checking environment variables for default settings.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -394,13 +397,13 @@
                   <span class="o">!=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">linker_path</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()))):</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">linker_attributes</span><span class="p">[</span><span class="s1">&#39;default_executable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">compiler_path</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">linker_path</span><span class="p">))</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">linker_attributes</span><span class="p">[</span><span class="s1">&#39;default_executable&#39;</span><span class="p">]))</span>
+            <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">linker_attributes</span><span class="p">[</span><span class="s1">&#39;default_executable&#39;</span><span class="p">])</span>
         <span class="n">CCompilerBase</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="MSVCCompiler.tool_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.MSVCCompiler.tool_version">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">tool_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pragma: windows</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this tool.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this tool.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Keyword arguments are passed to cls.call.</span>
@@ -418,7 +421,7 @@
 
 <span class="c1"># C Linkers</span>
 <div class="viewcode-block" id="LDLinker"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.LDLinker">[docs]</a><span class="k">class</span> <span class="nc">LDLinker</span><span class="p">(</span><span class="n">LinkerBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Linker class for ld tool.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Linker class for ld tool.&quot;&quot;&quot;</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;ld&#39;</span>
     <span class="c1"># Languages disabled for ld by default to prevent it being</span>
     <span class="c1"># selected instead of the default which seems to be happening</span>
@@ -431,7 +434,7 @@
 
 <div class="viewcode-block" id="LDLinker.tool_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.LDLinker.tool_version">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">tool_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this tool.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this tool.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Keyword arguments are passed to cls.call.</span>
@@ -454,7 +457,7 @@
 
 
 <div class="viewcode-block" id="ClangLinker"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.ClangLinker">[docs]</a><span class="k">class</span> <span class="nc">ClangLinker</span><span class="p">(</span><span class="n">LDLinker</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for clang linker (calls to ld).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for clang linker (calls to ld).&quot;&quot;&quot;</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="n">ClangCompiler</span><span class="o">.</span><span class="n">toolname</span>
     <span class="n">aliases</span> <span class="o">=</span> <span class="n">ClangCompiler</span><span class="o">.</span><span class="n">aliases</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="n">ClangCompiler</span><span class="o">.</span><span class="n">languages</span>
@@ -471,7 +474,7 @@
 
 <div class="viewcode-block" id="ClangLinker.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.ClangLinker.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
 <span class="sd">        to registration including things like platform dependent properties and</span>
 <span class="sd">        checking environment variables for default settings.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -484,7 +487,7 @@
 
 <div class="viewcode-block" id="ClangLinker.get_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.ClangLinker.get_flags">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of linker flags.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of linker flags.&quot;&quot;&quot;</span>
         <span class="c1"># Handle case where clang (10.0.0) is trying to pass</span>
         <span class="c1"># -platform_version to a version of ld64 that dosn&#39;t support</span>
         <span class="c1"># it (&lt;520).</span>
@@ -507,12 +510,21 @@
             <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-lstdc++&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;-fopenmp&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
             <span class="n">out</span><span class="p">[</span><span class="n">out</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;-fopenmp&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s1">&#39;-lomp&#39;</span>
+            <span class="k">if</span> <span class="s1">&#39;conda&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_executable</span><span class="p">(</span><span class="n">full_path</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span>
+                    <span class="s2">&quot;find /usr/local -xdev -name &#39;*libomp*&#39;&quot;</span><span class="p">,</span>
+                    <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                    <span class="n">x_dir</span><span class="p">,</span> <span class="n">x_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">x_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">((</span><span class="s1">&#39;libomp.dylib&#39;</span><span class="p">,</span> <span class="s1">&#39;libomp.a&#39;</span><span class="p">)):</span>
+                        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-L</span><span class="si">{</span><span class="n">x_dir</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="k">break</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 
 
 <span class="c1"># C Archivers</span>
 <div class="viewcode-block" id="ARArchiver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.ARArchiver">[docs]</a><span class="k">class</span> <span class="nc">ARArchiver</span><span class="p">(</span><span class="n">ArchiverBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Archiver class for ar tool.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Archiver class for ar tool.&quot;&quot;&quot;</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;ar&#39;</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">,</span> <span class="s1">&#39;fortran&#39;</span><span class="p">]</span>
     <span class="n">default_executable_env</span> <span class="o">=</span> <span class="s1">&#39;AR&#39;</span>
@@ -526,7 +538,7 @@
 
 
 <div class="viewcode-block" id="LibtoolArchiver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.LibtoolArchiver">[docs]</a><span class="k">class</span> <span class="nc">LibtoolArchiver</span><span class="p">(</span><span class="n">ArchiverBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Archiver class for libtool tool.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Archiver class for libtool tool.&quot;&quot;&quot;</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;libtool&#39;</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">]</span>
     <span class="n">default_executable_env</span> <span class="o">=</span> <span class="s1">&#39;LIBTOOL&#39;</span>
@@ -536,7 +548,7 @@
     
 
 <div class="viewcode-block" id="MSVCArchiver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.MSVCArchiver">[docs]</a><span class="k">class</span> <span class="nc">MSVCArchiver</span><span class="p">(</span><span class="n">ArchiverBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Microsoft Visual Studio C Archiver.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Microsoft Visual Studio C Archiver.&quot;&quot;&quot;</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;LIB&#39;</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">]</span>
     <span class="n">platforms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Windows&#39;</span><span class="p">]</span>
@@ -594,7 +606,7 @@
 
 
 <div class="viewcode-block" id="CModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver">[docs]</a><span class="k">class</span> <span class="nc">CModelDriver</span><span class="p">(</span><span class="n">CompiledModelDriver</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running C models.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running C models.&quot;&quot;&quot;</span>
 
     <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is written in C.&#39;</span><span class="p">)</span>
     <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;c&#39;</span>
@@ -832,7 +844,7 @@
 
 <div class="viewcode-block" id="CModelDriver.after_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.after_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes after</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes after</span>
 <span class="sd">        registration.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">default_compiler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_linux</span><span class="p">:</span>
@@ -872,7 +884,7 @@
         <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="s1">&#39;ygg&#39;</span><span class="p">][</span><span class="s1">&#39;include_dirs&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="n">_top_lang_dir</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
             <span class="n">stdint_win</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_lang_dir</span><span class="p">,</span> <span class="s1">&#39;windows_stdint.h&#39;</span><span class="p">)</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">stdint_win</span><span class="p">))</span>
+            <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">stdint_win</span><span class="p">)</span>
             <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">stdint_win</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_lang_dir</span><span class="p">,</span> <span class="s1">&#39;stdint.h&#39;</span><span class="p">))</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="s1">&#39;datatypes&#39;</span><span class="p">][</span><span class="s1">&#39;include_dirs&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="n">_top_lang_dir</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_linux</span><span class="p">:</span>
@@ -884,7 +896,7 @@
         
 <div class="viewcode-block" id="CModelDriver.configure"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.configure">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">macos_sdkroot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vcpkg_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add configuration options for this language. This includes locating</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add configuration options for this language. This includes locating</span>
 <span class="sd">        any required external libraries and setting option defaults.</span>
 
 <span class="sd">        Args:</span>
@@ -911,6 +923,8 @@
         <span class="k">if</span> <span class="n">vcpkg_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">vcpkg_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;VCPKG_ROOT&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">vcpkg_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting vcpkg_dir to </span><span class="si">{</span><span class="n">vcpkg_dir</span><span class="si">}</span><span class="s2">&quot;</span>
+                  <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">vcpkg_dir</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
             <span class="n">vcpkg_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">vcpkg_dir</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">vcpkg_dir</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Path to vcpkg root directory &quot;</span>
@@ -939,7 +953,7 @@
 
 <div class="viewcode-block" id="CModelDriver.get_dependency_info"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.get_dependency_info">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_dependency_info</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the dictionary of information associated with a</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the dictionary of information associated with a</span>
 <span class="sd">        dependency.</span>
 
 <span class="sd">        Args:</span>
@@ -972,7 +986,7 @@
 
 <div class="viewcode-block" id="CModelDriver.call_linker"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.call_linker">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">call_linker</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Link several object files to create an executable or library (shared</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Link several object files to create an executable or library (shared</span>
 <span class="sd">        or static), checking for errors.</span>
 
 <span class="sd">        Args:</span>
@@ -999,7 +1013,7 @@
     <span class="k">def</span> <span class="nf">update_ld_library_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">paths_to_add</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                <span class="n">add_to_front</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">add_libpython_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                <span class="n">toolname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">env_var</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update provided dictionary of environment variables so that</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update provided dictionary of environment variables so that</span>
 <span class="sd">        LD_LIBRARY_PATH includes the interface directory containing the interface</span>
 <span class="sd">        libraries.</span>
 
@@ -1061,7 +1075,7 @@
 
 <div class="viewcode-block" id="CModelDriver.update_python_path"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.update_python_path">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">update_python_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update provided dictionary of environment variables so that</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update provided dictionary of environment variables so that</span>
 <span class="sd">        PYTHONPATH and PYTHONHOME are set as needed (primarily on windows).</span>
 
 <span class="sd">        Args:</span>
@@ -1080,7 +1094,7 @@
 
 <div class="viewcode-block" id="CModelDriver.set_env_class"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.set_env_class">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">set_env_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set environment variables that are instance independent.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set environment variables that are instance independent.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
@@ -1097,7 +1111,7 @@
     
 <div class="viewcode-block" id="CModelDriver.parse_var_definition"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.parse_var_definition">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parse_var_definition</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">io</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Extract information about input/output variables from a</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Extract information about input/output variables from a</span>
 <span class="sd">        string definition.</span>
 
 <span class="sd">        Args:</span>
@@ -1138,7 +1152,7 @@
                 <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
                     <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;[]&#39;</span><span class="p">)))</span>
                     <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;shape&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;][&#39;</span><span class="p">)]</span>
-                <span class="k">assert</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;subtype&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">VALID_TYPES</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;subtype&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">VALID_TYPES</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;shape&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
                         <span class="s1">&#39;shape&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -1149,7 +1163,7 @@
         
 <div class="viewcode-block" id="CModelDriver.finalize_function_io"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.finalize_function_io">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">finalize_function_io</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Finalize info for an input/output channel following function</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Finalize info for an input/output channel following function</span>
 <span class="sd">        parsing.</span>
 
 <span class="sd">        Args:</span>
@@ -1226,7 +1240,7 @@
 
 <div class="viewcode-block" id="CModelDriver.input2output"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.input2output">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">input2output</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform conversion necessary to turn a variable extracted from a</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform conversion necessary to turn a variable extracted from a</span>
 <span class="sd">        function definition from an input to an output.</span>
 
 <span class="sd">        Args:</span>
@@ -1238,7 +1252,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">input2output</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ptr&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;native_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">))</span>
+            <span class="k">assert</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;native_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;ptr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;ptr&#39;</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;native_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;native_type&#39;</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_json_type</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;native_type&#39;</span><span class="p">])</span>
@@ -1250,7 +1264,7 @@
 
 <div class="viewcode-block" id="CModelDriver.output2input"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.output2input">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">output2input</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">in_definition</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform conversion necessary to turn an output variable</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform conversion necessary to turn an output variable</span>
 <span class="sd">        into an corresponding input that can be used to format a</span>
 <span class="sd">        function definition.</span>
 
@@ -1281,7 +1295,7 @@
         
 <div class="viewcode-block" id="CModelDriver.allows_realloc"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.allows_realloc">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">allows_realloc</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a variable allows the receive call to perform</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a variable allows the receive call to perform</span>
 <span class="sd">        realloc.</span>
 
 <span class="sd">        Args:</span>
@@ -1299,7 +1313,7 @@
         
 <div class="viewcode-block" id="CModelDriver.requires_length_var"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.requires_length_var">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">requires_length_var</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a variable requires a separate length variable.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a variable requires a separate length variable.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            var (dict): Dictionary of variable properties.</span>
@@ -1320,7 +1334,7 @@
     
 <div class="viewcode-block" id="CModelDriver.requires_shape_var"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.requires_shape_var">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">requires_shape_var</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a variable requires a separate shape variable.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a variable requires a separate shape variable.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            var (dict): Dictionary of variable properties.</span>
@@ -1339,7 +1353,7 @@
               
 <div class="viewcode-block" id="CModelDriver.get_native_type"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.get_native_type">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_native_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the native type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the native type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            type (str, optional): Name of |yggdrasil| extended JSON</span>
@@ -1360,7 +1374,7 @@
             <span class="n">json_type</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">json_type</span><span class="p">}</span>
         <span class="c1"># if &#39;type&#39; in kwargs:</span>
         <span class="c1">#     json_type.update(kwargs)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">json_type</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">json_type</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
         <span class="n">json_type</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">json_type</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">normalize_definition</span><span class="p">(</span>
             <span class="n">json_type</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
@@ -1389,7 +1403,7 @@
         
 <div class="viewcode-block" id="CModelDriver.get_json_type"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.get_json_type">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_json_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">native_type</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the JSON type from the native language type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the JSON type from the native language type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            native_type (str): The native language type.</span>
@@ -1446,7 +1460,7 @@
         
 <div class="viewcode-block" id="CModelDriver.format_function_param"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.format_function_param">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">format_function_param</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the formatted version of the specified key.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the formatted version of the specified key.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            key (str): Key in cls.function_param mapping that should be</span>
@@ -1475,7 +1489,7 @@
 <div class="viewcode-block" id="CModelDriver.write_model_function_call"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.write_model_function_call">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_model_function_call</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_function</span><span class="p">,</span> <span class="n">flag_var</span><span class="p">,</span>
                                   <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write lines necessary to call the model function.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write lines necessary to call the model function.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            model_function (str): Handle of the model function that should be</span>
@@ -1501,7 +1515,7 @@
         
 <div class="viewcode-block" id="CModelDriver.write_model_recv"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.write_model_recv">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_model_recv</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">recv_var</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a model receive call include checking the return flag.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a model receive call include checking the return flag.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            channel (str): Name of variable that the channel being received from</span>
@@ -1531,7 +1545,7 @@
             
 <div class="viewcode-block" id="CModelDriver.write_initialize_oiter"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.write_initialize_oiter">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_initialize_oiter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to initialize an array for iteration</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to initialize an array for iteration</span>
 <span class="sd">        output.</span>
 
 <span class="sd">        Args:</span>
@@ -1555,7 +1569,7 @@
     
 <div class="viewcode-block" id="CModelDriver.write_declaration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.write_declaration">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_declaration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to declare a variable with a certain</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to declare a variable with a certain</span>
 <span class="sd">        type.</span>
 
 <span class="sd">        Args:</span>
@@ -1592,7 +1606,7 @@
 
 <div class="viewcode-block" id="CModelDriver.get_name_declare"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.get_name_declare">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_name_declare</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the name that should be used for declaration.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the name that should be used for declaration.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            var (str, dict): Name of variable or dictionary of information.</span>
@@ -1603,7 +1617,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">return</span> <span class="n">var</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">var</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="s1">&#39;length&#39;</span> <span class="ow">in</span> <span class="n">var</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="p">{}):</span>
             <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;[</span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">var</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;length&#39;</span><span class="p">]</span>
@@ -1614,7 +1628,7 @@
         
 <div class="viewcode-block" id="CModelDriver.write_free"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.write_free">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_free</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to free a variable with a certain type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to free a variable with a certain type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            var (dict, str): Name or information dictionary for the variable</span>
@@ -1644,7 +1658,7 @@
 <div class="viewcode-block" id="CModelDriver.prepare_variables"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.prepare_variables">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">prepare_variables</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">vars_list</span><span class="p">,</span> <span class="n">in_definition</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                           <span class="n">for_yggdrasil</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concatenate a set of input variables such that it can be passed as a</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concatenate a set of input variables such that it can be passed as a</span>
 <span class="sd">        single string to the function_call parameter.</span>
 
 <span class="sd">        Args:</span>
@@ -1669,7 +1683,7 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="n">new_vars_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">for_yggdrasil</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_length_var&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                     <span class="k">continue</span>
                 <span class="n">new_vars_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -1704,7 +1718,7 @@
 <div class="viewcode-block" id="CModelDriver.prepare_output_variables"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.prepare_output_variables">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">prepare_output_variables</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">vars_list</span><span class="p">,</span> <span class="n">in_definition</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                  <span class="n">in_inputs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">for_yggdrasil</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concatenate a set of output variables such that it can be passed as</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concatenate a set of output variables such that it can be passed as</span>
 <span class="sd">        a single string to the function_call parameter.</span>
 
 <span class="sd">        Args:</span>
@@ -1735,7 +1749,7 @@
 
 <div class="viewcode-block" id="CModelDriver.write_print_output_var"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.write_print_output_var">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_print_output_var</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">in_inputs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to print an output variable in this</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to print an output variable in this</span>
 <span class="sd">        language.</span>
 
 <span class="sd">        Args:</span>
@@ -1760,7 +1774,7 @@
 <div class="viewcode-block" id="CModelDriver.write_function_def"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.write_function_def">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_function_def</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">dont_add_lengths</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                            <span class="n">use_length_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a function definition.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a function definition.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            function_name (str): Name fo the function being defined.</span>
@@ -1856,7 +1870,7 @@
                                <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                <span class="n">dont_add_lengths</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                <span class="n">use_length_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write lines assigning a value to an output variable.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write lines assigning a value to an output variable.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            dst_var (str, dict): Name or information dictionary for</span>
@@ -2033,7 +2047,7 @@
 
 <div class="viewcode-block" id="CModelDriver.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>

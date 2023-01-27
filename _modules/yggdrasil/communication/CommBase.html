@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.CommBase &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.communication.CommBase &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../communication.html">yggdrasil.communication</a> &raquo;</li>
-      <li>yggdrasil.communication.CommBase</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../communication.html">yggdrasil.communication</a></li>
+      <li class="breadcrumb-item active">yggdrasil.communication.CommBase</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -135,11 +136,11 @@
 
 
 <div class="viewcode-block" id="IncompleteBaseComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.IncompleteBaseComm">[docs]</a><span class="k">class</span> <span class="nc">IncompleteBaseComm</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;An exception class for methods that are incomplete for base classes.&quot;&quot;&quot;</span></div>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;An exception class for methods that are incomplete for base classes.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="CommMessage"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommMessage">[docs]</a><span class="k">class</span> <span class="nc">CommMessage</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for passing messages around with additional information required</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for passing messages around with additional information required</span>
 <span class="sd">    to send/receive them.</span>
 
 <span class="sd">    Attributes:</span>
@@ -192,13 +193,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tuple_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Form that arguments were originally supplied.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Form that arguments were originally supplied.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">singular</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span>
 
 <div class="viewcode-block" id="CommMessage.add_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommMessage.add_message">[docs]</a>    <span class="k">def</span> <span class="nf">add_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a message to the list of additional messages that should be sent</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a message to the list of additional messages that should be sent</span>
 <span class="sd">        following this one.</span>
 
 <span class="sd">        Args:</span>
@@ -210,7 +211,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">additional_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CommMessage</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="CommMessage.add_worker_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommMessage.add_worker_message">[docs]</a>    <span class="k">def</span> <span class="nf">add_worker_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a message to the list of messages that should be sent via work</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a message to the list of messages that should be sent via work</span>
 <span class="sd">        comm following this one.</span>
 
 <span class="sd">        Args:</span>
@@ -222,7 +223,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">worker_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CommMessage</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="CommMessage.send_worker_messages"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommMessage.send_worker_messages">[docs]</a>    <span class="k">def</span> <span class="nf">send_worker_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send the worker messages via the worker comm.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send the worker messages via the worker comm.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Keyword arguments are passed to the send_message</span>
@@ -239,7 +240,7 @@
         <span class="k">return</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="CommMessage.apply_function"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommMessage.apply_function">[docs]</a>    <span class="k">def</span> <span class="nf">apply_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a function to the message.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a function to the message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x (function): Function to apply.</span>
@@ -251,7 +252,7 @@
 
 
 <div class="viewcode-block" id="is_registered"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.is_registered">[docs]</a><span class="k">def</span> <span class="nf">is_registered</span><span class="p">(</span><span class="n">commtype</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a comm object has been registered under the specified key.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a comm object has been registered under the specified key.</span>
 <span class="sd">    </span>
 <span class="sd">    Args:</span>
 <span class="sd">        commtype (str): Comm class to check for the key under.</span>
@@ -266,7 +267,7 @@
 
 
 <div class="viewcode-block" id="get_comm_registry"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.get_comm_registry">[docs]</a><span class="k">def</span> <span class="nf">get_comm_registry</span><span class="p">(</span><span class="n">commtype</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the comm registry for a comm class.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the comm registry for a comm class.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        commtype (str): Comm class to get registry for.</span>
@@ -284,7 +285,7 @@
 
 
 <div class="viewcode-block" id="register_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.register_comm">[docs]</a><span class="k">def</span> <span class="nf">register_comm</span><span class="p">(</span><span class="n">commtype</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a comm object to the global registry.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a comm object to the global registry.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        commtype (str): Comm class to register the object under.</span>
@@ -301,7 +302,7 @@
 
 
 <div class="viewcode-block" id="unregister_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.unregister_comm">[docs]</a><span class="k">def</span> <span class="nf">unregister_comm</span><span class="p">(</span><span class="n">commtype</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">dont_close</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove a comm object from the global registry and close it.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove a comm object from the global registry and close it.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        commtype (str): Comm class to check for key under.</span>
@@ -328,7 +329,7 @@
 
 
 <div class="viewcode-block" id="cleanup_comms"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.cleanup_comms">[docs]</a><span class="k">def</span> <span class="nf">cleanup_comms</span><span class="p">(</span><span class="n">commtype</span><span class="p">,</span> <span class="n">close_func</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clean up comms of a certain type.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clean up comms of a certain type.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        commtype (str): Comm class that should be cleaned up.</span>
@@ -352,7 +353,7 @@
 
 
 <div class="viewcode-block" id="CommTaskLoop"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommTaskLoop">[docs]</a><span class="k">class</span> <span class="nc">CommTaskLoop</span><span class="p">(</span><span class="n">multitasking</span><span class="o">.</span><span class="n">YggTaskLoop</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Task loop for comms to ensure cleanup.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Task loop for comms to ensure cleanup.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        comm (:class:.CommBase): Comm class that thread is for.</span>
@@ -373,7 +374,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">CommTaskLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CommTaskLoop.on_main_terminated"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommTaskLoop.on_main_terminated">[docs]</a>    <span class="k">def</span> <span class="nf">on_main_terminated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions taken on the backlog thread when the main thread stops.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions taken on the backlog thread when the main thread stops.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;is_interface = </span><span class="si">%s</span><span class="s1">, direction = </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
                    <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">is_interface</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">is_interface</span><span class="p">:</span>
@@ -389,7 +390,7 @@
 
 
 <div class="viewcode-block" id="CommServer"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommServer">[docs]</a><span class="k">class</span> <span class="nc">CommServer</span><span class="p">(</span><span class="n">multitasking</span><span class="o">.</span><span class="n">YggTaskLoop</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Basic server object to keep track of clients.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Basic server object to keep track of clients.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        cli_count (int): Number of clients that have connected to this server.</span>
@@ -414,7 +415,7 @@
     <span class="c1">#     self.debug(&quot;Added server to server: nservers = %d&quot;, self.srv_count)</span>
 
 <div class="viewcode-block" id="CommServer.add_client"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommServer.add_client">[docs]</a>    <span class="k">def</span> <span class="nf">add_client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Increment the client count.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Increment the client count.&quot;&quot;&quot;</span>
         <span class="k">global</span> <span class="n">_registered_servers</span>
         <span class="n">_registered_servers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">srv_address</span><span class="p">]</span><span class="o">.</span><span class="n">cli_count</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Added client to server: nclients = </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cli_count</span><span class="p">)</span></div>
@@ -430,7 +431,7 @@
     <span class="c1">#         _registered_servers.pop(self.srv_address)</span>
             
 <div class="viewcode-block" id="CommServer.remove_client"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommServer.remove_client">[docs]</a>    <span class="k">def</span> <span class="nf">remove_client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decrement the client count, closing the server if all clients done.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decrement the client count, closing the server if all clients done.&quot;&quot;&quot;</span>
         <span class="k">global</span> <span class="n">_registered_servers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Removing client from server&quot;</span><span class="p">)</span>
         <span class="n">_registered_servers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">srv_address</span><span class="p">]</span><span class="o">.</span><span class="n">cli_count</span> <span class="o">-=</span> <span class="mi">1</span>
@@ -441,7 +442,7 @@
 
 
 <div class="viewcode-block" id="CommBase"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase">[docs]</a><span class="k">class</span> <span class="nc">CommBase</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">YggClass</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The environment variable where communication address is</span>
@@ -835,7 +836,7 @@
             <span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atexit</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialization steps that should be performed after base class, but</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialization steps that should be performed after base class, but</span>
 <span class="sd">        before the comm is opened.&quot;&quot;&quot;</span>
         <span class="n">seri_cls</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;serializer_class&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">seri_kws</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;serializer_kwargs&#39;</span><span class="p">,</span> <span class="p">{})</span>
@@ -866,7 +867,7 @@
         <span class="c1"># Set send/recv converter based on the serializer</span>
         <span class="n">dir_conv</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_converter&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;transform&#39;</span><span class="p">,</span> <span class="p">[]):</span>
-            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_conv</span><span class="p">,</span> <span class="p">[]))</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_conv</span><span class="p">,</span> <span class="p">[])</span>
             <span class="c1"># setattr(self, dir_conv, self.transform)</span>
         <span class="k">elif</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_conv</span><span class="p">,</span> <span class="p">[]):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_conv</span><span class="p">)</span>
@@ -912,7 +913,7 @@
 
 <div class="viewcode-block" id="CommBase.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">serializer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            serializer (str, optional): The name of the serializer that should</span>
@@ -964,7 +965,7 @@
 
 <div class="viewcode-block" id="CommBase.get_status_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.get_status_message">[docs]</a>    <span class="k">def</span> <span class="nf">get_status_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nindent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">extra_lines_before</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                            <span class="n">extra_lines_after</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return lines composing a status message.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return lines composing a status message.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            nindent (int, optional): Number of tabs that should be used to</span>
@@ -1010,7 +1011,7 @@
     <span class="c1">#     return out</span>
         
 <div class="viewcode-block" id="CommBase.printStatus"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">return_str</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print status of the communicator.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print status of the communicator.&quot;&quot;&quot;</span>
         <span class="n">nindent</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nindent&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">lines</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_status_message</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_work_comms</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -1023,12 +1024,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">any_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the comm interfaces with any files.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the comm interfaces with any files.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span>
         
 <div class="viewcode-block" id="CommBase.is_installed"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the necessary libraries are installed for this</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the necessary libraries are installed for this</span>
 <span class="sd">        communication class.</span>
 
 <span class="sd">        Args:</span>
@@ -1074,22 +1075,22 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">maxMsgSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Maximum size of a single message that should be sent.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Maximum size of a single message that should be sent.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_maxMsgSize</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">empty_bytes_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Empty serialized message.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Empty serialized message.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">model_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of the model using the comm.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of the model using the comm.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_MODEL_NAME&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">full_model_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of the model using the comm w/ copy suffix.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of the model using the comm w/ copy suffix.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;YGG_MODEL_COPY&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">):</span>
             <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;_copy</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">[</span><span class="s1">&#39;YGG_MODEL_COPY&#39;</span><span class="p">]</span>
@@ -1097,12 +1098,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">model_copies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of copies of the model using the comm.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of copies of the model using the comm.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_MODEL_COPIES&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">))</span>
 
 <div class="viewcode-block" id="CommBase.underlying_comm_class"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.underlying_comm_class">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">underlying_comm_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of underlying communication class.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of underlying communication class.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_commtype</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;fork&#39;</span><span class="p">]:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">elif</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_commtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;client&#39;</span><span class="p">,</span> <span class="s1">&#39;server&#39;</span><span class="p">]:</span>
@@ -1111,28 +1112,28 @@
 
 <div class="viewcode-block" id="CommBase.close_registry_entry"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.close_registry_entry">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">close_registry_entry</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close a registry entry.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close a registry entry.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="CommBase.cleanup_comms"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.cleanup_comms">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">cleanup_comms</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup registered comms of this class.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup registered comms of this class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">cleanup_comms</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">underlying_comm_class</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="CommBase.comm_registry"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.comm_registry">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">comm_registry</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Registry of comms of this class.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Registry of comms of this class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">get_comm_registry</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">underlying_comm_class</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="CommBase.is_registered"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.is_registered">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_registered</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the comm is registered, False otherwise.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the comm is registered, False otherwise.&quot;&quot;&quot;</span>
         <span class="n">commtype</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">underlying_comm_class</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">is_registered</span><span class="p">(</span><span class="n">commtype</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.register_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.register_comm">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">register_comm</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Register a comm.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Register a comm.&quot;&quot;&quot;</span>
         <span class="c1"># commtype = cls._commtype</span>
         <span class="n">commtype</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">underlying_comm_class</span><span class="p">()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Registering </span><span class="si">%s</span><span class="s2"> comm: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">commtype</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
@@ -1140,7 +1141,7 @@
 
 <div class="viewcode-block" id="CommBase.unregister_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.unregister_comm">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">unregister_comm</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">dont_close</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Unregister a comm.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Unregister a comm.&quot;&quot;&quot;</span>
         <span class="c1"># commtype = cls._commtype</span>
         <span class="n">commtype</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">underlying_comm_class</span><span class="p">()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Unregistering </span><span class="si">%s</span><span class="s2"> comm: </span><span class="si">%s</span><span class="s2"> (dont_close = </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
@@ -1149,7 +1150,7 @@
 
 <div class="viewcode-block" id="CommBase.comm_count"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.comm_count">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">comm_count</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of communication connections.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of communication connections.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">comm_registry</span><span class="p">())</span>
         <span class="k">if</span> <span class="n">out</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;There are </span><span class="si">%d</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> comms: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
@@ -1159,13 +1160,13 @@
 
 <div class="viewcode-block" id="CommBase.new_comm_kwargs"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.new_comm_kwargs">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">new_comm_kwargs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get keyword arguments for new comm.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get keyword arguments for new comm.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;address&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span></div>
 
 <div class="viewcode-block" id="CommBase.new_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.new_comm">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">new_comm</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize communication with new queue.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize communication with new queue.&quot;&quot;&quot;</span>
         <span class="n">dont_create</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;dont_create&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="n">env</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="k">for</span> <span class="n">ienv</span> <span class="ow">in</span> <span class="p">[</span><span class="n">env</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">]:</span>
@@ -1179,7 +1180,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">model_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping between model name and opposite comm</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping between model name and opposite comm</span>
 <span class="sd">        environment variables that need to be provided to the model.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">partner_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1188,21 +1189,21 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">opp_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name that should be used for the opposite comm.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name that should be used for the opposite comm.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">opp_address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Address for opposite comm.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Address for opposite comm.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">opp_comms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Name/address pairs for opposite comms.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Name/address pairs for opposite comms.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">opp_name</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">opp_address</span><span class="p">}</span>
 
 <div class="viewcode-block" id="CommBase.opp_comm_kwargs"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.opp_comm_kwargs">[docs]</a>    <span class="k">def</span> <span class="nf">opp_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">for_yaml</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get keyword arguments to initialize communication with opposite</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get keyword arguments to initialize communication with opposite</span>
 <span class="sd">        comm object.</span>
 
 <span class="sd">        Args:</span>
@@ -1235,21 +1236,21 @@
         <span class="k">return</span> <span class="n">kwargs</span></div>
 
 <div class="viewcode-block" id="CommBase.bind"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.bind">[docs]</a>    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bind in place of open.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bind in place of open.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_proxy</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">signon_to_server</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="CommBase.open"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the connection.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the connection.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Openning </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the connection.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the connection.&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
 <div class="viewcode-block" id="CommBase.close"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the connection.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the connection.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            linger (bool, optional): If True, drain messages before closing the</span>
@@ -1282,7 +1283,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;done&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.close_in_thread"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.close_in_thread">[docs]</a>    <span class="k">def</span> <span class="nf">close_in_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_wait</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;In a new thread, close the comm when it is empty.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;In a new thread, close the comm when it is empty.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            no_wait (bool, optional): If True, don&#39;t wait for closing thread</span>
@@ -1309,11 +1310,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="CommBase.linger_close"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.linger_close">[docs]</a>    <span class="k">def</span> <span class="nf">linger_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for messages to drain, then close.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for messages to drain, then close.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.linger"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.linger">[docs]</a>    <span class="k">def</span> <span class="nf">linger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">active_confirm</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for messages to drain.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for messages to drain.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
             <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg_recv_drain</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
@@ -1331,12 +1332,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Finished (timeout_drain = {str(self._timeout_drain)})&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.language_atexit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.language_atexit">[docs]</a>    <span class="k">def</span> <span class="nf">language_atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close operations specific to the language.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close operations specific to the language.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">language_driver</span><span class="o">.</span><span class="n">comm_atexit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">language_driver</span><span class="o">.</span><span class="n">comm_atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.atexit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close operations.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close operations.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;atexit begins (n_msg=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">language_atexit</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;atexit after language_atexit, but before close&#39;</span><span class="p">)</span>
@@ -1347,17 +1348,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection is open.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection is open.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># pragma: debug</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_closed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection is closed.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection is closed.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_confirmed_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if all sent messages have been confirmed.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if all sent messages have been confirmed.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_work_comms</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">is_confirmed_send</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">return</span> <span class="kc">False</span>
@@ -1365,7 +1366,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_confirmed_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if all received messages have been confirmed.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if all received messages have been confirmed.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_work_comms</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">is_confirmed_recv</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">return</span> <span class="kc">False</span>
@@ -1373,14 +1374,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_confirmed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if all messages have been confirmed.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if all messages have been confirmed.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_confirmed_recv</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_confirmed_send</span>
 
 <div class="viewcode-block" id="CommBase.wait_for_workers"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.wait_for_workers">[docs]</a>    <span class="k">def</span> <span class="nf">wait_for_workers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sleep until all workers are closed or have been used.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sleep until all workers are closed or have been used.&quot;&quot;&quot;</span>
         <span class="n">Tout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
                                   <span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;.wait_for_workers&#39;</span><span class="p">)</span>
         <span class="n">flag</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1402,7 +1403,7 @@
 
 <div class="viewcode-block" id="CommBase.wait_for_confirm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.wait_for_confirm">[docs]</a>    <span class="k">def</span> <span class="nf">wait_for_confirm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                          <span class="n">active_confirm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">noblock</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sleep until all messages are confirmed.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sleep until all messages are confirmed.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">direction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">direction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span>
@@ -1422,7 +1423,7 @@
         <span class="k">return</span> <span class="n">flag</span></div>
 
 <div class="viewcode-block" id="CommBase.confirm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.confirm">[docs]</a>    <span class="k">def</span> <span class="nf">confirm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">noblock</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm message.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm message.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">direction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">direction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span>
         <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
@@ -1432,16 +1433,16 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="CommBase.confirm_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.confirm_send">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noblock</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that sent message was received.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that sent message was received.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">noblock</span></div>
 
 <div class="viewcode-block" id="CommBase.confirm_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.confirm_recv">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noblock</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that message was received.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that message was received.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">noblock</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of messages in the connection.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of messages in the connection.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_recv</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1449,31 +1450,31 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of incoming messages in the connection.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of incoming messages in the connection.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of outgoing messages in the connection.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of outgoing messages in the connection.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_recv_drain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of incoming messages in the connection to drain.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of incoming messages in the connection to drain.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_recv</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_send_drain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of outgoing messages in the connection to drain.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of outgoing messages in the connection to drain.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_send</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">eof_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Message indicating EOF.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Message indicating EOF.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">constants</span><span class="o">.</span><span class="n">YGG_MSG_EOF</span>
 
 <div class="viewcode-block" id="CommBase.is_eof"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.is_eof">[docs]</a>    <span class="k">def</span> <span class="nf">is_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a message is an EOF.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a message is an EOF.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (obj): Message object to be tested.</span>
@@ -1486,7 +1487,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="CommBase.update_message_from_serializer"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.update_message_from_serializer">[docs]</a>    <span class="k">def</span> <span class="nf">update_message_from_serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update a message with information about the serializer.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update a message with information about the serializer.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (CommMessage): Incoming message.</span>
@@ -1500,7 +1501,7 @@
                     <span class="n">msg</span><span class="o">.</span><span class="n">stype</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">sinfo</span><span class="p">[</span><span class="n">k</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="CommBase.update_serializer_from_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.update_serializer_from_message">[docs]</a>    <span class="k">def</span> <span class="nf">update_serializer_from_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update the serializer based on information stored in a message.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update the serializer based on information stored in a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (CommMessage): Outgoing message.</span>
@@ -1518,7 +1519,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">update_serializer</span><span class="p">(</span><span class="n">skip_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.apply_transform_to_type"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.apply_transform_to_type">[docs]</a>    <span class="k">def</span> <span class="nf">apply_transform_to_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Evaluate the transform to alter the type definition.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Evaluate the transform to alter the type definition.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            typedef (dict): Type definition to transform.</span>
@@ -1534,7 +1535,7 @@
         <span class="k">return</span> <span class="n">typedef</span></div>
 
 <div class="viewcode-block" id="CommBase.apply_transform"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.apply_transform">[docs]</a>    <span class="k">def</span> <span class="nf">apply_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_in</span><span class="p">,</span> <span class="n">for_empty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Evaluate the transform to alter the emssage being sent/received.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Evaluate the transform to alter the emssage being sent/received.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg_in (object): Message being transformed.</span>
@@ -1558,7 +1559,7 @@
         <span class="c1"># about the received datatype that was recorded by the serializer</span>
         <span class="k">if</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">initialized</span>
              <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">for_empty</span><span class="p">))):</span>
-            <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">original_datatype</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">original_datatype</span>
         <span class="c1"># if (((self.direction == &#39;recv&#39;)</span>
         <span class="c1">#      and self.serializer.initialized</span>
         <span class="c1">#      and (not self.transform[0].original_datatype))):</span>
@@ -1589,7 +1590,7 @@
         <span class="k">return</span> <span class="n">msg_out</span></div>
 
 <div class="viewcode-block" id="CommBase.evaluate_filter"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.evaluate_filter">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">msg_in</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Evaluate the filter to determine how the message should be</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Evaluate the filter to determine how the message should be</span>
 <span class="sd">        handled.</span>
 
 <span class="sd">        Args:</span>
@@ -1604,16 +1605,16 @@
             <span class="n">msg_in</span> <span class="o">=</span> <span class="n">msg_in</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_eof</span><span class="p">(</span><span class="n">msg_in</span><span class="p">)):</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">msg_in</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="nb">bool</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">empty_obj_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;obj: Empty message object.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;obj: Empty message object.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">empty_msg</span><span class="p">,</span> <span class="n">for_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CommBase.is_empty"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.is_empty">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">emsg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check that a message matches an empty message object.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check that a message matches an empty message object.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (object): Message object.</span>
@@ -1630,13 +1631,13 @@
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
                 <span class="n">pandas</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_frame_equal</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">emsg</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">assert</span><span class="p">(</span><span class="n">msg</span> <span class="o">==</span> <span class="n">emsg</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="n">msg</span> <span class="o">==</span> <span class="n">emsg</span>
         <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="CommBase.is_empty_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.is_empty_recv">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if a received message object is empty.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if a received message object is empty.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (obj): Message object.</span>
@@ -1651,7 +1652,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_empty</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_obj_recv</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="CommBase.chunk_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.chunk_message">[docs]</a>    <span class="k">def</span> <span class="nf">chunk_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Yield chunks of message of size maxMsgSize</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Yield chunks of message of size maxMsgSize</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (str, bytes): Raw message bytes to be chunked.</span>
@@ -1667,7 +1668,7 @@
             <span class="n">prev</span> <span class="o">=</span> <span class="nb">next</span></div>
 
 <div class="viewcode-block" id="CommBase.precheck"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.precheck">[docs]</a>    <span class="k">def</span> <span class="nf">precheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check that comm is ready for action in specified direction,</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check that comm is ready for action in specified direction,</span>
 <span class="sd">        raising errors if it is not.</span>
 
 <span class="sd">        Args:</span>
@@ -1687,7 +1688,7 @@
 
     <span class="c1"># CLIENT/SERVER METHODS</span>
 <div class="viewcode-block" id="CommBase.server_exists"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.server_exists">[docs]</a>    <span class="k">def</span> <span class="nf">server_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">srv_address</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a server exists.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a server exists.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            srv_address (str): Address of server comm.</span>
@@ -1701,7 +1702,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">srv_address</span> <span class="ow">in</span> <span class="n">_registered_servers</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.new_server"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.new_server">[docs]</a>    <span class="k">def</span> <span class="nf">new_server</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">srv_address</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new server.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new server.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            srv_address (str): Address of server comm.</span>
@@ -1711,11 +1712,11 @@
                                   <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_server_kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.signon_to_server"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.signon_to_server">[docs]</a>    <span class="k">def</span> <span class="nf">signon_to_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a client to an existing server or create one.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a client to an existing server or create one.&quot;&quot;&quot;</span>
         <span class="k">global</span> <span class="n">_registered_servers</span>
         <span class="k">with</span> <span class="n">_registered_servers</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_server</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">server_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">))</span>
+                <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">server_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating new server&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_server</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_server</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
@@ -1730,7 +1731,7 @@
                     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Receive-side proxy untested&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.signoff_from_server"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.signoff_from_server">[docs]</a>    <span class="k">def</span> <span class="nf">signoff_from_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove a client from the server.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove a client from the server.&quot;&quot;&quot;</span>
         <span class="k">global</span> <span class="n">_registered_servers</span>
         <span class="k">with</span> <span class="n">_registered_servers</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_server</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1745,12 +1746,12 @@
     <span class="c1"># TEMP COMMS</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">get_response_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments to use for a response comm.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments to use for a response comm.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">commtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_commtype</span><span class="p">)</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">get_work_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for an existing work comm.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for an existing work comm.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_commtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">raise</span> <span class="n">IncompleteBaseComm</span><span class="p">(</span>
                 <span class="s2">&quot;Base comm class &#39;</span><span class="si">%s</span><span class="s2">&#39; cannot create work comm.&quot;</span>
@@ -1767,7 +1768,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">create_work_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for a new work comm.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for a new work comm.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_commtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">raise</span> <span class="n">IncompleteBaseComm</span><span class="p">(</span>
                 <span class="s2">&quot;Base comm class &#39;</span><span class="si">%s</span><span class="s2">&#39; cannot create work comm.&quot;</span>
@@ -1779,7 +1780,7 @@
                     <span class="n">uuid</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span> <span class="n">single_use</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CommBase.get_work_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.get_work_comm">[docs]</a>    <span class="k">def</span> <span class="nf">get_work_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get temporary work comm, creating as necessary.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get temporary work comm, creating as necessary.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            header (dict): Information that will be sent in the message header</span>
@@ -1797,7 +1798,7 @@
         <span class="k">return</span> <span class="n">c</span></div>
 
 <div class="viewcode-block" id="CommBase.create_work_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.create_work_comm">[docs]</a>    <span class="k">def</span> <span class="nf">create_work_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">work_comm_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a temporary work comm.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a temporary work comm.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            work_comm_name (str, optional): Name that should be used for the</span>
@@ -1821,7 +1822,7 @@
         <span class="k">return</span> <span class="n">c</span></div>
 
 <div class="viewcode-block" id="CommBase.add_work_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.add_work_comm">[docs]</a>    <span class="k">def</span> <span class="nf">add_work_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add work comm to dict.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add work comm to dict.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            comm (:class:.CommBase): Comm that should be added.</span>
@@ -1836,7 +1837,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_work_comms</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">comm</span></div>
 
 <div class="viewcode-block" id="CommBase.remove_work_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.remove_work_comm">[docs]</a>    <span class="k">def</span> <span class="nf">remove_work_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">in_thread</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close and remove a work comm.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close and remove a work comm.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            key (str): Key of comm that should be removed.</span>
@@ -1857,7 +1858,7 @@
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Closing in thread not recommended&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.workcomm2header"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.workcomm2header">[docs]</a>    <span class="k">def</span> <span class="nf">workcomm2header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">work_comm</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get header information from a comm.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get header information from a comm.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            work_comm (:class:.CommBase): Work comm that header describes.</span>
@@ -1873,7 +1874,7 @@
         <span class="k">return</span> <span class="n">header</span></div>
 
 <div class="viewcode-block" id="CommBase.header2workcomm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.header2workcomm">[docs]</a>    <span class="k">def</span> <span class="nf">header2workcomm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">work_comm_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a work comm based on header info.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a work comm based on header info.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            header (dict): Information that will be sent in the message header</span>
@@ -1901,7 +1902,7 @@
 
     <span class="c1"># SERIALIZATION/DESERIALIZATION METHODS</span>
 <div class="viewcode-block" id="CommBase.serialize"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message using the associated serializer.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message using the associated serializer.&quot;&quot;&quot;</span>
         <span class="c1"># Don&#39;t send metadata for files</span>
         <span class="c1"># kwargs.setdefault(&#39;dont_encode&#39;, self.is_file)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;add_serializer_info&#39;</span><span class="p">,</span>
@@ -1911,14 +1912,14 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.deserialize"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message using the associated deserializer.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message using the associated deserializer.&quot;&quot;&quot;</span>
         <span class="c1"># Don&#39;t serialize files using JSON</span>
         <span class="c1"># kwargs.setdefault(&#39;dont_decode&#39;, self.is_file)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     <span class="c1"># SEND METHODS</span>
     <span class="k">def</span> <span class="nf">_safe_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send message checking if is 1st message and then waiting.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send message checking if is 1st message and then waiting.&quot;&quot;&quot;</span>
         <span class="n">timeout</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;timeout&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
         <span class="n">quiet_timeout</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;quiet_timeout&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="n">send_1st</span> <span class="o">=</span> <span class="p">((</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_used</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_multiple_first_send</span><span class="p">)</span>
@@ -1956,11 +1957,11 @@
         <span class="k">return</span> <span class="n">out</span>
     
     <span class="k">def</span> <span class="nf">_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raw send. Should be overridden by inheriting class.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raw send. Should be overridden by inheriting class.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="n">IncompleteBaseComm</span><span class="p">(</span><span class="s2">&quot;_send method needs implemented.&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CommBase.send_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.send_message">[docs]</a>    <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">skip_safe_send</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message encapsulated in a CommMessage object.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message encapsulated in a CommMessage object.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (CommMessage): Message to be sent.</span>
@@ -1995,7 +1996,7 @@
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unrecognized message flag: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">special_debug</span><span class="p">(</span><span class="s1">&#39;Sending </span><span class="si">%d</span><span class="s1"> bytes to </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">length</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">msg</span><span class="o">.</span><span class="n">length</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">skip_safe_send</span><span class="p">:</span>
                 <span class="k">pass</span>
@@ -2056,7 +2057,7 @@
 <div class="viewcode-block" id="CommBase.prepare_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.prepare_message">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip_serialization</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                         <span class="n">skip_processing</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">skip_language2python</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                         <span class="n">after_prepare_message</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform actions preparing to send a message. The order of steps is</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform actions preparing to send a message. The order of steps is</span>
 
 <span class="sd">            1. Convert the message based on the language</span>
 <span class="sd">            2. Isolate the message if there is only one</span>
@@ -2198,7 +2199,7 @@
         <span class="k">return</span> <span class="n">msg</span></div>
 
 <div class="viewcode-block" id="CommBase.send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            *args: All arguments are assumed to be part of the message.</span>
@@ -2216,11 +2217,11 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.send_nolimit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.send_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for send.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for send.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.send_eof"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.send_eof">[docs]</a>    <span class="k">def</span> <span class="nf">send_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send the EOF message as a short message.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send the EOF message as a short message.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            *args: All arguments are passed to comm send.</span>
@@ -2234,7 +2235,7 @@
 
     <span class="c1"># RECV METHODS</span>
     <span class="k">def</span> <span class="nf">_safe_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quiet_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Safe receive that does things for all comm classes.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Safe receive that does things for all comm classes.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_timeout</span>
         <span class="n">Tout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;._safe_recv&#39;</span><span class="p">)</span>
@@ -2265,11 +2266,11 @@
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="k">def</span> <span class="nf">_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raw recv. Should be overridden by inheriting class.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raw recv. Should be overridden by inheriting class.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="n">IncompleteBaseComm</span><span class="p">(</span><span class="s2">&quot;_recv method needs implemented.&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CommBase.recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">return_message_object</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            *args: All arguments are passed to comm _recv method.</span>
@@ -2300,7 +2301,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="CommBase.recv_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.recv_message">[docs]</a>    <span class="k">def</span> <span class="nf">recv_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">skip_deserialization</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            *args: Arguments are passed to _safe_recv.</span>
@@ -2376,7 +2377,7 @@
 
 <div class="viewcode-block" id="CommBase.finalize_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.finalize_message">[docs]</a>    <span class="k">def</span> <span class="nf">finalize_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">skip_processing</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                          <span class="n">skip_python2language</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">after_finalize_message</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform actions to decipher a message. The order of steps is</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform actions to decipher a message. The order of steps is</span>
 
 <span class="sd">            1. Transform the message</span>
 <span class="sd">            2. Filter</span>
@@ -2441,16 +2442,16 @@
         <span class="k">return</span> <span class="n">msg</span></div>
 
 <div class="viewcode-block" id="CommBase.recv_nolimit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for recv.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for recv.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.drain_server_signon_messages"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.drain_server_signon_messages">[docs]</a>    <span class="k">def</span> <span class="nf">drain_server_signon_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Drain server signon messages. This should only be used</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Drain server signon messages. This should only be used</span>
 <span class="sd">        for testing purposes.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="CommBase.drain_messages"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.drain_messages">[docs]</a>    <span class="k">def</span> <span class="nf">drain_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sleep while waiting for messages to be drained.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sleep while waiting for messages to be drained.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">direction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">direction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span>
@@ -2473,7 +2474,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Done draining&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.purge"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Purge all messages from the comm.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Purge all messages from the comm.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
             <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_recv</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">skip_deserialization</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -2484,7 +2485,7 @@
 
     <span class="c1"># Send/recv dictionary of fields</span>
 <div class="viewcode-block" id="CommBase.extract_key_order"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.extract_key_order">[docs]</a>    <span class="k">def</span> <span class="nf">extract_key_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Extract the key order from keyword arguments.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Extract the key order from keyword arguments.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            kwargs (dict): Keyword arguments.</span>
@@ -2499,7 +2500,7 @@
         <span class="k">return</span> <span class="n">key_order</span></div>
     
 <div class="viewcode-block" id="CommBase.coerce_to_dict"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.coerce_to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">coerce_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">key_order</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a message to a dictionary.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a message to a dictionary.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (object): Message to convert to a dictionary.</span>
@@ -2532,7 +2533,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
     
 <div class="viewcode-block" id="CommBase.send_dict"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.send_dict">[docs]</a>    <span class="k">def</span> <span class="nf">send_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args_dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message with fields specified in the input dictionary.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message with fields specified in the input dictionary.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            args_dict (dict): Dictionary of arguments to send.</span>
@@ -2552,7 +2553,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.recv_dict"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.recv_dict">[docs]</a>    <span class="k">def</span> <span class="nf">recv_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a received message as a dictionary of fields. If there are</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a received message as a dictionary of fields. If there are</span>
 <span class="sd">        not any fields specified, the fields will have the form &#39;f0&#39;, &#39;f1&#39;,</span>
 <span class="sd">        &#39;f2&#39;, ...</span>
 
@@ -2571,11 +2572,10 @@
         <span class="n">return_message_object</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;return_message_object&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;return_message_object&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">msg_dict</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">args</span>
         <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="n">FLAG_SUCCESS</span><span class="p">:</span>
             <span class="n">msg_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coerce_to_dict</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">key_order</span><span class="p">,</span>
                                            <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">msg_dict</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">args</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">msg_dict</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">return_message_object</span><span class="p">:</span>
@@ -2616,12 +2616,12 @@
 
     <span class="c1"># ALIASES</span>
 <div class="viewcode-block" id="CommBase.send_array"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.send_array">[docs]</a>    <span class="k">def</span> <span class="nf">send_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for send.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for send.&quot;&quot;&quot;</span>
         <span class="c1"># TODO: Maybe explicitly handle transformation from array</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.recv_array"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.recv_array">[docs]</a>    <span class="k">def</span> <span class="nf">recv_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for recv.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for recv.&quot;&quot;&quot;</span>
         <span class="n">flag</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">:</span>

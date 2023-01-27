@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema.datatypes.MetaschemaType &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.MetaschemaType &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -82,11 +83,11 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
-          <li><a href="../datatypes.html">yggdrasil.metaschema.datatypes</a> &raquo;</li>
-      <li>yggdrasil.metaschema.datatypes.MetaschemaType</li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../metaschema.html">yggdrasil.metaschema</a></li>
+          <li class="breadcrumb-item"><a href="../datatypes.html">yggdrasil.metaschema.datatypes</a></li>
+      <li class="breadcrumb-item active">yggdrasil.metaschema.datatypes.MetaschemaType</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -115,7 +116,7 @@
 
 <div class="viewcode-block" id="MetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType">[docs]</a><span class="nd">@six</span><span class="o">.</span><span class="n">add_metaclass</span><span class="p">(</span><span class="n">MetaschemaTypeMeta</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">MetaschemaType</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base type that should be subclassed by user defined types. Attributes</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base type that should be subclassed by user defined types. Attributes</span>
 <span class="sd">    should be overwritten to match the type.</span>
 
 <span class="sd">    Arguments:</span>
@@ -195,7 +196,7 @@
     <span class="c1"># Methods to be overridden by subclasses</span>
 <div class="viewcode-block" id="MetaschemaType.encode_data"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.encode_data">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">encode_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s data.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s data.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to encode.</span>
@@ -210,7 +211,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.encode_data_readable"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.encode_data_readable">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">encode_data_readable</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s data in a readable format.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s data in a readable format.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to encode.</span>
@@ -225,7 +226,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.decode_data"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.decode_data">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">decode_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode an object.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode an object.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (string): Encoded object to decode.</span>
@@ -240,7 +241,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.transform_type"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.transform_type">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">transform_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Transform an object based on type info.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Transform an object based on type info.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to transform.</span>
@@ -255,7 +256,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.coerce_type"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.coerce_type">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">coerce_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Coerce objects of specific types to match the data type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Coerce objects of specific types to match the data type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to be coerced.</span>
@@ -273,7 +274,7 @@
     <span class="c1"># Methods not to be modified by subclasses</span>
 <div class="viewcode-block" id="MetaschemaType.issubtype"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.issubtype">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">issubtype</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this type is a subclass of the provided type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this type is a subclass of the provided type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            t (str, list): Type name or list of type names to check against.</span>
@@ -288,7 +289,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.jsonschema_type_checker"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.jsonschema_type_checker">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">jsonschema_type_checker</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">checker</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Type checker for use with jsonschema &gt;= 3.0.0.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Type checker for use with jsonschema &gt;= 3.0.0.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            checker (jsonschema.TypeChecker): Type checker class.</span>
@@ -302,7 +303,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.validate"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.validate">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object to check if it could be of this type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object to check if it could be of this type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to validate.</span>
@@ -324,7 +325,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.normalize"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.normalize">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object, if possible, to conform to this type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object, if possible, to conform to this type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to normalize.</span>
@@ -337,7 +338,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.encode_type"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.encode_type">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">encode_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_validated</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s type definition.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s type definition.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to encode.</span>
@@ -376,7 +377,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.get_extract_properties"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.get_extract_properties">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_extract_properties</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the list of properties that should be kept when extracting a</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the list of properties that should be kept when extracting a</span>
 <span class="sd">        typedef from message metadata.</span>
 
 <span class="sd">        Args:</span>
@@ -390,7 +391,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.extract_typedef"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.extract_typedef">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">extract_typedef</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">reqkeys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Extract the minimum typedef required for this type from the provided</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Extract the minimum typedef required for this type from the provided</span>
 <span class="sd">        metadata.</span>
 
 <span class="sd">        Args:</span>
@@ -412,7 +413,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="MetaschemaType.update_typedef"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.update_typedef">[docs]</a>    <span class="k">def</span> <span class="nf">update_typedef</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update the current typedef with new values.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update the current typedef with new values.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: All keyword arguments are considered to be new type</span>
@@ -447,17 +448,17 @@
 
 <div class="viewcode-block" id="MetaschemaType.metaschema"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.metaschema">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">metaschema</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON meta schema for validating schemas for this type.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON meta schema for validating schemas for this type.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">get_metaschema</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="MetaschemaType.validator"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.validator">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">validator</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON schema validator for the meta schema that includes added types.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON schema validator for the meta schema that includes added types.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">get_validator</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="MetaschemaType.definition_schema"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.definition_schema">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">definition_schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON schema for validating a type definition schema.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON schema for validating a type definition schema.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
@@ -467,7 +468,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.metadata_schema"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.metadata_schema">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">metadata_schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON schema for validating a JSON serialization of the type.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON schema for validating a JSON serialization of the type.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
@@ -477,7 +478,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.validate_metadata"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.validate_metadata">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">validate_metadata</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validates an encoded object.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validates an encoded object.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (string): Encoded object to validate.</span>
@@ -495,7 +496,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.validate_definition"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.validate_definition">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">validate_definition</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validates a type definition.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validates a type definition.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Type definition to validate.</span>
@@ -508,7 +509,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.validate_instance"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.validate_instance">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">validate_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validates an object against a type definition.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validates an object against a type definition.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to validate against a type definition.</span>
@@ -522,7 +523,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.normalize_definition"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.normalize_definition">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">normalize_definition</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalizes a type definition.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalizes a type definition.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Type definition to normalize.</span>
@@ -540,7 +541,7 @@
 <div class="viewcode-block" id="MetaschemaType.check_encoded"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.check_encoded">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">check_encoded</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                       <span class="n">typedef_validated</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata_validated</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Checks if the metadata for an encoded object matches the type</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Checks if the metadata for an encoded object matches the type</span>
 <span class="sd">        definition.</span>
 
 <span class="sd">        Args:</span>
@@ -592,7 +593,7 @@
 <div class="viewcode-block" id="MetaschemaType.check_decoded"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.check_decoded">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">check_decoded</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                       <span class="n">typedef_validated</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Checks if an object is of the this type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Checks if an object is of the this type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to be tested.</span>
@@ -633,7 +634,7 @@
 <div class="viewcode-block" id="MetaschemaType.encode"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.encode">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">typedef_validated</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                <span class="n">dont_check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to encode.</span>
@@ -674,7 +675,7 @@
 <div class="viewcode-block" id="MetaschemaType.decode"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.decode">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">typedef_validated</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                <span class="n">dont_check</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode an object.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode an object.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            metadata (dict): Meta data describing the data.</span>
@@ -721,7 +722,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.serialize"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">no_metadata</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dont_encode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                   <span class="n">dont_check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_header_size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Python object to be formatted.</span>
@@ -775,7 +776,7 @@
                       <span class="s1">&#39;zmq_reply_worker&#39;</span><span class="p">,</span> <span class="s1">&#39;model&#39;</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">metadata_type</span><span class="p">:</span>
                     <span class="n">metadata</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">metadata_type</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">metadata</span>
             <span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode_json</span><span class="p">(</span><span class="n">metadata_type</span><span class="p">)</span>
                     <span class="o">+</span> <span class="n">constants</span><span class="o">.</span><span class="n">YGG_MSG_HEAD</span> <span class="o">+</span> <span class="n">data</span><span class="p">)</span>
             <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -792,7 +793,7 @@
     
 <div class="viewcode-block" id="MetaschemaType.deserialize"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">no_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dont_decode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">dont_check</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (str, bytes): Message to be deserialized.</span>
@@ -827,7 +828,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">metadata</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">decode_json</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type_in_data&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">YGG_MSG_HEAD</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">msg</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">YGG_MSG_HEAD</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
             <span class="n">typedef</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">YGG_MSG_HEAD</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">decode_json</span><span class="p">(</span><span class="n">typedef</span><span class="p">))</span>
@@ -862,7 +863,7 @@
     <span class="c1"># TESTING METHODS</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_generate_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            typedef (dict): Type definition.</span>
@@ -875,7 +876,7 @@
     
 <div class="viewcode-block" id="MetaschemaType.generate_data"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.generate_data">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            typedef (dict): Type definition.</span>
@@ -892,7 +893,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.get_test_data"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.get_test_data">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_test_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;object: Test data.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;object: Test data.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">typedef</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">typedef</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">name</span><span class="p">}</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">generate_data</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span></div></div>

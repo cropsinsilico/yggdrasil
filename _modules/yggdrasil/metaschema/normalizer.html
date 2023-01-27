@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema.normalizer &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.metaschema.normalizer &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
-      <li>yggdrasil.metaschema.normalizer</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../metaschema.html">yggdrasil.metaschema</a></li>
+      <li class="breadcrumb-item active">yggdrasil.metaschema.normalizer</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -108,17 +109,17 @@
 
 
 <div class="viewcode-block" id="UndefinedProperty"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.normalizer.UndefinedProperty">[docs]</a><span class="k">class</span> <span class="nc">UndefinedProperty</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to be used as a flag for undefined properties.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to be used as a flag for undefined properties.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="UninitializedNormalized"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.normalizer.UninitializedNormalized">[docs]</a><span class="k">class</span> <span class="nc">UninitializedNormalized</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to be used as a flag for uninitialized normalized value.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to be used as a flag for uninitialized normalized value.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="create"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.normalizer.create">[docs]</a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dynamically create a validation/normalization class that subclasses</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dynamically create a validation/normalization class that subclasses</span>
 <span class="sd">    the jsonschema validation class.</span>
 
 <span class="sd">    Args:</span>
@@ -141,7 +142,7 @@
     <span class="n">validator_class</span> <span class="o">=</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">class</span> <span class="nc">Normalizer</span><span class="p">(</span><span class="n">validator_class</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class that can be used to normalize (or validate) objects against</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class that can be used to normalize (or validate) objects against</span>
 <span class="sd">        JSON schemas.</span>
 
 <span class="sd">        Args:</span>
@@ -178,7 +179,7 @@
 
         <span class="nd">@classmethod</span>
         <span class="k">def</span> <span class="nf">normalize_schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize a schema against the metaschema.</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize a schema against the metaschema.</span>
 
 <span class="sd">            Args:</span>
 <span class="sd">                schema (dict): Schema that should be normalized.</span>
@@ -193,19 +194,19 @@
 
         <span class="nd">@property</span>
         <span class="k">def</span> <span class="nf">current_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Current path from the top of the instance to the current</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Current path from the top of the instance to the current</span>
 <span class="sd">            instance being validated/normalized.&quot;&quot;&quot;</span>
             <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path_stack</span><span class="p">)</span>
 
         <span class="nd">@property</span>
         <span class="k">def</span> <span class="nf">current_schema_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Current path from the top of the schema to the current</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Current path from the top of the schema to the current</span>
 <span class="sd">            schema being used for validation/normalization.&quot;&quot;&quot;</span>
             <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_schema_path_stack</span><span class="p">)</span>
 
         <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
         <span class="k">def</span> <span class="nf">normalizing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Context for normalization that records normalizers before</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Context for normalization that records normalizers before</span>
 <span class="sd">            context is initialized so that they can be restored once the context</span>
 <span class="sd">            exist.</span>
 
@@ -266,7 +267,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_old_settings</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">def</span> <span class="nf">iter_errors_normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Iterate through all of the errors encountered during validation</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Iterate through all of the errors encountered during validation</span>
 <span class="sd">            of an instance at the current level or lower against properties in a</span>
 <span class="sd">            schema.</span>
 
@@ -354,7 +355,7 @@
                 <span class="k">yield</span> <span class="n">e</span>
 
         <span class="k">def</span> <span class="nf">descend_normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">schema_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Descend along a path in the schema/instance, recording</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Descend along a path in the schema/instance, recording</span>
 <span class="sd">            information about the normalization state so that it can be replaced</span>
 <span class="sd">            with the original value if there is a validation error along the</span>
 <span class="sd">            descent path.</span>
@@ -415,7 +416,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_working_dir_stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 
         <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an instance against a schema.</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an instance against a schema.</span>
 
 <span class="sd">            Args:</span>
 <span class="sd">                instance (object): Object to be validated.</span>
@@ -441,7 +442,7 @@
                 <span class="nb">super</span><span class="p">(</span><span class="n">Normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="n">_schema</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an instance during validation, allowing for aliases,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an instance during validation, allowing for aliases,</span>
 <span class="sd">            defaults, or simple type conversions.</span>
 
 <span class="sd">            Args:</span>

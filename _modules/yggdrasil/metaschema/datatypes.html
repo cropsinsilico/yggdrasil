@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema.datatypes &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.metaschema.datatypes &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
-      <li>yggdrasil.metaschema.datatypes</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../metaschema.html">yggdrasil.metaschema</a></li>
+      <li class="breadcrumb-item active">yggdrasil.metaschema.datatypes</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -113,7 +114,7 @@
 
 
 <div class="viewcode-block" id="import_schema_types"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.import_schema_types">[docs]</a><span class="k">def</span> <span class="nf">import_schema_types</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import all types to ensure they are registered.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import all types to ensure they are registered.&quot;&quot;&quot;</span>
     <span class="c1"># Load types from schema</span>
     <span class="n">schema_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_schema_dir</span><span class="p">,</span> <span class="s1">&#39;*.json&#39;</span><span class="p">))</span>
     <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
@@ -140,7 +141,7 @@
 
 
 <div class="viewcode-block" id="is_default_typedef"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.is_default_typedef">[docs]</a><span class="k">def</span> <span class="nf">is_default_typedef</span><span class="p">(</span><span class="n">typedef</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a type definition is the default type definition.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a type definition is the default type definition.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        typedef (dict): Type definition to test.</span>
@@ -153,7 +154,7 @@
 
 
 <div class="viewcode-block" id="register_type"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.register_type">[docs]</a><span class="k">def</span> <span class="nf">register_type</span><span class="p">(</span><span class="n">type_class</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Register a type class, recording methods for encoding/decoding.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Register a type class, recording methods for encoding/decoding.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        type_class (class): Class to be registered.</span>
@@ -205,7 +206,7 @@
 
 <span class="c1"># TODO: Replace this with ComponentMeta</span>
 <div class="viewcode-block" id="MetaschemaTypeMeta"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaTypeMeta">[docs]</a><span class="k">class</span> <span class="nc">MetaschemaTypeMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Meta class for registering datatypes.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Meta class for registering datatypes.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">class_dict</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">class_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;schema_file&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -249,7 +250,7 @@
 
 
 <div class="viewcode-block" id="add_type_from_schema"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.add_type_from_schema">[docs]</a><span class="k">def</span> <span class="nf">add_type_from_schema</span><span class="p">(</span><span class="n">path_to_schema</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a type from a schema in a file.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a type from a schema in a file.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        path_to_schema (string): Full path to the location of a schema file that</span>
@@ -274,7 +275,7 @@
                               <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">]})</span>
     <span class="n">name</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">_type_registry</span><span class="o">.</span><span class="n">has_entry</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;target_globals&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;target_globals&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">name</span>
     <span class="n">description</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span>
     <span class="n">base</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
@@ -307,7 +308,7 @@
 
 
 <div class="viewcode-block" id="get_registered_types"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.get_registered_types">[docs]</a><span class="k">def</span> <span class="nf">get_registered_types</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a dictionary of registered types.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a dictionary of registered types.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Registered type/class pairs.</span>
@@ -317,7 +318,7 @@
 
 
 <div class="viewcode-block" id="complete_typedef"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.complete_typedef">[docs]</a><span class="k">def</span> <span class="nf">complete_typedef</span><span class="p">(</span><span class="n">typedef</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Complete the type definition by converting it into the standard format.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Complete the type definition by converting it into the standard format.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        typedef (str, dict, list): A type name, type definition dictionary,</span>
@@ -339,7 +340,7 @@
 
 
 <div class="viewcode-block" id="get_type_class"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.get_type_class">[docs]</a><span class="k">def</span> <span class="nf">get_type_class</span><span class="p">(</span><span class="n">type_name</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a type class given it&#39;s name.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a type class given it&#39;s name.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        type_name (str, list): Name of type class or list of names of type classes.</span>
@@ -359,7 +360,7 @@
 
 
 <div class="viewcode-block" id="get_type_from_def"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.get_type_from_def">[docs]</a><span class="k">def</span> <span class="nf">get_type_from_def</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="n">dont_complete</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the type instance based on the provided type definition.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the type instance based on the provided type definition.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        typedef (obj): This can be the name of a type, a dictionary containing a</span>
@@ -380,7 +381,7 @@
 
 
 <div class="viewcode-block" id="guess_type_from_msg"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.guess_type_from_msg">[docs]</a><span class="k">def</span> <span class="nf">guess_type_from_msg</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Guess the type class from a message.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Guess the type class from a message.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        msg (str, bytes): Message containing metadata.</span>
@@ -405,7 +406,7 @@
 
 
 <div class="viewcode-block" id="guess_type_from_obj"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.guess_type_from_obj">[docs]</a><span class="k">def</span> <span class="nf">guess_type_from_obj</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Guess the type class for a given Python object.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Guess the type class for a given Python object.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (object): Python object.</span>
@@ -423,7 +424,7 @@
 
 
 <div class="viewcode-block" id="transform_type"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.transform_type">[docs]</a><span class="k">def</span> <span class="nf">transform_type</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Transform an object based on type info.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Transform an object based on type info.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (object): Object to transform.</span>
@@ -439,7 +440,7 @@
 
     
 <div class="viewcode-block" id="encode_type"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.encode_type">[docs]</a><span class="k">def</span> <span class="nf">encode_type</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object into a JSON schema that can be used to both</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object into a JSON schema that can be used to both</span>
 <span class="sd">    describe the object and validate others.</span>
 
 <span class="sd">    Args:</span>
@@ -459,7 +460,7 @@
 
 
 <div class="viewcode-block" id="encode_data"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.encode_data">[docs]</a><span class="k">def</span> <span class="nf">encode_data</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object into a JSON serializable object.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object into a JSON serializable object.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (object): Python object to be encoded.</span>
@@ -478,7 +479,7 @@
 
 
 <div class="viewcode-block" id="encode_data_readable"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.encode_data_readable">[docs]</a><span class="k">def</span> <span class="nf">encode_data_readable</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object into a JSON serializable object that is human readable</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object into a JSON serializable object that is human readable</span>
 <span class="sd">    but dosn&#39;t guarantee identical deserialization.</span>
 
 <span class="sd">    Args:</span>
@@ -498,7 +499,7 @@
 
 
 <div class="viewcode-block" id="decode_data"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.decode_data">[docs]</a><span class="k">def</span> <span class="nf">decode_data</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode a JSON serializable object to get the corresponding Python</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode a JSON serializable object to get the corresponding Python</span>
 <span class="sd">    variable.</span>
 
 <span class="sd">    Args:</span>
@@ -519,7 +520,7 @@
 
 
 <div class="viewcode-block" id="encode"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.encode">[docs]</a><span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object into a message.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object into a message.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (object): Python object to be encoded.</span>
@@ -537,7 +538,7 @@
 
 
 <div class="viewcode-block" id="decode"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.decode">[docs]</a><span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode an object from a message.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode an object from a message.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        msg (bytes): Bytes encoded message.</span>
@@ -555,7 +556,7 @@
 
 
 <div class="viewcode-block" id="resolve_schema_references"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.resolve_schema_references">[docs]</a><span class="k">def</span> <span class="nf">resolve_schema_references</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">resolver</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resolve references within a schema.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resolve references within a schema.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        schema (dict): Schema with references to resolve.</span>
@@ -584,7 +585,7 @@
 
 
 <div class="viewcode-block" id="compare_schema"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.compare_schema">[docs]</a><span class="k">def</span> <span class="nf">compare_schema</span><span class="p">(</span><span class="n">schema1</span><span class="p">,</span> <span class="n">schema2</span><span class="p">,</span> <span class="n">root1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compare two schemas for compatibility.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compare two schemas for compatibility.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        schema1 (dict): First schema.</span>
@@ -661,7 +662,7 @@
 
 
 <div class="viewcode-block" id="generate_data"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.generate_data">[docs]</a><span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        typedef (dict): Type definition.</span>

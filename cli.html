@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Line Interface (CLI) &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>Command Line Interface (CLI) &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -31,7 +32,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -57,9 +58,9 @@
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Command Line Interface (CLI)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#yggdrasil-command"><code class="docutils literal notranslate"><span class="pre">yggdrasil</span></code> Command</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#subcommands">subcommands</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Sub-commands:">Sub-commands:</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Sub-commands">Sub-commands</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#run">run</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#info">info</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#validate">validate</a></li>
@@ -81,11 +82,11 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#yggcc-command"><code class="docutils literal notranslate"><span class="pre">yggcc</span></code> Command</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#yggccflags-command"><code class="docutils literal notranslate"><span class="pre">yggccflags</span></code> Command</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#yggcctool-command"><code class="docutils literal notranslate"><span class="pre">yggcctool</span></code> Command</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#yggclean-command"><code class="docutils literal notranslate"><span class="pre">yggclean</span></code> Command</a></li>
@@ -96,11 +97,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#ygginfo-command"><code class="docutils literal notranslate"><span class="pre">ygginfo</span></code> Command</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ygginstall-command"><code class="docutils literal notranslate"><span class="pre">ygginstall</span></code> Command</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#yggldflags-command"><code class="docutils literal notranslate"><span class="pre">yggldflags</span></code> Command</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#yggldtool-command"><code class="docutils literal notranslate"><span class="pre">yggldtool</span></code> Command</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#yggmetaschema-command"><code class="docutils literal notranslate"><span class="pre">yggmetaschema</span></code> Command</a></li>
@@ -139,8 +140,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Command Line Interface (CLI)</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Command Line Interface (CLI)</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cli.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -159,8 +160,8 @@
                  <span class="o">...</span>
 </pre></div>
 </div>
-<section id="Named Arguments">
-<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h3>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>--version</kbd></dt>
 <dd><p>show program’s version number and exit</p>
@@ -175,8 +176,8 @@
 </dd>
 </dl>
 </section>
-<section id="Sub-commands:">
-<h3>Sub-commands:<a class="headerlink" href="#Sub-commands:" title="Permalink to this heading">¶</a></h3>
+<section id="Sub-commands">
+<h3>Sub-commands<a class="headerlink" href="#Sub-commands" title="Permalink to this heading">¶</a></h3>
 <section id="run">
 <h4>run<a class="headerlink" href="#run" title="Permalink to this heading">¶</a></h4>
 <p>Run an integration.</p>
@@ -190,16 +191,16 @@
               <span class="n">yamlfile</span> <span class="p">[</span><span class="n">yamlfile</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments">
-<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this heading">¶</a></h5>
+<section id="positional-arguments">
+<h5>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>yamlfile</kbd></dt>
 <dd><p>One or more yaml specification files.</p>
 </dd>
 </dl>
 </section>
-<section id="Named Arguments_repeat1">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat1" title="Permalink to this heading">¶</a></h5>
+<section id="named-arguments_repeat1">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat1" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--with-mpi, --mpi-nproc</kbd></dt>
 <dd><p>Number of MPI processes to run on.</p>
@@ -269,8 +270,8 @@
                <span class="p">{</span><span class="n">compiler</span><span class="p">,</span><span class="n">linker</span><span class="p">,</span><span class="n">archiver</span><span class="p">}</span> <span class="o">...</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat2">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat2" title="Permalink to this heading">¶</a></h5>
+<section id="named-arguments_repeat2">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat2" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--no-languages</kbd></dt>
 <dd><p>Don’t print information about individual languages.</p>
@@ -295,8 +296,8 @@
 </dd>
 </dl>
 </section>
-<section id="Sub-commands:_repeat1">
-<h5>Sub-commands:<a class="headerlink" href="#Sub-commands:_repeat1" title="Permalink to this heading">¶</a></h5>
+<section id="Sub-commands_repeat1">
+<h5>Sub-commands<a class="headerlink" href="#Sub-commands_repeat1" title="Permalink to this heading">¶</a></h5>
 <section id="compiler">
 <h6>compiler<a class="headerlink" href="#compiler" title="Permalink to this heading">¶</a></h6>
 <p>Get information about a compiler.</p>
@@ -304,8 +305,8 @@
                         <span class="p">{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">}</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat1">
-<h7>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat1" title="Permalink to this heading">¶</a></h7>
+<section id="positional-arguments_repeat1">
+<h7>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat1" title="Permalink to this heading">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>language</kbd></dt>
 <dd><p>Possible choices: c, c++, cpp, cxx, fortran</p>
@@ -313,8 +314,8 @@
 </dd>
 </dl>
 </section>
-<section id="Named Arguments_repeat3">
-<h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat3" title="Permalink to this heading">¶</a></h7>
+<section id="named-arguments_repeat3">
+<h7>Named Arguments<a class="headerlink" href="#named-arguments_repeat3" title="Permalink to this heading">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>--toolname</kbd></dt>
 <dd><p>Name of tool to get information for. If not provided, information for the default tool will be returned.</p>
@@ -338,8 +339,8 @@
                       <span class="p">{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">}</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat2">
-<h7>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat2" title="Permalink to this heading">¶</a></h7>
+<section id="positional-arguments_repeat2">
+<h7>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat2" title="Permalink to this heading">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>language</kbd></dt>
 <dd><p>Possible choices: c, c++, cpp, cxx, fortran</p>
@@ -347,8 +348,8 @@
 </dd>
 </dl>
 </section>
-<section id="Named Arguments_repeat4">
-<h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat4" title="Permalink to this heading">¶</a></h7>
+<section id="named-arguments_repeat4">
+<h7>Named Arguments<a class="headerlink" href="#named-arguments_repeat4" title="Permalink to this heading">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>--toolname</kbd></dt>
 <dd><p>Name of tool to get information for. If not provided, information for the default tool will be returned.</p>
@@ -375,8 +376,8 @@
                         <span class="p">{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">}</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat3">
-<h7>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat3" title="Permalink to this heading">¶</a></h7>
+<section id="positional-arguments_repeat3">
+<h7>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat3" title="Permalink to this heading">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>language</kbd></dt>
 <dd><p>Possible choices: c, c++, cpp, cxx, fortran</p>
@@ -384,8 +385,8 @@
 </dd>
 </dl>
 </section>
-<section id="Named Arguments_repeat5">
-<h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat5" title="Permalink to this heading">¶</a></h7>
+<section id="named-arguments_repeat5">
+<h7>Named Arguments<a class="headerlink" href="#named-arguments_repeat5" title="Permalink to this heading">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>--toolname</kbd></dt>
 <dd><p>Name of tool to get information for. If not provided, information for the default tool will be returned.</p>
@@ -410,16 +411,16 @@
                    <span class="n">yamlfile</span> <span class="p">[</span><span class="n">yamlfile</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat4">
-<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat4" title="Permalink to this heading">¶</a></h5>
+<section id="positional-arguments_repeat4">
+<h5>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat4" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>yamlfile</kbd></dt>
 <dd><p>One or more YAML specification files.</p>
 </dd>
 </dl>
 </section>
-<section id="Named Arguments_repeat6">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat6" title="Permalink to this heading">¶</a></h5>
+<section id="named-arguments_repeat6">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat6" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--model-only</kbd></dt>
 <dd><p>Validate a YAML containing an isolated model without ensuring that it is part of a complete integration.</p>
@@ -441,16 +442,16 @@
                   <span class="n">source</span> <span class="p">[</span><span class="n">source</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat5">
-<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat5" title="Permalink to this heading">¶</a></h5>
+<section id="positional-arguments_repeat5">
+<h5>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat5" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>source</kbd></dt>
 <dd><p>One or more source files or the directory containing an R package.</p>
 </dd>
 </dl>
 </section>
-<section id="Named Arguments_repeat7">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat7" title="Permalink to this heading">¶</a></h5>
+<section id="named-arguments_repeat7">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat7" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--language</kbd></dt>
 <dd><p>Possible choices: None, c, c++, cpp, cxx, fortran, R, r</p>
@@ -478,8 +479,8 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="nb">compile</span><span class="o">-</span><span class="n">deps</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="n">language</span> <span class="p">[</span><span class="n">language</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat6">
-<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat6" title="Permalink to this heading">¶</a></h5>
+<section id="positional-arguments_repeat6">
+<h5>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat6" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>language</kbd></dt>
 <dd><p>One or more languages to compile dependencies for.</p>
@@ -487,8 +488,8 @@
 </dd>
 </dl>
 </section>
-<section id="Named Arguments_repeat8">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat8" title="Permalink to this heading">¶</a></h5>
+<section id="named-arguments_repeat8">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat8" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--toolname</kbd></dt>
 <dd><p>Name of compilation tool that should be used</p>
@@ -502,8 +503,8 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">clean</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="n">language</span> <span class="p">[</span><span class="n">language</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat7">
-<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat7" title="Permalink to this heading">¶</a></h5>
+<section id="positional-arguments_repeat7">
+<h5>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat7" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>language</kbd></dt>
 <dd><p>One or more languages to clean up dependencies for.</p>
@@ -515,9 +516,27 @@
 <section id="install">
 <h4>install<a class="headerlink" href="#install" title="Permalink to this heading">¶</a></h4>
 <p>Complete yggdrasil installation for one or more languages.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">install</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">install</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">import</span><span class="p">]</span> <span class="p">[</span><span class="n">languages</span> <span class="p">[</span><span class="n">languages</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
+<section id="positional-arguments_repeat8">
+<h5>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat8" title="Permalink to this heading">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>languages</kbd></dt>
+<dd><p>One or more languages that should be configured.</p>
+<p>Default: []</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments_repeat9">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat9" title="Permalink to this heading">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>--no-import</kbd></dt>
+<dd><p>Don’t import the yggdrasil package in calling the installation script.</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
 </section>
 <section id="config">
 <h4>config<a class="headerlink" href="#config" title="Permalink to this heading">¶</a></h4>
@@ -535,8 +554,8 @@
                  <span class="p">[</span><span class="n">languages</span> <span class="p">[</span><span class="n">languages</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat8">
-<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat8" title="Permalink to this heading">¶</a></h5>
+<section id="positional-arguments_repeat9">
+<h5>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat9" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>languages</kbd></dt>
 <dd><p>One or more languages that should be configured.</p>
@@ -544,8 +563,8 @@
 </dd>
 </dl>
 </section>
-<section id="Named Arguments_repeat9">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat9" title="Permalink to this heading">¶</a></h5>
+<section id="named-arguments_repeat10">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat10" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--languages</kbd></dt>
 <dd><p>One or more languages that should be configured.</p>
@@ -626,8 +645,8 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">schema</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">only</span><span class="o">-</span><span class="n">constants</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat10">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat10" title="Permalink to this heading">¶</a></h5>
+<section id="named-arguments_repeat11">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat11" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--only-constants</kbd></dt>
 <dd><p>Only update the constants.py file without updating the schema.</p>
@@ -642,8 +661,8 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">model</span><span class="o">-</span><span class="n">form</span><span class="o">-</span><span class="n">schema</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">file</span> <span class="n">FILE</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat11">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat11" title="Permalink to this heading">¶</a></h5>
+<section id="named-arguments_repeat12">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat12" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--file</kbd></dt>
 <dd><p>Path to file where the schema should be saved.</p>
@@ -673,8 +692,8 @@
 </dd>
 </dl>
 </section>
-<section id="Sub-commands:_repeat2">
-<h5>Sub-commands:<a class="headerlink" href="#Sub-commands:_repeat2" title="Permalink to this heading">¶</a></h5>
+<section id="Sub-commands_repeat2">
+<h5>Sub-commands<a class="headerlink" href="#Sub-commands_repeat2" title="Permalink to this heading">¶</a></h5>
 <section id="commtype">
 <h6>commtype<a class="headerlink" href="#commtype" title="Permalink to this heading">¶</a></h6>
 <p>Compare different communication avenues.</p>
@@ -718,8 +737,8 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">gha</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">base</span> <span class="n">BASE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dest</span> <span class="n">DEST</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat12">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat12" title="Permalink to this heading">¶</a></h5>
+<section id="named-arguments_repeat13">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat13" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--base, --base-file</kbd></dt>
 <dd><p>Version of GHA workflow yaml that contains anchors.</p>
@@ -745,8 +764,8 @@
                                       <span class="o">...</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat13">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat13" title="Permalink to this heading">¶</a></h5>
+<section id="named-arguments_repeat14">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat14" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--manager-name</kbd></dt>
 <dd><p>Name that will be used to identify the service manager.</p>
@@ -775,8 +794,8 @@
 </dd>
 </dl>
 </section>
-<section id="Sub-commands:_repeat3">
-<h5>Sub-commands:<a class="headerlink" href="#Sub-commands:_repeat3" title="Permalink to this heading">¶</a></h5>
+<section id="Sub-commands_repeat3">
+<h5>Sub-commands<a class="headerlink" href="#Sub-commands_repeat3" title="Permalink to this heading">¶</a></h5>
 <section id="start">
 <h6>start<a class="headerlink" href="#start" title="Permalink to this heading">¶</a></h6>
 <p>Start an integration service manager and/or integration service.</p>
@@ -785,11 +804,12 @@
                                             <span class="p">[</span><span class="o">--</span><span class="n">integration</span><span class="o">-</span><span class="n">yamls</span> <span class="n">INTEGRATION_YAMLS</span> <span class="p">[</span><span class="n">INTEGRATION_YAMLS</span> <span class="o">...</span><span class="p">]]</span>
                                             <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">coverage</span><span class="p">]</span>
                                             <span class="p">[</span><span class="o">--</span><span class="n">model</span><span class="o">-</span><span class="n">repository</span> <span class="n">MODEL_REPOSITORY</span><span class="p">]</span>
+                                            <span class="p">[</span><span class="o">--</span><span class="n">track</span><span class="o">-</span><span class="n">memory</span><span class="p">]</span>
                                             <span class="p">[</span><span class="o">--</span><span class="n">log</span><span class="o">-</span><span class="n">level</span> <span class="n">LOG_LEVEL</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat14">
-<h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat14" title="Permalink to this heading">¶</a></h7>
+<section id="named-arguments_repeat15">
+<h7>Named Arguments<a class="headerlink" href="#named-arguments_repeat15" title="Permalink to this heading">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>--remote-url</kbd></dt>
 <dd><p>URL that will be used to access the service manager and running integrations by remote requests. If not provided, the environment variable YGGDRASIL_SERVICE_HOST_URL will be used if it is set. If it is not set, the local <code class="docutils literal notranslate"><span class="pre">address</span></code> will be used under the assumption that the service manager and integration services will only be connected to by local integrations.</p>
@@ -807,6 +827,10 @@
 <dt><kbd>--model-repository</kbd></dt>
 <dd><p>URL for a directory in a Git repository containing models that should be loaded into the service manager registry.</p>
 </dd>
+<dt><kbd>--track-memory</kbd></dt>
+<dd><p>Track the memory used by the service manager.</p>
+<p>Default: False</p>
+</dd>
 <dt><kbd>--log-level</kbd></dt>
 <dd><p>Level of logging that should be performed for the service manager application.</p>
 </dd>
@@ -820,8 +844,8 @@
                                            <span class="p">[</span><span class="o">--</span><span class="n">integration</span><span class="o">-</span><span class="n">name</span> <span class="n">INTEGRATION_NAME</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat15">
-<h7>Named Arguments<a class="headerlink" href="#Named Arguments_repeat15" title="Permalink to this heading">¶</a></h7>
+<section id="named-arguments_repeat16">
+<h7>Named Arguments<a class="headerlink" href="#named-arguments_repeat16" title="Permalink to this heading">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>--integration-name</kbd></dt>
 <dd><p>Name of integration to stop. If not provided, the service manager will be stopped as will all of the running services.</p>
@@ -844,8 +868,8 @@
                                                <span class="p">[</span><span class="n">integration</span><span class="o">-</span><span class="n">yamls</span> <span class="p">[</span><span class="n">integration</span><span class="o">-</span><span class="n">yamls</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat9">
-<h7>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat9" title="Permalink to this heading">¶</a></h7>
+<section id="positional-arguments_repeat10">
+<h7>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat10" title="Permalink to this heading">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>integration-name</kbd></dt>
 <dd><p>The name that the integration should be registered under or the path to a YAML file containing a list of one or more mappings between name and YAML specification files for integrations that should be registered.</p>
@@ -862,8 +886,8 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span> <span class="n">unregister</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">integration</span><span class="o">-</span><span class="n">name</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat10">
-<h7>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat10" title="Permalink to this heading">¶</a></h7>
+<section id="positional-arguments_repeat11">
+<h7>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat11" title="Permalink to this heading">¶</a></h7>
 <dl class="option-list">
 <dt><kbd>integration-name</kbd></dt>
 <dd><p>The name of the integration to remove from the registry or the path to a YAML file containing a list of one or more mappings between integration name and YAML specification files for integrations that should be unregistered.</p>
@@ -884,8 +908,8 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggccflags</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments">
-<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h3>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>--cpp</kbd></dt>
 <dd><p>Get the compilation flags used for C++ programs.</p>
@@ -902,8 +926,8 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggcctool</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fullpath</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments">
-<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h3>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>--cpp</kbd></dt>
 <dd><p>Get the compiler used for C++ programs.</p>
@@ -949,8 +973,8 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggldflags</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments">
-<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h3>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>--cpp</kbd></dt>
 <dd><p>Get the compilation flags used for C++ programs.</p>
@@ -967,8 +991,8 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggldtool</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fullpath</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments">
-<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h3>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>--cpp</kbd></dt>
 <dd><p>Get the linker used for C++ programs.</p>

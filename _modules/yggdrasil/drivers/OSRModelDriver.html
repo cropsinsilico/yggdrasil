@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.OSRModelDriver &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.drivers.OSRModelDriver &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
-      <li>yggdrasil.drivers.OSRModelDriver</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../drivers.html">yggdrasil.drivers</a></li>
+      <li class="breadcrumb-item active">yggdrasil.drivers.OSRModelDriver</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -116,7 +117,7 @@
 
 
 <div class="viewcode-block" id="OSRModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver">[docs]</a><span class="k">class</span> <span class="nc">OSRModelDriver</span><span class="p">(</span><span class="n">ExecutableModelDriver</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running OpenSimRoot model.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running OpenSimRoot model.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        sync_vars_in (list, optional): Variables that should be synchronized</span>
@@ -160,7 +161,7 @@
 
 <div class="viewcode-block" id="OSRModelDriver.after_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.after_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes after</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes after</span>
 <span class="sd">        registration.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ExecutableModelDriver</span><span class="o">.</span><span class="n">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -175,7 +176,7 @@
                     <span class="s1">&#39;StaticBuild&#39;</span><span class="p">,</span> <span class="s1">&#39;OpenSimRootYgg&#39;</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="OSRModelDriver.parse_arguments"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort model arguments to determine which one is the executable</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort model arguments to determine which one is the executable</span>
 <span class="sd">        and which ones are arguments.</span>
 
 <span class="sd">        Args:</span>
@@ -194,11 +195,11 @@
         <span class="c1"># if not (isinstance(self.executable_path, str)</span>
         <span class="c1">#         and os.path.isfile(self.executable_path)):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">()</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">executable_path</span><span class="p">))</span></div>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">executable_path</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="OSRModelDriver.is_library_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.is_library_installed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_library_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lib</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a dependency is installed.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a dependency is installed.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lib (str): Name of the library that should be checked.</span>
@@ -217,7 +218,7 @@
 
 <div class="viewcode-block" id="OSRModelDriver.compile_dependencies"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.compile_dependencies">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">compile_dependencies</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;OpenSimRootYgg&#39;</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile the OpenSimRoot executable with the yggdrasil flag set.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile the OpenSimRoot executable with the yggdrasil flag set.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            target (str, optional): Make target that should be build. Defaults to</span>
@@ -271,7 +272,7 @@
             <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="OSRModelDriver.write_wrappers"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.write_wrappers">[docs]</a>    <span class="k">def</span> <span class="nf">write_wrappers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write any wrappers needed to compile and/or run a model.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write any wrappers needed to compile and/or run a model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Keyword arguments are passed to the parent class&#39;s</span>
@@ -286,7 +287,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="OSRModelDriver.wrap_xml"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.wrap_xml">[docs]</a>    <span class="k">def</span> <span class="nf">wrap_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wrap the input XML, adding tags for the inputs/outputs specified for</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wrap the input XML, adding tags for the inputs/outputs specified for</span>
 <span class="sd">        this model.</span>
 
 <span class="sd">        Args:</span>
@@ -304,14 +305,14 @@
             <span class="n">sio</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">src_contents</span><span class="p">)</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_env</span><span class="p">())</span>
         <span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">src_contents</span><span class="p">)</span>
         <span class="n">timesync</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timesync</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">timesync</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">timesync</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">timesync</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">timesync</span> <span class="o">=</span> <span class="p">[</span><span class="n">timesync</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">tsync</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">timesync</span><span class="p">):</span>
             <span class="n">ivars</span> <span class="o">=</span> <span class="n">tsync</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="p">[])</span>
             <span class="n">ovars</span> <span class="o">=</span> <span class="n">tsync</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="p">[])</span>
-            <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ivars</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
-            <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ovars</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ivars</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ovars</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
             <span class="n">ivars</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ivars</span><span class="p">)</span>
             <span class="n">ovars</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ovars</span><span class="p">)</span>
             <span class="n">tupdate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_interval</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tsync</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="mf">1.0</span><span class="p">)</span>
@@ -349,7 +350,7 @@
 
 <div class="viewcode-block" id="OSRModelDriver.is_language_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.is_language_installed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_language_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the interpreter/compiler for the associated programming</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the interpreter/compiler for the associated programming</span>
 <span class="sd">        language is installed.</span>
 
 <span class="sd">        Returns:</span>
@@ -360,7 +361,7 @@
 
 <div class="viewcode-block" id="OSRModelDriver.clone_repository"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.clone_repository">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">clone_repository</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clone the OpenSimRoot repository.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clone the OpenSimRoot repository.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            dest (str, optional): Full path to location where the repository should</span>
@@ -380,7 +381,7 @@
         
 <div class="viewcode-block" id="OSRModelDriver.configure_executable_type"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.configure_executable_type">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">configure_executable_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add configuration options specific in the executable type</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add configuration options specific in the executable type</span>
 <span class="sd">        before the libraries are configured.</span>
 
 <span class="sd">        Args:</span>
@@ -417,7 +418,7 @@
         
 <div class="viewcode-block" id="OSRModelDriver.set_env_class"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.set_env_class">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">set_env_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set environment variables that are instance independent.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set environment variables that are instance independent.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Additional keyword arguments are passed to the</span>
@@ -436,7 +437,7 @@
         
 <div class="viewcode-block" id="OSRModelDriver.language_executable"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.language_executable">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">language_executable</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Command required to compile/run a model written in this language</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Command required to compile/run a model written in this language</span>
 <span class="sd">        from the command line.</span>
 
 <span class="sd">        Returns:</span>
@@ -448,7 +449,7 @@
         
 <div class="viewcode-block" id="OSRModelDriver.executable_command"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.executable_command">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">executable_command</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compose a command for running a program using the exectuable for</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compose a command for running a program using the exectuable for</span>
 <span class="sd">        this language (compiler/interpreter) with the provided arguments.</span>
 
 <span class="sd">        Args:</span>
@@ -470,13 +471,13 @@
 
 <div class="viewcode-block" id="OSRModelDriver.cleanup_dependencies"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.cleanup_dependencies">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">cleanup_dependencies</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup dependencies.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup dependencies.&quot;&quot;&quot;</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="s1">&#39;cleanygg&#39;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">OSRModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup_dependencies</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="OSRModelDriver.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Dictionary of variables to use for testing. Key/value pairs:</span>

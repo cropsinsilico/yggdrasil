@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.multitasking &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.multitasking &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -82,9 +83,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>yggdrasil.multitasking</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">yggdrasil.multitasking</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -138,7 +139,7 @@
 
 
 <div class="viewcode-block" id="check_processes"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.check_processes">[docs]</a><span class="k">def</span> <span class="nf">check_processes</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for processes that are still running.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for processes that are still running.&quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">psutil</span>
     <span class="n">current_process</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">Process</span><span class="p">()</span>
     <span class="n">children</span> <span class="o">=</span> <span class="n">current_process</span><span class="o">.</span><span class="n">children</span><span class="p">(</span><span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -150,7 +151,7 @@
 
 
 <div class="viewcode-block" id="check_threads"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.check_threads">[docs]</a><span class="k">def</span> <span class="nf">check_threads</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for threads that are still running.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for threads that are still running.&quot;&quot;&quot;</span>
     <span class="c1"># logger.info(&quot;Checking %d threads&quot; % len(_thread_registry))</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_thread_registry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
@@ -162,7 +163,7 @@
 
 
 <div class="viewcode-block" id="check_locks"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.check_locks">[docs]</a><span class="k">def</span> <span class="nf">check_locks</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for locks in lock registry that are locked.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for locks in lock registry that are locked.&quot;&quot;&quot;</span>
     <span class="c1"># logger.info(&quot;Checking %d locks&quot; % len(_lock_registry))</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_lock_registry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
@@ -173,7 +174,7 @@
 
 
 <div class="viewcode-block" id="check_sockets"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.check_sockets">[docs]</a><span class="k">def</span> <span class="nf">check_sockets</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check registered sockets.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check registered sockets.&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">cleanup_comms</span>
     <span class="n">count</span> <span class="o">=</span> <span class="n">cleanup_comms</span><span class="p">(</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -181,7 +182,7 @@
 
 
 <div class="viewcode-block" id="ygg_atexit"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ygg_atexit">[docs]</a><span class="k">def</span> <span class="nf">ygg_atexit</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Things to do at exit.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Things to do at exit.&quot;&quot;&quot;</span>
     <span class="n">check_locks</span><span class="p">()</span>
     <span class="n">check_threads</span><span class="p">()</span>
     <span class="c1"># # This causes a segfault in a C dependency</span>
@@ -200,7 +201,7 @@
 
 
 <div class="viewcode-block" id="SafeThread"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.SafeThread">[docs]</a><span class="k">class</span> <span class="nc">SafeThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Thread that sets Event on error.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Thread that sets Event on error.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_errored</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
@@ -215,14 +216,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">exitcode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Exit code. 1 if error, 0 otherwise.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Exit code. 1 if error, 0 otherwise.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_started</span><span class="o">.</span><span class="n">is_set</span><span class="p">())</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_errored</span><span class="o">.</span><span class="n">is_set</span><span class="p">())</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process ID.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process ID.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span></div>
 
 
@@ -231,7 +232,7 @@
 
 
 <div class="viewcode-block" id="add_aliased_attribute"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.add_aliased_attribute">[docs]</a><span class="k">def</span> <span class="nf">add_aliased_attribute</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">with_lock</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Factory to alias an attribute so that it refers to the wrapped</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Factory to alias an attribute so that it refers to the wrapped</span>
 <span class="sd">    object.</span>
 
 <span class="sd">    Args:</span>
@@ -258,7 +259,7 @@
 
 
 <div class="viewcode-block" id="add_aliased_method"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.add_aliased_method">[docs]</a><span class="k">def</span> <span class="nf">add_aliased_method</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">with_lock</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Factory to alias a method so that it refers to the wrapped</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Factory to alias a method so that it refers to the wrapped</span>
 <span class="sd">    object.</span>
 
 <span class="sd">    Args:</span>
@@ -285,15 +286,15 @@
 
 
 <div class="viewcode-block" id="AliasMeta"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.AliasMeta">[docs]</a><span class="k">class</span> <span class="nc">AliasMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Meta class for adding aliased methods to the class.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Meta class for adding aliased methods to the class.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">class_dict</span><span class="p">):</span>
         <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">class_dict</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_base_meth</span><span class="p">:</span>
-            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
             <span class="n">add_aliased_method</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">with_lock</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">_base_locked</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_base_attr</span><span class="p">:</span>
-            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
             <span class="n">add_aliased_attribute</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">with_lock</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">_base_locked</span><span class="p">)</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">_base_meth</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">_base_attr</span> <span class="o">=</span> <span class="p">[]</span>
@@ -306,7 +307,7 @@
 
 <div class="viewcode-block" id="AliasObject"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.AliasObject">[docs]</a><span class="nd">@six</span><span class="o">.</span><span class="n">add_metaclass</span><span class="p">(</span><span class="n">AliasMeta</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">AliasObject</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias object that calls to attribute.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias object that calls to attribute.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        dont_initialize_base (bool, optional): If True the base object</span>
@@ -329,7 +330,7 @@
 
 <div class="viewcode-block" id="AliasObject.from_base"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.AliasObject.from_base">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_base</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an instance by creating a based from the provided</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an instance by creating a based from the provided</span>
 <span class="sd">        base class.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dont_initialize_base&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
@@ -360,7 +361,7 @@
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AliasObject.check_for_base"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.AliasObject.check_for_base">[docs]</a>    <span class="k">def</span> <span class="nf">check_for_base</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raise an error if the aliased object has been disconnected.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raise an error if the aliased object has been disconnected.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">AliasDisconnectError</span><span class="p">(</span>
                 <span class="p">(</span><span class="s2">&quot;Aliased object has been disconnected so &quot;</span>
@@ -368,11 +369,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dummy_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy copy of base.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy copy of base.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="AliasObject.disconnect"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.AliasObject.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from the aliased object by replacing it with</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from the aliased object by replacing it with</span>
 <span class="sd">        a dummy object.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dummy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dummy_copy</span>
@@ -384,7 +385,7 @@
 
         
 <div class="viewcode-block" id="MultiObject"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MultiObject">[docs]</a><span class="k">class</span> <span class="nc">MultiObject</span><span class="p">(</span><span class="n">AliasObject</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concurrent/parallel processing object using either threads</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concurrent/parallel processing object using either threads</span>
 <span class="sd">    or processes.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;task_method&#39;</span><span class="p">,</span> <span class="s1">&#39;parallel&#39;</span><span class="p">]</span>
@@ -402,7 +403,7 @@
 
 
 <div class="viewcode-block" id="Context"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Context">[docs]</a><span class="k">class</span> <span class="nc">Context</span><span class="p">(</span><span class="n">MultiObject</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Context for managing threads/processes.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Context for managing threads/processes.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;thread&#39;</span><span class="p">,</span> <span class="n">dont_initialize_base</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Context</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dont_initialize_base</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -431,39 +432,39 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">Context</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__setstate__</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Context.RLock"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Context.RLock">[docs]</a>    <span class="k">def</span> <span class="nf">RLock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a recursive lock in this context.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a recursive lock in this context.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;task_context&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">return</span> <span class="n">RLock</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Context.Event"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Context.Event">[docs]</a>    <span class="k">def</span> <span class="nf">Event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get an event in this context.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get an event in this context.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;task_context&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">return</span> <span class="n">Event</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Context.Task"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Context.Task">[docs]</a>    <span class="k">def</span> <span class="nf">Task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a task in this context.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a task in this context.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;task_context&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">return</span> <span class="n">Task</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Context.Queue"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Context.Queue">[docs]</a>    <span class="k">def</span> <span class="nf">Queue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a queue in this context.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a queue in this context.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;task_context&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">return</span> <span class="n">Queue</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Context.Dict"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Context.Dict">[docs]</a>    <span class="k">def</span> <span class="nf">Dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a shared dictionary in this context.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a shared dictionary in this context.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;task_context&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">return</span> <span class="n">Dict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Context.current_task"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Context.current_task">[docs]</a>    <span class="k">def</span> <span class="nf">current_task</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Current task (process/thread).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Current task (process/thread).&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">current_process</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Context.main_task"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Context.main_task">[docs]</a>    <span class="k">def</span> <span class="nf">main_task</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Main task (process/thread).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Main task (process/thread).&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="p">,</span> <span class="s1">&#39;parent_process&#39;</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
@@ -488,7 +489,7 @@
 
 
 <div class="viewcode-block" id="ContextObject"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ContextObject">[docs]</a><span class="k">class</span> <span class="nc">ContextObject</span><span class="p">(</span><span class="n">MultiObject</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for object intialized in a context.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for object intialized in a context.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_managed_context&quot;</span><span class="p">,</span> <span class="s2">&quot;_context&quot;</span><span class="p">,</span> <span class="s2">&quot;_base_class&quot;</span><span class="p">]</span>
 
@@ -523,13 +524,13 @@
         
 <div class="viewcode-block" id="ContextObject.get_base_class"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ContextObject.get_base_class">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_base_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get instance of base class that will be represented.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get instance of base class that will be represented.&quot;&quot;&quot;</span>
         <span class="n">name</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_base_class_name</span>
         <span class="n">context</span><span class="o">.</span><span class="n">check_for_base</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">_base</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ContextObject.disconnect"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ContextObject.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from the aliased object by replacing it with</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from the aliased object by replacing it with</span>
 <span class="sd">        a dummy object.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">ContextObject</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">super</span><span class="p">(</span><span class="n">ContextObject</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
@@ -539,7 +540,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Context: Context used to create this object.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Context: Context used to create this object.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context</span><span class="p">()</span></div>
 
 
@@ -559,7 +560,7 @@
     
 
 <div class="viewcode-block" id="RLock"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.RLock">[docs]</a><span class="k">class</span> <span class="nc">RLock</span><span class="p">(</span><span class="n">ContextObject</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Recursive lock. Acquiring the lock after disconnect is called</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Recursive lock. Acquiring the lock after disconnect is called</span>
 <span class="sd">    through use as a context will not raise an error, but will not</span>
 <span class="sd">    do anything.&quot;&quot;&quot;</span>
 
@@ -578,7 +579,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dummy_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy copy of base.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy copy of base.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">DummyRLock</span><span class="p">()</span></div>
 
 
@@ -605,7 +606,7 @@
 
 
 <div class="viewcode-block" id="ProcessEvent"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ProcessEvent">[docs]</a><span class="k">class</span> <span class="nc">ProcessEvent</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Multiprocessing/threading event associated with a process that has</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Multiprocessing/threading event associated with a process that has</span>
 <span class="sd">    a discreet start and end.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;started&quot;</span><span class="p">,</span> <span class="s2">&quot;stopped&quot;</span><span class="p">]</span>
@@ -615,28 +616,28 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">task_context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">started</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ProcessEvent.start"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ProcessEvent.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the started event.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the started event.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">started</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ProcessEvent.stop"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ProcessEvent.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the stopped event.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the stopped event.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ProcessEvent.has_started"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ProcessEvent.has_started">[docs]</a>    <span class="k">def</span> <span class="nf">has_started</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the process has started.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the process has started.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">started</span><span class="o">.</span><span class="n">is_set</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ProcessEvent.has_stopped"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ProcessEvent.has_stopped">[docs]</a>    <span class="k">def</span> <span class="nf">has_stopped</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the process has stopped.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the process has stopped.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">is_set</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ProcessEvent.is_running"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ProcessEvent.is_running">[docs]</a>    <span class="k">def</span> <span class="nf">is_running</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the processes has started, but hasn&#39;t stopped.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the processes has started, but hasn&#39;t stopped.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">has_started</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_stopped</span><span class="p">()))</span></div></div>
 
 
 <div class="viewcode-block" id="Event"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Event">[docs]</a><span class="k">class</span> <span class="nc">Event</span><span class="p">(</span><span class="n">ContextObject</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Multiprocessing/threading event.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Multiprocessing/threading event.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_set&quot;</span><span class="p">,</span> <span class="s2">&quot;_clear&quot;</span><span class="p">,</span> <span class="s2">&quot;_set_callbacks&quot;</span><span class="p">,</span> <span class="s2">&quot;_clear_callbacks&quot;</span><span class="p">]</span>
     <span class="n">_base_attr</span> <span class="o">=</span> <span class="n">ContextObject</span><span class="o">.</span><span class="n">_base_attr</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;is_set&#39;</span><span class="p">,</span> <span class="s1">&#39;wait&#39;</span><span class="p">]</span>
@@ -651,20 +652,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_clear</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">clear</span>
 
 <div class="viewcode-block" id="Event.set"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Event.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the event.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the event.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">()</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_callbacks</span><span class="p">:</span>
             <span class="n">x</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">k</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Event.clear"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Event.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clear the event.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clear the event.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_clear</span><span class="p">()</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clear_callbacks</span><span class="p">:</span>
             <span class="n">x</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">k</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dummy_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy copy of base.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy copy of base.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">DummyEvent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">is_set</span><span class="p">())</span>
         
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -711,7 +712,7 @@
     <span class="c1">#     return or_event</span>
 
 <div class="viewcode-block" id="Event.add_callback"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Event.add_callback">[docs]</a>    <span class="k">def</span> <span class="nf">add_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="n">trigger</span><span class="o">=</span><span class="s1">&#39;set&#39;</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a callback that will be called when set or clear is invoked.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a callback that will be called when set or clear is invoked.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            callback (callable): Callable executed when set is called.</span>
@@ -726,7 +727,7 @@
             <span class="p">(</span><span class="n">callback</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="Event.disconnect"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Event.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from the aliased object by replacing it with</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from the aliased object by replacing it with</span>
 <span class="sd">        a dummy object.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">Event</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">super</span><span class="p">(</span><span class="n">Event</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
@@ -735,7 +736,7 @@
 
 
 <div class="viewcode-block" id="ValueEvent"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ValueEvent">[docs]</a><span class="k">class</span> <span class="nc">ValueEvent</span><span class="p">(</span><span class="n">Event</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling storing a value that also triggers an event.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling storing a value that also triggers an event.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_event_value&quot;</span><span class="p">]</span>
 
@@ -779,7 +780,7 @@
     
 
 <div class="viewcode-block" id="Task"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Task">[docs]</a><span class="k">class</span> <span class="nc">Task</span><span class="p">(</span><span class="n">ContextObject</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Multiprocessing/threading process.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Multiprocessing/threading process.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_target&quot;</span><span class="p">,</span> <span class="s2">&quot;_args&quot;</span><span class="p">,</span> <span class="s2">&quot;_kwargs&quot;</span><span class="p">]</span>
     <span class="n">_base_attr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;daemon&#39;</span><span class="p">,</span> <span class="s1">&#39;authkey&#39;</span><span class="p">,</span> <span class="s1">&#39;sentinel&#39;</span><span class="p">,</span> <span class="s1">&#39;exitcode&#39;</span><span class="p">,</span> <span class="s1">&#39;pid&#39;</span><span class="p">]</span>
@@ -799,7 +800,7 @@
 
 <div class="viewcode-block" id="Task.get_base_class"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Task.get_base_class">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_base_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get instance of base class that will be represented.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get instance of base class that will be represented.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">parallel</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">Process</span>
         <span class="k">else</span><span class="p">:</span>
@@ -807,7 +808,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dummy_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy copy of base.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy copy of base.&quot;&quot;&quot;</span>
         <span class="n">name</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;dummy&#39;</span>
         <span class="n">exitcode</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">daemon</span> <span class="o">=</span> <span class="kc">False</span>
@@ -836,7 +837,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">Task</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__setstate__</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Task.is_alive"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Task.is_alive">[docs]</a>    <span class="k">def</span> <span class="nf">is_alive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the process/thread is alive.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the process/thread is alive.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="n">out</span> <span class="o">=</span> <span class="kc">False</span>
@@ -844,14 +845,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ident</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process ID.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process ID.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">pid</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">ident</span>
 
 <div class="viewcode-block" id="Task.target"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Task.target">[docs]</a>    <span class="k">def</span> <span class="nf">target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the target.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the target.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_initialize</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
@@ -861,26 +862,26 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_finalize</span><span class="p">()</span></div>
             
     <span class="k">def</span> <span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize a run.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize a run.&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
     <span class="k">def</span> <span class="nf">_finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Finalize a run.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Finalize a run.&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
     <span class="k">def</span> <span class="nf">_on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Handle an error during a run.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Handle an error during a run.&quot;&quot;&quot;</span>
         <span class="k">raise</span>
         
 <div class="viewcode-block" id="Task.kill"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Task.kill">[docs]</a>    <span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Kill the task.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Kill the task.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="p">,</span> <span class="s1">&#39;kill&#39;</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="p">,</span> <span class="s1">&#39;terminate&#39;</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">terminate</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Task.disconnect"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Task.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from the aliased object by replacing it with</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from the aliased object by replacing it with</span>
 <span class="sd">        a dummy object.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_target</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">Task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -888,7 +889,7 @@
 
 
 <div class="viewcode-block" id="TaskLoop"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.TaskLoop">[docs]</a><span class="k">class</span> <span class="nc">TaskLoop</span><span class="p">(</span><span class="n">Task</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for looping over a task.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for looping over a task.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;break_flag&quot;</span><span class="p">,</span> <span class="s2">&quot;polling_interval&quot;</span><span class="p">,</span> <span class="s2">&quot;break_stack&quot;</span><span class="p">,</span>
                  <span class="s2">&quot;_loop_target&quot;</span><span class="p">,</span> <span class="s2">&quot;_loop_count&quot;</span><span class="p">]</span>
@@ -904,7 +905,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">task_context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_context</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TaskLoop.break_loop"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.TaskLoop.break_loop">[docs]</a>    <span class="k">def</span> <span class="nf">break_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">break_stack</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Break the task loop.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Break the task loop.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">break_stack</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">break_stack</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="kn">import</span> <span class="nn">traceback</span>
@@ -913,12 +914,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TaskLoop.kill"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.TaskLoop.kill">[docs]</a>    <span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Kill the task.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Kill the task.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">break_loop</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TaskLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TaskLoop.loop_target"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.TaskLoop.loop_target">[docs]</a>    <span class="k">def</span> <span class="nf">loop_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue calling the target until the loop is broken.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue calling the target until the loop is broken.&quot;&quot;&quot;</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_loop_target</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -930,11 +931,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_loop_count</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
     <span class="k">def</span> <span class="nf">_finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Finalize a run.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Finalize a run.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">break_loop</span><span class="p">()</span>
 
 <div class="viewcode-block" id="TaskLoop.disconnect"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.TaskLoop.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from the aliased object by replacing it with</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from the aliased object by replacing it with</span>
 <span class="sd">        a dummy object.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_loop_target</span> <span class="o">=</span> <span class="kc">None</span>
@@ -976,13 +977,13 @@
 
 
 <div class="viewcode-block" id="Queue"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Queue">[docs]</a><span class="k">class</span> <span class="nc">Queue</span><span class="p">(</span><span class="n">ContextObject</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Multiprocessing/threading queue.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Multiprocessing/threading queue.&quot;&quot;&quot;</span>
 
     <span class="n">_base_meth</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;full&#39;</span><span class="p">,</span> <span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;get_nowait&#39;</span><span class="p">,</span> <span class="s1">&#39;join_thread&#39;</span><span class="p">,</span> <span class="s1">&#39;qsize&#39;</span><span class="p">]</span>
     
 <div class="viewcode-block" id="Queue.get_base_class"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Queue.get_base_class">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_base_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get instance of base class that will be represented.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get instance of base class that will be represented.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">parallel</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">Queue</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1001,7 +1002,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dummy_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy copy of base.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy copy of base.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">DummyQueue</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Queue.join"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Queue.join">[docs]</a>    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1016,7 +1017,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Queue.disconnect"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Queue.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from the aliased object by replacing it with</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from the aliased object by replacing it with</span>
 <span class="sd">        a dummy object.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
@@ -1048,7 +1049,7 @@
 
 
 <div class="viewcode-block" id="Dict"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Dict">[docs]</a><span class="k">class</span> <span class="nc">Dict</span><span class="p">(</span><span class="n">ContextObject</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Multiprocessing/threading shared dictionary.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Multiprocessing/threading shared dictionary.&quot;&quot;&quot;</span>
 
     <span class="n">_base_meth</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;clear&#39;</span><span class="p">,</span> <span class="s1">&#39;copy&#39;</span><span class="p">,</span> <span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">,</span> <span class="s1">&#39;keys&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;pop&#39;</span><span class="p">,</span> <span class="s1">&#39;popitem&#39;</span><span class="p">,</span> <span class="s1">&#39;setdefault&#39;</span><span class="p">,</span> <span class="s1">&#39;update&#39;</span><span class="p">,</span> <span class="s1">&#39;values&#39;</span><span class="p">,</span>
@@ -1057,7 +1058,7 @@
     
 <div class="viewcode-block" id="Dict.get_base_class"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Dict.get_base_class">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_base_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get instance of base class that will be represented.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get instance of base class that will be represented.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">parallel</span><span class="p">:</span>
             <span class="n">manager</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">manager</span><span class="o">.</span><span class="n">dict</span>
@@ -1072,7 +1073,7 @@
     <span class="c1">#     return self._base.copy()</span>
         
 <div class="viewcode-block" id="Dict.disconnect"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Dict.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from the aliased object by replacing it with</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from the aliased object by replacing it with</span>
 <span class="sd">        a dummy object.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">final_value</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
@@ -1093,7 +1094,7 @@
 
 
 <div class="viewcode-block" id="LockedObject"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.LockedObject">[docs]</a><span class="k">class</span> <span class="nc">LockedObject</span><span class="p">(</span><span class="n">AliasObject</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Container that provides a lock that is acquired before accessing</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Container that provides a lock that is acquired before accessing</span>
 <span class="sd">    the object.&quot;&quot;&quot;</span>
 
     <span class="n">_base_locked</span> <span class="o">=</span> <span class="kc">True</span>
@@ -1105,7 +1106,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">LockedObject</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LockedObject.disconnect"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.LockedObject.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from the aliased object by replacing it with</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect from the aliased object by replacing it with</span>
 <span class="sd">        a dummy object.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">LockedObject</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">super</span><span class="p">(</span><span class="n">LockedObject</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
@@ -1121,7 +1122,7 @@
 
 
 <div class="viewcode-block" id="LockedDict"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.LockedDict">[docs]</a><span class="k">class</span> <span class="nc">LockedDict</span><span class="p">(</span><span class="n">LockedObject</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dictionary that can be shared between threads.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dictionary that can be shared between threads.&quot;&quot;&quot;</span>
 
     <span class="n">_base_class</span> <span class="o">=</span> <span class="nb">dict</span>
     <span class="n">_base_meth</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;clear&#39;</span><span class="p">,</span> <span class="s1">&#39;copy&#39;</span><span class="p">,</span> <span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">,</span> <span class="s1">&#39;keys&#39;</span><span class="p">,</span>
@@ -1130,12 +1131,12 @@
                   <span class="s1">&#39;__iter__&#39;</span><span class="p">,</span> <span class="s1">&#39;__len__&#39;</span><span class="p">,</span> <span class="s1">&#39;__setitem__&#39;</span><span class="p">]</span>
     
 <div class="viewcode-block" id="LockedDict.add_subdict"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.LockedDict.add_subdict">[docs]</a>    <span class="k">def</span> <span class="nf">add_subdict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a subdictionary.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a subdictionary.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dummy_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy copy of base.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy copy of base.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
@@ -1144,7 +1145,7 @@
 
 
 <div class="viewcode-block" id="TimeoutError"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.TimeoutError">[docs]</a><span class="k">class</span> <span class="nc">TimeoutError</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Error to raise when a wait times out.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Error to raise when a wait times out.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">function_value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">function_value</span> <span class="o">=</span> <span class="n">function_value</span>
@@ -1152,7 +1153,7 @@
     
 
 <div class="viewcode-block" id="WaitableFunction"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.WaitableFunction">[docs]</a><span class="k">class</span> <span class="nc">WaitableFunction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an object that can be waited on until a function returns True.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an object that can be waited on until a function returns True.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        function (callable): Callable function that takes no arguments and</span>
@@ -1169,7 +1170,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">polling_interval</span> <span class="o">=</span> <span class="n">polling_interval</span>
 
 <div class="viewcode-block" id="WaitableFunction.wait"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.WaitableFunction.wait">[docs]</a>    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for the function to return True.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for the function to return True.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            timeout (float, optional): Time (in seconds) that should be</span>
@@ -1210,7 +1211,7 @@
 
 <div class="viewcode-block" id="wait_on_function"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.wait_on_function">[docs]</a><span class="k">def</span> <span class="nf">wait_on_function</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                      <span class="n">polling_interval</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for the function to return True.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for the function to return True.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        function (callable): Callable function that takes no arguments and</span>
@@ -1237,7 +1238,7 @@
 
 
 <div class="viewcode-block" id="MPIRequestWrapper"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIRequestWrapper">[docs]</a><span class="k">class</span> <span class="nc">MPIRequestWrapper</span><span class="p">(</span><span class="n">WaitableFunction</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wrapper for an MPI request.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wrapper for an MPI request.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;request&quot;</span><span class="p">,</span> <span class="s2">&quot;completed&quot;</span><span class="p">,</span> <span class="s2">&quot;canceled&quot;</span><span class="p">,</span> <span class="s2">&quot;_result&quot;</span><span class="p">]</span>
 
@@ -1250,26 +1251,26 @@
             <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">canceled</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MPIRequestWrapper.cancel"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIRequestWrapper.cancel">[docs]</a>    <span class="k">def</span> <span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cancel the request.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cancel the request.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">()[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">canceled</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Cancel</span><span class="p">()</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;object: The result of the MPI request.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;object: The result of the MPI request.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">completed</span><span class="p">:</span>  <span class="c1"># pragma: intermittent</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result</span>
 
 <div class="viewcode-block" id="MPIRequestWrapper.test"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIRequestWrapper.test">[docs]</a>    <span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test to see if the request has completed.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test to see if the request has completed.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">completed</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">completed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">completed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MPIRequestWrapper.wait"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIRequestWrapper.wait">[docs]</a>    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for the request to be completed.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for the request to be completed.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            timeout (float, optional): Time (in seconds) that should be</span>
@@ -1294,12 +1295,12 @@
 
 
 <div class="viewcode-block" id="MPIPartnerError"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIPartnerError">[docs]</a><span class="k">class</span> <span class="nc">MPIPartnerError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Error raised when there is an error on another process.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Error raised when there is an error on another process.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="MPIErrorExchange"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIErrorExchange">[docs]</a><span class="k">class</span> <span class="nc">MPIErrorExchange</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set of MPI messages to check for errors.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set of MPI messages to check for errors.&quot;&quot;&quot;</span>
 
     <span class="n">tags</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ERROR_ON_RANK0&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
             <span class="s1">&#39;ERROR_ON_RANKX&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
@@ -1317,7 +1318,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_first_use</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="MPIErrorExchange.reset"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIErrorExchange.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">global_tag</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Rest comms for the next test.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Rest comms for the next test.&quot;&quot;&quot;</span>
         <span class="n">global_tag</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">alltoall</span><span class="p">([</span><span class="n">global_tag</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">global_tag</span> <span class="o">=</span> <span class="n">global_tag</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -1335,7 +1336,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_first_use</span> <span class="o">=</span> <span class="kc">False</span></div>
         
 <div class="viewcode-block" id="MPIErrorExchange.recv"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIErrorExchange.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for response to receive request.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for response to receive request.&quot;&quot;&quot;</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">wait</span><span class="p">:</span>
@@ -1354,7 +1355,7 @@
         <span class="k">return</span> <span class="n">results</span></div>
 
 <div class="viewcode-block" id="MPIErrorExchange.send"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIErrorExchange.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">partner_ranks</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_tag</span><span class="p">)</span>
@@ -1362,7 +1363,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">outgoing</span> <span class="o">=</span> <span class="n">msg</span></div>
 
 <div class="viewcode-block" id="MPIErrorExchange.finalize"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MPIErrorExchange.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">failure</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Finalize an instance by waiting for completions.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Finalize an instance by waiting for completions.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            failure (bool): True if there was an error.</span>
@@ -1386,7 +1387,7 @@
              <span class="n">check_equal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
              <span class="n">dont_raise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">local_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sync_tag</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
              <span class="n">check_complete</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Synchronize processes.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Synchronize processes.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            local_tag (int): Next tag that will be used by the local MPI comm.</span>
@@ -1417,7 +1418,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="n">local_tag</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">complete</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># self.recv(wait=True)[0]</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">complete</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">complete</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">msg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">closing_messages</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">outgoing</span> <span class="o">=</span> <span class="n">msg</span>
@@ -1434,7 +1435,7 @@
         <span class="k">if</span> <span class="n">remote_error</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">local_error</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">dont_raise</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
             <span class="k">raise</span> <span class="n">MPIPartnerError</span><span class="p">(</span><span class="s2">&quot;Error on another process.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">check_equal</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">remote_error</span> <span class="ow">or</span> <span class="n">local_error</span><span class="p">):</span>
-            <span class="k">assert</span><span class="p">(</span><span class="nb">all</span><span class="p">((</span><span class="n">x</span> <span class="o">==</span> <span class="n">local_tag</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_tag</span><span class="p">))</span>
+            <span class="k">assert</span> <span class="nb">all</span><span class="p">((</span><span class="n">x</span> <span class="o">==</span> <span class="n">local_tag</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_tag</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">check_complete</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">closing_messages</span>
                        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">results</span><span class="p">)</span>
@@ -1460,7 +1461,7 @@
 
 
 <div class="viewcode-block" id="YggTask"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask">[docs]</a><span class="k">class</span> <span class="nc">YggTask</span><span class="p">(</span><span class="n">YggClass</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for managing Ygg thread/process.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for managing Ygg thread/process.&quot;&quot;&quot;</span>
 
     <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="p">(</span><span class="n">YggClass</span><span class="o">.</span><span class="n">_disconnect_attr</span>
                         <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;context&#39;</span><span class="p">,</span> <span class="s1">&#39;lock&#39;</span><span class="p">,</span> <span class="s1">&#39;process_instance&#39;</span><span class="p">,</span>
@@ -1515,13 +1516,13 @@
         <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="YggTask.atexit"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed when python exits.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed when python exits.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Thread alive at exit&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="YggTask.printStatus"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_str</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print the class status.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print the class status.&quot;&quot;&quot;</span>
         <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">): state: </span><span class="si">%s</span><span class="s1">&#39;</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">return_str</span><span class="p">:</span>
@@ -1530,38 +1531,38 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTask.cleanup"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform to clean up the thread after it has stopped.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform to clean up the thread after it has stopped.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div>
         
 <div class="viewcode-block" id="YggTask.create_flag_attr"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.create_flag_attr">[docs]</a>    <span class="k">def</span> <span class="nf">create_flag_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a flag.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a flag.&quot;&quot;&quot;</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">Event</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="YggTask.get_flag_attr"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.get_flag_attr">[docs]</a>    <span class="k">def</span> <span class="nf">get_flag_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the flag attribute.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the flag attribute.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTask.set_flag_attr"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.set_flag_attr">[docs]</a>    <span class="k">def</span> <span class="nf">set_flag_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set a flag.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set a flag.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_flag_attr</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_flag_attr</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="YggTask.clear_flag_attr"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.clear_flag_attr">[docs]</a>    <span class="k">def</span> <span class="nf">clear_flag_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clear a flag.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clear a flag.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_flag_attr</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTask.check_flag_attr"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.check_flag_attr">[docs]</a>    <span class="k">def</span> <span class="nf">check_flag_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a flag is set.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a flag is set.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_flag_attr</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="n">is_set</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="YggTask.wait_flag_attr"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.wait_flag_attr">[docs]</a>    <span class="k">def</span> <span class="nf">wait_flag_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait until a flag is True.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait until a flag is True.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_flag_attr</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTask.start"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start thread/process and print info.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start thread/process and print info.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;starting&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_terminated</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_started_flag</span><span class="p">()</span>
@@ -1570,12 +1571,12 @@
         <span class="c1"># self._calling_thread = self.get_current_task()</span>
 
 <div class="viewcode-block" id="YggTask.before_start"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform on the main thread/process before</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform on the main thread/process before</span>
 <span class="sd">        starting the thread/process.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTask.run"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue running until terminate event set.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue running until terminate event set.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting method&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;running&#39;</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1590,7 +1591,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;finished&#39;</span></div>
 
 <div class="viewcode-block" id="YggTask.run_init"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.run_init">[docs]</a>    <span class="k">def</span> <span class="nf">run_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform at beginning of run.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform at beginning of run.&quot;&quot;&quot;</span>
         <span class="c1"># atexit.register(self.atexit)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;pid = </span><span class="si">%s</span><span class="s1">, ident = </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ident</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">in_process</span> <span class="o">=</span> <span class="kc">True</span>
@@ -1598,17 +1599,17 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">send_pipe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ygg_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;send_pipe&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTask.call_target"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.call_target">[docs]</a>    <span class="k">def</span> <span class="nf">call_target</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call target.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call target.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ygg_target</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_ygg_target</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_ygg_args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_ygg_kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTask.run_error"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.run_error">[docs]</a>    <span class="k">def</span> <span class="nf">run_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform on error in try/except wrapping run.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform on error in try/except wrapping run.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> ERROR&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">task_method</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_flag_attr</span><span class="p">(</span><span class="s1">&#39;error_flag&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTask.run_finally"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.run_finally">[docs]</a>    <span class="k">def</span> <span class="nf">run_finally</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform in finally clause of try/except wrapping</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform in finally clause of try/except wrapping</span>
 <span class="sd">        run.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_process</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_pipe</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1618,31 +1619,31 @@
                 <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTask.join"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.join">[docs]</a>    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Join the process/thread.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Join the process/thread.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_instance</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTask.is_alive"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.is_alive">[docs]</a>    <span class="k">def</span> <span class="nf">is_alive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the process/thread is alive.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the process/thread is alive.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_instance</span><span class="o">.</span><span class="n">is_alive</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process ID.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process ID.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_instance</span><span class="o">.</span><span class="n">pid</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ident</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process ID.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process ID.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_instance</span><span class="o">.</span><span class="n">ident</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">daemon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Indicates whether the thread/process is daemonic or not.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Indicates whether the thread/process is daemonic or not.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_instance</span><span class="o">.</span><span class="n">daemon</span>
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">exitcode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Exit code.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Exit code.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_process</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_flag_attr</span><span class="p">(</span><span class="s1">&#39;error_flag&#39;</span><span class="p">))</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_instance</span><span class="o">.</span><span class="n">exitcode</span><span class="p">:</span>
@@ -1653,16 +1654,16 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">returncode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return code.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return code.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exitcode</span>
 
 <div class="viewcode-block" id="YggTask.kill"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.kill">[docs]</a>    <span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Kill the process.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Kill the process.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">process_instance</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminate</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTask.terminate"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_wait</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the terminate event and wait for the thread/process to stop.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the terminate event and wait for the thread/process to stop.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            no_wait (bool, optional): If True, terminate will not block until</span>
@@ -1684,12 +1685,12 @@
             <span class="c1"># if self.is_alive():</span>
             <span class="c1">#     self.join(self.timeout)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
-            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())</span></div>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span></div>
         <span class="c1"># if self.as_process:</span>
         <span class="c1">#     self.process_instance.terminate()</span>
 
 <div class="viewcode-block" id="YggTask.poll"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.poll">[docs]</a>    <span class="k">def</span> <span class="nf">poll</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if the process is finished and return the return</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if the process is finished and return the return</span>
 <span class="sd">        code if it is.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
@@ -1697,38 +1698,38 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="YggTask.get_current_task"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.get_current_task">[docs]</a>    <span class="k">def</span> <span class="nf">get_current_task</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the current process/thread.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the current process/thread.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">current_task</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="YggTask.get_main_proc"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.get_main_proc">[docs]</a>    <span class="k">def</span> <span class="nf">get_main_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the main process/thread.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the main process/thread.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">main_task</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="YggTask.set_started_flag"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.set_started_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_started_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the started flag for the thread/process to True.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the started flag for the thread/process to True.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_flag_attr</span><span class="p">(</span><span class="s1">&#39;start_flag&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTask.set_terminated_flag"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.set_terminated_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_terminated_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the terminated flag for the thread/process to True.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the terminated flag for the thread/process to True.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_flag_attr</span><span class="p">(</span><span class="s1">&#39;terminate_flag&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">was_started</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the thread/process was started. False otherwise.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the thread/process was started. False otherwise.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_flag_attr</span><span class="p">(</span><span class="s1">&#39;start_flag&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">was_terminated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the thread/process was terminated. False otherwise.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the thread/process was terminated. False otherwise.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_flag_attr</span><span class="p">(</span><span class="s1">&#39;terminate_flag&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">main_terminated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the main thread/process has terminated.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the main thread/process has terminated.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_main_proc</span><span class="p">()</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())</span>
 
 <div class="viewcode-block" id="YggTask.wait"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.wait">[docs]</a>    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait until thread/process finish to return using sleeps rather than</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait until thread/process finish to return using sleeps rather than</span>
 <span class="sd">        blocking.</span>
 
 <span class="sd">        Args:</span>
@@ -1743,7 +1744,7 @@
 
 
 <div class="viewcode-block" id="BreakLoopException"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.BreakLoopException">[docs]</a><span class="k">class</span> <span class="nc">BreakLoopException</span><span class="p">(</span><span class="ne">BaseException</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Special exception that can be raised by the target function</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Special exception that can be raised by the target function</span>
 <span class="sd">    for a loop in order to break the loop.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;break_stack&quot;</span><span class="p">]</span>
@@ -1755,12 +1756,12 @@
 
 
 <div class="viewcode-block" id="BreakLoopError"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.BreakLoopError">[docs]</a><span class="k">class</span> <span class="nc">BreakLoopError</span><span class="p">(</span><span class="n">BreakLoopException</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Version of BreakLoopException that sets an error message.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Version of BreakLoopException that sets an error message.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
         
 
 <div class="viewcode-block" id="YggTaskLoop"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop">[docs]</a><span class="k">class</span> <span class="nc">YggTaskLoop</span><span class="p">(</span><span class="n">YggTask</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to run a loop inside a thread/process.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to run a loop inside a thread/process.&quot;&quot;&quot;</span>
 
     <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="p">(</span><span class="n">YggTask</span><span class="o">.</span><span class="n">_disconnect_attr</span>
                         <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;break_flag&#39;</span><span class="p">,</span> <span class="s1">&#39;loop_flag&#39;</span><span class="p">,</span> <span class="s1">&#39;unpause_flag&#39;</span><span class="p">])</span>
@@ -1777,12 +1778,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">loop_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of loops performed.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of loops performed.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loop_count</span>
 
 <div class="viewcode-block" id="YggTaskLoop.on_main_terminated"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop.on_main_terminated">[docs]</a>    <span class="k">def</span> <span class="nf">on_main_terminated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dont_break</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed when 1st main terminated.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed when 1st main terminated.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            dont_break (bool, optional): If True, the break flag won&#39;t be set.</span>
@@ -1795,7 +1796,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="YggTaskLoop.set_break_flag"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop.set_break_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_break_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">break_stack</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the break flag for the thread/process to True.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the break flag for the thread/process to True.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">break_stack</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">break_stack</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="kn">import</span> <span class="nn">traceback</span>
@@ -1806,29 +1807,29 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">set_flag_attr</span><span class="p">(</span><span class="s1">&#39;unpause_flag&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTaskLoop.pause"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop.pause">[docs]</a>    <span class="k">def</span> <span class="nf">pause</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pause the loop execution.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pause the loop execution.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_flag_attr</span><span class="p">(</span><span class="s1">&#39;unpause_flag&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTaskLoop.resume"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop.resume">[docs]</a>    <span class="k">def</span> <span class="nf">resume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resume the loop execution.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resume the loop execution.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_flag_attr</span><span class="p">(</span><span class="s1">&#39;unpause_flag&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">was_break</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the break flag was set.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the break flag was set.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_flag_attr</span><span class="p">(</span><span class="s1">&#39;break_flag&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="YggTaskLoop.set_loop_flag"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop.set_loop_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_loop_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the loop flag for the thread/process to True.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the loop flag for the thread/process to True.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_flag_attr</span><span class="p">(</span><span class="s1">&#39;loop_flag&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">was_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the thread/process was loop. False otherwise.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the thread/process was loop. False otherwise.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_flag_attr</span><span class="p">(</span><span class="s1">&#39;loop_flag&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="YggTaskLoop.wait_for_loop"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop.wait_for_loop">[docs]</a>    <span class="k">def</span> <span class="nf">wait_for_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nloop</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait until thread/process enters loop to return using sleeps rather than</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait until thread/process enters loop to return using sleeps rather than</span>
 <span class="sd">        blocking.</span>
 
 <span class="sd">        Args:</span>
@@ -1846,15 +1847,15 @@
             <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTaskLoop.before_loop"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop.before_loop">[docs]</a>    <span class="k">def</span> <span class="nf">before_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed before the loop.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed before the loop.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTaskLoop.after_loop"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed after the loop.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed after the loop.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTaskLoop.call_target"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop.call_target">[docs]</a>    <span class="k">def</span> <span class="nf">call_target</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call target.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call target.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting loop&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">before_loop</span><span class="p">()</span>
         <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_break</span><span class="p">):</span>
@@ -1877,7 +1878,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span></div>
         
 <div class="viewcode-block" id="YggTaskLoop.run_loop"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed on each loop iteration.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed on each loop iteration.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ygg_target</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_ygg_target</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_ygg_args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_ygg_kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1886,13 +1887,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_loop_count</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
 <div class="viewcode-block" id="YggTaskLoop.run_error"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop.run_error">[docs]</a>    <span class="k">def</span> <span class="nf">run_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform on error in try/except wrapping run.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform on error in try/except wrapping run.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggTaskLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_error</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;run_error&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span></div>
         
 <div class="viewcode-block" id="YggTaskLoop.run"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue running until terminate event set.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue running until terminate event set.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggTaskLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">after_loop</span><span class="p">()</span>
@@ -1901,10 +1902,45 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">set_flag_attr</span><span class="p">(</span><span class="s1">&#39;error_flag&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTaskLoop.terminate"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Also set break flag.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Also set break flag.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;terminate&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggTaskLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">terminate</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="MemoryTracker"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MemoryTracker">[docs]</a><span class="k">class</span> <span class="nc">MemoryTracker</span><span class="p">(</span><span class="n">YggTaskLoop</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to track the memory used by another process.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pid (int): Process ID for the process that should be tracked.</span>
+<span class="sd">        interval (float, optional): Time (in seconds) that should be</span>
+<span class="sd">            waiting between memory usage checks. Defaults to 1 second.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">track_pid</span> <span class="o">=</span> <span class="n">pid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">track_interval</span> <span class="o">=</span> <span class="n">interval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MemoryTracker</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_memory</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MemoryTracker.record_memory"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.MemoryTracker.record_memory">[docs]</a>    <span class="k">def</span> <span class="nf">record_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">psutil</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">psutil</span><span class="o">.</span><span class="n">pid_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">track_pid</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="n">process</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">track_pid</span><span class="p">)</span>
+        <span class="n">children</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">children</span><span class="p">(</span><span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">total_mem</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">memory_info</span><span class="p">()</span><span class="o">.</span><span class="n">rss</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">child_mem</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+            <span class="n">child_mem</span> <span class="o">+=</span> <span class="n">x</span><span class="o">.</span><span class="n">memory_info</span><span class="p">()</span><span class="o">.</span><span class="n">rss</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">record</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">total_mem</span> <span class="o">+</span> <span class="n">child_mem</span><span class="p">)</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">track_interval</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">record</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

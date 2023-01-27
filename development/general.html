@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>General Development Notes &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>General Development Notes &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -31,7 +32,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -97,9 +98,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="index.html">Development</a> &raquo;</li>
-      <li>General Development Notes</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Development</a></li>
+      <li class="breadcrumb-item active">General Development Notes</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/development/general.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -117,8 +118,7 @@
 are then merged in via pull request after passing linting (via
 <a class="reference external" href="http://flake8.pycqa.org/en/latest/">flake8</a>), testing (via
 continuous integration on
-<a class="reference external" href="https://travis-ci.org/cropsinsilico/yggdrasil">travis</a> and
-<a class="reference external" href="https://ci.appveyor.com/project/langmm/yggdrasil">appveyor</a>),
+<a class="reference external" href="https://github.com/cropsinsilico/yggdrasil/actions">Github Actions</a>),
 and code review. Prior to beginning new development,
 developers should open a Github issue on the repository that describes
 the proposed changes and/or features so that discussion can help identify
@@ -141,21 +141,26 @@ and features that would break a significant portion of the code.</p>
 </pre></div>
 </div>
 </li>
+<li><p>[OPTIONAL] Install mamba. Mamba is a drop in replacement for conda that is often much faster. If you don’t install mamba, replace mamba with conda in the following commands.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install mamba
+</pre></div>
+</div>
+</li>
 <li><p>Create a fork of the yggdrasil Github repository for you Github account (<code class="docutils literal notranslate"><span class="pre">Fork</span></code> button located in the upper right corner of the yggdrasil <a class="reference external" href="https://github.com/cropsinsilico/yggdrasil">Github repository</a>).</p></li>
-<li><p>Clone your fork of the yggdrasil repository using git and then change directory into the cloned repository. NOTE: If you do not have <code class="docutils literal notranslate"><span class="pre">git</span></code> you can either <a class="reference external" href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">install it yourself</a> or using conda (<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">git</span></code>).:</p>
+<li><p>Clone your fork of the yggdrasil repository using git and then change directory into the cloned repository. NOTE: If you do not have <code class="docutils literal notranslate"><span class="pre">git</span></code> you can either <a class="reference external" href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">install it yourself</a> or using mamba/conda (<code class="docutils literal notranslate"><span class="pre">mamba</span> <span class="pre">install</span> <span class="pre">git</span></code>).:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone --recurse-submodules https://github.com/&lt;your Github username&gt;/yggdrasil.git
 $ cd yggdrasil
 </pre></div>
 </div>
 </li>
 <li><p>[OPTIONAL] Create a conda environment for development and activate that environment. You can create an environment using any of the supported versions of Python and may need more than one for testing.:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda create -n ygg python=3.6
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mamba create -n ygg python=3.7
 $ conda activate ygg
 </pre></div>
 </div>
-<p>yggdrasil provides a python script, <code class="docutils literal notranslate"><span class="pre">utils/create_envs.py</span></code> for creating development environments and installing yggdrasil in develoment mode for a combination of dependency installation methods (pip vs. conda) and versions of Python. For example, to create a conda environment with Python 3.6 (as above) and install yggdrasil’s dependencies using conda, the following commands can
+<p>yggdrasil provides a python script, <code class="docutils literal notranslate"><span class="pre">utils/setup_test_env.py</span></code> for creating development environments and installing yggdrasil in develoment mode for a combination of dependency installation methods (pip vs. conda) and versions of Python. For example, to create a conda environment with Python 3.7 (as above) and install yggdrasil’s dependencies using mamba, the following commands can
 be executed from the root directory of your local yggdrasil repository.:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python utils/create_envs.py --name=ygg
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python utils/setup_test_env.py devenv mamba 3.7 --name=ygg
 $ conda activate ygg
 </pre></div>
 </div>
@@ -164,16 +169,16 @@ $ conda activate ygg
 <p><strong>If you use ``utils/create_envs.py`` to create your dev environment, you can skip to the last step.</strong></p>
 </div>
 </li>
-<li><p>Install the requirements using conda via the helper script <code class="docutils literal notranslate"><span class="pre">utils/install_from_requirements.py</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python utils/install_from_requirements.py conda requirements.txt requirements_condaonly.txt requirements_testing.txt
+<li><p>Install the requirements using mamba/conda via the helper script <code class="docutils literal notranslate"><span class="pre">utils/install_from_requirements.py</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python utils/manage_requirements.py install mamba --for-development
 </pre></div>
 </div>
-<p>Alternatively, if you did not install conda, you can install the Python dependencies using <code class="docutils literal notranslate"><span class="pre">pip</span></code> via the same script.:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python utils/install_from_requirements.py pip requirements.txt requirements_testing.txt
+<p>Alternatively, if you did not install mamba or conda, you can install the Python dependencies using <code class="docutils literal notranslate"><span class="pre">pip</span></code> via the same script. This script will attempt to install non-python dependencies via a package manager like <code class="docutils literal notranslate"><span class="pre">apt</span></code>, <code class="docutils literal notranslate"><span class="pre">brew</span></code>, or <code class="docutils literal notranslate"><span class="pre">vcpkg</span></code> unless <code class="docutils literal notranslate"><span class="pre">--python-only</span></code> is passed.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python utils/manage_requirements.py install pip --for-development
 </pre></div>
 </div>
-<p>However, if you use this method, you will need to manually install the non-Python dependencies as described <a class="reference internal" href="../install.html#manual-install-rst"><span class="std std-ref">here</span></a>. This should be done BEFORE installing yggdrasil in the next step.</p>
-<p>There are also two additional requirements files, <code class="docutils literal notranslate"><span class="pre">requirements_documentation.txt</span></code> and <code class="docutils literal notranslate"><span class="pre">requirements_optional.txt</span></code>, that can optionally be added to the end of either of these commands. <code class="docutils literal notranslate"><span class="pre">requirements_documentation.txt</span></code> includes packages required for building the documentation and <code class="docutils literal notranslate"><span class="pre">requirements_optional.txt</span></code> includes packages required for optional yggdrasil features (e.g. using <code class="docutils literal notranslate"><span class="pre">astropy</span></code> table parsing or <code class="docutils literal notranslate"><span class="pre">pika</span></code> for RabbitMQ communication).</p>
+<p>If you use this method with the <code class="docutils literal notranslate"><span class="pre">--python-only</span></code> flag, you will need to manually install the non-Python dependencies as described <a class="reference internal" href="../install.html#manual-install-rst"><span class="std std-ref">here</span></a>. This should be done BEFORE installing yggdrasil in the next step.</p>
+<p>There are additional optional requirements that can be enabled via various command line flags. To see what these options are, take a look at the help information for the <code class="docutils literal notranslate"><span class="pre">utils/manage_requirements.py</span> <span class="pre">install</span></code> script by passing <code class="docutils literal notranslate"><span class="pre">-h</span></code> or <code class="docutils literal notranslate"><span class="pre">--help</span></code>.</p>
 </li>
 <li><p>Run the yggdrasil installation script in development mode.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python setup.py develop
@@ -210,7 +215,7 @@ the module directory containing the class being tested. In some cases
 yggdrasil will automatically generate tests if certain class
 attributes and/or methods are defined (e.g. serialization, communication,
 and connection driver classes).</p>
-<p>Tests can be run using the <code class="docutils literal notranslate"><span class="pre">yggtest</span></code> command. If no arguments are provided, <code class="docutils literal notranslate"><span class="pre">yggtest</span></code> will run all of the tests (excluding the examples). If you only want to run some tests, you can provide the path to file or directory containing the tests you would like to run; these paths can be absolute, relative to the current directory, or relative to the top level directory of the yggdrasil source tree. To also run example tests, include the <code class="docutils literal notranslate"><span class="pre">--with-examples</span></code> flag.</p>
+<p>Tests can be run by passing the tests directory to the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> command. If no other arguments are provided, <code class="docutils literal notranslate"><span class="pre">pytest</span></code> will run all of the tests (excluding the examples). If you only want to run some tests, you can provide the path to file or directory containing the tests you would like to run; these paths can be absolute, relative to the current directory, or relative to the top level directory of the yggdrasil source tree. To also run example tests, include the <code class="docutils literal notranslate"><span class="pre">--with-examples</span></code> flag.</p>
 </section>
 </section>
 

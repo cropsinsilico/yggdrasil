@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -29,7 +30,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -83,8 +84,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>&lt;no title&gt;</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">&lt;no title&gt;</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/examples/timesync2_src.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -103,34 +104,34 @@
 <span class="linenos">  6</span>
 <span class="linenos">  7</span>
 <span class="linenos">  8</span><span class="k">def</span> <span class="nf">xvar2x</span><span class="p">(</span><span class="n">xvar</span><span class="p">):</span>
-<span class="linenos">  9</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert xvar to x.&quot;&quot;&quot;</span>
+<span class="linenos">  9</span><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert xvar to x.&quot;&quot;&quot;</span>
 <span class="linenos"> 10</span>    <span class="n">x</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">xvar</span>
 <span class="linenos"> 11</span>    <span class="k">return</span> <span class="n">x</span>
 <span class="linenos"> 12</span>
 <span class="linenos"> 13</span>
 <span class="linenos"> 14</span><span class="k">def</span> <span class="nf">x2xvar</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-<span class="linenos"> 15</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert x to xvar.&quot;&quot;&quot;</span>
+<span class="linenos"> 15</span><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert x to xvar.&quot;&quot;&quot;</span>
 <span class="linenos"> 16</span>    <span class="n">xvar</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="mi">2</span>
 <span class="linenos"> 17</span>    <span class="k">return</span> <span class="n">xvar</span>
 <span class="linenos"> 18</span>
 <span class="linenos"> 19</span>
 <span class="linenos"> 20</span><span class="k">def</span> <span class="nf">xagg</span><span class="p">(</span><span class="n">series</span><span class="p">):</span>
-<span class="linenos"> 21</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Aggregate x variables.&quot;&quot;&quot;</span>
+<span class="linenos"> 21</span><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Aggregate x variables.&quot;&quot;&quot;</span>
 <span class="linenos"> 22</span>    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">abs</span><span class="p">)</span>
 <span class="linenos"> 23</span>
 <span class="linenos"> 24</span>
 <span class="linenos"> 25</span><span class="k">def</span> <span class="nf">merge_z</span><span class="p">(</span><span class="n">z1</span><span class="p">,</span> <span class="n">z2</span><span class="p">):</span>
-<span class="linenos"> 26</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Merge the z1 and z2 variables.&quot;&quot;&quot;</span>
+<span class="linenos"> 26</span><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Merge the z1 and z2 variables.&quot;&quot;&quot;</span>
 <span class="linenos"> 27</span>    <span class="k">return</span> <span class="n">z1</span> <span class="o">+</span> <span class="n">z2</span>
 <span class="linenos"> 28</span>
 <span class="linenos"> 29</span>
 <span class="linenos"> 30</span><span class="k">def</span> <span class="nf">split_z</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
-<span class="linenos"> 31</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Split z into z1 and z2 variables.&quot;&quot;&quot;</span>
+<span class="linenos"> 31</span><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Split z into z1 and z2 variables.&quot;&quot;&quot;</span>
 <span class="linenos"> 32</span>    <span class="k">return</span> <span class="p">(</span><span class="n">z</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">z</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
 <span class="linenos"> 33</span>
 <span class="linenos"> 34</span>
 <span class="linenos"> 35</span><span class="k">def</span> <span class="nf">timestep_calc</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
-<span class="linenos"> 36</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Updates the state based on the time where x is a sine wave</span>
+<span class="linenos"> 36</span><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Updates the state based on the time where x is a sine wave</span>
 <span class="linenos"> 37</span><span class="sd">    with period of 10 days and y is a cosine wave with a period of 5 days.</span>
 <span class="linenos"> 38</span><span class="sd">    If model is &#39;A&#39;, the forth state variable will be &#39;a&#39;, a sine</span>
 <span class="linenos"> 39</span><span class="sd">    with a period of 2.5 days. If model is &#39;B&#39;, the forth state</span>
@@ -161,7 +162,7 @@
 <span class="linenos"> 64</span>
 <span class="linenos"> 65</span>
 <span class="linenos"> 66</span><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
-<span class="linenos"> 67</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute integration.</span>
+<span class="linenos"> 67</span><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute integration.</span>
 <span class="linenos"> 68</span>
 <span class="linenos"> 69</span><span class="sd">    Args:</span>
 <span class="linenos"> 70</span><span class="sd">        t_step (float): The time step that should be used.</span>

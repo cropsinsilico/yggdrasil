@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.scanf &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.scanf &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -82,9 +83,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>yggdrasil.scanf</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">yggdrasil.scanf</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -166,7 +167,7 @@
 
 
 <span class="k">def</span> <span class="nf">no_cast</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy function to cast a string to a string.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy function to cast a string to a string.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (str): String to cast.</span>
@@ -179,7 +180,7 @@
 
 
 <span class="k">def</span> <span class="nf">cast_str</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cast a string value to a string, stripping whitespace.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cast a string value to a string, stripping whitespace.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (str): String to cast.</span>
@@ -192,7 +193,7 @@
 
 
 <span class="k">def</span> <span class="nf">cast_hex</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cast a string value to a hex integer.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cast a string value to a hex integer.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (str): String to cast.</span>
@@ -205,7 +206,7 @@
 
 
 <span class="k">def</span> <span class="nf">cast_oct</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cast a string value to an octal.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cast a string value to an octal.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (str): String to cast.</span>
@@ -218,7 +219,7 @@
 
 
 <span class="k">def</span> <span class="nf">cformat2regex</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">specifier</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get regex substring that will match the given cformat components.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get regex substring that will match the given cformat components.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        flags (str): Format flags.</span>
@@ -396,7 +397,7 @@
 
 
 <div class="viewcode-block" id="scanf_compile"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.scanf.scanf_compile">[docs]</a><span class="k">def</span> <span class="nf">scanf_compile</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">collapseWhitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Translate the format into a regular expression</span>
 
 <span class="sd">    For example:</span>
@@ -454,7 +455,7 @@
 
 
 <div class="viewcode-block" id="scanf"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.scanf.scanf">[docs]</a><span class="k">def</span> <span class="nf">scanf</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">collapseWhitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    scanf supports the following formats:</span>
 <span class="sd">      %c        One character</span>
 <span class="sd">      %5c       5 characters</span>
@@ -506,7 +507,7 @@
 
 
 <span class="k">def</span> <span class="nf">extractdata</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filepath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Read through an entire file or body of text one line at a time. Parse each</span>
 <span class="sd">    line that matches the supplied pattern string and ignore the rest.</span>
 <span class="sd">    </span>

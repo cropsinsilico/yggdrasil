@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema.datatypes.JSONMetaschemaType &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.JSONMetaschemaType &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -82,11 +83,11 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
-          <li><a href="../datatypes.html">yggdrasil.metaschema.datatypes</a> &raquo;</li>
-      <li>yggdrasil.metaschema.datatypes.JSONMetaschemaType</li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../metaschema.html">yggdrasil.metaschema</a></li>
+          <li class="breadcrumb-item"><a href="../datatypes.html">yggdrasil.metaschema.datatypes</a></li>
+      <li class="breadcrumb-item active">yggdrasil.metaschema.datatypes.JSONMetaschemaType</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -101,7 +102,7 @@
 
 
 <div class="viewcode-block" id="JSONMetaschemaTypeBase"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.JSONMetaschemaType.JSONMetaschemaTypeBase">[docs]</a><span class="k">class</span> <span class="nc">JSONMetaschemaTypeBase</span><span class="p">(</span><span class="n">MetaschemaType</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base type for default JSON types.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base type for default JSON types.&quot;&quot;&quot;</span>
 
     <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;json&#39;</span>
     <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;A json base type.&#39;</span>
@@ -110,7 +111,7 @@
     
 <div class="viewcode-block" id="JSONMetaschemaTypeBase.encode_data"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.JSONMetaschemaType.JSONMetaschemaTypeBase.encode_data">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">encode_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s data.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s data.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to encode.</span>
@@ -125,7 +126,7 @@
 
 <div class="viewcode-block" id="JSONMetaschemaTypeBase.decode_data"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.JSONMetaschemaType.JSONMetaschemaTypeBase.decode_data">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">decode_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode an object.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode an object.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (string): Encoded object to decode.</span>
@@ -140,7 +141,7 @@
 
 
 <div class="viewcode-block" id="JSONBooleanMetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.JSONMetaschemaType.JSONBooleanMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">JSONBooleanMetaschemaType</span><span class="p">(</span><span class="n">JSONMetaschemaTypeBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON base boolean type.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON base boolean type.&quot;&quot;&quot;</span>
 
     <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;boolean&#39;</span>
     <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;JSON boolean type.&#39;</span>
@@ -149,7 +150,7 @@
 
 <div class="viewcode-block" id="JSONBooleanMetaschemaType.normalize"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.JSONMetaschemaType.JSONBooleanMetaschemaType.normalize">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object, if possible, to conform to this type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object, if possible, to conform to this type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to normalize.</span>
@@ -167,7 +168,7 @@
 
 
 <div class="viewcode-block" id="JSONIntegerMetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.JSONMetaschemaType.JSONIntegerMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">JSONIntegerMetaschemaType</span><span class="p">(</span><span class="n">JSONMetaschemaTypeBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON base integer type.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON base integer type.&quot;&quot;&quot;</span>
 
     <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;integer&#39;</span>
     <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;JSON integer type.&#39;</span>
@@ -178,7 +179,7 @@
     
 <div class="viewcode-block" id="JSONIntegerMetaschemaType.normalize"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.JSONMetaschemaType.JSONIntegerMetaschemaType.normalize">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object, if possible, to conform to this type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object, if possible, to conform to this type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to normalize.</span>
@@ -195,7 +196,7 @@
 
 
 <div class="viewcode-block" id="JSONNullMetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.JSONMetaschemaType.JSONNullMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">JSONNullMetaschemaType</span><span class="p">(</span><span class="n">JSONMetaschemaTypeBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON base null type.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON base null type.&quot;&quot;&quot;</span>
 
     <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span>
     <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;JSON null type.&#39;</span>
@@ -204,7 +205,7 @@
     
 
 <div class="viewcode-block" id="JSONNumberMetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.JSONMetaschemaType.JSONNumberMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">JSONNumberMetaschemaType</span><span class="p">(</span><span class="n">JSONMetaschemaTypeBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON base number type.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON base number type.</span>
 
 <span class="sd">    Developer Notes:</span>
 <span class="sd">        This covers the JSON default for floating point or integer values.</span>
@@ -218,7 +219,7 @@
 
 <div class="viewcode-block" id="JSONNumberMetaschemaType.normalize"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.JSONMetaschemaType.JSONNumberMetaschemaType.normalize">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object, if possible, to conform to this type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object, if possible, to conform to this type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to normalize.</span>
@@ -235,7 +236,7 @@
     
 
 <div class="viewcode-block" id="JSONStringMetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.JSONMetaschemaType.JSONStringMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">JSONStringMetaschemaType</span><span class="p">(</span><span class="n">JSONMetaschemaTypeBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON base string type.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;JSON base string type.</span>
 
 <span class="sd">    Developer Notes:</span>
 <span class="sd">        Encoding dependent on JSON library.</span>
@@ -249,7 +250,7 @@
 
 <div class="viewcode-block" id="JSONStringMetaschemaType.normalize"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.JSONMetaschemaType.JSONStringMetaschemaType.normalize">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object, if possible, to conform to this type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object, if possible, to conform to this type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to normalize.</span>

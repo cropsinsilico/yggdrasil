@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.FortranModelDriver &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.drivers.FortranModelDriver &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
-      <li>yggdrasil.drivers.FortranModelDriver</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../drivers.html">yggdrasil.drivers</a></li>
+      <li class="breadcrumb-item active">yggdrasil.drivers.FortranModelDriver</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -117,7 +118,7 @@
 <span class="c1"># TODO: Add support for f77: e.g.</span>
 <span class="c1"># https://people.sc.fsu.edu/~jburkardt/f77_src/f77_calls_c/f77_calls_c.html</span>
 <div class="viewcode-block" id="FortranCompilerBase"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranCompilerBase">[docs]</a><span class="k">class</span> <span class="nc">FortranCompilerBase</span><span class="p">(</span><span class="n">CompilerBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for Fortran compilers.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for Fortran compilers.&quot;&quot;&quot;</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;fortran&#39;</span><span class="p">]</span>
     <span class="n">default_executable_env</span> <span class="o">=</span> <span class="s1">&#39;FC&#39;</span>
     <span class="n">default_flags_env</span> <span class="o">=</span> <span class="s1">&#39;FFLAGS&#39;</span>
@@ -132,7 +133,7 @@
 
 <div class="viewcode-block" id="FortranCompilerBase.get_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranCompilerBase.get_flags">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of flags for the tool.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of flags for the tool.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Keyword arguments are passed to the parent class&#39;s</span>
@@ -156,7 +157,7 @@
 <div class="viewcode-block" id="FortranCompilerBase.append_product"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranCompilerBase.append_product">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">append_product</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">new</span><span class="p">,</span> <span class="n">new_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">dont_append_src</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append a product to the specified list along with additional values</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append a product to the specified list along with additional values</span>
 <span class="sd">        indicated by cls.product_exts.</span>
 
 <span class="sd">        Args:</span>
@@ -194,7 +195,7 @@
 
 
 <div class="viewcode-block" id="GFortranCompiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.GFortranCompiler">[docs]</a><span class="k">class</span> <span class="nc">GFortranCompiler</span><span class="p">(</span><span class="n">FortranCompilerBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for gfortran compiler/linker.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for gfortran compiler/linker.&quot;&quot;&quot;</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;gfortran&#39;</span>
     <span class="n">platforms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MacOS&#39;</span><span class="p">,</span> <span class="s1">&#39;Linux&#39;</span><span class="p">,</span> <span class="s1">&#39;Windows&#39;</span><span class="p">]</span>
     <span class="n">default_flags</span> <span class="o">=</span> <span class="p">(</span><span class="n">FortranCompilerBase</span><span class="o">.</span><span class="n">default_flags</span>
@@ -220,7 +221,7 @@
 
 
 <div class="viewcode-block" id="FortranModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver">[docs]</a><span class="k">class</span> <span class="nc">FortranModelDriver</span><span class="p">(</span><span class="n">CompiledModelDriver</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running Fortran models.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running Fortran models.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        standard (str, optional): Fortran standard that should be used.</span>
@@ -477,7 +478,7 @@
     
 <div class="viewcode-block" id="FortranModelDriver.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
 <span class="sd">        to registration including things like platform dependent properties and</span>
 <span class="sd">        checking environment variables for default settings.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -523,7 +524,7 @@
 
 <div class="viewcode-block" id="FortranModelDriver.set_env_class"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.set_env_class">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">set_env_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set environment variables that are instance independent.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set environment variables that are instance independent.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
@@ -544,7 +545,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="FortranModelDriver.compile_model"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.compile_model">[docs]</a>    <span class="k">def</span> <span class="nf">compile_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile model executable(s).</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile model executable(s).</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Keyword arguments are passed to the parent class&#39;s</span>
@@ -559,7 +560,7 @@
 
 <div class="viewcode-block" id="FortranModelDriver.get_internal_suffix"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.get_internal_suffix">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_internal_suffix</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the suffix that should be used for internal libraries.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the suffix that should be used for internal libraries.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            commtype (str, optional): If provided, this is the communication</span>
@@ -580,7 +581,7 @@
 
 <div class="viewcode-block" id="FortranModelDriver.get_inverse_type_map"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.get_inverse_type_map">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_inverse_type_map</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the inverse type map.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the inverse type map.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Mapping from native type to JSON type.</span>
@@ -592,7 +593,7 @@
         
 <div class="viewcode-block" id="FortranModelDriver.get_native_type"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.get_native_type">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_native_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the native type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the native type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            type (str, optional): Name of |yggdrasil| extended JSON</span>
@@ -633,7 +634,7 @@
             <span class="n">json_type</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">json_type</span><span class="p">}</span>
         <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">json_type</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">json_type</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">json_type</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
         <span class="n">json_type</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">json_type</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">normalize_definition</span><span class="p">(</span>
             <span class="n">json_type</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
@@ -678,7 +679,7 @@
         
 <div class="viewcode-block" id="FortranModelDriver.get_json_type"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.get_json_type">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_json_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">native_type</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the JSON type from the native language type.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the JSON type from the native language type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            native_type (str): The native language type.</span>
@@ -746,7 +747,7 @@
 
 <div class="viewcode-block" id="FortranModelDriver.parse_function_definition"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.parse_function_definition">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parse_function_definition</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_file</span><span class="p">,</span> <span class="n">model_function</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get information about the inputs &amp; outputs to a model from its</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get information about the inputs &amp; outputs to a model from its</span>
 <span class="sd">        defintition if possible.</span>
 
 <span class="sd">        Args:</span>
@@ -791,7 +792,7 @@
 
 <div class="viewcode-block" id="FortranModelDriver.update_io_from_function"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.update_io_from_function">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">update_io_from_function</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_file</span><span class="p">,</span> <span class="n">model_function</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update inputs/outputs from the function definition.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update inputs/outputs from the function definition.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            model_file (str): Full path to the file containing the model</span>
@@ -820,7 +821,7 @@
         
 <div class="viewcode-block" id="FortranModelDriver.prepare_variables"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.prepare_variables">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">prepare_variables</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">vars_list</span><span class="p">,</span> <span class="n">for_yggdrasil</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concatenate a set of input variables such that it can be passed as a</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concatenate a set of input variables such that it can be passed as a</span>
 <span class="sd">        single string to the function_call parameter.</span>
 
 <span class="sd">        Args:</span>
@@ -843,7 +844,7 @@
         <span class="k">if</span> <span class="n">for_yggdrasil</span><span class="p">:</span>
             <span class="n">new_vars_list</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vars_list</span><span class="p">:</span>
-                <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
                 <span class="c1"># if isinstance(v, dict):</span>
                 <span class="n">v</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;yggarg(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
                 <span class="c1"># else:</span>
@@ -857,7 +858,7 @@
         
 <div class="viewcode-block" id="FortranModelDriver.write_executable_import"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.write_executable_import">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_executable_import</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add import statements to executable lines.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add import statements to executable lines.</span>
 <span class="sd">       </span>
 <span class="sd">        Args:</span>
 <span class="sd">            module (str, optional): If provided, the include statement</span>
@@ -900,7 +901,7 @@
         
 <div class="viewcode-block" id="FortranModelDriver.write_executable"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.write_executable">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_executable</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to complete a program that will run</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to complete a program that will run</span>
 <span class="sd">        the provided lines.</span>
 
 <span class="sd">        Args:</span>
@@ -948,7 +949,7 @@
         
 <div class="viewcode-block" id="FortranModelDriver.write_function_def"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.write_function_def">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_function_def</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a function definition.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a function definition.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            function_name (str): Name fo the function being defined.</span>
@@ -974,7 +975,7 @@
 
 <div class="viewcode-block" id="FortranModelDriver.escape_quotes"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.escape_quotes">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">escape_quotes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Escape quotes in a string.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Escape quotes in a string.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">           x (str): String to escape quotes in.</span>
@@ -989,7 +990,7 @@
 
 <div class="viewcode-block" id="FortranModelDriver.split_line"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.split_line">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">split_line</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_split</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Split a line as close to (or before) a given character as</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Split a line as close to (or before) a given character as</span>
 <span class="sd">        possible.</span>
 
 <span class="sd">        Args:</span>
@@ -1013,7 +1014,7 @@
 
 <div class="viewcode-block" id="FortranModelDriver.allows_realloc"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.allows_realloc">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">allows_realloc</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">from_native_type</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a variable allows the receive call to perform</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a variable allows the receive call to perform</span>
 <span class="sd">        realloc.</span>
 
 <span class="sd">        Args:</span>
@@ -1050,7 +1051,7 @@
         
 <div class="viewcode-block" id="FortranModelDriver.write_initialize_oiter"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.write_initialize_oiter">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_initialize_oiter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to initialize an array for iteration</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to initialize an array for iteration</span>
 <span class="sd">        output.</span>
 
 <span class="sd">        Args:</span>
@@ -1075,7 +1076,7 @@
     
 <div class="viewcode-block" id="FortranModelDriver.write_declaration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.write_declaration">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_declaration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to declare a variable with a certain</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to declare a variable with a certain</span>
 <span class="sd">        type.</span>
 
 <span class="sd">        Args:</span>
@@ -1102,7 +1103,7 @@
             
 <div class="viewcode-block" id="FortranModelDriver.write_model_recv"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.write_model_recv">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_model_recv</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">recv_var</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a model receive call include checking the return flag.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a model receive call include checking the return flag.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            channel (str): Name of variable that the channel being received from</span>
@@ -1144,7 +1145,7 @@
 
 <div class="viewcode-block" id="FortranModelDriver.write_model_send"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.write_model_send">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_model_send</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">send_var</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a model send call include checking the return flag.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a model send call include checking the return flag.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            channel (str): Name of variable that the channel being sent to</span>
@@ -1181,7 +1182,7 @@
     
 <div class="viewcode-block" id="FortranModelDriver.write_print_var"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.write_print_var">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_print_var</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to print a variable in this language.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to print a variable in this language.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            var (dict): Variable information.</span>
@@ -1203,7 +1204,7 @@
 
 <div class="viewcode-block" id="FortranModelDriver.write_type_def"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.write_type_def">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_type_def</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">datatype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get lines declaring the data type within the language.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get lines declaring the data type within the language.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name (str): Name of variable that definition should be stored in.</span>
@@ -1235,7 +1236,7 @@
     
 <div class="viewcode-block" id="FortranModelDriver.write_type_decl"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.write_type_decl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_type_decl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">datatype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get lines declaring the datatype within the language.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get lines declaring the datatype within the language.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name (str): Name of variable that should be declared.</span>
@@ -1262,7 +1263,7 @@
     
 <div class="viewcode-block" id="FortranModelDriver.format_function_param_len"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.format_function_param_len">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">format_function_param_len</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the formatted version of the len key.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the formatted version of the len key.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            extra (dict, optional): Variable dictionary specifying the</span>
@@ -1280,7 +1281,7 @@
 
 <div class="viewcode-block" id="FortranModelDriver.format_function_param_index"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.format_function_param_index">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">format_function_param_index</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the formatted version of the index key.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the formatted version of the index key.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            extra (dict, optional): Variable dictionary specifying the</span>
@@ -1298,7 +1299,7 @@
 
 <div class="viewcode-block" id="FortranModelDriver.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>

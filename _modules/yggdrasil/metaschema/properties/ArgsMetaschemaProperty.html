@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema.properties.ArgsMetaschemaProperty &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.metaschema.properties.ArgsMetaschemaProperty &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -82,11 +83,11 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
-          <li><a href="../properties.html">yggdrasil.metaschema.properties</a> &raquo;</li>
-      <li>yggdrasil.metaschema.properties.ArgsMetaschemaProperty</li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../metaschema.html">yggdrasil.metaschema</a></li>
+          <li class="breadcrumb-item"><a href="../properties.html">yggdrasil.metaschema.properties</a></li>
+      <li class="breadcrumb-item active">yggdrasil.metaschema.properties.ArgsMetaschemaProperty</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -105,7 +106,7 @@
 
 
 <div class="viewcode-block" id="ArgsMetaschemaProperty"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.properties.html#yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty">[docs]</a><span class="k">class</span> <span class="nc">ArgsMetaschemaProperty</span><span class="p">(</span><span class="n">MetaschemaProperty</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Property class for &#39;args&#39; property.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Property class for &#39;args&#39; property.&quot;&quot;&quot;</span>
 
     <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;args&#39;</span>
     <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Arguments required to recreate a class instance.&#39;</span><span class="p">),</span>
@@ -114,7 +115,7 @@
 
 <div class="viewcode-block" id="ArgsMetaschemaProperty.instance2args"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.properties.html#yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.instance2args">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">instance2args</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get input arguments from a class instance.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get input arguments from a class instance.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            instance (object): Instance of a Python class.</span>
@@ -154,7 +155,7 @@
 
 <div class="viewcode-block" id="ArgsMetaschemaProperty.encode"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.properties.html#yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.encode">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encoder for the &#39;args&#39; property.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encoder for the &#39;args&#39; property.&quot;&quot;&quot;</span>
         <span class="n">typedef_args</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># if isinstance(typedef, dict) and (&#39;args&#39; in typedef):</span>
         <span class="c1">#     typedef_args = typedef[&#39;args&#39;]</span>
@@ -163,7 +164,7 @@
 
 <div class="viewcode-block" id="ArgsMetaschemaProperty.compare"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.properties.html#yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.compare">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Comparison method for &#39;args&#39; container property.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Comparison method for &#39;args&#39; container property.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ItemsMetaschemaProperty</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">e</span></div></div>
 </pre></div>

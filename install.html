@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>Installation &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -31,7 +32,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -45,7 +46,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#conda-installation-recommended">Conda Installation (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conda-mamba-installation-recommended">Conda/Mamba Installation (recommended)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#development-installation">Development Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manual-installation">Manual Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#user-defined-rapidjson">User Defined rapidjson</a></li>
@@ -110,8 +111,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Installation</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Installation</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/install.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -133,7 +134,7 @@
 <li><p>“MSVC v140 - VS 2015 C++ build tools (v14.00)” - Individual component under “Compilers, build tools, and runtimes” section.</p></li>
 </ul>
 </div></blockquote>
-<p>If you <em>do not use conda</em> to install yggdrasil, you will also need to initialize the command line build tools in any prompt you will be calling yggdrasil from. This can be done by calling yggdrasil from a “VS2015 x64 Native Tools Developer Command Prompt”, or by locating the <code class="docutils literal notranslate"><span class="pre">vsvarsall.bat</span></code> script that comes with Visual Studio. Information on the developer prompt and how to locate the <code class="docutils literal notranslate"><span class="pre">vsvarsall.bat</span></code> script can be found <a class="reference external" href="https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=vs-2019">here</a>. The prompt/script used must enable the Visual Studio 2015 build tools (the specific year) to be compatible with the Python C library (see the discussion <a class="reference external" href="https://wiki.python.org/moin/WindowsCompilers">here</a>). The VS 2015 tools prompt/script will be installed from within Visual Studio 2019 by selecting the components indicated above. On a 64bit Windows machine (assuming you will be using 64 bit Python), the command to initialize these tools within a regular command prompt will look something like this, but the exact path will vary with your particular installation:</p>
+<p>If you <em>do not use conda/mamba</em> to install yggdrasil, you will also need to initialize the command line build tools in any prompt you will be calling yggdrasil from. This can be done by calling yggdrasil from a “VS2015 x64 Native Tools Developer Command Prompt”, or by locating the <code class="docutils literal notranslate"><span class="pre">vsvarsall.bat</span></code> script that comes with Visual Studio. Information on the developer prompt and how to locate the <code class="docutils literal notranslate"><span class="pre">vsvarsall.bat</span></code> script can be found <a class="reference external" href="https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=vs-2019">here</a>. The prompt/script used must enable the Visual Studio 2015 build tools (the specific year) to be compatible with the Python C library (see the discussion <a class="reference external" href="https://wiki.python.org/moin/WindowsCompilers">here</a>). The VS 2015 tools prompt/script will be installed from within Visual Studio 2019 by selecting the components indicated above. On a 64bit Windows machine (assuming you will be using 64 bit Python), the command to initialize these tools within a regular command prompt will look something like this, but the exact path will vary with your particular installation:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ call &quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat&quot; amd64
 </pre></div>
 </div>
@@ -141,10 +142,15 @@
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><strong>Mac Users</strong></p>
-<p>If you will be running C/C++/Fortran models, you will need to install the command line developer tools on Mac which provides several utilities for compilation and code management (e.g. clang, gcc, make, git). <a class="reference external" href="https://cloudtechpoint.medium.com/how-to-install-command-line-tools-homebrew-in-macos-without-xcode-1b910742d923">This</a> article outlines how to check if they are installed and install them if they are not. It also describes how to install the Homebrew package manager, which will be useful for installing non-Python dependencies if you do not plan on using conda to install yggdrasil.</p>
+<p>If you will be running C/C++/Fortran models, you will need to install the command line developer tools on Mac which provides several utilities for compilation and code management (e.g. clang, gcc, make, git). <a class="reference external" href="https://cloudtechpoint.medium.com/how-to-install-command-line-tools-homebrew-in-macos-without-xcode-1b910742d923">This</a> article outlines how to check if they are installed and install them if they are not. It also describes how to install the Homebrew package manager, which will be useful for installing non-Python dependencies if you do not plan on using conda/mamba to install yggdrasil.</p>
 </div>
-<section id="conda-installation-recommended">
-<h2>Conda Installation (recommended)<a class="headerlink" href="#conda-installation-recommended" title="Permalink to this heading">¶</a></h2>
+<section id="conda-mamba-installation-recommended">
+<h2>Conda/Mamba Installation (recommended)<a class="headerlink" href="#conda-mamba-installation-recommended" title="Permalink to this heading">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Mamba Installation</strong></p>
+<p>Mamba is a drop in replacement for conda that is often faster and provides clearer error messages when there are conflicts. You can install mamba by following the instructions <a class="reference external" href="https://mamba.readthedocs.io/en/latest/installation.html">here</a> (including by using conda). Then you may just use <code class="docutils literal notranslate"><span class="pre">mamba</span></code> in place of any of the commands below.</p>
+</div>
 <p>Download and install Miniconda from <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">here</a> (or Anaconda from <a class="reference external" href="https://www.anaconda.com/download/">here</a> if you would like additional Python libraries installed by default). There are conda distributions available for yggdrasil from <a class="reference external" href="https://github.com/conda-forge/yggdrasil-feedstock">conda-forge</a>. You can install yggdrasil from conda-forge by calling:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install -c conda-forge yggdrasil
 </pre></div>
@@ -172,7 +178,7 @@ the terminal (or Anaconda Prompt on Windows).:</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>If conda takes a very long time to install yggdrasil (&gt;5 min spent solving the environment) or fails with an error about conflicts and you are using a version of conda older than 4.7.2, try either updating conda and/or adding the conda-forge channel (if you havn’t already):</p>
+<p>If conda takes a very long time to install yggdrasil (&gt;5 min spent solving the environment) or fails with an error about conflicts and you are using a version of conda older than 4.7.2, try either updating conda, using mamba (see note above), and/or adding the conda-forge channel (if you havn’t already):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">config</span> <span class="o">--</span><span class="n">add</span> <span class="n">channels</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
 </pre></div>
 </div>

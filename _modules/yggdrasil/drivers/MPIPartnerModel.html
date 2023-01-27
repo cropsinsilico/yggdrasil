@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.MPIPartnerModel &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.drivers.MPIPartnerModel &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
-      <li>yggdrasil.drivers.MPIPartnerModel</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../drivers.html">yggdrasil.drivers</a></li>
+      <li class="breadcrumb-item active">yggdrasil.drivers.MPIPartnerModel</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -95,14 +96,15 @@
            <div itemprop="articleBody">
              
   <h1>Source code for yggdrasil.drivers.MPIPartnerModel</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">shutil</span>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.ModelDriver</span> <span class="kn">import</span> <span class="n">ModelDriver</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.multitasking</span> <span class="kn">import</span> <span class="n">MPI</span><span class="p">,</span> <span class="n">MPIRequestWrapper</span>
 
 
 <div class="viewcode-block" id="MPIPartnerModel"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel">[docs]</a><span class="k">class</span> <span class="nc">MPIPartnerModel</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for shadowing a model run on another MPI process.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for shadowing a model run on another MPI process.&quot;&quot;&quot;</span>
 
     <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is being run on another MPI &#39;</span>
                                    <span class="s1">&#39;process and this driver is used as &#39;</span>
@@ -124,13 +126,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">partner_driver</span><span class="o">.</span><span class="n">mpi_partner_init</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MPIPartnerModel.cleanup"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove compile executable.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove compile executable.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">partner_driver</span><span class="o">.</span><span class="n">mpi_partner_cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MPIPartnerModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MPIPartnerModel.is_language_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.is_language_installed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_language_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this model driver is installed on the current</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this model driver is installed on the current</span>
 <span class="sd">        machine.</span>
 
 <span class="sd">        Returns:</span>
@@ -140,20 +142,22 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">MPI</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MPIPartnerModel.is_configured"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.is_configured">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">is_configured</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the appropriate configuration has been performed (e.g.</span>
-<span class="sd">        installation of supporting libraries etc.)</span>
+<div class="viewcode-block" id="MPIPartnerModel.configuration_steps"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.configuration_steps">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">configuration_steps</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of configuration steps with tuples of flags and</span>
+<span class="sd">        boolean values.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            bool: True if the language has been configured.</span>
+<span class="sd">            OrderedDict: Pairs of descriptions and states for</span>
+<span class="sd">                different steps in the configuration all steps must be</span>
+<span class="sd">                True for the language to be configured.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="kc">True</span></div>
+        <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="MPIPartnerModel.is_comm_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.is_comm_installed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_comm_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a comm is installed for the associated programming</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a comm is installed for the associated programming</span>
 <span class="sd">        language.</span>
 
 <span class="sd">        Args:</span>
@@ -167,7 +171,7 @@
     
 <div class="viewcode-block" id="MPIPartnerModel.language_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.language_version">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">language_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this language.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this language.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Keyword arguments are passed to cls.run_executable.</span>
@@ -181,7 +185,7 @@
     
 <div class="viewcode-block" id="MPIPartnerModel.language_executable"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.language_executable">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">language_executable</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Command required to compile/run a model written in this language</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Command required to compile/run a model written in this language</span>
 <span class="sd">        from the command line.</span>
 
 <span class="sd">        Returns:</span>
@@ -192,11 +196,11 @@
         <span class="k">return</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;mpiexec&#39;</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="MPIPartnerModel.run_model"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.run_model">[docs]</a>    <span class="k">def</span> <span class="nf">run_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy stand-in for ModelDriver run_model method.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy stand-in for ModelDriver run_model method.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">None</span></div>
         
 <div class="viewcode-block" id="MPIPartnerModel.before_start"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform before the run starts.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform before the run starts.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;no_queue_thread&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MPIPartnerModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">before_start</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -207,34 +211,34 @@
     <span class="c1">#     self.send_mpi(env, tag=self._mpi_tags[&#39;ENV&#39;])</span>
         
 <div class="viewcode-block" id="MPIPartnerModel.init_mpi"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.init_mpi">[docs]</a>    <span class="k">def</span> <span class="nf">init_mpi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize MPI communicator.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize MPI communicator.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">send_mpi</span><span class="p">(</span><span class="s1">&#39;START&#39;</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mpi_tags</span><span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mpi_requests</span><span class="p">[</span><span class="s1">&#39;stopped&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">MPIRequestWrapper</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">recv_mpi</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mpi_tags</span><span class="p">[</span><span class="s1">&#39;STOP_RANK0&#39;</span><span class="p">],</span> <span class="n">dont_block</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="MPIPartnerModel.stop_mpi_partner"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.stop_mpi_partner">[docs]</a>    <span class="k">def</span> <span class="nf">stop_mpi_partner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message to stop the MPI partner model on the main process.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message to stop the MPI partner model on the main process.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dest</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mpi_partner_rank</span><span class="p">,</span>
                       <span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mpi_tags</span><span class="p">[</span><span class="s1">&#39;STOP_RANKX&#39;</span><span class="p">],</span>
                       <span class="n">msg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_sent_messages</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MPIPartnerModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">stop_mpi_partner</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MPIPartnerModel.run_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Loop to check if model is still running.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Loop to check if model is still running.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_mpi_request</span><span class="p">(</span><span class="s1">&#39;stopped&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="MPIPartnerModel.graceful_stop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.graceful_stop">[docs]</a>    <span class="k">def</span> <span class="nf">graceful_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Gracefully stop the driver.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Gracefully stop the driver.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_sent_messages</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wait_on_mpi_request</span><span class="p">(</span><span class="s1">&#39;stopped&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MPIPartnerModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">graceful_stop</span><span class="p">()</span></div>
         
 <div class="viewcode-block" id="MPIPartnerModel.kill_process"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.kill_process">[docs]</a>    <span class="k">def</span> <span class="nf">kill_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Kill the process running the model, checking return code.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Kill the process running the model, checking return code.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_process_complete</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_mpi_requests</span><span class="p">[</span><span class="s1">&#39;stopped&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">completed</span> <span class="o">=</span> <span class="kc">True</span>
@@ -242,7 +246,7 @@
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">model_process_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Has the process finished or not. Returns True if the process</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Has the process finished or not. Returns True if the process</span>
 <span class="sd">        has not started.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_mpi_request</span><span class="p">(</span><span class="s1">&#39;stopped&#39;</span><span class="p">)</span></div>
 </pre></div>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.IPCComm &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.communication.IPCComm &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../communication.html">yggdrasil.communication</a> &raquo;</li>
-      <li>yggdrasil.communication.IPCComm</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../communication.html">yggdrasil.communication</a></li>
+      <li class="breadcrumb-item active">yggdrasil.communication.IPCComm</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -113,7 +114,7 @@
 
 
 <div class="viewcode-block" id="get_queue"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.get_queue">[docs]</a><span class="k">def</span> <span class="nf">get_queue</span><span class="p">(</span><span class="n">qid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create or return a sysv_ipc.MessageQueue and register it.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create or return a sysv_ipc.MessageQueue and register it.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        qid (int, optional): If provided, ID for existing queue that should be</span>
@@ -140,7 +141,7 @@
 
 
 <div class="viewcode-block" id="remove_queue"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.remove_queue">[docs]</a><span class="k">def</span> <span class="nf">remove_queue</span><span class="p">(</span><span class="n">mq</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove a sysv_ipc.MessageQueue and unregister it.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove a sysv_ipc.MessageQueue and unregister it.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        mq (:class:`sysv_ipc.MessageQueue`) Message queue.</span>
@@ -156,7 +157,7 @@
     
 
 <div class="viewcode-block" id="ipcs"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.ipcs">[docs]</a><span class="k">def</span> <span class="nf">ipcs</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[]):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the output from running the ipcs command.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the output from running the ipcs command.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        options (list): List of flags that should be used. Defaults to an empty</span>
@@ -182,7 +183,7 @@
 
 
 <div class="viewcode-block" id="ipc_queues"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.ipc_queues">[docs]</a><span class="k">def</span> <span class="nf">ipc_queues</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of active IPC queues.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of active IPC queues.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">       list: List of IPC queues.</span>
@@ -221,7 +222,7 @@
 
 
 <div class="viewcode-block" id="ipcrm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.ipcrm">[docs]</a><span class="k">def</span> <span class="nf">ipcrm</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[]):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove IPC constructs using the ipcrm command.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove IPC constructs using the ipcrm command.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        options (list): List of flags that should be used. Defaults to an empty</span>
@@ -244,7 +245,7 @@
 
 
 <div class="viewcode-block" id="ipcrm_queues"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.ipcrm_queues">[docs]</a><span class="k">def</span> <span class="nf">ipcrm_queues</span><span class="p">(</span><span class="n">queue_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Delete existing IPC queues.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Delete existing IPC queues.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        queue_keys (list, str, optional): A list of keys for queues that should</span>
@@ -263,7 +264,7 @@
 
 
 <div class="viewcode-block" id="IPCServer"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCServer">[docs]</a><span class="k">class</span> <span class="nc">IPCServer</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommServer</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;IPC server object for cleaning up server queue.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;IPC server object for cleaning up server queue.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="IPCServer.terminate"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCServer.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">IPCComm</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srv_address</span><span class="p">)</span>
@@ -271,7 +272,7 @@
 
 
 <div class="viewcode-block" id="IPCComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm">[docs]</a><span class="k">class</span> <span class="nc">IPCComm</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O via IPC message queues.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O via IPC message queues.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        q (:class:`sysv_ipc.MessageQueue`): Message queue.</span>
@@ -290,14 +291,14 @@
     <span class="n">address_description</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;An IPC message queue key.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize empty queue and server class.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize empty queue and server class.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_server_class</span> <span class="o">=</span> <span class="n">IPCServer</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">IPCComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_init_before_open</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             
 <div class="viewcode-block" id="IPCComm.close_registry_entry"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm.close_registry_entry">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">close_registry_entry</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close a registry entry.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close a registry entry.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">value</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
             <span class="n">out</span> <span class="o">=</span> <span class="kc">True</span>
@@ -307,13 +308,13 @@
 
 <div class="viewcode-block" id="IPCComm.new_comm_kwargs"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm.new_comm_kwargs">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">new_comm_kwargs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize communication with new queue.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize communication with new queue.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;address&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;generate&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span></div>
 
 <div class="viewcode-block" id="IPCComm.bind"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm.bind">[docs]</a>    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bind to random queue if address is generate.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bind to random queue if address is generate.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">==</span> <span class="s1">&#39;generate&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span> <span class="o">=</span> <span class="kc">True</span>
@@ -322,19 +323,19 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">IPCComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="IPCComm.open_after_bind"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm.open_after_bind">[docs]</a>    <span class="k">def</span> <span class="nf">open_after_bind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the connection by getting the queue from the bound address.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the connection by getting the queue from the bound address.&quot;&quot;&quot;</span>
         <span class="n">qid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">get_queue</span><span class="p">(</span><span class="n">qid</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="IPCComm.open"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the queue.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the queue.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">IPCComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">open_after_bind</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;qid: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">key</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">skip_remove</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the queue.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the queue.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">open_after_bind</span><span class="p">()</span>
@@ -352,14 +353,14 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">IPCComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="n">linger</span><span class="p">)</span>
 
 <div class="viewcode-block" id="IPCComm.atexit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close operations.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close operations.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">linger</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">IPCComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">atexit</span><span class="p">()</span></div>
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the queue is not None.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the queue is not None.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">try</span><span class="p">:</span>
@@ -374,18 +375,18 @@
         <span class="k">return</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="IPCComm.confirm_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm.confirm_send">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noblock</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that sent message was received.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that sent message was received.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">noblock</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg_send</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="IPCComm.confirm_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm.confirm_recv">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noblock</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that message was received.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that message was received.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the queue to send.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the queue to send.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">current_messages</span>
@@ -401,11 +402,11 @@
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the queue to recv.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the queue to recv.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_send</span>
 
     <span class="k">def</span> <span class="nf">_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            payload (str): Message to send.</span>
@@ -421,7 +422,7 @@
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message from the IPC queue.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message from the IPC queue.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple (bool, str): The success or failure of receiving a message</span>
@@ -435,7 +436,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
 <div class="viewcode-block" id="IPCComm.purge"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Purge all messages from the comm.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Purge all messages from the comm.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">IPCComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sbml3 &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>sbml3 &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -29,7 +30,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -83,8 +84,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>sbml3</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">sbml3</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/examples/sbml3.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -578,23 +579,23 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">feedback</span><span class="w"></span>
-<span class="linenos"> 3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sbml</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/sbml3.xml</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">only_output_final_step</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">      </span><span class="nt">vars</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time,S1,S2</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">      </span><span class="nt">vars</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time,S1,S2</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./output.txt</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">feedback</span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sbml</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/sbml3.xml</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">only_output_final_step</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input</span>
+<span class="linenos"> 8</span><span class="w">      </span><span class="nt">vars</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time,S1,S2</span>
+<span class="linenos"> 9</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">10</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+<span class="linenos">11</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">12</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output</span>
+<span class="linenos">14</span><span class="w">      </span><span class="nt">vars</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time,S1,S2</span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">16</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<span class="linenos">17</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span>
 </pre></div>
 </div>
 </section>

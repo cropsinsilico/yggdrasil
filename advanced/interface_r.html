@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>R Interface &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>R Interface &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -31,7 +32,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -106,10 +107,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="index.html">Advanced</a> &raquo;</li>
-          <li><a href="model_interface.html">Model Interface</a> &raquo;</li>
-      <li>R Interface</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Advanced</a></li>
+          <li class="breadcrumb-item"><a href="model_interface.html">Model Interface</a></li>
+      <li class="breadcrumb-item active">R Interface</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/advanced/interface_r.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -133,7 +134,7 @@ additional details.</p>
 </section>
 <section id="usage">
 <h3>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">YggInterface</span><span class="p">(</span><span class="n">type</span><span class="p">,</span> <span class="kc">...</span><span class="p">)</span>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">YggInterface</span><span class="p">(</span><span class="n">type</span><span class="p">,</span><span class="w"> </span><span class="kc">...</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -154,7 +155,9 @@ additional details.</p>
 <td><p>The name of the Python interface
 that should be called
 (e.g. <a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggInterface.YggInput">YggInput</a>,
-<a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggInterface.YggOutput">YggOutput</a>,
+<a href="#id2"><span class="problematic" id="id3">`YggOutput &lt;
+interface_py.html#yggdrasil.language
+s.Python.YggInterface.YggOutput&gt;`__</span></a>,
 <a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggInterface.YggRpcClient">YggRpcClient</a>,
 <a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggInterface.YggRpcServer">YggRpcServer</a>,
 <a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggInterface.YggTimesync">YggTimesync</a>)</p></td>
@@ -173,12 +176,12 @@ methods.</p>
 </section>
 <section id="examples">
 <h3>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">in_channel</span> <span class="o">=</span> <span class="nf">YggInterface</span><span class="p">(</span><span class="s">&#39;YggInput&#39;</span><span class="p">,</span> <span class="s">&#39;input_channel_name&#39;</span><span class="p">)</span>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">in_channel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">YggInterface</span><span class="p">(</span><span class="s">&#39;YggInput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;input_channel_name&#39;</span><span class="p">)</span>
 <span class="c1"># Use zeallot &#39;%&lt;-%&#39; syntax to expand multiple variables</span>
-<span class="nf">c</span><span class="p">(</span><span class="n">flag</span><span class="p">,</span> <span class="n">input</span><span class="p">)</span> <span class="o">%&lt;-%</span> <span class="n">in_channel</span><span class="o">$</span><span class="nf">recv</span><span class="p">()</span>
+<span class="nf">c</span><span class="p">(</span><span class="n">flag</span><span class="p">,</span><span class="w"> </span><span class="n">input</span><span class="p">)</span><span class="w"> </span><span class="o">%&lt;-%</span><span class="w"> </span><span class="n">in_channel</span><span class="o">$</span><span class="nf">recv</span><span class="p">()</span>
 
-<span class="n">out_channel</span> <span class="o">=</span> <span class="nf">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span> <span class="s">&#39;output_channel_name&#39;</span><span class="p">)</span>
-<span class="n">flag</span> <span class="o">&lt;-</span> <span class="n">out_channel</span><span class="o">$</span><span class="nf">send</span><span class="p">(</span><span class="n">output1</span><span class="p">,</span> <span class="n">output2</span><span class="p">,</span> <span class="kc">...</span><span class="p">)</span>
+<span class="n">out_channel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;output_channel_name&#39;</span><span class="p">)</span>
+<span class="n">flag</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">out_channel</span><span class="o">$</span><span class="nf">send</span><span class="p">(</span><span class="n">output1</span><span class="p">,</span><span class="w"> </span><span class="n">output2</span><span class="p">,</span><span class="w"> </span><span class="kc">...</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

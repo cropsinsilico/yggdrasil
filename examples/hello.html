@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>hello &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>hello &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -29,7 +30,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -83,8 +84,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>hello</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">hello</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/examples/hello.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -110,175 +111,175 @@
 <section id="c-version">
 <h2><a class="toc-backref" href="#id2">C Version</a><a class="headerlink" href="#c-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.h&quot;</span>
 <span class="linenos"> 3</span>
 <span class="linenos"> 4</span><span class="cp">#define BSIZE 512 </span><span class="c1">// the max</span>
 <span class="linenos"> 5</span>
-<span class="linenos"> 6</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="n">buf</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="n">buf</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
 <span class="linenos"> 9</span><span class="w">  </span>
-<span class="linenos">10</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="linenos">11</span>
 <span class="linenos">12</span><span class="w">  </span><span class="c1">// Ins/outs matching with the the model yaml</span>
 <span class="linenos">13</span><span class="w">  </span><span class="n">yggInput_t</span><span class="w"> </span><span class="n">inf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;inFile&quot;</span><span class="p">);</span><span class="w"> </span>
-<span class="linenos">14</span><span class="w">  </span><span class="n">yggOutput_t</span><span class="w"> </span><span class="n">outf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggOutput</span><span class="p">(</span><span class="s">&quot;outFile&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">  </span><span class="n">yggInput_t</span><span class="w"> </span><span class="n">inq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;helloQueueIn&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">  </span><span class="n">yggOutput_t</span><span class="w"> </span><span class="n">outq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggOutput</span><span class="p">(</span><span class="s">&quot;helloQueueOut&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): Created I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">  </span><span class="n">yggOutput_t</span><span class="w"> </span><span class="n">outf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggOutput</span><span class="p">(</span><span class="s">&quot;outFile&quot;</span><span class="p">);</span>
+<span class="linenos">15</span><span class="w">  </span><span class="n">yggInput_t</span><span class="w"> </span><span class="n">inq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;helloQueueIn&quot;</span><span class="p">);</span>
+<span class="linenos">16</span><span class="w">  </span><span class="n">yggOutput_t</span><span class="w"> </span><span class="n">outq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggOutput</span><span class="p">(</span><span class="s">&quot;helloQueueOut&quot;</span><span class="p">);</span>
+<span class="linenos">17</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): Created I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="linenos">18</span>
 <span class="linenos">19</span><span class="w">  </span><span class="c1">// Receive input from a local file</span>
-<span class="linenos">20</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_recv</span><span class="p">(</span><span class="n">inf</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">21</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): ERROR FILE RECV</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">23</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">24</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">25</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">bufsiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">26</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): Received %d bytes from file: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">20</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_recv</span><span class="p">(</span><span class="n">inf</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span>
+<span class="linenos">21</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">22</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): ERROR FILE RECV</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">23</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">24</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos">25</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">bufsiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span>
+<span class="linenos">26</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): Received %d bytes from file: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">);</span>
 <span class="linenos">27</span>
 <span class="linenos">28</span><span class="w">  </span><span class="c1">// Send output to the output queue</span>
-<span class="linenos">29</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_send</span><span class="p">(</span><span class="n">outq</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">30</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">31</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): ERROR QUEUE SEND</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">32</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">33</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">34</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): Sent to outq</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">29</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_send</span><span class="p">(</span><span class="n">outq</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">);</span>
+<span class="linenos">30</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">31</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): ERROR QUEUE SEND</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">32</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">33</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos">34</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): Sent to outq</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="linenos">35</span>
 <span class="linenos">36</span><span class="w">  </span><span class="c1">// Receive input form the input queue</span>
-<span class="linenos">37</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_recv</span><span class="p">(</span><span class="n">inq</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">38</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">39</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): ERROR QUEUE RECV</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">40</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">41</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">42</span><span class="w">  </span><span class="n">bufsiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">43</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): Received %d bytes from queue: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">37</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_recv</span><span class="p">(</span><span class="n">inq</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span>
+<span class="linenos">38</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">39</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): ERROR QUEUE RECV</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">40</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">41</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos">42</span><span class="w">  </span><span class="n">bufsiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span>
+<span class="linenos">43</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): Received %d bytes from queue: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">);</span>
 <span class="linenos">44</span><span class="w">  </span>
 <span class="linenos">45</span><span class="w">  </span><span class="c1">// Send output to a local file</span>
-<span class="linenos">46</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_send</span><span class="p">(</span><span class="n">outf</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">47</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">48</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): ERROR FILE SEND</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">49</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">50</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">51</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): Sent to outf</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">46</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_send</span><span class="p">(</span><span class="n">outf</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">);</span>
+<span class="linenos">47</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">48</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): ERROR FILE SEND</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">49</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">50</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos">51</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(C): Sent to outf</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="linenos">52</span>
-<span class="linenos">53</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">54</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">55</span><span class="p">}</span><span class="w"></span>
+<span class="linenos">53</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">54</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">55</span><span class="p">}</span>
 <span class="linenos">56</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hello_c</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/hello.c</span><span class="w">  </span><span class="c1"># compile the C code with necessary libraries</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hello_c</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/hello.c</span><span class="w">  </span><span class="c1"># compile the C code with necessary libraries</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inFile</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outFile</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_hello.txt</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">        </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inFile</span>
+<span class="linenos">10</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span>
+<span class="linenos">12</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span>
+<span class="linenos">14</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outFile</span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">16</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_hello.txt</span>
+<span class="linenos">17</span><span class="w">        </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 <span class="linenos">18</span>
-<span class="linenos">19</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">20</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span><span class="w"></span>
-<span class="linenos">21</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">    </span><span class="nt">onexit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">printStatus</span><span class="w"></span>
+<span class="linenos">19</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">20</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span>
+<span class="linenos">21</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span>
+<span class="linenos">22</span><span class="w">    </span><span class="nt">onexit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">printStatus</span>
 </pre></div>
 </div>
 </section>
 <section id="id1">
 <h2><a class="toc-backref" href="#id3">C++ Version</a><a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span><span class="cp"></span>
-<span class="linenos"> 3</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-<span class="linenos"> 4</span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.hpp&quot;</span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
+<span class="linenos"> 3</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<span class="linenos"> 4</span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="linenos"> 5</span>
 <span class="linenos"> 6</span><span class="cp">#define BSIZE 512 </span><span class="c1">// the max</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="n">buf</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="linenos">10</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="n">buf</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
 <span class="linenos">11</span>
-<span class="linenos">12</span><span class="w">  </span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Hello from C++</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">  </span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Hello from C++</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
 <span class="linenos">13</span><span class="w">  </span>
-<span class="linenos">14</span><span class="w">  </span><span class="cm">/* Matching with the the model yaml */</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">  </span><span class="cm">/* Matching with the the model yaml */</span>
 <span class="linenos">15</span><span class="w">  </span><span class="n">YggInput</span><span class="w"> </span><span class="n">inf</span><span class="p">(</span><span class="s">&quot;inFile&quot;</span><span class="p">);</span><span class="w"> </span>
-<span class="linenos">16</span><span class="w">  </span><span class="n">YggOutput</span><span class="w"> </span><span class="n">outf</span><span class="p">(</span><span class="s">&quot;outFile&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">  </span><span class="n">YggInput</span><span class="w"> </span><span class="n">inq</span><span class="p">(</span><span class="s">&quot;helloQueueIn&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">  </span><span class="n">YggOutput</span><span class="w"> </span><span class="n">outq</span><span class="p">(</span><span class="s">&quot;helloQueueOut&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">  </span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;hello(CPP): Created I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">  </span><span class="n">YggOutput</span><span class="w"> </span><span class="n">outf</span><span class="p">(</span><span class="s">&quot;outFile&quot;</span><span class="p">);</span>
+<span class="linenos">17</span><span class="w">  </span><span class="n">YggInput</span><span class="w"> </span><span class="n">inq</span><span class="p">(</span><span class="s">&quot;helloQueueIn&quot;</span><span class="p">);</span>
+<span class="linenos">18</span><span class="w">  </span><span class="n">YggOutput</span><span class="w"> </span><span class="n">outq</span><span class="p">(</span><span class="s">&quot;helloQueueOut&quot;</span><span class="p">);</span>
+<span class="linenos">19</span><span class="w">  </span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;hello(CPP): Created I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
 <span class="linenos">20</span>
 <span class="linenos">21</span><span class="w">  </span><span class="c1">// Receive input from the local file</span>
-<span class="linenos">22</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inf</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">23</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">24</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(CPP): ERROR FILE RECV</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">25</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">26</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">27</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">bufsiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">28</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(CPP): Received %d bytes from file: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inf</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span>
+<span class="linenos">23</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">24</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(CPP): ERROR FILE RECV</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">25</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">26</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos">27</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">bufsiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span>
+<span class="linenos">28</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(CPP): Received %d bytes from file: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">);</span>
 <span class="linenos">29</span>
 <span class="linenos">30</span><span class="w">  </span><span class="c1">// Send output to queue</span>
-<span class="linenos">31</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">outq</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">32</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">33</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(CPP): ERROR QUEUE SEND</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">34</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">35</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">36</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(CPP): Sent to outq</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">31</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">outq</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">);</span>
+<span class="linenos">32</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">33</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(CPP): ERROR QUEUE SEND</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">34</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">35</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos">36</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(CPP): Sent to outq</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="linenos">37</span>
 <span class="linenos">38</span><span class="w">  </span><span class="c1">// Receive input from queue</span>
-<span class="linenos">39</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inq</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">40</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">41</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(CPP): ERROR QUEUE RECV</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">42</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">43</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">44</span><span class="w">  </span><span class="n">bufsiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">45</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(CPP): Received %d bytes from queue: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">39</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inq</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span>
+<span class="linenos">40</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">41</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(CPP): ERROR QUEUE RECV</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">42</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">43</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos">44</span><span class="w">  </span><span class="n">bufsiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span>
+<span class="linenos">45</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(CPP): Received %d bytes from queue: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">);</span>
 <span class="linenos">46</span>
 <span class="linenos">47</span><span class="w">  </span><span class="c1">// Send output to local file</span>
-<span class="linenos">48</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">outf</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">49</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">50</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(CPP): ERROR FILE SEND</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">51</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">52</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">53</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(CPP): Sent to outf</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">48</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">outf</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">);</span>
+<span class="linenos">49</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">50</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(CPP): ERROR FILE SEND</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">51</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">52</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos">53</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello(CPP): Sent to outf</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="linenos">54</span>
-<span class="linenos">55</span><span class="w">  </span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Goodbye from C++</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">56</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">57</span><span class="p">}</span><span class="w"></span>
+<span class="linenos">55</span><span class="w">  </span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Goodbye from C++</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="linenos">56</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">57</span><span class="p">}</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hello_cpp</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c++</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/hello.cpp</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hello_cpp</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c++</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/hello.cpp</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inFile</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outFile</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_hello.txt</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">        </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inFile</span>
+<span class="linenos">10</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span>
+<span class="linenos">12</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span>
+<span class="linenos">14</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outFile</span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">16</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_hello.txt</span>
+<span class="linenos">17</span><span class="w">        </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 <span class="linenos">18</span>
-<span class="linenos">19</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">20</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span><span class="w"></span>
-<span class="linenos">21</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">    </span><span class="nt">onexit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">printStatus</span><span class="w"></span>
+<span class="linenos">19</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">20</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span>
+<span class="linenos">21</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span>
+<span class="linenos">22</span><span class="w">    </span><span class="nt">onexit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">printStatus</span>
 </pre></div>
 </div>
 </section>
@@ -344,101 +345,101 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hello_fortran</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fortran</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/hello.f90</span><span class="w">  </span><span class="c1"># compile the Fortran code with necessary libraries</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hello_fortran</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fortran</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/hello.f90</span><span class="w">  </span><span class="c1"># compile the Fortran code with necessary libraries</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inFile</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outFile</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inFile</span>
+<span class="linenos">10</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span>
+<span class="linenos">11</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">12</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span>
+<span class="linenos">13</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outFile</span>
 <span class="linenos">14</span>
-<span class="linenos">15</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inFile</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span><span class="w"></span>
-<span class="linenos">20</span><span class="w">    </span><span class="nt">onexit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">printStatus</span><span class="w"></span>
-<span class="linenos">21</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outFile</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_hello.txt</span><span class="w"></span>
-<span class="linenos">23</span><span class="w">    </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">15</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">16</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+<span class="linenos">17</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inFile</span>
+<span class="linenos">18</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span>
+<span class="linenos">19</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">onexit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">printStatus</span>
+<span class="linenos">21</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outFile</span>
+<span class="linenos">22</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_hello.txt</span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 </section>
 <section id="matlab-version">
 <h2><a class="toc-backref" href="#id5">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Hello from Matlab&#39;</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Hello from Matlab&#39;</span><span class="p">);</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="c">% Ins/outs matching with the the model yaml</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="n">inf</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggInput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;inFile&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="n">outf</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;outFile&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="n">inq</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggInput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;helloQueueIn&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="n">outq</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;helloQueueOut&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;hello(M): Created I/O channels&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="c">% Ins/outs matching with the the model yaml</span>
+<span class="linenos"> 4</span><span class="n">inf</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggInput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;inFile&#39;</span><span class="p">);</span>
+<span class="linenos"> 5</span><span class="n">outf</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;outFile&#39;</span><span class="p">);</span>
+<span class="linenos"> 6</span><span class="n">inq</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggInput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;helloQueueIn&#39;</span><span class="p">);</span>
+<span class="linenos"> 7</span><span class="n">outq</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;helloQueueOut&#39;</span><span class="p">);</span>
+<span class="linenos"> 8</span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;hello(M): Created I/O channels&#39;</span><span class="p">);</span>
 <span class="linenos"> 9</span>
-<span class="linenos">10</span><span class="c">% Receive input from a local file</span><span class="w"></span>
-<span class="linenos">11</span><span class="p">[</span><span class="nb">flag</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">inf</span><span class="p">.</span><span class="n">recv</span><span class="p">();</span><span class="w"></span>
-<span class="linenos">12</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="nb">flag</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">  </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;hello(M): ERROR FILE RECV&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">14</span><span class="k">end</span><span class="w"></span>
-<span class="linenos">15</span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;hello(M): Received %d bytes from file: %s\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">	</span><span class="nb">length</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span><span class="w"> </span><span class="n">buf</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">10</span><span class="c">% Receive input from a local file</span>
+<span class="linenos">11</span><span class="p">[</span><span class="nb">flag</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">inf</span><span class="p">.</span><span class="n">recv</span><span class="p">();</span>
+<span class="linenos">12</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="nb">flag</span><span class="p">);</span>
+<span class="linenos">13</span><span class="w">  </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;hello(M): ERROR FILE RECV&#39;</span><span class="p">);</span>
+<span class="linenos">14</span><span class="k">end</span>
+<span class="linenos">15</span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;hello(M): Received %d bytes from file: %s\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">...</span>
+<span class="linenos">16</span><span class="w">	</span><span class="nb">length</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span><span class="w"> </span><span class="n">buf</span><span class="p">);</span>
 <span class="linenos">17</span>
-<span class="linenos">18</span><span class="c">% Send output to the output queue</span><span class="w"></span>
-<span class="linenos">19</span><span class="n">ret</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">outq</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">20</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">21</span><span class="w">  </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;hello(M): ERROR QUEUE SEND&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">22</span><span class="k">end</span><span class="w"></span>
-<span class="linenos">23</span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;hello(M): Sent to outq&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">24</span><span class="n">outq</span><span class="p">.</span><span class="n">send_eof</span><span class="p">();</span><span class="w"></span>
+<span class="linenos">18</span><span class="c">% Send output to the output queue</span>
+<span class="linenos">19</span><span class="n">ret</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">outq</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
+<span class="linenos">20</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span>
+<span class="linenos">21</span><span class="w">  </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;hello(M): ERROR QUEUE SEND&#39;</span><span class="p">);</span>
+<span class="linenos">22</span><span class="k">end</span>
+<span class="linenos">23</span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;hello(M): Sent to outq&#39;</span><span class="p">);</span>
+<span class="linenos">24</span><span class="n">outq</span><span class="p">.</span><span class="n">send_eof</span><span class="p">();</span>
 <span class="linenos">25</span>
-<span class="linenos">26</span><span class="c">% Receive input form the input queue</span><span class="w"></span>
-<span class="linenos">27</span><span class="p">[</span><span class="nb">flag</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">inq</span><span class="p">.</span><span class="n">recv</span><span class="p">();</span><span class="w"></span>
-<span class="linenos">28</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="nb">flag</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">29</span><span class="w">  </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;hello(M): ERROR QUEUE RECV&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">30</span><span class="k">end</span><span class="w"></span>
-<span class="linenos">31</span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;hello(M): Received %d bytes from queue: %s\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
-<span class="linenos">32</span><span class="w">	</span><span class="nb">length</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span><span class="w"> </span><span class="n">buf</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">26</span><span class="c">% Receive input form the input queue</span>
+<span class="linenos">27</span><span class="p">[</span><span class="nb">flag</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">inq</span><span class="p">.</span><span class="n">recv</span><span class="p">();</span>
+<span class="linenos">28</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="nb">flag</span><span class="p">);</span>
+<span class="linenos">29</span><span class="w">  </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;hello(M): ERROR QUEUE RECV&#39;</span><span class="p">);</span>
+<span class="linenos">30</span><span class="k">end</span>
+<span class="linenos">31</span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;hello(M): Received %d bytes from queue: %s\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">...</span>
+<span class="linenos">32</span><span class="w">	</span><span class="nb">length</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span><span class="w"> </span><span class="n">buf</span><span class="p">);</span>
 <span class="linenos">33</span>
-<span class="linenos">34</span><span class="c">% Send output to a local file</span><span class="w"></span>
-<span class="linenos">35</span><span class="n">ret</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">outf</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">36</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">37</span><span class="w">  </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;hello(M): ERROR FILE SEND&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">38</span><span class="k">end</span><span class="w"></span>
-<span class="linenos">39</span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;hello(M): Sent to outf&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">34</span><span class="c">% Send output to a local file</span>
+<span class="linenos">35</span><span class="n">ret</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">outf</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
+<span class="linenos">36</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span>
+<span class="linenos">37</span><span class="w">  </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;hello(M): ERROR FILE SEND&#39;</span><span class="p">);</span>
+<span class="linenos">38</span><span class="k">end</span>
+<span class="linenos">39</span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;hello(M): Sent to outf&#39;</span><span class="p">);</span>
 <span class="linenos">40</span>
-<span class="linenos">41</span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">41</span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hello_matlab</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/hello.m</span><span class="w">  </span><span class="c1"># Runs the matlab script using Matlab engine</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hello_matlab</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/hello.m</span><span class="w">  </span><span class="c1"># Runs the matlab script using Matlab engine</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inFile</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outFile</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_hello.txt</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">        </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inFile</span>
+<span class="linenos">10</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span>
+<span class="linenos">12</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span>
+<span class="linenos">14</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outFile</span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">16</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_hello.txt</span>
+<span class="linenos">17</span><span class="w">        </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 <span class="linenos">18</span>
-<span class="linenos">19</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">20</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span><span class="w"></span>
-<span class="linenos">21</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">    </span><span class="nt">onexit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">printStatus</span><span class="w"></span>
+<span class="linenos">19</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">20</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span>
+<span class="linenos">21</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span>
+<span class="linenos">22</span><span class="w">    </span><span class="nt">onexit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">printStatus</span>
 </pre></div>
 </div>
 </section>
@@ -491,28 +492,28 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hello_python</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/hello.py</span><span class="w">  </span><span class="c1"># Runs the python script using default python</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hello_python</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/hello.py</span><span class="w">  </span><span class="c1"># Runs the python script using default python</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inFile</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outFile</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_hello.txt</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">        </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inFile</span>
+<span class="linenos">10</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span>
+<span class="linenos">12</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span>
+<span class="linenos">14</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outFile</span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">16</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_hello.txt</span>
+<span class="linenos">17</span><span class="w">        </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 <span class="linenos">18</span>
-<span class="linenos">19</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">20</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span><span class="w"></span>
-<span class="linenos">21</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">    </span><span class="nt">onexit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">printStatus</span><span class="w"></span>
+<span class="linenos">19</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">20</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span>
+<span class="linenos">21</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span>
+<span class="linenos">22</span><span class="w">    </span><span class="nt">onexit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">printStatus</span>
 </pre></div>
 </div>
 </section>
@@ -562,28 +563,28 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hello_R</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/hello.R</span><span class="w">  </span><span class="c1"># Runs the R script using the R interpreter</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hello_R</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/hello.R</span><span class="w">  </span><span class="c1"># Runs the R script using the R interpreter</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inFile</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outFile</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_hello.txt</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">        </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inFile</span>
+<span class="linenos">10</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+<span class="linenos">11</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span>
+<span class="linenos">12</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span>
+<span class="linenos">14</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outFile</span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">16</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_hello.txt</span>
+<span class="linenos">17</span><span class="w">        </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 <span class="linenos">18</span>
-<span class="linenos">19</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">20</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span><span class="w"></span>
-<span class="linenos">21</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">    </span><span class="nt">onexit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">printStatus</span><span class="w"></span>
+<span class="linenos">19</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">20</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueOut</span>
+<span class="linenos">21</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">helloQueueIn</span>
+<span class="linenos">22</span><span class="w">    </span><span class="nt">onexit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">printStatus</span>
 </pre></div>
 </div>
 </section>

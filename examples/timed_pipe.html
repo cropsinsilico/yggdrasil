@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>timed_pipe &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>timed_pipe &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -29,7 +30,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -83,8 +84,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>timed_pipe</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">timed_pipe</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/examples/timed_pipe.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -110,249 +111,249 @@
 <section id="c-version">
 <h2><a class="toc-backref" href="#id2">C Version</a><a class="headerlink" href="#c-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.h&quot;</span>
 <span class="linenos"> 3</span>
-<span class="linenos"> 4</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">bufsiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">512</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">bufsiz</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">bufsiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">512</span><span class="p">;</span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">bufsiz</span><span class="p">);</span>
 <span class="linenos"> 9</span><span class="w">  </span>
-<span class="linenos">10</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C pipe_dst</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">10</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C pipe_dst</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="linenos">11</span>
 <span class="linenos">12</span><span class="w">  </span><span class="c1">// Ins/outs matching with the the model yaml</span>
-<span class="linenos">13</span><span class="w">  </span><span class="n">yggInput_t</span><span class="w"> </span><span class="n">inq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;input_pipe&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">  </span><span class="n">yggOutput_t</span><span class="w"> </span><span class="n">outf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggOutput</span><span class="p">(</span><span class="s">&quot;output_file&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_dst(C): Created I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">  </span><span class="n">yggInput_t</span><span class="w"> </span><span class="n">inq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggInput</span><span class="p">(</span><span class="s">&quot;input_pipe&quot;</span><span class="p">);</span>
+<span class="linenos">14</span><span class="w">  </span><span class="n">yggOutput_t</span><span class="w"> </span><span class="n">outf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggOutput</span><span class="p">(</span><span class="s">&quot;output_file&quot;</span><span class="p">);</span>
+<span class="linenos">15</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_dst(C): Created I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="linenos">16</span>
 <span class="linenos">17</span><span class="w">  </span><span class="c1">// Continue receiving input from the queue</span>
-<span class="linenos">18</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">20</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_recv_nolimit</span><span class="p">(</span><span class="n">inq</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">21</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_dst(C): Input channel closed</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">23</span><span class="w">      </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">24</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">25</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">bufsiz</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">26</span><span class="w">      </span><span class="n">bufsiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">27</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_dst(C): Buffer increased to %d bytes</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">28</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">29</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_send_nolimit</span><span class="p">(</span><span class="n">outf</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">30</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">31</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_dst(C): SEND ERROR ON MSG %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">32</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">33</span><span class="w">      </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">34</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">35</span><span class="w">    </span><span class="n">count</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">36</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">19</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">20</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_recv_nolimit</span><span class="p">(</span><span class="n">inq</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">);</span>
+<span class="linenos">21</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">22</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_dst(C): Input channel closed</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">23</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="linenos">24</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos">25</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">bufsiz</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">26</span><span class="w">      </span><span class="n">bufsiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="linenos">27</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_dst(C): Buffer increased to %d bytes</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">);</span>
+<span class="linenos">28</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos">29</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_send_nolimit</span><span class="p">(</span><span class="n">outf</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span>
+<span class="linenos">30</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">31</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_dst(C): SEND ERROR ON MSG %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span>
+<span class="linenos">32</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">33</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="linenos">34</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos">35</span><span class="w">    </span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+<span class="linenos">36</span><span class="w">  </span><span class="p">}</span>
 <span class="linenos">37</span>
-<span class="linenos">38</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C destination. Received %d messages.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">38</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C destination. Received %d messages.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span>
 <span class="linenos">39</span>
-<span class="linenos">40</span><span class="w">  </span><span class="n">free</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">41</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">exit_code</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">42</span><span class="p">}</span><span class="w"></span>
+<span class="linenos">40</span><span class="w">  </span><span class="n">free</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
+<span class="linenos">41</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">exit_code</span><span class="p">;</span>
+<span class="linenos">42</span><span class="p">}</span>
 <span class="linenos">43</span>
 </pre></div>
 </div>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.h&quot;</span>
 <span class="linenos"> 3</span>
-<span class="linenos"> 4</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">argc</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Error in C pipe_src: The message count and size must be provided as input arguments.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">argc</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Error in C pipe_src: The message count and size must be provided as input arguments.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">10</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="linenos">11</span>
-<span class="linenos">12</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">msg_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">msg_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C pipe_src: msg_count = %d, msg_size = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">	 </span><span class="n">msg_count</span><span class="p">,</span><span class="w"> </span><span class="n">msg_size</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">msg_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<span class="linenos">13</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">msg_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+<span class="linenos">14</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C pipe_src: msg_count = %d, msg_size = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<span class="linenos">15</span><span class="w">	 </span><span class="n">msg_count</span><span class="p">,</span><span class="w"> </span><span class="n">msg_size</span><span class="p">);</span>
 <span class="linenos">16</span>
 <span class="linenos">17</span><span class="w">  </span><span class="c1">// Ins/outs matching with the the model yaml</span>
-<span class="linenos">18</span><span class="w">  </span><span class="n">yggOutput_t</span><span class="w"> </span><span class="n">outq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggOutput</span><span class="p">(</span><span class="s">&quot;output_pipe&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_src(C): Created I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">  </span><span class="n">yggOutput_t</span><span class="w"> </span><span class="n">outq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggOutput</span><span class="p">(</span><span class="s">&quot;output_pipe&quot;</span><span class="p">);</span>
+<span class="linenos">19</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_src(C): Created I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="linenos">20</span>
 <span class="linenos">21</span><span class="w">  </span><span class="c1">// Create test message</span>
-<span class="linenos">22</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">test_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">msg_size</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">23</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">24</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">msg_size</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
-<span class="linenos">25</span><span class="w">    </span><span class="n">test_msg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;0&#39;</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">26</span><span class="w">  </span><span class="n">test_msg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;\0&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">test_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">msg_size</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="linenos">23</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="linenos">24</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">msg_size</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<span class="linenos">25</span><span class="w">    </span><span class="n">test_msg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;0&#39;</span><span class="p">;</span>
+<span class="linenos">26</span><span class="w">  </span><span class="n">test_msg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;\0&#39;</span><span class="p">;</span>
 <span class="linenos">27</span>
 <span class="linenos">28</span><span class="w">  </span><span class="c1">// Send test message multiple times</span>
-<span class="linenos">29</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">30</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">msg_count</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">31</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_send</span><span class="p">(</span><span class="n">outq</span><span class="p">,</span><span class="w"> </span><span class="n">test_msg</span><span class="p">,</span><span class="w"> </span><span class="n">msg_size</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">32</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">33</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_src(C): SEND ERROR ON MSG %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">34</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">35</span><span class="w">      </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">36</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">37</span><span class="w">    </span><span class="n">count</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">38</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">29</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">30</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">msg_count</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">31</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ygg_send</span><span class="p">(</span><span class="n">outq</span><span class="p">,</span><span class="w"> </span><span class="n">test_msg</span><span class="p">,</span><span class="w"> </span><span class="n">msg_size</span><span class="p">);</span>
+<span class="linenos">32</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">33</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_src(C): SEND ERROR ON MSG %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+<span class="linenos">34</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">35</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="linenos">36</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos">37</span><span class="w">    </span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+<span class="linenos">38</span><span class="w">  </span><span class="p">}</span>
 <span class="linenos">39</span>
-<span class="linenos">40</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C source. Sent %d messages.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">41</span><span class="w">  </span><span class="n">free</span><span class="p">(</span><span class="n">test_msg</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">42</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">exit_code</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">43</span><span class="p">}</span><span class="w"></span>
+<span class="linenos">40</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C source. Sent %d messages.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span>
+<span class="linenos">41</span><span class="w">  </span><span class="n">free</span><span class="p">(</span><span class="n">test_msg</span><span class="p">);</span>
+<span class="linenos">42</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">exit_code</span><span class="p">;</span>
+<span class="linenos">43</span><span class="p">}</span>
 <span class="linenos">44</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_src</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_src.c</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_COUNT}}&quot;</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_SIZE}}&quot;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_src</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_src.c</span>
+<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_COUNT}}&quot;</span>
+<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_SIZE}}&quot;</span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">11</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span>
 <span class="linenos">12</span>
-<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_dst</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_dst.c</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_dst</span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_dst.c</span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span>
+<span class="linenos">18</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">19</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span>
 <span class="linenos">20</span>
-<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span><span class="w"></span>
-<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span><span class="w"></span>
-<span class="linenos">24</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span><span class="w"></span>
-<span class="linenos">25</span><span class="w">    </span><span class="nt">output_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">26</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_timed_pipe.txt</span><span class="w"></span>
-<span class="linenos">27</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span><span class="w"></span>
-<span class="linenos">28</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span>
+<span class="linenos">24</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span>
+<span class="linenos">25</span><span class="w">    </span><span class="nt">output_file</span><span class="p">:</span>
+<span class="linenos">26</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_timed_pipe.txt</span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 </section>
 <section id="id1">
 <h2><a class="toc-backref" href="#id3">C++ Version</a><a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.hpp&quot;</span>
 <span class="linenos"> 3</span>
-<span class="linenos"> 4</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">bufsiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">512</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">bufsiz</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">bufsiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">512</span><span class="p">;</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">bufsiz</span><span class="p">);</span>
 <span class="linenos"> 8</span><span class="w">  </span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C++ pipe_dst</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C++ pipe_dst</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="linenos">10</span>
 <span class="linenos">11</span><span class="w">  </span><span class="c1">// Ins/outs matching with the the model yaml</span>
-<span class="linenos">12</span><span class="w">  </span><span class="n">YggInput</span><span class="w"> </span><span class="n">inq</span><span class="p">(</span><span class="s">&quot;input_pipe&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">  </span><span class="n">YggOutput</span><span class="w"> </span><span class="n">outf</span><span class="p">(</span><span class="s">&quot;output_file&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_dst(CPP): Created I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">  </span><span class="n">YggInput</span><span class="w"> </span><span class="n">inq</span><span class="p">(</span><span class="s">&quot;input_pipe&quot;</span><span class="p">);</span>
+<span class="linenos">13</span><span class="w">  </span><span class="n">YggOutput</span><span class="w"> </span><span class="n">outf</span><span class="p">(</span><span class="s">&quot;output_file&quot;</span><span class="p">);</span>
+<span class="linenos">14</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_dst(CPP): Created I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="linenos">15</span>
 <span class="linenos">16</span><span class="w">  </span><span class="c1">// Continue receiving input from the queue</span>
-<span class="linenos">17</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inq</span><span class="p">.</span><span class="n">recv_nolimit</span><span class="p">(</span><span class="o">&amp;</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">20</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">21</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_dst(CPP): Input channel closed</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">      </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">23</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">24</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">bufsiz</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">25</span><span class="w">      </span><span class="n">bufsiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">26</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_dst(CPP): Buffer increased to %d bytes</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">27</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">28</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">outf</span><span class="p">.</span><span class="n">send_nolimit</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">29</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">30</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_dst(CPP): SEND ERROR ON MSG %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">31</span><span class="w">      </span><span class="n">free</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">32</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">33</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">34</span><span class="w">    </span><span class="n">count</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">35</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">18</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">19</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inq</span><span class="p">.</span><span class="n">recv_nolimit</span><span class="p">(</span><span class="o">&amp;</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">);</span>
+<span class="linenos">20</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">21</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_dst(CPP): Input channel closed</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">22</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="linenos">23</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos">24</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">bufsiz</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">25</span><span class="w">      </span><span class="n">bufsiz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="linenos">26</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_dst(CPP): Buffer increased to %d bytes</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bufsiz</span><span class="p">);</span>
+<span class="linenos">27</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos">28</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">outf</span><span class="p">.</span><span class="n">send_nolimit</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span>
+<span class="linenos">29</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">30</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_dst(CPP): SEND ERROR ON MSG %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span>
+<span class="linenos">31</span><span class="w">      </span><span class="n">free</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
+<span class="linenos">32</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">33</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos">34</span><span class="w">    </span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+<span class="linenos">35</span><span class="w">  </span><span class="p">}</span>
 <span class="linenos">36</span>
-<span class="linenos">37</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C++ destination. Received %d messages.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">37</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C++ destination. Received %d messages.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span>
 <span class="linenos">38</span>
-<span class="linenos">39</span><span class="w">  </span><span class="n">free</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">40</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">41</span><span class="p">}</span><span class="w"></span>
+<span class="linenos">39</span><span class="w">  </span><span class="n">free</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
+<span class="linenos">40</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">41</span><span class="p">}</span>
 </pre></div>
 </div>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.hpp&quot;</span>
 <span class="linenos"> 3</span>
-<span class="linenos"> 4</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">argc</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Error in C++ pipe_src: The message count and size must be provided as input arguments.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 4</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">argc</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Error in C++ pipe_src: The message count and size must be provided as input arguments.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">10</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="linenos">11</span>
-<span class="linenos">12</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">msg_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">msg_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C++ pipe_src: msg_count = %d, msg_size = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">	 </span><span class="n">msg_count</span><span class="p">,</span><span class="w"> </span><span class="n">msg_size</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">msg_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<span class="linenos">13</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">msg_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+<span class="linenos">14</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C++ pipe_src: msg_count = %d, msg_size = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<span class="linenos">15</span><span class="w">	 </span><span class="n">msg_count</span><span class="p">,</span><span class="w"> </span><span class="n">msg_size</span><span class="p">);</span>
 <span class="linenos">16</span>
 <span class="linenos">17</span><span class="w">  </span><span class="c1">// Ins/outs matching with the the model yaml</span>
-<span class="linenos">18</span><span class="w">  </span><span class="n">YggOutput</span><span class="w"> </span><span class="n">outq</span><span class="p">(</span><span class="s">&quot;output_pipe&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_src(CPP): Created I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">  </span><span class="n">YggOutput</span><span class="w"> </span><span class="n">outq</span><span class="p">(</span><span class="s">&quot;output_pipe&quot;</span><span class="p">);</span>
+<span class="linenos">19</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_src(CPP): Created I/O channels</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="linenos">20</span>
 <span class="linenos">21</span><span class="w">  </span><span class="c1">// Create test message</span>
-<span class="linenos">22</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">test_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">msg_size</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">23</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">24</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">msg_size</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
-<span class="linenos">25</span><span class="w">    </span><span class="n">test_msg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;0&#39;</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">26</span><span class="w">  </span><span class="n">test_msg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;\0&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">test_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">msg_size</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="linenos">23</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="linenos">24</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">msg_size</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<span class="linenos">25</span><span class="w">    </span><span class="n">test_msg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;0&#39;</span><span class="p">;</span>
+<span class="linenos">26</span><span class="w">  </span><span class="n">test_msg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;\0&#39;</span><span class="p">;</span>
 <span class="linenos">27</span>
 <span class="linenos">28</span><span class="w">  </span><span class="c1">// Send test message multiple times</span>
-<span class="linenos">29</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">30</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">msg_count</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">31</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">outq</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">test_msg</span><span class="p">,</span><span class="w"> </span><span class="n">msg_size</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">32</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">33</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_src(CPP): SEND ERROR ON MSG %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">34</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">35</span><span class="w">      </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">36</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">37</span><span class="w">    </span><span class="n">count</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">38</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">29</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">30</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">msg_count</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">31</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">outq</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">test_msg</span><span class="p">,</span><span class="w"> </span><span class="n">msg_size</span><span class="p">);</span>
+<span class="linenos">32</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">33</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;pipe_src(CPP): SEND ERROR ON MSG %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+<span class="linenos">34</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">35</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="linenos">36</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos">37</span><span class="w">    </span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+<span class="linenos">38</span><span class="w">  </span><span class="p">}</span>
 <span class="linenos">39</span>
-<span class="linenos">40</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C++ source. Sent %d messages.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">41</span><span class="w">  </span><span class="n">free</span><span class="p">(</span><span class="n">test_msg</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">42</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">exit_code</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">43</span><span class="p">}</span><span class="w"></span>
+<span class="linenos">40</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C++ source. Sent %d messages.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span>
+<span class="linenos">41</span><span class="w">  </span><span class="n">free</span><span class="p">(</span><span class="n">test_msg</span><span class="p">);</span>
+<span class="linenos">42</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">exit_code</span><span class="p">;</span>
+<span class="linenos">43</span><span class="p">}</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_src</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c++</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_src.cpp</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_COUNT}}&quot;</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_SIZE}}&quot;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_src</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c++</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_src.cpp</span>
+<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_COUNT}}&quot;</span>
+<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_SIZE}}&quot;</span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">11</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span>
 <span class="linenos">12</span>
-<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_dst</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c++</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_dst.cpp</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_dst</span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c++</span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_dst.cpp</span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span>
+<span class="linenos">18</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">19</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span>
 <span class="linenos">20</span>
-<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span><span class="w"></span>
-<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span><span class="w"></span>
-<span class="linenos">24</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span><span class="w"></span>
-<span class="linenos">25</span><span class="w">    </span><span class="nt">output_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">26</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_timed_pipe.txt</span><span class="w"></span>
-<span class="linenos">27</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span><span class="w"></span>
-<span class="linenos">28</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span>
+<span class="linenos">24</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span>
+<span class="linenos">25</span><span class="w">    </span><span class="nt">output_file</span><span class="p">:</span>
+<span class="linenos">26</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_timed_pipe.txt</span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 </section>
@@ -467,121 +468,121 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_src</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fortran</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_src.f90</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_COUNT}}&quot;</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_SIZE}}&quot;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_src</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fortran</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_src.f90</span>
+<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_COUNT}}&quot;</span>
+<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_SIZE}}&quot;</span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">11</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span>
 <span class="linenos">12</span>
-<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_dst</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fortran</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_dst.f90</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_dst</span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fortran</span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_dst.f90</span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span>
+<span class="linenos">18</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">19</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span>
 <span class="linenos">20</span>
-<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span><span class="w"></span>
-<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span><span class="w"></span>
-<span class="linenos">24</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span><span class="w"></span>
-<span class="linenos">25</span><span class="w">    </span><span class="nt">output_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">26</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_timed_pipe.txt</span><span class="w"></span>
-<span class="linenos">27</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span><span class="w"></span>
-<span class="linenos">28</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span>
+<span class="linenos">24</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span>
+<span class="linenos">25</span><span class="w">    </span><span class="nt">output_file</span><span class="p">:</span>
+<span class="linenos">26</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_timed_pipe.txt</span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 </section>
 <section id="matlab-version">
 <h2><a class="toc-backref" href="#id5">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Hello from Matlab pipe_dst&#39;</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Hello from Matlab pipe_dst&#39;</span><span class="p">);</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="c">% Ins/outs matching with the the model yaml</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="n">inq</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggInput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;input_pipe&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="n">outf</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;output_file&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;pipe_dst(M): Created I/O channels&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="c">% Ins/outs matching with the the model yaml</span>
+<span class="linenos"> 4</span><span class="n">inq</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggInput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;input_pipe&#39;</span><span class="p">);</span>
+<span class="linenos"> 5</span><span class="n">outf</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;output_file&#39;</span><span class="p">);</span>
+<span class="linenos"> 6</span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;pipe_dst(M): Created I/O channels&#39;</span><span class="p">);</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="c">% Continue receiving input from the queue</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="nb">count</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">10</span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">  </span><span class="p">[</span><span class="nb">flag</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">inq</span><span class="p">.</span><span class="n">recv</span><span class="p">();</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="nb">flag</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">    </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;pipe_dst(M): Input channel closed&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">  </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">outf</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">    </span><span class="nb">error</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span><span class="s">&#39;pipe_dst(M): SEND ERROR ON MSG %d\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">count</span><span class="p">));</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">  </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">20</span><span class="w">  </span><span class="nb">count</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">21</span><span class="k">end</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="c">% Continue receiving input from the queue</span>
+<span class="linenos"> 9</span><span class="nb">count</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">10</span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="linenos">11</span><span class="w">  </span><span class="p">[</span><span class="nb">flag</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">inq</span><span class="p">.</span><span class="n">recv</span><span class="p">();</span>
+<span class="linenos">12</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="nb">flag</span><span class="p">);</span>
+<span class="linenos">13</span><span class="w">    </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;pipe_dst(M): Input channel closed&#39;</span><span class="p">);</span>
+<span class="linenos">14</span><span class="w">    </span><span class="k">break</span><span class="p">;</span>
+<span class="linenos">15</span><span class="w">  </span><span class="k">end</span><span class="p">;</span>
+<span class="linenos">16</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">outf</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
+<span class="linenos">17</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span>
+<span class="linenos">18</span><span class="w">    </span><span class="nb">error</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span><span class="s">&#39;pipe_dst(M): SEND ERROR ON MSG %d\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">count</span><span class="p">));</span>
+<span class="linenos">19</span><span class="w">  </span><span class="k">end</span><span class="p">;</span>
+<span class="linenos">20</span><span class="w">  </span><span class="nb">count</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="linenos">21</span><span class="k">end</span><span class="p">;</span>
 <span class="linenos">22</span>
-<span class="linenos">23</span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab destination. Received %d messages.\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">count</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">23</span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab destination. Received %d messages.\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">count</span><span class="p">);</span>
 </pre></div>
 </div>
-<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">function</span><span class="w"> </span><span class="nf">timed_pipe_src</span><span class="p">(</span>msg_count, msg_size<span class="p">)</span><span class="w"></span>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">function</span><span class="w"> </span><span class="nf">timed_pipe_src</span><span class="p">(</span>msg_count, msg_size<span class="p">)</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="w">  </span><span class="n">msg_count</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">str2num</span><span class="p">(</span><span class="n">msg_count</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="n">msg_size</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">str2num</span><span class="p">(</span><span class="n">msg_size</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Hello from Matlab pipe_src: msg_count = %d, msg_size = %d\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">          </span><span class="n">msg_count</span><span class="p">,</span><span class="w"> </span><span class="n">msg_size</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="n">msg_count</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">str2num</span><span class="p">(</span><span class="n">msg_count</span><span class="p">);</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="n">msg_size</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">str2num</span><span class="p">(</span><span class="n">msg_size</span><span class="p">);</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Hello from Matlab pipe_src: msg_count = %d, msg_size = %d\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">...</span>
+<span class="linenos"> 6</span><span class="w">          </span><span class="n">msg_count</span><span class="p">,</span><span class="w"> </span><span class="n">msg_size</span><span class="p">);</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="c">% Ins/outs matching with the the model yaml</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="n">outq</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;output_pipe&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;pipe_src(M): Created I/O channels&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="c">% Ins/outs matching with the the model yaml</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="n">outq</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;output_pipe&#39;</span><span class="p">);</span>
+<span class="linenos">10</span><span class="w">  </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;pipe_src(M): Created I/O channels&#39;</span><span class="p">);</span>
 <span class="linenos">11</span>
-<span class="linenos">12</span><span class="w">  </span><span class="c">% Send test message multiple times</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">  </span><span class="n">test_msg</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">msg_size</span><span class="p">)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;0&#39;</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">  </span><span class="nb">count</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="nb">i</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="n">msg_count</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">      </span><span class="n">ret</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">outq</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">test_msg</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">)</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">          </span><span class="nb">error</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span><span class="s">&#39;pipe_src(M): SEND ERROR ON MSG %d\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">i</span><span class="p">));</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">      </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">20</span><span class="w">      </span><span class="nb">count</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">21</span><span class="w">  </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">  </span><span class="c">% Send test message multiple times</span>
+<span class="linenos">13</span><span class="w">  </span><span class="n">test_msg</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">msg_size</span><span class="p">)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;0&#39;</span><span class="p">;</span>
+<span class="linenos">14</span><span class="w">  </span><span class="nb">count</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">15</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="nb">i</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="n">msg_count</span>
+<span class="linenos">16</span><span class="w">      </span><span class="n">ret</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">outq</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">test_msg</span><span class="p">);</span>
+<span class="linenos">17</span><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">)</span>
+<span class="linenos">18</span><span class="w">          </span><span class="nb">error</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span><span class="s">&#39;pipe_src(M): SEND ERROR ON MSG %d\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">i</span><span class="p">));</span>
+<span class="linenos">19</span><span class="w">      </span><span class="k">end</span><span class="p">;</span>
+<span class="linenos">20</span><span class="w">      </span><span class="nb">count</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="linenos">21</span><span class="w">  </span><span class="k">end</span><span class="p">;</span>
 <span class="linenos">22</span>
-<span class="linenos">23</span><span class="w">  </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab source. Sent %d messages.\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">count</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab source. Sent %d messages.\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">count</span><span class="p">);</span>
 <span class="linenos">24</span>
-<span class="linenos">25</span><span class="k">end</span><span class="w"></span>
+<span class="linenos">25</span><span class="k">end</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_src</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_src.m</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_COUNT}}&quot;</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_SIZE}}&quot;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_src</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_src.m</span>
+<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_COUNT}}&quot;</span>
+<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_SIZE}}&quot;</span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">11</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span>
 <span class="linenos">12</span>
-<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_dst</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_dst.m</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_dst</span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab</span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_dst.m</span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span>
+<span class="linenos">18</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">19</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span>
 <span class="linenos">20</span>
-<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span><span class="w"></span>
-<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span><span class="w"></span>
-<span class="linenos">24</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span><span class="w"></span>
-<span class="linenos">25</span><span class="w">    </span><span class="nt">output_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">26</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_timed_pipe.txt</span><span class="w"></span>
-<span class="linenos">27</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span><span class="w"></span>
-<span class="linenos">28</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span>
+<span class="linenos">24</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span>
+<span class="linenos">25</span><span class="w">    </span><span class="nt">output_file</span><span class="p">:</span>
+<span class="linenos">26</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_timed_pipe.txt</span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 </section>
@@ -651,34 +652,34 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_src</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_src.py</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_COUNT}}&quot;</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_SIZE}}&quot;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_src</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_src.py</span>
+<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_COUNT}}&quot;</span>
+<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_SIZE}}&quot;</span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">11</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span>
 <span class="linenos">12</span>
-<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_dst</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_dst.py</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_dst</span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_dst.py</span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span>
+<span class="linenos">18</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">19</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span>
 <span class="linenos">20</span>
-<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span><span class="w"></span>
-<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span><span class="w"></span>
-<span class="linenos">24</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span><span class="w"></span>
-<span class="linenos">25</span><span class="w">    </span><span class="nt">output_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">26</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_timed_pipe.txt</span><span class="w"></span>
-<span class="linenos">27</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span><span class="w"></span>
-<span class="linenos">28</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span>
+<span class="linenos">24</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span>
+<span class="linenos">25</span><span class="w">    </span><span class="nt">output_file</span><span class="p">:</span>
+<span class="linenos">26</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_timed_pipe.txt</span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 </section>
@@ -751,34 +752,34 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_src</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">r</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_src.R</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_COUNT}}&quot;</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_SIZE}}&quot;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_src</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">r</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_src.R</span>
+<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_COUNT}}&quot;</span>
+<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_SIZE}}&quot;</span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">11</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span>
 <span class="linenos">12</span>
-<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_dst</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">r</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_dst.R</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_dst</span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">r</span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_dst.R</span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span>
+<span class="linenos">18</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">19</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span>
 <span class="linenos">20</span>
-<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span><span class="w"></span>
-<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span><span class="w"></span>
-<span class="linenos">24</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span><span class="w"></span>
-<span class="linenos">25</span><span class="w">    </span><span class="nt">output_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">26</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_timed_pipe.txt</span><span class="w"></span>
-<span class="linenos">27</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span><span class="w"></span>
-<span class="linenos">28</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span>
+<span class="linenos">24</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span>
+<span class="linenos">25</span><span class="w">    </span><span class="nt">output_file</span><span class="p">:</span>
+<span class="linenos">26</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_timed_pipe.txt</span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 </section>

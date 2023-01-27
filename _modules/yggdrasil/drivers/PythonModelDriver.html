@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.PythonModelDriver &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.drivers.PythonModelDriver &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
-      <li>yggdrasil.drivers.PythonModelDriver</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../drivers.html">yggdrasil.drivers</a></li>
+      <li class="breadcrumb-item active">yggdrasil.drivers.PythonModelDriver</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -103,7 +104,7 @@
 
 
 <div class="viewcode-block" id="PythonModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver">[docs]</a><span class="k">class</span> <span class="nc">PythonModelDriver</span><span class="p">(</span><span class="n">InterpretedModelDriver</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running Python models.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running Python models.&quot;&quot;&quot;</span>
 
     <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is written in Python.&#39;</span><span class="p">)</span>
     <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;python&#39;</span>
@@ -200,13 +201,13 @@
 
 <div class="viewcode-block" id="PythonModelDriver.finalize_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.finalize_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">finalize_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed after a class has been fully</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed after a class has been fully</span>
 <span class="sd">        initialized and registered.&quot;&quot;&quot;</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">supported_comms</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_comm</span><span class="p">()</span>
         <span class="n">InterpretedModelDriver</span><span class="o">.</span><span class="n">finalize_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="PythonModelDriver.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Additional keyword arguments are passed to the parent class&#39;s</span>
@@ -223,7 +224,7 @@
         
 <div class="viewcode-block" id="PythonModelDriver.is_language_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.is_language_installed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_language_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this model driver is installed on the current</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this model driver is installed on the current</span>
 <span class="sd">        machine.</span>
 
 <span class="sd">        Returns:</span>
@@ -236,7 +237,7 @@
 
 <div class="viewcode-block" id="PythonModelDriver.is_library_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.is_library_installed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_library_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lib</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a dependency is installed.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a dependency is installed.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lib (str): Name of the library that should be checked.</span>
@@ -254,7 +255,7 @@
 
 <div class="viewcode-block" id="PythonModelDriver.format_function_param"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.format_function_param">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">format_function_param</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the formatted version of the specified key.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the formatted version of the specified key.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            key (str): Key in cls.function_param mapping that should be</span>
@@ -281,7 +282,7 @@
 
 <div class="viewcode-block" id="PythonModelDriver.write_initialize_oiter"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.write_initialize_oiter">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_initialize_oiter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to initialize an array for iteration</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to initialize an array for iteration</span>
 <span class="sd">        output.</span>
 
 <span class="sd">        Args:</span>
@@ -303,7 +304,7 @@
 
 <div class="viewcode-block" id="PythonModelDriver.write_finalize_oiter"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.write_finalize_oiter">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_finalize_oiter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to finalize an array after iteration.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to finalize an array after iteration.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            var (dict, str): Name or information dictionary for the variable</span>
@@ -325,7 +326,7 @@
 
 <div class="viewcode-block" id="PythonModelDriver.install_dependency"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.install_dependency">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">install_dependency</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">package</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">package_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Install a dependency.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Install a dependency.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            package (str): Name of the package that should be installed. If</span>
@@ -347,7 +348,7 @@
             <span class="n">package</span><span class="p">,</span> <span class="n">package_manager</span><span class="o">=</span><span class="n">package_manager</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="PythonModelDriver.run_validation"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.run_validation">[docs]</a>    <span class="k">def</span> <span class="nf">run_validation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the validation script for the model.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the validation script for the model.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">validation_command</span>
              <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validation_command</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">)))):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">validation_command</span> <span class="o">=</span> <span class="p">(</span>
@@ -356,7 +357,7 @@
 
 <div class="viewcode-block" id="PythonModelDriver.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>

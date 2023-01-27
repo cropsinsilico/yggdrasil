@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.transforms.PandasTransform &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.communication.transforms.PandasTransform &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../../communication.html">yggdrasil.communication</a> &raquo;</li>
-      <li>yggdrasil.communication.transforms.PandasTransform</li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../communication.html">yggdrasil.communication</a></li>
+      <li class="breadcrumb-item active">yggdrasil.communication.transforms.PandasTransform</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -102,11 +103,11 @@
 
 
 <div class="viewcode-block" id="PandasTransform"><a class="viewcode-back" href="../../../../yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.PandasTransform.PandasTransform">[docs]</a><span class="k">class</span> <span class="nc">PandasTransform</span><span class="p">(</span><span class="n">ArrayTransform</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for consolidating values into a Pandas data frame.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for consolidating values into a Pandas data frame.&quot;&quot;&quot;</span>
     <span class="n">_transformtype</span> <span class="o">=</span> <span class="s1">&#39;pandas&#39;</span>
 
 <div class="viewcode-block" id="PandasTransform.evaluate_transform"><a class="viewcode-back" href="../../../../yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.PandasTransform.PandasTransform.evaluate_transform">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">no_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call transform on the provided message.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call transform on the provided message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x (object): Message object to transform.</span>
@@ -128,7 +129,7 @@
     
 <div class="viewcode-block" id="PandasTransform.get_testing_options"><a class="viewcode-back" href="../../../../yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.PandasTransform.PandasTransform.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get testing options for the transform class.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get testing options for the transform class.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            list: Multiple dictionaries of keywords and messages before/after</span>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.InterpretedModelDriver &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.drivers.InterpretedModelDriver &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
-      <li>yggdrasil.drivers.InterpretedModelDriver</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../drivers.html">yggdrasil.drivers</a></li>
+      <li class="breadcrumb-item active">yggdrasil.drivers.InterpretedModelDriver</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -104,7 +105,7 @@
 
 
 <div class="viewcode-block" id="InterpretedModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver">[docs]</a><span class="k">class</span> <span class="nc">InterpretedModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for models written in interpreted languages.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for models written in interpreted languages.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): Driver name.</span>
@@ -191,7 +192,7 @@
 
 <div class="viewcode-block" id="InterpretedModelDriver.after_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.after_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes after</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes after</span>
 <span class="sd">        registration. For compiled languages this includes selecting the</span>
 <span class="sd">        default compiler. The order of precedence is the config file &#39;compiler&#39;</span>
 <span class="sd">        option for the language, followed by the environment variable set by</span>
@@ -211,7 +212,7 @@
                 <span class="k">pass</span></div>
                 
 <div class="viewcode-block" id="InterpretedModelDriver.parse_arguments"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort model arguments to determine which one is the executable</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort model arguments to determine which one is the executable</span>
 <span class="sd">        and which ones are arguments.</span>
 
 <span class="sd">        Args:</span>
@@ -224,7 +225,7 @@
         
 <div class="viewcode-block" id="InterpretedModelDriver.get_interpreter"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.get_interpreter">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_interpreter</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Command required to run a model written in this language from</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Command required to run a model written in this language from</span>
 <span class="sd">        the command line.</span>
 
 <span class="sd">        Returns:</span>
@@ -239,7 +240,7 @@
 
 <div class="viewcode-block" id="InterpretedModelDriver.get_interpreter_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.get_interpreter_flags">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_interpreter_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the flags that should be passed to the interpreter when using it</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the flags that should be passed to the interpreter when using it</span>
 <span class="sd">        to run a model on the command line.</span>
 
 <span class="sd">        Returns:</span>
@@ -253,7 +254,7 @@
 
 <div class="viewcode-block" id="InterpretedModelDriver.language_executable"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.language_executable">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">language_executable</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Command required to compile/run a model written in this language</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Command required to compile/run a model written in this language</span>
 <span class="sd">        from the command line.</span>
 
 <span class="sd">        Returns:</span>
@@ -264,7 +265,7 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_interpreter</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="InterpretedModelDriver.run_model"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.run_model">[docs]</a>    <span class="k">def</span> <span class="nf">run_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the model. Unless overridden, the model will be run using</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the model. Unless overridden, the model will be run using</span>
 <span class="sd">        run_executable.</span>
 
 <span class="sd">        Args:</span>
@@ -283,7 +284,7 @@
     <span class="k">def</span> <span class="nf">executable_command</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">exec_type</span><span class="o">=</span><span class="s1">&#39;interpreter&#39;</span><span class="p">,</span> <span class="n">unused_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                            <span class="n">skip_interpreter_flags</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">interpreter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                            <span class="n">interpreter_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compose a command for running a program in this language with the</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compose a command for running a program in this language with the</span>
 <span class="sd">        provied arguments. If not already present, the interpreter command and</span>
 <span class="sd">        interpreter flags are prepended to the provided arguments.</span>
 
@@ -312,7 +313,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ext</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language_ext</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">exec_type</span> <span class="o">==</span> <span class="s1">&#39;interpreter&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_interpreter</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                 <span class="k">if</span> <span class="n">interpreter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -331,7 +332,7 @@
 
 <div class="viewcode-block" id="InterpretedModelDriver.is_interpreter"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.is_interpreter">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_interpreter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a command line argument is an interpreter.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a command line argument is an interpreter.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            cmd (str): Command that should be checked.</span>
@@ -346,7 +347,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="InterpretedModelDriver.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Environment variables for the model process.</span>
@@ -365,7 +366,7 @@
     <span class="c1"># Methods for handling type conversions</span>
 <div class="viewcode-block" id="InterpretedModelDriver.python2language"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.python2language">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">python2language</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pyobj</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prepare a python object for transformation in target</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prepare a python object for transformation in target</span>
 <span class="sd">        language.</span>
 
 <span class="sd">        Args:</span>
@@ -380,7 +381,7 @@
 
 <div class="viewcode-block" id="InterpretedModelDriver.language2python"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.language2python">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">language2python</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pyobj</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prepare an object from the target language for receipt</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prepare an object from the target language for receipt</span>
 <span class="sd">        in Python.</span>
 
 <span class="sd">        Args:</span>

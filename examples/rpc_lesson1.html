@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rpc_lesson1 &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>rpc_lesson1 &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -29,7 +30,7 @@
             <a href="../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -83,8 +84,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>rpc_lesson1</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">rpc_lesson1</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/examples/rpc_lesson1.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -110,272 +111,272 @@
 <section id="c-version">
 <h2><a class="toc-backref" href="#id2">C Version</a><a class="headerlink" href="#c-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.h&quot;</span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
 <span class="linenos"> 3</span>
 <span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="kt">int</span><span class="w"> </span><span class="nf">get_fibonacci</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">pprev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">fib_no</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">fib_no</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prev</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pprev</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">    </span><span class="n">pprev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prev</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">    </span><span class="n">prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">    </span><span class="n">fib_no</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fib_no</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">14</span><span class="p">};</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="kt">int</span><span class="w"> </span><span class="nf">get_fibonacci</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">pprev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">fib_no</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">fib_no</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prev</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pprev</span><span class="p">;</span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="n">pprev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prev</span><span class="p">;</span>
+<span class="linenos">10</span><span class="w">    </span><span class="n">prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<span class="linenos">11</span><span class="w">    </span><span class="n">fib_no</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fib_no</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="linenos">12</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos">13</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<span class="linenos">14</span><span class="p">};</span>
 <span class="linenos">15</span>
 <span class="linenos">16</span>
-<span class="linenos">17</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">17</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos">18</span><span class="w">  </span>
-<span class="linenos">19</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">20</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C server!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">20</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C server!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="linenos">21</span>
 <span class="linenos">22</span><span class="w">  </span><span class="c1">// Create server-side rpc conneciton using model name</span>
-<span class="linenos">23</span><span class="w">  </span><span class="n">yggRpc_t</span><span class="w"> </span><span class="n">rpc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggRpcServer</span><span class="p">(</span><span class="s">&quot;server&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="n">yggRpc_t</span><span class="w"> </span><span class="n">rpc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggRpcServer</span><span class="p">(</span><span class="s">&quot;server&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">);</span>
 <span class="linenos">24</span>
 <span class="linenos">25</span><span class="w">  </span><span class="c1">// Continue receiving requests until the connection is closed when all</span>
 <span class="linenos">26</span><span class="w">  </span><span class="c1">// clients have disconnected.</span>
-<span class="linenos">27</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">flag</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">28</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">29</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C): receiving...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">30</span><span class="w">    </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rpcRecv</span><span class="p">(</span><span class="n">rpc</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">n</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">31</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">flag</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">32</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C): end of input</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">33</span><span class="w">      </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">34</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">flag</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<span class="linenos">28</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">29</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C): receiving...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">30</span><span class="w">    </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rpcRecv</span><span class="p">(</span><span class="n">rpc</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">n</span><span class="p">);</span>
+<span class="linenos">31</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">flag</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">32</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C): end of input</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">33</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="linenos">34</span><span class="w">    </span><span class="p">}</span>
 <span class="linenos">35</span>
 <span class="linenos">36</span><span class="w">    </span><span class="c1">// Compute fibonacci number</span>
-<span class="linenos">37</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C): Received request for Fibonacci number %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">38</span><span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">39</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C): Sending response for Fibonacci number %d: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="linenos">40</span><span class="w">	   </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">37</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C): Received request for Fibonacci number %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">);</span>
+<span class="linenos">38</span><span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+<span class="linenos">39</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C): Sending response for Fibonacci number %d: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<span class="linenos">40</span><span class="w">	   </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
 <span class="linenos">41</span>
 <span class="linenos">42</span><span class="w">    </span><span class="c1">// Send response back</span>
-<span class="linenos">43</span><span class="w">    </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rpcSend</span><span class="p">(</span><span class="n">rpc</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">44</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">flag</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">45</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C): ERROR sending</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">46</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">47</span><span class="w">      </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">48</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">49</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">43</span><span class="w">    </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rpcSend</span><span class="p">(</span><span class="n">rpc</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+<span class="linenos">44</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">flag</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">45</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C): ERROR sending</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">46</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">47</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="linenos">48</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos">49</span><span class="w">  </span><span class="p">}</span>
 <span class="linenos">50</span>
-<span class="linenos">51</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C server</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">52</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">exit_code</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">53</span><span class="p">};</span><span class="w"></span>
+<span class="linenos">51</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C server</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">52</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">exit_code</span><span class="p">;</span>
+<span class="linenos">53</span><span class="p">};</span>
 </pre></div>
 </div>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.h&quot;</span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
 <span class="linenos"> 3</span>
 <span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos"> 6</span><span class="w">   </span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">iterations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C client: iterations %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">iterations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C client: iterations %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="p">);</span>
 <span class="linenos">10</span><span class="w">  </span>
 <span class="linenos">11</span><span class="w">  </span><span class="c1">// Set up connections matching yaml</span>
 <span class="linenos">12</span><span class="w">  </span><span class="c1">// RPC client-side connection will be $(server_name)_$(client_name)</span>
-<span class="linenos">13</span><span class="w">  </span><span class="n">yggRpc_t</span><span class="w"> </span><span class="n">rpc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggRpcClient</span><span class="p">(</span><span class="s">&quot;server_client&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">  </span><span class="n">yggOutput_t</span><span class="w"> </span><span class="n">log</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggOutputFmt</span><span class="p">(</span><span class="s">&quot;output_log&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fib(%-2d) = %-2d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">  </span><span class="n">yggRpc_t</span><span class="w"> </span><span class="n">rpc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggRpcClient</span><span class="p">(</span><span class="s">&quot;server_client&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">);</span>
+<span class="linenos">14</span><span class="w">  </span><span class="n">yggOutput_t</span><span class="w"> </span><span class="n">log</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggOutputFmt</span><span class="p">(</span><span class="s">&quot;output_log&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fib(%-2d) = %-2d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="linenos">15</span>
 <span class="linenos">16</span><span class="w">  </span><span class="c1">// Initialize variables</span>
-<span class="linenos">17</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">fib</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">logmsg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">YGG_MSG_MAX</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span><span class="w"></span>
-<span class="linenos">20</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">18</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">fib</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">19</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">logmsg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">YGG_MSG_MAX</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+<span class="linenos">20</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
 <span class="linenos">21</span>
 <span class="linenos">22</span><span class="w">  </span><span class="c1">// Iterate over Fibonacci sequence</span>
-<span class="linenos">23</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">iterations</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">iterations</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos">24</span><span class="w">    </span>
 <span class="linenos">25</span><span class="w">    </span><span class="c1">// Call the server and receive response</span>
-<span class="linenos">26</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C): Calling fib(%d)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">27</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rpcCall</span><span class="p">(</span><span class="n">rpc</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">fib</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">28</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">29</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C): RPC CALL ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">30</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">31</span><span class="w">      </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">32</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">33</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C): Response fib(%d) = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">fib</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C): Calling fib(%d)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+<span class="linenos">27</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rpcCall</span><span class="p">(</span><span class="n">rpc</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">fib</span><span class="p">);</span>
+<span class="linenos">28</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">29</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C): RPC CALL ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">30</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">31</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="linenos">32</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos">33</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C): Response fib(%d) = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">fib</span><span class="p">);</span>
 <span class="linenos">34</span>
 <span class="linenos">35</span><span class="w">    </span><span class="c1">// Log result by sending it to the log connection</span>
-<span class="linenos">36</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggSend</span><span class="p">(</span><span class="n">log</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">fib</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">37</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">38</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C): SEND ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">39</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">40</span><span class="w">      </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">41</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">42</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">36</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggSend</span><span class="p">(</span><span class="n">log</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">fib</span><span class="p">);</span>
+<span class="linenos">37</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">38</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C): SEND ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">39</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">40</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="linenos">41</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos">42</span><span class="w">  </span><span class="p">}</span>
 <span class="linenos">43</span>
-<span class="linenos">44</span><span class="w">  </span><span class="n">free</span><span class="p">(</span><span class="n">logmsg</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">45</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C client</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">46</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">exit_code</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">44</span><span class="w">  </span><span class="n">free</span><span class="p">(</span><span class="n">logmsg</span><span class="p">);</span>
+<span class="linenos">45</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C client</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">46</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">exit_code</span><span class="p">;</span>
 <span class="linenos">47</span><span class="w">    </span>
-<span class="linenos">48</span><span class="p">}</span><span class="w"></span>
+<span class="linenos">48</span><span class="p">}</span>
 <span class="linenos">49</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w"></span>
-<span class="linenos">5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span><span class="w"></span>
-<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.c</span><span class="w"></span>
-<span class="linenos">7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span><span class="w"></span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.c</span>
+<span class="linenos">7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.c</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.c</span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span>
 <span class="linenos">11</span>
-<span class="linenos">12</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">  </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output.txt</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">  </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">12</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">  </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span>
+<span class="linenos">14</span><span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output.txt</span>
+<span class="linenos">15</span><span class="w">  </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 </section>
 <section id="id1">
 <h2><a class="toc-backref" href="#id3">C++ Version</a><a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.hpp&quot;</span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
 <span class="linenos"> 3</span>
 <span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="kt">int</span><span class="w"> </span><span class="nf">get_fibonacci</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">pprev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">fib_no</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">fib_no</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prev</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pprev</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">    </span><span class="n">pprev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prev</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">    </span><span class="n">prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">    </span><span class="n">fib_no</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fib_no</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">14</span><span class="p">};</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="kt">int</span><span class="w"> </span><span class="nf">get_fibonacci</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">pprev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">fib_no</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">fib_no</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prev</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pprev</span><span class="p">;</span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="n">pprev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prev</span><span class="p">;</span>
+<span class="linenos">10</span><span class="w">    </span><span class="n">prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<span class="linenos">11</span><span class="w">    </span><span class="n">fib_no</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fib_no</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="linenos">12</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos">13</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<span class="linenos">14</span><span class="p">};</span>
 <span class="linenos">15</span>
 <span class="linenos">16</span>
-<span class="linenos">17</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">17</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos">18</span><span class="w">  </span>
-<span class="linenos">19</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">20</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C++ server!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">20</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C++ server!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="linenos">21</span>
 <span class="linenos">22</span><span class="w">  </span><span class="c1">// Create server-side rpc conneciton using model name</span>
-<span class="linenos">23</span><span class="w">  </span><span class="n">YggRpcServer</span><span class="w"> </span><span class="n">rpc</span><span class="p">(</span><span class="s">&quot;server&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="n">YggRpcServer</span><span class="w"> </span><span class="n">rpc</span><span class="p">(</span><span class="s">&quot;server&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">);</span>
 <span class="linenos">24</span>
 <span class="linenos">25</span><span class="w">  </span><span class="c1">// Continue receiving requests until the connection is closed when all</span>
 <span class="linenos">26</span><span class="w">  </span><span class="c1">// clients have disconnected.</span>
-<span class="linenos">27</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">flag</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">28</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">29</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C++): receiving...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">30</span><span class="w">    </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rpc</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">n</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">31</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">flag</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">32</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C++): end of input</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">33</span><span class="w">      </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">34</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">flag</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<span class="linenos">28</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">29</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C++): receiving...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">30</span><span class="w">    </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rpc</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">n</span><span class="p">);</span>
+<span class="linenos">31</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">flag</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">32</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C++): end of input</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">33</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="linenos">34</span><span class="w">    </span><span class="p">}</span>
 <span class="linenos">35</span>
 <span class="linenos">36</span><span class="w">    </span><span class="c1">// Compute fibonacci number</span>
-<span class="linenos">37</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C++): Received request for Fibonacci number %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">38</span><span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">39</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C++): Sending response for Fibonacci number %d: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="linenos">40</span><span class="w">	   </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">37</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C++): Received request for Fibonacci number %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">);</span>
+<span class="linenos">38</span><span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+<span class="linenos">39</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C++): Sending response for Fibonacci number %d: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<span class="linenos">40</span><span class="w">	   </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
 <span class="linenos">41</span>
 <span class="linenos">42</span><span class="w">    </span><span class="c1">// Send response back</span>
-<span class="linenos">43</span><span class="w">    </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rpc</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">44</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">flag</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">45</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C++): ERROR sending</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">46</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">47</span><span class="w">      </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">48</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">49</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">43</span><span class="w">    </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rpc</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+<span class="linenos">44</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">flag</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">45</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;server(C++): ERROR sending</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">46</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">47</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="linenos">48</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos">49</span><span class="w">  </span><span class="p">}</span>
 <span class="linenos">50</span>
-<span class="linenos">51</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C++ server</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">52</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">exit_code</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">53</span><span class="p">};</span><span class="w"></span>
+<span class="linenos">51</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C++ server</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">52</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">exit_code</span><span class="p">;</span>
+<span class="linenos">53</span><span class="p">};</span>
 </pre></div>
 </div>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
-<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.hpp&quot;</span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
 <span class="linenos"> 3</span>
 <span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos"> 6</span><span class="w">   </span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">iterations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C++ client: iterations %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">iterations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C++ client: iterations %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="p">);</span>
 <span class="linenos">10</span><span class="w">  </span>
 <span class="linenos">11</span><span class="w">  </span><span class="c1">// Set up connections matching yaml</span>
 <span class="linenos">12</span><span class="w">  </span><span class="c1">// RPC client-side connection will be $(server_name)_$(client_name)</span>
-<span class="linenos">13</span><span class="w">  </span><span class="n">YggRpcClient</span><span class="w"> </span><span class="n">rpc</span><span class="p">(</span><span class="s">&quot;server_client&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">  </span><span class="n">YggOutput</span><span class="w"> </span><span class="n">log</span><span class="p">(</span><span class="s">&quot;output_log&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fib(%-2d) = %-2d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">  </span><span class="n">YggRpcClient</span><span class="w"> </span><span class="n">rpc</span><span class="p">(</span><span class="s">&quot;server_client&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d&quot;</span><span class="p">);</span>
+<span class="linenos">14</span><span class="w">  </span><span class="n">YggOutput</span><span class="w"> </span><span class="n">log</span><span class="p">(</span><span class="s">&quot;output_log&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fib(%-2d) = %-2d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="linenos">15</span><span class="w">  </span>
 <span class="linenos">16</span><span class="w">  </span><span class="c1">// Initialize variables</span>
-<span class="linenos">17</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">fib</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">logmsg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">YGG_MSG_MAX</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span><span class="w"></span>
-<span class="linenos">20</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">17</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">18</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">fib</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">19</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">logmsg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">YGG_MSG_MAX</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+<span class="linenos">20</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
 <span class="linenos">21</span>
 <span class="linenos">22</span><span class="w">  </span><span class="c1">// Iterate over Fibonacci sequence</span>
-<span class="linenos">23</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">iterations</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">iterations</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos">24</span><span class="w">    </span>
 <span class="linenos">25</span><span class="w">    </span><span class="c1">// Call the server and receive response</span>
-<span class="linenos">26</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C++): Calling fib(%d)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">27</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rpc</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">fib</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">28</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">29</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C++): RPC CALL ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">30</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">31</span><span class="w">      </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">32</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">33</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C++): Response fib(%d) = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">fib</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C++): Calling fib(%d)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+<span class="linenos">27</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rpc</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">fib</span><span class="p">);</span>
+<span class="linenos">28</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">29</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C++): RPC CALL ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">30</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">31</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="linenos">32</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos">33</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C++): Response fib(%d) = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">fib</span><span class="p">);</span>
 <span class="linenos">34</span>
 <span class="linenos">35</span><span class="w">    </span><span class="c1">// Log result by sending it to the log connection</span>
-<span class="linenos">36</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">fib</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">37</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos">38</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C++): SEND ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">39</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">40</span><span class="w">      </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">41</span><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">42</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="linenos">36</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">fib</span><span class="p">);</span>
+<span class="linenos">37</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">38</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C++): SEND ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">39</span><span class="w">      </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos">40</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="linenos">41</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos">42</span><span class="w">  </span><span class="p">}</span>
 <span class="linenos">43</span>
-<span class="linenos">44</span><span class="w">  </span><span class="n">free</span><span class="p">(</span><span class="n">logmsg</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">45</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C++ client</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">46</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">exit_code</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">47</span><span class="p">}</span><span class="w"></span>
+<span class="linenos">44</span><span class="w">  </span><span class="n">free</span><span class="p">(</span><span class="n">logmsg</span><span class="p">);</span>
+<span class="linenos">45</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C++ client</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">46</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">exit_code</span><span class="p">;</span>
+<span class="linenos">47</span><span class="p">}</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w"></span>
-<span class="linenos">5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c++</span><span class="w"></span>
-<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.cpp</span><span class="w"></span>
-<span class="linenos">7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span><span class="w"></span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c++</span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.cpp</span>
+<span class="linenos">7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c++</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.cpp</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c++</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.cpp</span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span>
 <span class="linenos">11</span>
-<span class="linenos">12</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">  </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output.txt</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">  </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">12</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">  </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span>
+<span class="linenos">14</span><span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output.txt</span>
+<span class="linenos">15</span><span class="w">  </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 </section>
@@ -510,139 +511,139 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w"></span>
-<span class="linenos">5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fortran</span><span class="w"></span>
-<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.f90</span><span class="w"></span>
-<span class="linenos">7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span><span class="w"></span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fortran</span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.f90</span>
+<span class="linenos">7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fortran</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.f90</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fortran</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.f90</span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span>
 <span class="linenos">11</span>
-<span class="linenos">12</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">  </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output.txt</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">  </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">12</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">  </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span>
+<span class="linenos">14</span><span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output.txt</span>
+<span class="linenos">15</span><span class="w">  </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 </section>
 <section id="matlab-version">
 <h2><a class="toc-backref" href="#id5">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">function</span><span class="w"> </span><span class="nf">server</span><span class="p">()</span><span class="w"></span>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">function</span><span class="w"> </span><span class="nf">server</span><span class="p">()</span>
 <span class="linenos"> 2</span><span class="w">  </span>
-<span class="linenos"> 3</span><span class="w">  </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Hello from Matlab server!&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Hello from Matlab server!&#39;</span><span class="p">);</span>
 <span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="c">% Create server-side rpc conneciton using model name</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="n">rpc</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggRpcServer&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;server&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;%d&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;%d&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="c">% Create server-side rpc conneciton using model name</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="n">rpc</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggRpcServer&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;server&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;%d&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;%d&#39;</span><span class="p">);</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="c">% Continue receiving requests until the connection is closed when all</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="c">% clients have disconnected.</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="nb">true</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">    </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;server(M): receiving...&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">    </span><span class="p">[</span><span class="n">retval</span><span class="p">,</span><span class="w"> </span><span class="n">rpc_in</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">rpc</span><span class="p">.</span><span class="n">recv</span><span class="p">();</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">retval</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">      </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;server(M):end of input&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">      </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">    </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="c">% Continue receiving requests until the connection is closed when all</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="c">% clients have disconnected.</span>
+<span class="linenos">10</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="nb">true</span>
+<span class="linenos">11</span><span class="w">    </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;server(M): receiving...&#39;</span><span class="p">);</span>
+<span class="linenos">12</span><span class="w">    </span><span class="p">[</span><span class="n">retval</span><span class="p">,</span><span class="w"> </span><span class="n">rpc_in</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">rpc</span><span class="p">.</span><span class="n">recv</span><span class="p">();</span>
+<span class="linenos">13</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">retval</span><span class="p">);</span>
+<span class="linenos">14</span><span class="w">      </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;server(M):end of input&#39;</span><span class="p">);</span>
+<span class="linenos">15</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="linenos">16</span><span class="w">    </span><span class="k">end</span><span class="p">;</span>
 <span class="linenos">17</span>
-<span class="linenos">18</span><span class="w">    </span><span class="c">% Compute fibonacci number</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">    </span><span class="n">n</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">rpc_in</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span><span class="w"></span>
-<span class="linenos">20</span><span class="w">    </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;server(M): Received request for Fibonacci number %d\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">21</span><span class="w">    </span><span class="n">pprev</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">    </span><span class="n">prev</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">23</span><span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">24</span><span class="w">    </span><span class="n">fib_no</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">25</span><span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="n">fib_no</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="w"></span>
-<span class="linenos">26</span><span class="w">      </span><span class="n">result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">prev</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pprev</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">27</span><span class="w">      </span><span class="n">pprev</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">prev</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">28</span><span class="w">      </span><span class="n">prev</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">result</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">29</span><span class="w">      </span><span class="n">fib_no</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fib_no</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">30</span><span class="w">    </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">31</span><span class="w">    </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;server(M): Sending response for Fibonacci number %d: %d\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">18</span><span class="w">    </span><span class="c">% Compute fibonacci number</span>
+<span class="linenos">19</span><span class="w">    </span><span class="n">n</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">rpc_in</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
+<span class="linenos">20</span><span class="w">    </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;server(M): Received request for Fibonacci number %d\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">);</span>
+<span class="linenos">21</span><span class="w">    </span><span class="n">pprev</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">22</span><span class="w">    </span><span class="n">prev</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="linenos">23</span><span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="linenos">24</span><span class="w">    </span><span class="n">fib_no</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="linenos">25</span><span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="n">fib_no</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span>
+<span class="linenos">26</span><span class="w">      </span><span class="n">result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">prev</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pprev</span><span class="p">;</span>
+<span class="linenos">27</span><span class="w">      </span><span class="n">pprev</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">prev</span><span class="p">;</span>
+<span class="linenos">28</span><span class="w">      </span><span class="n">prev</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<span class="linenos">29</span><span class="w">      </span><span class="n">fib_no</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fib_no</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="linenos">30</span><span class="w">    </span><span class="k">end</span><span class="p">;</span>
+<span class="linenos">31</span><span class="w">    </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;server(M): Sending response for Fibonacci number %d: %d\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
 <span class="linenos">32</span>
-<span class="linenos">33</span><span class="w">    </span><span class="c">% Send response back</span><span class="w"></span>
-<span class="linenos">34</span><span class="w">    </span><span class="nb">flag</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">rpc</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="nb">int32</span><span class="p">(</span><span class="n">result</span><span class="p">));</span><span class="w"></span>
-<span class="linenos">35</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="nb">flag</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">36</span><span class="w">      </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;server(M): ERROR sending&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">37</span><span class="w">    </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">38</span><span class="w">  </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">33</span><span class="w">    </span><span class="c">% Send response back</span>
+<span class="linenos">34</span><span class="w">    </span><span class="nb">flag</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">rpc</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="nb">int32</span><span class="p">(</span><span class="n">result</span><span class="p">));</span>
+<span class="linenos">35</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="nb">flag</span><span class="p">);</span>
+<span class="linenos">36</span><span class="w">      </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;server(M): ERROR sending&#39;</span><span class="p">);</span>
+<span class="linenos">37</span><span class="w">    </span><span class="k">end</span><span class="p">;</span>
+<span class="linenos">38</span><span class="w">  </span><span class="k">end</span><span class="p">;</span>
 <span class="linenos">39</span>
-<span class="linenos">40</span><span class="w">  </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab server&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">40</span><span class="w">  </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab server&#39;</span><span class="p">);</span>
 <span class="linenos">41</span><span class="w">  </span>
-<span class="linenos">42</span><span class="k">end</span><span class="w"></span>
+<span class="linenos">42</span><span class="k">end</span>
 </pre></div>
 </div>
-<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">function</span><span class="w"> </span><span class="nf">client</span><span class="p">(</span>iterations<span class="p">)</span><span class="w"></span>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">function</span><span class="w"> </span><span class="nf">client</span><span class="p">(</span>iterations<span class="p">)</span>
 <span class="linenos"> 2</span><span class="w">  </span>
-<span class="linenos"> 3</span><span class="w">  </span><span class="n">iterations</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">str2num</span><span class="p">(</span><span class="n">iterations</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Hello from Matlab client: iterations = %d\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="n">iterations</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">str2num</span><span class="p">(</span><span class="n">iterations</span><span class="p">);</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Hello from Matlab client: iterations = %d\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="p">);</span>
 <span class="linenos"> 5</span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="c">% Set up connections matching yaml</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="c">% RPC client-side connection will be $(server_name)_$(client_name)</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="n">rpc</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggRpcClient&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;server_client&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;%d&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;%d&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="nb">log</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;output_log&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;fib(%-2d) = %-2d\n&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="c">% Set up connections matching yaml</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="c">% RPC client-side connection will be $(server_name)_$(client_name)</span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="n">rpc</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggRpcClient&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;server_client&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;%d&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;%d&#39;</span><span class="p">);</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nb">log</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;output_log&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;fib(%-2d) = %-2d\n&#39;</span><span class="p">);</span>
 <span class="linenos">10</span>
-<span class="linenos">11</span><span class="w">  </span><span class="c">% Iterate over Fibonacci sequence</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="nb">i</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="n">iterations</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">  </span><span class="c">% Iterate over Fibonacci sequence</span>
+<span class="linenos">12</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="nb">i</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="n">iterations</span>
 <span class="linenos">13</span><span class="w">    </span>
-<span class="linenos">14</span><span class="w">    </span><span class="c">% Call the server and receive response</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">    </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;client(Matlab): Calling fib(%d)\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">i</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">    </span><span class="p">[</span><span class="n">ret</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">rpc</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="nb">int32</span><span class="p">(</span><span class="nb">i</span><span class="p">));</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">      </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;client(Matlab): RPC CALL ERROR&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">    </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">20</span><span class="w">    </span><span class="n">fib</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">result</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span><span class="w"></span>
-<span class="linenos">21</span><span class="w">    </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;client(Matlab): Response fib(%d) = %d\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">i</span><span class="p">,</span><span class="w"> </span><span class="n">fib</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="c">% Call the server and receive response</span>
+<span class="linenos">15</span><span class="w">    </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;client(Matlab): Calling fib(%d)\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">i</span><span class="p">);</span>
+<span class="linenos">16</span><span class="w">    </span><span class="p">[</span><span class="n">ret</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">rpc</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="nb">int32</span><span class="p">(</span><span class="nb">i</span><span class="p">));</span>
+<span class="linenos">17</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span>
+<span class="linenos">18</span><span class="w">      </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;client(Matlab): RPC CALL ERROR&#39;</span><span class="p">);</span>
+<span class="linenos">19</span><span class="w">    </span><span class="k">end</span><span class="p">;</span>
+<span class="linenos">20</span><span class="w">    </span><span class="n">fib</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">result</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
+<span class="linenos">21</span><span class="w">    </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;client(Matlab): Response fib(%d) = %d\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">i</span><span class="p">,</span><span class="w"> </span><span class="n">fib</span><span class="p">);</span>
 <span class="linenos">22</span>
-<span class="linenos">23</span><span class="w">    </span><span class="c">% Log result by sending it to the log connection</span><span class="w"></span>
-<span class="linenos">24</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">log</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="nb">int32</span><span class="p">(</span><span class="nb">i</span><span class="p">),</span><span class="w"> </span><span class="n">fib</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">25</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">26</span><span class="w">      </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;client(Matlab): SEND ERROR&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="linenos">27</span><span class="w">    </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">28</span><span class="w">  </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">    </span><span class="c">% Log result by sending it to the log connection</span>
+<span class="linenos">24</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">log</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="nb">int32</span><span class="p">(</span><span class="nb">i</span><span class="p">),</span><span class="w"> </span><span class="n">fib</span><span class="p">);</span>
+<span class="linenos">25</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span>
+<span class="linenos">26</span><span class="w">      </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;client(Matlab): SEND ERROR&#39;</span><span class="p">);</span>
+<span class="linenos">27</span><span class="w">    </span><span class="k">end</span><span class="p">;</span>
+<span class="linenos">28</span><span class="w">  </span><span class="k">end</span><span class="p">;</span>
 <span class="linenos">29</span>
-<span class="linenos">30</span><span class="w">  </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab client&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">30</span><span class="w">  </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab client&#39;</span><span class="p">);</span>
 <span class="linenos">31</span><span class="w">  </span>
-<span class="linenos">32</span><span class="k">end</span><span class="w"></span>
+<span class="linenos">32</span><span class="k">end</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w"></span>
-<span class="linenos">5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab</span><span class="w"></span>
-<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.m</span><span class="w"></span>
-<span class="linenos">7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span><span class="w"></span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab</span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.m</span>
+<span class="linenos">7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.m</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matlab</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.m</span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span>
 <span class="linenos">11</span>
-<span class="linenos">12</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">  </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output.txt</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">  </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">12</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">  </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span>
+<span class="linenos">14</span><span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output.txt</span>
+<span class="linenos">15</span><span class="w">  </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 </section>
@@ -654,7 +655,7 @@
 <span class="linenos"> 3</span>
 <span class="linenos"> 4</span>
 <span class="linenos"> 5</span><span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-<span class="linenos"> 6</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
 <span class="linenos"> 7</span>
 <span class="linenos"> 8</span><span class="sd">    Args:</span>
 <span class="linenos"> 9</span><span class="sd">        n (int): Index of the Fibonacci number in the Fibonacci sequence that</span>
@@ -677,7 +678,7 @@
 <span class="linenos">26</span>
 <span class="linenos">27</span>
 <span class="linenos">28</span><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-<span class="linenos">29</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
+<span class="linenos">29</span><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
 <span class="linenos">30</span>
 <span class="linenos">31</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
 <span class="linenos">32</span>
@@ -725,7 +726,7 @@
 <span class="linenos"> 5</span>
 <span class="linenos"> 6</span>
 <span class="linenos"> 7</span><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
-<span class="linenos"> 8</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute client communication with server that computes</span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute client communication with server that computes</span>
 <span class="linenos"> 9</span><span class="sd">    numbers in the Fibonacci sequence.</span>
 <span class="linenos">10</span>
 <span class="linenos">11</span><span class="sd">    Args:</span>
@@ -765,35 +766,35 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.py</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">params</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">    </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/server_params.txt</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">params</span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">11</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/server_params.txt</span>
+<span class="linenos">12</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.py</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span>
 <span class="linenos">11</span>
-<span class="linenos">12</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">  </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output.txt</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">  </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">12</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">  </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span>
+<span class="linenos">14</span><span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output.txt</span>
+<span class="linenos">15</span><span class="w">  </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 </section>
@@ -895,30 +896,30 @@
 </pre></div>
 </div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
 <span class="linenos">2</span>
-<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w"></span>
-<span class="linenos">5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R</span><span class="w"></span>
-<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.R</span><span class="w"></span>
-<span class="linenos">7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span><span class="w"></span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R</span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.R</span>
+<span class="linenos">7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.R</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.R</span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span>
 <span class="linenos">11</span>
-<span class="linenos">12</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">  </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output.txt</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">  </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">12</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">  </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span>
+<span class="linenos">14</span><span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output.txt</span>
+<span class="linenos">15</span><span class="w">  </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 </section>

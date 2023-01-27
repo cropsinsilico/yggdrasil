@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.MatlabModelDriver &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.drivers.MatlabModelDriver &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
-      <li>yggdrasil.drivers.MatlabModelDriver</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../drivers.html">yggdrasil.drivers</a></li>
+      <li class="breadcrumb-item active">yggdrasil.drivers.MatlabModelDriver</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -138,7 +139,7 @@
 
 
 <div class="viewcode-block" id="kill_all"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.kill_all">[docs]</a><span class="k">def</span> <span class="nf">kill_all</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Kill all Matlab shared engines.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Kill all Matlab shared engines.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
         <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">((</span><span class="s1">&#39;taskkill /F /IM matlab.engine.shareEngine /T&#39;</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
@@ -146,7 +147,7 @@
 
 
 <div class="viewcode-block" id="locate_matlab_engine_processes"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.locate_matlab_engine_processes">[docs]</a><span class="k">def</span> <span class="nf">locate_matlab_engine_processes</span><span class="p">():</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get all of the active matlab sharedEngine processes.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get all of the active matlab sharedEngine processes.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        list: Active matlab sharedEngine processes.</span>
@@ -162,7 +163,7 @@
 
 
 <div class="viewcode-block" id="is_matlab_running"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.is_matlab_running">[docs]</a><span class="k">def</span> <span class="nf">is_matlab_running</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if there is a Matlab engine running.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if there is a Matlab engine running.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        bool: True if there is a Matlab engine running, False otherwise.</span>
@@ -176,7 +177,7 @@
 
 
 <div class="viewcode-block" id="locate_matlabroot"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.locate_matlabroot">[docs]</a><span class="k">def</span> <span class="nf">locate_matlabroot</span><span class="p">():</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find directory that servers as matlab root.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find directory that servers as matlab root.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        str: Full path to matlabroot directory.</span>
@@ -186,7 +187,7 @@
 
 
 <div class="viewcode-block" id="install_matlab_engine"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.install_matlab_engine">[docs]</a><span class="k">def</span> <span class="nf">install_matlab_engine</span><span class="p">():</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Install the MATLAB engine API for Python.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Install the MATLAB engine API for Python.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_matlab_engine_installed</span><span class="p">:</span>
         <span class="n">mtl_root</span> <span class="o">=</span> <span class="n">locate_matlabroot</span><span class="p">()</span>
         <span class="n">mtl_setup</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mtl_root</span><span class="p">,</span> <span class="s1">&#39;extern&#39;</span><span class="p">,</span> <span class="s1">&#39;engines&#39;</span><span class="p">,</span> <span class="s1">&#39;python&#39;</span><span class="p">)</span>
@@ -196,7 +197,7 @@
     
 
 <div class="viewcode-block" id="start_matlab_engine"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.start_matlab_engine">[docs]</a><span class="k">def</span> <span class="nf">start_matlab_engine</span><span class="p">(</span><span class="n">skip_connect</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start a Matlab shared engine session inside a detached screen</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start a Matlab shared engine session inside a detached screen</span>
 <span class="sd">    session.</span>
 
 <span class="sd">    Args:</span>
@@ -250,7 +251,7 @@
 
 
 <div class="viewcode-block" id="connect_matlab_engine"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.connect_matlab_engine">[docs]</a><span class="k">def</span> <span class="nf">connect_matlab_engine</span><span class="p">(</span><span class="n">matlab_session</span><span class="p">,</span> <span class="n">first_connect</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Connect to Matlab engine.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Connect to Matlab engine.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        matlab_session (str): Name of the Matlab session that should be</span>
@@ -278,7 +279,7 @@
 
 <div class="viewcode-block" id="stop_matlab_engine"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.stop_matlab_engine">[docs]</a><span class="k">def</span> <span class="nf">stop_matlab_engine</span><span class="p">(</span><span class="n">screen_session</span><span class="p">,</span> <span class="n">matlab_engine</span><span class="p">,</span> <span class="n">matlab_session</span><span class="p">,</span>
                        <span class="n">matlab_process</span><span class="p">,</span> <span class="n">keep_engine</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop a Matlab shared engine session running inside a detached screen</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop a Matlab shared engine session running inside a detached screen</span>
 <span class="sd">    session.</span>
 
 <span class="sd">    Args:</span>
@@ -333,7 +334,7 @@
 
 
 <div class="viewcode-block" id="MatlabProcess"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabProcess">[docs]</a><span class="k">class</span> <span class="nc">MatlabProcess</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">YggClass</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add features to mimic subprocess.Popen while running Matlab function</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add features to mimic subprocess.Popen while running Matlab function</span>
 <span class="sd">    asynchronously.</span>
 
 <span class="sd">    Args:</span>
@@ -384,12 +385,12 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">MatlabProcess</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MatlabProcess.poll"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabProcess.poll">[docs]</a>    <span class="k">def</span> <span class="nf">poll</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Fake poll.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Fake poll.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">returncode</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">stdout_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Output to stdout from function call.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Output to stdout from function call.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stdout_line</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
@@ -399,7 +400,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">stderr_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Output to stderr from function call.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Output to stderr from function call.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stderr_line</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
@@ -408,22 +409,22 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stderr_line</span>
 
 <div class="viewcode-block" id="MatlabProcess.print_output"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabProcess.print_output">[docs]</a>    <span class="k">def</span> <span class="nf">print_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print output from stdout and stderr.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print output from stdout and stderr.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdout_line</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">print_encoded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stdout_line</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stderr_line</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">print_encoded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stderr_line</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
             
 <div class="viewcode-block" id="MatlabProcess.start"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabProcess.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start asychronous call.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start asychronous call.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">future</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MatlabProcess.is_started"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabProcess.is_started">[docs]</a>    <span class="k">def</span> <span class="nf">is_started</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Has start been called.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Has start been called.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">future</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MatlabProcess.is_cancelled"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabProcess.is_cancelled">[docs]</a>    <span class="k">def</span> <span class="nf">is_cancelled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Was the async call cancelled or not.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Was the async call cancelled or not.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_started</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">cancelled</span><span class="p">()</span>
@@ -435,7 +436,7 @@
         <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="MatlabProcess.is_done"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabProcess.is_done">[docs]</a>    <span class="k">def</span> <span class="nf">is_done</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Is the async call still running.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Is the async call still running.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_started</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">done</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_cancelled</span><span class="p">()</span>
@@ -447,14 +448,14 @@
         <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="MatlabProcess.is_alive"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabProcess.is_alive">[docs]</a>    <span class="k">def</span> <span class="nf">is_alive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Is the async call funning.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Is the async call funning.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_started</span><span class="p">():</span>
             <span class="k">return</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_done</span><span class="p">())</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">returncode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Return code.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Return code.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_done</span><span class="p">():</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stderr_line</span><span class="p">:</span>  <span class="c1"># or self.is_cancelled():</span>
                 <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
@@ -464,7 +465,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_returncode</span>
 
 <div class="viewcode-block" id="MatlabProcess.kill"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabProcess.kill">[docs]</a>    <span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cancel the async call.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cancel the async call.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
@@ -480,10 +481,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">matlab_engine</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">future</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_returncode</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())</span></div>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="MatlabProcess.on_matlab_error"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabProcess.on_matlab_error">[docs]</a>    <span class="k">def</span> <span class="nf">on_matlab_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed on error in Matlab engine.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed on error in Matlab engine.&quot;&quot;&quot;</span>
         <span class="c1"># self.print_output()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matlab_engine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -495,7 +496,7 @@
 
 
 <div class="viewcode-block" id="MatlabModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver">[docs]</a><span class="k">class</span> <span class="nc">MatlabModelDriver</span><span class="p">(</span><span class="n">InterpretedModelDriver</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for running Matlab models.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for running Matlab models.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): Driver name.</span>
@@ -645,7 +646,7 @@
 
 <div class="viewcode-block" id="MatlabModelDriver.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
 <span class="sd">        to registration including things like platform dependent properties and</span>
 <span class="sd">        checking environment variables for default settings.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -655,7 +656,7 @@
         
 <div class="viewcode-block" id="MatlabModelDriver.after_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.after_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes after</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes after</span>
 <span class="sd">        registration. For compiled languages this includes selecting the</span>
 <span class="sd">        default compiler. The order of precedence is the config file &#39;compiler&#39;</span>
 <span class="sd">        option for the language, followed by the environment variable set by</span>
@@ -668,7 +669,7 @@
         <span class="n">InterpretedModelDriver</span><span class="o">.</span><span class="n">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="MatlabModelDriver.parse_arguments"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort model arguments to determine which one is the executable</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort model arguments to determine which one is the executable</span>
 <span class="sd">        and which ones are arguments.</span>
 
 <span class="sd">        Args:</span>
@@ -686,7 +687,7 @@
 <div class="viewcode-block" id="MatlabModelDriver.write_error_wrapper"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.write_error_wrapper">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_error_wrapper</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">try_lines</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                             <span class="n">matlab_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a wrapper for the model that encloses it in a try except so</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a wrapper for the model that encloses it in a try except so</span>
 <span class="sd">        that the error can be propagated appropriately.</span>
 
 <span class="sd">        Args:</span>
@@ -735,7 +736,7 @@
 
 <div class="viewcode-block" id="MatlabModelDriver.run_code"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.run_code">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">run_code</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run code by first writing it as an executable and then calling</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run code by first writing it as an executable and then calling</span>
 <span class="sd">        the driver.</span>
 
 <span class="sd">        Args:</span>
@@ -755,7 +756,7 @@
 <div class="viewcode-block" id="MatlabModelDriver.run_executable"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.run_executable">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">run_executable</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">dont_wrap_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fname_wrapper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">matlab_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run a program using the executable for this language and the</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run a program using the executable for this language and the</span>
 <span class="sd">        provided arguments.</span>
 
 <span class="sd">        Args:</span>
@@ -811,7 +812,7 @@
             <span class="bp">cls</span><span class="o">.</span><span class="n">write_error_wrapper</span><span class="p">(</span><span class="n">fname_wrapper</span><span class="p">,</span> <span class="n">try_block</span><span class="p">,</span>
                                     <span class="n">env</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
                                     <span class="n">matlab_engine</span><span class="o">=</span><span class="n">matlab_engine</span><span class="p">)</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname_wrapper</span><span class="p">))</span>
+            <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname_wrapper</span><span class="p">)</span>
             <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fname_wrapper</span><span class="p">))[</span><span class="mi">0</span><span class="p">]]</span>
         <span class="c1"># Call base, catching error to remove temp wrapper</span>
         <span class="k">try</span><span class="p">:</span>
@@ -823,7 +824,7 @@
                 <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug_flags&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Debugging via valgrind, strace, etc. disabled &quot;</span>
                                 <span class="s2">&quot;for Matlab when using a Matlab shared engine.&quot;</span><span class="p">)</span>
-                <span class="k">assert</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;return_process&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+                <span class="k">assert</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;return_process&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
                 <span class="c1"># Add environment variables</span>
                 <span class="n">env</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="p">{})</span>
                 <span class="n">old_env</span> <span class="o">=</span> <span class="p">{}</span>
@@ -848,7 +849,7 @@
         
 <div class="viewcode-block" id="MatlabModelDriver.language_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.language_version">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">language_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">skip_config</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this language.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this language.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            skip_config (bool, optional): If True, the config option</span>
@@ -865,7 +866,7 @@
         
 <div class="viewcode-block" id="MatlabModelDriver.executable_command"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.executable_command">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">executable_command</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compose a command for running a program in this language with the</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compose a command for running a program in this language with the</span>
 <span class="sd">        provied arguments. If not already present, the interpreter command and</span>
 <span class="sd">        interpreter flags are prepended to the provided arguments.</span>
 
@@ -885,7 +886,7 @@
     
 <div class="viewcode-block" id="MatlabModelDriver.configure"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.configure">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">disable_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hide_matlab_libiomp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add configuration options for this language. This includes locating</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add configuration options for this language. This includes locating</span>
 <span class="sd">        any required external libraries and setting option defaults.</span>
 
 <span class="sd">        Args:</span>
@@ -966,7 +967,7 @@
 
 <div class="viewcode-block" id="MatlabModelDriver.get_matlab_info"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.get_matlab_info">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_matlab_info</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the root directory where Matlab is installed and the version</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the root directory where Matlab is installed and the version</span>
 <span class="sd">        that is installed (if Matlab is installed at all). This will fail if Matlab</span>
 <span class="sd">        is not installed, cannot be started, or does not operate as expected.</span>
 
@@ -994,7 +995,7 @@
         <span class="k">return</span> <span class="n">matlabroot</span><span class="p">,</span> <span class="n">release</span></div>
 
 <div class="viewcode-block" id="MatlabModelDriver.start_matlab_engine"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.start_matlab_engine">[docs]</a>    <span class="k">def</span> <span class="nf">start_matlab_engine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start matlab session and connect to it.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start matlab session and connect to it.&quot;&quot;&quot;</span>
         <span class="n">ml_attr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;screen_session&#39;</span><span class="p">,</span> <span class="s1">&#39;mlengine&#39;</span><span class="p">,</span> <span class="s1">&#39;mlsession&#39;</span><span class="p">,</span> <span class="s1">&#39;mlprocess&#39;</span><span class="p">]</span>
         <span class="n">attempt_connect</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">matlab</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">find_matlab</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
         <span class="c1"># Connect to matlab if a session exists</span>
@@ -1024,7 +1025,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Connected to matlab session &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlsession</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MatlabModelDriver.before_start"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform before the run loop.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform before the run loop.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">fname_wrapper</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_wrapper</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">using_matlab_engine</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">start_matlab_engine</span><span class="p">()</span>
@@ -1039,7 +1040,7 @@
             <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">before_start</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MatlabModelDriver.run_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Loop to check if model is still running and forward output.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Loop to check if model is still running and forward output.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">using_matlab_engine</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">print_output</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">periodic_debug</span><span class="p">(</span><span class="s1">&#39;matlab loop&#39;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">100</span><span class="p">)(</span><span class="s1">&#39;Looping&#39;</span><span class="p">)</span>
@@ -1060,7 +1061,7 @@
             <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_loop</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="MatlabModelDriver.after_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform after run_loop has finished. Mainly checking</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform after run_loop has finished. Mainly checking</span>
 <span class="sd">        if there was an error and then handling it.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">using_matlab_engine</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_process</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
@@ -1073,7 +1074,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="MatlabModelDriver.cleanup"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the Matlab session and engine.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the Matlab session and engine.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">using_matlab_engine</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">stop_matlab_engine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen_session</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="p">,</span>
@@ -1091,7 +1092,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="MatlabModelDriver.check_exits"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.check_exits">[docs]</a>    <span class="k">def</span> <span class="nf">check_exits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check to make sure the program dosn&#39;t contain any exits as exits</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check to make sure the program dosn&#39;t contain any exits as exits</span>
 <span class="sd">        will shut down the Matlab engine as well as the program.</span>
 
 <span class="sd">        Raises:</span>
@@ -1113,7 +1114,7 @@
                 <span class="o">+</span> <span class="s2">&quot;with a return or error.&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MatlabModelDriver.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Environment variables for the model process.</span>
@@ -1141,7 +1142,7 @@
         
 <div class="viewcode-block" id="MatlabModelDriver.comm_atexit"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.comm_atexit">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">comm_atexit</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">comm</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations performed on comm at exit including draining receive.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations performed on comm at exit including draining receive.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            comm (CommBase): Communication object.</span>
@@ -1157,7 +1158,7 @@
 
 <div class="viewcode-block" id="MatlabModelDriver.decode_format"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.decode_format">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">decode_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">format_str</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method for decoding format strings created in this language.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method for decoding format strings created in this language.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            format_str (str): Encoded format string.</span>
@@ -1178,7 +1179,7 @@
 
 <div class="viewcode-block" id="MatlabModelDriver.write_finalize_iiter"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.write_finalize_iiter">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_finalize_iiter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to initialize an array for iteration</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to initialize an array for iteration</span>
 <span class="sd">        output.</span>
 
 <span class="sd">        Args:</span>
@@ -1214,7 +1215,7 @@
 
 <div class="viewcode-block" id="MatlabModelDriver.write_initialize_oiter"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.write_initialize_oiter">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_initialize_oiter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to initialize an array for iteration</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to initialize an array for iteration</span>
 <span class="sd">        output.</span>
 
 <span class="sd">        Args:</span>
@@ -1236,7 +1237,7 @@
 
 <div class="viewcode-block" id="MatlabModelDriver.write_finalize_oiter"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.write_finalize_oiter">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_finalize_oiter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to finalize an array after iteration.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to finalize an array after iteration.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            var (dict, str): Name or information dictionary for the variable</span>
@@ -1264,7 +1265,7 @@
 
 <div class="viewcode-block" id="MatlabModelDriver.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>

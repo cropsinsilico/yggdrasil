@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.languages package &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.languages package &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -29,7 +30,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -83,8 +84,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>yggdrasil.languages package</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">yggdrasil.languages package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/yggdrasil.languages.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -103,13 +104,52 @@
 <li class="toctree-l1"><a class="reference internal" href="yggdrasil.languages.Python.html">yggdrasil.languages.Python package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.languages.Python.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.languages.Python.html#module-yggdrasil.languages.Python.CisInterface">yggdrasil.languages.Python.CisInterface module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="yggdrasil.languages.Python.html#module-yggdrasil.languages.Python.YggInterface">yggdrasil.languages.Python.YggInterface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="yggdrasil.languages.Python.html#module-yggdrasil.languages.Python.YggInterface">yggdrasil.languages.Python.YggInterface module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.InterfaceComm"><code class="docutils literal notranslate"><span class="pre">InterfaceComm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggArrayInput"><code class="docutils literal notranslate"><span class="pre">YggArrayInput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggArrayOutput"><code class="docutils literal notranslate"><span class="pre">YggArrayOutput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggAsciiArrayInput"><code class="docutils literal notranslate"><span class="pre">YggAsciiArrayInput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggAsciiArrayOutput"><code class="docutils literal notranslate"><span class="pre">YggAsciiArrayOutput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggAsciiFileInput"><code class="docutils literal notranslate"><span class="pre">YggAsciiFileInput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggAsciiFileOutput"><code class="docutils literal notranslate"><span class="pre">YggAsciiFileOutput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggAsciiTableInput"><code class="docutils literal notranslate"><span class="pre">YggAsciiTableInput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggAsciiTableOutput"><code class="docutils literal notranslate"><span class="pre">YggAsciiTableOutput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggInit"><code class="docutils literal notranslate"><span class="pre">YggInit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggInput"><code class="docutils literal notranslate"><span class="pre">YggInput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggObjInput"><code class="docutils literal notranslate"><span class="pre">YggObjInput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggObjOutput"><code class="docutils literal notranslate"><span class="pre">YggObjOutput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggOutput"><code class="docutils literal notranslate"><span class="pre">YggOutput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggPandasInput"><code class="docutils literal notranslate"><span class="pre">YggPandasInput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggPandasOutput"><code class="docutils literal notranslate"><span class="pre">YggPandasOutput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggPickleInput"><code class="docutils literal notranslate"><span class="pre">YggPickleInput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggPickleOutput"><code class="docutils literal notranslate"><span class="pre">YggPickleOutput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggPlyInput"><code class="docutils literal notranslate"><span class="pre">YggPlyInput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggPlyOutput"><code class="docutils literal notranslate"><span class="pre">YggPlyOutput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggRpcClient"><code class="docutils literal notranslate"><span class="pre">YggRpcClient()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggRpcServer"><code class="docutils literal notranslate"><span class="pre">YggRpcServer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggTimesync"><code class="docutils literal notranslate"><span class="pre">YggTimesync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggTimesyncServer"><code class="docutils literal notranslate"><span class="pre">YggTimesyncServer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.bufMsgSize"><code class="docutils literal notranslate"><span class="pre">bufMsgSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.eof_msg"><code class="docutils literal notranslate"><span class="pre">eof_msg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.maxMsgSize"><code class="docutils literal notranslate"><span class="pre">maxMsgSize()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.languages.Python.html#module-yggdrasil.languages.Python">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="yggdrasil.languages.R.html">yggdrasil.languages.R package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.languages.R.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="yggdrasil.languages.R.html#module-yggdrasil.languages.R.install">yggdrasil.languages.R.install module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="yggdrasil.languages.R.html#module-yggdrasil.languages.R.install">yggdrasil.languages.R.install module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.R.html#yggdrasil.languages.R.install.call_R"><code class="docutils literal notranslate"><span class="pre">call_R()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.R.html#yggdrasil.languages.R.install.install"><code class="docutils literal notranslate"><span class="pre">install()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.R.html#yggdrasil.languages.R.install.install_packages"><code class="docutils literal notranslate"><span class="pre">install_packages()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.R.html#yggdrasil.languages.R.install.make_call"><code class="docutils literal notranslate"><span class="pre">make_call()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.R.html#yggdrasil.languages.R.install.requirements_from_description"><code class="docutils literal notranslate"><span class="pre">requirements_from_description()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.R.html#yggdrasil.languages.R.install.restore_makevars"><code class="docutils literal notranslate"><span class="pre">restore_makevars()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.R.html#yggdrasil.languages.R.install.update_argparser"><code class="docutils literal notranslate"><span class="pre">update_argparser()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.languages.R.html#yggdrasil.languages.R.install.write_makevars"><code class="docutils literal notranslate"><span class="pre">write_makevars()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.languages.R.html#module-yggdrasil.languages.R">Module contents</a></li>
 </ul>
 </li>
@@ -134,7 +174,7 @@
 <dd class="field-odd"><p>Language directories.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -146,9 +186,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of language that installation script should be
+<li><p><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Name of language that installation script should be
 imported for.</p></li>
-<li><p><strong>no_import</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, yggdrasil will not be imported.
+<li><p><strong>no_import</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, yggdrasil will not be imported.
 Defaults to False.</p></li>
 </ul>
 </dd>
@@ -167,10 +207,10 @@ successful, False otherwise).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>from_setup</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the function is being called from
+<li><p><strong>from_setup</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the function is being called from
 setup.py and the positional arguments should not be parsed and
 unrecognized arguments will be ignored. Defaults to False.</p></li>
-<li><p><strong>arglist</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – List of arguments to parse. Defaults to
+<li><p><strong>arglist</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>, </em><em>optional</em>) – List of arguments to parse. Defaults to
 None and sys.argv is used.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to each call to
 install_language.</p></li>
@@ -184,7 +224,7 @@ install_language.</p></li>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -196,16 +236,16 @@ install_language.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of language that should be checked.</p></li>
-<li><p><strong>results</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>, </em><em>optional</em>) – Dictionary where result (whether or not the
+<li><p><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Name of language that should be checked.</p></li>
+<li><p><strong>results</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – Dictionary where result (whether or not the
 language is installed) should be logged. Defaults to None and is
 initialized to an empty dict.</p></li>
-<li><p><strong>no_import</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, yggdrasil will not be imported.
+<li><p><strong>no_import</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, yggdrasil will not be imported.
 Defaults to None and is set based on the value parsed from
 arglist.</p></li>
-<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.Namespace" title="(in Python v3.10)"><em>argparse.Namespace</em></a><em>, </em><em>optional</em>) – Arguments parsed from the
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.Namespace" title="(in Python v3.11)"><em>argparse.Namespace</em></a><em>, </em><em>optional</em>) – Arguments parsed from the
 command line. Default to None and is created.</p></li>
-<li><p><strong>arglist</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – List of arguments to parse. Defaults to
+<li><p><strong>arglist</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>, </em><em>optional</em>) – List of arguments to parse. Defaults to
 None and sys.argv is used.</p></li>
 </ul>
 </dd>
@@ -218,13 +258,13 @@ None and sys.argv is used.</p></li>
 <dd><p>Determine if a directory is valid in a case-sensitive manner.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>fdir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Full directory path to be tested.</p>
+<dd class="field-odd"><p><strong>fdir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Full directory path to be tested.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>True if the directory exists, False otherwise.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -235,13 +275,13 @@ None and sys.argv is used.</p></li>
 <dd><p>Determine if a file is valid in a case-sensitive manner.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Full file path to be tested.</p>
+<dd class="field-odd"><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Full file path to be tested.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>True if the file exists, False otherwise.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -252,13 +292,13 @@ None and sys.argv is used.</p></li>
 <dd><p>Determine if a path is valid in a case-sensitive manner.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>fpath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Full path to be tested.</p>
+<dd class="field-odd"><p><strong>fpath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Full path to be tested.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>True if the path exists, False otherwise.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -270,18 +310,18 @@ None and sys.argv is used.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>parser</strong> (<a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="(in Python v3.10)"><em>argparse.ArgumentParser</em></a><em>, </em><em>optional</em>) – Existing argument parser
+<li><p><strong>parser</strong> (<a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="(in Python v3.11)"><em>argparse.ArgumentParser</em></a><em>, </em><em>optional</em>) – Existing argument parser
 that should be updated. Default to None and a new argument parser
 will be created.</p></li>
-<li><p><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Language that argument parser should be
+<li><p><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Language that argument parser should be
 updated with options for. Defaults to None and all language options
 will be added.</p></li>
-<li><p><strong>no_import</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, yggdrasil will not be imported.
+<li><p><strong>no_import</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, yggdrasil will not be imported.
 Defaults to None and will be set based on sys.argv.</p></li>
-<li><p><strong>from_setup</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the function is being called from
+<li><p><strong>from_setup</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the function is being called from
 setup.py and the positional arguments should not be parsed and
 unrecognized arguments will be ignored. Defaults to False.</p></li>
-<li><p><strong>arglist</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – List of arguments to parse. Defaults to
+<li><p><strong>arglist</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>, </em><em>optional</em>) – List of arguments to parse. Defaults to
 None and sys.argv is used.</p></li>
 </ul>
 </dd>
@@ -289,7 +329,7 @@ None and sys.argv is used.</p></li>
 <dd class="field-even"><p>Argument parser with language specific arguments.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="(in Python v3.10)">argparse.ArgumentParser</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="(in Python v3.11)">argparse.ArgumentParser</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -303,13 +343,13 @@ None and sys.argv is used.</p></li>
 <dd><p>Return the directory containing the interface for the requested language.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>lang</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The name of the language to return a directory for.</p>
+<dd class="field-odd"><p><strong>lang</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The name of the language to return a directory for.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The full path to the interface directory for the language.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -321,8 +361,8 @@ None and sys.argv is used.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lang</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Programming language that extension should be returned for.</p></li>
-<li><p><strong>default</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Extension that should be returned if no
+<li><p><strong>lang</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Programming language that extension should be returned for.</p></li>
+<li><p><strong>default</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Extension that should be returned if no
 extensions are registered for the language. Defaults to None and
 an error will be raised if there are not any extensions associated
 with the language.</p></li>
@@ -332,10 +372,10 @@ with the language.</p></li>
 <dd class="field-even"><p>The most common extension associated with the specified language.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If there are not any executables associated with a language.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If there are not any executables associated with a language.</p>
 </dd>
 </dl>
 </dd></dl>

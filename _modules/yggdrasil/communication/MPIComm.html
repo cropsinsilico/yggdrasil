@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.MPIComm &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.communication.MPIComm &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../communication.html">yggdrasil.communication</a> &raquo;</li>
-      <li>yggdrasil.communication.MPIComm</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../communication.html">yggdrasil.communication</a></li>
+      <li class="breadcrumb-item active">yggdrasil.communication.MPIComm</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -104,11 +105,11 @@
 
 
 <div class="viewcode-block" id="MPIClosedError"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIClosedError">[docs]</a><span class="k">class</span> <span class="nc">MPIClosedError</span><span class="p">(</span><span class="ne">BaseException</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Exception to raise when the MPI connection has been closed.&quot;&quot;&quot;</span></div>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Exception to raise when the MPI connection has been closed.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="MPIRequest"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIRequest">[docs]</a><span class="k">class</span> <span class="nc">MPIRequest</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Container for MPI request.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Container for MPI request.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;direction&#39;</span><span class="p">,</span> <span class="s1">&#39;tag&#39;</span><span class="p">,</span> <span class="s1">&#39;size_req&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;req&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="s1">&#39;_data&#39;</span><span class="p">]</span>
@@ -125,13 +126,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;object: Data returned by a request.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;object: Data returned by a request.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
 
 <div class="viewcode-block" id="MPIRequest.make_request"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIRequest.make_request">[docs]</a>    <span class="k">def</span> <span class="nf">make_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Complete a request.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Complete a request.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
             <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;Isend&#39;</span>
@@ -156,7 +157,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the request has been completed, False otherwise.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the request has been completed, False otherwise.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_req</span><span class="o">.</span><span class="n">test</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">req</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;c&#39;</span><span class="p">)</span>
@@ -169,14 +170,14 @@
                 <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_req</span><span class="o">.</span><span class="n">canceled</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MPIRequest.cancel"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIRequest.cancel">[docs]</a>    <span class="k">def</span> <span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cancel a request.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cancel a request.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">size_req</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">req</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: intermittent</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">req</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span></div></div>
 
 
 <div class="viewcode-block" id="MPIMultiRequest"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIMultiRequest">[docs]</a><span class="k">class</span> <span class="nc">MPIMultiRequest</span><span class="p">(</span><span class="n">MPIRequest</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Container for MPI request for multiple partner comms.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Container for MPI request for multiple partner comms.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;remainder&quot;</span><span class="p">]</span>
 
@@ -185,7 +186,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">MPIMultiRequest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MPIMultiRequest.make_request"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIMultiRequest.make_request">[docs]</a>    <span class="k">def</span> <span class="nf">make_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">previous_requests</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Complete a request.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Complete a request.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">previous_requests</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
@@ -196,7 +197,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the request has been completed, False otherwise.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the request has been completed, False otherwise.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">remainder</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">req</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">complete</span><span class="p">:</span>
@@ -209,13 +210,13 @@
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remainder</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MPIMultiRequest.cancel"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIMultiRequest.cancel">[docs]</a>    <span class="k">def</span> <span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cancel a request.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cancel a request.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">req</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">v</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span></div></div>
 
 
 <div class="viewcode-block" id="MPIComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm">[docs]</a><span class="k">class</span> <span class="nc">MPIComm</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O via MPI communicators.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O via MPI communicators.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        tag_start (int, optional): Tag that MPI messages should start with.</span>
@@ -244,10 +245,10 @@
     <span class="n">_maxMsgSize</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">20</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">ranks</span><span class="o">=</span><span class="p">[],</span> <span class="n">tag_start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tag_stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">_on_mpi</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">_on_mpi</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;partner_mpi_ranks&#39;</span><span class="p">,</span> <span class="p">[]):</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;generate&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;generate&#39;</span><span class="p">,</span>
-                                                         <span class="s1">&#39;address&#39;</span><span class="p">])</span>
+            <span class="k">assert</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;generate&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;generate&#39;</span><span class="p">,</span>
+                                                         <span class="s1">&#39;address&#39;</span><span class="p">]</span>
             <span class="n">ranks</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;partner_mpi_ranks&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_request_lock</span> <span class="o">=</span> <span class="n">RLock</span><span class="p">(</span><span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;thread&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">requests</span> <span class="o">=</span> <span class="p">[]</span>
@@ -268,7 +269,7 @@
 
 <div class="viewcode-block" id="MPIComm.format_address"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm.format_address">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">format_address</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ranks</span><span class="p">,</span> <span class="n">tag_start</span><span class="p">,</span> <span class="n">tag_stride</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Format an MPI address.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Format an MPI address.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            ranks (tuple): Ranks of the partner MPI processes.</span>
@@ -284,7 +285,7 @@
 
 <div class="viewcode-block" id="MPIComm.parse_address"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm.parse_address">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parse_address</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse an MPI address for information about the partner process</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse an MPI address for information about the partner process</span>
 <span class="sd">        ranks and how the tags should be iterated.</span>
 
 <span class="sd">        Args:</span>
@@ -301,11 +302,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Tag for the next message.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Tag for the next message.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tag</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranks</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_tag</span><span class="p">))</span>
 
 <div class="viewcode-block" id="MPIComm.next_rank"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm.next_rank">[docs]</a>    <span class="k">def</span> <span class="nf">next_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the rank that should be used next.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the rank that should be used next.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
@@ -314,7 +315,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranks</span></div>
 
 <div class="viewcode-block" id="MPIComm.get_tag"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm.get_tag">[docs]</a>    <span class="k">def</span> <span class="nf">get_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the next tag for a rank.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the next tag for a rank.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            rank (int): Rank to get tag for.</span>
@@ -332,7 +333,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="p">[</span><span class="n">rank</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="MPIComm.advance_tag"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm.advance_tag">[docs]</a>    <span class="k">def</span> <span class="nf">advance_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Advance to the next tag.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Advance to the next tag.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            request (MPIRequest, MPIMultiRequest): Request advancing the tag.</span>
@@ -349,7 +350,7 @@
                                          <span class="n">request</span><span class="o">.</span><span class="n">tag</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_stride</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MPIComm.cache_tag"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm.cache_tag">[docs]</a>    <span class="k">def</span> <span class="nf">cache_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Store a tag for an uncompleted request.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Store a tag for an uncompleted request.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            request (MPIRequest, MPIMultiRequest): Request to cache.</span>
@@ -363,10 +364,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">unused_tags</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">address</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MPIComm.bind"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm.bind">[docs]</a>    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bind to random queue if address is generate.&quot;&quot;&quot;</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bind to random queue if address is generate.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;generate&#39;</span><span class="p">,</span> <span class="s1">&#39;address&#39;</span><span class="p">]:</span>
-            <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranks</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranks</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_address</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranks</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_start</span><span class="p">,</span>
                                                <span class="bp">self</span><span class="o">.</span><span class="n">tag_stride</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -378,19 +379,19 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">model_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping between model name and opposite comm</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping between model name and opposite comm</span>
 <span class="sd">        environment variables that need to be provided to the model.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{}</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">opp_address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Address for opposite comm.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Address for opposite comm.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_address</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()],</span>
                                    <span class="bp">self</span><span class="o">.</span><span class="n">tag_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_stride</span><span class="p">)</span>
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">get_response_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments to use for a response comm.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments to use for a response comm.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MPIComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_response_comm_kwargs</span>
         <span class="c1"># tag = self.tag_start + len(self.response_tags) + 2</span>
         <span class="c1"># tag_stride = self.tag_stride</span>
@@ -400,7 +401,7 @@
         <span class="c1">#                     &quot;other messages this comm will send.&quot;)</span>
         <span class="n">tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tag</span><span class="p">()</span>
         <span class="n">tag_stride</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_tags</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_tags</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_address</span><span class="p">(</span>
             <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">next_rank</span><span class="p">()],</span> <span class="n">tag</span><span class="p">,</span> <span class="n">tag_stride</span><span class="p">)</span>
@@ -408,21 +409,21 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">create_work_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for a new work comm.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for a new work comm.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MPIComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create_work_comm_kwargs</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_address</span><span class="p">(</span>
             <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">next_rank</span><span class="p">()],</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tag</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
     
 <div class="viewcode-block" id="MPIComm.open"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the queue.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the queue.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MPIComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranks</span><span class="p">)</span></div>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">mpi_comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranks</span></div>
             
     <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the queue.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the queue.&quot;&quot;&quot;</span>
         <span class="c1"># Disconnect will only be required if a subset of processes is used,</span>
         <span class="c1"># but that is not currently supported. This should be uncommented if</span>
         <span class="c1"># support for dynamic processes management is added.</span>
@@ -434,7 +435,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">MPIComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="n">linger</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MPIComm.cancel_requests"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm.cancel_requests">[docs]</a>    <span class="k">def</span> <span class="nf">cancel_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cancel requests that have not yet been completed.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cancel requests that have not yet been completed.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_lock</span><span class="p">:</span>
             <span class="n">complete_requests</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="p">:</span>
@@ -448,24 +449,24 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the queue is not None.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the queue is not None.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span>
         
 <div class="viewcode-block" id="MPIComm.confirm_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm.confirm_send">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noblock</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that sent message was received.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that sent message was received.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">noblock</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg_send</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MPIComm.confirm_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm.confirm_recv">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noblock</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that message was received.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that message was received.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">noblock</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg_recv</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the queue to send.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the queue to send.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">sum</span><span class="p">([(</span><span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">complete</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
@@ -473,7 +474,7 @@
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the queue to recv.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the queue to recv.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">add_request</span><span class="p">(</span><span class="n">on_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -485,7 +486,7 @@
             <span class="k">return</span> <span class="mi">0</span>
 
 <div class="viewcode-block" id="MPIComm.add_request"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm.add_request">[docs]</a>    <span class="k">def</span> <span class="nf">add_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on_empty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a request to the queue.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a request to the queue.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">on_empty</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="p">:</span>
                 <span class="k">return</span>
@@ -504,7 +505,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">advance_tag</span><span class="p">(</span><span class="n">req</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MPIComm.send_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm.send_message">[docs]</a>    <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message encapsulated in a CommMessage object.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message encapsulated in a CommMessage object.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (CommMessage): Message to be sent.</span>
@@ -521,7 +522,7 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">MPIComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MPIComm.recv_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm.recv_message">[docs]</a>    <span class="k">def</span> <span class="nf">recv_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            *args: Arguments are passed to the forked comm&#39;s recv_message method.</span>
@@ -541,7 +542,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
         
     <span class="k">def</span> <span class="nf">_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            payload (str): Message to send.</span>
@@ -554,7 +555,7 @@
         <span class="k">return</span> <span class="kc">True</span>
         
     <span class="k">def</span> <span class="nf">_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message from the MPI communicator.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message from the MPI communicator.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple (bool, str): The success or failure of receiving a message</span>
@@ -569,7 +570,7 @@
             <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_request</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MPIComm.purge"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Purge all messages from the comm.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Purge all messages from the comm.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MPIComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cancel_requests</span><span class="p">()</span>

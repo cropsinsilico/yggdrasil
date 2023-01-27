@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Server/Client I/O &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>Server/Client I/O &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -31,7 +32,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -92,8 +93,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Server/Client I/O</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Server/Client I/O</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/server_client_io.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -124,7 +125,7 @@ disconnected.</p>
 <span class="linenos"> 3</span>
 <span class="linenos"> 4</span>
 <span class="linenos"> 5</span><span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-<span class="linenos"> 6</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
 <span class="linenos"> 7</span>
 <span class="linenos"> 8</span><span class="sd">    Args:</span>
 <span class="linenos"> 9</span><span class="sd">        n (int): Index of the Fibonacci number in the Fibonacci sequence that</span>
@@ -147,7 +148,7 @@ disconnected.</p>
 <span class="linenos">26</span>
 <span class="linenos">27</span>
 <span class="linenos">28</span><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-<span class="linenos">29</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
+<span class="linenos">29</span><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
 <span class="linenos">30</span>
 <span class="linenos">31</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
 <span class="linenos">32</span>
@@ -195,7 +196,7 @@ disconnected.</p>
 <span class="linenos"> 5</span>
 <span class="linenos"> 6</span>
 <span class="linenos"> 7</span><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
-<span class="linenos"> 8</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute client communication with server that computes</span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute client communication with server that computes</span>
 <span class="linenos"> 9</span><span class="sd">    numbers in the Fibonacci sequence.</span>
 <span class="linenos">10</span>
 <span class="linenos">11</span><span class="sd">    Args:</span>
@@ -251,35 +252,35 @@ as a server and requires a set of RPC channels. In the client model YAML,
 the key/value pair <code class="docutils literal notranslate"><span class="pre">client_of:</span> <span class="pre">&lt;server_model_name&gt;</span></code> is required to indicate
 that the model will act as a client of the <code class="docutils literal notranslate"><span class="pre">&lt;server_model_name&gt;</span></code> model.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.py</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">params</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">    </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/server_params.txt</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">params</span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">11</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/server_params.txt</span>
+<span class="linenos">12</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.py</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+<span class="linenos">10</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span>
 <span class="linenos">11</span>
-<span class="linenos">12</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">  </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output.txt</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">  </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">12</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">  </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log</span>
+<span class="linenos">14</span><span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output.txt</span>
+<span class="linenos">15</span><span class="w">  </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 <p>(<a class="reference external" href="examples/rpc_lesson1.html">Example in other languages</a>)</p>
@@ -316,7 +317,7 @@ between two clients using the same source code.</p>
 <span class="linenos"> 3</span>
 <span class="linenos"> 4</span>
 <span class="linenos"> 5</span><span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-<span class="linenos"> 6</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
 <span class="linenos"> 7</span>
 <span class="linenos"> 8</span><span class="sd">    Args:</span>
 <span class="linenos"> 9</span><span class="sd">        n (int): Index of the Fibonacci number in the Fibonacci sequence that</span>
@@ -339,7 +340,7 @@ between two clients using the same source code.</p>
 <span class="linenos">26</span>
 <span class="linenos">27</span>
 <span class="linenos">28</span><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-<span class="linenos">29</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
+<span class="linenos">29</span><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
 <span class="linenos">30</span>
 <span class="linenos">31</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
 <span class="linenos">32</span>
@@ -387,7 +388,7 @@ between two clients using the same source code.</p>
 <span class="linenos"> 5</span>
 <span class="linenos"> 6</span>
 <span class="linenos"> 7</span><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">client_index</span><span class="p">):</span>
-<span class="linenos"> 8</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute client communication with server that computes</span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute client communication with server that computes</span>
 <span class="linenos"> 9</span><span class="sd">    numbers in the Fibonacci sequence.</span>
 <span class="linenos">10</span>
 <span class="linenos">11</span><span class="sd">    Args:</span>
@@ -434,47 +435,47 @@ between two clients using the same source code.</p>
 two models which are both clients of the server model and call the same
 source code.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.py</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">params</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">    </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/server_params.txt</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">params</span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">11</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/server_params.txt</span>
+<span class="linenos">12</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client1</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.py</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">  </span><span class="c1"># Pass index of the client</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">    </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log1</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client2</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.py</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w">  </span><span class="c1"># Pass index of the client</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">    </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log2</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client1</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span>
+<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">  </span><span class="c1"># Pass index of the client</span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+<span class="linenos">11</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log1</span>
+<span class="linenos">12</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client2</span>
+<span class="linenos">13</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos">15</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+<span class="linenos">16</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span>
+<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w">  </span><span class="c1"># Pass index of the client</span>
+<span class="linenos">18</span><span class="w">    </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+<span class="linenos">19</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log2</span>
 <span class="linenos">20</span>
-<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log1</span><span class="w"></span>
-<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output1.txt</span><span class="w"></span>
-<span class="linenos">24</span><span class="w">    </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
-<span class="linenos">25</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log2</span><span class="w"></span>
-<span class="linenos">26</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output2.txt</span><span class="w"></span>
-<span class="linenos">27</span><span class="w">    </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log1</span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output1.txt</span>
+<span class="linenos">24</span><span class="w">    </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">25</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log2</span>
+<span class="linenos">26</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output2.txt</span>
+<span class="linenos">27</span><span class="w">    </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 <p>(<a class="reference external" href="examples/rpc_lesson2.html">Example in other languages</a>)</p>
@@ -488,48 +489,48 @@ used to responsd to RPC requests from the clients. In the example below, the
 server and clients are the same as above, but 2 copies of the server model
 are run as specified by the model <code class="docutils literal notranslate"><span class="pre">copies</span></code> parameter in the server YAML.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.py</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">  </span><span class="nt">copies</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">params</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">    </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/server_params.txt</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
+<span class="linenos"> 8</span><span class="w">  </span><span class="nt">copies</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="linenos"> 9</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">params</span>
+<span class="linenos">11</span><span class="w">    </span><span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">12</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/server_params.txt</span>
+<span class="linenos">13</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client1</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.py</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">  </span><span class="c1"># Pass index of the client</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">    </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log1</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client2</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.py</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span><span class="w"></span>
-<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w">  </span><span class="c1"># Pass index of the client</span><span class="w"></span>
-<span class="linenos">18</span><span class="w">    </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span><span class="w"></span>
-<span class="linenos">19</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log2</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client1</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span>
+<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">  </span><span class="c1"># Pass index of the client</span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+<span class="linenos">11</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log1</span>
+<span class="linenos">12</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client2</span>
+<span class="linenos">13</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos">15</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+<span class="linenos">16</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w">  </span><span class="c1"># Pass the number of iterations that should be performed</span>
+<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w">  </span><span class="c1"># Pass index of the client</span>
+<span class="linenos">18</span><span class="w">    </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w">  </span><span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+<span class="linenos">19</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log2</span>
 <span class="linenos">20</span>
-<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log1</span><span class="w"></span>
-<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output1.txt</span><span class="w"></span>
-<span class="linenos">24</span><span class="w">    </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
-<span class="linenos">25</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log2</span><span class="w"></span>
-<span class="linenos">26</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output2.txt</span><span class="w"></span>
-<span class="linenos">27</span><span class="w">    </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log1</span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output1.txt</span>
+<span class="linenos">24</span><span class="w">    </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">25</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_log2</span>
+<span class="linenos">26</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_output2.txt</span>
+<span class="linenos">27</span><span class="w">    </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 <p>(<a class="reference external" href="examples/rpc_lesson2b.html">Example in other languages</a>)</p>
@@ -580,30 +581,30 @@ example for specifics).</p>
 <p>The RPC connection between the server and the client is controlled by the
 same <code class="docutils literal notranslate"><span class="pre">is_server</span></code> and <code class="docutils literal notranslate"><span class="pre">client_of</span></code> YAML parameters as before.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w"></span>
-<span class="linenos">3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="linenos">4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.py</span><span class="w"></span>
-<span class="linenos">5</span><span class="w">  </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model_function</span><span class="w"></span>
-<span class="linenos">6</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos">2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="linenos">3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model_function</span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span><span class="w"></span>
-<span class="linenos"> 3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.py</span><span class="w"></span>
-<span class="linenos"> 5</span><span class="w">  </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model_function</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">in_buf</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">    </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w"></span>
-<span class="linenos">11</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span><span class="w"></span>
-<span class="linenos">12</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">13</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">out_buf</span><span class="w"></span>
-<span class="linenos">14</span><span class="w">    </span><span class="nt">default_file</span><span class="p">:</span><span class="w"></span>
-<span class="linenos">15</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span><span class="w"></span>
-<span class="linenos">16</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client</span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+<span class="linenos"> 5</span><span class="w">  </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model_function</span>
+<span class="linenos"> 6</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="linenos"> 7</span><span class="w">  </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">in_buf</span>
+<span class="linenos"> 9</span><span class="w">    </span><span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">10</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+<span class="linenos">11</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span>
+<span class="linenos">12</span><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">out_buf</span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">15</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
+<span class="linenos">16</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </pre></div>
 </div>
 <p>(<a class="reference external" href="examples/rpc_lesson3.html">Example in other languages</a>)</p>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema.encoder &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.metaschema.encoder &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -82,10 +83,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
-      <li>yggdrasil.metaschema.encoder</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../metaschema.html">yggdrasil.metaschema</a></li>
+      <li class="breadcrumb-item active">yggdrasil.metaschema.encoder</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -105,7 +106,7 @@
 
 
 <div class="viewcode-block" id="indent_char2int"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.indent_char2int">[docs]</a><span class="k">def</span> <span class="nf">indent_char2int</span><span class="p">(</span><span class="n">indent</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a character indent into a number of spaces that should be used.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a character indent into a number of spaces that should be used.</span>
 <span class="sd">    Tabs are set to be equivalent to 4 spaces.</span>
 
 <span class="sd">    Args:</span>
@@ -121,7 +122,7 @@
 
 
 <div class="viewcode-block" id="string2import"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.string2import">[docs]</a><span class="k">def</span> <span class="nf">string2import</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import a function/class based on its representation as a string.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import a function/class based on its representation as a string.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (str): String that may or may not contain a represetnation of an</span>
@@ -143,10 +144,10 @@
 
 
 <div class="viewcode-block" id="JSONReadableEncoder"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.JSONReadableEncoder">[docs]</a><span class="k">class</span> <span class="nc">JSONReadableEncoder</span><span class="p">(</span><span class="n">stdjson</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encoder class for Ygg messages.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encoder class for Ygg messages.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="JSONReadableEncoder.default"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.JSONReadableEncoder.default">[docs]</a>    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encoder that allows for expansion types.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encoder that allows for expansion types.&quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="kn">import</span> <span class="n">MetaschemaTypeError</span>
         <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">encode_data_readable</span>
         <span class="k">try</span><span class="p">:</span>
@@ -156,10 +157,10 @@
 
 
 <div class="viewcode-block" id="JSONEncoder"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.JSONEncoder">[docs]</a><span class="k">class</span> <span class="nc">JSONEncoder</span><span class="p">(</span><span class="n">_json_encoder</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encoder class for Ygg messages.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encoder class for Ygg messages.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="JSONEncoder.default"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.JSONEncoder.default">[docs]</a>    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encoder that allows for expansion types.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encoder that allows for expansion types.&quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="kn">import</span> <span class="n">MetaschemaTypeError</span>
         <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">encode_data</span>
         <span class="k">try</span><span class="p">:</span>
@@ -169,16 +170,16 @@
     
 
 <div class="viewcode-block" id="JSONDecoder"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.JSONDecoder">[docs]</a><span class="k">class</span> <span class="nc">JSONDecoder</span><span class="p">(</span><span class="n">_json_decoder</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decoder class for Ygg messages.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decoder class for Ygg messages.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="JSONDecoder.string"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.JSONDecoder.string">[docs]</a>    <span class="k">def</span> <span class="nf">string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Try to parse string with class.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Try to parse string with class.&quot;&quot;&quot;</span>
         <span class="c1"># TODO: Do this dynamically for classes based on an attribute</span>
         <span class="k">return</span> <span class="n">string2import</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></div></div>
 
     
 <div class="viewcode-block" id="encode_json"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.encode_json">[docs]</a><span class="k">def</span> <span class="nf">encode_json</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">fd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode a Python object in JSON format.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode a Python object in JSON format.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (object): Python object to encode.</span>
@@ -211,7 +212,7 @@
 
 
 <div class="viewcode-block" id="decode_json"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.decode_json">[docs]</a><span class="k">def</span> <span class="nf">decode_json</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode a Python object from a JSON serialization.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode a Python object from a JSON serialization.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        msg (str): JSON serialization to decode.</span>
@@ -233,7 +234,7 @@
 
 <div class="viewcode-block" id="encode_yaml"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.encode_yaml">[docs]</a><span class="k">def</span> <span class="nf">encode_yaml</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">fd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">sorted_dict_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode a Python object in YAML format.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode a Python object in YAML format.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (object): Python object to encode.</span>
@@ -253,7 +254,7 @@
     <span class="n">indent</span> <span class="o">=</span> <span class="n">indent_char2int</span><span class="p">(</span><span class="n">indent</span><span class="p">)</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;indent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">indent</span>
     <span class="k">if</span> <span class="n">fd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">assert</span><span class="p">(</span><span class="s1">&#39;stream&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="s1">&#39;stream&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;stream&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fd</span>
     <span class="k">if</span> <span class="n">sorted_dict_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">class</span> <span class="nc">OrderedDumper</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Dumper&#39;</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">SafeDumper</span><span class="p">)):</span>
@@ -273,7 +274,7 @@
 
 
 <div class="viewcode-block" id="decode_yaml"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.decode_yaml">[docs]</a><span class="k">def</span> <span class="nf">decode_yaml</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">sorted_dict_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode a Python object from a YAML serialization.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode a Python object from a YAML serialization.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        msg (str): YAML serialization to decode.</span>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.metaschema &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.metaschema &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -82,9 +83,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>yggdrasil.metaschema</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">yggdrasil.metaschema</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -118,7 +119,7 @@
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_metaschema_fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
         <span class="n">_metaschema</span> <span class="o">=</span> <span class="n">decode_json</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
     <span class="n">schema_id</span> <span class="o">=</span> <span class="n">_metaschema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">_metaschema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;$id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
-    <span class="k">assert</span><span class="p">(</span><span class="n">schema_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">schema_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="n">_metaschema</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;$schema&#39;</span><span class="p">,</span> <span class="n">schema_id</span><span class="p">)</span>
     <span class="n">_base_schema</span><span class="p">[</span><span class="s1">&#39;$schema&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_metaschema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;$schema&#39;</span><span class="p">,</span> <span class="n">schema_id</span><span class="p">)</span>
 
@@ -127,12 +128,12 @@
 
         
 <div class="viewcode-block" id="MetaschemaTypeError"><a class="viewcode-back" href="../../yggdrasil.metaschema.html#yggdrasil.metaschema.MetaschemaTypeError">[docs]</a><span class="k">class</span> <span class="nc">MetaschemaTypeError</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Error that should be raised when a class encounters a type it cannot handle.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Error that should be raised when a class encounters a type it cannot handle.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="create_metaschema"><a class="viewcode-back" href="../../yggdrasil.metaschema.html#yggdrasil.metaschema.create_metaschema">[docs]</a><span class="k">def</span> <span class="nf">create_metaschema</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create the meta schema for validating ygg schema.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create the meta schema for validating ygg schema.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        overwrite (bool, optional): If True, the existing meta schema will be</span>
@@ -157,14 +158,14 @@
     <span class="c1"># Add properties</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">get_registered_properties</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">])</span>
+            <span class="k">assert</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">schema</span>
     <span class="c1"># Add types</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">get_registered_types</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
         <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;simpleTypes&#39;</span><span class="p">][</span><span class="s1">&#39;enum&#39;</span><span class="p">]:</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;simpleTypes&#39;</span><span class="p">][</span><span class="s1">&#39;enum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">properties</span><span class="p">:</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">p</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">])</span>
+            <span class="k">assert</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span>
     <span class="c1"># Print</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Created metaschema&#39;</span><span class="p">)</span>
     <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
@@ -175,7 +176,7 @@
 
 
 <div class="viewcode-block" id="get_metaschema"><a class="viewcode-back" href="../../yggdrasil.metaschema.html#yggdrasil.metaschema.get_metaschema">[docs]</a><span class="k">def</span> <span class="nf">get_metaschema</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the meta schema for validating ygg schema.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the meta schema for validating ygg schema.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Meta schema specifying rules for ygg type schema. This includes</span>
@@ -194,7 +195,7 @@
 
 
 <div class="viewcode-block" id="get_validator"><a class="viewcode-back" href="../../yggdrasil.metaschema.html#yggdrasil.metaschema.get_validator">[docs]</a><span class="k">def</span> <span class="nf">get_validator</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">normalizers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the validator that includes ygg expansion types.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the validator that includes ygg expansion types.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        overwrite (bool, optional): If True, the existing validator will be</span>
@@ -214,7 +215,7 @@
         <span class="n">all_validators</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">_base_validator</span><span class="o">.</span><span class="n">VALIDATORS</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">get_registered_properties</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">_replaces_existing</span><span class="p">):</span>
-                <span class="k">assert</span><span class="p">(</span><span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_validators</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_validators</span>
             <span class="n">all_validators</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">wrapped_validate</span>
         <span class="c1"># Get set of datatypes</span>
         <span class="n">type_checker</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">_base_validator</span><span class="o">.</span><span class="n">TYPE_CHECKER</span><span class="p">)</span>
@@ -222,7 +223,7 @@
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">get_registered_types</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">_replaces_existing</span><span class="p">):</span>
                 <span class="c1"># Error raised on registration</span>
-                <span class="k">assert</span><span class="p">(</span><span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">type_checker</span><span class="o">.</span><span class="n">_type_checkers</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">type_checker</span><span class="o">.</span><span class="n">_type_checkers</span>
             <span class="n">new_type_checkers</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">jsonschema_type_checker</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;type_checker&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">type_checker</span><span class="o">.</span><span class="n">redefine_many</span><span class="p">(</span>
             <span class="n">new_type_checkers</span><span class="p">)</span>
@@ -238,7 +239,7 @@
 
 
 <div class="viewcode-block" id="validate_schema"><a class="viewcode-back" href="../../yggdrasil.metaschema.html#yggdrasil.metaschema.validate_schema">[docs]</a><span class="k">def</span> <span class="nf">validate_schema</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate a schema against the metaschema.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate a schema against the metaschema.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (dict): Schema to be validated.</span>
@@ -266,7 +267,7 @@
 
 
 <div class="viewcode-block" id="validate_instance"><a class="viewcode-back" href="../../yggdrasil.metaschema.html#yggdrasil.metaschema.validate_instance">[docs]</a><span class="k">def</span> <span class="nf">validate_instance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an instance against a schema.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an instance against a schema.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (object): Object to be validated using the provided schema.</span>
@@ -283,7 +284,7 @@
 
 
 <div class="viewcode-block" id="normalize_instance"><a class="viewcode-back" href="../../yggdrasil.metaschema.html#yggdrasil.metaschema.normalize_instance">[docs]</a><span class="k">def</span> <span class="nf">normalize_instance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object using the provided schema.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object using the provided schema.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (object): Object to be normalized using the provided schema.</span>
@@ -300,7 +301,7 @@
 
 
 <div class="viewcode-block" id="data2dtype"><a class="viewcode-back" href="../../yggdrasil.metaschema.html#yggdrasil.metaschema.data2dtype">[docs]</a><span class="k">def</span> <span class="nf">data2dtype</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get numpy data type for an object.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get numpy data type for an object.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        data (object): Python object.</span>
@@ -323,7 +324,7 @@
 
 
 <div class="viewcode-block" id="definition2dtype"><a class="viewcode-back" href="../../yggdrasil.metaschema.html#yggdrasil.metaschema.definition2dtype">[docs]</a><span class="k">def</span> <span class="nf">definition2dtype</span><span class="p">(</span><span class="n">props</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get numpy data type for a type definition.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get numpy data type for a type definition.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        props (dict): Type definition properties.</span>
@@ -355,7 +356,7 @@
 
 
 <div class="viewcode-block" id="type2numpy"><a class="viewcode-back" href="../../yggdrasil.metaschema.html#yggdrasil.metaschema.type2numpy">[docs]</a><span class="k">def</span> <span class="nf">type2numpy</span><span class="p">(</span><span class="n">typedef</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a type definition into a numpy dtype.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a type definition into a numpy dtype.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        typedef (dict): Type definition.</span>

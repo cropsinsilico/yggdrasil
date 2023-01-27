@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.units &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.units &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -82,9 +83,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>yggdrasil.units</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">yggdrasil.units</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -115,7 +116,7 @@
 
 
 <div class="viewcode-block" id="get_ureg"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.get_ureg">[docs]</a><span class="k">def</span> <span class="nf">get_ureg</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the unit registry.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the unit registry.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_ureg_unyt</span>
     <span class="k">if</span> <span class="n">_ureg_unyt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_ureg_unyt</span> <span class="o">=</span> <span class="n">unyt</span><span class="o">.</span><span class="n">UnitRegistry</span><span class="p">(</span><span class="s1">&#39;mks&#39;</span><span class="p">)</span>
@@ -139,7 +140,7 @@
 
 
 <div class="viewcode-block" id="convert_to_pandas_timedelta"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.convert_to_pandas_timedelta">[docs]</a><span class="k">def</span> <span class="nf">convert_to_pandas_timedelta</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert variable with time units to a pandas.Timedelta instance.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert variable with time units to a pandas.Timedelta instance.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        x (object): Scalar/array with units to convert to a pandas.Timedelta</span>
@@ -149,7 +150,7 @@
 <span class="sd">        pandas.Timedelta: Equivalent Timedelta variable.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span><span class="p">(</span><span class="n">has_units</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="n">has_units</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">t_data</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">t_unit</span> <span class="o">=</span> <span class="n">get_units</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">unit_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ns&#39;</span><span class="p">:</span> <span class="s1">&#39;ns&#39;</span><span class="p">,</span>
@@ -164,7 +165,7 @@
 
 
 <div class="viewcode-block" id="convert_from_pandas_timedelta"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.convert_from_pandas_timedelta">[docs]</a><span class="k">def</span> <span class="nf">convert_from_pandas_timedelta</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Covert a pandas.Timedelta instance to a scalar/array with</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Covert a pandas.Timedelta instance to a scalar/array with</span>
 <span class="sd">    time units.</span>
 
 <span class="sd">    Args:</span>
@@ -178,7 +179,7 @@
 
 
 <div class="viewcode-block" id="convert_matlab_unit_string"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.convert_matlab_unit_string">[docs]</a><span class="k">def</span> <span class="nf">convert_matlab_unit_string</span><span class="p">(</span><span class="n">m_str</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert Matlab unit string to string that the Python package</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert Matlab unit string to string that the Python package</span>
 <span class="sd">    can understand.</span>
 
 <span class="sd">    Args:</span>
@@ -202,7 +203,7 @@
 
 
 <div class="viewcode-block" id="convert_R_unit_string"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.convert_R_unit_string">[docs]</a><span class="k">def</span> <span class="nf">convert_R_unit_string</span><span class="p">(</span><span class="n">r_str</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert R unit string to string that the Python package can</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert R unit string to string that the Python package can</span>
 <span class="sd">    understand.</span>
 
 <span class="sd">    Args:</span>
@@ -216,7 +217,7 @@
 
 
 <div class="viewcode-block" id="convert_unit_string"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.convert_unit_string">[docs]</a><span class="k">def</span> <span class="nf">convert_unit_string</span><span class="p">(</span><span class="n">orig_str</span><span class="p">,</span> <span class="n">replacements</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert unit string to string that the Python package can</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert unit string to string that the Python package can</span>
 <span class="sd">    understand.</span>
 
 <span class="sd">    Args:</span>
@@ -272,7 +273,7 @@
 
 
 <div class="viewcode-block" id="has_units"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.has_units">[docs]</a><span class="k">def</span> <span class="nf">has_units</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">check_dimensionless</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a Python object has associated units.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a Python object has associated units.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (object): Object to be tested for units.</span>
@@ -292,7 +293,7 @@
 
 
 <div class="viewcode-block" id="get_units"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.get_units">[docs]</a><span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the string representation of the units.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the string representation of the units.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (object): Object to get units for.</span>
@@ -309,7 +310,7 @@
 
 
 <div class="viewcode-block" id="get_data"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.get_data">[docs]</a><span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the array/scalar assocaited with the object.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the array/scalar assocaited with the object.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (object): Object to get data for.</span>
@@ -328,7 +329,7 @@
 
 
 <div class="viewcode-block" id="add_units"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.add_units">[docs]</a><span class="k">def</span> <span class="nf">add_units</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">unit_str</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add units to an array or scalar.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add units to an array or scalar.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        arr (np.ndarray, float, int): Scalar or array of data to add units to.</span>
@@ -367,7 +368,7 @@
 
 
 <div class="viewcode-block" id="are_compatible"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.are_compatible">[docs]</a><span class="k">def</span> <span class="nf">are_compatible</span><span class="p">(</span><span class="n">units1</span><span class="p">,</span> <span class="n">units2</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if two units are compatible.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if two units are compatible.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        units1 (str): First units string.</span>
@@ -391,7 +392,7 @@
 
 
 <div class="viewcode-block" id="is_null_unit"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.is_null_unit">[docs]</a><span class="k">def</span> <span class="nf">is_null_unit</span><span class="p">(</span><span class="n">ustr</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determines if a string is a null unit.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determines if a string is a null unit.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        ustr (str): String to test.</span>
@@ -406,7 +407,7 @@
 
 
 <div class="viewcode-block" id="as_unit"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.as_unit">[docs]</a><span class="k">def</span> <span class="nf">as_unit</span><span class="p">(</span><span class="n">ustr</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get unit object for the string.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get unit object for the string.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        ustr (str): Unit string.</span>
@@ -426,7 +427,7 @@
 
 
 <div class="viewcode-block" id="is_unit"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.is_unit">[docs]</a><span class="k">def</span> <span class="nf">is_unit</span><span class="p">(</span><span class="n">ustr</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a string is a valid unit.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a string is a valid unit.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        ustr (str): String representation to test.</span>
@@ -446,7 +447,7 @@
 
 
 <div class="viewcode-block" id="convert_to"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.convert_to">[docs]</a><span class="k">def</span> <span class="nf">convert_to</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">new_units</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert quantity with units to new units. Objects without units</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert quantity with units to new units. Objects without units</span>
 <span class="sd">    will be returned with the new units.</span>
 
 <span class="sd">    Args:</span>
@@ -477,7 +478,7 @@
 
 
 <div class="viewcode-block" id="get_conversion_function"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.get_conversion_function">[docs]</a><span class="k">def</span> <span class="nf">get_conversion_function</span><span class="p">(</span><span class="n">old_units</span><span class="p">,</span> <span class="n">new_units</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a function that will convert a scalar/array from one unit</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a function that will convert a scalar/array from one unit</span>
 <span class="sd">    to another.</span>
 
 <span class="sd">    Args:</span>

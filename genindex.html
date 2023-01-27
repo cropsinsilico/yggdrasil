@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>Index &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -28,7 +29,7 @@
             <a href="index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -82,8 +83,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Index</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Index</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -170,6 +171,8 @@
       <ul>
         <li><a href="advanced/code_python.html#yggdrasil.command_line.update_config.add_arguments">(yggdrasil.command_line.update_config class method)</a>
 </li>
+        <li><a href="advanced/code_python.html#yggdrasil.command_line.ygginstall.add_arguments">(yggdrasil.command_line.ygginstall class method)</a>
+</li>
         <li><a href="advanced/code_python.html#yggdrasil.command_line.yggrun.add_arguments">(yggdrasil.command_line.yggrun class method)</a>
 </li>
       </ul></li>
@@ -200,8 +203,6 @@
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.add_on_channel_close_callback">add_on_channel_close_callback() (yggdrasil.communication.RMQAsyncComm.RMQAsyncComm method)</a>, <a href="yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.add_on_channel_close_callback">[1]</a>
 </li>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.communication.MPIComm.MPIComm.add_request">add_request() (yggdrasil.communication.MPIComm.MPIComm method)</a>, <a href="yggdrasil.communication.html#yggdrasil.communication.MPIComm.MPIComm.add_request">[1]</a>
-</li>
-      <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.CPPModelDriver.CPPCompilerBase.add_standard_flag">add_standard_flag() (yggdrasil.drivers.CPPModelDriver.CPPCompilerBase class method)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPCompilerBase.add_standard_flag">[1]</a>
 </li>
       <li><a href="advanced/code_python.html#yggdrasil.multitasking.LockedDict.add_subdict">add_subdict() (yggdrasil.multitasking.LockedDict method)</a>
 </li>
@@ -415,10 +416,10 @@
 </li>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.ModelDriver.ModelDriver.are_base_languages_installed">are_base_languages_installed() (yggdrasil.drivers.ModelDriver.ModelDriver class method)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.are_base_languages_installed">[1]</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="advanced/code_python.html#yggdrasil.units.are_compatible">are_compatible() (in module yggdrasil.units)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.ModelDriver.ModelDriver.are_dependencies_installed">are_dependencies_installed() (yggdrasil.drivers.ModelDriver.ModelDriver class method)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.are_dependencies_installed">[1]</a>
 </li>
       <li><a href="advanced/yggdrasil_code.html#id28">args (yggdrasil.communication.CommBase.CommMessage attribute)</a>, <a href="advanced/yggdrasil_code.html#yggdrasil.communication.CommBase.CommMessage.args">[1]</a>, <a href="yggdrasil.communication.html#id2">[2]</a>, <a href="yggdrasil.communication.html#yggdrasil.communication.CommBase.CommMessage.args">[3]</a>
@@ -469,6 +470,8 @@
         <li><a href="advanced/code_python.html#yggdrasil.command_line.yggcompile.arguments">(yggdrasil.command_line.yggcompile attribute)</a>
 </li>
         <li><a href="advanced/code_python.html#yggdrasil.command_line.ygginfo.arguments">(yggdrasil.command_line.ygginfo attribute)</a>
+</li>
+        <li><a href="advanced/code_python.html#yggdrasil.command_line.ygginstall.arguments">(yggdrasil.command_line.ygginstall attribute)</a>
 </li>
         <li><a href="advanced/code_python.html#yggdrasil.command_line.yggmodelform.arguments">(yggdrasil.command_line.yggmodelform attribute)</a>
 </li>
@@ -1161,6 +1164,8 @@
 </li>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.ModelDriver.ModelDriver.cleanup_products">cleanup_products() (yggdrasil.drivers.ModelDriver.ModelDriver method)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.cleanup_products">[1]</a>
 </li>
+      <li><a href="advanced/code_python.html#yggdrasil.services.ServiceBase.cleanup_server">cleanup_server() (yggdrasil.services.ServiceBase method)</a>
+</li>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.communication.BufferComm.LockedBuffer.clear">clear() (yggdrasil.communication.BufferComm.LockedBuffer method)</a>, <a href="yggdrasil.communication.html#yggdrasil.communication.BufferComm.LockedBuffer.clear">[1]</a>
 
       <ul>
@@ -1399,8 +1404,6 @@
 </li>
       <li><a href="advanced/datatypes_cpp.html#c.COMMBUFFSIZ">COMMBUFFSIZ (C macro)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.communication.CommBase.CommMessage">CommMessage (class in yggdrasil.communication.CommBase)</a>, <a href="yggdrasil.communication.html#yggdrasil.communication.CommBase.CommMessage">[1]</a>
 </li>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.comms_implicit">comms_implicit (yggdrasil.drivers.DummyModelDriver.DummyModelDriver attribute)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.comms_implicit">[1]</a>
@@ -1413,6 +1416,8 @@
         <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.comms_implicit">(yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel attribute)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.comms_implicit">[1]</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.communication.CommBase.CommServer">CommServer (class in yggdrasil.communication.CommBase)</a>, <a href="yggdrasil.communication.html#yggdrasil.communication.CommBase.CommServer">[1]</a>
 </li>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.communication.CommBase.CommTaskLoop">CommTaskLoop (class in yggdrasil.communication.CommBase)</a>, <a href="yggdrasil.communication.html#yggdrasil.communication.CommBase.CommTaskLoop">[1]</a>
@@ -1629,6 +1634,18 @@
 </li>
       <li><a href="advanced/model_drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.configuration">configuration (yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver attribute)</a>, <a href="advanced/yggdrasil_code.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.configuration">[1]</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.configuration">[2]</a>
 </li>
+      <li><a href="advanced/model_drivers.html#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.configuration_steps">configuration_steps() (yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver class method)</a>, <a href="advanced/yggdrasil_code.html#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.configuration_steps">[1]</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.configuration_steps">[2]</a>
+
+      <ul>
+        <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.configuration_steps">(yggdrasil.drivers.DummyModelDriver.DummyModelDriver class method)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.configuration_steps">[1]</a>
+</li>
+        <li><a href="advanced/model_drivers.html#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.configuration_steps">(yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver class method)</a>, <a href="advanced/yggdrasil_code.html#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.configuration_steps">[1]</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.configuration_steps">[2]</a>
+</li>
+        <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.ModelDriver.ModelDriver.configuration_steps">(yggdrasil.drivers.ModelDriver.ModelDriver class method)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.configuration_steps">[1]</a>
+</li>
+        <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.configuration_steps">(yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel class method)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.configuration_steps">[1]</a>
+</li>
+      </ul></li>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.CModelDriver.CModelDriver.configure">configure() (yggdrasil.drivers.CModelDriver.CModelDriver class method)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.configure">[1]</a>
 
       <ul>
@@ -3167,6 +3184,8 @@
 </li>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.CompiledModelDriver.find_compilation_tool">find_compilation_tool() (in module yggdrasil.drivers.CompiledModelDriver)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.find_compilation_tool">[1]</a>
 </li>
+      <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.CPPModelDriver.CPPCompilerBase.find_standard_flag">find_standard_flag() (yggdrasil.drivers.CPPModelDriver.CPPCompilerBase class method)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPCompilerBase.find_standard_flag">[1]</a>
+</li>
       <li><a href="advanced/code_python.html#yggdrasil.timing.TimedRun.fit_scaling_count">fit_scaling_count() (yggdrasil.timing.TimedRun method)</a>
 </li>
       <li><a href="advanced/code_python.html#yggdrasil.timing.TimedRun.fit_scaling_size">fit_scaling_size() (yggdrasil.timing.TimedRun method)</a>
@@ -4430,8 +4449,6 @@
       <ul>
         <li><a href="advanced/code_python.html#yggdrasil.command_line.SubCommand.get_parser">(yggdrasil.command_line.SubCommand class method)</a>
 </li>
-        <li><a href="advanced/code_python.html#yggdrasil.command_line.ygginstall.get_parser">(yggdrasil.command_line.ygginstall class method)</a>
-</li>
       </ul></li>
       <li><a href="advanced/code_python.html#yggdrasil.tools.get_python_c_library">get_python_c_library() (in module yggdrasil.tools)</a>
 </li>
@@ -4777,6 +4794,8 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.CPPModelDriver.CPPCompilerBase.handle_standard_flag">handle_standard_flag() (yggdrasil.drivers.CPPModelDriver.CPPCompilerBase class method)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPCompilerBase.handle_standard_flag">[1]</a>
+</li>
       <li><a href="advanced/code_python.html#yggdrasil.components.ClassRegistry.has_entry">has_entry() (yggdrasil.components.ClassRegistry method)</a>
 
       <ul>
@@ -5239,18 +5258,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.is_comm_open">is_comm_open (yggdrasil.drivers.ConnectionDriver.ConnectionDriver property)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.is_comm_open">[1]</a>
 </li>
-      <li><a href="advanced/model_drivers.html#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.is_configured">is_configured() (yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver class method)</a>, <a href="advanced/yggdrasil_code.html#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.is_configured">[1]</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.is_configured">[2]</a>
-
-      <ul>
-        <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.is_configured">(yggdrasil.drivers.DummyModelDriver.DummyModelDriver class method)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.DummyModelDriver.DummyModelDriver.is_configured">[1]</a>
+      <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.ModelDriver.ModelDriver.is_configured">is_configured() (yggdrasil.drivers.ModelDriver.ModelDriver class method)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.is_configured">[1]</a>
 </li>
-        <li><a href="advanced/model_drivers.html#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.is_configured">(yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver class method)</a>, <a href="advanced/yggdrasil_code.html#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.is_configured">[1]</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.is_configured">[2]</a>
-</li>
-        <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.ModelDriver.ModelDriver.is_configured">(yggdrasil.drivers.ModelDriver.ModelDriver class method)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.is_configured">[1]</a>
-</li>
-        <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.is_configured">(yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel class method)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel.is_configured">[1]</a>
-</li>
-      </ul></li>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.communication.CommBase.CommBase.is_confirmed">is_confirmed (yggdrasil.communication.CommBase.CommBase property)</a>, <a href="yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.is_confirmed">[1]</a>
 </li>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.communication.BufferComm.BufferComm.is_confirmed_recv">is_confirmed_recv (yggdrasil.communication.BufferComm.BufferComm property)</a>, <a href="yggdrasil.communication.html#yggdrasil.communication.BufferComm.BufferComm.is_confirmed_recv">[1]</a>
@@ -6279,6 +6288,8 @@
         <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.ModelDriver.ModelDriver.max_line_width">(yggdrasil.drivers.ModelDriver.ModelDriver attribute)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.max_line_width">[1]</a>
 </li>
       </ul></li>
+      <li><a href="advanced/code_python.html#yggdrasil.multitasking.MemoryTracker.max_memory">max_memory (yggdrasil.multitasking.MemoryTracker property)</a>
+</li>
       <li><a href="advanced/code_python.html#yggdrasil.timing.TimedRun.max_msg_size">max_msg_size (yggdrasil.timing.TimedRun property)</a>
 </li>
       <li><a href="advanced/code_python.html#yggdrasil.tools.TimeOut.max_time">max_time (yggdrasil.tools.TimeOut attribute)</a>
@@ -6294,6 +6305,8 @@
 </li>
       </ul></li>
       <li><a href="advanced/interface_py.html#yggdrasil.languages.Python.YggInterface.maxMsgSize">maxMsgSize() (in module yggdrasil.languages.Python.YggInterface)</a>, <a href="advanced/yggdrasil_code.html#yggdrasil.languages.Python.YggInterface.maxMsgSize">[1]</a>, <a href="yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.maxMsgSize">[2]</a>
+</li>
+      <li><a href="advanced/code_python.html#yggdrasil.multitasking.MemoryTracker">MemoryTracker (class in yggdrasil.multitasking)</a>
 </li>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.drivers.TimeSyncModelDriver.TimeSyncModelDriver.merge">merge() (yggdrasil.drivers.TimeSyncModelDriver.TimeSyncModelDriver class method)</a>, <a href="yggdrasil.drivers.html#yggdrasil.drivers.TimeSyncModelDriver.TimeSyncModelDriver.merge">[1]</a>
 
@@ -8416,6 +8429,8 @@
 </li>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.reconnect">reconnect() (yggdrasil.communication.RMQAsyncComm.RMQAsyncComm method)</a>, <a href="yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.reconnect">[1]</a>
 </li>
+      <li><a href="advanced/code_python.html#yggdrasil.multitasking.MemoryTracker.record_memory">record_memory() (yggdrasil.multitasking.MemoryTracker method)</a>
+</li>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm.record_position">record_position() (yggdrasil.communication.FileComm.FileComm method)</a>, <a href="yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.record_position">[1]</a>
 </li>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.communication.AsyncComm.AsyncComm.recv">recv() (yggdrasil.communication.AsyncComm.AsyncComm method)</a>, <a href="yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv">[1]</a>
@@ -8592,10 +8607,10 @@
 </li>
       <li><a href="advanced/code_python.html#yggdrasil.multitasking.MPIRequestWrapper.request">request (yggdrasil.multitasking.MPIRequestWrapper attribute)</a>
 </li>
-      <li><a href="advanced/yggdrasil_code.html#yggdrasil.communication.ServerComm.Request.request_id">request_id (yggdrasil.communication.ServerComm.Request attribute)</a>, <a href="yggdrasil.communication.html#yggdrasil.communication.ServerComm.Request.request_id">[1]</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="advanced/yggdrasil_code.html#yggdrasil.communication.ServerComm.Request.request_id">request_id (yggdrasil.communication.ServerComm.Request attribute)</a>, <a href="yggdrasil.communication.html#yggdrasil.communication.ServerComm.Request.request_id">[1]</a>
+</li>
       <li><a href="advanced/yggdrasil_code.html#yggdrasil.communication.ClientComm.ClientComm.request_order">request_order (yggdrasil.communication.ClientComm.ClientComm attribute)</a>, <a href="yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.request_order">[1]</a>
 </li>
       <li><a href="yggdrasil.languages.R.html#yggdrasil.languages.R.install.requirements_from_description">requirements_from_description() (in module yggdrasil.languages.R.install)</a>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.yamlfile &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.yamlfile &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -82,9 +83,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>yggdrasil.yamlfile</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">yggdrasil.yamlfile</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -109,13 +110,13 @@
 
 
 <div class="viewcode-block" id="YAMLSpecificationError"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.YAMLSpecificationError">[docs]</a><span class="k">class</span> <span class="nc">YAMLSpecificationError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Error raised when the yaml specification does not meet expectations.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Error raised when the yaml specification does not meet expectations.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="no_duplicates_constructor"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.no_duplicates_constructor">[docs]</a><span class="k">def</span> <span class="nf">no_duplicates_constructor</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="c1"># https://gist.github.com/pypt/94d747fe5180851196eb</span>
-    <span class="sd">&quot;&quot;&quot;Check for duplicate keys.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check for duplicate keys.&quot;&quot;&quot;</span>
     <span class="n">mapping</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">key_node</span><span class="p">,</span> <span class="n">value_node</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">construct_object</span><span class="p">(</span><span class="n">key_node</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="n">deep</span><span class="p">)</span>
@@ -133,7 +134,7 @@
 
 
 <div class="viewcode-block" id="clone_github_repo"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.clone_github_repo">[docs]</a><span class="k">def</span> <span class="nf">clone_github_repo</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">commit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">local_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clone a GitHub repository, returning the path to the local copy of the</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clone a GitHub repository, returning the path to the local copy of the</span>
 <span class="sd">    file pointed to by the URL if there is one.</span>
 
 <span class="sd">    Args:</span>
@@ -189,7 +190,7 @@
 
 
 <div class="viewcode-block" id="load_yaml"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.load_yaml">[docs]</a><span class="k">def</span> <span class="nf">load_yaml</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">yaml_param</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">directory_for_clones</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml file defining a run.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml file defining a run.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fname (str, file, dict): Path to a YAML file, an open file descriptor</span>
@@ -251,7 +252,7 @@
 
 
 <div class="viewcode-block" id="prep_yaml"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.prep_yaml">[docs]</a><span class="k">def</span> <span class="nf">prep_yaml</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">yaml_param</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">directory_for_clones</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prepare yaml to be parsed by jsonschema including covering backwards</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prepare yaml to be parsed by jsonschema including covering backwards</span>
 <span class="sd">    compatible options.</span>
 
 <span class="sd">    Args:</span>
@@ -305,7 +306,7 @@
             <span class="n">x</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;for_request&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
             <span class="n">cli</span> <span class="o">=</span> <span class="n">IntegrationServiceManager</span><span class="p">(</span><span class="o">**</span><span class="n">x</span><span class="p">)</span>
             <span class="n">response</span> <span class="o">=</span> <span class="n">cli</span><span class="o">.</span><span class="n">send_request</span><span class="p">(</span><span class="o">**</span><span class="n">request</span><span class="p">)</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;complete&#39;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;complete&#39;</span>
             <span class="n">y</span><span class="p">[</span><span class="s1">&#39;models&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
     <span class="c1"># Standardize format of models and connections to be lists and</span>
     <span class="c1"># add working_dir to each</span>
@@ -335,7 +336,7 @@
 <div class="viewcode-block" id="parse_yaml"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.parse_yaml">[docs]</a><span class="k">def</span> <span class="nf">parse_yaml</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">complete_partial</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">partial_commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">model_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">model_submission</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">yaml_param</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">directory_for_clones</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse list of yaml files.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse list of yaml files.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        files (str, list): Either the path to a single yaml file or a list of</span>
@@ -407,7 +408,7 @@
     <span class="k">for</span> <span class="n">tsync</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">timesync_names</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">yml_norm</span><span class="p">[</span><span class="s1">&#39;models&#39;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">tsync</span><span class="p">:</span>
-                <span class="k">assert</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;language&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;timesync&#39;</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;language&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;timesync&#39;</span>
                 <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">is_server</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="p">[],</span> <span class="n">outputs</span><span class="o">=</span><span class="p">[])</span>
                 <span class="k">break</span>
         <span class="k">else</span><span class="p">:</span>
@@ -425,6 +426,11 @@
             <span class="n">existing</span> <span class="o">=</span> <span class="n">parse_component</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">k</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">existing</span><span class="o">=</span><span class="n">existing</span><span class="p">)</span>
     <span class="c1"># Exit early</span>
     <span class="k">if</span> <span class="n">model_only</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">yml_norm</span><span class="p">[</span><span class="s1">&#39;models&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">io</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">]:</span>
+                <span class="n">x</span><span class="p">[</span><span class="n">io</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">z</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="n">io</span><span class="p">]</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">z</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_default&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="p">[</span><span class="n">io</span><span class="p">]:</span>
+                    <span class="k">del</span> <span class="n">x</span><span class="p">[</span><span class="n">io</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">yml_norm</span>
     <span class="c1"># Add stand-in model that uses unpaired channels</span>
     <span class="k">if</span> <span class="n">complete_partial</span><span class="p">:</span>
@@ -512,7 +518,7 @@
 
 
 <div class="viewcode-block" id="complete_partial_integration"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.complete_partial_integration">[docs]</a><span class="k">def</span> <span class="nf">complete_partial_integration</span><span class="p">(</span><span class="n">existing</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">partial_commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Patch input/output channels that are not connected to a stand-in model.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Patch input/output channels that are not connected to a stand-in model.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        existing (dict): Dictionary of existing components.</span>
@@ -573,7 +579,7 @@
 
 
 <div class="viewcode-block" id="parse_component"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.parse_component">[docs]</a><span class="k">def</span> <span class="nf">parse_component</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">ctype</span><span class="p">,</span> <span class="n">existing</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml entry for a component, adding it to the list of</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml entry for a component, adding it to the list of</span>
 <span class="sd">    existing components.</span>
 
 <span class="sd">    Args:</span>
@@ -627,7 +633,7 @@
 
 
 <div class="viewcode-block" id="parse_model"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.parse_model">[docs]</a><span class="k">def</span> <span class="nf">parse_model</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">existing</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml entry for a model.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml entry for a model.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        yml (dict): YAML dictionary for a model.</span>
@@ -733,7 +739,7 @@
 
 
 <div class="viewcode-block" id="parse_connection"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.parse_connection">[docs]</a><span class="k">def</span> <span class="nf">parse_connection</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">existing</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml entry for a connection between I/O channels.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml entry for a connection between I/O channels.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        yml (dict): YAML dictionary for a connection.</span>
@@ -820,7 +826,7 @@
 
 
 <div class="viewcode-block" id="link_model_io"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.yamlfile.link_model_io">[docs]</a><span class="k">def</span> <span class="nf">link_model_io</span><span class="p">(</span><span class="n">existing</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Link I/O drivers back to the models they communicate with.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Link I/O drivers back to the models they communicate with.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        existing (dict): Dictionary of existing components.</span>

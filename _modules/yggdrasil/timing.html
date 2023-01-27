@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.timing &mdash; yggdrasil v1.8.3 documentation</title>
+  <title>yggdrasil.timing &mdash; yggdrasil v1.8.4 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../../index.html" class="icon icon-home"> yggdrasil
           </a>
               <div class="version">
-                v1.8.3
+                v1.8.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -82,9 +83,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>yggdrasil.timing</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">yggdrasil.timing</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -138,7 +139,7 @@
 
 
 <div class="viewcode-block" id="get_lang_list"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.get_lang_list">[docs]</a><span class="k">def</span> <span class="nf">get_lang_list</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the list of testable languages on the current platform.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the list of testable languages on the current platform.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        list: Names of testable languages using timed_pipe.</span>
@@ -158,7 +159,7 @@
 
 
 <div class="viewcode-block" id="get_comm_list"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.get_comm_list">[docs]</a><span class="k">def</span> <span class="nf">get_comm_list</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the list of testable communication methods on the current platform.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the list of testable communication methods on the current platform.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        list: Names of testable communication methods using timed_pipe.</span>
@@ -176,7 +177,7 @@
 <div class="viewcode-block" id="write_pyperf_script"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.write_pyperf_script">[docs]</a><span class="k">def</span> <span class="nf">write_pyperf_script</span><span class="p">(</span><span class="n">script_file</span><span class="p">,</span> <span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">,</span>
                         <span class="n">lang_src</span><span class="p">,</span> <span class="n">lang_dst</span><span class="p">,</span> <span class="n">comm_type</span><span class="p">,</span>
                         <span class="n">nrep</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_errors</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">matlab_running</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a script to run pyperf.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a script to run pyperf.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        script_file (str): Full path to the file where the script should be</span>
@@ -215,7 +216,7 @@
     <span class="c1">#     tmpdir = os.environ[&#39;TMPDIR&#39;]</span>
     <span class="c1">#     if platform._is_win:  # pragma: windows</span>
     <span class="c1">#         tmpdir = repr(tmpdir)</span>
-    <span class="c1">#         assert(tmpdir.startswith(&#39;\&#39;&#39;) and tmpdir.endswith(&#39;\&#39;&#39;))</span>
+    <span class="c1">#         assert tmpdir.startswith(&#39;\&#39;&#39;) and tmpdir.endswith(&#39;\&#39;&#39;)</span>
     <span class="c1">#         tmpdir = tmpdir[1:-1]</span>
     <span class="c1">#         # tmpdir = tmpdir.replace(&#39;\\&#39;, &#39;\\\\&#39;)</span>
     <span class="c1">#     lines += [&#39;os.environ[&quot;TMPDIR&quot;] = &quot;%s&quot;&#39; % tmpdir]</span>
@@ -227,13 +228,13 @@
         <span class="s1">&#39;out = runner.bench_time_func(timer.entry_name(nmsg, msg_size),&#39;</span><span class="p">,</span>
         <span class="s1">&#39;                             timing.pyperf_func,&#39;</span><span class="p">,</span>
         <span class="s1">&#39;                             timer, nmsg, msg_size, max_errors)&#39;</span><span class="p">]</span>
-    <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">script_file</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">script_file</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">script_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
         <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="pyperf_func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.pyperf_func">[docs]</a><span class="k">def</span> <span class="nf">pyperf_func</span><span class="p">(</span><span class="n">loops</span><span class="p">,</span> <span class="n">timer</span><span class="p">,</span> <span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">,</span> <span class="n">max_errors</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to do pyperf loops over function.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to do pyperf loops over function.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        loops (int): Number of loops to perform.</span>
@@ -276,7 +277,7 @@
 
 
 <div class="viewcode-block" id="get_source"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.get_source">[docs]</a><span class="k">def</span> <span class="nf">get_source</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">test_name</span><span class="o">=</span><span class="s1">&#39;timed_pipe&#39;</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the path to the source file.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the path to the source file.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        lang (str): Language that should be returned.</span>
@@ -309,7 +310,7 @@
 
 <div class="viewcode-block" id="debug_log"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.debug_log">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
 <span class="k">def</span> <span class="nf">debug_log</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the log level to debug.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the log level to debug.&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="kn">import</span> <span class="n">ygg_cfg</span><span class="p">,</span> <span class="n">cfg_logging</span>
     <span class="n">loglevel</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">)</span>
     <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">,</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">)</span>
@@ -321,7 +322,7 @@
 
 
 <div class="viewcode-block" id="TimedRun"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun">[docs]</a><span class="k">class</span> <span class="nc">TimedRun</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">YggClass</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to time sending messages from one language to another.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to time sending messages from one language to another.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        lang_src (str): Language that messages should be sent from.</span>
@@ -403,11 +404,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict or pyperf.BenchmarkSuite: Timing statistics data.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict or pyperf.BenchmarkSuite: Timing statistics data.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
 
 <div class="viewcode-block" id="TimedRun.can_run"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.can_run">[docs]</a>    <span class="k">def</span> <span class="nf">can_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the test can be run from the current platform and</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the test can be run from the current platform and</span>
 <span class="sd">        python version.</span>
 
 <span class="sd">        Args:</span>
@@ -446,7 +447,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="TimedRun.entry_name"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.entry_name">[docs]</a>    <span class="k">def</span> <span class="nf">entry_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a unique identifier for a run.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a unique identifier for a run.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            nmsg (int): Number of messages that should be sent.</span>
@@ -468,12 +469,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max_msg_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Largest size of message that can be sent without being split.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Largest size of message that can be sent without being split.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_YGG_MSG_MAX</span><span class="p">(</span><span class="n">comm_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm_type</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">default_msg_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Default message sizes for scaling tests. This will vary</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Default message sizes for scaling tests. This will vary</span>
 <span class="sd">        depending on the comm type so that the maximum size is not more than 10x</span>
 <span class="sd">        larger than the maximum message size.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ipc&#39;</span><span class="p">):</span>
@@ -484,17 +485,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">default_msg_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Default message count for scaling tests.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Default message count for scaling tests.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">base_msg_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Message size to use for tests varrying message count.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Message size to use for tests varrying message count.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">1000</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">base_msg_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Message count to use for tests varrying message size.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Message count to use for tests varrying message size.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">5</span>
 
     <span class="nd">@property</span>
@@ -503,12 +504,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">time_per_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;float: Time required to send a single message of 1000 bytes.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;float: Time required to send a single message of 1000 bytes.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_scaling_count</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">startup_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;float: Time required to set up communications and start models.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;float: Time required to set up communications and start models.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_scaling_count</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="c1"># @property</span>
@@ -518,16 +519,16 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tempdir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Temporary directory.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Temporary directory.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">output_file_format</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Full path to the output file created by the run.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Full path to the output file created by the run.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tempdir</span><span class="p">,</span> <span class="s1">&#39;output_</span><span class="si">%s</span><span class="s1">.txt&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TimedRun.get_new_uuid"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.get_new_uuid">[docs]</a>    <span class="k">def</span> <span class="nf">get_new_uuid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a new unique ID.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a new unique ID.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: Unique identifier.</span>
@@ -536,7 +537,7 @@
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="TimedRun.output_content"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.output_content">[docs]</a>    <span class="k">def</span> <span class="nf">output_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the result that should be output to file during the run.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the result that should be output to file during the run.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            nmsg: The number of messages that will be sent.</span>
@@ -550,7 +551,7 @@
         <span class="k">return</span> <span class="s1">&#39;0&#39;</span> <span class="o">*</span> <span class="n">siz</span></div>
 
 <div class="viewcode-block" id="TimedRun.check_output"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.check_output">[docs]</a>    <span class="k">def</span> <span class="nf">check_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fout</span><span class="p">,</span> <span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that the output file contains the expected result.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that the output file contains the expected result.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fout (str): The file that should be checked.</span>
@@ -565,16 +566,16 @@
         <span class="k">def</span> <span class="nf">on_timeout</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">fres</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fres</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">200</span><span class="p">):</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected:</span><span class="se">\n</span><span class="si">{</span><span class="n">fres</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-                      <span class="sa">f</span><span class="s2">&quot;Actual:</span><span class="se">\n</span><span class="si">{</span><span class="nb">open</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                      <span class="sa">f</span><span class="s2">&quot;Actual:</span><span class="se">\n</span><span class="si">{</span><span class="nb">open</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File size (</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">fout</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span><span class="si">}</span><span class="s2">), &quot;</span>
                                  <span class="sa">f</span><span class="s2">&quot;dosn&#39;t match expected size (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fres</span><span class="p">)</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
         <span class="n">wait_on_function</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">fout</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">fres</span><span class="p">),</span>
                          <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">on_timeout</span><span class="o">=</span><span class="n">on_timeout</span><span class="p">)</span>
         <span class="n">ocont</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">ocont</span> <span class="o">==</span> <span class="n">fres</span><span class="p">)</span></div>
+        <span class="k">assert</span> <span class="n">ocont</span> <span class="o">==</span> <span class="n">fres</span></div>
 
 <div class="viewcode-block" id="TimedRun.cleanup_output"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.cleanup_output">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fout</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup the output file.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup the output file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">           fout (str): The file to be cleaned up.</span>
@@ -585,27 +586,27 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">source_src</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Source file for language messages will be sent from.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Source file for language messages will be sent from.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">get_source</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lang_src</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="n">test_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">program_name</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">source_dst</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Source file for language messages will be sent to.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Source file for language messages will be sent to.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">get_source</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lang_dst</span><span class="p">,</span> <span class="s1">&#39;dst&#39;</span><span class="p">,</span> <span class="n">test_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">program_name</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">yamlfile_format</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Format string for creating a yaml file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Format string for creating a yaml file.&quot;&quot;&quot;</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tempdir</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.yml&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">path</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pyperfscript</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Format string for creating a pyperf script.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Format string for creating a pyperf script.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tempdir</span><span class="p">,</span> <span class="s1">&#39;runperf.py&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TimedRun.make_yamlfile"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.make_yamlfile">[docs]</a>    <span class="k">def</span> <span class="nf">make_yamlfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a YAML file for running the test.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a YAML file for running the test.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            path (str): Full path to file where the YAML should be saved.</span>
@@ -618,7 +619,7 @@
             <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TimedRun.get_yaml_src"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.get_yaml_src">[docs]</a>    <span class="k">def</span> <span class="nf">get_yaml_src</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lang</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the yaml entry for the source model.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the yaml entry for the source model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lang (str): Language for the source model.</span>
@@ -634,7 +635,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="TimedRun.get_yaml_dst"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.get_yaml_dst">[docs]</a>    <span class="k">def</span> <span class="nf">get_yaml_dst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lang</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the yaml entry for the destination model.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the yaml entry for the destination model.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lang (str): Language for the destination model.</span>
@@ -653,7 +654,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="TimedRun.before_run"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.before_run">[docs]</a>    <span class="k">def</span> <span class="nf">before_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions that should be performed before a run.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions that should be performed before a run.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            nmsg (int): Number of messages that should be sent.</span>
@@ -663,7 +664,7 @@
 <span class="sd">            str: Unique identifier for the run.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matlab_running</span> <span class="o">==</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">is_matlab_running</span><span class="p">())</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">matlab_running</span> <span class="o">==</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">is_matlab_running</span><span class="p">()</span>
         <span class="n">nmsg</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nmsg</span><span class="p">)</span>
         <span class="n">msg_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">msg_size</span><span class="p">)</span>
         <span class="n">run_uuid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_new_uuid</span><span class="p">()</span>
@@ -682,7 +683,7 @@
         <span class="k">return</span> <span class="n">run_uuid</span></div>
 
 <div class="viewcode-block" id="TimedRun.after_run"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.after_run">[docs]</a>    <span class="k">def</span> <span class="nf">after_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_uuid</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions that should be performed after a run.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions that should be performed after a run.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            nmsg (int): Number of messages that were sent.</span>
@@ -695,11 +696,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished </span><span class="si">%s</span><span class="s2">: </span><span class="si">%f</span><span class="s2"> s&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_name</span><span class="p">(</span><span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">),</span> <span class="n">result</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_output</span><span class="p">(</span><span class="n">fout</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matlab_running</span> <span class="o">==</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">is_matlab_running</span><span class="p">())</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">matlab_running</span> <span class="o">==</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">is_matlab_running</span><span class="p">()</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">run_uuid</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fyaml</span><span class="p">[</span><span class="n">run_uuid</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">foutput</span><span class="p">[</span><span class="n">run_uuid</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="TimedRun.run"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_uuid</span><span class="p">,</span> <span class="n">timer</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run test sending a set of messages between the designated models.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run test sending a set of messages between the designated models.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            run_uuid (str): Unique ID for the run.</span>
@@ -718,12 +719,12 @@
         <span class="n">r</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">get_runner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fyaml</span><span class="p">[</span><span class="n">run_uuid</span><span class="p">],</span>
                               <span class="n">namespace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="n">run_uuid</span><span class="p">)</span>
         <span class="n">times</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">timer</span><span class="o">=</span><span class="n">timer</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">r</span><span class="o">.</span><span class="n">error_flag</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">r</span><span class="o">.</span><span class="n">error_flag</span>
         <span class="k">del</span> <span class="n">r</span>
         <span class="k">return</span> <span class="n">times</span></div>
 
 <div class="viewcode-block" id="TimedRun.time_run"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.time_run">[docs]</a>    <span class="k">def</span> <span class="nf">time_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">,</span> <span class="n">nrep</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Time sending a set of messages between the designated models.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Time sending a set of messages between the designated models.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            nmsg (int): Number of messages that should be sent.</span>
@@ -766,7 +767,7 @@
         <span class="k">return</span> <span class="n">ret</span></div>
 
 <div class="viewcode-block" id="TimedRun.time_run_pyperf"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.time_run_pyperf">[docs]</a>    <span class="k">def</span> <span class="nf">time_run_pyperf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">,</span> <span class="n">nrep</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Time sending a set of messages between the designated models using</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Time sending a set of messages between the designated models using</span>
 <span class="sd">        the pyperf package.</span>
 
 <span class="sd">        Args:</span>
@@ -797,11 +798,11 @@
                <span class="s1">&#39;--inherit-environ=&#39;</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">copy_env</span><span class="p">),</span>
                <span class="s1">&#39;--warmups=</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">_pyperf_warmups</span><span class="p">]</span>
         <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pyperfscript</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TimedRun.time_run_mine"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.time_run_mine">[docs]</a>    <span class="k">def</span> <span class="nf">time_run_mine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">,</span> <span class="n">nrep</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Time sending a set of messages between the designated models without</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Time sending a set of messages between the designated models without</span>
 <span class="sd">        using the pyperf package.</span>
 
 <span class="sd">        Args:</span>
@@ -829,7 +830,7 @@
 
 <div class="viewcode-block" id="TimedRun.class_plot"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.class_plot">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">class_plot</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lang_src</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="n">lang_dst</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create the class for a given combo of languages and comm types, then</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create the class for a given combo of languages and comm types, then</span>
 <span class="sd">        call plot_scaling_joint.</span>
 
 <span class="sd">        Args:</span>
@@ -858,7 +859,7 @@
 
 <div class="viewcode-block" id="TimedRun.plot_scaling_joint"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.plot_scaling_joint">[docs]</a>    <span class="k">def</span> <span class="nf">plot_scaling_joint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_size0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg_count0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                            <span class="n">msg_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg_count</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Plot scaling of run time with both count and size, side by side.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Plot scaling of run time with both count and size, side by side.</span>
 <span class="sd">        Anywhere data is exchanged as a tuple for each plot, the plot of</span>
 <span class="sd">        scaling with count is first and the scaling with size is second.</span>
 <span class="sd">        </span>
@@ -923,7 +924,7 @@
 <div class="viewcode-block" id="TimedRun.plot_scaling"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.plot_scaling">[docs]</a>    <span class="k">def</span> <span class="nf">plot_scaling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">,</span> <span class="n">msg_count</span><span class="p">,</span> <span class="n">axs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">xscale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">yscale</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">plot_kws</span><span class="o">=</span><span class="p">{},</span>
                      <span class="n">time_method</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="n">per_message</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Plot scaling of run time with a variable.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Plot scaling of run time with a variable.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg_size (int, list, np.ndarray): List of message sizes to use as</span>
@@ -1028,7 +1029,7 @@
         <span class="k">return</span> <span class="n">axs</span></div>
 
 <div class="viewcode-block" id="TimedRun.fit_scaling_count"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.fit_scaling_count">[docs]</a>    <span class="k">def</span> <span class="nf">fit_scaling_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">counts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Do a linear fit to the scaling of execution time with message count.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Do a linear fit to the scaling of execution time with message count.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg_size (int, optional): Size of each message that should be sent.</span>
@@ -1051,7 +1052,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TimedRun.fit_scaling_size"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.fit_scaling_size">[docs]</a>    <span class="k">def</span> <span class="nf">fit_scaling_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_count</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sizes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Do a linear fit to the scaling of execution time with message count.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Do a linear fit to the scaling of execution time with message count.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg_count (int, optional): Number of messages that should be sent</span>
@@ -1080,7 +1081,7 @@
 
 <div class="viewcode-block" id="TimedRun.scaling_count"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.scaling_count">[docs]</a>    <span class="k">def</span> <span class="nf">scaling_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">,</span> <span class="n">counts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_count</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
                       <span class="n">nsamples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">per_message</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get scaling of run time with message count.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get scaling of run time with message count.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg_size (int): Size of each message that should be sent.</span>
@@ -1131,7 +1132,7 @@
 
 <div class="viewcode-block" id="TimedRun.scaling_size"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.scaling_size">[docs]</a>    <span class="k">def</span> <span class="nf">scaling_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmsg</span><span class="p">,</span> <span class="n">sizes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_size</span><span class="o">=</span><span class="mf">1e7</span><span class="p">,</span>
                      <span class="n">nsamples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">per_message</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get scaling of run time with message size.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get scaling of run time with message size.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            nmsg (int): Number of messages that should be sent.</span>
@@ -1181,7 +1182,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sizes</span><span class="p">),</span> <span class="n">mbo</span><span class="p">,</span> <span class="n">avg</span><span class="p">,</span> <span class="n">std</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TimedRun.get_entry"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.get_entry">[docs]</a>    <span class="k">def</span> <span class="nf">get_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get values for an entry.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get values for an entry.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name (str): Name of the entry to return.</span>
@@ -1196,7 +1197,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="TimedRun.has_entry"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.has_entry">[docs]</a>    <span class="k">def</span> <span class="nf">has_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check to see if there is an entry with the provided name.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check to see if there is an entry with the provided name.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name (str): Name of the entry to check for.</span>
@@ -1211,7 +1212,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="TimedRun.remove_entry"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.remove_entry">[docs]</a>    <span class="k">def</span> <span class="nf">remove_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove all runs associated with an entry.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove all runs associated with an entry.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name (str): Name of the entry to be removed.</span>
@@ -1243,11 +1244,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TimedRun.reload"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.reload">[docs]</a>    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Reload scalings data and store it in the data attribute.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Reload scalings data and store it in the data attribute.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TimedRun.load"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load scalings data from a pyperf BenchmarkSuite json file or a</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load scalings data from a pyperf BenchmarkSuite json file or a</span>
 <span class="sd">        Python pickle.</span>
 
 <span class="sd">        Args:</span>
@@ -1266,7 +1267,7 @@
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;latin1&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.json&#39;</span><span class="p">))</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.json&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">as_json</span><span class="p">:</span>
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
                     <span class="n">out</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
@@ -1275,7 +1276,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="TimedRun.save"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Save scalings data to a new pyperf BenchmarkSuite json file or a</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Save scalings data to a new pyperf BenchmarkSuite json file or a</span>
 <span class="sd">        Python pickle. If the file exists and overwrite is not set, an error</span>
 <span class="sd">        will be raised. No file is written if data is None.</span>
 
@@ -1307,7 +1308,7 @@
 <div class="viewcode-block" id="plot_scalings"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.plot_scalings">[docs]</a><span class="k">def</span> <span class="nf">plot_scalings</span><span class="p">(</span><span class="n">compare</span><span class="o">=</span><span class="s1">&#39;comm_type&#39;</span><span class="p">,</span> <span class="n">compare_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">plotfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">test_name</span><span class="o">=</span><span class="s1">&#39;timed_pipe&#39;</span><span class="p">,</span>
                   <span class="n">cleanup_plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_paper_values</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Plot comparison of scaling for chosen variable.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Plot comparison of scaling for chosen variable.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        compare (str, optional): Name of variable that should be compared.</span>
@@ -1359,7 +1360,7 @@
     <span class="k">if</span> <span class="n">compare_values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">compare_values</span> <span class="o">=</span> <span class="n">default_vals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">compare</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">compare_values</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">compare_values</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
     <span class="n">per_message</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;per_message&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">compare</span> <span class="o">==</span> <span class="s1">&#39;comm_type&#39;</span><span class="p">:</span>
         <span class="n">color_var</span> <span class="o">=</span> <span class="s1">&#39;comm_type&#39;</span>
@@ -1406,7 +1407,7 @@
         <span class="n">yscale</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid compare: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">compare</span><span class="p">)</span>
-    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">var_kws</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_kws</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
     <span class="c1"># Raise error if any of the varied keys are set in kwargs</span>
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">var_kws</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
@@ -1441,7 +1442,7 @@
         <span class="n">kws</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">is_matlab_running</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
             <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">kill_all</span><span class="p">()</span>
-            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">is_matlab_running</span><span class="p">())</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">is_matlab_running</span><span class="p">()</span>
         <span class="k">if</span> <span class="p">((</span><span class="n">kws</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;matlab_running&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
              <span class="ow">and</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">_matlab_engine_installed</span><span class="p">)):</span>  <span class="c1"># pragma: matlab</span>
             <span class="n">nml</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1460,7 +1461,7 @@
              <span class="ow">and</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">_matlab_engine_installed</span><span class="p">)):</span>  <span class="c1"># pragma: matlab</span>
             <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ml_sessions</span><span class="p">:</span>
                 <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">stop_matlab_engine</span><span class="p">(</span><span class="o">*</span><span class="n">v</span><span class="p">)</span>
-            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">is_matlab_running</span><span class="p">())</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">is_matlab_running</span><span class="p">()</span>
     <span class="c1"># Print a table</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%-20s</span><span class="se">\t</span><span class="si">%-20s</span><span class="se">\t</span><span class="si">%-20s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;Label&#39;</span><span class="p">,</span> <span class="s1">&#39;Time per Message (s)&#39;</span><span class="p">,</span> <span class="s1">&#39;Overhead (s)&#39;</span><span class="p">))</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%-20s</span><span class="se">\t</span><span class="si">%-20s</span><span class="se">\t</span><span class="si">%-20s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">20</span> <span class="o">*</span> <span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="mi">20</span> <span class="o">*</span> <span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="mi">20</span> <span class="o">*</span> <span class="s1">&#39;=&#39;</span><span class="p">))</span>
@@ -1477,7 +1478,7 @@
 
 
 <div class="viewcode-block" id="pyperfjson_to_pandas"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.pyperfjson_to_pandas">[docs]</a><span class="k">def</span> <span class="nf">pyperfjson_to_pandas</span><span class="p">(</span><span class="n">json_file</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert pyperf benchmarks json file to a Pandas data frame.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert pyperf benchmarks json file to a Pandas data frame.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        json_file (str): Full path to the JSON benchmarks file that should be</span>
