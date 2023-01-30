@@ -405,21 +405,27 @@ class YggRequirements(UserDict):
     def create_extras_require(self):
         r"""Create a config file containing extras_require."""
         import configparser
-        fname = os.path.join(_req_dir, 'requirements_extras.ini')
+        # fname = os.path.join(_req_dir, 'requirements_extras.ini')
+        fname = os.path.join(_req_dir, 'requirements_extras.json')
         extras = {}
         format_kws = {'include_method': False, 'include_extra': False}
         for k in self.extras():
             extras[k] = self.create_requirements_file_varient(
                 k, format_kws=format_kws)
-        config = configparser.ConfigParser(allow_no_value=True)
-        for k, v in extras.items():
-            if not v:
-                continue
-            config.add_section(k)
-            for x in v:
-                config.set(k, x, None)
-        with open(fname, 'w') as fd:
-            config.write(fd)
+        extras = {k: v for k, v in extras.items() if v}
+        if fname.endswith('.ini'):
+            config = configparser.ConfigParser(allow_no_value=True)
+            for k, v in extras.items():
+                config.add_section(k)
+                for x in v:
+                    config.set(k, x, None)
+            with open(fname, 'w') as fd:
+                config.write(fd)
+        elif fname.endswith(".json"):
+            with open(fname, 'w') as fd:
+                json.dump(extras, fd, indent=2)
+        else:
+            raise NotImplementedError(fname)
         print(f"Created '{fname}':\n{open(fname, 'r').read()}")
 
 
