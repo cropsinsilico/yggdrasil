@@ -621,13 +621,19 @@ class YggRequirementsList(UserList):
             excluded_methods=excluded_methods).flatten()
         kwargs['standard'] = standard
         out = [
-            x.format(**kwargs) for x in selected if not x.host_only]
+            x.format(**kwargs) for x in selected
+            if not (x.host_only or x.flags.get('build_only', False))]
         out = sorted(list(set(out)))
         if standard == 'conda':
             req = out
             out = OrderedDict()
             host_req = [
-                x.format(**kwargs) for x in selected if x.host]
+                x.format(**kwargs) for x in selected
+                if x.host]
+            build_req = [
+                x.format(for_build=True, padding=39, **kwargs)
+                for x in selected
+                if x.flags.get('build', False)]
             if self.extras:
                 host_req.append('python')
                 name = self.extras[0]
@@ -648,6 +654,8 @@ class YggRequirementsList(UserList):
                     req.insert(
                         0, "{{ pin_subpackage('yggdrasil', exact=True) }}")
             out['requirements'] = OrderedDict()
+            if build_req:
+                out['requirements']['build'] = sorted(build_req)
             if host_req:
                 out['requirements']['host'] = sorted(host_req)
             out['requirements']['run'] = req
@@ -1038,23 +1046,36 @@ class YggRequirement(object):
             out = '\n'.join(out)
         return out
 
-    def conda_requirement(self):
+    def conda_requirement(self, for_build=False, padding=0):
         r"""Get the formatted conda requirement string.
+
+        Args:
+            for_build (bool, optional): If True, varients will
+                be added so that the requirement will only be
+                used when building cross-platform. Defaults to
+                False.
+            padding (int, optional): Number of spaces to pad with
+               before varients.
 
         Returns:
             str: Conda requirement.
 
         """
-        suffix = ''
         varients = []
+        if self.flags.get("build", False) and for_build:
+            varients.append("build_platform != target_platform")
         if self.os is not None:
             if self.os == 'unix':
                 varients.append('not win')
             else:
                 varients.append(self.os)
+        out = self.full_name
+        out_name = isolate_package_name(out)
+        if out_name != out:
+            out = out.replace(out_name, out_name + ' ')
         if varients:
-            suffix += '  ' + self.format_varients(varients)
-        out = self.full_name + suffix
+            suffix = self.format_varients(varients)
+            out = self.add_padded_suffix(out, suffix, padding=padding)
         if self.add:
             out = [out]
             for x in self.add:

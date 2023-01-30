@@ -45,8 +45,12 @@ build:
     - ygggha = yggdrasil.command_line:generate_gha_workflow
 
 requirements:
+  build:
+    - cross-python_{{ target_platform }}     # [build_platform != target_platform]
+    - numpy >=1.13.0                         # [build_platform != target_platform]
+    - python                                 # [build_platform != target_platform]
   host:
-    - numpy>=1.13.0
+    - numpy >=1.13.0
     - pip
     - python
     - sysv_ipc  # [not win]
@@ -54,9 +58,10 @@ requirements:
     - GitPython
     - chevron
     - flask
-    - jsonschema==3.2.0
+    - git
+    - jsonschema ==3.2.0
     - matplotlib-base
-    - numpy>=1.13.0
+    - numpy >=1.13.0
     - pandas
     - psutil
     - pyperf
@@ -167,7 +172,7 @@ outputs:
         - python
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
-        - pika>=1.0.0
+        - pika >=1.0.0
   - name: yggdrasil.testing
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
@@ -218,7 +223,6 @@ outputs:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - PyGithub
         - black
-        - git
         - ipython
   - name: yggdrasil.astropy
     build:
@@ -278,3 +282,4 @@ about:
 extra:
   recipe-maintainers:
     - langmm
+    - conda-forge/r

@@ -1,8 +1,13 @@
 general:
   - chevron
+  - "cross-python_{{ target_platform }}":
+      method: conda_recipe
+      flags:
+        build: True
+        build_only: True
   - flask
-  # - git:  # This may need to be removed from conda recipe
-  #     method: conda
+  - git:
+      method: conda
   - jsonschema==3.2.0
   - matplotlib:
       flags:
@@ -17,6 +22,7 @@ general:
       flags:
         from_env: NUMPY
         method_in_setup: conda
+        build: True
   - pandas
   - pip:
       method: conda_recipe
@@ -27,6 +33,8 @@ general:
   - python:
       method: conda_recipe
       host: True
+      flags:
+        build: True
   - python-rapidjson
   - pyyaml
   - pyzmq
@@ -247,8 +255,6 @@ extras:
     - sphinx-argparse
   dev:
     - black
-    - git:
-        method: conda
     - ipython
     - PyGithub
 bespoke_extras:

@@ -1,7 +1,21 @@
 {
   "general": [
     "chevron",
+    {
+      "cross-python_{{ target_platform }}": {
+        "method": "conda_recipe",
+        "flags": {
+          "build": true,
+          "build_only": true
+        }
+      }
+    },
     "flask",
+    {
+      "git": {
+        "method": "conda"
+      }
+    },
     "jsonschema==3.2.0",
     {
       "matplotlib": {
@@ -25,7 +39,8 @@
         "host": true,
         "flags": {
           "from_env": "NUMPY",
-          "method_in_setup": "conda"
+          "method_in_setup": "conda",
+          "build": true
         }
       }
     },
@@ -42,7 +57,10 @@
     {
       "python": {
         "method": "conda_recipe",
-        "host": true
+        "host": true,
+        "flags": {
+          "build": true
+        }
       }
     },
     "python-rapidjson",
@@ -495,11 +513,6 @@
     ],
     "dev": [
       "black",
-      {
-        "git": {
-          "method": "conda"
-        }
-      },
       "ipython",
       "PyGithub"
     ]
