@@ -343,7 +343,7 @@ class CMakeConfigure(BuildToolBase):
             str: Output to stdout from the command execution.
 
         """
-        assert(len(args) == 1)
+        assert len(args) == 1
         new_args = []
         if (args == cls.version_flags) or ('--help' in args):
             new_args = args
@@ -420,8 +420,8 @@ class CMakeConfigure(BuildToolBase):
             library_flags = []
         if internal_library_flags is None:
             internal_library_flags = []
-        assert(compiler is not None)
-        assert(linker is not None)
+        assert compiler is not None
+        assert linker is not None
         lines = []
         pretarget_lines = []
         preamble_lines = []
@@ -689,7 +689,7 @@ class CMakeBuilder(LinkerBase):
             str: Output to stdout from the command execution.
 
         """
-        assert(len(args) == 1)
+        assert len(args) == 1
         if not kwargs.get('skip_flags', False):
             builddir = kwargs.get('builddir', args[0])
             if not os.path.isabs(builddir) and os.path.isabs(args[0]):
@@ -813,7 +813,7 @@ class CMakeModelDriver(BuildModelDriver):
                     self.target_language_info['internal_library_flags']))
         newlines_before = self.get_tool_instance('compiler').create_include(
             include_file, self.target, **kws)
-        assert(os.path.isfile(include_file))
+        assert os.path.isfile(include_file)
         # Create copy of cmakelists and modify
         newlines_after = []
         if os.path.isfile(self.buildfile):
@@ -960,12 +960,6 @@ class CMakeModelDriver(BuildModelDriver):
                 linker_flag_kwargs['use_library_path_internal'], [])
             internal_library_flags = linker_flag_kwargs[
                 linker_flag_kwargs['use_library_path_internal']]
-        # Add python flags
-        python_flags = sysconfig.get_config_var('LIBS')
-        if python_flags:
-            for x in python_flags.split():
-                if x.startswith(('-L', '-l')) and (x not in target_linker_flags):
-                    target_linker_flags.append(x)
         # Link local lib on MacOS because on Mac >=10.14 setting sysroot
         # clobbers the default paths.
         # https://stackoverflow.com/questions/54068035/linking-not-working-in
@@ -985,6 +979,14 @@ class CMakeModelDriver(BuildModelDriver):
                                + internal_library_flags),
                 external_library_flags=external_library_flags,
                 internal_library_flags=internal_library_flags)
+        # Add python flags
+        if out['compiler'].env_matches_tool(use_sysconfig=True):
+            python_flags = sysconfig.get_config_var('LIBS')
+            if python_flags:
+                for x in python_flags.split():
+                    if ((x.startswith(('-L', '-l'))
+                         and (x not in target_linker_flags))):
+                        target_linker_flags.append(x)
         for k in constants.LANGUAGES['compiled']:
             if k == out['driver'].language:
                 continue

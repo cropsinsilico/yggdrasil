@@ -215,7 +215,7 @@ class InterpretedModelDriver(ModelDriver):
 
         """
         ext = cls.language_ext
-        assert(isinstance(ext, (tuple, list)))
+        assert isinstance(ext, (tuple, list))
         if exec_type == 'interpreter':
             if not cls.is_interpreter(args[0]):
                 if interpreter is None:

@@ -13,6 +13,7 @@ def _make_ids(ids):
     return ','.join([str(x) for x in ids])
 
 
+@pytest.mark.remote_service
 @pytest.mark.language('c')
 @pytest.mark.language('c++')
 def test_call_integration_remote():
@@ -25,14 +26,16 @@ def test_call_integration_remote():
     yamls.remove(test_yml)
     yamls.remove(copy_yml)
     yamls.append(remote_yml)
-    address = 'https://model-service-demo.herokuapp.com/'
+    # address = 'https://model-service-demo.herokuapp.com/'
+    # address = "https://model-service-demo.fly.dev/"
+    address = "https://model-service-demo.onrender.com/"
     service_type = 'flask'
     cli = IntegrationServiceManager(service_type=service_type,
                                     for_request=True,
                                     address=address)
-    cli.wait_for_server()
+    cli.wait_for_server(timeout=600.0)
     if not cli.is_running:  # pragma: debug
-        pytest.skip("Heroku app is not running.")
+        pytest.skip("Web service app is not running.")
     try:
         shutil.copy(copy_yml, remote_yml)
         with open(remote_yml, 'a') as fd:
@@ -42,7 +45,7 @@ def test_call_integration_remote():
                                 f'    address: {address}']))
         r = runner.get_runner(yamls)
         r.run()
-        assert(not r.error_flag)
+        assert not r.error_flag
     finally:
         if os.path.isfile(remote_yml):
             os.remove(remote_yml)
@@ -55,7 +58,10 @@ class TestServices(object):
     @pytest.fixture(params=itertools.product(['flask', 'rmq'], [None, 'rmq']),
                     ids=_make_ids, scope="class", autouse=True)
     def running_service(self, request, running_service):
-        with running_service(request.param[0], request.param[1]) as cli:
+        track_memory = (request.param[0] == 'flask'
+                        and request.param[1] is None)
+        with running_service(request.param[0], request.param[1],
+                             track_memory=track_memory) as cli:
             self.cli = cli
             yield cli
             self.cli = None
@@ -90,7 +96,7 @@ class TestServices(object):
                 fd.write('\n'.join(lines))
             r = runner.get_runner(yamls)
             r.run()
-            assert(not r.error_flag)
+            assert not r.error_flag
         finally:
             if os.path.isfile(remote_yml):
                 os.remove(remote_yml)
@@ -100,8 +106,8 @@ class TestServices(object):
         cli = running_service
         test_yml = ("git:https://github.com/cropsinsilico/example-fakemodel/"
                     "fakemodel3.yml")
-        assert(not os.path.isfile(
-            "cropsinsilico/example-fakemodel/fakemodel3.yml"))
+        assert not os.path.isfile(
+            "cropsinsilico/example-fakemodel/fakemodel3.yml")
         with pytest.raises(ServerError):
             cli.send_request(yamls=test_yml, action='start')
 
@@ -212,10 +218,10 @@ class TestServices(object):
             fmodel.model_info()
             result = fmodel(**input_args)
             for x in fmodel.returns:
-                assert(x in result)
+                assert x in result
             result = fmodel(*list(input_args.values()))
             for x in fmodel.returns:
-                assert(x in result)
+                assert x in result
             fmodel.stop()
             fmodel.stop()
         finally:

@@ -12,7 +12,8 @@ import threading
 import logging
 from yggdrasil import runner
 from yggdrasil import platform
-from yggdrasil.multitasking import wait_on_function, ValueEvent
+from yggdrasil.multitasking import (
+    wait_on_function, ValueEvent, MemoryTracker)
 from yggdrasil.tools import YggClass, kill
 from yggdrasil.config import ygg_cfg
 
@@ -129,7 +130,8 @@ class ServiceBase(YggClass):
         logging.basicConfig(level=log_level)
 
     def start_server(self, remote_url=None, with_coverage=False,
-                     log_level=None, model_repository=None):
+                     log_level=None, model_repository=None,
+                     track_memory=False):
         r"""Start the server.
 
         Args:
@@ -145,6 +147,9 @@ class ServiceBase(YggClass):
             model_repository (str, optional): URL of directory in a Git
                 repository containing YAMLs that should be added to the model
                 registry. Defaults to None and is ignored.
+            track_memory (boolean, optional): If True, the memory used
+                by the server will be reported at shutdown. Defaults
+                to False.
 
         """
         if remote_url is None:
@@ -159,6 +164,7 @@ class ServiceBase(YggClass):
             self.set_log_level(log_level)
         if with_coverage:  # pragma: testing
             def handle_shutdown(sig, frame):
+                self.cleanup_server(track_memory=track_memory)
                 sys.exit()
             signal.signal(_shutdown_signal, handle_shutdown)
             # try:
@@ -167,10 +173,26 @@ class ServiceBase(YggClass):
             # except ImportError:  # pragma: debug
             #     pass
         self._is_running = True
+        if track_memory:
+            track_memory = MemoryTracker(os.getpid())
+            track_memory.start()
         try:
             self.run_server()
         finally:
-            self._is_running = False
+            self.cleanup_server(track_memory=track_memory)
+
+    def cleanup_server(self, track_memory=False):
+        r"""Cleanup server process after it finishes.
+
+        Args:
+            track_memory (MemoryTracker, optional): If provided,
+                print information about memory usage.
+
+        """
+        if track_memory and self._is_running:
+            track_memory.terminate()
+            print(f"Max memory usage: {track_memory.max_memory} MB")
+        self._is_running = False
 
     def run_server(self):
         r"""Begin listening for requests."""
@@ -277,7 +299,7 @@ class ServiceBase(YggClass):
 
         """
         request_str = self.serialize(request)
-        assert(self.for_request)
+        assert self.for_request
         # if not self.for_request:
         #     x = self.__class__(self.name, *self._args,
         #                        **self._kwargs, for_request=True,
@@ -703,7 +725,7 @@ def create_service_manager_class(service_type=None):
             
         def stop_server(self):
             r"""Stop the server from the client-side."""
-            assert(self.for_request)
+            assert self.for_request
             try:
                 response = self.send_request(action='shutdown')
             except ClientError:  # pragma: debug
@@ -922,7 +944,7 @@ def create_service_manager_class(service_type=None):
                         args = (self.address, registry_str, running_str)
                         response['status'] = fmt % args
                     else:
-                        assert(client_id is not None)
+                        assert client_id is not None
                         response['status'] = (
                             self.integrations[client_id][name].printStatus(
                                 return_str=True))
@@ -1049,7 +1071,7 @@ class IntegrationServiceRegistry(object):
         """
         with open(name, 'r') as fd:
             out = yaml.safe_load(fd.read())
-        assert(isinstance(out, dict))
+        assert isinstance(out, dict)
         base_dir = os.path.dirname(name)
         for k in out.keys():
             v = out.get(k, [])
@@ -1135,11 +1157,11 @@ class IntegrationServiceRegistry(object):
         """
         registry = self.load()
         if os.path.isfile(name):
-            assert(not yamls)
+            assert not yamls
             collection = {k: dict(kwargs, name=k, yamls=v)
                           for k, v in self.load_collection(name).items()}
         else:
-            assert(yamls)
+            assert yamls
             collection = {name: dict(kwargs, name=name, yamls=yamls)}
         for k, v in collection.items():
             if (k in registry) and (registry[k] != v):

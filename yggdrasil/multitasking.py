@@ -194,10 +194,10 @@ class AliasMeta(type):
     def __new__(meta, name, bases, class_dict):
         cls = type.__new__(meta, name, bases, class_dict)
         for k in cls._base_meth:
-            assert(not hasattr(cls, k))
+            assert not hasattr(cls, k)
             add_aliased_method(cls, k, with_lock=cls._base_locked)
         for k in cls._base_attr:
-            assert(not hasattr(cls, k))
+            assert not hasattr(cls, k)
             add_aliased_attribute(cls, k, with_lock=cls._base_locked)
         cls._base_meth = []
         cls._base_attr = []
@@ -1321,7 +1321,7 @@ class MPIErrorExchange(object):
             self.send((local_tag, msg))
             out = self.recv(wait=True)
             complete, results = out[0]  # self.recv(wait=True)[0]
-            assert(complete)
+            assert complete
         else:
             if (self.outgoing is None) and (msg in self.closing_messages):
                 self.outgoing = msg
@@ -1338,7 +1338,7 @@ class MPIErrorExchange(object):
         if remote_error and (not local_error) and (not dont_raise):  # pragma: debug
             raise MPIPartnerError("Error on another process.")
         if check_equal and not (remote_error or local_error):
-            assert(all((x == local_tag) for x in all_tag))
+            assert all((x == local_tag) for x in all_tag)
         if check_complete:
             return all(x[1][1] in self.closing_messages
                        for x in results)
@@ -1588,7 +1588,7 @@ class YggTask(YggClass):
             # if self.is_alive():
             #     self.join(self.timeout)
             self.wait(timeout=self.timeout)
-            assert(not self.is_alive())
+            assert not self.is_alive()
         # if self.as_process:
         #     self.process_instance.terminate()
 
@@ -1809,3 +1809,38 @@ class YggTaskLoop(YggTask):
         self.debug("terminate")
         self.set_break_flag()
         super(YggTaskLoop, self).terminate(*args, **kwargs)
+
+
+class MemoryTracker(YggTaskLoop):
+    r"""Class to track the memory used by another process.
+
+    Args:
+        pid (int): Process ID for the process that should be tracked.
+        interval (float, optional): Time (in seconds) that should be
+            waiting between memory usage checks. Defaults to 1 second.
+
+    """
+
+    def __init__(self, pid, interval=1.0):
+        self.track_pid = pid
+        self.track_interval = interval
+        self.record = []
+        super(MemoryTracker, self).__init__(target=self.record_memory)
+
+    def record_memory(self):
+        import psutil
+        if not psutil.pid_exists(self.track_pid):  # pragma: debug
+            self.set_break_flag()
+            return
+        process = psutil.Process(self.track_pid)
+        children = process.children(recursive=True)
+        total_mem = process.memory_info().rss / 1024 ** 2
+        child_mem = 0
+        for x in children:
+            child_mem += x.memory_info().rss / 1024 ** 2
+        self.record.append(total_mem + child_mem)
+        sleep(self.track_interval)
+
+    @property
+    def max_memory(self):
+        return max(self.record)

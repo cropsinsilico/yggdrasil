@@ -40,8 +40,8 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
             if isinstance(v, list):
                 indent = ' ' * len(iline)
                 arr_lines = []
-                assert(len(v) == 2)
-                assert(v[0].shape == v[1].shape)
+                assert len(v) == 2
+                assert v[0].shape == v[1].shape
                 for i in range(len(v[0])):
                     arr_lines.append(self._array_fmt % (v[0][i], v[1][i]))
                 v_units = [str(getattr(vv, 'units', '-')) for vv in v]

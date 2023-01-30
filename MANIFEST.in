@@ -46,3 +46,7 @@ include versioneer.py
 include yggdrasil/_version.py
 include create_coveragerc.py
 include utils/*.py
+include utils/requirements/*.txt
+include utils/requirements/*.yaml
+include utils/requirements/*.json
+include utils/requirements/*.ini

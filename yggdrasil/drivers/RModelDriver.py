@@ -302,7 +302,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 for m in re.finditer(cls.function_param['interface_regex'],
                                      contents):
                     mdict = m.groupdict()
-                    assert('global_scope' in mdict['args'])
+                    assert 'global_scope' in mdict['args']
                     # if 'global_scope' not in mdict['args']:
                     #     mdict['args'] += ', global_scope=TRUE'
                     new_channel = (
@@ -349,7 +349,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         if flags is None:
             flags = []
         if isinstance(package_dir, list):
-            assert(len(package_dir) == 1)
+            assert len(package_dir) == 1
             package_dir = package_dir[0]
         cexec_vars = {'c': ['CC', 'CC_FOR_BUILD'],
                       'c++': ['CXX', 'CPP', 'CXX98', 'CXX11', 'CXX14',

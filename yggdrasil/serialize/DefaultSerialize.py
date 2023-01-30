@@ -40,7 +40,7 @@ class DefaultSerialize(SerializeBase):
 
         """
         if field_names is None:
-            assert(not as_array)
+            assert not as_array
             return super(DefaultSerialize, cls).object2dict(obj, **kwargs)
         else:
             out = serialize.list2dict(obj, names=field_names)
@@ -66,7 +66,7 @@ class DefaultSerialize(SerializeBase):
 
         """
         if as_array:
-            assert(field_names is not None)
+            assert field_names is not None
             out = serialize.list2numpy(obj, names=field_names)
         else:
             out = super(DefaultSerialize, cls).object2array(obj, **kwargs)

@@ -33,7 +33,7 @@ class TemporaryCommunicationError(Exception):
         self.max_consecutive_allowed = max_consecutive_allowed
         if max_consecutive_allowed is not None:
             global _temp_error_registry
-            assert(registry_key is not None)
+            assert registry_key is not None
             _temp_error_registry.setdefault(registry_key, 0)
             _temp_error_registry[registry_key] += 1
             if ((_temp_error_registry[registry_key]
@@ -150,7 +150,7 @@ def new_comm(name, commtype=None, use_async=False, **kwargs):
         Comm: Communicator of given class.
 
     """
-    assert('comm' not in kwargs)
+    assert 'comm' not in kwargs
     if isinstance(commtype, list):
         if len(commtype) == 1:
             kwargs.update(commtype[0])

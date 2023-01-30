@@ -572,7 +572,7 @@ class BuildModelDriver(CompiledModelDriver):
             dict: Environment variables for the model process.
 
         """
-        assert(language_info is not None)
+        assert language_info is not None
         kwargs['compiler'] = language_info['compiler']
         out = super(BuildModelDriver, cls).set_env_compiler(**kwargs)
         if language_info['compiler_env'] and language_info['compiler_executable']:

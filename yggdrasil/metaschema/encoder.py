@@ -156,7 +156,7 @@ def encode_yaml(obj, fd=None, indent=None,
     indent = indent_char2int(indent)
     kwargs['indent'] = indent
     if fd is not None:
-        assert('stream' not in kwargs)
+        assert 'stream' not in kwargs
         kwargs['stream'] = fd
     if sorted_dict_type is not None:
         class OrderedDumper(kwargs.get('Dumper', yaml.SafeDumper)):

@@ -383,7 +383,7 @@ class MatlabProcess(tools.YggClass):  # pragma: matlab
             self.matlab_engine.quit()
             self.future = None
             self._returncode = -1
-        assert(not self.is_alive())
+        assert not self.is_alive()
 
     def on_matlab_error(self):
         r"""Actions performed on error in Matlab engine."""
@@ -714,7 +714,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
             cls.write_error_wrapper(fname_wrapper, try_block,
                                     env=kwargs.get('env', None),
                                     matlab_engine=matlab_engine)
-            assert(os.path.isfile(fname_wrapper))
+            assert os.path.isfile(fname_wrapper)
             args = [os.path.splitext(os.path.basename(fname_wrapper))[0]]
         # Call base, catching error to remove temp wrapper
         try:
@@ -726,7 +726,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                 if kwargs.get('debug_flags', None):  # pragma: debug
                     logger.warn("Debugging via valgrind, strace, etc. disabled "
                                 "for Matlab when using a Matlab shared engine.")
-                assert(kwargs.get('return_process', False))
+                assert kwargs.get('return_process', False)
                 # Add environment variables
                 env = kwargs.get('env', {})
                 old_env = {}

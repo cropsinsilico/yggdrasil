@@ -243,35 +243,35 @@ class ObjDict(PlyDict):
         if isinstance(kws.get('vertices', None), np.ndarray):
             old_vert = kws['vertices']
             nvert = old_vert.shape[1]
-            assert(nvert in (3, 4))
+            assert nvert in (3, 4)
             kws['vertices'] = [
                 {k: old_vert[i, j] for j, k in enumerate('xyzw'[:nvert])
                  if ((j < 3) or (not np.isnan(old_vert[i, j])))}
                 for i in range(old_vert.shape[0])]
         if isinstance(in_dict.get('vertex_colors', None), np.ndarray):
             old_colr = in_dict['vertex_colors']
-            assert(old_colr.shape == (len(kws['vertices']), 3))
+            assert old_colr.shape == (len(kws['vertices']), 3)
             for i in range(old_colr.shape[0]):
                 for j, k in enumerate(['red', 'green', 'blue']):
                     kws['vertices'][i][k] = old_colr[i, j]
         if isinstance(kws.get('params', None), np.ndarray):
             old_parm = kws['params']
             nparm = old_parm.shape[1]
-            assert(nparm in [2, 3])
+            assert nparm in [2, 3]
             kws['params'] = [
                 {k: old_parm[i, j] for j, k in enumerate('uvw'[:nparm])
                  if ((j < 2) or (not np.isnan(old_parm[i, j])))}
                 for i in range(old_parm.shape[0])]
         if isinstance(kws.get('normals', None), np.ndarray):
             old_norm = kws['normals']
-            assert(old_norm.shape[1] == 3)
+            assert old_norm.shape[1] == 3
             kws['normals'] = [
                 {k: old_norm[i, j] for j, k in enumerate('ijk')}
                 for i in range(old_norm.shape[0])]
         if isinstance(kws.get('texcoords', None), np.ndarray):
             old_texc = kws['texcoords']
             ntexc = old_texc.shape[1]
-            assert(ntexc in [1, 2, 3])
+            assert ntexc in [1, 2, 3]
             kws['texcoords'] = [
                 {k: old_texc[i, j] for j, k in enumerate('uvw'[:ntexc])
                  if ((j < 1) or (not np.isnan(old_texc[i, j])))}
@@ -279,7 +279,7 @@ class ObjDict(PlyDict):
         # Composites of above
         if isinstance(kws.get('lines', None), np.ndarray):
             old_edge = kws['lines']
-            assert(old_edge.shape[1] == 2)
+            assert old_edge.shape[1] == 2
             kws['lines'] = [
                 [{'vertex_index': np.int32(old_edge[i, j])}
                  for j in range(old_edge.shape[1])
@@ -287,7 +287,7 @@ class ObjDict(PlyDict):
                 for i in range(old_edge.shape[0])]
         if isinstance(kws.get('faces', None), np.ndarray):
             old_face = kws['faces']
-            assert(old_face.shape[1] >= 3)
+            assert old_face.shape[1] >= 3
             kws['faces'] = [
                 [{'vertex_index': np.int32(old_face[i, j])}
                  for j in range(old_face.shape[1])
@@ -295,7 +295,7 @@ class ObjDict(PlyDict):
                 for i in range(old_face.shape[0])]
         if isinstance(in_dict.get('face_texcoords', None), np.ndarray):
             old_texc = in_dict['face_texcoords']
-            assert(old_texc.shape[0] == len(kws.get('faces', [])))
+            assert old_texc.shape[0] == len(kws.get('faces', []))
             for i in range(old_texc.shape[0]):
                 for j in range(old_texc.shape[1]):
                     if not np.isnan(old_texc[i, j]):
@@ -303,7 +303,7 @@ class ObjDict(PlyDict):
                             old_texc[i, j])
         if isinstance(in_dict.get('face_normals', None), np.ndarray):
             old_norm = in_dict['face_normals']
-            assert(old_norm.shape[0] == len(kws.get('faces', [])))
+            assert old_norm.shape[0] == len(kws.get('faces', []))
             for i in range(old_norm.shape[0]):
                 for j in range(old_norm.shape[1]):
                     if not np.isnan(old_norm[i, j]):
@@ -322,10 +322,10 @@ class ObjDict(PlyDict):
                     np.int32(old_curv[i, j]) for j in range(old_curv.shape[1])
                     if (not np.isnan(old_curv[i, j]))]}
                 for i in range(old_curv.shape[0])]
-            assert('curve_params' in in_dict)
+            assert 'curve_params' in in_dict
             if isinstance(in_dict['curve_params'], np.ndarray):
                 old_parm = in_dict['curve_params']
-                assert(old_parm.shape == (len(kws['curves']), 2))
+                assert old_parm.shape == (len(kws['curves']), 2)
                 for i in range(old_parm.shape[0]):
                     kws['curves'][i]['starting_param'] = old_parm[i, 0]
                     kws['curves'][i]['ending_param'] = old_parm[i, 1]
@@ -343,10 +343,10 @@ class ObjDict(PlyDict):
                     for j in range(old_surf.shape[1])
                     if (not np.isnan(old_surf[i, j]))]}
                 for i in range(old_surf.shape[0])]
-            assert('surface_params' in in_dict)
+            assert 'surface_params' in in_dict
             if isinstance(in_dict['surface_params'], np.ndarray):
                 old_parm = in_dict['surface_params']
-                assert(old_parm.shape == (len(kws['surfaces']), 4))
+                assert old_parm.shape == (len(kws['surfaces']), 4)
                 for i in range(old_parm.shape[0]):
                     kws['surfaces'][i]['starting_param_u'] = old_parm[i, 0]
                     kws['surfaces'][i]['ending_param_u'] = old_parm[i, 1]
@@ -354,7 +354,7 @@ class ObjDict(PlyDict):
                     kws['surfaces'][i]['ending_param_v'] = old_parm[i, 3]
         if isinstance(in_dict.get('surface_texcoords', None), np.ndarray):
             old_texc = in_dict['surface_texcoords']
-            assert(old_texc.shape[0] == len(kws['surfaces']))
+            assert old_texc.shape[0] == len(kws['surfaces'])
             for i in range(old_texc.shape[0]):
                 for j in range(old_texc.shape[1]):
                     if not np.isnan(old_texc[i, j]):
@@ -362,7 +362,7 @@ class ObjDict(PlyDict):
                             'texcoord_index'] = np.int32(old_texc[i, j])
         if isinstance(in_dict.get('surface_normals', None), np.ndarray):
             old_norm = in_dict['surface_normals']
-            assert(old_norm.shape[0] == len(kws['surfaces']))
+            assert old_norm.shape[0] == len(kws['surfaces'])
             for i in range(old_norm.shape[0]):
                 for j in range(old_norm.shape[1]):
                     if not np.isnan(old_norm[i, j]):
@@ -757,12 +757,12 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
         elif isinstance(obj, dict):
             for i, k in enumerate(order):
                 if isinstance(k, dict):
-                    assert(len(k) == 1)
+                    assert len(k) == 1
                     ksub = list(k.keys())[0]
                     if ksub in obj:
                         plist.append(cls._encode_object_property(obj[ksub], k[ksub]))
                 elif isinstance(k, (list, tuple)):
-                    assert(len(k) == 1)
+                    assert len(k) == 1
                     ksub = k[0]
                     if ksub in obj:
                         plist.append(cls._encode_object_property(obj[ksub], ksub))
@@ -792,12 +792,12 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
                     if not v:
                         continue
                     if isinstance(o, dict):
-                        assert(len(o) == 1)
+                        assert len(o) == 1
                         osub = list(o.keys())[0]
                         out[osub] = cls._decode_object_property(values[i:], o[osub])
                         break
                     elif isinstance(o, (list, tuple)):
-                        assert(len(o) == 1)
+                        assert len(o) == 1
                         osub = o[0]
                         out[osub] = cls._decode_object_property(values[i:], osub)
                     else:
@@ -811,8 +811,8 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
                     out -= 1
             elif '/' in values:
                 subvalues = values.split('/')
-                assert(isinstance(order, tuple))
-                assert(len(order) == len(subvalues))
+                assert isinstance(order, tuple)
+                assert len(order) == len(subvalues)
                 out = cls._decode_object_property(subvalues, list(order))
             else:
                 out = cls._decode_object_property([values], [order[0]])
@@ -967,7 +967,7 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
                 if sum(req_flags.values()) == len(props):
                     break
                 if isinstance(o, dict):
-                    assert(sube)
+                    assert sube
                     if (((sube not in o) or (not isinstance(o[sube], (list, tuple)))
                          or (len(o[sube]) == 0) or (not isinstance(o[sube][0], dict)))):
                         continue

@@ -125,7 +125,7 @@ class MakeCompiler(BuildToolBase):
 
         """
         if not kwargs.get('skip_flags', False):
-            assert(len(args) <= 1)
+            assert len(args) <= 1
             if len(args) == 1:
                 if target is None:
                     target = cls.file2base(args[0])

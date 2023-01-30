@@ -77,7 +77,7 @@ class AsciiTableSerialize(DefaultSerialize):
                 names = self.get_field_names()
                 if not names:
                     names = list(old_typedef['properties'].keys())
-                assert(len(old_typedef['properties']) == len(names))
+                assert len(old_typedef['properties']) == len(names)
                 new_typedef = {'type': 'array', 'items': []}
                 for n in names:
                     new_typedef['items'].append(dict(
@@ -96,7 +96,7 @@ class AsciiTableSerialize(DefaultSerialize):
         r"""Update the format string based on the type definition."""
         # Get format information from precision etc.
         if (self.format_str is None) and self.initialized:
-            assert(self.typedef['type'] == 'array')
+            assert self.typedef['type'] == 'array'
             fmts = []
             if isinstance(self.typedef['items'], dict):  # pragma: debug
                 idtype = definition2dtype(self.typedef['items'])
@@ -116,13 +116,13 @@ class AsciiTableSerialize(DefaultSerialize):
     def update_field_names(self):
         r"""list: Names for each field in the data type."""
         if (self.field_names is None) and self.initialized:
-            assert(self.typedef['type'] == 'array')
+            assert self.typedef['type'] == 'array'
             self.field_names = self.get_field_names()
 
     def update_field_units(self):
         r"""list: Units for each field in the data type."""
         if (self.field_units is None) and self.initialized:
-            assert(self.typedef['type'] == 'array')
+            assert self.typedef['type'] == 'array'
             self.field_units = self.get_field_units()
 
     def func_serialize(self, args):

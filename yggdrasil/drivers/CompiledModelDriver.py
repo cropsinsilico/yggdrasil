@@ -8,6 +8,7 @@ import subprocess
 import shutil
 import contextlib
 import threading
+import sysconfig
 from collections import OrderedDict
 from yggdrasil import platform, tools, scanf
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_products
@@ -225,12 +226,12 @@ class CompilationToolMeta(type):
             cls.before_registration(cls)
             if cls._dont_register:
                 return cls
-            assert(cls.toolname is not None)
+            assert cls.toolname is not None
             if getattr(cls, 'is_build_tool', False):
                 languages = [cls.build_language]
             else:
                 languages = cls.languages
-            assert(len(languages) > 0)
+            assert len(languages) > 0
             if cls.toolname in cls.aliases:  # pragma: debug
                 raise ValueError(("The name '%s' for class %s is also in "
                                   "its list of aliases: %s")
@@ -398,10 +399,12 @@ class CompilationToolBase(object):
         for k in attr_list:
             # Copy so that list modification is not propagated to subclasses
             setattr(cls, k, copy.deepcopy(getattr(cls, k, [])))
-        # Set attributes based on environment variables
-        if cls.env_matches_tool():
-            cls.default_executable = os.environ[cls.default_executable_env].split(
-                'ccache ')[-1]
+        # Set attributes based on environment variables or sysconfig
+        if cls.default_executable is None:
+            cls.default_executable = cls.env_matches_tool()
+        if cls.default_executable is None:
+            cls.default_executable = cls.env_matches_tool(
+                use_sysconfig=True)
         # Set default_executable to name
         if cls.default_executable is None:
             cls.default_executable = cls.toolname
@@ -488,12 +491,16 @@ class CompilationToolBase(object):
             existing = {}
             existing.update(os.environ)
         if not cls.env_matches_tool():
+            config_vars = {}
+            cls.env_matches_tool(use_sysconfig=True, env=config_vars)
             env = getattr(cls, 'default_flags_env', None)
             if env is not None:
                 if not isinstance(env, list):
                     env = [env]
                 for ienv in env:
                     existing.pop(ienv, [])
+                    if ienv in config_vars:
+                        existing[ienv] = config_vars[ienv]
         return existing
 
     @classmethod
@@ -673,40 +680,63 @@ class CompilationToolBase(object):
         return (exec_path is not None)
 
     @classmethod
-    def env_matches_tool(cls):
+    def env_matches_tool(cls, use_sysconfig=False, env=None,
+                         with_flags=False):
         r"""Determine if the executable pointed to by any environment
         variable matches this compilation tool.
+
+        Args:
+            use_sysconfig (bool, optional): If True, check the
+                sysconfig variables, otherwise check os.environ.
+                Defaults to False.
+            env (dict, optional): Existing dictionary that should be
+                updated with variables. Defaults to None and is ignored.
+            with_flags (bool, optional): If True, preserve any flags
+                included in the environment variable. Defaults to False.
 
         Returns:
             bool: True if the environment variable matches, False otherwise.
 
         """
+        if env is None:
+            env = {}
+        if use_sysconfig:
+            env.update(sysconfig.get_config_vars())
+        else:
+            env.update(os.environ)
         tool_base = cls.aliases.copy()
         envi_base = ''
+        envi_full = ''
         if isinstance(cls.toolname, str):
             tool_base.append(cls.toolname)
         if isinstance(cls.default_executable, str):
             tool_base.append(cls.default_executable)
         if isinstance(cls.default_executable_env, str):
-            envi_base = os.path.basename(
-                os.environ.get(cls.default_executable_env, '').split('ccache ')[-1])
+            envi_full = env.get(cls.default_executable_env, '').split(
+                'ccache ')[-1]
+        if envi_full:
+            envi_base = os.path.basename(envi_full.split(maxsplit=1)[0])
         if os.environ.get('PATHEXT', ''):
             tool_base = [x.split(os.environ['PATHEXT'])[0]
                          for x in tool_base]
             envi_base = envi_base.split(os.environ['PATHEXT'])[0]
-        out = False
+        out = None
         regex_literal = '-+*$%#@!^&(){}[]<>,.;:'
         regex_pathsep = r'(?:[\-\_\.0-9])'
         if tool_base and envi_base:
             for x in tool_base:
                 for k in regex_literal:
                     x = x.replace(k, '\\' + k)
-                regex = r'(?:(?:^)|%s)%s(?:(?:$)|%s)' % (regex_pathsep, x,
-                                                         regex_pathsep)
+                regex = r'(?:(?:^)|%s)%s(?:(?:$)|%s)' % (
+                    regex_pathsep, x, regex_pathsep)
                 if re.search(regex, envi_base):
                     out = True
                     break
             # out = envi_base.endswith(tuple(tool_base))
+        if out:
+            if not with_flags:
+                envi_full = envi_full.split(maxsplit=1)[0]
+            return envi_full
         return out
 
     @classmethod
@@ -718,13 +748,19 @@ class CompilationToolBase(object):
 
         """
         out = []
-        if cls.env_matches_tool():
+        env_dict = {}
+        exe = cls.env_matches_tool(env=env_dict, with_flags=True)
+        if not exe:
+            exe = cls.env_matches_tool(env=env_dict, with_flags=True,
+                                       use_sysconfig=True)
+        if exe and env_dict:
+            out += exe.split()[1:]
             env = getattr(cls, 'default_flags_env', None)
             if env is not None:
                 if not isinstance(env, list):
                     env = [env]
                 for ienv in env:
-                    new_val = os.environ.get(ienv, '').split()
+                    new_val = env_dict.get(ienv, '').split()
                     out += [v for v in new_val if v not in out]
         return out
 
@@ -764,7 +800,7 @@ class CompilationToolBase(object):
         """
         if flags is None:
             flags = []
-        flags = kwargs.pop('%s_flags' % cls.tooltype, flags)
+        flags = kwargs.pop(f'{cls.tooltype}_flags', flags)
         out = copy.deepcopy(flags)
         if not isinstance(out, list):
             out = [out]
@@ -818,11 +854,12 @@ class CompilationToolBase(object):
             out = cls.default_executable
             if cls.languages:
                 out = ygg_cfg.get(cls.languages[0],
-                                  '%s_executable' % cls.toolname,
+                                  f'{cls.toolname}_executable',
                                   out)
         if out is None:
-            raise NotImplementedError("Executable not set for %s '%s'."
-                                      % (cls.tooltype, cls.toolname))
+            raise NotImplementedError(f"Executable not set for "
+                                      f"{cls.tooltype} "
+                                      f"'{cls.tooltype}'.")
         if full_path:
             out = shutil.which(out)
         return out
@@ -874,7 +911,7 @@ class CompilationToolBase(object):
                 paths.append(os.path.join(prefix, suffix))
         # Get search paths from environment variable
         if (cls.search_path_envvar is not None) and (not env_only):
-            assert(isinstance(cls.search_path_envvar, list))
+            assert isinstance(cls.search_path_envvar, list)
             for ienv in cls.search_path_envvar:
                 paths += os.environ.get(ienv, '').split(os.pathsep)
         # Get flags based on path
@@ -892,7 +929,7 @@ class CompilationToolBase(object):
         # Get search paths from the virtualenv/conda environment
         if (cls.search_path_env is not None):
             for iprefix in cls.get_env_prefixes():
-                assert(isinstance(cls.search_path_env, list))
+                assert isinstance(cls.search_path_env, list)
                 for ienv in cls.search_path_env:
                     paths.append(os.path.join(iprefix, ienv))
         # Get libtype specific search paths
@@ -901,8 +938,7 @@ class CompilationToolBase(object):
             vcpkg_dir = cfg.get('c', 'vcpkg_dir', None)
             if vcpkg_dir is not None:
                 if not os.path.isdir(vcpkg_dir):  # pragma: debug
-                    raise RuntimeError("vcpkg_dir is not valid: '%s'"
-                                       % vcpkg_dir)
+                    raise RuntimeError(f"vcpkg_dir is not valid: '{vcpkg_dir}'")
                 typ2dir = {'include': 'include',
                            'shared': 'bin',
                            'static': 'lib'}
@@ -911,10 +947,21 @@ class CompilationToolBase(object):
                 else:  # pragma: debug
                     arch = 'x86-windows'
                     raise NotImplementedError("Not yet tested on 32bit Python")
-                if (libtype in typ2dir) and os.path.isdir(vcpkg_dir):
+                if (libtype in typ2dir) and os.path.isdir(os.path.join(vcpkg_dir,
+                                                                       'installed')):
                     paths.append(os.path.join(vcpkg_dir, 'installed', arch,
                                               typ2dir[libtype]))
-                    assert(os.path.isdir(paths[-1]))
+                    if not os.path.isdir(paths[-1]):  # pragma: debug
+                        partial = vcpkg_dir
+                        for x in ['installed', arch, typ2dir[libtype]]:
+                            next_partial = os.path.join(partial, x)
+                            if not os.path.isdir(next_partial):
+                                files = glob.glob(os.path.join(partial, '*'))
+                                print(f'missing {next_partial}: {files}')
+                                break
+                            partial = next_partial
+                        raise RuntimeError(r"vcpkg subdirectory does not "
+                                           r"exist: {paths[-1]}")
             if os.environ.get('ChocolateyInstall'.upper(), None):
                 base_paths.append(os.environ['ChocolateyInstall'])
         else:
@@ -925,7 +972,8 @@ class CompilationToolBase(object):
                 '/Library/Developer/CommandLineTools/usr',
                 # XCode >= 12
                 '/Applications/Xcode.app/Contents/Developer/'
-                'Toolchains/XcodeDefault.xctoolchain/usr']
+                'Toolchains/XcodeDefault.xctoolchain/usr',
+                '/usr/local/opt/llvm']
             if macos_sdkroot is not None:
                 base_paths.append(os.path.join(macos_sdkroot, 'usr'))
                 if 'Platforms' in macos_sdkroot:
@@ -1147,7 +1195,7 @@ class CompilationToolBase(object):
         # Add additional arguments
         if isinstance(args, (str, bytes)):
             args = [args]
-        assert(isinstance(args, list))
+        assert isinstance(args, list)
         if additional_args is not None:
             args = args + additional_args
         # Process arguments only valid if skip_flags is False
@@ -1161,7 +1209,7 @@ class CompilationToolBase(object):
             elif (((out != 'clean') and (not os.path.isabs(out))
                    and (working_dir is not None))):
                 out = os.path.join(working_dir, out)
-            assert(out not in args)  # Don't remove source files
+            assert out not in args  # Don't remove source files
             # Check for file
             if overwrite and (not dry_run):
                 cls.remove_products(args, out)
@@ -1354,7 +1402,7 @@ class CompilerBase(CompilationToolBase):
         if linker:
             out = get_compilation_tool('linker', linker)(flags=linker_flags,
                                                          executable=linker)
-            assert(out.is_installed())
+            assert out.is_installed()
         else:
             out = linker
         return out
@@ -2170,7 +2218,7 @@ class CompiledModelDriver(ModelDriver):
         if not skip_compile:
             self.compile_model()
             self.products.append(self.model_file)
-            assert(os.path.isfile(self.model_file))
+            assert os.path.isfile(self.model_file)
             self.debug("Compiled %s", self.model_file)
 
     @staticmethod
@@ -2319,7 +2367,7 @@ class CompiledModelDriver(ModelDriver):
         global _buildfile_locks
         if fname is None:
             fname = cls.locked_buildfile
-        assert(fname is not None)
+        assert fname is not None
         if (context is None) and (instance is not None):
             context = instance.context
         with _buildfile_locks_lock:
@@ -2525,7 +2573,7 @@ class CompiledModelDriver(ModelDriver):
             # Get tool
             kwargs = {'flags': tool_flags}
             kwargs['executable'] = cls.cfg.get(cls.language,
-                                               '%s_executable' % toolname,
+                                               f'{toolname}_executable',
                                                toolname)
             if tooltype == 'compiler':
                 kwargs.update(
@@ -2641,7 +2689,7 @@ class CompiledModelDriver(ModelDriver):
         """
         out = None
         if isinstance(dep, tuple):
-            assert(len(dep) == 2)
+            assert len(dep) == 2
             dep_lang, dep = dep
             if dep_lang != cls.language:
                 drv = import_component('model', dep_lang)
@@ -2684,7 +2732,7 @@ class CompiledModelDriver(ModelDriver):
         """
         out = None
         if isinstance(dep, tuple):
-            assert(len(dep) == 2)
+            assert len(dep) == 2
             dep_lang, dep = dep
             if dep_lang != cls.language:
                 drv = import_component('model', dep_lang)
@@ -2745,7 +2793,7 @@ class CompiledModelDriver(ModelDriver):
 
         """
         if isinstance(dep, tuple):
-            assert(len(dep) == 2)
+            assert len(dep) == 2
             dep_lang, dep = dep
             if dep_lang != cls.language:
                 drv = import_component('model', dep_lang)
@@ -2811,7 +2859,7 @@ class CompiledModelDriver(ModelDriver):
 
         """
         if isinstance(dep, tuple):
-            assert(len(dep) == 2)
+            assert len(dep) == 2
             dep_lang, dep = dep
             if dep_lang != cls.language:
                 drv = import_component('model', dep_lang)
@@ -2926,7 +2974,7 @@ class CompiledModelDriver(ModelDriver):
         """
         out = None
         if isinstance(dep, tuple):
-            assert(len(dep) == 2)
+            assert len(dep) == 2
             dep_lang, dep = dep
             if dep_lang != cls.language:
                 drv = import_component('model', dep_lang)
@@ -2982,7 +3030,7 @@ class CompiledModelDriver(ModelDriver):
         for d in deps:
             new_deps = []
             if isinstance(d, tuple):
-                assert(len(d) == 2)
+                assert len(d) == 2
                 d_lang = d[0]
                 if d_lang == cls.language:
                     drv = cls
@@ -3003,7 +3051,7 @@ class CompiledModelDriver(ModelDriver):
                     new_deps.append(sub_d)
             if d in out:
                 dpos = out.index(d)
-                assert(dpos <= min_dep)
+                assert dpos <= min_dep
                 min_dep = dpos
             elif d not in new_deps:
                 new_deps.insert(0, d)
@@ -3390,7 +3438,7 @@ class CompiledModelDriver(ModelDriver):
 
         """
         if isinstance(lib, tuple) and (lib[0] != cls.language):
-            assert(len(lib) == 2)
+            assert len(lib) == 2
             lib_lang, lib = lib
             drv = import_component("model", lib_lang)
             return drv.is_library_installed(lib, cfg=cfg)
@@ -3406,26 +3454,26 @@ class CompiledModelDriver(ModelDriver):
                 continue
             if not out:  # pragma: no cover
                 break
-            lib_opt = '%s_%s' % (lib, lib_typ)
+            lib_opt = f'{lib}_{lib_typ}'
             out = (cfg.get(dep_lang, lib_opt, None) is not None)
         return out
         
     @classmethod
-    def is_configured(cls):
-        r"""Determine if the appropriate configuration has been performed (e.g.
-        installation of supporting libraries etc.)
+    def configuration_steps(cls):
+        r"""Get a list of configuration steps with tuples of flags and
+        boolean values.
 
         Returns:
-            bool: True if the language has been configured.
+            OrderedDict: Pairs of descriptions and states for
+                different steps in the configuration all steps must be
+                True for the language to be configured.
 
         """
-        out = super(CompiledModelDriver, cls).is_configured()
+        out = super(CompiledModelDriver, cls).configuration_steps()
         for k in cls.get_external_libraries():
-            if not out:  # pragma: no cover
-                break
-            out = cls.is_library_installed(k)
+            out[str(k)] = cls.is_library_installed(k)
         return out
-
+        
     @classmethod
     def is_tool_installed(cls, tooltype):
         r"""Determine if a compilation tool of a certain is installed for
@@ -3577,7 +3625,7 @@ class CompiledModelDriver(ModelDriver):
         k_lang = v.get('language', cls.language)
         for t in v.keys():
             fname = v[t]
-            assert(isinstance(fname, str))
+            assert isinstance(fname, str)
             opt = f'{k}_{t}'
             if t in ['libtype', 'language']:
                 continue
@@ -3625,7 +3673,7 @@ class CompiledModelDriver(ModelDriver):
                         for exts in ext_sets:
                             if fname.endswith(exts):
                                 base = fname.split('.', 1)[0]
-                                assert(not base.startswith('lib'))
+                                assert not base.startswith('lib')
                                 fname = []
                                 for ext in exts:
                                     fname += [base + ext,
@@ -3751,7 +3799,7 @@ class CompiledModelDriver(ModelDriver):
             dep_order = cls.get_dependency_order(dep, toolname=toolname)
             for k in dep_order[::-1]:
                 if isinstance(k, tuple):
-                    assert(len(k) == 2)
+                    assert len(k) == 2
                     ikw = dict(kwargs, language=k[0],
                                toolname=get_compatible_tool(compiler, 'compiler', k[0]))
                     cls.call_compiler(k[1], **ikw)

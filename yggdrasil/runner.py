@@ -174,7 +174,7 @@ class YggFunction(YggClass):
         self.runner.resume()
         # Check for arguments
         for a, arg in zip(self.arguments, args):
-            assert(a not in kwargs)
+            assert a not in kwargs
             kwargs[a] = arg
         for a in self.arguments:
             if a not in kwargs:  # pragma: debug
@@ -192,11 +192,11 @@ class YggFunction(YggClass):
                 raise RuntimeError("Failed to receive variable %s" % v)
             ivars = v['vars']
             if isinstance(data, (list, tuple)):
-                assert(len(data) == len(ivars))
+                assert len(data) == len(ivars)
                 for a, d in zip(ivars, data):
                     out[a] = d
             else:
-                assert(len(ivars) == 1)
+                assert len(ivars) == 1
                 out[ivars[0]] = data
         self.runner.pause()
         return out
@@ -521,7 +521,7 @@ class YggRunner(YggClass):
         else:
             models = [self.modeldrivers[
                 DuplicatedModelDriver.get_base_name(name)]]
-            assert(models[0].get('copies', 0) > 1)
+            assert models[0].get('copies', 0) > 1
         if rank is not None:  # pragma: debug
             # models = [x for x in models if (x['mpi_rank'] == rank)]
             raise NotImplementedError
@@ -772,7 +772,7 @@ class YggRunner(YggClass):
         # This is required if modelcopies are not joined before drivers
         # are started
         # if name in self.modelcopies:
-        #     assert(name not in self.modeldrivers)
+        #     assert name not in self.modeldrivers
         #     for cpy in self.modelcopies[name]:
         #         self.start_server(cpy)
         #     return
@@ -786,7 +786,7 @@ class YggRunner(YggClass):
         # This is required if modelcopies are not joined before drivers
         # are started
         # if name in self.modelcopies:
-        #     assert(name not in self.modeldrivers)
+        #     assert name not in self.modeldrivers
         #     for cpy in self.modelcopies[name]:
         #         self.stop_server(cpy)
         #     return
@@ -796,7 +796,7 @@ class YggRunner(YggClass):
     def startDrivers(self):
         r"""Start drivers, starting with the IO drivers."""
         if not self.mpi_comm or (self.rank == 0):
-            assert(not self.modelcopies)
+            assert not self.modelcopies
         self.info('Starting I/O drivers and models on system '
                   + '{} in namespace {} with rank {}'.format(
                       self.host, self.namespace, self.rank))
@@ -813,8 +813,8 @@ class YggRunner(YggClass):
                 self.debug("Checking driver %s", driver['name'])
                 d = driver['instance']
                 d.wait_for_loop()
-                assert(d.was_loop)
-                assert(not d.errors)
+                assert d.was_loop
+                assert not d.errors
             # Start models
             for driver in self.modeldrivers.values():
                 self.debug("Starting driver %s", driver['name'])
@@ -961,7 +961,7 @@ class YggRunner(YggClass):
                 self.debug('Stop %s', driver['name'])
                 driver['instance'].terminate()
                 # Terminate should ensure instance not alive
-                assert(not driver['instance'].is_alive())
+                assert not driver['instance'].is_alive()
         self.debug('Returning')
 
     def cleanup(self):
@@ -1011,7 +1011,7 @@ class YggRunner(YggClass):
         for drv in drivers:
             if 'instance' in drv:
                 driver = drv['instance']
-                assert(not driver.is_alive())
+                assert not driver.is_alive()
         self.debug('Returning')
 
         

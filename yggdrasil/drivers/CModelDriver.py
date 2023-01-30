@@ -158,7 +158,7 @@ class GCCCompiler(CCompilerBase):
             + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
             + [('library_rpath', '-Wl,-rpath')]))
     toolset = 'gnu'
-    aliases = ['gnu-cc']
+    aliases = ['gnu-cc', 'gnu-gcc']
 
     @classmethod
     def is_installed(cls):
@@ -209,7 +209,7 @@ class GCCCompiler(CCompilerBase):
                     [dlltool, '-D', dll, '-d', '%s.def' % base, '-l', dst])
             else:
                 dst = dll
-        assert(os.path.isfile(dst))
+        assert os.path.isfile(dst)
         return dst
 
 
@@ -236,8 +236,10 @@ class ClangCompiler(CCompilerBase):
         out = super(ClangCompiler, cls).get_flags(*args, **kwargs)
         if '-fopenmp' in out:
             idx = out.index('-fopenmp')
-            if (idx > 0) and (out[idx - 1] != '-Xpreprocessor'):
-                out.insert(idx, '-Xpreprocessor')
+            # new_flag = '-Xpreprocessor'
+            new_flag = '-Xclang'
+            if (idx > 0) and (out[idx - 1] != new_flag):
+                out.insert(idx, new_flag)
         return out
         
 
@@ -297,8 +299,8 @@ class MSVCCompiler(CCompilerBase):
                   != os.path.dirname(linker_path).lower()))):
             cls.linker_attributes['default_executable'] = os.path.join(
                 os.path.dirname(compiler_path), os.path.basename(linker_path))
-            assert(os.path.isfile(
-                cls.linker_attributes['default_executable']))
+            assert os.path.isfile(
+                cls.linker_attributes['default_executable'])
         CCompilerBase.before_registration(cls)
         
     @classmethod
@@ -410,6 +412,15 @@ class ClangLinker(LDLinker):
             out.append('-lstdc++')
         if '-fopenmp' in out:
             out[out.index('-fopenmp')] = '-lomp'
+            if 'conda' not in cls.get_executable(full_path=True):
+                result = subprocess.check_output(
+                    "find /usr/local -xdev -name '*libomp*'",
+                    shell=True).splitlines()
+                for x in result:
+                    x_dir, x_file = os.path.split(x.decode("utf-8"))
+                    if x_file.endswith(('libomp.dylib', 'libomp.a')):
+                        out.append(f'-L{x_dir}')
+                        break
         return out
 
 
@@ -775,7 +786,7 @@ class CModelDriver(CompiledModelDriver):
         cls.internal_libraries['ygg']['include_dirs'] += [_top_lang_dir]
         if platform._is_win:  # pragma: windows
             stdint_win = os.path.join(_top_lang_dir, 'windows_stdint.h')
-            assert(os.path.isfile(stdint_win))
+            assert os.path.isfile(stdint_win)
             shutil.copy(stdint_win, os.path.join(_top_lang_dir, 'stdint.h'))
             cls.internal_libraries['datatypes']['include_dirs'] += [_top_lang_dir]
         if platform._is_linux:
@@ -814,6 +825,8 @@ class CModelDriver(CompiledModelDriver):
         if vcpkg_dir is None:
             vcpkg_dir = os.environ.get('VCPKG_ROOT', None)
         if vcpkg_dir is not None:
+            print(f"Setting vcpkg_dir to {vcpkg_dir}"
+                  f" ({os.path.abspath(vcpkg_dir)})")
             vcpkg_dir = os.path.abspath(vcpkg_dir)
             if not os.path.isdir(vcpkg_dir):  # pragma: debug
                 raise ValueError("Path to vcpkg root directory "
@@ -1041,7 +1054,7 @@ class CModelDriver(CompiledModelDriver):
                 x['datatype']['shape'] = [
                     int(float(s.strip('[]')))
                     for s in x.pop('shape').split('][')]
-                assert(x['datatype']['subtype'] in constants.VALID_TYPES)
+                assert x['datatype']['subtype'] in constants.VALID_TYPES
                 if len(x['datatype']['shape']) == 1:
                     x['datatype']['length'] = x['datatype'].pop(
                         'shape')[0]
@@ -1141,7 +1154,7 @@ class CModelDriver(CompiledModelDriver):
         """
         out = super(CModelDriver, cls).input2output(var)
         if out.get('ptr', ''):
-            assert(out['native_type'].endswith('*'))
+            assert out['native_type'].endswith('*')
             out['ptr'] = out['ptr'][:-1]
             out['native_type'] = out['native_type'][:-1]
             out['datatype'] = cls.get_json_type(out['native_type'])
@@ -1263,7 +1276,7 @@ class CModelDriver(CompiledModelDriver):
             json_type = {'type': json_type}
         # if 'type' in kwargs:
         #     json_type.update(kwargs)
-        assert(isinstance(json_type, dict))
+        assert isinstance(json_type, dict)
         json_type = get_type_class(json_type['type']).normalize_definition(
             json_type)
         if out == '*':
@@ -1506,7 +1519,7 @@ class CModelDriver(CompiledModelDriver):
         """
         if isinstance(var, str):  # pragma: no cover
             return var
-        assert(isinstance(var, dict))
+        assert isinstance(var, dict)
         out = var['name']
         if 'length' in var.get('datatype', {}):
             out += '[%d]' % var['datatype']['length']
@@ -1572,7 +1585,7 @@ class CModelDriver(CompiledModelDriver):
             if isinstance(x, str):
                 new_vars_list.append(x)
             else:
-                assert(isinstance(x, dict))
+                assert isinstance(x, dict)
                 if for_yggdrasil and x.get('is_length_var', False):
                     continue
                 new_vars_list.append(x)

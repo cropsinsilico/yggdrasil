@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 
 
@@ -31,16 +32,17 @@ class DummyModelDriver(InterpretedModelDriver):
         return True
 
     @classmethod
-    def is_configured(cls):
-        r"""Determine if the appropriate configuration has been performed (e.g.
-        installation of supporting libraries etc.)
+    def configuration_steps(cls):
+        r"""Get a list of configuration steps with tuples of flags and
+        boolean values.
 
         Returns:
-            bool: True if the language has been configured.
+            OrderedDict: Pairs of descriptions and states for
+                different steps in the configuration all steps must be
+                True for the language to be configured.
 
         """
-        # There are not any config options
-        return True
+        return OrderedDict()
 
     @classmethod
     def language_version(cls, **kwargs):
@@ -86,12 +88,12 @@ class DummyModelDriver(InterpretedModelDriver):
                     drv[io1 + 's'][0]['partner_model'] + ':')[-1]
                 out[io2 + 's'].append(x)
                 if drv['instance']._connection_type.startswith('rpc_'):
-                    assert(io2 == 'input')
+                    assert io2 == 'input'
                     out[io1 + 's'].append({'name': x['name'] + '_response'})
                     out['is_server'] = {io2: x['name'],
                                         io1: x['name'] + '_response'}
         for io1, io2 in dir2opp.items():
-            assert(out[io2 + 's'])
+            assert out[io2 + 's']
             # TODO: Is there a case where a DummyModelDriver will be created
             # for a model that does not have inputs or outputs?
             # if not out[io2 + 's']:

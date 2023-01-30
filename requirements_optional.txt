@@ -1,7 +1,0 @@
-astropy       # [astropy]
-pika>=1.0.0   # [rmq]
-pygments      # [pygments]
-trimesh       # [trimesh]
-libroadrunner<2.0.7  # [pip,sbml]
-ccache; platform_system != 'Windows'  # [conda]
-mpi4py        # [mpi]

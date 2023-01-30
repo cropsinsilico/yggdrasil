@@ -22,7 +22,7 @@ def is_path(fpath):
 
     """
     pdir, base = os.path.split(fpath)
-    return(base in os.listdir(pdir))
+    return (base in os.listdir(pdir))
 
 
 def is_file(fname):
@@ -160,6 +160,8 @@ def update_argparser(parser=None, language=None, no_import=None,
             language = get_language_directories()
     else:
         args = parser.parse_known_args(args=arglist)[0]
+        args.language = getattr(
+            args, 'languages', getattr(args, 'language', None))
         if no_import is None:
             no_import = args.no_import
         if language is None:

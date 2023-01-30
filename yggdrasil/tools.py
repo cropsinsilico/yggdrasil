@@ -291,7 +291,7 @@ def get_shell():
             shell = os.environ.get('COMSPEC', None)
         else:
             shell = '/bin/sh'  # Default used by subprocess
-        assert(shell)
+        assert shell
     # return psutil.Process(os.getppid()).name()
     if platform._is_win:  # pragma: windows
         shell = shell.lower()
@@ -1095,7 +1095,7 @@ class ProxyMeta(type):
                          ['__overrides__'])
         for base in bases:
             overrides.extend(getattr(base, '__overrides__', []))
-        assert('_wrapped' in overrides)
+        assert '_wrapped' in overrides
         attrs['__overrides__'] = overrides
         
         def make_method(name):
@@ -1311,7 +1311,7 @@ def import_all_modules(base=None, exclude=None, do_first=None):
         exclude = []
     if do_first is None:
         do_first = []
-    assert(base.startswith('yggdrasil'))
+    assert base.startswith('yggdrasil')
     for x in do_first:
         import_all_modules(x, exclude=exclude)
     exclude = exclude + do_first

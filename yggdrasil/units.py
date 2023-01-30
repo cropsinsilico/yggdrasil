@@ -53,7 +53,7 @@ def convert_to_pandas_timedelta(x):
         pandas.Timedelta: Equivalent Timedelta variable.
 
     """
-    assert(has_units(x))
+    assert has_units(x)
     t_data = get_data(x)
     t_unit = get_units(x)
     unit_map = {'ns': 'ns',

@@ -86,7 +86,7 @@ def registration_in_progress():
 def registering(recurse=False):
     r"""Context for preforming registration."""
     if not recurse:
-        assert(not registration_in_progress())
+        assert not registration_in_progress()
     try:
         previous = os.environ.get('YGGDRASIL_REGISTRATION_IN_PROGRESS', None)
         os.environ['YGGDRASIL_REGISTRATION_IN_PROGRESS'] = '1'
@@ -316,7 +316,7 @@ def inherit_schema(orig, new_properties=None, new_required=None,
     """
     remove_keys = copy.deepcopy(remove_keys)
     # Get set of original properties
-    assert(issubclass(orig, ComponentBase))
+    assert issubclass(orig, ComponentBase)
     out_prp = copy.deepcopy(orig._schema_properties)
     if orig._schema_excluded_from_inherit is not None:
         remove_keys += orig._schema_excluded_from_inherit
@@ -355,7 +355,7 @@ class ComponentMeta(type):
                               getattr(cls, '_' + cls._schema_subtype_key, None))
         # Inherit new schema properties
         if cls._schema_inherit and (cls.__name__ != 'ComponentBase'):
-            assert(isinstance(cls._schema_inherit, bool))
+            assert isinstance(cls._schema_inherit, bool)
             inherit_from = None
             for x in bases:
                 if hasattr(x, '_schema_properties'):
@@ -375,7 +375,7 @@ class ComponentMeta(type):
         if not (name.endswith('Base') or (subtype is None) or cls._dont_register):
             # Perform class specific actions in preparation for registration
             cls.before_registration(cls)
-            # assert(cls.name is not None)
+            # assert cls.name is not None
             # Add parameter descriptions from docs
             for x in cls.__mro__[::-1]:
                 args_dict = docs2args(x.__doc__)
@@ -414,7 +414,7 @@ class ComponentMeta(type):
                     ("key", cls._schema_subtype_key),
                     ("subtypes", {})])
             elif default_subtype is not None:
-                assert(_registry[yaml_typ]["default"] == default_subtype)
+                assert _registry[yaml_typ]["default"] == default_subtype
             if cls.__name__ not in _registry[yaml_typ]["classes"]:
                 _registry[yaml_typ]["classes"][cls.__name__] = cls
                 _registry[yaml_typ]["subtypes"][subtype] = cls.__name__

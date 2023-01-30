@@ -295,7 +295,7 @@ def requirements_from_description(fname=None):
     in_section = False
     if fname is None:
         fname = desc_file
-    assert(os.path.isfile(fname))
+    assert os.path.isfile(fname)
     with open(fname, 'r') as fd:
         for x in fd.readlines():
             if x.startswith(('Imports:', 'Depends:')):

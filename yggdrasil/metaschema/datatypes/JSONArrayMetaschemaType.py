@@ -86,8 +86,8 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
             names = obj.dtype.names
         out = super(JSONArrayMetaschemaType, cls).encode_type(obj, **kwargs)
         if names is not None:
-            assert('items' in out)
-            assert(len(out['items']) == len(names))
+            assert 'items' in out
+            assert len(out['items']) == len(names)
             for n, x in zip(names, out['items']):
                 x.setdefault('title', n)
         return out
@@ -210,7 +210,7 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
 
         """
         if isinstance(container, dict):
-            assert('type' in container)
+            assert 'type' in container
             return container
         return super(JSONArrayMetaschemaType, cls)._get_element(
             container, index, default)

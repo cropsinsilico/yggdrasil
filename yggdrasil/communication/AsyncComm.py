@@ -444,7 +444,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         if not self.is_open_direct:  # pragma: debug
             return False
         if dont_prepare:
-            assert((len(args) == 1) and isinstance(args[0], CommBase.CommMessage))
+            assert (len(args) == 1) and isinstance(args[0], CommBase.CommMessage)
             msg = args[0]
         else:
             msg = self._wrapped.prepare_message(*args, **kws_prepare)

@@ -229,7 +229,7 @@ class NetCDFFileComm(FileComm):
         self.file_seek(prev_pos)
 
     def _file_send(self, msg):
-        assert(isinstance(msg, dict))
+        assert isinstance(msg, dict)
         for k, v in msg.items():
             if isinstance(v, np.ndarray):
                 dims = []

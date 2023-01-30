@@ -22,7 +22,7 @@ if os.path.isfile(_metaschema_fname):
     with open(_metaschema_fname, 'r') as fd:
         _metaschema = decode_json(fd)
     schema_id = _metaschema.get('id', _metaschema.get('$id', None))
-    assert(schema_id is not None)
+    assert schema_id is not None
     _metaschema.setdefault('$schema', schema_id)
     _base_schema['$schema'] = _metaschema.get('$schema', schema_id)
 
@@ -61,14 +61,14 @@ def create_metaschema(overwrite=False):
     # Add properties
     for k, v in get_registered_properties().items():
         if v.schema is not None:
-            assert(k not in out['properties'])
+            assert k not in out['properties']
             out['properties'][k] = v.schema
     # Add types
     for k, v in sorted(get_registered_types().items()):
         if k not in out['definitions']['simpleTypes']['enum']:
             out['definitions']['simpleTypes']['enum'].append(k)
         for p in v.properties:
-            assert(p in out['properties'])
+            assert p in out['properties']
     # Print
     print('Created metaschema')
     pprint.pprint(out)
@@ -118,7 +118,7 @@ def get_validator(overwrite=False, normalizers=None, **kwargs):
         all_validators = copy.deepcopy(_base_validator.VALIDATORS)
         for k, v in get_registered_properties().items():
             if (not v._replaces_existing):
-                assert(k not in all_validators)
+                assert k not in all_validators
             all_validators[k] = v.wrapped_validate
         # Get set of datatypes
         type_checker = copy.deepcopy(_base_validator.TYPE_CHECKER)
@@ -126,7 +126,7 @@ def get_validator(overwrite=False, normalizers=None, **kwargs):
         for k, v in get_registered_types().items():
             if (not v._replaces_existing):
                 # Error raised on registration
-                assert(k not in type_checker._type_checkers)
+                assert k not in type_checker._type_checkers
             new_type_checkers[k] = v.jsonschema_type_checker
         kwargs['type_checker'] = type_checker.redefine_many(
             new_type_checkers)

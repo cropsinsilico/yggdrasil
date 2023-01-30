@@ -12,7 +12,7 @@ class ValueComm(CommBase):
     def __init__(self, *args, **kwargs):
         self._is_open = False
         super(ValueComm, self).__init__(*args, **kwargs)
-        assert(self.direction == 'recv')
+        assert self.direction == 'recv'
         self.remaining = self.count
 
     @classmethod

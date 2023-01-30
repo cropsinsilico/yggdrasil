@@ -52,7 +52,7 @@ class DuplicatedModelDriver(Driver):
             str: Base model name.
 
         """
-        assert('_copy' in name)
+        assert '_copy' in name
         return name.split('_copy')[0]
 
     @classmethod

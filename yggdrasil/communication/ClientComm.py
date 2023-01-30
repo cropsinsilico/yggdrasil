@@ -274,7 +274,7 @@ class ClientComm(CommBase.CommBase):
             self.errors += self.icomm.errors
             if msg.flag != CommBase.FLAG_SUCCESS:  # pragma: debug
                 break
-            assert(msg.header['request_id'] not in self.responses)
+            assert msg.header['request_id'] not in self.responses
             self.responses[msg.header['request_id']] = msg
         if self.request_order[0] in self.responses:
             msg = self.responses.pop(self.request_order[0])

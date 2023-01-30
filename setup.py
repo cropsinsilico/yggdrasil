@@ -2,6 +2,7 @@ import os
 import sys
 import logging
 import warnings
+import json
 from setuptools import setup, find_packages
 from distutils.sysconfig import get_python_lib
 import versioneer
@@ -49,12 +50,13 @@ else:
 
 
 # Create requirements list based on platform
+req_dir = os.path.join("utils", "requirements")
 with open("requirements.txt", 'r') as fd:
     requirements = fd.read().splitlines()
-with open("requirements_testing.txt", 'r') as fd:
+with open(os.path.join(req_dir, "requirements_testing.txt"), 'r') as fd:
     test_requirements = fd.read().splitlines()
-# with open("requirements_optional.txt", 'r') as fd:
-#     optional_requirements = fd.read().splitlines()
+extras_requirements = json.load(
+    open(os.path.join(req_dir, "requirements_extras.json"), 'r'))
 with open("console_scripts.txt", 'r') as fd:
     console_scripts = fd.read().splitlines()
 
@@ -87,6 +89,7 @@ setup(
     keywords=["plants", "simulation", "models", "framework"],
     install_requires=requirements,
     tests_require=test_requirements,
+    extras_require=extras_requirements,
     classifiers=[
         "Programming Language :: C",
         "Programming Language :: C++",

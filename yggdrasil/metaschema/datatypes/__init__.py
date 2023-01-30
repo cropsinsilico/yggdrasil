@@ -177,7 +177,7 @@ def add_type_from_schema(path_to_schema, **kwargs):
                               'required': ['title', 'description', 'type']})
     name = out['title']
     if _type_registry.has_entry(name):
-        assert(kwargs['target_globals'] is not None)
+        assert kwargs['target_globals'] is not None
         return name
     description = out['description']
     base = get_type_class(out['type'])

@@ -104,11 +104,11 @@ class ForkComm(CommBase.CommBase):
         if kwargs.get('direction', 'send') == 'recv':
             # if self.pattern is None:
             #     self.pattern = 'cycle'
-            assert(self.pattern in ['cycle', 'gather'])
+            assert self.pattern in ['cycle', 'gather']
         else:
             if self.pattern is None:
                 self.pattern = 'broadcast'
-            assert(self.pattern in ['cycle', 'scatter', 'broadcast'])
+            assert self.pattern in ['cycle', 'scatter', 'broadcast']
         address = kwargs.pop('address', None)
         if comm_list is None:
             if isinstance(address, list):
@@ -116,7 +116,7 @@ class ForkComm(CommBase.CommBase):
             else:
                 ncomm = 0
             comm_list = [None for i in range(ncomm)]
-        assert(isinstance(comm_list, list))
+        assert isinstance(comm_list, list)
         ncomm = len(comm_list)
         for i in range(ncomm):
             if comm_list[i] is None:
@@ -129,7 +129,7 @@ class ForkComm(CommBase.CommBase):
                                      "root ForkComm and a child comm, but can only "
                                      "be present for one." % k)
         if isinstance(address, list):
-            assert(len(address) == ncomm)
+            assert len(address) == ncomm
             for i in range(ncomm):
                 comm_list[i]['address'] = address[i]
         for i in range(ncomm):
@@ -146,9 +146,9 @@ class ForkComm(CommBase.CommBase):
             kwargs['address'] = [x.address for x in self.comm_list]
         kwargs.update(noprop_kwargs)
         super(ForkComm, self).__init__(name, is_async=is_async, **kwargs)
-        assert(not self.single_use)
-        assert(not self.is_server)
-        assert(not (self.is_client and (self.pattern != 'cycle')))
+        assert not self.single_use
+        assert not self.is_server
+        assert not (self.is_client and (self.pattern != 'cycle'))
 
     def disconnect(self):
         r"""Disconnect attributes that are aliases."""
@@ -211,7 +211,7 @@ class ForkComm(CommBase.CommBase):
             ncomm = kwargs.pop('ncomm', 0)
             if comm_list is None:
                 comm_list = [None for i in range(ncomm)]
-            assert(isinstance(comm_list, list))
+            assert isinstance(comm_list, list)
             ncomm = len(comm_list)
             for i in range(ncomm):
                 x = comm_list[i]
@@ -286,7 +286,7 @@ class ForkComm(CommBase.CommBase):
     @property
     def get_response_comm_kwargs(self):
         r"""dict: Keyword arguments to use for a response comm."""
-        assert(self.pattern == 'cycle')
+        assert self.pattern == 'cycle'
         return self.curr_comm.get_response_comm_kwargs
         
     def bind(self):
@@ -455,7 +455,7 @@ class ForkComm(CommBase.CommBase):
             bool: Success or failure of send.
         
         """
-        assert(isinstance(msg.args, dict))
+        assert isinstance(msg.args, dict)
         for idx in range(len(self)):
             i = self.curr_comm_index % len(self)
             x = self.curr_comm
@@ -517,8 +517,8 @@ class ForkComm(CommBase.CommBase):
                         if msg.flag == CommBase.FLAG_EOF:
                             self.eof_recv[idx] = 1
                             if self.pattern == 'gather':
-                                assert(all((v.flag == CommBase.FLAG_EOF)
-                                           for v in out_gather.values()))
+                                assert all((v.flag == CommBase.FLAG_EOF)
+                                           for v in out_gather.values())
                                 out_gather[idx] = msg
                             elif sum(self.eof_recv) == len(self):
                                 out_gather[idx] = msg
@@ -572,7 +572,7 @@ class ForkComm(CommBase.CommBase):
                     v, skip_python2language=True)
                 for idx, v in msg.args.items()}
             if self.pattern == 'cycle':
-                assert(len(msg.args) == 1)
+                assert len(msg.args) == 1
                 msg = next(iter(msg.args.values()))
             elif msg.flag == CommBase.FLAG_EOF:
                 msg.args = msg.args[0].args
@@ -633,7 +633,7 @@ class ForkComm(CommBase.CommBase):
 
         """
         if self.pattern in ['scatter', 'gather']:
-            assert(isinstance(msg, (list, tuple)) and (len(msg) == len(self)))
+            assert isinstance(msg, (list, tuple)) and (len(msg) == len(self))
             out = [x.coerce_to_dict(msg[i], key_order, metadata)
                    for i, x in enumerate(self.comm_list)]
             return out

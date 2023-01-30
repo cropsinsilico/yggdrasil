@@ -88,8 +88,8 @@ class InstanceMetaschemaType(MetaschemaType):
         """
         # TODO: Normalization can be removed if metadata is normalized
         typedef = cls.normalize_definition(typedef)
-        assert(isinstance(obj, list))
-        assert(len(obj) == 2)
+        assert isinstance(obj, list)
+        assert len(obj) == 2
         args = JSONArrayMetaschemaType.decode_data(
             obj[0], {'items': typedef.get('args', [])})
         kwargs = JSONObjectMetaschemaType.decode_data(

@@ -27,7 +27,9 @@ _markers = [
      "tests that take a long time to run", None),
     ("extra_example", "--extra-examples",
      "tests for superfluous examples", None),
-    ("production_run", "--production-run", None)
+    ("production_run", "--production-run", None),
+    ("remote_service", "--remote-service",
+     "tests that must connect to a running remote service", None)
 ]
 _params = {
     "example_name": [],
@@ -107,7 +109,7 @@ def setup_ci(args):
         package_dir = os.path.join(x, 'yggdrasil')
         if os.path.isdir(package_dir):
             break
-    assert(os.path.isdir(package_dir))
+    assert os.path.isdir(package_dir)
     args += ['-v',
              '--import-mode=importlib',
              f'--cov={package_dir}',
@@ -115,8 +117,8 @@ def setup_ci(args):
              '--cov-config=.coveragerc',
              '--ignore=yggdrasil/rapidjson/']
     # f'--rootdir={package_dir}']
-    if not any(x.startswith('--with-mpi') for x in args):
-        args += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
+    # if not any(x.startswith('--with-mpi') for x in args):
+    #     args += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
     # Additional checks
     if not os.path.isfile('setup.cfg'):
         raise RuntimeError("The CI tests must be run from the root "
@@ -193,7 +195,9 @@ def pytest_cmdline_preparse(args, dont_exit=False):
         remove_option(args, 'mpi_nproc')
         run_process = True
         prefix = ['mpiexec', '-n', str(pargs.mpi_nproc)]
-        if os.environ.get('CI', False) and platform._is_linux:
+        print(mpi_flavor())
+        if ((os.environ.get('CI', False) and platform._is_linux
+             and mpi_flavor() == 'openmpi')):
             prefix.append('--oversubscribe')
         if '--with-mpi' not in args:
             args.append('--with-mpi')
@@ -234,7 +238,7 @@ def pytest_cmdline_preparse(args, dont_exit=False):
         # for k in x_args_copy:
         #     if k.split('=')[0] not in x_args_keys:
         #         x_args.append(k)
-        assert(any((k.split('=', 1)[0] == '--write-script') for k in x_args))
+        assert (any((k.split('=', 1)[0] == '--write-script') for k in x_args))
         if not pargs.second_attempt:
             pytest_cmdline_preparse(x_args, dont_exit=True)
     # Run test in separate process
@@ -318,6 +322,8 @@ def add_options_to_parser(parser):
                      help="Don't capture output or log messages from tests.")
     parser.addoption('--end-yggdrasil-opts', action="store_true",
                      help="Internal use only")
+    parser.addoption('--rerun-flaky', action="store_true",
+                     help="Re-run flaky tests.")
 
 
 def pytest_configure(config):
@@ -338,6 +344,11 @@ def pytest_configure(config):
         "markers", ("related_language(name): mark test as being related "
                     "to a language. The language may or may not be "
                     "installed, but must be enabled for the test to run."))
+    config.addinivalue_line(
+        "markers", ("flaky_optin(name,condition=None,reruns=1,"
+                    "reruns_delay=0): mark test as "
+                    "flaky without automatically re-running on "
+                    "failure unless --rerun-flaky is specified."))
 
 
 # def pytest_runtest_setup(item):
@@ -373,6 +384,7 @@ def pytest_collection_modifyitems(config, items):
     selected_suites = config.getoption('--suite')
     enabled = config.getoption("--language")
     disabled = config.getoption("--skip-language")
+    rerun_flaky = config.getoption("--rerun-flaky")
     for item in items:
         # Suites
         suites = [mark.args[0] for mark in item.iter_markers(name="suite")]
@@ -440,6 +452,11 @@ def pytest_collection_modifyitems(config, items):
                     pytest.mark.skip(
                         reason=(f"test requires languages {absent_langs!r} "
                                 f"NOT be installed")))
+        # Flaky markers
+        if rerun_flaky:
+            for mark in item.iter_markers(name="flaky_optin"):
+                item.add_marker(
+                    pytest.mark.flaky(*mark.args, **mark.kwargs))
 
 
 def pytest_generate_tests(metafunc):
@@ -640,6 +657,8 @@ def config_env(pytestconfig):
     if second_attempt:
         production_run = False
         debug = True
+    if pytestconfig.getoption("--rerun-flaky"):
+        os.environ['YGGDRASIL_RERUN_FLAKY'] = '1'
     from yggdrasil import config
     with config.temp_config(production_run=production_run,
                             debug=debug, default_comm=default_comm,
@@ -708,7 +727,7 @@ def get_service_manager_skips(service_type, partial_commtype=None,
     out.append(
         (not cls.is_installed(),
          f"Service type '{service_type}' not installed."))
-    assert(not check_running)
+    assert not check_running
     # if check_running and cls.is_installed():
     #     cli = IntegrationServiceManager(service_type=service_type,
     #                                     commtype=partial_commtype,
@@ -744,7 +763,8 @@ def running_service(pytestconfig, check_service_manager_settings,
             break
 
     @contextlib.contextmanager
-    def running_service_w(service_type, partial_commtype=None):
+    def running_service_w(service_type, partial_commtype=None,
+                          track_memory=False):
         from yggdrasil.services import (
             IntegrationServiceManager)
         if ((((service_type, partial_commtype) == ('flask', 'rmq'))
@@ -759,6 +779,8 @@ def running_service(pytestconfig, check_service_manager_settings,
             args.append(f"--commtype={partial_commtype}")
         args += ["start", f"--model-repository={model_repo}",
                  f"--log-level={log_level}"]
+        if track_memory:
+            args.append("--track-memory")
         process_kws = {}
         if with_coverage:
             script_path = os.path.expanduser(os.path.join('~', 'run_server.py'))
@@ -775,13 +797,16 @@ def running_service(pytestconfig, check_service_manager_settings,
             if partial_commtype is not None:
                 lines[-1] += f'commtype=\'{partial_commtype}\''
             lines[-1] += ')'
-            lines += ['assert(not srv.is_running)',
+            lines += ['assert not srv.is_running',
                       f'srv.start_server(with_coverage={with_coverage},',
                       f'                 log_level={log_level},'
-                      f'                 model_repository=\'{model_repo}\')']
+                      f'                 model_repository=\'{model_repo}\','
+                      f'                 track_memory={track_memory})']
             with open(script_path, 'w') as fd:
                 fd.write('\n'.join(lines))
             args = [sys.executable, script_path]
+            # args = 'ulimit -v 256000; ' + ' '.join(args)
+            # process_kws['shell'] = True
         verify_flask = (service_type == 'flask')
         if verify_flask:
             # Flask is the default, verify that it is selected
@@ -790,14 +815,14 @@ def running_service(pytestconfig, check_service_manager_settings,
                                         commtype=partial_commtype,
                                         for_request=True)
         if verify_flask:
-            assert(cli.service_type == 'flask')
-        assert(not cli.is_running)
+            assert cli.service_type == 'flask'
+        assert not cli.is_running
         p = subprocess.Popen(args, **process_kws)
         try:
             cli.wait_for_server()
             yield cli
             cli.stop_server()
-            assert(not cli.is_running)
+            assert not cli.is_running
             p.wait(10)
         finally:
             if p.returncode is None:  # pragma: debug
@@ -916,11 +941,11 @@ def recv_message_list(timeout, wait_on_function, nested_approx):
                     return True
                 msg_list.append(msg_recv)
             else:
-                assert(msg_recv == recv_inst.eof_msg)
+                assert msg_recv == recv_inst.eof_msg
             return (not flag)
         wait_on_function(recv_element, timeout=timeout)
         if expected_result is not None:
-            assert(msg_list == nested_approx(expected_result))
+            assert msg_list == nested_approx(expected_result)
         return msg_list
     return wrapped_recv_message_list
 
@@ -1178,7 +1203,7 @@ def close_comm():
     def close_comm_w(comm):
         comm.close()
         comm.disconnect()
-        assert(comm.is_closed)
+        assert comm.is_closed
         del comm
     return close_comm_w
 
@@ -1345,6 +1370,19 @@ _global_tag = 0
 _mpi_error_exchange = None
 
 
+def mpi_flavor():
+    r"""Return the MPI flavor."""
+    if shutil.which('mpicc'):
+        result = subprocess.check_output("mpicc -v", shell=True).decode(
+            "utf-8")
+        print('mpi_flavor', result)
+        if "MPICH" in result:
+            return 'mpich'
+        # elif "Open MPI" in result:
+        return 'openmpi'
+    return None
+
+
 @pytest.fixture(scope="session")
 def mpi_comm():
     r"""MPI communicator."""
@@ -1395,7 +1433,7 @@ def new_mpi_exchange():
 def adv_global_mpi_tag():
     def adv_global_mpi_tag_w(value=1):
         global _mpi_error_exchange
-        assert(_mpi_error_exchange is not None)
+        assert _mpi_error_exchange is not None
         out = _mpi_error_exchange.global_tag
         _mpi_error_exchange.global_tag += value
         return out
@@ -1406,7 +1444,7 @@ def adv_global_mpi_tag():
 def sync_mpi_exchange():
     def sync_mpi_exchange_w(*args, **kwargs):
         global _mpi_error_exchange
-        assert(_mpi_error_exchange is not None)
+        assert _mpi_error_exchange is not None
         return _mpi_error_exchange.sync(*args, **kwargs)
     return sync_mpi_exchange_w
 
