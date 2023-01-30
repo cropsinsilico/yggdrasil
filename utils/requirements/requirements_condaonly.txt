@@ -1,6 +1,7 @@
 cmake; platform_system != 'Windows'  # [conda,c]
 czmq             # [conda,zmq,c]
 fortran-compiler; platform_system != 'Windows'  # [conda,fortran,c]
+git              # [conda]
 lz4              # [conda,zmq,c]
 m2w64-gcc-fortran; platform_system == 'Windows'  # [conda,fortran,c]
 m2w64-toolchain_win-64; platform_system == 'Windows'  # [conda,fortran,c]

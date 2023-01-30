@@ -405,21 +405,27 @@ class YggRequirements(UserDict):
     def create_extras_require(self):
         r"""Create a config file containing extras_require."""
         import configparser
-        fname = os.path.join(_req_dir, 'requirements_extras.ini')
+        # fname = os.path.join(_req_dir, 'requirements_extras.ini')
+        fname = os.path.join(_req_dir, 'requirements_extras.json')
         extras = {}
         format_kws = {'include_method': False, 'include_extra': False}
         for k in self.extras():
             extras[k] = self.create_requirements_file_varient(
                 k, format_kws=format_kws)
-        config = configparser.ConfigParser(allow_no_value=True)
-        for k, v in extras.items():
-            if not v:
-                continue
-            config.add_section(k)
-            for x in v:
-                config.set(k, x, None)
-        with open(fname, 'w') as fd:
-            config.write(fd)
+        extras = {k: v for k, v in extras.items() if v}
+        if fname.endswith('.ini'):
+            config = configparser.ConfigParser(allow_no_value=True)
+            for k, v in extras.items():
+                config.add_section(k)
+                for x in v:
+                    config.set(k, x, None)
+            with open(fname, 'w') as fd:
+                config.write(fd)
+        elif fname.endswith(".json"):
+            with open(fname, 'w') as fd:
+                json.dump(extras, fd, indent=2)
+        else:
+            raise NotImplementedError(fname)
         print(f"Created '{fname}':\n{open(fname, 'r').read()}")
 
 
@@ -624,7 +630,8 @@ class YggRequirementsList(UserList):
             host_req = [
                 x.format(**kwargs) for x in selected if x.host]
             build_req = [
-                x.format(**kwargs) for x in selected
+                x.format(for_build=True, padding=39, **kwargs)
+                for x in selected
                 if x.flags.get('build', False)]
             if self.extras:
                 host_req.append('python')
@@ -646,6 +653,8 @@ class YggRequirementsList(UserList):
                     req.insert(
                         0, "{{ pin_subpackage('yggdrasil', exact=True) }}")
             out['requirements'] = OrderedDict()
+            if build_req:
+                out['requirements']['build'] = sorted(build_req)
             if host_req:
                 out['requirements']['host'] = sorted(host_req)
             if build_req:
@@ -1038,23 +1047,36 @@ class YggRequirement(object):
             out = '\n'.join(out)
         return out
 
-    def conda_requirement(self):
+    def conda_requirement(self, for_build=False, padding=0):
         r"""Get the formatted conda requirement string.
+
+        Args:
+            for_build (bool, optional): If True, varients will
+                be added so that the requirement will only be
+                used when building cross-platform. Defaults to
+                False.
+            padding (int, optional): Number of spaces to pad with
+               before varients.
 
         Returns:
             str: Conda requirement.
 
         """
-        suffix = ''
         varients = []
+        if self.flags.get("build", False) and for_build:
+            varients.append("build_platform != target_platform")
         if self.os is not None:
             if self.os == 'unix':
                 varients.append('not win')
             else:
                 varients.append(self.os)
+        out = self.full_name
+        out_name = isolate_package_name(out)
+        if out_name != out:
+            out = out.replace(out_name, out_name + ' ')
         if varients:
-            suffix += '  ' + self.format_varients(varients)
-        out = self.full_name + suffix
+            suffix = self.format_varients(varients)
+            out = self.add_padded_suffix(out, suffix, padding=padding)
         if self.add:
             out = [out]
             for x in self.add:
