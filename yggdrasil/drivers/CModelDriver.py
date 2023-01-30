@@ -169,10 +169,11 @@ class GCCCompiler(CCompilerBase):
 
         """
         out = super(GCCCompiler, cls).is_installed()
+        # Disable gcc when it is an alias for clang
         if out and platform._is_mac:  # pragma: debug
-            ver = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
+            ver = cls.tool_version()
             if 'clang' in ver:
-                out = False  # Disable gcc when it is an alias for clang
+                out = False
         return out
 
     def dll2a(cls, dll, dst=None, overwrite=False):
@@ -233,6 +234,7 @@ class ClangCompiler(CCompilerBase):
     @classmethod
     def get_flags(cls, *args, **kwargs):
         r"""Get a list of compiler flags."""
+        with_asan = kwargs.pop('with_asan', False)
         out = super(ClangCompiler, cls).get_flags(*args, **kwargs)
         if '-fopenmp' in out:
             idx = out.index('-fopenmp')
@@ -240,6 +242,8 @@ class ClangCompiler(CCompilerBase):
             new_flag = '-Xclang'
             if (idx > 0) and (out[idx - 1] != new_flag):
                 out.insert(idx, new_flag)
+        if with_asan:
+            out += ['-fsanitize=address']
         return out
         
 
@@ -314,8 +318,7 @@ class MSVCCompiler(CCompilerBase):
             str: Version of the tool.
 
         """
-        out = cls.call(cls.version_flags, skip_flags=True,
-                       allow_error=True, **kwargs)
+        out = super(MSVCCompiler, cls).tool_version()
         if 'Copyright' not in out:  # pragma: debug
             raise RuntimeError("Version call failed: %s" % out)
         return out.split('Copyright')[0]
@@ -345,8 +348,7 @@ class LDLinker(LinkerBase):
             str: Version of the tool.
 
         """
-        out = cls.call(cls.version_flags, skip_flags=True,
-                       allow_error=True, **kwargs)
+        out = super(LDLinker, cls).tool_version(**kwargs)
         if platform._is_mac:
             regex = r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)'
         else:
@@ -354,7 +356,7 @@ class LDLinker(LinkerBase):
                      r'(?P<version>\d+(?:\.\d+){0,2})')
         match = re.search(regex, out)
         if match is None:  # pragma: debug
-            raise RuntimeError("Could not locate version in string: %s" % out)
+            raise RuntimeError(f"Could not locate version in string: {out}")
         return match.group('version')
 
 
@@ -388,18 +390,35 @@ class ClangLinker(LDLinker):
             cls.flag_options.pop('library_rpath', None)
 
     @classmethod
+    def tool_version(cls, **kwargs):
+        r"""Determine the version of this tool.
+
+        Args:
+            **kwargs: Keyword arguments are passed to cls.call.
+
+        Returns:
+            str: Version of the tool.
+
+        """
+        out = super(LDLinker, cls).tool_version(**kwargs)
+        regex = r'clang version (?P<version>\d+\.\d+\.\d+)'
+        match = re.search(regex, out)
+        if match is None:  # pragma: debug
+            raise RuntimeError(f"Could not locate version in string: {out}")
+        return match.group('version')
+        
+    @classmethod
     def get_flags(cls, *args, **kwargs):
         r"""Get a list of linker flags."""
+        with_asan = kwargs.pop('with_asan', False)
         # Handle case where clang (10.0.0) is trying to pass
         # -platform_version to a version of ld64 that dosn't support
         # it (<520).
         # https://bugs.llvm.org/show_bug.cgi?id=44813
         # https://reviews.llvm.org/D71579
         # https://reviews.llvm.org/D74784
-        out = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
-        regex = r'clang version (?P<version>\d+)\.\d+\.\d+'
-        match = re.search(regex, out)
-        if (match is not None) and (int(match.group('version')) >= 10):
+        ver = cls.tool_version()
+        if int(ver.split('.')[0]) >= 10:
             ld_version = LDLinker.tool_version()
             if float(ld_version.split('.')[0]) < 520:  # pragma: version
                 # No longer covered as the default conda
@@ -421,6 +440,8 @@ class ClangLinker(LDLinker):
                     if x_file.endswith(('libomp.dylib', 'libomp.a')):
                         out.append(f'-L{x_dir}')
                         break
+        if with_asan:
+            out += ['-fsanitize=address', '-shared-libasan']
         return out
 
 
@@ -511,6 +532,10 @@ class CModelDriver(CompiledModelDriver):
     r"""Class for running C models."""
 
     _schema_subtype_description = ('Model is written in C.')
+    _schema_properties = {
+        'with_asan': {
+            'type': 'boolean',
+            'description': 'Compile with Clang ASAN.'}}
     language = 'c'
     language_ext = ['.c', '.h']
     interface_library = 'ygg'
@@ -1011,6 +1036,21 @@ class CModelDriver(CompiledModelDriver):
         out = cls.update_python_path(out)
         return out
     
+    def compile_model(self, **kwargs):
+        r"""Compile model executable(s).
+
+        Args:
+            **kwargs: Keyword arguments are passed on to the
+                parent class's method.
+
+        Returns:
+            str: Compiled model file path.
+
+        """
+        if self.with_asan:
+            kwargs['with_asan'] = True
+        return super(CModelDriver, self).compile_model(**kwargs)
+        
     @classmethod
     def parse_var_definition(cls, io, value, **kwargs):
         r"""Extract information about input/output variables from a

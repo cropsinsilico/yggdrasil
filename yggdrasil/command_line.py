@@ -960,7 +960,10 @@ class yggcompile(SubCommand):
          {'help': "Name of compilation tool that should be used"}),
         (('--disable-python', ),
          {'action': 'store_true',
-          'help': 'Disable access to the Python C API from yggdrasil.'})]
+          'help': 'Disable access to the Python C API from yggdrasil.'}),
+        (('--with-asan', ),
+         {'action': 'store_true',
+          'help': "Compile with Clang ASAN if available."})]
 
     @classmethod
     def func(cls, args):
@@ -968,15 +971,26 @@ class yggcompile(SubCommand):
         yggclean.func(args, verbose=False)
         error_on_missing = (not getattr(args, 'all_languages', False))
         missing = []
+        languages = copy.deepcopy(args.language)
         for lang in args.language:
-            import_component('model', lang).cleanup_dependencies(
+            drv = import_component('model', lang)
+            drv.cleanup_dependencies(
                 disable_python=args.disable_python)
+            # Prevent language from being recompiled more than
+            # once as a dependency
+            for base_lang in drv.base_languages:
+                if base_lang in languages:
+                    languages.remove(base_lang)
+        kwargs = {'toolname': args.toolname,
+                  'disable_python': args.disable_python}
+        if args.with_asan:
+            kwargs['with_asan'] = True
+        for lang in languages:
             drv = import_component('model', lang)
             if ((hasattr(drv, 'compile_dependencies')
                  and (not getattr(drv, 'is_build_tool', False)))):
                 if drv.is_installed():
-                    drv.compile_dependencies(toolname=args.toolname,
-                                             disable_python=args.disable_python)
+                    drv.compile_dependencies(**kwargs)
                 else:
                     missing.append(lang)
         if error_on_missing and missing:  # pragma: debug

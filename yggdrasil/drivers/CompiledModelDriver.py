@@ -373,6 +373,7 @@ class CompilationToolBase(object):
     is_build_tool = False
     tool_suffix_format = '_%sx'
     _language_ext = None  # only update once per class
+    _language_cache = {}
     
     def __init__(self, **kwargs):
         for k in ['executable', 'flags']:
@@ -798,6 +799,7 @@ class CompilationToolBase(object):
             list: Flags for the tool.
 
         """
+        kwargs.pop('with_asan', False)
         if flags is None:
             flags = []
         flags = kwargs.pop(f'{cls.tooltype}_flags', flags)
@@ -1132,10 +1134,23 @@ class CompilationToolBase(object):
                     products.remove(isrc)
 
     @classmethod
+    def tool_version(cls, **kwargs):
+        r"""Get the version of the compilation tool.
+
+        Returns:
+            str: Version.
+
+        """
+        kwargs.setdefault('cache_key', True)
+        kwargs.setdefault('allow_error', True)
+        return cls.call(cls.version_flags, skip_flags=True,
+                        **kwargs)
+
+    @classmethod
     def call(cls, args, language=None, toolname=None, skip_flags=False,
              dry_run=False, out=None, overwrite=False, products=None,
              allow_error=False, working_dir=None, additional_args=None,
-             suffix='', **kwargs):
+             suffix='', cache_key=None, **kwargs):
         r"""Call the tool with the provided arguments. If the first argument
         resembles the name of the tool executable, the executable will not be
         added.
@@ -1176,6 +1191,9 @@ class CompilationToolBase(object):
                 ignored.
             suffix (str, optional): Suffix that should be added to the
                 output file (before the extension). Defaults to "".
+            cache_key (str, optional): Key that should be used to
+                cache results so that they may be used multiple
+                times. Defaults to None and is ignored.
             **kwargs: Additional keyword arguments are passed to
                 cls.get_executable_command. and tools.popen_nobuffer.
 
@@ -1224,6 +1242,11 @@ class CompilationToolBase(object):
         cmd = cls.get_executable_command(args, skip_flags=skip_flags,
                                          unused_kwargs=unused_kwargs,
                                          cwd=working_dir, **kwargs)
+        if cache_key is not None:
+            if cache_key is True:
+                cache_key = ' '.join(cmd)
+            if cache_key in cls._language_cache:
+                return cls._language_cache[cache_key]
         # Return if dry run, adding potential output to product
         if dry_run:
             if skip_flags:
@@ -1269,6 +1292,8 @@ class CompilationToolBase(object):
                              % (cls.tooltype.title(), cls.toolname, out))
                 cls.append_product(products, args, out)
             return out
+        if cache_key:
+            cls._language_cache[cache_key] = output
         return output
 
 
@@ -1821,7 +1846,7 @@ class LinkerBase(CompilationToolBase):
                     'libraries', 'library_dirs', 'library_libs',
                     'library_libs_nonstd', 'library_flags']
         kws_both = ['overwrite', 'products', 'allow_error', 'dry_run',
-                    'working_dir', 'env']
+                    'working_dir', 'env', 'with_asan']
         kws_link += add_kws_link
         kws_both += add_kws_both
         kwargs_link = {}
