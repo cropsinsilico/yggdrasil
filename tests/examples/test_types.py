@@ -223,12 +223,14 @@ class TestExampleTypes(base_class):
         env['TEST_LANGUAGE'] = language
         env['TEST_LANGUAGE_EXT'] = language_ext
         env['TEST_TYPENAME'] = typename
+        lines = []
+        if (language in ['c', 'cpp', 'c++', 'fortran']):
+            lines += ['with_asan: True']
         if (language in ['c', 'fortran']) and (not using_generics):
             yaml_fields['vars'] = True
             if typename in ['array', 'object']:
                 yaml_fields['dtype'] = True
         if any(list(yaml_fields.values())):
-            lines = []
             for io, io_vars in zip(['input', 'output'],
                                    [inputs, outputs]):
                 lines += [io + 's:',
@@ -252,6 +254,7 @@ class TestExampleTypes(base_class):
                         if "units: ''" in x:
                             continue
                         lines.append('    ' + x)
+        if lines:
             env['TEST_MODEL_IO'] = '\n    '.join(lines) + '\n'
         else:
             env['TEST_MODEL_IO'] = ''

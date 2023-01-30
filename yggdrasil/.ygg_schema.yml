@@ -2456,6 +2456,9 @@ definitions:
             the model ran as expected. A non-zero return code is taken to indicate
             failure.
           type: string
+        with_asan:
+          description: Compile with Clang ASAN.
+          type: boolean
         with_strace:
           default: false
           description: If True, the command is run with strace (on Linux) or dtrace
@@ -2682,6 +2685,9 @@ definitions:
             items:
               type: string
             type: array
+          with_asan:
+            description: Compile with Clang ASAN.
+            type: boolean
         required:
         - language
         title: yggdrasil.drivers.CModelDriver.CModelDriver
@@ -2742,6 +2748,9 @@ definitions:
             items:
               type: string
             type: array
+          with_asan:
+            description: Compile with Clang ASAN.
+            type: boolean
         required:
         - language
         title: yggdrasil.drivers.CPPModelDriver.CPPModelDriver
