@@ -3,7 +3,6 @@ import numpy as np
 from collections import OrderedDict
 # No other yggdrasil modules should be import here
 # TODO: Move platform constants into this module?
-from yggdrasil import platform
 
 
 # Type related constants
@@ -50,10 +49,14 @@ NUMPY_PRECISIONS = {
     'uint': [8, 16, 32, 64],
     'complex': [64, 128],
 }
-if not platform._is_win:
+try:
     # Not available on windows
+    np.dtype('float128')
     NUMPY_PRECISIONS['float'].append(128)
+    np.dtype('complex256')
     NUMPY_PRECISIONS['complex'].append(256)
+except TypeError:
+    pass
 for T, T_NP in VALID_TYPES.items():
     PYTHON_SCALARS[T].append(np.dtype(T_NP).type)
     if T in NUMPY_PRECISIONS:

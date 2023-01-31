@@ -276,9 +276,11 @@ void clean_comms(void) {
     // #if defined(_MSC_VER) && defined(ZMQINSTALLED)
     ygg_zsys_shutdown();
 #endif
+#ifndef YGGDRASIL_DISABLE_PYTHON_C_API
     if (Py_IsInitialized()) {
       Py_Finalize();
     }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   /* printf(""); */
     clean_called = 1;
 #ifdef _OPENMP

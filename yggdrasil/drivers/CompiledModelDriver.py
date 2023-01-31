@@ -1476,7 +1476,8 @@ class CompilerBase(CompilationToolBase):
 
     @classmethod
     def get_flags(cls, dont_link=None, add_linker_switch=False,
-                  libtype=None, logging_level=None, **kwargs):
+                  libtype=None, logging_level=None, disable_python=False,
+                  **kwargs):
         r"""Get a list of compiler flags.
 
         Args:
@@ -1492,6 +1493,8 @@ class CompilerBase(CompilationToolBase):
             logging_level (int, optional): Logging level that should be passed
                 as a definition to the C compiler. Defaults to None and will be
                 ignored.
+            disable_python (bool, optional): If True, the Python C API will
+                be disabled. Defaults to False.
             **kwargs: Additional keyword arguments are passed to the parent
                 class's method and get_linker_flags if dont_link is False.
 
@@ -1520,6 +1523,10 @@ class CompilerBase(CompilationToolBase):
         if logging_level is not None:
             kwargs.setdefault('definitions', [])
             kwargs['definitions'].append('YGG_DEBUG=%d' % logging_level)
+        # Disable Python C API
+        if disable_python:
+            kwargs.setdefault('definitions', [])
+            kwargs['definitions'].append('YGGDRASIL_DISABLE_PYTHON_C_API')
         # Call parent class
         outfile_link = None
         if not dont_link:
@@ -2786,7 +2793,7 @@ class CompiledModelDriver(ModelDriver):
 
     @classmethod
     def get_dependency_object(cls, dep, default=None, commtype=None,
-                              toolname=None):
+                              toolname=None, disable_python=False):
         r"""Get the location of an object file for a dependency.
 
         Args:
@@ -2803,6 +2810,8 @@ class CompiledModelDriver(ModelDriver):
             toolname (str, optional): Name of compiler tool that should be used.
                 Defaults to None and the default compiler for the language will
                 be used.
+            disable_python (bool, optional): If True, the Python C API will
+                be disabled. Defaults to False.
 
         Returns:
             str: Full path to the object file.
@@ -2814,11 +2823,13 @@ class CompiledModelDriver(ModelDriver):
             if dep_lang != cls.language:
                 drv = import_component('model', dep_lang)
                 return drv.get_dependency_object(
-                    dep, default=default, commtype=commtype, toolname=toolname)
+                    dep, default=default, commtype=commtype,
+                    toolname=toolname, disable_python=disable_python)
         out = None
         if dep in cls.internal_libraries:
             src = cls.get_dependency_source(dep, toolname=toolname)
-            suffix = cls.get_internal_suffix(commtype=commtype)
+            suffix = cls.get_internal_suffix(commtype=commtype,
+                                             disable_python=disable_python)
             dep_info = cls.get_dependency_info(dep, toolname=toolname)
             toolname = dep_info.get('toolname', toolname)
             dep_lang = dep_info.get('language', cls.language)
@@ -2837,7 +2848,8 @@ class CompiledModelDriver(ModelDriver):
 
     @classmethod
     def get_dependency_library(cls, dep, default=None, libtype=None,
-                               commtype=None, toolname=None):
+                               commtype=None, toolname=None,
+                               disable_python=False):
         r"""Get the library location for a dependency.
 
         Args:
@@ -2858,6 +2870,8 @@ class CompiledModelDriver(ModelDriver):
             toolname (str, optional): Name of compiler tool that should be used.
                 Defaults to None and the default compiler for the language will
                 be used.
+            disable_python (bool, optional): If True, the Python C API will
+                be disabled. Defaults to False.
 
         Returns:
             str: Full path to the library file. For header only libraries,
@@ -2876,7 +2890,8 @@ class CompiledModelDriver(ModelDriver):
                 drv = import_component('model', dep_lang)
                 return drv.get_dependency_library(
                     dep, default=default, libtype=libtype,
-                    commtype=commtype, toolname=toolname)
+                    commtype=commtype, toolname=toolname,
+                    disable_python=disable_python)
         libclass = None
         libinfo = {}
         if dep in cls.internal_libraries:
@@ -2926,13 +2941,14 @@ class CompiledModelDriver(ModelDriver):
                     tool = cls.get_tool('compiler', language=dep_lang,
                                         toolname=toolname)
                 if tool.is_gnu:
-                    dll = cls.get_dependency_library(dep, libtype='shared',
-                                                     commtype=commtype,
-                                                     toolname=toolname)
+                    dll = cls.get_dependency_library(
+                        dep, libtype='shared', commtype=commtype,
+                        toolname=toolname, disable_python=disable_python)
                     out = tool.dll2a(dll)
         elif libclass == 'internal':
             src = cls.get_dependency_source(dep, toolname=toolname)
-            suffix = cls.get_internal_suffix(commtype=commtype)
+            suffix = cls.get_internal_suffix(commtype=commtype,
+                                             disable_python=disable_python)
             dep_lang = cls.get_dependency_info(dep, toolname=toolname).get(
                 'language', cls.language)
             tool = cls.get_tool('compiler', language=dep_lang, toolname=toolname)
@@ -3198,12 +3214,16 @@ class CompiledModelDriver(ModelDriver):
             libinfo = cls.get_dependency_info(x, toolname=toolname)
             if libinfo.get('libtype', None) == 'object':
                 additional_objs.append(cls.get_dependency_object(
-                    x, commtype=commtype, toolname=libinfo.get('toolname',
-                                                               toolname)))
+                    x, commtype=commtype,
+                    toolname=libinfo.get('toolname', toolname),
+                    disable_python=kwargs.get('disable_python', False)))
+                                         
         if additional_objs:
             kwargs['additional_objs'] = additional_objs
         # Add directories for internal/external dependencies
         for dep in all_internal_dependencies + external_dependencies:
+            if kwargs.get('disable_python', False) and (dep in ['python', 'numpy']):
+                continue
             include_dirs += cls.get_dependency_include_dirs(dep, toolname=toolname)
         # Add flags for included directories
         if directory is not None:
@@ -3300,8 +3320,11 @@ class CompiledModelDriver(ModelDriver):
         # Add flags for internal/external depenencies
         all_dep = internal_dependencies + external_dependencies
         for dep in cls.get_dependency_order(all_dep, toolname=toolname):
+            if kwargs.get('disable_python', False) and (dep in ['python', 'numpy']):
+                continue
             dep_lib = cls.get_dependency_library(
-                dep, commtype=commtype, toolname=toolname)
+                dep, commtype=commtype, toolname=toolname,
+                disable_python=kwargs.get('disable_python', False))
             if dep_lib:
                 if (((not kwargs.get('dry_run', False))
                      and (not os.path.isfile(dep_lib)))):  # pragma: debug
@@ -3817,7 +3840,9 @@ class CompiledModelDriver(ModelDriver):
         compiler = cls.get_tool('compiler', toolname=kwargs.get('toolname', None),
                                 default=None)
         if compiler is not None:
-            suffix = cls.get_internal_suffix(commtype=kwargs.get('commtype', None))
+            suffix = cls.get_internal_suffix(
+                commtype=kwargs.get('commtype', None),
+                disable_python=kwargs.get('disable_python', False))
             suffix += compiler.get_tool_suffix()
             try:
                 cls.compile_dependencies(products=products, **kwargs)
@@ -3888,19 +3913,23 @@ class CompiledModelDriver(ModelDriver):
                 self.restore_files()
 
     @classmethod
-    def get_internal_suffix(cls, commtype=None):
+    def get_internal_suffix(cls, commtype=None, disable_python=False):
         r"""Determine the suffix that should be used for internal libraries.
 
         Args:
             commtype (str, optional): If provided, this is the communication
                 type that should be used for the model. If None, the
                 default comm is used.
+            disable_python (bool, optional): If True, the Python C API will
+                be disabled. Defaults to False.
 
         Returns:
             str: Suffix that should be added to internal libraries to
                 differentiate between different dependencies.
 
         """
+        if disable_python:
+            return _system_suffix + '_nopython'
         return _system_suffix
 
     @classmethod
@@ -3982,12 +4011,15 @@ class CompiledModelDriver(ModelDriver):
                 kwargs.setdefault(
                     'out', cls.get_dependency_library(
                         dep, libtype=kwargs['libtype'],
-                        commtype=kwargs.get('commtype', None), toolname=toolname))
+                        commtype=kwargs.get('commtype', None),
+                        toolname=toolname,
+                        disable_python=kwargs.get('disable_python', False)))
                 if (kwargs['libtype'] == 'static') and ('linker_language' in kwargs):
                     kwargs['archiver_language'] = kwargs.pop('linker_language')
             kwargs.setdefault('suffix', '')
             kwargs['suffix'] += cls.get_internal_suffix(
-                commtype=kwargs.get('commtype', None))
+                commtype=kwargs.get('commtype', None),
+                disable_python=kwargs.get('disable_python', False))
             return cls.call_compiler(src, toolname=toolname, **kwargs)
         # Compile using the compiler after updating the flags
         kwargs = cls.update_compiler_kwargs(toolname=toolname, **kwargs)
