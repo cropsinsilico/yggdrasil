@@ -1560,11 +1560,12 @@ class CModelDriver(CompiledModelDriver):
             return var
         assert isinstance(var, dict)
         out = var['name']
-        if 'length' in var.get('datatype', {}):
-            out += '[%d]' % var['datatype']['length']
-        elif 'shape' in var.get('datatype', {}):
-            for s in var['datatype']['shape']:
-                out += '[%d]' % s
+        if isinstance(var.get('datatype', None), dict):
+            if 'length' in var['datatype']:
+                out += '[%d]' % var['datatype']['length']
+            elif 'shape' in var['datatype']:
+                for s in var['datatype']['shape']:
+                    out += '[%d]' % s
         return out
         
     @classmethod
@@ -2019,11 +2020,11 @@ class CModelDriver(CompiledModelDriver):
                 vnew = 'float*'
                 out['replacement_code_types'][(k, v)] = (knew, vnew)
             elif 'X' in v:
-                knew = {'type': k, 'precision': 8}
+                knew = {'type': 'scalar', 'subtype': k, 'precision': 8}
                 if k == 'complex':
                     vnew = v.replace('X', 'float')
                 else:
-                    vnew = v.replace('X', '8')
+                    vnew = v.replace('X', '64')
                 out['replacement_code_types'][(k, v)] = (knew, vnew)
         # Code composition parameters
         out.setdefault('write_function_def_params', [])

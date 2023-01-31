@@ -101,6 +101,7 @@ class SelectFieldsTransform(TransformBase):
         elif datatype.get('type', None) == 'object':
             if self.as_single:
                 datatype = copy.deepcopy(datatype['properties'][self.selected[0]])
+                datatype.setdefault('title', self.selected[0])
             else:
                 datatype = copy.deepcopy(datatype)
                 datatype['properties'] = {k: datatype['properties'][k]
@@ -178,7 +179,7 @@ class SelectFieldsTransform(TransformBase):
                  'in/out_t': [({'type': 'object',
                                 'properties': {x: {'type': 'int'}
                                                for x in 'abc'}},
-                               {'type': 'int'})]},
+                               {'type': 'int', 'title': 'a'})]},
                 {'kwargs': {'selected': ['a', 'c'],
                             'original_datatype': {
                                 'type': 'array',

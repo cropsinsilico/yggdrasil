@@ -374,7 +374,7 @@ class TestYggClass(base_class):
                 for msg_recv in testing_options['recv']:
                     msg_flag, msg_recv0 = instance.recv(timeout)
                     assert msg_flag
-                    assert msg_recv0 == nested_approx(msg_recv)
+                    assert nested_approx(msg_recv) == msg_recv0
                 msg_flag, msg_recv0 = instance.recv(timeout)
                 assert not msg_flag
             else:
@@ -384,7 +384,7 @@ class TestYggClass(base_class):
                     assert msg_flag
                     msg_flag, msg_recv0 = instance.recv(timeout)
                     assert msg_flag
-                    assert msg_recv0 == nested_approx(msg_recv)
+                    assert nested_approx(msg_recv) == msg_recv0
         else:
             if filecomm:
                 for msg in testing_options['send']:

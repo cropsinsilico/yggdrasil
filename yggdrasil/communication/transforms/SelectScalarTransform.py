@@ -140,7 +140,7 @@ class SelectScalarTransform(SelectFieldsTransform):
              'in/out_t': [({'type': 'array',
                             'items': [
                                 {'type': 'int'} for x in 'abc']},
-                           {'type': 'int', 'title': 'f0'})]},
+                           {'type': 'int'})]},
             {'kwargs': {'index': 0,
                         'original_datatype': {
                             'type': 'array',
@@ -148,4 +148,4 @@ class SelectScalarTransform(SelectFieldsTransform):
              'in/out': [([0, 1, 2], 0)],
              'in/out_t': [({'type': 'array',
                             'items': {'type': 'int'}},
-                           {'type': 'int', 'title': 'f0'})]}]
+                           {'type': 'int'})]}]

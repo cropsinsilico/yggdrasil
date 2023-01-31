@@ -3847,10 +3847,16 @@ class ModelDriver(Driver):
                               'ndarray_pointer', 'flag']
                         for x in [json_type.get('subtype', None),
                                   json_type['type']])):
-                length = json_type.pop('length', None)
-                json_type = rapidjson.normalize(json_type, {'type': 'schema'})
-                if length is not None:
-                    json_type['length'] = length
+                # length = json_type.pop('length', None)
+                if json_type.get('type', None) != 'length':
+                    try:
+                        json_type = rapidjson.normalize(
+                            json_type, {'type': 'schema'})
+                    except rapidjson.NormalizationError:  # pragma: debug
+                        print(f"Invalid schema: {json_type}")
+                        raise
+                    # if length is not None:
+                    #     json_type['length'] = length
             return cls.type_map[type_name], json_type
         return cls.type_map[type_name]
 

@@ -1222,11 +1222,17 @@ class FortranModelDriver(CompiledModelDriver):
                     vnew += ', dimension(3,4)'
             elif 'X' in v:
                 if vnew.startswith('complex'):
-                    knew = {'type': knew, 'precision': 64}
+                    knew = {'type': 'scalar', 'subtype': knew,
+                            'precision': 16}
+                elif k == 'boolean':
+                    knew = {'type': knew}
+                    vnew = vnew.replace('X', '1')
                 elif 'ISO_10646' in vnew:
-                    knew = {'type': knew, 'precision': 4 * 8}
+                    knew = {'type': 'scalar', 'subtype': knew,
+                            'precision': 8}
                 else:
-                    knew = {'type': knew, 'precision': 8}
+                    knew = {'type': 'scalar', 'subtype': knew,
+                            'precision': 8}
                 vnew = vnew.replace('X', '8')
             if vnew.startswith('ygg'):
                 vnew = 'type(%s)' % vnew
