@@ -139,7 +139,9 @@ class InterpretedModelDriver(ModelDriver):
             raise NotImplementedError("Interpreter not set for language '%s'."
                                       % cls.language)
         if not os.path.isfile(out):
-            out = shutil.which(out)
+            out_full = shutil.which(out)
+            if out_full:
+                out = out_full
         return out
 
     @classmethod
