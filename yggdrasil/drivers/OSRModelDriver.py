@@ -119,7 +119,8 @@ class OSRModelDriver(ExecutableModelDriver):
             lib, **kwargs)  # pragma: debug
 
     @classmethod
-    def compile_dependencies(cls, target='OpenSimRootYgg', toolname=None):
+    def compile_dependencies(cls, target='OpenSimRootYgg', toolname=None,
+                             **kwargs):
         r"""Compile the OpenSimRoot executable with the yggdrasil flag set.
 
         Args:
@@ -129,8 +130,12 @@ class OSRModelDriver(ExecutableModelDriver):
             toolname (str, optional): C++ compiler that should be used. Forced
                 to be 'cl.exe' on windows. Otherwise the default C++ compiler will
                 be used.
+            **kwargs: Additional keyword arguments are passed to the
+                compile_dependencies methods of the base classes.
 
         """
+        # TODO: Allow disable_python to be passed by setting the
+        # definition YGGDRASIL_DISABLE_PYTHON_C_API
         if (cls.repository is not None) and CPPModelDriver.is_installed():
             if not os.path.isdir(cls.repository):  # pragma: debug
                 # This will only need to be called if the tempdir was cleaned up
@@ -167,7 +172,8 @@ class OSRModelDriver(ExecutableModelDriver):
             if target != 'cleanygg':
                 for x in cls.base_languages:
                     base_cls = import_component('model', x)
-                    base_cls.compile_dependencies(toolname=toolname)
+                    base_cls.compile_dependencies(toolname=toolname,
+                                                  **kwargs)
             elif not os.path.isfile(cls.executable_path):
                 return
             cmd = ['make', target] + flags
