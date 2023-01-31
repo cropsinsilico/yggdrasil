@@ -232,7 +232,11 @@ class yggrun(SubCommand):
         (('--validate', ),
          {'action': 'store_true',
           'help': ('Validate the run via model validation commands on '
-                   'completion.')})]
+                   'completion.')}),
+        (('--with-debugger', ),
+         {'type': str,
+          'help': ('Run all models with a specific debuggin tool. If '
+                   'quoted, this can also include flags for the tool.')})]
 
     @classmethod
     def add_arguments(cls, parser, **kwargs):
@@ -260,7 +264,8 @@ class yggrun(SubCommand):
             runner.run(args.yamlfile, ygg_debug_prefix=prog,
                        production_run=args.production_run,
                        mpi_tag_start=args.mpi_tag_start,
-                       validate=args.validate)
+                       validate=args.validate,
+                       with_debugger=args.with_debugger)
 
 
 class integration_service_manager(SubCommand):

@@ -8,6 +8,7 @@ History
 * Allow yggcompile to be called like yggcc
 * Add --with-asan option to compilation CLI and YAML options for enabling the Clang address sanitizer
 * Allow for 128 bit types to be absent
+* Generalize option for running with a debugging tool via the --with-debugger flag for yggrun or with_debugger YAML option
 
 1.8.4 (2023-01-27) Update CI to use mamba, improve dev utilities, & various bug fixes
 ------------------

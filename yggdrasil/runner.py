@@ -267,6 +267,8 @@ class YggRunner(YggClass):
         validate (bool, optional): If True, the validation scripts for each
             modle (if present), will be run after the integration finishes
             running. Defaults to False.
+        with_debugger (str, optional): Tool (and any flags for the tool)
+            that should be used to run models.
 
     Attributes:
         namespace (str): Name that should be used to uniquely identify any
@@ -286,7 +288,8 @@ class YggRunner(YggClass):
                  ygg_debug_prefix=None, connection_task_method='thread',
                  as_service=False, complete_partial=False,
                  partial_commtype=None, production_run=False,
-                 mpi_tag_start=None, yaml_param=None, validate=False):
+                 mpi_tag_start=None, yaml_param=None, validate=False,
+                 with_debugger=None):
         self.mpi_comm = None
         name = 'runner'
         if MPI is not None:
@@ -331,6 +334,9 @@ class YggRunner(YggClass):
                 partial_commtype=partial_commtype, yaml_param=yaml_param)
             self.connectiondrivers = self.drivers['connection']
             self.modeldrivers = self.drivers['model']
+            if with_debugger:
+                for v in self.modeldrivers.values():
+                    v['with_debugger'] = with_debugger
             for x in self.modeldrivers.values():
                 if x['driver'] == 'DummyModelDriver':
                     x['runner'] = self

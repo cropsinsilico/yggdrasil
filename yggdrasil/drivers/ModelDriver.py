@@ -193,6 +193,9 @@ class ModelDriver(Driver):
         additional_dependencies (dict, optional): A mapping between languages
             and lists of packages in those languages that are required by the
             model.
+        with_debugger (str, optional): Debugger tool that should be used
+            to run models. This string should include the tool executable
+            and any flags that should be passed to it.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Class Attributes:
@@ -408,6 +411,7 @@ class ModelDriver(Driver):
                                   {'type': 'array',
                                    'items': {'type': 'string'}}]}}}]}}],
             'default': False},
+        'with_debugger': {'type': 'string'},
         'with_strace': {'type': 'boolean', 'default': False},
         'strace_flags': {'type': 'array',
                          'default': ['-e', 'trace=memory'],
@@ -521,12 +525,19 @@ class ModelDriver(Driver):
         self.queue_thread = None
         self.event_process_kill_called = multitasking.Event()
         self.event_process_kill_complete = multitasking.Event()
-        # Strace/valgrind
-        if self.with_strace and self.with_valgrind:
-            raise RuntimeError("Trying to run with strace and valgrind.")
-        if (((self.with_strace or self.with_valgrind)
-             and platform._is_win)):  # pragma: windows
-            raise RuntimeError("strace/valgrind options invalid on windows.")
+        # Tools
+        if self.with_debugger == 'valgrind':
+            self.with_debugger += ' --leak-check=full --show-leak-kinds=all'
+        elif self.with_debugger == 'strace':
+            self.with_debugger += ' -e trace=memory'
+        if self.with_strace:
+            # TODO: deprecate with_strace, strace_flags
+            assert not (self.with_debugger or self.with_valgrind)
+            self.with_debugger = 'strace ' + ' '.join(self.strace_flags)
+        if self.with_valgrind:
+            # TODO: deprecate with_valgrind, valgrind_flags
+            assert not (self.with_debugger or self.with_strace)
+            self.with_debugger = 'valgrind ' + ' '.join(self.valgrind_flags)
         self.model_index = model_index
         self.copy_index = copy_index
         self.clients = clients
@@ -1053,11 +1064,13 @@ class ModelDriver(Driver):
         subprocess.check_call(self.validation_command.split(),
                               cwd=self.working_dir)
         
-    def run_model(self, return_process=True, **kwargs):
+    def run_model(self, command=None, return_process=True, **kwargs):
         r"""Run the model. Unless overridden, the model will be run using
         run_executable.
 
         Args:
+            command (list, optional): Command to run. Defaults to None
+                and is created by the model_command method.
             return_process (bool, optional): If True, the process running
                 the model is returned. If False, the process will block until
                 the model finishes running. Defaults to True.
@@ -1065,16 +1078,17 @@ class ModelDriver(Driver):
 
         """
         env = self.set_env()
-        command = self.model_command()
-        if self.with_strace or self.with_valgrind:
-            kwargs.setdefault('debug_flags', self.debug_flags)
+        if command is None:
+            command = self.model_command()
+        if self.with_debugger:
+            kwargs.setdefault('debug_flags', self.with_debugger.split())
         self.debug('Working directory: %s', self.working_dir)
         self.debug('Command: %s', ' '.join(command))
         self.debug('Environment Variables:\n%s', self.pprint(env, block_indent=1))
         # Update keywords
         # NOTE: Setting forward_signals to False allows faster debugging
-        # but should not be used in deployment for cases where models are not
-        # running locally.
+        # but should not be used in deployment for cases where models are
+        # not running locally.
         default_kwargs = dict(env=env, working_dir=self.working_dir,
                               forward_signals=False,
                               shell=platform._is_win)
@@ -1082,29 +1096,6 @@ class ModelDriver(Driver):
             kwargs.setdefault(k, v)
         return self.run_executable(command, return_process=return_process, **kwargs)
 
-    @property
-    def debug_flags(self):
-        r"""list: Flags that should be prepended to an executable command to
-        enable debugging."""
-        pre_args = []
-        if self.with_strace:
-            if platform._is_linux:
-                pre_args += ['strace'] + self.strace_flags
-            else:  # pragma: debug
-                raise RuntimeError("strace not supported on this OS.")
-            # TODO: dtruss cannot be run without sudo, sudo cannot be
-            # added to the model process command if it is not in the original
-            # yggdrasil CLI call, and must be tested with an executable that
-            # is not "signed with restricted entitlements" (which most built-in
-            # utilities (e.g. sleep) are).
-            # elif platform._is_mac:
-            #     if 'sudo' in sys.argv:
-            #         pre_args += ['sudo']
-            #     pre_args += ['dtruss']
-        elif self.with_valgrind:
-            pre_args += ['valgrind'] + self.valgrind_flags
-        return pre_args
-        
     @classmethod
     def language_version(cls, version_flags=None, **kwargs):
         r"""Determine the version of this language.
