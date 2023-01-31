@@ -99,14 +99,17 @@
         }
       },
       {
-        "{{ compiler('c') }}": {
-          "method": "conda_recipe"
-        }
-      },
-      {
-        "{{ compiler('cxx') }}": {
-          "method": "conda_recipe"
-        }
+        "gcc": [
+          {
+            "method": "conda",
+            "os": "unix"
+          },
+          {
+            "name": "m2w64-gcc",
+            "method": "conda",
+            "os": "win"
+          }
+        ]
       }
     ],
     "fortran": {
@@ -117,12 +120,7 @@
         {
           "gfortran": [
             {
-              "name": "{{ compiler('fortran') }}",
-              "method": "conda_recipe",
-              "os": "unix"
-            },
-            {
-              "name": "fortran-compiler",
+              "name": "gfortran",
               "os": "unix",
               "method": "conda"
             },
