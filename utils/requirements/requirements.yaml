@@ -57,27 +57,18 @@ extras:
     - make:
         method: conda
         os: unix
-    - gcc:
-        - method: conda
-          os: unix
-        - name: m2w64-gcc
-          method: conda
-          os: win
-    # - "{{ compiler('c') }}":
-    #     method: conda_recipe
-    # - "{{ compiler('cxx') }}":
-    #     method: conda_recipe
+    - "{{ compiler('c') }}":
+        method: conda_recipe
+    - "{{ compiler('cxx') }}":
+        method: conda_recipe
   fortran:
     requires_extras: [c]
     requirements:
     - gfortran:
-        # - name: "{{ compiler('fortran') }}"
-        #   method: conda_recipe
-        #   os: unix
-        # - name: fortran-compiler
-        #   os: unix
-        #   method: conda
-        - name: gfortran
+        - name: "{{ compiler('fortran') }}"
+          method: conda_recipe
+          os: unix
+        - name: fortran-compiler
           os: unix
           method: conda
         - name: m2w64-gcc-fortran
