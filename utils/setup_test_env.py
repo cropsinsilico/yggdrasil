@@ -1280,7 +1280,11 @@ def install_pkg(method, param=None, without_build=False,
         R_cmd = f"{param.python_cmd} -m yggdrasil install r"
         if not param.install_opts['no_sudo']:
             R_cmd += ' --sudoR'
+        if param.method == 'conda' and param.conda_env:
+            cmds.append(f"conda activate {param.conda_env}")
         cmds.append(R_cmd)
+        if param.method == 'conda' and param.conda_env:
+            cmds.append("conda deactivate")
     call_kws = {}
     if param.method == 'conda':
         env = copy.copy(os.environ)
