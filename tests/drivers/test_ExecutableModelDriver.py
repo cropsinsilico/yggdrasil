@@ -11,7 +11,7 @@ def test_execution_error():
 
 def test_error_valgrind_strace():
     r"""Test error if both valgrind and strace set."""
-    with pytest.raises(RuntimeError):
+    with pytest.raises(AssertionError):
         ExecutableModelDriver('test', 'test',
                               with_strace=True, with_valgrind=True)
 
