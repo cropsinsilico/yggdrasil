@@ -1864,10 +1864,13 @@ class CModelDriver(CompiledModelDriver):
                     raise RuntimeError("Length must be set in order "
                                        "to write array assignments.")
                 elif (dst_var['datatype'].get('subtype', dst_var['datatype']['type'])
-                      in ['bytes']):
-                    src_var_length = '(strlen(%s)+1)' % src_var['name']
+                      in ['bytes', 'string']):
+                    src_var_length = 'strlen(%s)' % src_var['name']
                 else:
-                    src_var_length = '(strlen4(%s)+1)' % src_var['name']
+                    src_var_length = 'strlen4(%s)' % src_var['name']
+            if ((dst_var['datatype'].get('subtype', dst_var['datatype']['type'])
+                 in ['bytes', 'string', 'unicode'])):
+                src_var_length = f"({src_var_length}+1)"
             src_var_dtype = cls.get_native_type(**src_var)
             if src_var_dtype in ['bytes_t', 'unicode_t', 'string_t']:
                 src_var_dtype = 'char*'

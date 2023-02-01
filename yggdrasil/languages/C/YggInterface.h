@@ -37,7 +37,7 @@ comm_t* yggRpcServerType_global(const char *name, dtype_t *inType, dtype_t *outT
       2. Prepare: Format data to a character array buffer.
 ```
             char buffer[YGG_MSG_BUF]; 
-	    sprintf(buffer, "a=%d, b=%d", 1, 2);
+	    snprintf(buffer, YGG_MSG_BUF, "a=%d, b=%d", 1, 2);
 ```
       3. Send:
 ```
@@ -80,7 +80,7 @@ yggOutput_t yggOutputType(const char *name, dtype_t *datatype) {
       return yggRpcServerType_global(YGG_MODEL_NAME, NULL, datatype);
     } else {
       char alt_name[100];
-      sprintf(alt_name, "%s:%s", YGG_MODEL_NAME, name);
+      snprintf(alt_name, 100, "%s:%s", YGG_MODEL_NAME, name);
       if (strcmp(alt_name, YGG_SERVER_OUTPUT) == 0) {
 	return yggRpcServerType_global(YGG_MODEL_NAME, NULL, datatype);
       }
@@ -108,7 +108,7 @@ yggInput_t yggInputType(const char *name, dtype_t *datatype) {
       return yggRpcServerType_global(YGG_MODEL_NAME, datatype, NULL);
     } else {
       char alt_name[100];
-      sprintf(alt_name, "%s:%s", YGG_MODEL_NAME, name);
+      snprintf(alt_name, 100, "%s:%s", YGG_MODEL_NAME, name);
       if (strcmp(alt_name, YGG_SERVER_INPUT) == 0) {
 	return yggRpcServerType_global(YGG_MODEL_NAME, datatype, NULL);
       }

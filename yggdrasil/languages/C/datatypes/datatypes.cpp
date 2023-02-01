@@ -260,8 +260,8 @@ JSONArrayMetaschemaType* create_dtype_format_class(const char *format_str,
   char ifmt[FMT_LEN];
   char re_fmt[FMT_LEN];
   char re_fmt_eof[FMT_LEN];
-  sprintf(re_fmt, "%%[^%s%s ]+[%s%s ]", "\t", "\n", "\t", "\n");
-  sprintf(re_fmt_eof, "%%[^%s%s ]+", "\t", "\n");
+  snprintf(re_fmt, FMT_LEN, "%%[^%s%s ]+[%s%s ]", "\t", "\n", "\t", "\n");
+  snprintf(re_fmt_eof, FMT_LEN, "%%[^%s%s ]+", "\t", "\n");
   size_t iprecision = 0;
   while (beg < strlen(format_str)) {
     char isubtype[FMT_LEN] = "";

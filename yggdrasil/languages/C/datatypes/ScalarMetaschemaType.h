@@ -368,7 +368,14 @@ public:
     case T_BYTES: {
       // TODO: Handle array of char arrays
       char* arg = (char*)(data->get_data());
-      std::cout << arg << std::endl;
+      for (i = 0; i < data->get_nbytes(); i++) {
+	std::cout << arg[i];
+      }
+      // if (data->get_nbytes() > 0) {
+      // 	char* arg = (char*)(data->get_data());
+      // 	std::cout << arg;
+      // }
+      std::cout << std::endl;
       return;
     }
     case T_UNICODE: {

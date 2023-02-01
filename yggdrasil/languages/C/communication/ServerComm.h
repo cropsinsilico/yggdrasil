@@ -164,7 +164,7 @@ int server_add_comm(requests_t *x, char* response_address,
   x->comms[x->ncomm] = new_comm_base(response_address, "send",
 				     _default_comm, dtype_copy);
   x->comms[x->ncomm]->flags = x->comms[x->ncomm]->flags | COMM_ALLOW_MULTIPLE_COMMS;
-  /* sprintf(x->comms[x->ncomm]->name, "server_response.%s",x->comms[x->ncomm]->address); */
+  /* snprintf(x->comms[x->ncomm]->name, COMM_NAME_SIZE, "server_response.%s",x->comms[x->ncomm]->address); */
   int newret = init_default_comm(x->comms[x->ncomm]);
   if (newret < 0) {
     ygglog_error("server_add_comm(%s): Could not initialize response comm.", response_address);
@@ -210,7 +210,7 @@ int server_add_request(requests_t *x, const char* request_id, char* response_add
   char uuid[10] = "";
   strcpy(response_id, request_id);
   while (server_has_response(x, response_id) >= 0) {
-    sprintf(uuid, "%d", rand());
+    snprintf(uuid, 10, "%d", rand());
     strcat(response_id, uuid);
   }
   ygglog_debug("server_add_request: Response id = %s", response_id);
@@ -306,7 +306,7 @@ int init_server_comm(comm_t *comm) {
   comm_t *handle;
   if (strlen(comm->name) == 0) {
     handle = new_comm_base(comm->address, "recv", _default_comm, dtype_in);
-    sprintf(handle->name, "server_request.%s", comm->address);
+    snprintf(handle->name, COMM_NAME_SIZE, "server_request.%s", comm->address);
   } else {
     handle = init_comm_base(comm->name, "recv", _default_comm, dtype_in);
   }

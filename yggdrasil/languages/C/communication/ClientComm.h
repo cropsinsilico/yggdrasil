@@ -282,7 +282,7 @@ int init_client_comm(comm_t *comm) {
   comm_t *handle;
   if (strlen(comm->name) == 0) {
     handle = new_comm_base(comm->address, "send", _default_comm, dtype_out);
-    sprintf(handle->name, "client_request.%s", comm->address);
+    snprintf(handle->name, COMM_NAME_SIZE, "client_request.%s", comm->address);
   } else {
     handle = init_comm_base(comm->name, "send", _default_comm, dtype_out);
   }
@@ -364,7 +364,7 @@ comm_head_t client_response_header(const comm_t* x, comm_head_t head) {
   }
   // Add address & request ID to header
   strcpy(head.response_address, resp->comm->address);
-  sprintf(head.request_id, "%d", rand());
+  snprintf(head.request_id, COMMBUFFSIZ, "%d", rand());
   if (client_add_request(resp, head.request_id) < 0) {
     ygglog_error("client_response_header(%s): Failed to add request",
 		 x->name);

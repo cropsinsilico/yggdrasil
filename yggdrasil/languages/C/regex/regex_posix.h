@@ -376,7 +376,7 @@ int regex_replace_sub(char *buf, const size_t len_buf,
       i = refs[j];
       strcpy(igrp, p + m[i].rm_so);
       igrp[m[i].rm_eo - m[i].rm_so] = 0; // terminate
-      sprintf(re_sub, "\\$%d", (int)i);
+      snprintf(re_sub, len_buf, "\\$%d", (int)i);
       ret = regex_replace_nosub(rp_sub, 2*len_buf, re_sub, igrp, 0);
       if (ret < 0) {
 	printf("regex_replace_sub: Error replacing substring $%d.\n", (int)i);

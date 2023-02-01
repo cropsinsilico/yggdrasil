@@ -50,7 +50,7 @@ int init_ascii_file_comm(comm_t *comm) {
 */
 static inline
 int new_ascii_file_address(comm_t *comm) {
-  sprintf(comm->name, "temp%d", _yggAsciiFilesCreated);
+  snprintf(comm->name, COMM_NAME_SIZE, "temp%d", _yggAsciiFilesCreated);
   int ret = init_ascii_file_comm(comm);
   return ret;
 };
