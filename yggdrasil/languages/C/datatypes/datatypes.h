@@ -943,7 +943,7 @@ int split_head_body(const char *buf, const size_t buf_siz,
   UNUSED(buf_siz);
   size_t sind1, eind1, sind2, eind2;
   char re_head_tag[COMMBUFFSIZ];
-  sprintf(re_head_tag, "(%s)", MSG_HEAD_SEP);
+  snprintf(re_head_tag, COMMBUFFSIZ, "(%s)", MSG_HEAD_SEP);
   ret = find_match(re_head_tag, buf, &sind1, &eind1);
   if (ret > 0) {
     sind = sind1;

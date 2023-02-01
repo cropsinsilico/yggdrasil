@@ -14,7 +14,8 @@ from yggdrasil import platform, constants, rapidjson
 from yggdrasil.serialize.ObjSerialize import ObjDict
 from yggdrasil.serialize.PlySerialize import PlyDict
 from yggdrasil.tools import (
-    get_supported_lang, get_supported_comm, get_supported_type)
+    get_supported_lang, get_supported_comm, get_supported_type,
+    resolve_language_aliases)
 from yggdrasil.components import import_component
 from yggdrasil.multitasking import _on_mpi
 logger = logging.getLogger(__name__)
@@ -874,9 +875,14 @@ def pprint_diff():
 @pytest.fixture(scope="session")
 def check_required_languages(pytestconfig):
     r"""Check if a set of languages is enabled/disabled."""
+    enabled = resolve_language_aliases(
+        pytestconfig.getoption("--language"))
+    disabled = resolve_language_aliases(
+        pytestconfig.getoption("--skip-language"))
+
     def check_required_languages_w(required_languages):
-        enabled = pytestconfig.getoption("--language")
-        disabled = pytestconfig.getoption("--skip-language")
+        required_languages = resolve_language_aliases(
+            required_languages)
         if enabled and (not all(x in enabled for x in required_languages)):
             pytest.skip(f"One or more required languages "
                         f"({required_languages}) not enabled")

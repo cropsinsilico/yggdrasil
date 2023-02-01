@@ -982,7 +982,7 @@ class yggcompile(SubCommand):
                    "to be treated as source files to be compiled.")}),
         (('--source-language', ),
          {'default': None,
-          'choices': [None] + LANGUAGES_WITH_ALIASES['all'],
+          # 'choices': [None] + LANGUAGES_WITH_ALIASES['all'],
           'help': ("Language of the source code. If not provided, "
                    "the language will be determined from the "
                    "source extension.")}),

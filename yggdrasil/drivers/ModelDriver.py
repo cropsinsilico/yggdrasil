@@ -552,6 +552,10 @@ class ModelDriver(Driver):
             # TODO: deprecate with_valgrind, valgrind_flags
             assert not (self.with_debugger or self.with_strace)
             self.with_debugger = 'valgrind ' + ' '.join(self.valgrind_flags)
+        if ((platform._is_win and self.with_debugger
+             and self.with_debugger.startswith(('strace', 'valgrind')))):
+            raise RuntimeError("strace and valgrind are not available "
+                               "on Windows")
         self.model_index = model_index
         self.copy_index = copy_index
         self.clients = clients

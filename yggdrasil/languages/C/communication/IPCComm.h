@@ -170,13 +170,13 @@ int new_ipc_address(comm_t *comm) {
     key = rand();
   }
   if (strlen(comm->name) == 0) {
-    sprintf(comm->name, "tempnewIPC.%d", key);
+    snprintf(comm->name, COMM_NAME_SIZE, "tempnewIPC.%d", key);
   } else {
     ret = check_channels(comm);
     if (ret < 0)
       return ret;
   }
-  sprintf(comm->address, "%d", key);
+  snprintf(comm->address, COMM_ADDRESS_SIZE, "%d", key);
   int *fid = (int*)malloc(sizeof(int));
   if (fid == NULL) {
     ygglog_error("new_ipc_address: Could not malloc queue fid.");
@@ -203,7 +203,7 @@ int init_ipc_comm(comm_t *comm) {
   if (!(comm->flags & COMM_FLAG_VALID))
     return -1;
   if (strlen(comm->name) == 0) {
-    sprintf(comm->name, "tempinitIPC.%s", comm->address);
+    snprintf(comm->name, COMM_NAME_SIZE, "tempinitIPC.%s", comm->address);
   } else {
     int ret = check_channels(comm);
     if (ret < 0)
@@ -386,7 +386,7 @@ int ipc_comm_send_nolimit(const comm_t *x, const char *data, const size_t len){
   int ret = -1;
   size_t msgsiz = 0;
   char msg[YGG_MSG_MAX];
-  sprintf(msg, "%ld", (long)(len));
+  snprintf(msg, YGG_MSG_MAX, "%ld", (long)(len));
   ret = ipc_comm_send(x, msg, strlen(msg));
   if (ret != 0) {
     ygglog_debug("ipc_comm_send_nolimit(%s): sending size of payload failed.", x->name);

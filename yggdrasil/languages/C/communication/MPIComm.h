@@ -31,7 +31,7 @@ int init_mpi_comm(comm_t *comm) {
   if (!(comm->flags & COMM_FLAG_VALID))
     return -1;
   if (strlen(comm->name) == 0) {
-    sprintf(comm->name, "tempinitMPI.%s", comm->address);
+    snprintf(comm->name, COMM_NAME_SIZE, "tempinitMPI.%s", comm->address);
   }
   mpi_registry_t* reg = (mpi_registry_t*)malloc(sizeof(mpi_registry_t));
   if (reg == NULL) {

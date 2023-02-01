@@ -119,7 +119,7 @@ comm_t* get_global_scope_comm(const char *name) {
 	} else {
 	  const char* YGG_MODEL_NAME = getenv("YGG_MODEL_NAME");
 	  char alt_name[100];
-	  sprintf(alt_name, "%s:%s", YGG_MODEL_NAME, name);
+	  snprintf(alt_name, 100, "%s:%s", YGG_MODEL_NAME, name);
 	  if ((strcmp(icomm->name, alt_name) == 0) && (icomm->thread_id == current_thread)) {
 	    out = icomm;
 	    break;
@@ -440,7 +440,7 @@ comm_t* new_comm(char *address, const char *direction,
     ret->flags = ret->flags & ~COMM_FLAG_VALID;
   } else {
     if (strlen(ret->name) == 0) {
-      sprintf(ret->name, "temp.%s", ret->address);
+      snprintf(ret->name, COMM_NAME_SIZE, "temp.%s", ret->address);
     }
     flag = register_comm(ret);
     if (flag < 0) {
@@ -1226,7 +1226,7 @@ int comm_recv_nolimit(comm_t *x, char **data, const size_t len) {
   is then sent to the specified output comm. If the message is larger than
   YGG_MSG_MAX or cannot be encoded, it will not be sent.  
   @param[in] x comm_t* structure for comm that message should be sent to.
-  @param[in] ap va_list arguments to be formatted into a message using sprintf.
+  @param[in] ap va_list arguments to be formatted into a message using snprintf.
   @returns int Number of arguments formatted if send succesfull, -1 if send
   unsuccessful.
  */
@@ -1278,7 +1278,7 @@ int vcommSend(const comm_t *x, va_list_t ap) {
   is then sent to the specified output comm.
   @param[in] x comm_t structure for comm that message should be sent to.
   @param[in] nargs size_t Number of variable arguments provided.
-  @param[in] ... Arguments to be formatted into a message using sprintf.
+  @param[in] ... Arguments to be formatted into a message using snprintf.
   @returns int Number of arguments formatted if send succesfull, -1 if send
   unsuccessful.
 */
