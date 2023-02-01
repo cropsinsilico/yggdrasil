@@ -201,6 +201,8 @@ class TestYggClass(base_class):
             return {'format_str': format_str}
         elif class_name == 'YggAsciiTableOutput':
             return {}
+        elif class_name.endswith('Input'):
+            return {}
         return dict(testing_options.get('kwargs', {}))
 
     @pytest.fixture(scope="class")

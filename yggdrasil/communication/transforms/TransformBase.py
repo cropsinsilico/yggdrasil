@@ -69,7 +69,8 @@ class TransformBase(ComponentBase):
 
         """
         try:
-            out = rapidjson.encode_schema(self(rapidjson.generate_data(datatype)))
+            out = rapidjson.encode_schema(self(rapidjson.generate_data(datatype)),
+                                          minimal=True)
             if (((out['type'] == 'array') and (datatype['type'] == 'array')
                  and isinstance(out['items'], list)
                  and isinstance(datatype['items'], list)

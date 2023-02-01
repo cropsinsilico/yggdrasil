@@ -543,7 +543,8 @@ class SerializeBase(tools.YggClass):
             if datatype is None:
                 datatype = {}
             # Update datatype from oldstyle keywords in extra_kwargs
-            datatype = self.update_typedef_from_oldstyle(datatype)
+            if datatype != self.default_datatype:
+                datatype = self.update_typedef_from_oldstyle(datatype)
             if 'type' in datatype:
                 # TODO: Fix push/pull of schema properties
                 if ((self.partial_datatype
@@ -666,8 +667,17 @@ class SerializeBase(tools.YggClass):
                 for iv, itype in zip(v, typedef.get('items', [])):
                     if tk in itype:
                         all_updated = False
-                    if tk == 'units' and units.is_null_unit(iv):
-                        continue
+                    if tk == 'units':
+                        if units.is_null_unit(iv):
+                            continue
+                        if itype['type'] == 'number':
+                            itype.update(type='scalar',
+                                         subtype='float',
+                                         precision=8)
+                        elif itype['type'] == 'integer':
+                            itype.update(type='scalar',
+                                         subtype='int',
+                                         precision=8)
                     itype.setdefault(tk, iv)
                 if all_updated:
                     used.append(k)
