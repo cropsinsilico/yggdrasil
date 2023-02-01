@@ -238,7 +238,10 @@ class yggrun(SubCommand):
         (('--with-debugger', ),
          {'type': str,
           'help': ('Run all models with a specific debuggin tool. If '
-                   'quoted, this can also include flags for the tool.')})]
+                   'quoted, this can also include flags for the tool.')}),
+        (('--with-asan', ),
+         {'action': 'store_true',
+          'help': 'Compile models with the address sanitizer enabled.'})]
 
     @classmethod
     def add_arguments(cls, parser, **kwargs):
@@ -267,7 +270,8 @@ class yggrun(SubCommand):
                        production_run=args.production_run,
                        mpi_tag_start=args.mpi_tag_start,
                        validate=args.validate,
-                       with_debugger=args.with_debugger)
+                       with_debugger=args.with_debugger,
+                       with_asan=args.with_asan)
 
 
 class integration_service_manager(SubCommand):

@@ -159,6 +159,9 @@ class GCCCompiler(CCompilerBase):
             + [('library_rpath', '-Wl,-rpath')]))
     toolset = 'gnu'
     aliases = ['gnu-cc', 'gnu-gcc']
+    asan_flags = ['-fsanitize=address']
+    asan_libenv = 'LD_PRELOAD'
+    object_tool = "ldd"
 
     @classmethod
     def is_installed(cls):
@@ -226,6 +229,9 @@ class ClangCompiler(CCompilerBase):
                                                 'prepend': True}),
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
+    asan_flags = ['-fsanitize=address']
+    asan_libenv = 'DYLD_INSERT_LIBRARIES'
+    object_tool = "otool -L"
     # Set to False since ClangLinker has its own class to handle
     # conflict between versions of clang and ld.
     is_linker = False
@@ -234,7 +240,6 @@ class ClangCompiler(CCompilerBase):
     @classmethod
     def get_flags(cls, *args, **kwargs):
         r"""Get a list of compiler flags."""
-        with_asan = kwargs.pop('with_asan', False)
         out = super(ClangCompiler, cls).get_flags(*args, **kwargs)
         if '-fopenmp' in out:
             idx = out.index('-fopenmp')
@@ -242,8 +247,6 @@ class ClangCompiler(CCompilerBase):
             new_flag = '-Xclang'
             if (idx > 0) and (out[idx - 1] != new_flag):
                 out.insert(idx, new_flag)
-        if with_asan:
-            out += ['-fsanitize=address']
         return out
         
 
@@ -336,6 +339,7 @@ class LDLinker(LinkerBase):
     default_flags_env = 'LDFLAGS'
     version_flags = ['-v']
     search_path_envvar = ['LIBRARY_PATH', 'LD_LIBRARY_PATH']
+    asan_flags = ['-fsanitize=address', '-static-libasan']
 
     @classmethod
     def tool_version(cls, **kwargs):
@@ -375,6 +379,7 @@ class ClangLinker(LDLinker):
                                **{'linker-version': '-mlinker-version=%s',
                                   'library_rpath': '-rpath',
                                   'library_libs_nonstd': ''})
+    asan_flags = ['-fsanitize=address', '-shared-libasan']
 
     @staticmethod
     def before_registration(cls):
@@ -410,7 +415,6 @@ class ClangLinker(LDLinker):
     @classmethod
     def get_flags(cls, *args, **kwargs):
         r"""Get a list of linker flags."""
-        with_asan = kwargs.pop('with_asan', False)
         # Handle case where clang (10.0.0) is trying to pass
         # -platform_version to a version of ld64 that dosn't support
         # it (<520).
@@ -440,8 +444,6 @@ class ClangLinker(LDLinker):
                     if x_file.endswith(('libomp.dylib', 'libomp.a')):
                         out.append(f'-L{x_dir}')
                         break
-        if with_asan:
-            out += ['-fsanitize=address', '-shared-libasan']
         return out
 
 
@@ -458,6 +460,7 @@ class ARArchiver(ArchiverBase):
     toolset = 'gnu'
     compatible_toolsets = ['llvm']
     search_path_envvar = ['LIBRARY_PATH']
+    asan_flags = []
 
 
 class LibtoolArchiver(ArchiverBase):
@@ -468,6 +471,7 @@ class LibtoolArchiver(ArchiverBase):
     static_library_flag = '-static'  # This is the default
     toolset = 'clang'
     search_path_envvar = ['LIBRARY_PATH']
+    asan_flags = []
     
 
 class MSVCArchiver(ArchiverBase):
@@ -532,10 +536,6 @@ class CModelDriver(CompiledModelDriver):
     r"""Class for running C models."""
 
     _schema_subtype_description = ('Model is written in C.')
-    _schema_properties = {
-        'with_asan': {
-            'type': 'boolean',
-            'description': 'Compile with Clang ASAN.'}}
     _deprecated_drivers = ['GCCModelDriver']
     language = 'c'
     language_ext = ['.c', '.h']
@@ -1040,21 +1040,6 @@ class CModelDriver(CompiledModelDriver):
         out = cls.update_python_path(out)
         return out
     
-    def compile_model(self, **kwargs):
-        r"""Compile model executable(s).
-
-        Args:
-            **kwargs: Keyword arguments are passed on to the
-                parent class's method.
-
-        Returns:
-            str: Compiled model file path.
-
-        """
-        if self.with_asan:
-            kwargs['with_asan'] = True
-        return super(CModelDriver, self).compile_model(**kwargs)
-        
     @classmethod
     def parse_var_definition(cls, io, value, **kwargs):
         r"""Extract information about input/output variables from a

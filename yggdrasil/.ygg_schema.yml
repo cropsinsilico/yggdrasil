@@ -2457,7 +2457,7 @@ definitions:
             failure.
           type: string
         with_asan:
-          description: Compile with Clang ASAN.
+          description: Compile/link with the address sanitizer.
           type: boolean
         with_debugger:
           description: Debugger tool that should be used to run models. This string
@@ -2632,6 +2632,9 @@ definitions:
             items:
               type: string
             type: array
+          with_asan:
+            description: Compile/link with the address sanitizer.
+            type: boolean
         required:
         - language
         title: yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver
@@ -2691,7 +2694,7 @@ definitions:
               type: string
             type: array
           with_asan:
-            description: Compile with Clang ASAN.
+            description: Compile/link with the address sanitizer.
             type: boolean
         required:
         - language
@@ -2754,7 +2757,7 @@ definitions:
               type: string
             type: array
           with_asan:
-            description: Compile with Clang ASAN.
+            description: Compile/link with the address sanitizer.
             type: boolean
         required:
         - language
@@ -2861,6 +2864,9 @@ definitions:
             - f2003
             - f2008
             type: string
+          with_asan:
+            description: Compile/link with the address sanitizer.
+            type: boolean
         required:
         - language
         title: yggdrasil.drivers.FortranModelDriver.FortranModelDriver
@@ -3041,6 +3047,9 @@ definitions:
             items:
               type: string
             type: array
+          with_asan:
+            description: Compile/link with the address sanitizer.
+            type: boolean
         required:
         - language
         title: yggdrasil.drivers.MakeModelDriver.MakeModelDriver

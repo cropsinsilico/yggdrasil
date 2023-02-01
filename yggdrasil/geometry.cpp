@@ -911,7 +911,7 @@ static PyObject* ply_as_dict(PyObject* self, PyObject* args, PyObject* kwargs) {
 		return NULL;
 	    }
 	    char key[100];
-	    sprintf(key, "%s_colors", it->c_str());
+	    snprintf(key, 100, "%s_colors", it->c_str());
 	    if (PyDict_SetItemString(out, key, val) < 0) {
 		Py_DECREF(val);
 		Py_DECREF(out);
@@ -2405,7 +2405,7 @@ static PyObject* objwavefront_as_dict(PyObject* self, PyObject* args, PyObject* 
 		return NULL;
 	    }
 	    char key[100];
-	    sprintf(key, "%s_colors", longName.c_str());
+	    snprintf(key, 100, "%s_colors", longName.c_str());
 	    if (PyDict_SetItemString(out, key, val) < 0) {
 		Py_DECREF(val);
 		Py_DECREF(out);

@@ -334,6 +334,7 @@ class CompilationToolBase(object):
         remove_product_exts (list): List of extensions or directories matching
             entries in product_exts and product_files that should be removed
             during cleanup. Be careful when adding files to this list.
+        asan_flags (list): Flags added when with_asan is specified.
 
     """
 
@@ -372,6 +373,9 @@ class CompilationToolBase(object):
     compatible_toolsets = []
     is_build_tool = False
     tool_suffix_format = '_%sx'
+    asan_flags = None
+    asan_libenv = None
+    object_tool = None
     _language_ext = None  # only update once per class
     _language_cache = {}
     
@@ -768,7 +772,8 @@ class CompilationToolBase(object):
     @classmethod
     def get_flags(cls, flags=None, outfile=None, output_first=None,
                   unused_kwargs=None, skip_defaults=False,
-                  dont_skip_env_defaults=False, remove_flags=None, **kwargs):
+                  dont_skip_env_defaults=False, remove_flags=None,
+                  with_asan=False, **kwargs):
         r"""Get a list of flags for the tool.
 
         Args:
@@ -799,7 +804,6 @@ class CompilationToolBase(object):
             list: Flags for the tool.
 
         """
-        kwargs.pop('with_asan', False)
         if flags is None:
             flags = []
         flags = kwargs.pop(f'{cls.tooltype}_flags', flags)
@@ -808,6 +812,8 @@ class CompilationToolBase(object):
             out = [out]
         if output_first is None:
             output_first = cls.output_first
+        if with_asan and cls.asan_flags:
+            out += cls.asan_flags
         # Add default & user defined flags
         if skip_defaults:
             # Include flags set by the environment (this is especially
@@ -1721,6 +1727,48 @@ class CompilerBase(CompilationToolBase):
             return tool.call(out_comp, out=out, additional_args=additional_objs,
                              **kwargs_link)
 
+    # @classmethod
+    # def init_asan_env(cls, out):
+    #     r"""Add environment variables to preload the ASAN libraries."""
+    #     if not (cls.asan_flags and cls.asan_libenv and cls.object_tool
+    #             and not platform._is_win):
+    #         return
+    #     lib = cls.asan_library()
+    #     if lib:
+    #         out[cls.asan_libenv] = lib
+
+    @classmethod
+    def asan_library(cls):
+        r"""Return the address sanitizer library."""
+        if not (cls.asan_flags and cls.object_tool
+                and not platform._is_win):
+            return None
+        if 'asan_library' in cls._language_cache:
+            return cls._language_cache['asan_library']
+        try:
+            fname = 'a.out'
+            fname_src = 'a.c'
+            with open(fname_src, 'w') as fd:
+                fd.write('void foo() {}')
+            cmds = [' '.join(cls.get_executable_command(
+                ['-x', 'c', '-fPIC', '-shared', '-o', fname]
+                + cls.asan_flags + [fname_src], skip_flags=True))]
+            cmds += [f"{cls.object_tool} {fname} | grep asan | "
+                     f"awk '{{print $1}}'"]
+            subprocess.check_call(cmds[0], shell=True)
+            lib = subprocess.check_output(cmds[1], shell=True).decode('utf-8').strip()
+            if not os.path.isabs(lib):
+                lib = os.path.basename(lib)
+                lib = subprocess.check_output(
+                    [cls.get_executable(),
+                     f'-print-file-name={lib}']).decode('utf-8').strip()
+        finally:
+            for x in [fname, fname_src]:
+                if os.path.isfile(x):
+                    os.remove(x)
+        cls._language_cache['asan_library'] = lib
+        return lib
+
         
 class LinkerBase(CompilationToolBase):
     r"""Base class for linkers.
@@ -2208,7 +2256,10 @@ class CompiledModelDriver(ModelDriver):
                            'default': []},
         'linker': {'type': 'string'},
         'linker_flags': {'type': 'array', 'items': {'type': 'string'},
-                         'default': []}}
+                         'default': []},
+        'with_asan': {
+            'type': 'boolean',
+            'description': 'Compile/link with the address sanitizer.'}}
     executable_type = 'compiler'
     default_compiler = None
     default_compiler_flags = None
@@ -3799,6 +3850,9 @@ class CompiledModelDriver(ModelDriver):
                 compiler=compiler, existing=out,
                 logging_level=self.numeric_logging_level,
                 **compile_kwargs)
+        # elif self.with_asan:
+        #     compiler = self.get_tool_instance('compiler', toolname=toolname)
+        #     compiler.init_asan_env(out)
         return out
 
     def compile_dependencies_instance(self, *args, **kwargs):
@@ -3889,7 +3943,8 @@ class CompiledModelDriver(ModelDriver):
                                   products=self.products,
                                   toolname=self.get_tool_instance(
                                       'compiler', return_prop='name'),
-                                  suffix=('_%s' % self.name))
+                                  suffix=('_%s' % self.name),
+                                  with_asan=self.with_asan)
             if not kwargs.get('dont_link', False):
                 default_kwargs.update(linker_flags=self.linker_flags)
             for k, v in default_kwargs.items():
