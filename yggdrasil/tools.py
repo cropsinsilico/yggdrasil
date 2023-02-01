@@ -734,6 +734,24 @@ def get_supported_platforms():
     return copy.deepcopy(platform._supported_platforms)
 
 
+def resolve_language_aliases(language):
+    r"""Get a list of languages, replacing any aliases.
+
+    Args:
+        language (str, list): One or more language.
+
+    Returns:
+        str, list: Aliased language(s).
+
+    """
+    if isinstance(language, (list, tuple)):
+        return [resolve_language_aliases(x) for x in language]
+    for k, v in constants.ALIASED_LANGUAGES.items():
+        if language in v:
+            return k
+    return language
+
+
 def is_language_alias(x, language):
     r"""Check if a string is an alias for a language.
 
