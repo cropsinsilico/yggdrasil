@@ -222,10 +222,10 @@ class SetupParam(object):
             self.conda_flags += ' -y'
             # self.pip_flags += ' -y'
         if self.verbose:
-            self.conda_flags += ' -vvv'
+            # self.conda_flags += ' -vvv'
             self.pip_flags += ' --verbose'
-        # else:
-        #     self.conda_flags += '-q'
+        else:
+            self.conda_flags += '-q'
         if self.method.endswith('-dev'):
             self.method_base = self.method.split('-dev')[0]
             self.for_development = True
@@ -477,7 +477,8 @@ class SetupParam(object):
         if kwargs:
             pprint.pprint(kwargs)
         assert not kwargs  # Use all keyword arguments
-        add_install_opts_args(parser, install_opts=install_opts)
+        if 'install' not in skip_types:
+            add_install_opts_args(parser, install_opts=install_opts)
 
 
 def get_summary_commands(param=None, **kwargs):
@@ -947,6 +948,131 @@ def create_env(env_method, python, param=None, name=None, packages=None,
                 dry_run=param.dry_run)
 
 
+def install_conda_recipe(recipe='recipe', package=None, param=None,
+                         return_commands=False, dont_test=False,
+                         **kwargs):
+    r"""Build and install a package from a conda recipe.
+
+    Args:
+        recipe (str, optional): Directory containing the recipe. Defaults
+            to 'recipe' indicating a directory in the current directory.
+        package (str, list, optional): Package(s) to install from the
+            recipe. If not provided, all packages from the recipe will be
+            installed.
+        param (SetupParam, optional): Parameters defining setup. If
+            not provided, one will be created from kwargs.
+        return_commands (bool, optional): If True, the commands
+            necessary to build the package are returned instead of
+            running them. Defaults to False.
+        dont_test (bool, optional): If True, the tests will not be run as
+            part of the build process. Defaults to False.
+        **kwargs: Additional keyword arguments are passed to
+            SetupParam.
+
+    """
+    if param is None:
+        kwargs.setdefault('method', 'mamba')
+        param = SetupParam(method, **kwargs)
+    summary_cmds = get_summary_commands(param=param)
+    cmds = []
+    cmds += build_conda_recipe(recipe, param=param, return_commands=True,
+                               dont_test=dont_test)
+    cmds += summary_cmds
+    if package is None:
+        package = []
+        with open(os.path.join(recipe, 'meta.yaml'), 'r') as fd:
+            lines = fd.read()
+            idx = lines.find('\noutputs:')
+            if idx != -1:
+                while idx != -1:
+                    idx = lines.find('\n  - name:', idx)
+                    if idx == -1:
+                        break
+                    idx += len('\n  - name:')
+                    package.append(lines[idx:].splitlines()[0].strip())
+            else:
+                idx = lines.find('\npackage:')
+                assert idx != -1
+                idx = lines.find('name:', idx)
+                assert idx != -1
+                idx += len('name:')
+                package.append(lines[idx:].splitlines()[0].strip())
+    cmds += install_conda_build(package, param=param, return_commands=True)
+    if return_commands:
+        return cmds
+    cmds += summary_cmds
+    call_script(cmds, verbose=param.verbose, dry_run=param.dry_run)
+    return cmds
+
+
+def build_conda_recipe(recipe='recipe', param=None,
+                       return_commands=False, dont_test=False, **kwargs):
+    r"""Build a conda recipe.
+
+    Args:
+        recipe (str, optional): Directory containing the recipe. Defaults
+            to 'recipe' indicating a directory in the current directory.
+        param (SetupParam, optional): Parameters defining setup. If
+            not provided, one will be created from kwargs.
+        return_commands (bool, optional): If True, the commands
+            necessary to build the package are returned instead of
+            running them. Defaults to False.
+        dont_test (bool, optional): If True, the tests will not be run as
+            part of the build process. Defaults to False.
+        **kwargs: Additional keyword arguments are passed to
+            SetupParam.
+
+    """
+    if param is None:
+        kwargs.setdefault('build_method', 'mamba')
+        param = SetupParam(**kwargs)
+    cmds = []
+    conda_env = CONDA_ENV
+    conda_idx = CONDA_INDEX
+    if param.use_mamba:
+        conda_build = f"{CONDA_CMD} mambabuild"
+        build_pkgs = ["boa"]
+    else:
+        conda_build = f"{CONDA_CMD} build"
+        build_pkgs = ["conda-build", "conda-verify"]
+    if param.verbose:
+        build_flags = ''
+    else:
+        build_flags = '-q'
+    # Must always build in base to avoid errors (and don't change the
+    # version of Python used in the environment)
+    # https://github.com/conda/conda/issues/9124
+    # https://github.com/conda/conda/issues/7758#issuecomment-660328841
+    assert conda_env == 'base' or param.dry_run
+    assert conda_idx
+    if _on_gha:
+        cmds += [
+            f"{param.conda_exe_config} config --prepend channels"
+            f" conda-forge",
+            f"{param.conda_exe} update -q {param.method}",
+        ]
+    if not dont_test:
+        # The tests issue a command that is too long for the
+        # windows command prompt which is used to build the conda
+        # package on Github Actions
+        build_flags += ' --no-test'
+    cmds += [
+        f"{param.conda_exe} clean --all"]  # Might invalidate cache
+    if not (_is_win and _on_gha):
+        cmds += [f"{param.conda_exe} update --all"]
+    cmds += [
+        f"{param.conda_exe} install -n base " + ' '.join(build_pkgs),
+        f"{conda_build} recipe --python {param.python} {build_flags}"
+    ]
+    cmds.append(f"{param.conda_exe} index {conda_idx}")
+    if return_commands:
+        return cmds
+    if cmds:
+        call_script(cmds, verbose=param.verbose, dry_run=param.dry_run)
+    print(f"CONDA_IDX = {conda_idx}")
+    assert (conda_idx and os.path.isdir(conda_idx))
+
+
 def build_pkg(method, param=None, return_commands=False, **kwargs):
     r"""Build the package on a CI resource.
 
@@ -969,45 +1095,9 @@ def build_pkg(method, param=None, return_commands=False, **kwargs):
     upgrade_pkgs = ['wheel', 'setuptools']
     if not _is_win:
         upgrade_pkgs.insert(0, 'pip')
-    if param.build_method in ('conda', 'mamba'):
-        conda_env = CONDA_ENV
-        conda_idx = CONDA_INDEX
-        if param.use_mamba:
-            conda_build = f"{CONDA_CMD} mambabuild"
-            build_pkgs = ["boa"]
-        else:
-            conda_build = f"{CONDA_CMD} build"
-            build_pkgs = ["conda-build", "conda-verify"]
-        if param.verbose:
-            build_flags = ''
-        else:
-            build_flags = '-q'
-        # Must always build in base to avoid errors (and don't change the
-        # version of Python used in the environment)
-        # https://github.com/conda/conda/issues/9124
-        # https://github.com/conda/conda/issues/7758#issuecomment-660328841
-        assert conda_env == 'base' or param.dry_run
-        assert conda_idx
-        if _on_gha:
-            cmds += [
-                f"{param.conda_exe_config} config --prepend channels"
-                f" conda-forge",
-                f"{param.conda_exe} update -q {param.build_method}",
-            ]
-        if _is_win and _on_gha:
-            # The tests issue a command that is too long for the
-            # windows command prompt which is used to build the conda
-            # package on Github Actions
-            build_flags += ' --no-test'
-        cmds += [
-            f"{param.conda_exe} clean --all"]  # Might invalidate cache
-        if not (_is_win and _on_gha):
-            cmds += [f"{param.conda_exe} update --all"]
-        cmds += [
-            f"{param.conda_exe} install -q -n base " + ' '.join(build_pkgs),
-            f"{conda_build} recipe --python {param.python} {build_flags}"
-        ]
-        cmds.append(f"{param.conda_exe} index {conda_idx}")
+    if param.build_method in ('mamba', 'conda'):
+        cmds += build_conda_recipe(param=param, return_commands=True,
+                                   dont_test=(_is_win and _on_gha))
     elif param.build_method in ('sdist', 'bdist',
                                 'wheel', 'bdist_wheel'):
         build_method = param.build_method
@@ -1048,9 +1138,6 @@ def build_pkg(method, param=None, return_commands=False, **kwargs):
             cmds += cmds_after
         call_script(cmds, verbose=param.verbose,
                     dry_run=param.dry_run)
-    if param.build_method in ('conda', 'mamba'):
-        print(f"CONDA_IDX = {conda_idx}")
-        assert (conda_idx and os.path.isdir(conda_idx))
 
 
 def preinstall_deps(method, param=None, return_commands=False,
@@ -1172,6 +1259,69 @@ def install_deps(method, param=None, return_commands=False,
     return cmds
 
 
+def install_conda_build(package, param=None, return_commands=False,
+                        allow_fail=False, **kwargs):
+    r"""Install a package from a local conda build.
+
+    Args:
+        package (str, list): Name(s) of the package(s) to install.
+        param (SetupParam, optional): Parameters defining setup. If
+            not provided, one will be created from kwargs.
+        return_commands (bool, optional): If True, the commands
+            necessary to install the package are returned instead of
+            running them. Defaults to False.
+        allow_fail (bool, optional): If True, the install command will be
+            allowed to fail. Defaults to False.
+        **kwargs: Additional keyword arguments are passed to
+            SetupParam.
+
+    """
+    if isinstance(package, list):
+        package = ' '.join(package)
+    if param is None:
+        kwargs.setdefault('method', 'mamba')
+        param = SetupParam(**kwargs)
+    conda_exe_config = CONDA_CMD
+    if param.use_mamba:
+        conda_exe = MAMBA_CMD
+        conda_idx = CONDA_INDEX  # 'local'
+    else:
+        conda_exe = CONDA_CMD
+        conda_idx = CONDA_INDEX
+    if not (conda_idx and os.path.isdir(conda_idx)):
+        print(f"conda_idx = {conda_idx}")
+    assert (conda_idx and os.path.isdir(conda_idx))
+    # Install from conda build
+    # Assumes that the target environment is active
+    install_flags = param.conda_flags
+    if not param.use_mamba:
+        install_flags += ' --update-deps'
+    if _is_win:
+        index_channel = conda_idx
+    else:
+        index_channel = f"file:/{conda_idx}"
+    allow_fail_str = ''
+    if allow_fail:
+        allow_fail_str = " # [ALLOW FAIL]"
+    cmds = [
+        f"{conda_exe_config} config --prepend channels {index_channel}",
+        # Related issues if this stops working again
+        # https://github.com/conda/conda/issues/466#issuecomment-378050252
+        f"{conda_exe} install {install_flags} -c"
+        f" {index_channel} {package}{allow_fail_str}"
+        # Required for non-strict channel priority
+        # https://github.com/conda-forge/conda-forge.github.io/pull/670
+        # https://conda.io/projects/conda/en/latest/user-guide/concepts/ ...
+        # packages.html?highlight=openblas#installing-numpy-with-blas-variants
+        # f"{conda_exe} install {install_flags} --update-deps -c
+        #   {index_channel} yggdrasil \"blas=*=openblas\""
+    ]
+    if return_commands:
+        return cmds
+    call_script(cmds, verbose=param.verbose, dry_run=param.dry_run)
+    return cmds
+
+
 def install_pkg(method, param=None, without_build=False,
                 without_deps=False, install_deps_before=False,
                 return_commands=False, allow_missing=False, **kwargs):
@@ -1240,43 +1390,11 @@ def install_pkg(method, param=None, without_build=False,
         # cmds += [f"{param.python_cmd} setup.py develop"]
         pass
     elif param.method == 'conda':
-        conda_exe_config = CONDA_CMD
-        if param.use_mamba:
-            conda_exe = MAMBA_CMD
-            conda_idx = CONDA_INDEX  # 'local'
-        else:
-            conda_exe = CONDA_CMD
-            conda_idx = CONDA_INDEX
-        if not (conda_idx and os.path.isdir(conda_idx)):
-            print(f"conda_idx = {conda_idx}")
-        assert (conda_idx and os.path.isdir(conda_idx))
-        # Install from conda build
-        # Assumes that the target environment is active
-        install_flags = param.conda_flags
-        if not param.use_mamba:
-            install_flags += ' --update-deps'
-        if _is_win:
-            index_channel = conda_idx
-        else:
-            index_channel = f"file:/{conda_idx}"
         ygg_pkgs = ['yggdrasil']
         ygg_pkgs += [f'yggdrasil.{x}' for x in extras]
-        cmds += [
-            f"{conda_exe_config} config --prepend channels {index_channel}",
-            # Related issues if this stops working again
-            # https://github.com/conda/conda/issues/466#issuecomment-378050252
-            f"{conda_exe} install {install_flags} -c"
-            f" {index_channel} {' '.join(ygg_pkgs)}"
-            # Required for non-strict channel priority
-            # https://github.com/conda-forge/conda-forge.github.io/pull/670
-            # https://conda.io/projects/conda/en/latest/user-guide/concepts/ ...
-            # packages.html?highlight=openblas#installing-numpy-with-blas-variants
-            # f"{conda_exe} install {install_flags} --update-deps -c
-            #   {index_channel} yggdrasil \"blas=*=openblas\""
-        ]
-        if 'mpi' in extras:
-            assert ' install ' in cmds[-1]
-            cmds[-1] += " # [ALLOW FAIL]"
+        cmds += install_conda_build(ygg_pkgs, param=param,
+                                    return_commands=True,
+                                    allow_fail=('mpi' in extras))
         cmds += summary_cmds
     elif param.method == 'pip':
         build_ext = None
@@ -1629,6 +1747,29 @@ if __name__ == "__main__":
              {'action': 'store_true',
               'help': "Ignore requirements with no valid options"}),
         ])
+    # Install recipe
+    parser_rcp = subparsers.add_parser(
+        'install-recipe', help="Install a package from a conda recipe.")
+    SetupParam.add_parser_args(
+        parser_rcp,
+        skip=['target_os', 'use_mamba', 'method'],
+        skip_types=['install'],
+        include=['user', 'build_method'],
+        build_method_choices=['mamba', 'conda'],
+        build_method_default='mamba',
+        additional_args=[
+            (('--recipe', ),
+             {'type': str, 'default': 'recipe',
+              'help': "Location of conda recipe to build and install."}),
+            (('--packages', ),
+             {'nargs': '*',
+              'help': ("One or more packages to install from the "
+                       "recipe. Defaults to all of the package in the "
+                       "recipe.")}),
+            (('--dont-test', ),
+             {'action': 'store_true',
+              'help': "Don't run tests as part of the build process."}),
+        ])
     # Installation verification
     parser_ver = subparsers.add_parser(
         'verify', help="Verify that the package was installed correctly.")
@@ -1690,6 +1831,10 @@ if __name__ == "__main__":
                     without_build=args.without_build,
                     without_deps=args.without_deps,
                     allow_missing=args.allow_missing)
+    elif args.operation == 'install-recipe':
+        param = SetupParam.from_args(args, install_opts)
+        install_conda_recipe(recipe=args.recipe, package=args.packages,
+                             param=param, dont_test=args.dont_test)
     elif args.operation == 'verify':
         param = SetupParam.from_args(args, install_opts)
         verify_pkg(install_opts=param.install_opts)
