@@ -3387,11 +3387,7 @@ class CompiledModelDriver(ModelDriver):
 
         """
         compiler = cls.get_tool('compiler', toolname=toolname)
-        if hasattr(compiler, 'tool_version'):  # pragma: windows
-            return compiler.tool_version(**kwargs).strip()
-        kwargs['version_flags'] = compiler.version_flags
-        kwargs['skip_flags'] = True
-        return super(CompiledModelDriver, cls).language_version(**kwargs)
+        return compiler.tool_version(**kwargs).strip()
         
     def run_model(self, **kwargs):
         r"""Run the model. Unless overridden, the model will be run using
