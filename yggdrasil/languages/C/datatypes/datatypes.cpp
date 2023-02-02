@@ -456,6 +456,7 @@ int normalize_document(rapidjson::Document* d, rapidjson::Document* s,
   if (!d->Accept(normalizer)) {
     if (dont_raise)
       return 0;
+    display_document(d);
     throw_validator_error("normalize_document", normalizer);
   }
   if (normalizer.WasNormalized()) {

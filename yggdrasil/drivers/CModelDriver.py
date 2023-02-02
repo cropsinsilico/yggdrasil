@@ -1377,6 +1377,9 @@ class CModelDriver(CompiledModelDriver):
             if grp['type'] in ['char', 'void']:
                 nptr -= 1
             if nptr > 0:
+                if out['type'] == 'number':
+                    out['type'] = 'float'
+                assert out['type'] in constants.SCALAR_TYPES
                 out['subtype'] = out['type']
                 out['type'] = '1darray'
         if out['type'] in constants.SCALAR_TYPES:
