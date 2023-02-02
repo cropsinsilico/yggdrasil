@@ -184,7 +184,7 @@ static PySequenceMethods ply_seq = {
 
 static PyTypeObject Ply_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "rapidjson.geometry.Ply",       /* tp_name */
+    "yggdrasil.rapidjson.geometry.Ply",       /* tp_name */
     sizeof(PlyObject),              /* tp_basicsize */
     0,                              /* tp_itemsize */
     (destructor) ply_dealloc,       /* tp_dealloc */
@@ -1614,7 +1614,7 @@ static PySequenceMethods objwavefront_seq = {
 
 static PyTypeObject ObjWavefront_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "rapidjson.geometry.ObjWavefront",  /* tp_name */
+    "yggdrasil.rapidjson.geometry.ObjWavefront",  /* tp_name */
     sizeof(ObjWavefrontObject),         /* tp_basicsize */
     0,                                  /* tp_itemsize */
     (destructor) objwavefront_dealloc,  /* tp_dealloc */
@@ -3025,7 +3025,7 @@ geom_module_exec(PyObject* m)
         return -1;
     }
 
-    geom_error = PyErr_NewException("rapidjson.geometry.GeometryError",
+    geom_error = PyErr_NewException("yggdrasil.rapidjson.geometry.GeometryError",
 				    PyExc_ValueError, NULL);
     if (geom_error == NULL)
         return -1;
@@ -3047,7 +3047,7 @@ static struct PyModuleDef_Slot geom_slots[] = {
 
 static PyModuleDef geom_module = {
     PyModuleDef_HEAD_INIT,      /* m_base */
-    "rapidjson.geometry",       /* m_name */
+    "yggdrasil.rapidjson.geometry",       /* m_name */
     PyDoc_STR("Structures for handling 3D geometries."),
     0,                          /* m_size */
     geom_functions,             /* m_methods */

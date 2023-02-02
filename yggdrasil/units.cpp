@@ -247,7 +247,7 @@ static PyNumberMethods units_number_methods = {
 
 static PyTypeObject Units_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "rapidjson.units.Units",        /* tp_name */
+    "yggdrasil.rapidjson.units.Units",        /* tp_name */
     sizeof(UnitsObject),            /* tp_basicsize */
     0,                              /* tp_itemsize */
     (destructor) units_dealloc,     /* tp_dealloc */
@@ -493,7 +493,7 @@ static PyObject* do_units_op(PyObject* a, PyObject *b, BinaryOps op,
 	if (!inplace) {
 	    Py_DECREF(out);
 	}
-	PyErr_SetString(PyExc_NotImplementedError, "rapidjson.units.Units do not support this operation.");
+	PyErr_SetString(PyExc_NotImplementedError, "yggdrasil.rapidjson.units.Units do not support this operation.");
 	return NULL;
     }
     }
@@ -634,7 +634,7 @@ static PyMappingMethods quantity_array_map = {
 
 static PyTypeObject QuantityArray_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "rapidjson.units.QuantityArray",      /* tp_name */
+    "yggdrasil.rapidjson.units.QuantityArray",      /* tp_name */
     sizeof(QuantityArrayObject),          /* tp_basicsize */
     0,                                    /* tp_itemsize */
     (destructor) quantity_array_dealloc,  /* tp_dealloc */
@@ -693,7 +693,7 @@ PyDoc_STRVAR(quantity_doc,
 
 static PyTypeObject Quantity_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "rapidjson.units.Quantity",     /* tp_name */
+    "yggdrasil.rapidjson.units.Quantity",     /* tp_name */
     sizeof(QuantityObject),         /* tp_basicsize */
     0,                              /* tp_itemsize */
     0,                              /* tp_dealloc */
@@ -2551,7 +2551,7 @@ units_module_exec(PyObject* m)
         return -1;
     }
 
-    units_error = PyErr_NewException("rapidjson.UnitsError",
+    units_error = PyErr_NewException("yggdrasil.rapidjson.UnitsError",
 				     PyExc_ValueError, NULL);
     if (units_error == NULL)
         return -1;
@@ -2573,7 +2573,7 @@ static struct PyModuleDef_Slot units_slots[] = {
 
 static PyModuleDef units_module = {
     PyModuleDef_HEAD_INIT,      /* m_base */
-    "rapidjson.units",          /* m_name */
+    "yggdrasil.rapidjson.units",          /* m_name */
     PyDoc_STR("Fast, simple units library developed for yggdrasil."),
     0,                          /* m_size */
     units_functions,            /* m_methods */

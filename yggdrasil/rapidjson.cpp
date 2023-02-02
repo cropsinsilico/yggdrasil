@@ -547,7 +547,7 @@ PyDoc_STRVAR(rawjson_doc,
 
 static PyTypeObject RawJSON_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "rapidjson.RawJSON",            /* tp_name */
+    "yggdrasil.rapidjson.RawJSON",            /* tp_name */
     sizeof(RawJSON),                /* tp_basicsize */
     0,                              /* tp_itemsize */
     (destructor) RawJSON_dealloc,   /* tp_dealloc */
@@ -2267,7 +2267,7 @@ static PyMemberDef decoder_members[] = {
 
 static PyTypeObject Decoder_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "rapidjson.Decoder",                      /* tp_name */
+    "yggdrasil.rapidjson.Decoder",                      /* tp_name */
     sizeof(DecoderObject),                    /* tp_basicsize */
     0,                                        /* tp_itemsize */
     0,                                        /* tp_dealloc */
@@ -4460,7 +4460,7 @@ static PyGetSetDef encoder_props[] = {
 
 static PyTypeObject Encoder_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "rapidjson.Encoder",                      /* tp_name */
+    "yggdrasil.rapidjson.Encoder",                      /* tp_name */
     sizeof(EncoderObject),                    /* tp_basicsize */
     0,                                        /* tp_itemsize */
     0,                                        /* tp_dealloc */
@@ -4884,7 +4884,7 @@ static PyMethodDef validator_methods[] = {
 
 static PyTypeObject Validator_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "rapidjson.Validator",          /* tp_name */
+    "yggdrasil.rapidjson.Validator",          /* tp_name */
     sizeof(ValidatorObject),        /* tp_basicsize */
     0,                              /* tp_itemsize */
     (destructor) validator_dealloc, /* tp_dealloc */
@@ -5890,7 +5890,7 @@ static PyMethodDef normalizer_methods[] = {
 
 static PyTypeObject Normalizer_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "rapidjson.Normalizer",         /* tp_name */
+    "yggdrasil.rapidjson.Normalizer",         /* tp_name */
     sizeof(NormalizerObject),       /* tp_basicsize */
     0,                              /* tp_itemsize */
     (destructor) normalizer_dealloc, /* tp_dealloc */
@@ -6375,7 +6375,7 @@ add_submodule(PyObject* m, const char* cname, PyModuleDef* module_def) {
     if (moduleDict == NULL)
 	return NULL;
     char fullname[200] = "";
-    int n = snprintf(fullname, 200, "rapidjson.%s", cname);
+    int n = snprintf(fullname, 200, "yggdrasil.rapidjson.%s", cname);
     if ((n < 0) || (n > 200))
 	return NULL;
     if (PyDict_SetItemString(moduleDict, fullname, submodule) < 0)
@@ -6640,7 +6640,7 @@ module_exec(PyObject* m)
         return -1;
     }
 
-    validation_error = PyErr_NewException("rapidjson.ValidationError",
+    validation_error = PyErr_NewException("yggdrasil.rapidjson.ValidationError",
                                           PyExc_ValueError, NULL);
     if (validation_error == NULL)
         return -1;
@@ -6650,7 +6650,7 @@ module_exec(PyObject* m)
         return -1;
     }
 
-    validation_warning = PyErr_NewException("rapidjson.ValidationWarning",
+    validation_warning = PyErr_NewException("yggdrasil.rapidjson.ValidationWarning",
 					       PyExc_Warning, NULL);
     if (validation_warning == NULL)
         return -1;
@@ -6660,7 +6660,7 @@ module_exec(PyObject* m)
         return -1;
     }
     
-    normalization_error = PyErr_NewException("rapidjson.NormalizationError",
+    normalization_error = PyErr_NewException("yggdrasil.rapidjson.NormalizationError",
 					     PyExc_ValueError, NULL);
     if (normalization_error == NULL)
         return -1;
@@ -6670,7 +6670,7 @@ module_exec(PyObject* m)
         return -1;
     }
 
-    normalization_warning = PyErr_NewException("rapidjson.NormalizationWarning",
+    normalization_warning = PyErr_NewException("yggdrasil.rapidjson.NormalizationWarning",
 					       PyExc_Warning, NULL);
     if (normalization_warning == NULL)
         return -1;
@@ -6680,7 +6680,7 @@ module_exec(PyObject* m)
         return -1;
     }
     
-    decode_error = PyErr_NewException("rapidjson.JSONDecodeError",
+    decode_error = PyErr_NewException("yggdrasil.rapidjson.JSONDecodeError",
                                       PyExc_ValueError, NULL);
     if (decode_error == NULL)
         return -1;
@@ -6690,7 +6690,7 @@ module_exec(PyObject* m)
         return -1;
     }
 
-    comparison_error = PyErr_NewException("rapidjson.ComparisonError",
+    comparison_error = PyErr_NewException("yggdrasil.rapidjson.ComparisonError",
 					  PyExc_ValueError, NULL);
     if (comparison_error == NULL)
 	return -1;
@@ -6700,7 +6700,7 @@ module_exec(PyObject* m)
 	return -1;
     }
 
-    generate_error = PyErr_NewException("rapidjson.GenerateError",
+    generate_error = PyErr_NewException("yggdrasil.rapidjson.GenerateError",
 					  PyExc_ValueError, NULL);
     if (generate_error == NULL)
 	return -1;
@@ -6740,7 +6740,7 @@ static struct PyModuleDef_Slot slots[] = {
 
 static PyModuleDef module = {
     PyModuleDef_HEAD_INIT,      /* m_base */
-    "rapidjson",                /* m_name */
+    "yggdrasil.rapidjson",                /* m_name */
     PyDoc_STR("Fast, simple JSON encoder and decoder. Based on RapidJSON C++ library."),
     0,                          /* m_size */
     functions,                  /* m_methods */

@@ -25,9 +25,13 @@ def vendor(srcdir):
     for x in files_to_copy:
         shutil.copy2(os.path.join(srcdir, x), os.path.join(PYRJ_DIR, x))
         if x.endswith('.cpp'):
-            shutil.copy2(os.path.join(srcdir, x),
-                         os.path.join(ROOT_DIR, 'yggdrasil', x))
-
+            contents = open(os.path.join(srcdir, x), 'r').read()
+            contents = contents.replace('"rapidjson"',
+                                        '"yggdrasil.rapidjson"')
+            contents = contents.replace('"rapidjson.',
+                                        '"yggdrasil.rapidjson.')
+            with open(os.path.join(ROOT_DIR, 'yggdrasil', x), 'w') as fd:
+                fd.write(contents)
     setup_lines = open(os.path.join(srcdir, 'setup.py'), 'r').read().split(
         '\nsetup(')[0]
     open(os.path.join(PYRJ_DIR, 'pyrj_setup.py'), 'w').write(
