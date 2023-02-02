@@ -1,4 +1,6 @@
 int32_to_R <- function(pyobj) {
-  out <- as.integer(reticulate::py_to_r(pyobj))
+  tmp <- reticulate::py_to_r(pyobj)
+  out <- as.integer(tmp)
+  dim(out) <- dim(tmp)
   return(out)
 }

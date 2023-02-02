@@ -35,7 +35,9 @@ python2R <- function(pyobj) {
     }
   } else if (is(pyobj, "pint.quantity.Quantity")
              || is(pyobj, "unyt.array.unyt_quantity")
-             || is(pyobj, "unyt.array.unyt_array")) {
+             || is(pyobj, "unyt.array.unyt_array")
+	     || is(pyobj, "yggdrasil.rapidjson.units.Quantity")
+	     || is(pyobj, "yggdrasil.rapidjson.units.QuantityArray")) {
     ygg_units <- reticulate::import('yggdrasil.units', convert=FALSE)
     robj_data <- python2R(ygg_units$get_data(pyobj))
     robj_units <- python2R(ygg_units$get_units(pyobj))
