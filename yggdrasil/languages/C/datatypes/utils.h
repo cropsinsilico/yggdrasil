@@ -228,12 +228,12 @@ bool set_va_list_mem(const va_list_t &ap,
 		     char*& dst, char**& dst_ref, size_t& dst_len,
 		     const char* src, const size_t src_len,
 		     int allow_realloc) {
-  if ((src_len + 1) > dst_len || dst == NULL) {
+  size_t src_len_alloc = src_len;
+  if (!ap.for_fortran)
+    src_len_alloc++;
+  if (src_len_alloc > dst_len || dst == NULL) {
     if (!allow_realloc)
       ygglog_throw_error("set_va_list_mem: Buffer is not large enough (dst_len = %zu, src_len = %zu)", dst_len, src_len);
-    size_t src_len_alloc = src_len;
-    if (!ap.for_fortran)
-      src_len_alloc++;
     dst = (char*)realloc(dst, src_len_alloc * sizeof(char));
     dst_ref[0] = dst;
   }
@@ -262,7 +262,7 @@ template<typename T>
 bool pop_va_list_mem(va_list_t &ap, T*& dst, T**& dst_ref, int allow_realloc = 0) {
   try {
     if (ap.nargs[0] == 0) {
-      ygglog_throw_error("set_va_list: No more arguments");
+      ygglog_throw_error("pop_va_list_mem: No more arguments");
     }
     if (allow_realloc) {
       if (ap.ptrs) {

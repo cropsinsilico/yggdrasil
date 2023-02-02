@@ -202,7 +202,11 @@ class TestExampleTypes(base_class):
         function_contents = []
         for i, o in zip(inputs, outputs):
             if using_pointers and drv.is_typed:
-                for k in ['shape', 'length']:
+                for x in i, o:
+                    xT = x['datatype']
+                    if xT['type'] == 'ndarray' and len(xT['shape']) == 1:
+                        xT['type'] = '1darray'
+                for k in ['shape', 'length', 'ndim']:
                     i['datatype'].pop(k, None)
                     o['datatype'].pop(k, None)
             function_contents += drv.write_assign_to_output(

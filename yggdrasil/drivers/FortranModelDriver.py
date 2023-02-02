@@ -946,10 +946,12 @@ class FortranModelDriver(CompiledModelDriver):
                      and ('precision' not in datatype))):
                     return True
                 elif (((datatype.get('type', None) == '1darray')
-                       and ('length' not in datatype))):
+                       and ('length' not in datatype)
+                       and ('shape' not in datatype))):
                     return True
                 elif (((datatype.get('type', None) == 'ndarray')
-                       and ('shape' not in datatype))):
+                       and ('shape' not in datatype)
+                       and ('length' not in datatype))):
                     return True
         return False
         

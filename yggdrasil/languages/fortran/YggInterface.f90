@@ -2400,22 +2400,19 @@ contains
     end if
   end function is_size_t
 
-  function pre_send(args, c_args, is_format) result(c_nargs)
+  function pre_send(args, c_args, is_format) result(nargs)
     implicit none
     type(yggptr) :: args(:)
     type(c_ptr), allocatable, target :: c_args(:)
     logical :: is_format
-    integer(kind=c_int) :: c_nargs
     integer(kind=c_size_t) :: k
     integer :: i, j
     integer :: nargs
     call ygglog_debug("pre_send: begin")
     nargs = size(args)  ! Number of arguments passed
-    c_nargs = nargs  ! Number of arguments that C should be aware of
     if (is_format) then
        if (.not.is_size_t(args(1))) then
           nargs = nargs + 1
-          c_nargs = c_nargs + 1
        end if
     end if
     do i = 1, size(args)
@@ -2437,17 +2434,14 @@ contains
              else if (is_next_size_t(args, i, req_array=.true.)) then
                 if (args(i)%alloc) then
                    nargs = nargs + 1  ! For ndim
-                   c_nargs = c_nargs + 1
                 end if
              else if (args(i)%alloc) then
                 nargs = nargs + 2  ! For ndim and shape
-                c_nargs = c_nargs + 2
              end if
           else
              if ((.not.is_format).and.(.not.is_next_size_t(args, i))) then
                 if (args(i)%alloc) then
                    nargs = nargs + 1  ! For the array size
-                   c_nargs = c_nargs + 1
                 end if
              end if
           end if
@@ -2455,7 +2449,6 @@ contains
             (args(i)%type.eq."unicode")) then
           if (.not.is_next_size_t(args, i)) then
              nargs = nargs + 1  ! For the string size
-             c_nargs = c_nargs + 1
           end if
        end if
     end do
@@ -2522,22 +2515,19 @@ contains
     call ygglog_debug("pre_send: end")
   end function pre_send
 
-  function pre_recv(args, c_args, is_format) result(c_nargs)
+  function pre_recv(args, c_args, is_format) result(nargs)
     implicit none
     type(yggptr) :: args(:)
     type(c_ptr), allocatable, target :: c_args(:)
     logical :: is_format
-    integer(kind=c_int) :: c_nargs
     integer(kind=c_size_t) :: k
     integer :: i, j
     integer :: nargs
     call ygglog_debug("pre_recv: begin")
     nargs = size(args)  ! Number of arguments passed
-    c_nargs = nargs  ! Number of arguments that C should be aware of
     if ((is_format).and.(nargs.gt.0)) then
        if (.not.is_size_t(args(1))) then
           nargs = nargs + 1
-          c_nargs = c_nargs + 1
        end if
     end if
     do i = 1, size(args)
@@ -2559,33 +2549,22 @@ contains
                 ! Do nothing, vars already exist
              else if (is_next_size_t(args, i, req_array=.true.)) then
                 nargs = nargs + 1  ! For ndim
-                if (args(i)%alloc) then
-                   c_nargs = c_nargs + 1
-                end if
              else
                 nargs = nargs + 2  ! For ndim and shape
-                if (args(i)%alloc) then
-                   c_nargs = c_nargs + 2
-                end if
              end if
           else
              if ((.not.is_format).and.(.not.is_next_size_t(args, i))) then
                 nargs = nargs + 1  ! For the array size
-                if (args(i)%alloc) then
-                   c_nargs = c_nargs + 1
-                end if
              end if
           end if
           if ((args(i)%type.eq."character").or. &
                (args(i)%type.eq."unicode")) then
              nargs = nargs + 1  ! For the string length
-             c_nargs = c_nargs + 1
           end if
        else if ((args(i)%type.eq."character").or. &
             (args(i)%type.eq."unicode")) then
           if (.not.is_next_size_t(args, i)) then
              nargs = nargs + 1  ! For the string size
-             c_nargs = c_nargs + 1
           end if
        end if
     end do
