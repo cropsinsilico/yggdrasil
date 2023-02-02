@@ -272,6 +272,9 @@ bool pop_va_list_mem(va_list_t &ap, T*& dst, T**& dst_ref, int allow_realloc = 0
 	if (ap.nargs[0] > 0)
 	  ap.nargs[0]--;
       }
+      if (dst_ref == nullptr) {
+	ygglog_throw_error("pop_va_list_mem: NULL reference returned.");
+      }
       dst = dst_ref[0];
     } else {
       if (ap.ptrs) {

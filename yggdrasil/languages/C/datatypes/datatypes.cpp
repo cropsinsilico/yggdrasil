@@ -1276,19 +1276,19 @@ int document_set_vargs(rapidjson::Value& document,
 		 type == rapidjson::Document::GetNDArrayString()) {
 	bool has_shape = false;
 	size_t len = 1;
-	if (!ap.for_fortran) {
-	  if (schema.HasMember("length") && schema["length"].IsInt()) {
-	    len = static_cast<size_t>(schema["length"].GetInt());
-	    has_shape = true;
-	  } else if (schema.HasMember("shape") && schema["shape"].IsArray()) {
-	    len = 1;
-	    for (rapidjson::Value::ConstValueIterator it = schema["shape"].Begin();
-		 it != schema["shape"].End(); it++) {
-	      len *= static_cast<size_t>(it->GetUint());
-	    }
-	    has_shape = true;
+	// if (!ap.for_fortran) {
+	if (schema.HasMember("length") && schema["length"].IsInt()) {
+	  len = static_cast<size_t>(schema["length"].GetInt());
+	  has_shape = true;
+	} else if (schema.HasMember("shape") && schema["shape"].IsArray()) {
+	  len = 1;
+	  for (rapidjson::Value::ConstValueIterator it = schema["shape"].Begin();
+	       it != schema["shape"].End(); it++) {
+	    len *= static_cast<size_t>(it->GetUint());
 	  }
+	  has_shape = true;
 	}
+	// }
 	const char* tmp = document.GetString();
 	size_t tmp_len = (size_t)(document.GetNBytes()); // StringLength());
 	char* mem = NULL;
@@ -1297,7 +1297,7 @@ int document_set_vargs(rapidjson::Value& document,
 	size_t** mem_len_ref = NULL;
 	if (!pop_va_list_mem(ap, mem, mem_ref, allow_realloc))
 	  return 0;
-	if (has_shape || table_nelements) {
+	if ((has_shape || table_nelements) && !ap.for_fortran) {
 	  if (table_nelements)
 	    len = table_nelements;
 	  // len = 0;
@@ -1313,8 +1313,13 @@ int document_set_vargs(rapidjson::Value& document,
 	    size_t** mem_shape_ref = NULL;
 	    if (!pop_va_list_mem(ap, mem_shape, mem_shape_ref, allow_realloc))
 	      return 0;
-	    for (size_t i = 0; i < mem_ndim[0]; i++) {
-	      len *= mem_shape[i];
+	    if (ap.for_fortran && mem_shape == nullptr) {
+	      len = 0;
+	    } else {
+	      len = 1;
+	      for (size_t i = 0; i < mem_ndim[0]; i++) {
+		len *= mem_shape[i];
+	      }
 	    }
 	    size_t i = 0;
 	    size_t src_shape_len = (size_t)(document.GetShape().Size());

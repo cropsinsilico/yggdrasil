@@ -552,6 +552,12 @@ class SerializeBase(tools.YggClass):
                     datatype.update(self.partial_datatype)
                 self.datatype = rapidjson.normalize(datatype,
                                                     {'type': 'schema'})
+                if ((self.datatype['type'] == 'array'
+                     and isinstance(self.datatype.get('items', None), list)
+                     and len(self.datatype['items']) == 1)):
+                    self.datatype['allowSingular'] = True
+                # elif self.datatype['type'] not in ['array', 'object']:
+                #     self.datatype['allowNested'] = True
             # Check to see if new datatype is compatible with new one
             if old_datatype != self.default_datatype and datatype:
                 rapidjson.compare_schemas(self.datatype, old_datatype)
@@ -608,8 +614,7 @@ class SerializeBase(tools.YggClass):
                     elif len(fmts) == 1:
                         cpy = copy.deepcopy(typedef)
                         typedef.clear()
-                        typedef.update(type='array', items=[cpy],
-                                       allowSingular=True)
+                        typedef.update(type='array', items=[cpy])
                     # This continue is covered, but the optimization
                     # causes it to be skipped at runtime
                     # https://bitbucket.org/ned/coveragepy/issues/198/
@@ -633,8 +638,6 @@ class SerializeBase(tools.YggClass):
                             del itype['precision']
                         # itype['type'] = itype.pop('subtype')
                     typedef['items'].append(itype)
-                if len(fmts) == 1:
-                    typedef['allowSingular'] = True
                 used.append('as_array')
                 updated.append('format_str')
             elif k == 'as_array':
