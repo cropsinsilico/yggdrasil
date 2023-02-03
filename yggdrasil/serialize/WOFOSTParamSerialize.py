@@ -197,17 +197,17 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
         out['objects'] = [{'CRPNAM': 'Grain maize CSA practicals',
                            'TBASEM': units.add_units(4.0, 'degC'),
                            'TEFFMX': units.add_units(30.0, 'degC'),
-                           'TSUMEM': units.add_units(110.0, 'degC*d'),
+                           'TSUMEM': units.add_units(110.0, 'ΔdegC*d'),
                            'IDSL': 0,
                            'DLO': units.add_units(-99.0, 'hr'),
                            'DLC': units.add_units(-99.0, 'hr'),
-                           'TSUM1': units.add_units(900.0, 'degC*d'),
-                           'TSUM2': units.add_units(800.0, 'degC*d'),
+                           'TSUM1': units.add_units(900.0, 'ΔdegC*d'),
+                           'TSUM2': units.add_units(800.0, 'ΔdegC*d'),
                            'DTSMTB': [
                                units.add_units(
                                    np.array([0.0, 10.0, 30.0, 35.0]), 'degC'),
                                units.add_units(
-                                   np.array([0.0, 0.0, 24.0, 24.0]), 'degC*d')],
+                                   np.array([0.0, 0.0, 24.0, 24.0]), 'ΔdegC*d')],
                            'DVSI': 0.0,
                            'DVSEND': 2.0,
                            'SSATB': [

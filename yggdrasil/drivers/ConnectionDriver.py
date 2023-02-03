@@ -858,7 +858,7 @@ class ConnectionDriver(Driver):
                 return False
             msg = self.icomm.recv(return_message_object=True, **kwargs)
             self.errors += self.icomm.errors
-        if msg.header and ('model' in msg.header['__meta__']):
+        if msg.header and ('model' in msg.header.get('__meta__', {})):
             self.models_recvd.setdefault(msg.header['__meta__']['model'], 0)
             self.models_recvd[msg.header['__meta__']['model']] += 1
             if msg.header['__meta__']['model'] not in self.models['input']:
@@ -1003,7 +1003,7 @@ class ConnectionDriver(Driver):
         self.debug('')
         with self.lock:
             self._used = True
-        if (msg.header is not None) and ('model' in msg.header['__meta__']):
+        if (msg.header is not None) and ('model' in msg.header.get('__meta__', {})):
             kwargs.setdefault('header_kwargs', {})
             kwargs['header_kwargs'].setdefault('__meta__', {})
             kwargs['header_kwargs']['__meta__'].setdefault(
