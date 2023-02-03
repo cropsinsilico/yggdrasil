@@ -59,11 +59,11 @@ MacOS Errors
     
     **Possible Cause:** You are trying to use the conda-forge supplied compilers on a newer Mac OS (see discussion `here <https://github.com/conda-forge/compilers-feedstock/issues/6>`_). The newer Mac SDKs cannot be packaged by conda-forge due to licensing issues. As a result, the libraries are not correctly linked and you will get the above warning and ``Undefined symbol`` errors.
 
-    **Solution:** Download an older SDK (10.9 works well) and point the conda compilers to it using the steps below.::
+    **Solution:** Download an older SDK (10.9 works well for pre-Apple silicon Macs, but 11.0 should be used for Macs with the M1/M2 chips and arm64 architechture) and point the conda compilers to it using the steps below. If you use a version other than 11.0, check the location of that release's download directly at https://github.com/phracker/MacOSX-SDKs/releases to verify what the directory containing it is as it will be version dependent (step 3).::
 
-      $ export MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET:-10.9}
+      $ export MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET:-11.0}
       $ export CONDA_BUILD_SYSROOT="$(xcode-select -p)/SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk"
-      $ curl -L -O https://github.com/phracker/MacOSX-SDKs/releases/download/10.13/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz
+      $ curl -L -O https://github.com/phracker/MacOSX-SDKs/releases/download/11.0-11.1/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz
       $ tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz -C "$(dirname "$CONDA_BUILD_SYSROOT")"  # This may require sudo
 
     You will need to set the ``CONDA_BUILD_SYSROOT`` environment variable in every process in which you will be running |yggdrasil|. Alternatively, you can permanently add it to your |yggdrasil| configuration file using the following command::

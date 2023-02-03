@@ -72,7 +72,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'call': 'c(flag, {inputs}) %<-% {channel_obj}$call({outputs})',
     }
     function_param = {
-        'import': 'source(\"{filename}\")',
+        'import': 'reticulate::py_config(); source(\"{filename}\")',
         'istype': 'is({variable}, \"{type}\")',
         'len': 'length({variable})',
         'index': '{variable}[[{index}]]',
@@ -556,6 +556,9 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 class.
 
         """
+        if cls.compiled_with_asan():
+            kwargs.setdefault('env', {})
+            cls.set_asan_env(kwargs['env'])
         if package_manager in [None, 'cran', 'CRAN']:
             if isinstance(package, list):
                 package = (

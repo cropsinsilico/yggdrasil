@@ -269,6 +269,8 @@ class YggRunner(YggClass):
             running. Defaults to False.
         with_debugger (str, optional): Tool (and any flags for the tool)
             that should be used to run models.
+        with_asan (bool, optional): Compile and run all models with the
+            address sanitizer. Defaults to False.
 
     Attributes:
         namespace (str): Name that should be used to uniquely identify any
@@ -289,7 +291,9 @@ class YggRunner(YggClass):
                  as_service=False, complete_partial=False,
                  partial_commtype=None, production_run=False,
                  mpi_tag_start=None, yaml_param=None, validate=False,
-                 with_debugger=None):
+                 with_debugger=None, with_asan=False):
+        kwargs_models = {'with_debugger': with_debugger,
+                         'with_asan': with_asan}
         self.mpi_comm = None
         name = 'runner'
         if MPI is not None:
@@ -334,9 +338,11 @@ class YggRunner(YggClass):
                 partial_commtype=partial_commtype, yaml_param=yaml_param)
             self.connectiondrivers = self.drivers['connection']
             self.modeldrivers = self.drivers['model']
-            if with_debugger:
-                for v in self.modeldrivers.values():
-                    v['with_debugger'] = with_debugger
+            for k, v in kwargs_models.items():
+                if not v:
+                    continue
+                for x in self.modeldrivers.values():
+                    x[k] = v
             for x in self.modeldrivers.values():
                 if x['driver'] == 'DummyModelDriver':
                     x['runner'] = self

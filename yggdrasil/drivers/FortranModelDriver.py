@@ -109,6 +109,12 @@ class GFortranCompiler(FortranCompilerBase):
     toolset = 'gnu'
     compatible_toolsets = ['llvm']
     default_archiver = 'ar'
+    # GNU ASAN not currently installed with gfortran on osx
+    # asan_flags = ['-fsanitize=address']
+    # linker_attributes = dict(
+    #     FortranCompilerBase.linker_attributes,
+    #     asan_flags=['-fsanitize=address', '-shared-libasan'])
+    # f'-l{CModelDriver.ClangCompiler.asan_library()}'])
 
 
 # class IFortCompiler(FortranCompilerBase):

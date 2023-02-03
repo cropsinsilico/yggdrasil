@@ -876,7 +876,8 @@ class ModelDriver(Driver):
 
     @classmethod
     def install_dependency(cls, package=None, package_manager=None,
-                           arguments=None, command=None, always_yes=False):
+                           arguments=None, command=None, always_yes=False,
+                           env=None):
         r"""Install a dependency.
 
         Args:
@@ -892,6 +893,8 @@ class ModelDriver(Driver):
             always_yes (bool, optional): If True, the package manager will
                 not ask users for input during installation. Defaults to
                 False.
+            env (dict, optional): Environment variables to set on process
+                where installation will be done.
 
         """
         assert package
@@ -910,6 +913,9 @@ class ModelDriver(Driver):
                 package_manager = 'choco'
         yes_cmd = []
         cmd_kwargs = {}
+        if env:
+            env = dict(os.environ, **env)
+            cmd_kwargs['env'] = env
         if command:
             cmd = copy.copy(command)
         elif package_manager in ('conda', 'mamba'):
@@ -979,6 +985,12 @@ class ModelDriver(Driver):
         raise NotImplementedError("language_executable not implemented for '%s'"
                                   % cls.language)
         
+    @classmethod
+    def compiled_with_asan(cls):
+        r"""Returns true if the compiled_with_asan flag is set."""
+        return (cls.cfg.get(
+            cls.language, 'compiled_with_asan', 'false').lower() == 'true')
+
     @classmethod
     def executable_command(cls, args, unused_kwargs=None, **kwargs):
         r"""Compose a command for running a program using the exectuable for
@@ -1485,6 +1497,28 @@ class ModelDriver(Driver):
         return out
 
     @classmethod
+    def set_asan_env(cls, env, compiler=None):
+        r"""Add flags in the case that the program being run links against
+        a shared ASAN library.
+
+        Args:
+            env (dict): Environment variables dictionary to add library to.
+            compiler (Compiler): Compiler that should be used to determine
+                the location of the ASAN library. Defaults to the C compiler.
+
+        Returns:
+            dict: Environment variables dictionary.
+
+        """
+        if compiler is None:
+            drv = cls
+            if cls._language != 'c':
+                drv = import_component('model', 'c')
+            compiler = drv.get_tool('compiler')
+        compiler.init_asan_env(env)
+        return env
+
+    @classmethod
     def set_env_class(cls, existing=None, **kwargs):
         r"""Set environment variables that are instance independent.
 
@@ -1501,6 +1535,8 @@ class ModelDriver(Driver):
         if existing is None:  # pragma: no cover
             existing = {}
         existing.update(os.environ)
+        if cls.compiled_with_asan():
+            cls.set_env_asan(existing)
         return existing
 
     def set_env(self, existing=None, **kwargs):
@@ -2244,9 +2280,9 @@ class ModelDriver(Driver):
         if yml.get('is_server', False):
             assert isinstance(yml['is_server'], dict)
         if cls.function_param is None:
-            raise ValueError(("Language %s is not parameterized "
-                              "and so functions cannot be automatically "
-                              "wrapped as a model.") % cls.language)
+            raise ValueError(f"Language {cls.language} is not parameterized "
+                             f"and so functions cannot be automatically "
+                             f"wrapped as a model.")
         source_files = cls.identify_source_files(**yml)
         if not source_files:  # pragma: debug
             raise ValueError("Could not identify any source files.")
