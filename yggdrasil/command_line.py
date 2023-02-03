@@ -1196,6 +1196,9 @@ class ygginstall(SubCommand):
           {'action': 'store_true',
            'help': ('Don\'t import the yggdrasil package in '
                     'calling the installation script.')}),
+         (('--with-asan', ),
+          {'action': 'store_true',
+           'help': "Load ASAN library before running executables."}),
          ]
     )
 
@@ -1213,6 +1216,10 @@ class ygginstall(SubCommand):
              or (isinstance(languages, list) and ('all' in languages)))):
             languages = [x.lower() for x in
                          install_languages.get_language_directories()]
+        if args.with_asan:
+            assert not args.no_import
+            from yggdrasil.drivers.CModelDriver import CModelDriver
+            CModelDriver.set_asan_env(os.environ)
         for x in languages:
             install_languages.install_language(x, args=args)
 

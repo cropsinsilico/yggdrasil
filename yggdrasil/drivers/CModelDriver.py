@@ -861,15 +861,16 @@ class CModelDriver(CompiledModelDriver):
                 raise ValueError("Path to vcpkg root directory "
                                  "does not exist: %s." % vcpkg_dir)
             cfg.set(cls._language, 'vcpkg_dir', vcpkg_dir)
-        if macos_sdkroot is None:
-            macos_sdkroot = _osx_sysroot
-        if macos_sdkroot is not None:
-            if not os.path.isdir(macos_sdkroot):  # pragma: debug
-                raise ValueError("Path to MacOS SDK root directory "
-                                 "does not exist: %s." % macos_sdkroot)
-            cfg.set(cls._language, 'macos_sdkroot', macos_sdkroot)
-        # Call __func__ to avoid direct invoking of class which dosn't exist
-        # in after_registration where this is called
+        if cls._language == 'c':
+            if macos_sdkroot is None:
+                macos_sdkroot = cfg.get('c', 'macos_sdkroot', _osx_sysroot)
+            if macos_sdkroot is not None:
+                if not os.path.isdir(macos_sdkroot):  # pragma: debug
+                    raise ValueError(f"Path to MacOS SDK root directory "
+                                     f"does not exist: {macos_sdkroot}")
+                cfg.set('c', 'macos_sdkroot', macos_sdkroot)
+        # Call __func__ to avoid direct invoking of class which dosn't
+        # exist in after_registration where this is called
         out = CompiledModelDriver.configure.__func__(cls, cfg, **kwargs)
         # Change configuration to be directory containing include files
         rjlib = cfg.get(cls._language, 'rapidjson_include', None)

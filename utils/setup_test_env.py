@@ -185,6 +185,7 @@ class SetupParam(object):
             else:
                 setattr(self, k, self.get_default(k))
         assert not kwargs
+        self.conda_flags_general = ''
         self.conda_flags = ''
         self.pip_flags = ''
         if not self.python:
@@ -220,6 +221,7 @@ class SetupParam(object):
             self.method = self.method.replace('mamba', 'conda')
         if self.always_yes:
             self.conda_flags += ' -y'
+            self.conda_flags_general += ' -y'
             # self.pip_flags += ' -y'
         if self.verbose:
             # self.conda_flags += ' -vvv'
@@ -950,6 +952,7 @@ def create_env(env_method, python, param=None, name=None, packages=None,
 
 def install_conda_recipe(recipe='recipe', package=None, param=None,
                          return_commands=False, dont_test=False,
+                         varient_config_files=None, without_build=False,
                          **kwargs):
     r"""Build and install a package from a conda recipe.
 
@@ -966,6 +969,10 @@ def install_conda_recipe(recipe='recipe', package=None, param=None,
             running them. Defaults to False.
         dont_test (bool, optional): If True, the tests will not be run as
             part of the build process. Defaults to False.
+        varient_config_files (list, optional): One or more varient config
+            files to build for.
+        without_build (bool, optional): If True, the package will not
+            be built prior to install. Defaults to False.
         **kwargs: Additional keyword arguments are passed to
             SetupParam.
 
@@ -975,8 +982,11 @@ def install_conda_recipe(recipe='recipe', package=None, param=None,
         param = SetupParam(method, **kwargs)
     summary_cmds = get_summary_commands(param=param)
     cmds = []
-    cmds += build_conda_recipe(recipe, param=param, return_commands=True,
-                               dont_test=dont_test)
+    if not without_build:
+        cmds += build_conda_recipe(
+            recipe, param=param, return_commands=True,
+            dont_test=dont_test,
+            varient_config_files=varient_config_files)
     cmds += summary_cmds
     if package is None:
         package = []
@@ -1006,7 +1016,8 @@ def install_conda_recipe(recipe='recipe', package=None, param=None,
 
 
 def build_conda_recipe(recipe='recipe', param=None,
-                       return_commands=False, dont_test=False, **kwargs):
+                       return_commands=False, dont_test=False,
+                       varient_config_files=None, **kwargs):
     r"""Build a conda recipe.
 
     Args:
@@ -1019,6 +1030,8 @@ def build_conda_recipe(recipe='recipe', param=None,
             running them. Defaults to False.
         dont_test (bool, optional): If True, the tests will not be run as
             part of the build process. Defaults to False.
+        varient_config_files (list, optional): One or more varient config
+            files to build for.
         **kwargs: Additional keyword arguments are passed to
             SetupParam.
 
@@ -1056,10 +1069,14 @@ def build_conda_recipe(recipe='recipe', param=None,
         # windows command prompt which is used to build the conda
         # package on Github Actions
         build_flags += ' --no-test'
+    # Might invalidate cache
     cmds += [
-        f"{param.conda_exe} clean --all"]  # Might invalidate cache
+        f"{param.conda_exe} clean --all {param.conda_flags_general}"]
     if not (_is_win and _on_gha):
         cmds += [f"{param.conda_exe} update --all"]
+    if varient_config_files:
+        build_flags += (
+            f" --variant-config-files {' '.join(varient_config_files)}")
     cmds += [
         f"{param.conda_exe} install -n base " + ' '.join(build_pkgs),
         f"{conda_build} recipe --python {param.python} {build_flags}"
@@ -1453,10 +1470,10 @@ def install_pkg(method, param=None, without_build=False,
         if not param.install_opts['no_sudo']:
             R_cmd += ' --sudoR'
         if param.method == 'conda' and param.conda_env:
-            cmds.append(f"conda activate {param.conda_env}")
+            cmds.append(f"{param.conda_exe} activate {param.conda_env}")
         cmds.append(R_cmd)
         if param.method == 'conda' and param.conda_env:
-            cmds.append("conda deactivate")
+            cmds.append(f"{param.conda_exe} deactivate")
     call_kws = {}
     if param.method == 'conda':
         env = copy.copy(os.environ)
@@ -1770,6 +1787,38 @@ if __name__ == "__main__":
              {'action': 'store_true',
               'help': "Don't run tests as part of the build process."}),
         ])
+    # Install recipe
+    parser_rcp = subparsers.add_parser(
+        'install-recipe', help="Install a package from a conda recipe.")
+    SetupParam.add_parser_args(
+        parser_rcp,
+        skip=['target_os', 'use_mamba'],
+        skip_types=['install'],
+        include=['user'],
+        method_choices=['mamba', 'conda'],
+        method_default='mamba',
+        method_optional=True,
+        additional_args=[
+            (('--recipe', ),
+             {'type': str, 'default': 'recipe',
+              'help': "Location of conda recipe to build and install."}),
+            (('--packages', ),
+             {'nargs': '*',
+              'help': ("One or more packages to install from the "
+                       "recipe. Defaults to all of the package in the "
+                       "recipe.")}),
+            (('--dont-test', ),
+             {'action': 'store_true',
+              'help': "Don't run tests as part of the build process."}),
+            (('--varient-config-files', '-m'),
+             {'nargs': '+',
+              'help': "YAML files for varients that should be built."}),
+            (('--without-build', ),
+             {'action': 'store_true',
+              'help': ("Perform installation steps without building "
+                       "first (assuming the package was already "
+                       "built).")}),
+        ])
     # Installation verification
     parser_ver = subparsers.add_parser(
         'verify', help="Verify that the package was installed correctly.")
@@ -1834,7 +1883,9 @@ if __name__ == "__main__":
     elif args.operation == 'install-recipe':
         param = SetupParam.from_args(args, install_opts)
         install_conda_recipe(recipe=args.recipe, package=args.packages,
-                             param=param, dont_test=args.dont_test)
+                             param=param, dont_test=args.dont_test,
+                             varient_config_files=args.varient_config_files,
+                             without_build=args.without_build)
     elif args.operation == 'verify':
         param = SetupParam.from_args(args, install_opts)
         verify_pkg(install_opts=param.install_opts)

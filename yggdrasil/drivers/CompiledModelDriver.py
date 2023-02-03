@@ -1727,15 +1727,15 @@ class CompilerBase(CompilationToolBase):
             return tool.call(out_comp, out=out, additional_args=additional_objs,
                              **kwargs_link)
 
-    # @classmethod
-    # def init_asan_env(cls, out):
-    #     r"""Add environment variables to preload the ASAN libraries."""
-    #     if not (cls.asan_flags and cls.asan_libenv and cls.object_tool
-    #             and not platform._is_win):
-    #         return
-    #     lib = cls.asan_library()
-    #     if lib:
-    #         out[cls.asan_libenv] = lib
+    @classmethod
+    def init_asan_env(cls, out):
+        r"""Add environment variables to preload the ASAN libraries."""
+        if not (cls.asan_flags and cls.asan_libenv and cls.object_tool
+                and not platform._is_win):
+            return
+        lib = cls.asan_library()
+        if lib:
+            out[cls.asan_libenv] = lib
 
     @classmethod
     def asan_library(cls):
@@ -3438,11 +3438,7 @@ class CompiledModelDriver(ModelDriver):
 
         """
         compiler = cls.get_tool('compiler', toolname=toolname)
-        if hasattr(compiler, 'tool_version'):  # pragma: windows
-            return compiler.tool_version(**kwargs).strip()
-        kwargs['version_flags'] = compiler.version_flags
-        kwargs['skip_flags'] = True
-        return super(CompiledModelDriver, cls).language_version(**kwargs)
+        return compiler.tool_version(**kwargs).strip()
         
     def run_model(self, **kwargs):
         r"""Run the model. Unless overridden, the model will be run using
