@@ -861,7 +861,7 @@ class CModelDriver(CompiledModelDriver):
                 raise ValueError("Path to vcpkg root directory "
                                  "does not exist: %s." % vcpkg_dir)
             cfg.set(cls._language, 'vcpkg_dir', vcpkg_dir)
-        if cls._language == 'c':
+        if cls.language == 'c':
             if macos_sdkroot is None:
                 macos_sdkroot = cfg.get('c', 'macos_sdkroot', _osx_sysroot)
             if macos_sdkroot is not None:
