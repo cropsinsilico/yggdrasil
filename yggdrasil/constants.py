@@ -49,6 +49,33 @@ NUMPY_PRECISIONS = {
     'uint': [8, 16, 32, 64],
     'complex': [64, 128],
 }
+JSON_SIMPLE_TYPES = OrderedDict([
+    ("null", ""),
+    ("boolean", "true or false"),
+    ("string", "Arrays of characters"),
+    ("integer", "Integer numbers"),
+    ("number", "Integer or decimal numbers"),
+])
+JSON_CONTAINER_TYPES = OrderedDict([
+    ("array", "Container for sequences of values"),
+    ("object", "Container for mappings of key and value pairs"),
+])
+
+YGGDRASIL_TYPES = OrderedDict([
+    ("scalar", ("Scalar quantities that can have units, variables "
+                "precision, or an encoding (for unicode scalars)")),
+    ("ndarray", ("N-dimensional arrays of memory contiguous arrays of "
+                 "scalars")),
+    ("instance", "Python class instance"),
+    ("class", "Python class"),
+    ("function", "Python function"),
+    ("obj", "ObjWavefront 3D structure"),
+    ("ply", "Ply 3D structure"),
+    ("schema", "JSON schema"),
+])
+ALL_TYPES = OrderedDict()
+for x in [JSON_SIMPLE_TYPES, JSON_CONTAINER_TYPES, YGGDRASIL_TYPES]:
+    ALL_TYPES.update(x)
 try:
     # Not available on windows
     np.dtype('float128')

@@ -1083,7 +1083,8 @@ class CModelDriver(CompiledModelDriver):
                 x['datatype']['shape'] = [
                     int(float(s.strip('[]')))
                     for s in x.pop('shape').split('][')]
-                assert x['datatype']['subtype'] in constants.SCALAR_TYPES
+                assert x['datatype']['subtype'] in (constants.SCALAR_TYPES
+                                                    + ['string'])
                 if len(x['datatype']['shape']) == 1:
                     x['datatype']['length'] = x['datatype'].pop(
                         'shape')[0]
@@ -1379,7 +1380,8 @@ class CModelDriver(CompiledModelDriver):
             if nptr > 0:
                 if out['type'] == 'number':
                     out['type'] = 'float'
-                assert out['type'] in constants.SCALAR_TYPES
+                assert out['type'] in constants.SCALAR_TYPES + ['string',
+                                                                'length']
                 out['subtype'] = out['type']
                 out['type'] = '1darray'
         if out['type'] in constants.SCALAR_TYPES:

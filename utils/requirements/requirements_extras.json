@@ -24,6 +24,7 @@
   "docs": [
     "breathe",
     "pypandoc",
+    "r-rd2md",
     "sphinx",
     "sphinx-argparse",
     "sphinx_rtd_theme"

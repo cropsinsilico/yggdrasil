@@ -249,6 +249,7 @@ extras:
           os: win
         - method: conda_skip
     - pypandoc
+    - r-rd2md
     - r-roxygen2:
         method: conda
     - sphinx

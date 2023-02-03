@@ -1539,7 +1539,7 @@ class CommBase(tools.YggClass):
                 pandas.testing.assert_frame_equal(msg, emsg)
             else:
                 assert msg == emsg
-        except (AssertionError, ValueError):
+        except (AssertionError, ValueError, TypeError):
             return False
         return True
 

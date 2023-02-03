@@ -90,9 +90,9 @@ def write_datatype_mapping_table(**kwargs):
         str, list: Name of file or files created.
 
     """
-    from yggdrasil import tools, components
+    from yggdrasil import tools, components, constants
     kwargs.setdefault('fname_base', 'datatype_mapping_table.rst')
-    args = {}
+    args = {k: {} for k in constants.ALL_TYPES}
     # TODO: Find another way to add types
     # for k, v in _type_registry.items():
     #     if v.cross_language_support:
@@ -202,6 +202,7 @@ def write_datatype_table(table_type='all', **kwargs):
         ValueError: If table_type is not one of the supported values.
 
     """
+    from yggdrasil import constants
     table_type_list = ['simple', 'container', 'yggdrasil']
     if table_type == 'all':
         fname = kwargs.get("fname", None)
@@ -215,25 +216,17 @@ def write_datatype_table(table_type='all', **kwargs):
         raise ValueError("Unsupported table_type: '%s'" % table_type)
     fname_format = 'datatype_table_%s.rst'
     kwargs.setdefault('fname_base', fname_format % (table_type))
-    # target_types = []
+    target_types = []
     args = {}
-    # TODO: Find another way to add types
-    # if table_type == 'simple':
-    #     for k, v in _type_registry.items():
-    #         if v._replaces_existing and (not hasattr(v, '_container_type')):
-    #             target_types.append(k)
-    # elif table_type == 'container':
-    #     for k, v in _type_registry.items():
-    #         if v._replaces_existing and hasattr(v, '_container_type'):
-    #             target_types.append(k)
-    # elif table_type == 'yggdrasil':
-    #     for k, v in _type_registry.items():
-    #         if not v._replaces_existing:
-    #             target_types.append(k)
-    # for k in target_types:
-    #     v = _type_registry[k]
-    #     args[k] = {'description': v.description,
-    #                'required properties': v.definition_properties}
+    if table_type == 'simple':
+        target_types += constants.JSON_SIMPLE_TYPES
+    elif table_type == 'container':
+        target_types += constants.JSON_CONTAINER_TYPES
+    elif table_type == 'yggdrasil':
+        target_types += constants.YGGDRASIL_TYPES
+    for k in target_types:
+        args[k] = {'description': constants.ALL_TYPES[k]}
+        # 'required properties'?
     kwargs.setdefault('key_column_name', 'type')
     kwargs.setdefault('list_columns', 'required properties')
     lines = dict2table(args, **kwargs)

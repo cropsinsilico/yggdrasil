@@ -1035,18 +1035,24 @@ def safe_eval(statement, **kwargs):
 
     """
     safe_dict = {}
-    _safe_lists = {'math': ['acos', 'asin', 'atan', 'atan2', 'ceil', 'cos',
-                            'cosh', 'degrees', 'e', 'exp', 'fabs', 'floor', 'fmod',
-                            'frexp', 'hypot', 'ldexp', 'log', 'log10', 'modf', 'pi',
-                            'pow', 'radians', 'sin', 'sinh', 'sqrt', 'tan', 'tanh'],
-                   'builtins': ['abs', 'any', 'bool', 'bytes', 'float', 'int', 'len',
-                                'list', 'map', 'max', 'min', 'repr', 'set', 'str',
-                                'sum', 'tuple', 'type'],
-                   'numpy': ['array', 'int8', 'int16', 'int32', 'int64',
-                             'uint8', 'uint16', 'uint32', 'uint64',
-                             'float16', 'float32', 'float64'],
-                   'yggdrasil.units': ['get_data', 'add_units'],
-                   'rapidjson.units': ['Quantity', 'QuantityArray']}
+    _safe_lists = {
+        'math': [
+            'acos', 'asin', 'atan', 'atan2', 'ceil', 'cos',
+            'cosh', 'degrees', 'e', 'exp', 'fabs', 'floor', 'fmod',
+            'frexp', 'hypot', 'ldexp', 'log', 'log10', 'modf', 'pi',
+            'pow', 'radians', 'sin', 'sinh', 'sqrt', 'tan', 'tanh'],
+        'builtins': [
+            'abs', 'any', 'bool', 'bytes', 'float', 'int', 'len',
+            'list', 'map', 'max', 'min', 'repr', 'set', 'str',
+            'sum', 'tuple', 'type'],
+        'numpy': [
+            'array', 'int8', 'int16', 'int32', 'int64',
+            'uint8', 'uint16', 'uint32', 'uint64',
+            'float16', 'float32', 'float64'],
+        'yggdrasil.units': [
+            'get_data', 'add_units'],
+        'yggdrasil.rapidjson.units': [
+            'Quantity', 'QuantityArray']}
     for mod_name, func_list in _safe_lists.items():
         mod = importlib.import_module(mod_name)
         for func in func_list:

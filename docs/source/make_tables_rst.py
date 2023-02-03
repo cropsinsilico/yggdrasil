@@ -1,7 +1,5 @@
 import os
 from yggdrasil import doctools
-from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
-from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 from yggdrasil.drivers.ModelDriver import ModelDriver
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.drivers.CompiledModelDriver import (
@@ -10,8 +8,7 @@ from yggdrasil.drivers.CompiledModelDriver import (
 tables_dir = os.path.join(os.path.dirname(__file__), 'tables')
 dir_list = [tables_dir]
 class_list = [ModelDriver, InterpretedModelDriver, CompiledModelDriver,
-              CompilerBase, LinkerBase, ArchiverBase,
-              MetaschemaType, MetaschemaProperty]
+              CompilerBase, LinkerBase, ArchiverBase]
 
 
 for x in dir_list:

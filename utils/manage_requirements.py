@@ -1276,7 +1276,7 @@ class YggRequirement(object):
 
         """
         # print(self.name, not self.os_matches(param),
-        #       not self.method_selected(param)
+        #       not self.method_selected(param),
         #       not self.flags_selected(select_flags=select_flags,
         #                               deselect_flags=deselect_flags,
         #                               required_flags=required_flags),
