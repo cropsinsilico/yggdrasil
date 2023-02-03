@@ -1,7 +1,7 @@
 breathe
 doxygen          # [conda]
 pypandoc
-r-rd2md
+r-rd2md          # [conda]
 r-roxygen2       # [conda]
 sphinx
 sphinx-argparse
