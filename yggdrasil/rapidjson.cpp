@@ -1247,16 +1247,20 @@ struct PyHandler {
             PyMem_Free((void*) ctx.key);
 
         PyObject* mapping = ctx.object;
+	
+	bool isInstance = false;
+	if (yggdrasilInstance && stack.size() > 0)
+	    isInstance = (ctx.isObject == HandlerContextObjectFlagInstance);
         stack.pop_back();
 
         if (objectHook == NULL && decoderEndObject == NULL &&
-	    !(yggdrasilInstance && (ctx.isObject == HandlerContextObjectFlagInstance))) {
+	    !(yggdrasilInstance && isInstance)) {
             Py_DECREF(mapping);
             return true;
         }
 
-        PyObject* replacement;
-	if (yggdrasilInstance && (ctx.isObject == HandlerContextObjectFlagInstance)) {
+        PyObject* replacement = NULL;
+	if (yggdrasilInstance && isInstance) {
 	    // TODO: Replace when schema?
 	    replacement = dict2instance(mapping);
 	} else if (decoderEndObject != NULL) {
