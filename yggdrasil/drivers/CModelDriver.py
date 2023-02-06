@@ -41,6 +41,9 @@ def get_OSX_SYSROOT():
         cfg_sdkroot = ygg_cfg.get('c', 'macos_sdkroot', None)
         if cfg_sdkroot:
             fname_try.append(cfg_sdkroot)
+        if os.environ.get('SDKROOT', False):
+            fname_try.append(os.environ['SDKROOT'])
+            # fname_try.insert(0, os.environ['SDKROOT'])
         if xcode_dir is not None:
             fname_base = os.path.join(xcode_dir, 'Platforms',
                                       'MacOSX.platform', 'Developer',
@@ -49,8 +52,6 @@ def get_OSX_SYSROOT():
                 fname_base % os.environ.get('MACOSX_DEPLOYMENT_TARGET', ''),
                 fname_base % '',
                 os.path.join(xcode_dir, 'SDKs', 'MacOSX.sdk')]
-        if os.environ.get('SDKROOT', False):
-            fname_try.insert(0, os.environ['SDKROOT'])
         for fcheck in fname_try:
             if os.path.isdir(fcheck):
                 fname = fcheck
