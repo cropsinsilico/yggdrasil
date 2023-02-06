@@ -647,7 +647,10 @@ def locate_conda_bin(conda_env, use_mamba=False):
     if conda_env is None:
         conda_env = CONDA_ENV
     assert CONDA_ROOT
-    conda_prefix = os.path.join(CONDA_ROOT, 'envs')
+    if CONDA_ENV and CONDA_ROOT.endswith(CONDA_ENV):
+        conda_prefix = os.path.dirname(CONDA_ROOT)
+    else:
+        conda_prefix = os.path.join(CONDA_ROOT, 'envs')
     if sys.platform in ['win32', 'cygwin']:
         out = os.path.join(conda_prefix, conda_env, 'Scripts')
     else:
@@ -1470,10 +1473,11 @@ def install_pkg(method, param=None, without_build=False,
         if not param.install_opts['no_sudo']:
             R_cmd += ' --sudoR'
         if param.method == 'conda' and param.conda_env:
-            cmds.append(f"{param.conda_exe} activate {param.conda_env}")
+            R_exe = locate_conda_exe(param.conda_env, 'R',
+                                     use_mamba=param.use_mamba,
+                                     allow_missing=True)
+            R_cmd += f" --r-interpreter={R_exe}"
         cmds.append(R_cmd)
-        if param.method == 'conda' and param.conda_env:
-            cmds.append(f"{param.conda_exe} deactivate")
     call_kws = {}
     if param.method == 'conda':
         env = copy.copy(os.environ)
