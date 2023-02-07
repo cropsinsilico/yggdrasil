@@ -799,7 +799,7 @@ def get_install_opts(old=None, empty=False):
             'pygments': False,
             'omp': False,
             'docs': False,
-            # 'no_sudo': False,
+            'no_sudo': False,
             'mpi': False,
             'dev': False,
             'testing': False,
@@ -819,7 +819,7 @@ def get_install_opts(old=None, empty=False):
             'pygments': (os.environ.get('INSTALLPYGMENTS', '0') == '1'),
             'omp': (os.environ.get('INSTALLOMP', '0') == '1'),
             'docs': (os.environ.get('BUILDDOCS', '0') == '1'),
-            # 'no_sudo': False,
+            'no_sudo': False,
             'mpi': (os.environ.get('INSTALLMPI', '0') == '1'),
             'dev': False,
             'testing': True,
@@ -840,7 +840,7 @@ def get_install_opts(old=None, empty=False):
             'pygments': True,
             'omp': False,
             'docs': False,
-            # 'no_sudo': False,
+            'no_sudo': False,
             'mpi': False,
             'dev': False,
             'testing': True,
@@ -1768,6 +1768,9 @@ def setup_biocro_osr_integration(integration_dir, param=None,
         f"--osr-repository-path={integration_dir}/models/OpenSimRoot",
         "--disable-languages=matlab"]
     if _is_osx:
+        sudo_cmd = ''
+        if not param.install_opts['no_sudo']:
+            sudo_cmd = 'sudo '
         cmds += [
             'export MACOSX_DEPLOYMENT_TARGET=11.0',
             'export CONDA_BUILD_SYSROOT="$(xcode-select -p)/SDKs/'
@@ -1777,8 +1780,9 @@ def setup_biocro_osr_integration(integration_dir, param=None,
             '  curl -L -O https://github.com/phracker/MacOSX-SDKs/'
             'releases/download/11.0-11.1/MacOSX'
             '${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz',
-            '  sudo tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz '
-            '-C \"$(dirname \"$CONDA_BUILD_SYSROOT\")\"',
+            ('  ' + sudo_cmd
+             + 'tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz '
+             + '-C \"$(dirname \"$CONDA_BUILD_SYSROOT\")\"'),
             'fi',
         ]
         config_flags.append("--macos-sdkroot=$CONDA_BUILD_SYSROOT")
