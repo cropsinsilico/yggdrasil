@@ -903,7 +903,7 @@ class validate_yaml(SubCommand):
 class yggcc(SubCommand):
     r"""Compile a program."""
 
-    name = "compile"
+    name = "compile-model"
     help = ("Compile a program from source files for use in an "
             "yggdrasil integration.")
     arguments = [
@@ -959,7 +959,7 @@ class yggcc(SubCommand):
 class yggcompile(SubCommand):
     r"""Compile interface library/libraries."""
 
-    name = "compile-deps"
+    name = "compile"
     help = ("Compile yggdrasil dependency libraries. Existing "
             "libraries are first deleted.")
     arguments = [
@@ -1231,12 +1231,12 @@ class update_config(SubCommand):
         [(('languages', ),
           {'nargs': '*',
            # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
-           'default': [],
+           'default': ['all'],
            'help': 'One or more languages that should be configured.'}),
          (('--languages', ),
           {'nargs': '+', 'dest': 'languages_flag',
            # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
-           'default': [],
+           'default': ['all'],
            'help': 'One or more languages that should be configured.'}),
          (('--show-file', ),
           {'action': 'store_true',
