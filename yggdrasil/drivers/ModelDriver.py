@@ -1406,7 +1406,7 @@ class ModelDriver(Driver):
         return True
     
     @classmethod
-    def configure(cls, cfg):
+    def configure(cls, cfg, **kwargs):
         r"""Add configuration options for this language.
 
         Args:
@@ -1445,6 +1445,9 @@ class ModelDriver(Driver):
                 if cls.is_comm_installed(commtype=c, cfg=cfg, skip_config=True):
                     comms.append(c)
             cfg.set(cls.language, 'commtypes', comms)
+        for k in cls._config_keys:
+            if k in kwargs:
+                cfg.set(cls.language, k, kwargs[k])
         cls.after_registration(cls, cfg=cfg, second_pass=True)
         return out
 
