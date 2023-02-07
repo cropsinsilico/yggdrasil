@@ -132,10 +132,13 @@ class SetupParam(object):
             'default': None,
             'help': ("Conda or virtualenv environment that packages "
                      "should be installed in.")}),
-        ('--verbose', ['run'], {
+        (('--verbose', '-v'), ['run'], {
             'action': 'store_true',
             'help': "Turn up verbosity of output."}),
-        ('--always-yes', ['run'], {
+        (('--quiet', '-q'), ['run'], {
+            'action': 'store_true',
+            'help': "Turn off output."}),
+        (('--always-yes', '-y'), ['run'], {
             'action': 'store_true',
             'help': "Don't ask for user input to run commands."}),
         (('--only-python', '--python-only'), ['install'], {
@@ -231,10 +234,13 @@ class SetupParam(object):
             self.conda_flags_general += ' -y'
             # self.pip_flags += ' -y'
         if self.verbose:
-            # self.conda_flags += ' -vvv'
+            self.conda_flags += ' -v'
+            self.conda_flags_general += ' -v'
             self.pip_flags += ' --verbose'
-        else:
-            self.conda_flags += '-q'
+        elif self.quiet:
+            self.conda_flags += ' -q'
+            self.conda_flags_general += ' -q'
+            self.pip_flags += ' -q'
         if self.method.endswith('-dev'):
             self.method_base = self.method.split('-dev')[0]
             self.for_development = True
@@ -328,6 +334,8 @@ class SetupParam(object):
                     self.valid_methods.remove(k)
         # print(f"deps_method = {self.deps_method}, "
         #       f"valid_methods = {self.valid_methods}")
+        self.conda_flags = self.conda_flags.strip()
+        self.pip_flags = self.pip_flags.strip()
         self.conda_initialized = []
 
     @classmethod
@@ -526,10 +534,16 @@ def get_summary_commands(param=None, conda_env=None, **kwargs):
     """
     if param is None:
         param = SetupParam(conda_env=conda_env, **kwargs)
+    if param.quiet and not param.verbose:
+        return []
     if conda_env is None:
         conda_env = param.conda_env
-    out = [f"{param.python_cmd} --version",
-           f"{param.python_cmd} -m pip list"]
+    python_cmd = param.python_cmd
+    if conda_env != param.conda_env:
+        python_cmd = locate_conda_exe(conda_env, 'python',
+                                      use_mamba=param.use_mamba)
+    out = [f"{python_cmd} --version",
+           f"{python_cmd} -m pip list"]
     if CONDA_ENV:
         flags = ''
         if conda_env:
@@ -561,7 +575,7 @@ def call_conda_command(args, use_mamba=False, **kwargs):
 
 
 def call_script(lines, force_bash=False, verbose=False, dry_run=False,
-                call_kws=None):
+                call_kws=None, use_shell=False):
     r"""Write lines to a script and call it.
 
     Args:
@@ -574,6 +588,8 @@ def call_script(lines, force_bash=False, verbose=False, dry_run=False,
             commands. Defaults to False.
         call_kws (dict, optional): Keyword arguments that should be
             passed to the subprocess call.
+        use_shell (bool, optional): If True, execute as a shell and
+            source the script. Defaults to False.
 
     """
     # if _on_gha:
@@ -601,6 +617,8 @@ def call_script(lines, force_bash=False, verbose=False, dry_run=False,
             lines = [lines[0].split('#')[0].strip()]
         if verbose:
             for i in range(len(lines) - 1, 0, -1):
+                if lines[i].startswith(('if ', 'then', 'fi')):
+                    continue
                 line_str = lines[i].replace('"', '\\"')
                 lines.insert(i, f'echo "CALLING: {line_str}"')
         if _is_win and (not force_bash):  # pragma: windows
@@ -624,7 +642,11 @@ def call_script(lines, force_bash=False, verbose=False, dry_run=False,
             if _is_win:  # pragma: windows
                 call_cmd = [os.environ['COMSPEC'], '/c', 'call', fname]
             else:
-                call_cmd = ['./%s' % fname]
+                if use_shell:
+                    call_kws['shell'] = True
+                    call_cmd = f"bash -i {fname}"
+                else:
+                    call_cmd = [f'./{fname}']
                 os.chmod(fname, 0o755)
             subprocess.check_call(call_cmd, **call_kws)
         except subprocess.CalledProcessError:
@@ -680,10 +702,14 @@ def locate_conda_bin(conda_env, use_mamba=False):
         conda_prefix = os.path.dirname(CONDA_ROOT)
     else:
         conda_prefix = os.path.join(CONDA_ROOT, 'envs')
-    if sys.platform in ['win32', 'cygwin']:
-        out = os.path.join(conda_prefix, conda_env, 'Scripts')
+    if conda_env == 'base':
+        conda_prefix = os.path.dirname(conda_prefix)
     else:
-        out = os.path.join(conda_prefix, conda_env, 'bin')
+        conda_prefix = os.path.join(conda_prefix, conda_env)
+    if sys.platform in ['win32', 'cygwin']:
+        out = os.path.join(conda_prefix, 'Scripts')
+    else:
+        out = os.path.join(conda_prefix, 'bin')
     return out
 
 
@@ -889,11 +915,11 @@ def create_env(env_method, python, param=None, name=None, packages=None,
     #     packages.append('requests')
     existing_env = False
     if param.env_method in ('conda', 'mamba'):
-        if ((remove_existing
-             and conda_env_exists(name, use_mamba=param.use_mamba))):
-            cmds += [f"{param.conda_exe} env remove -n {name}"]
         existing_env = conda_env_exists(name, use_mamba=param.use_mamba)
-        if (((not param.dry_run) and existing_env)):
+        if remove_existing and existing_env:
+            cmds += [f"{param.conda_exe} env remove -n {name}"]
+            existing_env = False
+        if (not param.dry_run) and existing_env:
             print(f"Conda env with name '{name}' already exists.")
             if not populate:
                 return
@@ -902,8 +928,8 @@ def create_env(env_method, python, param=None, name=None, packages=None,
                                 return_commands=True,
                                 skip_update=(_is_win and _on_gha))
             cmds += [
-                (f"{param.conda_exe} create -q -n {name} python={python} "
-                 + ' '.join(packages))
+                (f"{param.conda_exe} create {param.conda_flags_general} "
+                 f"-n {name} python={python} {' '.join(packages)}")
             ]
     elif param.env_method == 'virtualenv':
         python_cmd = param.python_cmd
@@ -1197,7 +1223,7 @@ def setup_conda(param=None, return_commands=False, conda_env=None,
         flags_env += f" -n {conda_env}"
     conda_exe = param.conda_exe
     mamba_missing = (param.use_mamba
-                     and not (shutil.which('mamba')
+                     and not (True  # shutil.which('mamba')
                               or param.conda_initialized))
     if mamba_missing:
         conda_exe = param.conda_exe_config
@@ -1717,22 +1743,29 @@ def setup_biocro_osr_integration(integration_dir, param=None,
             SetupParam.
 
     """
+    if not os.path.isabs(integration_dir):
+        integration_dir = os.path.abspath(integration_dir)
     if param is None:
         param = SetupParam(**kwargs)
     cmds = []
+    config_flags = [
+        f"--osr-repository-path={integration_dir}/models/OpenSimRoot",
+        "--disable-languages=matlab"]
     if _is_osx:
         cmds += [
             'export MACOSX_DEPLOYMENT_TARGET=11.0',
             'export CONDA_BUILD_SYSROOT="$(xcode-select -p)/SDKs/'
             'MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk"',
-            'if [ ! -d "$CONDA_BUILD_SYSROOT" ]',
+            'if [ ! -d "$CONDA_BUILD_SYSROOT" -a ! -h "$CONDA_BUILD_SYSROOT" ]',
+            'then',
             '  curl -L -O https://github.com/phracker/MacOSX-SDKs/'
             'releases/download/11.0-11.1/MacOSX'
             '${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz',
             '  sudo tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz '
-            '-C "$(dirname "$CONDA_BUILD_SYSROOT")"',
+            '-C \"$(dirname \"$CONDA_BUILD_SYSROOT\")\"',
             'fi',
         ]
+        config_flags.append("--macos-sdkroot=$CONDA_BUILD_SYSROOT")
     if param.fallback_to_conda:
         cmds += setup_conda(param=param, return_commands=True,
                             conda_env='base')
@@ -1740,22 +1773,24 @@ def setup_biocro_osr_integration(integration_dir, param=None,
                        populate=True, allow_missing=allow_missing,
                        remove_existing=remove_existing,
                        return_commands=True)
-    if not os.path.isabs(integration_dir):
-        integration_dir = os.path.abspath(integration_dir)
     os.environ['PATH'] = os.pathsep.join([
         locate_conda_bin(param.conda_env, use_mamba=param.use_mamba),
         os.environ['PATH']])
+    if param.fallback_to_conda and param.conda_env:
+        # TODO: Activate venv?
+        cmds += [f"{param.conda_exe} activate {param.conda_env}"]
     cmds += [
-        f"{param.python_cmd} -m yggdrasil config"
-        f" --macos-sdkroot=$CONDA_BUILD_SYSROOT"
-        f" --osr-repository-path={integration_dir}/models/OpenSimRoot",
+        f"{param.python_cmd} -m yggdrasil config {' '.join(config_flags)}",
         f"{param.python_cmd} -m yggdrasil compile c cpp fortran osr",
-        f"cd {integration_dir}/models/biocro_mlm",
+        f"cd {integration_dir}/models/biocro-mlm",
         "rm src/*.o src/*.dylib src/*/*.o",
-        f"{param.python_cmd} -m yggdrasil compile ./"]
+        f"{param.python_cmd} -m yggdrasil compile ./",
+        f"cd {os.getcwd()}",
+        "ygginfo --verbose"]
     if return_commands:
         return cmds
-    call_script(cmds, verbose=param.verbose, dry_run=param.dry_run)
+    call_script(cmds, verbose=param.verbose, dry_run=param.dry_run,
+                use_shell=True)
 
 
 if __name__ == "__main__":
