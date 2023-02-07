@@ -194,6 +194,8 @@ class SetupParam(object):
                 setattr(self, k, kwargs.pop(k))
             else:
                 setattr(self, k, self.get_default(k))
+        if kwargs:
+            print(kwargs)
         assert not kwargs
         self.conda_flags_general = ''
         self.conda_flags = ''
@@ -533,7 +535,7 @@ def get_summary_commands(param=None, conda_env=None, **kwargs):
 
     """
     if param is None:
-        param = SetupParam(conda_env=conda_env, **kwargs)
+        param = SetupParam(env_name=conda_env, **kwargs)
     if param.quiet and not param.verbose:
         return []
     if conda_env is None:
@@ -914,11 +916,20 @@ def create_env(env_method, python, param=None, name=None, packages=None,
     #     # dependencies required by packages during testing
     #     packages.append('requests')
     existing_env = False
+    env_removed = False
     if param.env_method in ('conda', 'mamba'):
         existing_env = conda_env_exists(name, use_mamba=param.use_mamba)
         if remove_existing and existing_env:
-            cmds += [f"{param.conda_exe} env remove -n {name}"]
+            assert name != 'base'
+            env_dir = os.path.dirname(
+                locate_conda_bin(name, use_mamba=param.use_mamba))
+            cmds += [f"{param.conda_exe} env remove -n {name}",
+                     f"if [ -d {env_dir} ]",
+                     "then",
+                     f"  rm -rf {env_dir}",
+                     "fi"]
             existing_env = False
+            env_removed = True
         if (not param.dry_run) and existing_env:
             print(f"Conda env with name '{name}' already exists.")
             if not populate:
@@ -972,7 +983,8 @@ def create_env(env_method, python, param=None, name=None, packages=None,
                                 skip_update=(not existing_env))
         cmds += install_pkg(param.method, param=param,
                             return_commands=True,
-                            allow_missing=allow_missing)
+                            allow_missing=allow_missing,
+                            force_yggdrasil=env_removed)
     if return_commands:
         return cmds
     call_script(cmds, verbose=param.verbose, dry_run=param.dry_run)
@@ -1421,7 +1433,8 @@ def install_conda_build(package, param=None, return_commands=False,
 
 def install_pkg(method, param=None, without_build=False,
                 without_deps=False, install_deps_before=False,
-                return_commands=False, allow_missing=False, **kwargs):
+                return_commands=False, allow_missing=False,
+                force_yggdrasil=False, **kwargs):
     r"""Build and install the package and its dependencies on a CI
     resource.
 
@@ -1446,6 +1459,8 @@ def install_pkg(method, param=None, without_build=False,
         allow_missing (bool, optional): If True, requirements
             without valid options will be ignored. Defaults to
             False.
+        force_yggdrasil (bool, optional): Force installation of yggdrasil
+            reguardless of if it is already installed. Defaults to False.
         **kwargs: Additional keyword arguments are passed to
             SetupParam.
 
@@ -1521,15 +1536,16 @@ def install_pkg(method, param=None, without_build=False,
     else:  # pragma: debug
         raise ValueError(f"Invalid method: '{param.method}'")
     yggdrasil_installed = False
-    if param.method == 'conda':
-        try:
-            locate_conda_exe(param.conda_env, 'yggdrasil',
-                             use_mamba=param.use_mamba)
-            yggdrasil_installed = True
-        except AssertionError:
-            pass
-    else:
-        yggdrasil_installed = (locate_exe('yggdrasil') is not None)
+    if not force_yggdrasil:
+        if param.method == 'conda':
+            try:
+                locate_conda_exe(param.conda_env, 'yggdrasil',
+                                 use_mamba=param.use_mamba)
+                yggdrasil_installed = True
+            except AssertionError:
+                pass
+        else:
+            yggdrasil_installed = (locate_exe('yggdrasil') is not None)
     if yggdrasil_installed and not param.dry_run:
         cmds = []
     if not install_deps_before:
@@ -1547,8 +1563,8 @@ def install_pkg(method, param=None, without_build=False,
     if param.install_opts['r'] and _is_unix:
         # TODO: Fix location of R executable
         R_cmd = f"{param.python_cmd} -m yggdrasil install r"
-        if not param.install_opts['no_sudo']:
-            R_cmd += ' --sudoR'
+        # if not param.install_opts['no_sudo']:
+        #     R_cmd += ' --sudoR'
         if param.method == 'conda' and param.conda_env:
             R_exe = locate_conda_exe(param.conda_env, 'R',
                                      use_mamba=param.use_mamba,
@@ -1558,8 +1574,8 @@ def install_pkg(method, param=None, without_build=False,
     call_kws = {}
     if param.method == 'conda':
         env = copy.copy(os.environ)
-        if (not param.install_opts['no_sudo']) and param.install_opts['r']:
-            env['YGG_USE_SUDO_FOR_R'] = '1'
+        # if (not param.install_opts['no_sudo']) and param.install_opts['r']:
+        #     env['YGG_USE_SUDO_FOR_R'] = '1'
         src_dir = os.path.join(os.getcwd(),
                                os.path.dirname(os.path.dirname(__file__)))
         cmds += [
@@ -1752,6 +1768,9 @@ def setup_biocro_osr_integration(integration_dir, param=None,
         f"--osr-repository-path={integration_dir}/models/OpenSimRoot",
         "--disable-languages=matlab"]
     if _is_osx:
+        sudo_cmd = ''
+        if not param.install_opts['no_sudo']:
+            sudo_cmd = 'sudo '
         cmds += [
             'export MACOSX_DEPLOYMENT_TARGET=11.0',
             'export CONDA_BUILD_SYSROOT="$(xcode-select -p)/SDKs/'
@@ -1761,8 +1780,9 @@ def setup_biocro_osr_integration(integration_dir, param=None,
             '  curl -L -O https://github.com/phracker/MacOSX-SDKs/'
             'releases/download/11.0-11.1/MacOSX'
             '${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz',
-            '  sudo tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz '
-            '-C \"$(dirname \"$CONDA_BUILD_SYSROOT\")\"',
+            ('  ' + sudo_cmd
+             + 'tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz '
+             + '-C \"$(dirname \"$CONDA_BUILD_SYSROOT\")\"'),
             'fi',
         ]
         config_flags.append("--macos-sdkroot=$CONDA_BUILD_SYSROOT")
@@ -1783,7 +1803,10 @@ def setup_biocro_osr_integration(integration_dir, param=None,
         f"{param.python_cmd} -m yggdrasil config {' '.join(config_flags)}",
         f"{param.python_cmd} -m yggdrasil compile c cpp fortran osr",
         f"cd {integration_dir}/models/biocro-mlm",
-        "rm src/*.o src/*.dylib src/*/*.o",
+        "if [ -f \"src/BioCro.dylib\" ]",
+        "then",
+        "  rm src/*.o src/*.dylib src/*/*.o",
+        "fi",
         f"{param.python_cmd} -m yggdrasil compile ./",
         f"cd {os.getcwd()}",
         "ygginfo --verbose"]
