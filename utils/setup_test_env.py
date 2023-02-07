@@ -1223,7 +1223,7 @@ def setup_conda(param=None, return_commands=False, conda_env=None,
         flags_env += f" -n {conda_env}"
     conda_exe = param.conda_exe
     mamba_missing = (param.use_mamba
-                     and not (True  # shutil.which('mamba')
+                     and not (shutil.which('mamba')
                               or param.conda_initialized))
     if mamba_missing:
         conda_exe = param.conda_exe_config
