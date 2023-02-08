@@ -1882,7 +1882,7 @@ definitions:
             failure.
           type: string
         with_asan:
-          description: Compile with Clang ASAN.
+          description: Compile/link with the address sanitizer.
           type: boolean
         with_debugger:
           description: Debugger tool that should be used to run models. This string
@@ -2022,6 +2022,9 @@ definitions:
             items:
               type: string
             type: array
+          with_asan:
+            description: Compile/link with the address sanitizer.
+            type: boolean
         title: yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver
         type: object
       - additionalProperties: true
@@ -2072,7 +2075,7 @@ definitions:
               type: string
             type: array
           with_asan:
-            description: Compile with Clang ASAN.
+            description: Compile/link with the address sanitizer.
             type: boolean
         title: yggdrasil.drivers.CModelDriver.CModelDriver
         type: object
@@ -2126,7 +2129,7 @@ definitions:
               type: string
             type: array
           with_asan:
-            description: Compile with Clang ASAN.
+            description: Compile/link with the address sanitizer.
             type: boolean
         title: yggdrasil.drivers.CPPModelDriver.CPPModelDriver
         type: object
@@ -2228,6 +2231,9 @@ definitions:
             - f2003
             - f2008
             type: string
+          with_asan:
+            description: Compile/link with the address sanitizer.
+            type: boolean
         title: yggdrasil.drivers.FortranModelDriver.FortranModelDriver
         type: object
       - additionalProperties: true
@@ -2384,6 +2390,9 @@ definitions:
             items:
               type: string
             type: array
+          with_asan:
+            description: Compile/link with the address sanitizer.
+            type: boolean
         title: yggdrasil.drivers.MakeModelDriver.MakeModelDriver
         type: object
       - additionalProperties: true
