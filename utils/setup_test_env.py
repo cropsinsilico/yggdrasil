@@ -520,13 +520,18 @@ class SetupParam(object):
                     help=("Install %s" % k))
             
 
-def get_summary_commands(param=None, conda_env=None, **kwargs):
+def get_summary_commands(param=None, conda_env=None,
+                         allow_missing_python=False, **kwargs):
     r"""Get commands to use to summarize the state of the environment.
 
     Args:
-        use_mamba (bool, optional): If True, use mamba in place of conda.
         param (SetupParam, optional): Parameters controlling setup. If
             not provided, parameters will be generated from kwargs.
+        conda_env (str, optional): Conda environment to print a summary
+            of if different than the one provided by param.
+        allow_missing_python (bool, optional): If True, don't raise an
+            error if the Python executable cannot be located. Defaults
+            to False.
         **kwargs: Keyword arguments are passed to SetupParam if param
             is not provided.
 
@@ -543,9 +548,13 @@ def get_summary_commands(param=None, conda_env=None, **kwargs):
     python_cmd = param.python_cmd
     if conda_env != param.conda_env:
         python_cmd = locate_conda_exe(conda_env, 'python',
-                                      use_mamba=param.use_mamba)
-    out = [f"{python_cmd} --version",
-           f"{python_cmd} -m pip list"]
+                                      use_mamba=param.use_mamba,
+                                      allow_missing=allow_missing_python)
+        if allow_missing_python and not os.path.isfile(python_cmd):
+            python_cmd = None
+    if python_cmd:
+        out = [f"{python_cmd} --version",
+               f"{python_cmd} -m pip list"]
     if CONDA_ENV:
         flags = ''
         if conda_env:
@@ -765,8 +774,10 @@ def locate_conda_exe(conda_env, name, use_mamba=False,
     try:
         assert os.path.isfile(out)
     except AssertionError:
+        out_orig = out
         out = os.path.expanduser(os.path.join('~', '.conda', 'envs', name))
         if not os.path.isfile(out):
+            print(f"File missing: {out_orig}")
             raise
     return out
 
@@ -1251,7 +1262,8 @@ def setup_conda(param=None, return_commands=False, conda_env=None,
         cmds += get_summary_commands(param, conda_env=conda_env)
     if _on_gha and not (mamba_missing or param.conda_initialized):
         cmds += [f"{conda_exe} update {param.method_base} {flags} -n base"]
-        cmds += get_summary_commands(param=param, conda_env='base')
+        cmds += get_summary_commands(param=param, conda_env='base',
+                                     allow_missing_python=True)
     # To allow installation of an old version of conda
     # if not (param.use_mamba or param.conda_initialized):
     #     cmds += [
@@ -1570,13 +1582,13 @@ def install_pkg(method, param=None, without_build=False,
     if param.install_opts['r'] and _is_unix:
         # TODO: Fix location of R executable
         R_cmd = f"{param.python_cmd} -m yggdrasil install r"
-        if _on_gha and not param.install_opts['no_sudo']:
-            R_cmd += ' --sudoR'
-        if param.method == 'conda' and param.conda_env:
+        if param.method == 'conda':
             R_exe = locate_conda_exe(param.conda_env, 'R',
                                      use_mamba=param.use_mamba,
                                      allow_missing=True)
             R_cmd += f" --r-interpreter={R_exe}"
+        elif _on_gha and not param.install_opts['no_sudo']:
+            R_cmd += ' --sudoR'
         cmds.append(R_cmd)
     call_kws = {}
     if param.method == 'conda':
