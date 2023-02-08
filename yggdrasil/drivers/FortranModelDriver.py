@@ -467,15 +467,15 @@ class FortranModelDriver(CompiledModelDriver):
         return super(FortranModelDriver, self).compile_model(**kwargs)
 
     @classmethod
-    def get_internal_suffix(cls, commtype=None, disable_python=False):
+    def get_internal_suffix(cls, commtype=None, **kwargs):
         r"""Determine the suffix that should be used for internal libraries.
 
         Args:
             commtype (str, optional): If provided, this is the communication
                 type that should be used for the model. If None, the
                 default comm is used.
-            disable_python (bool, optional): If True, the Python C API will
-                be disabled. Defaults to False.
+            **kwargs: Additional keyword arguments will be passed to the
+                parent class's method.
 
         Returns:
             str: Suffix that should be added to internal libraries to
@@ -483,7 +483,7 @@ class FortranModelDriver(CompiledModelDriver):
 
         """
         out = super(FortranModelDriver, cls).get_internal_suffix(
-            commtype=commtype, disable_python=disable_python)
+            commtype=commtype, **kwargs)
         if commtype is None:
             commtype = tools.get_default_comm()
         out += '_%s' % commtype[:3].lower()

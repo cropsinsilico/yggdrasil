@@ -269,6 +269,8 @@ class YggRunner(YggClass):
             running. Defaults to False.
         with_debugger (str, optional): Tool (and any flags for the tool)
             that should be used to run models.
+        disable_python_c_api (bool, optional): If True, the Python C API will
+            be disabled. Defaults to False.
         with_asan (bool, optional): Compile and run all models with the
             address sanitizer. Defaults to False.
 
@@ -291,8 +293,10 @@ class YggRunner(YggClass):
                  as_service=False, complete_partial=False,
                  partial_commtype=None, production_run=False,
                  mpi_tag_start=None, yaml_param=None, validate=False,
-                 with_debugger=None, with_asan=False):
+                 with_debugger=None, disable_python_c_api=False,
+                 with_asan=False):
         kwargs_models = {'with_debugger': with_debugger,
+                         'disable_python_c_api': disable_python_c_api,
                          'with_asan': with_asan}
         self.mpi_comm = None
         name = 'runner'

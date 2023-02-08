@@ -1220,12 +1220,19 @@ def setup_conda(param=None, return_commands=False, conda_env=None,
     # Refresh channel
     # https://github.com/conda/conda/issues/8051
     if _on_gha:
+        # These commands will not be valid for mamba
+        # cmds += [
+        #     f"{param.conda_exe} install -n root conda=4.9",
+        #     f"{param.conda_exe_config} config --set "
+        #     f" allow_conda_downgrades true",
+        # ]
+        if 'defaults' in call_conda_command(
+                [param.conda_exe_config, 'config', '--get', 'channels'],
+                use_mamba=param.use_mamba):
+            cmds += [
+                f"{param.conda_exe_config} config --remove channels defaults",
+            ]
         cmds += [
-            # These commands will not be valid for mamba
-            # f"{param.conda_exe} install -n root conda=4.9",
-            # f"{param.conda_exe_config} config --set "
-            # f" allow_conda_downgrades true",
-            f"{param.conda_exe_config} config --remove channels defaults",
             f"{param.conda_exe_config} config --remove channels conda-forge",
             f"{param.conda_exe_config} config --prepend channels conda-forge",
         ]

@@ -237,9 +237,13 @@ class yggrun(SubCommand):
          {'type': str,
           'help': ('Run all models with a specific debuggin tool. If '
                    'quoted, this can also include flags for the tool.')}),
+        (('--disable-python-c-api', ),
+         {'action': 'store_true',
+          'help': 'Disable access to the Python C API from yggdrasil.'}),
         (('--with-asan', ),
          {'action': 'store_true',
-          'help': 'Compile models with the address sanitizer enabled.'})]
+          'help': 'Compile models with the address sanitizer enabled.'}),
+    ]
 
     @classmethod
     def add_arguments(cls, parser, **kwargs):
@@ -269,6 +273,7 @@ class yggrun(SubCommand):
                        mpi_tag_start=args.mpi_tag_start,
                        validate=args.validate,
                        with_debugger=args.with_debugger,
+                       disable_python_c_api=args.disable_python_c_api,
                        with_asan=args.with_asan)
 
 
@@ -500,9 +505,13 @@ class ygginfo(SubCommand):
                 (('--fullpath', ),
                  {'action': 'store_true',
                   'help': 'Get the full path to the tool exectuable.'}),
-                (('--disable-python', ),
+                (('--disable-python-c-api', ),
                  {'action': 'store_true',
-                  'help': 'Disable access to the Python C API from yggdrasil.'})],
+                  'help': 'Disable access to the Python C API from yggdrasil.'}),
+                (('--with-asan', ),
+                 {'action': 'store_true',
+                  'help': "Compile with Clang ASAN if available."}),
+            ],
             parsers=[
                 ArgumentParser(
                     name='compiler',
@@ -529,7 +538,8 @@ class ygginfo(SubCommand):
                     flags = drv.get_compiler_flags(
                         for_model=True, toolname=args.toolname,
                         dry_run=True, dont_link=True,
-                        disable_python=args.disable_python)
+                        disable_python_c_api=args.disable_python_c_api,
+                        with_asan=args.with_asan)
                     if '/link' in flags:  # pragma: windows
                         flags = flags[:flags.index('/link')]
                     for k in ['-c']:
@@ -545,7 +555,8 @@ class ygginfo(SubCommand):
                     flags = drv.get_linker_flags(
                         for_model=True, toolname=args.toolname,
                         dry_run=True, libtype=libtype,
-                        disable_python=args.disable_python)
+                        disable_python_c_api=args.disable_python_c_api,
+                        with_asan=args.with_asan)
                 out = ' '.join(flags)
                 if platform._is_win:  # pragma: windows:
                     out = out.replace('/', '-')
@@ -929,7 +940,7 @@ class yggcc(SubCommand):
         (('--Rpkg-language', ),
          {'help': ("Language that R package is written in "
                    "(only used if the specified language is R).")}),
-        (('--disable-python', ),
+        (('--disable-python-c-api', ),
          {'action': 'store_true',
           'help': 'Disable access to the Python C API from yggdrasil.'}),
         (('--with-asan', ),
@@ -949,7 +960,7 @@ class yggcc(SubCommand):
         drv = import_component('model', args.language)
         kws = {'toolname': args.toolname, 'flags': args.flags,
                'use_ccache': args.use_ccache,
-               'disable_python': args.disable_python,
+               'disable_python_c_api': args.disable_python_c_api,
                'with_asan': args.with_asan}
         if (args.language in ['r', 'R']) and args.Rpkg_language:
             kws['language'] = args.Rpkg_language
@@ -972,7 +983,7 @@ class yggcompile(SubCommand):
                    "or the directory containing an R package.")}),
         (('--toolname', ),
          {'help': "Name of compilation tool that should be used"}),
-        (('--disable-python', ),
+        (('--disable-python-c-api', ),
          {'action': 'store_true',
           'help': 'Disable access to the Python C API from yggdrasil.'}),
         (('--with-asan', ),
@@ -1018,14 +1029,15 @@ class yggcompile(SubCommand):
         for lang in list(languages):
             drv = import_component('model', lang)
             drv.cleanup_dependencies(
-                disable_python=args.disable_python)
+                disable_python_c_api=args.disable_python_c_api,
+                with_asan=args.with_asan)
             # Prevent language from being recompiled more than
             # once as a dependency
             for base_lang in drv.base_languages:
                 if base_lang in languages:
                     languages.remove(base_lang)
         kwargs = {'toolname': args.toolname,
-                  'disable_python': args.disable_python,
+                  'disable_python_c_api': args.disable_python_c_api,
                   'with_asan': args.with_asan}
         for lang in languages:
             drv = import_component('model', lang)
@@ -1143,9 +1155,13 @@ class cc_flags(cc_toolname):
         (('--toolname', ),
          {'default': None,
           'help': 'Name of the tool that associated flags be returned for.'}),
-        (('--disable-python', ),
+        (('--disable-python-c-api', ),
          {'action': 'store_true',
-          'help': 'Disable access to the Python C API from yggdrasil.'})]
+          'help': 'Disable access to the Python C API from yggdrasil.'}),
+        (('--with-asan', ),
+         {'action': 'store_true',
+          'help': "Compile with Clang ASAN if available."}),
+    ]
 
     @classmethod
     def parse_args(cls, *args, **kwargs):
@@ -1167,9 +1183,13 @@ class ld_flags(cc_toolname):
         (('--toolname', ),
          {'default': None,
           'help': 'Name of the tool that associated flags be returned for.'}),
-        (('--disable-python', ),
+        (('--disable-python-c-api', ),
          {'action': 'store_true',
-          'help': 'Disable access to the Python C API from yggdrasil.'})]
+          'help': 'Disable access to the Python C API from yggdrasil.'}),
+        (('--with-asan', ),
+         {'action': 'store_true',
+          'help': "Compile with Clang ASAN if available."}),
+    ]
 
     @classmethod
     def parse_args(cls, *args, **kwargs):
