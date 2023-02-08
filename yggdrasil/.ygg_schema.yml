@@ -1970,6 +1970,9 @@ definitions:
           description: Description of the model. This parameter is only used in the
             model repository or when providing the model as a service.
           type: string
+        disable_python_c_api:
+          description: If True, the Python C API will be disabled. Defaults to False.
+          type: boolean
         driver:
           deprecated: true
           description: '[DEPRECATED] Name of driver class that should be used.'
@@ -2156,7 +2159,7 @@ definitions:
         linker_flags:
           default: []
           description: Flags that should be passed to the linker during compilation.
-            If nto provided, the linker flags will be determined based on configuration
+            If not provided, the linker flags will be determined based on configuration
             options for the language (if present), the linker defaults, and the default_linker_flags
             class attribute.
           items:
@@ -2457,7 +2460,8 @@ definitions:
             failure.
           type: string
         with_asan:
-          description: Compile/link with the address sanitizer.
+          description: If True, the model will be compiled and linked with the address
+            sanitizer enabled (if there is one available for the selected compiler).
           type: boolean
         with_debugger:
           description: Debugger tool that should be used to run models. This string
@@ -2543,6 +2547,9 @@ definitions:
             description: Build type/configuration that should be built. Defaults to
               'Release'.
             type: string
+          disable_python_c_api:
+            description: If True, the Python C API will be disabled. Defaults to False.
+            type: boolean
           driver:
             deprecated: true
             description: '[DEPRECATED] Name of driver class that should be used.'
@@ -2584,7 +2591,7 @@ definitions:
           linker_flags:
             default: []
             description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
+              If not provided, the linker flags will be determined based on configuration
               options for the language (if present), the linker defaults, and the
               default_linker_flags class attribute.
             items:
@@ -2633,7 +2640,8 @@ definitions:
               type: string
             type: array
           with_asan:
-            description: Compile/link with the address sanitizer.
+            description: If True, the model will be compiled and linked with the address
+              sanitizer enabled (if there is one available for the selected compiler).
             type: boolean
         required:
         - language
@@ -2657,6 +2665,9 @@ definitions:
             items:
               type: string
             type: array
+          disable_python_c_api:
+            description: If True, the Python C API will be disabled. Defaults to False.
+            type: boolean
           driver:
             deprecated: true
             description: '[DEPRECATED] Name of driver class that should be used.'
@@ -2679,7 +2690,7 @@ definitions:
           linker_flags:
             default: []
             description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
+              If not provided, the linker flags will be determined based on configuration
               options for the language (if present), the linker defaults, and the
               default_linker_flags class attribute.
             items:
@@ -2694,7 +2705,8 @@ definitions:
               type: string
             type: array
           with_asan:
-            description: Compile/link with the address sanitizer.
+            description: If True, the model will be compiled and linked with the address
+              sanitizer enabled (if there is one available for the selected compiler).
             type: boolean
         required:
         - language
@@ -2718,6 +2730,9 @@ definitions:
             items:
               type: string
             type: array
+          disable_python_c_api:
+            description: If True, the Python C API will be disabled. Defaults to False.
+            type: boolean
           driver:
             deprecated: true
             description: '[DEPRECATED] Name of driver class that should be used.'
@@ -2742,7 +2757,7 @@ definitions:
           linker_flags:
             default: []
             description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
+              If not provided, the linker flags will be determined based on configuration
               options for the language (if present), the linker defaults, and the
               default_linker_flags class attribute.
             items:
@@ -2757,7 +2772,8 @@ definitions:
               type: string
             type: array
           with_asan:
-            description: Compile/link with the address sanitizer.
+            description: If True, the model will be compiled and linked with the address
+              sanitizer enabled (if there is one available for the selected compiler).
             type: boolean
         required:
         - language
@@ -2822,6 +2838,9 @@ definitions:
             items:
               type: string
             type: array
+          disable_python_c_api:
+            description: If True, the Python C API will be disabled. Defaults to False.
+            type: boolean
           driver:
             deprecated: true
             description: '[DEPRECATED] Name of driver class that should be used.'
@@ -2843,7 +2862,7 @@ definitions:
           linker_flags:
             default: []
             description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
+              If not provided, the linker flags will be determined based on configuration
               options for the language (if present), the linker defaults, and the
               default_linker_flags class attribute.
             items:
@@ -2865,7 +2884,8 @@ definitions:
             - f2008
             type: string
           with_asan:
-            description: Compile/link with the address sanitizer.
+            description: If True, the model will be compiled and linked with the address
+              sanitizer enabled (if there is one available for the selected compiler).
             type: boolean
         required:
         - language
@@ -2953,6 +2973,9 @@ definitions:
             items:
               type: string
             type: array
+          disable_python_c_api:
+            description: If True, the Python C API will be disabled. Defaults to False.
+            type: boolean
           driver:
             deprecated: true
             description: '[DEPRECATED] Name of driver class that should be used.'
@@ -2994,7 +3017,7 @@ definitions:
           linker_flags:
             default: []
             description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
+              If not provided, the linker flags will be determined based on configuration
               options for the language (if present), the linker defaults, and the
               default_linker_flags class attribute.
             items:
@@ -3048,7 +3071,8 @@ definitions:
               type: string
             type: array
           with_asan:
-            description: Compile/link with the address sanitizer.
+            description: If True, the model will be compiled and linked with the address
+              sanitizer enabled (if there is one available for the selected compiler).
             type: boolean
         required:
         - language
