@@ -79,22 +79,23 @@ class CCompilerBase(CompilerBase):
     search_regex = [r'(?:#include <...> search starts here:)|'
                     r'(?: ([^\n]+?)(?: \(framework directory\))?)\n']
 
-    @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration including things like platform dependent properties and
-        checking environment variables for default settings.
-        """
-        if platform._is_mac:
-            cls.linker_attributes = dict(cls.linker_attributes,
-                                         search_path_flags=['-Xlinker', '-v'],
-                                         search_regex=[r'\t([^\t\n]+)\n'],
-                                         search_regex_begin='Library search paths:')
-        elif platform._is_linux:
-            cls.linker_attributes = dict(cls.linker_attributes,
-                                         search_path_flags=['-Xlinker', '--verbose'],
-                                         search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
-        CompilerBase.before_registration(cls)
+    # This is only needed if one of the linkers is created from the compiler
+    # @staticmethod
+    # def before_registration(cls):
+    #     r"""Operations that should be performed to modify class attributes prior
+    #     to registration including things like platform dependent properties and
+    #     checking environment variables for default settings.
+    #     """
+    #     if platform._is_mac:
+    #         cls.linker_attributes = dict(cls.linker_attributes,
+    #                                      search_path_flags=['-Xlinker', '-v'],
+    #                                      search_regex=[r'\t([^\t\n]+)\n'],
+    #                                      search_regex_begin='Library search paths:')
+    #     elif platform._is_linux:
+    #         cls.linker_attributes = dict(cls.linker_attributes,
+    #                                      search_path_flags=['-Xlinker', '--verbose'],
+    #                                      search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
+    #     CompilerBase.before_registration(cls)
 
     @classmethod
     def set_env(cls, *args, **kwargs):
@@ -375,6 +376,8 @@ class GCCLinker(LDLinker):
     platforms = GCCCompiler.platforms
     default_executable = GCCCompiler.default_executable
     toolset = GCCCompiler.toolset
+    search_path_flags = ['-Xlinker', '--verbose']
+    search_regex = [r'SEARCH_DIR\("=([^"]+)"\);']
     flag_options = OrderedDict(LDLinker.flag_options,
                                **{'library_rpath': '-Wl,-rpath'})
 
