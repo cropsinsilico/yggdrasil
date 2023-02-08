@@ -262,7 +262,7 @@ jobs:
     - name: Re-run test failures (1st)
       timeout-minutes: 120
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=all
         --second-attempt
     - name: Run generated test script (1st)
       timeout-minutes: 120
@@ -273,7 +273,7 @@ jobs:
     - name: Re-run test script failures (1st)
       timeout-minutes: 120
       if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
     - name: Run tests (2nd)
       timeout-minutes: 120
       if: ${{ matrix.test-flags2 != '' }}
@@ -283,7 +283,7 @@ jobs:
     - name: Re-run test failures (2nd)
       timeout-minutes: 120
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=all
         --second-attempt
     - name: Run generated test script (2nd)
       timeout-minutes: 120
@@ -295,7 +295,7 @@ jobs:
     - name: Re-run test script failures (2nd)
       timeout-minutes: 120
       if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -580,7 +580,7 @@ jobs:
     - name: Re-run test failures (1st)
       timeout-minutes: 120
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=all
         --second-attempt
     - name: Run generated test script (1st)
       timeout-minutes: 120
@@ -591,7 +591,7 @@ jobs:
     - name: Re-run test script failures (1st)
       timeout-minutes: 120
       if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
     - name: Run tests (2nd)
       timeout-minutes: 120
       if: ${{ matrix.test-flags2 != '' }}
@@ -601,7 +601,7 @@ jobs:
     - name: Re-run test failures (2nd)
       timeout-minutes: 120
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=all
         --second-attempt
     - name: Run generated test script (2nd)
       timeout-minutes: 120
@@ -613,7 +613,7 @@ jobs:
     - name: Re-run test script failures (2nd)
       timeout-minutes: 120
       if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -870,7 +870,7 @@ jobs:
     - name: Re-run test failures (1st)
       timeout-minutes: 120
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=all
         --second-attempt
     - name: Run generated test script (1st)
       timeout-minutes: 120
@@ -881,7 +881,7 @@ jobs:
     - name: Re-run test script failures (1st)
       timeout-minutes: 120
       if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
     - name: Run tests (2nd)
       timeout-minutes: 120
       if: ${{ matrix.test-flags2 != '' }}
@@ -891,7 +891,7 @@ jobs:
     - name: Re-run test failures (2nd)
       timeout-minutes: 120
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=all
         --second-attempt
     - name: Run generated test script (2nd)
       timeout-minutes: 120
@@ -903,7 +903,7 @@ jobs:
     - name: Re-run test script failures (2nd)
       timeout-minutes: 120
       if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -1162,7 +1162,7 @@ jobs:
     - name: Re-run test failures (1st)
       timeout-minutes: 120
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=all
         --second-attempt
     - name: Run generated test script (1st)
       timeout-minutes: 120
@@ -1173,7 +1173,7 @@ jobs:
     - name: Re-run test script failures (1st)
       timeout-minutes: 120
       if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
     - name: Run tests (2nd)
       timeout-minutes: 120
       if: ${{ matrix.test-flags2 != '' }}
@@ -1183,7 +1183,7 @@ jobs:
     - name: Re-run test failures (2nd)
       timeout-minutes: 120
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=all
         --second-attempt
     - name: Run generated test script (2nd)
       timeout-minutes: 120
@@ -1195,7 +1195,7 @@ jobs:
     - name: Re-run test script failures (2nd)
       timeout-minutes: 120
       if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -1453,7 +1453,7 @@ jobs:
     - name: Re-run test failures (1st)
       timeout-minutes: 120
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=all
         --second-attempt
     - name: Run generated test script (1st)
       timeout-minutes: 120
@@ -1464,7 +1464,7 @@ jobs:
     - name: Re-run test script failures (1st)
       timeout-minutes: 120
       if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
     - name: Run tests (2nd)
       timeout-minutes: 120
       if: ${{ matrix.test-flags2 != '' }}
@@ -1474,7 +1474,7 @@ jobs:
     - name: Re-run test failures (2nd)
       timeout-minutes: 120
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=all
         --second-attempt
     - name: Run generated test script (2nd)
       timeout-minutes: 120
@@ -1486,7 +1486,7 @@ jobs:
     - name: Re-run test script failures (2nd)
       timeout-minutes: 120
       if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
