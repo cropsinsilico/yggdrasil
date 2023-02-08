@@ -168,6 +168,7 @@ class TestExampleTypes(base_class):
             using_generics, split_array, dont_add_lengths,
             length_prefix, example_module):
         r"""dict: Environment variables set for the test."""
+        with_asan = (language in ['c', 'c++', 'cpp'])
         kwargs = {}
         assign_kws = {}
         if language in ['c', 'c++', 'cpp']:
@@ -182,6 +183,8 @@ class TestExampleTypes(base_class):
         modelfile = os.path.join(os.path.dirname(__file__), example_name,
                                  'src', 'model' + language_ext)
         drv = import_component('model', language)
+        if with_asan:
+            drv.compile_dependencies(with_asan=True)
         if using_generics and drv.is_typed:
             testtype = {'type': 'any'}
         else:
@@ -228,7 +231,7 @@ class TestExampleTypes(base_class):
         env['TEST_LANGUAGE_EXT'] = language_ext
         env['TEST_TYPENAME'] = typename
         lines = []
-        if (language in ['c', 'cpp', 'c++', 'fortran']):
+        if with_asan:
             lines += ['with_asan: True']
         if (language in ['c', 'fortran']) and (not using_generics):
             yaml_fields['vars'] = True
