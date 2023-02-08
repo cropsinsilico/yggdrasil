@@ -4,7 +4,7 @@ import copy
 from yggdrasil import platform
 from yggdrasil.drivers.CModelDriver import (
     CCompilerBase, CModelDriver, GCCCompiler, ClangCompiler, MSVCCompiler,
-    ClangLinker)
+    GCCLinker, ClangLinker)
 
 
 class CPPCompilerBase(CCompilerBase):
@@ -55,6 +55,8 @@ class GPPCompiler(CPPCompilerBase, GCCCompiler):
     r"""Interface class for G++ compiler/linker."""
     toolname = 'g++'
     aliases = ['gnu-c++']
+    default_linker = 'g++'
+    is_linker = False
 
     @classmethod
     def get_flags(cls, skip_standard_flag=False, **kwargs):
@@ -156,9 +158,19 @@ class MSVCPPCompiler(CPPCompilerBase, MSVCCompiler):
         return MSVCCompiler.before_registration(cls)
 
 
+class GPPLinker(GCCLinker):
+    r"""Interface class for clang++ linker (calls to ld)."""
+    toolname = GPPCompiler.toolname
+    aliases = GPPCompiler.aliases
+    languages = GPPCompiler.languages
+    default_executable = GPPCompiler.default_executable
+    toolset = GPPCompiler.toolset
+
+
 class ClangPPLinker(ClangLinker):
     r"""Interface class for clang++ linker (calls to ld)."""
     toolname = ClangPPCompiler.toolname
+    aliases = ClangPPCompiler.aliases
     languages = ClangPPCompiler.languages
     default_executable = ClangPPCompiler.default_executable
     toolset = ClangPPCompiler.toolset

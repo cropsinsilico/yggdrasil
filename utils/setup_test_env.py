@@ -552,9 +552,10 @@ def get_summary_commands(param=None, conda_env=None,
                                       allow_missing=allow_missing_python)
         if allow_missing_python and not os.path.isfile(python_cmd):
             python_cmd = None
+    out = []
     if python_cmd:
-        out = [f"{python_cmd} --version",
-               f"{python_cmd} -m pip list"]
+        out += [f"{python_cmd} --version",
+                f"{python_cmd} -m pip list"]
     if CONDA_ENV:
         flags = ''
         if conda_env:

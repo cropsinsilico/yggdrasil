@@ -169,6 +169,12 @@ class OSRModelDriver(ExecutableModelDriver):
                 cwd = os.path.join(cwd, 'StaticBuild_win64')
             else:
                 cwd = os.path.join(cwd, 'StaticBuild')
+            flag_options = ''
+            for k in ['with_asan', 'disable_python_c_api']:
+                if kwargs.get(k, False):
+                    flag_options += f" --{k.replace('_', '-')}"
+            if flag_options:
+                env['YGG_OSR_FLAG_OPTIONS'] = flag_options.strip()
             if target != 'cleanygg':
                 for x in cls.base_languages:
                     base_cls = import_component('model', x)

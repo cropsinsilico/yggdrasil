@@ -152,12 +152,14 @@ class GCCCompiler(CCompilerBase):
     toolname = 'gcc'
     platforms = ['MacOS', 'Linux', 'Windows']
     default_archiver = 'ar'
-    linker_attributes = dict(
-        CCompilerBase.linker_attributes,
-        flag_options=OrderedDict(
-            list(LinkerBase.flag_options.items())
-            + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
-            + [('library_rpath', '-Wl,-rpath')]))
+    default_linker = 'gcc'
+    is_linker = False
+    # linker_attributes = dict(
+    #     CCompilerBase.linker_attributes,
+    #     flag_options=OrderedDict(
+    #         list(LinkerBase.flag_options.items())
+    #         + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
+    #         + [('library_rpath', '-Wl,-rpath')]))
     toolset = 'gnu'
     aliases = ['gnu-cc', 'gnu-gcc']
     asan_flags = ['-fsanitize=address']
@@ -354,15 +356,27 @@ class LDLinker(LinkerBase):
 
         """
         out = super(LDLinker, cls).tool_version(**kwargs)
-        if platform._is_mac:
-            regex = r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)'
-        else:
-            regex = (r'GNU ld \(GNU Binutils(?: for (?P<os>.+))?\) '
-                     r'(?P<version>\d+(?:\.\d+){0,2})')
-        match = re.search(regex, out)
+        for regex in [r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)',
+                      (r'GNU ld \(GNU Binutils(?: for (?P<os>.+))?\) '
+                       r'(?P<version>\d+(?:\.\d+){0,2})')]:
+            match = re.search(regex, out)
+            if match is not None:
+                break
         if match is None:  # pragma: debug
             raise RuntimeError(f"Could not locate version in string: {out}")
         return match.group('version')
+
+
+class GCCLinker(LDLinker):
+    r"""Interface class for gcc linker (calls to ld)."""
+    toolname = GCCCompiler.toolname
+    aliases = GCCCompiler.aliases
+    languages = GCCCompiler.languages
+    platforms = GCCCompiler.platforms
+    default_executable = GCCCompiler.default_executable
+    toolset = GCCCompiler.toolset
+    flag_options = OrderedDict(LDLinker.flag_options,
+                               **{'library_rpath': '-Wl,-rpath'})
 
 
 class ClangLinker(LDLinker):
