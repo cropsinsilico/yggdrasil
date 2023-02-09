@@ -1583,7 +1583,7 @@ def install_pkg(method, param=None, without_build=False,
     if param.install_opts['r'] and _is_unix:
         # TODO: Fix location of R executable
         R_cmd = f"{param.python_cmd} -m yggdrasil install r"
-        if param.method == 'conda':
+        if param.method_base == 'conda':
             R_exe = locate_conda_exe(param.conda_env, 'R',
                                      use_mamba=param.use_mamba,
                                      allow_missing=True)
@@ -1594,8 +1594,9 @@ def install_pkg(method, param=None, without_build=False,
     call_kws = {}
     if param.method == 'conda':
         env = copy.copy(os.environ)
-        if ((_on_gha and (not param.install_opts['no_sudo'])
-             and param.install_opts['r'])):
+        if ((_on_gha and param.install_opts['r']
+             and not (param.install_opts['no_sudo']
+                      or param.method_base == 'conda'))):
             env['YGG_USE_SUDO_FOR_R'] = '1'
         src_dir = os.path.join(os.getcwd(),
                                os.path.dirname(os.path.dirname(__file__)))

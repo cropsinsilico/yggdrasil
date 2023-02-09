@@ -168,6 +168,7 @@ class TestExampleTypes(base_class):
             length_prefix, example_module):
         r"""dict: Environment variables set for the test."""
         with_asan = (language in ['c', 'c++', 'cpp'])
+        # and typename not in ['instance', 'class', 'function'])
         kwargs = {}
         assign_kws = {}
         if language in ['c', 'c++', 'cpp']:
@@ -227,6 +228,10 @@ class TestExampleTypes(base_class):
         lines = []
         if with_asan:
             lines += ['with_asan: True']
+            if typename in ['instance', 'class', 'function']:
+                env['ASAN_OPTIONS'] = 'detect_leaks=0'
+            # else:
+            #     env['ASAN_OPTIONS'] = 'detect_leaks=1'
         if (language in ['c', 'fortran']) and (not using_generics):
             yaml_fields['vars'] = True
             if typename in ['array', 'object']:

@@ -185,6 +185,15 @@ int destroy_generic(generic_t* x);
 
 
 /*!
+  @brief Copy data from one generic object into another.
+  @param[in,out] dst Pointer to destination object.
+  @param[in] src Source object.
+  @returns int -1 if unsuccessful, 0 otherwise.
+*/
+int copy_generic_into(generic_t* dst, generic_t src);
+
+
+/*!
   @brief Copy data from one generic object to the other.
   @param[in] src generic_t Generic structure that data should be copied from.
   @returns generic_t Copied structure.
