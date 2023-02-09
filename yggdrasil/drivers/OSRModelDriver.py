@@ -51,7 +51,7 @@ class OSRModelDriver(ExecutableModelDriver):
     executable_type = 'dsl'
     language = 'osr'
     language_ext = '.xml'
-    base_languages = ['cpp']
+    base_languages = ['c++']
     interface_dependencies = ['make']
     repository = None
     executable_path = None
