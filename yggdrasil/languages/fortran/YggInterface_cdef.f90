@@ -752,13 +752,14 @@
        character(kind=c_char), dimension(*), intent(in) :: type
        type(c_ptr) :: out
      end function generic_array_get_item_c
-     function generic_array_get_item_nbytes_c(x, index) result(out) &
+     function generic_array_get_item_nbytes_c(x, index, type) result(out) &
           bind(c, name="generic_array_get_item_nbytes_f")
-       use, intrinsic :: iso_c_binding, only: c_size_t, c_int
+       use, intrinsic :: iso_c_binding, only: c_size_t, c_int, c_char
        import :: ygggeneric
        implicit none
        type(ygggeneric), value :: x
        integer(kind=c_size_t), value, intent(in) :: index
+       character(kind=c_char), dimension(*), intent(in) :: type
        integer(kind=c_int) :: out
      end function generic_array_get_item_nbytes_c
      function generic_array_get_scalar_c(x, index, subtype, precision) &
@@ -891,13 +892,14 @@
        character(kind=c_char), dimension(*), intent(in) :: type
        type(c_ptr) :: out
      end function generic_map_get_item_c
-     function generic_map_get_item_nbytes_c(x, key) result(out) &
+     function generic_map_get_item_nbytes_c(x, key, type) result(out) &
           bind(c, name="generic_map_get_item_nbytes_f")
        use, intrinsic :: iso_c_binding, only: c_char, c_int
        import :: ygggeneric
        implicit none
        type(ygggeneric), value :: x
        character(kind=c_char), dimension(*), intent(in) :: key
+       character(kind=c_char), dimension(*), intent(in) :: type
        integer(kind=c_int) :: out
      end function generic_map_get_item_nbytes_c
      function generic_map_get_scalar_c(x, key, subtype, precision) &

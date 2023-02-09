@@ -442,8 +442,8 @@ void* generic_array_get_item_f(generic_t x, const size_t index, const char *type
   return generic_array_get_item(x, index, type);
 }
 
-int generic_array_get_item_nbytes_f(generic_t x, const size_t index) {
-  return generic_array_get_item_nbytes(x, index);
+int generic_array_get_item_nbytes_f(generic_t x, const size_t index, const char* type) {
+  return generic_array_get_item_nbytes(x, index, type);
 }
 
 void* generic_array_get_scalar_f(generic_t x, const size_t index,
@@ -527,8 +527,8 @@ void* generic_map_get_item_f(generic_t x, const char* key,
   return generic_map_get_item(x, key, type);
 }
 
-int generic_map_get_item_nbytes_f(generic_t x, const char* key) {
-  return generic_map_get_item_nbytes(x, key);
+int generic_map_get_item_nbytes_f(generic_t x, const char* key, const char* type) {
+  return generic_map_get_item_nbytes(x, key, type);
 }
 
 void* generic_map_get_scalar_f(generic_t x, const char* key,

@@ -267,7 +267,7 @@ subroutine generic_array_get_bytes(x, index, out)
   type(c_ptr) :: c_out
   integer :: length, i
   c_out = generic_array_get_scalar(x, index, "bytes", 0)
-  length = generic_array_get_item_nbytes(x, index)
+  length = generic_array_get_item_nbytes(x, index, "bytes")
   call c_f_pointer(c_out, temp, [length])
   allocate(character(len=length) :: out)
   do i = 1, length
@@ -284,7 +284,7 @@ subroutine generic_array_get_unicode(x, index, out)
   type(c_ptr) :: c_out
   integer :: length, i
   c_out = generic_array_get_scalar(x, index, "unicode", 0)
-  length = generic_array_get_item_nbytes(x, index)/4
+  length = generic_array_get_item_nbytes(x, index, "unicode")/4
   call c_f_pointer(c_out, temp, [length])
   allocate(character(kind=ucs4, len=length) :: out)
   do i = 1, length
@@ -477,7 +477,7 @@ subroutine generic_array_get_1darray_bytes(x, index, out)
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
   c_length = generic_array_get_1darray(x, index, "bytes", 0, c_out_ptr)
-  nbytes = generic_array_get_item_nbytes(x, index)
+  nbytes = generic_array_get_item_nbytes(x, index, "bytes")
   precision = nbytes/int(c_length, kind=4)
   call c_f_pointer(c_out_ptr, temp_ptr)
   call c_f_pointer(temp_ptr, temp, [nbytes])
@@ -503,7 +503,7 @@ subroutine generic_array_get_1darray_unicode(x, index, out)
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
   c_length = generic_array_get_1darray(x, index, "unicode", 0, c_out_ptr)
-  nbytes = generic_array_get_item_nbytes(x, index)
+  nbytes = generic_array_get_item_nbytes(x, index, "unicode")
   precision = nbytes/(int(c_length, kind=4)*4)
   call c_f_pointer(c_out_ptr, temp_ptr)
   call c_f_pointer(temp_ptr, temp, [nbytes/4])
@@ -701,7 +701,7 @@ subroutine generic_array_get_ndarray_character(x, index, out)
   c_out_ptr = c_loc(c_out)
   out%shape => generic_array_get_ndarray(x, index, "bytes", 0, &
        c_out_ptr)
-  nbytes = generic_array_get_item_nbytes(x, index)
+  nbytes = generic_array_get_item_nbytes(x, index, "bytes")
   nelements = 1
   do i = 1, size(out%shape)
      nelements = nelements * out%shape(i)
@@ -733,7 +733,7 @@ subroutine generic_array_get_ndarray_bytes(x, index, out)
   c_out_ptr = c_loc(c_out)
   out%shape => generic_array_get_ndarray(x, index, "bytes", 0, &
        c_out_ptr)
-  nbytes = generic_array_get_item_nbytes(x, index)
+  nbytes = generic_array_get_item_nbytes(x, index, "bytes")
   nelements = 1
   do i = 1, size(out%shape)
      nelements = nelements * out%shape(i)
@@ -764,7 +764,7 @@ subroutine generic_array_get_ndarray_unicode(x, index, out)
   c_out_ptr = c_loc(c_out)
   out%shape => generic_array_get_ndarray(x, index, "unicode", 0, &
        c_out_ptr)
-  nbytes = generic_array_get_item_nbytes(x, index)
+  nbytes = generic_array_get_item_nbytes(x, index, "unicode")
   nelements = 1
   do i = 1, size(out%shape)
      nelements = nelements * out%shape(i)

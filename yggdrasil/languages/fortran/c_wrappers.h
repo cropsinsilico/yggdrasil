@@ -124,7 +124,7 @@ void display_python_f(python_t x);
 // Interface for getting generic array elements
 size_t generic_array_get_size_f(generic_t x);
 void* generic_array_get_item_f(generic_t x, const size_t index, const char *type);
-int generic_array_get_item_nbytes_f(generic_t x, const size_t index);
+int generic_array_get_item_nbytes_f(generic_t x, const size_t index, const char *type);
 void* generic_array_get_scalar_f(generic_t x, const size_t index,
 				 const char *subtype, const size_t precision);
 size_t generic_array_get_1darray_f(generic_t x, const size_t index,
@@ -137,7 +137,7 @@ size_t generic_map_get_size_f(generic_t x);
 void* generic_map_get_keys_f(generic_t x, void* n_keys_f, void* key_size_f);
 void* generic_map_get_item_f(generic_t x, const char* key,
 			   const char *type);
-int generic_map_get_item_nbytes_f(generic_t x, const char* key);
+int generic_map_get_item_nbytes_f(generic_t x, const char* key, const char *type);
 void* generic_map_get_scalar_f(generic_t x, const char* key,
 			     const char *subtype, const size_t precision);
 size_t generic_map_get_1darray_f(generic_t x, const char* key,

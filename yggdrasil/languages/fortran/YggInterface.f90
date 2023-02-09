@@ -3306,13 +3306,17 @@ contains
   !> @brief Get the size of an item from an array in bytes.
   !> @param[in] x Generic object that is presumed to contain an array.
   !> @param[in] index Index for value that the size should be returned for.
+  !> @param[in] typename Type of value expected.
   !> @returns Size of the item in bytes.
-  function generic_array_get_item_nbytes(x, index) result(out)
+  function generic_array_get_item_nbytes(x, index, typename) result(out)
     implicit none
     type(ygggeneric) :: x
     integer, intent(in) :: index
+    character(len=*), intent(in) :: typename
     integer(kind=c_int) :: out
-    out = generic_array_get_item_nbytes_c(x, int(index-1, c_size_t))
+    character(len=len_trim(typename)+1) :: c_typename
+    c_typename = trim(typename)//c_null_char
+    out = generic_array_get_item_nbytes_c(x, int(index-1, c_size_t), c_typename)
     if (out.lt.0) then
        stop "Error getting number of bytes in array item."
     end if
@@ -3581,15 +3585,19 @@ contains
   !> @brief Get the size of an item from a map in bytes.
   !> @param[in] x Generic object that is presumed to contain a map.
   !> @param[in] key Key for value that the size should be returned for.
+  !> @param[in] typename Type of value expected.
   !> @returns Size of the item in bytes.
-  function generic_map_get_item_nbytes(x, key) result(out)
+  function generic_map_get_item_nbytes(x, key, typename) result(out)
     implicit none
     type(ygggeneric) :: x
     character(len=*) :: key
+    character(len=*) :: typename
     integer(kind=c_int) :: out
     character(len=len_trim(key)+1) :: c_key
+    character(len=len_trim(typename)+1) :: c_typename
     c_key = trim(key)//c_null_char
-    out = generic_map_get_item_nbytes_c(x, c_key)
+    c_typename = trim(typename)//c_null_char
+    out = generic_map_get_item_nbytes_c(x, c_key, c_typename)
     if (out.lt.0) then
        stop "Error getting number of bytes in map item."
     end if

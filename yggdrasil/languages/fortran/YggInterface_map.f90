@@ -266,7 +266,7 @@ subroutine generic_map_get_bytes(x, key, out)
   type(c_ptr) :: c_out
   integer :: length, i
   c_out = generic_map_get_scalar(x, key, "bytes", 0)
-  length = generic_map_get_item_nbytes(x, key)
+  length = generic_map_get_item_nbytes(x, key, "bytes")
   call c_f_pointer(c_out, temp, [length])
   allocate(character(len=length) :: out)
   do i = 1, length
@@ -283,7 +283,7 @@ subroutine generic_map_get_unicode(x, key, out)
   type(c_ptr) :: c_out
   integer :: length, i
   c_out = generic_map_get_scalar(x, key, "unicode", 0)
-  length = generic_map_get_item_nbytes(x, key)/4
+  length = generic_map_get_item_nbytes(x, key, "unicode")/4
   call c_f_pointer(c_out, temp, [length])
   allocate(character(kind=ucs4, len=length) :: out)
   do i = 1, length
@@ -476,7 +476,7 @@ subroutine generic_map_get_1darray_bytes(x, key, out)
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
   c_length = generic_map_get_1darray(x, key, "bytes", 0, c_out_ptr)
-  nbytes = generic_map_get_item_nbytes(x, key)
+  nbytes = generic_map_get_item_nbytes(x, key, "bytes")
   precision = nbytes/int(c_length, kind=4)
   call c_f_pointer(c_out_ptr, temp_ptr)
   call c_f_pointer(temp_ptr, temp, [nbytes])
@@ -502,7 +502,7 @@ subroutine generic_map_get_1darray_unicode(x, key, out)
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
   c_length = generic_map_get_1darray(x, key, "unicode", 0, c_out_ptr)
-  nbytes = generic_map_get_item_nbytes(x, key)
+  nbytes = generic_map_get_item_nbytes(x, key, "unicode")
   precision = nbytes/(int(c_length, kind=4)*4)
   call c_f_pointer(c_out_ptr, temp_ptr)
   call c_f_pointer(temp_ptr, temp, [nbytes/4])
@@ -700,7 +700,7 @@ subroutine generic_map_get_ndarray_character(x, key, out)
   c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "bytes", 0, &
        c_out_ptr)
-  nbytes = generic_map_get_item_nbytes(x, key)
+  nbytes = generic_map_get_item_nbytes(x, key, "bytes")
   nelements = 1
   do i = 1, size(out%shape)
      nelements = nelements * out%shape(i)
@@ -732,7 +732,7 @@ subroutine generic_map_get_ndarray_bytes(x, key, out)
   c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "bytes", 0, &
        c_out_ptr)
-  nbytes = generic_map_get_item_nbytes(x, key)
+  nbytes = generic_map_get_item_nbytes(x, key, "bytes")
   nelements = 1
   do i = 1, size(out%shape)
      nelements = nelements * out%shape(i)
@@ -763,7 +763,7 @@ subroutine generic_map_get_ndarray_unicode(x, key, out)
   c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "unicode", 0, &
        c_out_ptr)
-  nbytes = generic_map_get_item_nbytes(x, key)
+  nbytes = generic_map_get_item_nbytes(x, key, "unicode")
   nelements = 1
   do i = 1, size(out%shape)
      nelements = nelements * out%shape(i)
