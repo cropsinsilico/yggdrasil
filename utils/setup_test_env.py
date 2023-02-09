@@ -6,7 +6,6 @@ import pprint
 import shutil
 import subprocess
 import difflib
-import copy
 from datetime import datetime
 PYVER = ('%s.%s' % sys.version_info[:2])
 PY2 = (sys.version_info[0] == 2)
@@ -339,6 +338,7 @@ class SetupParam(object):
         self.conda_flags = self.conda_flags.strip()
         self.pip_flags = self.pip_flags.strip()
         self.conda_initialized = []
+        self.call_kws = {}
 
     @classmethod
     def find_args(cls, x):
@@ -587,7 +587,7 @@ def call_conda_command(args, use_mamba=False, **kwargs):
 
 
 def call_script(lines, force_bash=False, verbose=False, dry_run=False,
-                call_kws=None, use_shell=False):
+                call_kws=None, use_shell=False, param=None):
     r"""Write lines to a script and call it.
 
     Args:
@@ -604,6 +604,10 @@ def call_script(lines, force_bash=False, verbose=False, dry_run=False,
             source the script. Defaults to False.
 
     """
+    if param is not None:
+        verbose = param.verbose
+        dry_run = param.dry_run
+        call_kws = param.call_kws
     # if _on_gha:
     verbose = True
     if call_kws is None:
@@ -1451,6 +1455,59 @@ def install_conda_build(package, param=None, return_commands=False,
     return cmds
 
 
+def config_pkg(param=None, return_commands=False, allow_missing=False,
+               **kwargs):
+    r"""Configure yggdrasil after installation.
+
+    Args:
+        param (SetupParam, optional): Parameters defining setup. If
+            not provided, one will be created from kwargs.
+        return_commands (bool, optional): If True, the commands
+            necessary to install the package are returned instead of
+            running them. Defaults to False.
+        allow_missing (bool, optional): If True, allow for missing
+            executables under the assumption that these commands will
+            only be called after the executable is installed. Defaults
+            to False.
+        **kwargs: Additional keyword arguments are passed to
+            SetupParam.
+    
+    """
+    if param is None:
+        param = SetupParam(method, **kwargs)
+    cmds = []
+    install_flags = ''
+    if param.install_opts['r']:
+        if param.method_base == 'conda':
+            R_exe = locate_conda_exe(param.conda_env, 'R',
+                                     use_mamba=param.use_mamba,
+                                     allow_missing=True)
+            install_flags += f" --r-interpreter={R_exe}"
+        elif _on_gha and _is_unix and not param.install_opts['no_sudo']:
+            install_flags += ' --sudoR'
+    install_called = False
+    if _on_ci or param.for_development:
+        coverage_flags = ''
+        if _on_ci:
+            coverage_flags += " --from-env"
+        else:
+            install_called = True
+            coverage_flags += install_flags
+        src_dir = os.path.dirname(os.path.dirname(__file__))
+        if not os.path.isabs(src_dir):
+            src_dir = os.path.abs(src_dir)
+        cmds += [
+            f"cd {src_dir}",
+            f"{param.python_cmd} create_coveragerc.py {coverage_flags}",
+            f"cd {os.getcwd()}"]
+    if not install_called:
+        cmds += [f"{param.python_cmd} yggdrasil install{install_flags}"]
+    if return_commands:
+        return cmds
+    call_script(cmds, param=param)
+    return cmds
+
+
 def install_pkg(method, param=None, without_build=False,
                 without_deps=False, install_deps_before=False,
                 return_commands=False, allow_missing=False,
@@ -1550,7 +1607,6 @@ def install_pkg(method, param=None, without_build=False,
         cmds += [
             f"{param.python_cmd} -m pip install"
             f" {param.pip_flags} {build_dist}",
-            f"{param.python_cmd} create_coveragerc.py"
         ]
         cmds += summary_cmds
     else:  # pragma: debug
@@ -1579,36 +1635,11 @@ def install_pkg(method, param=None, without_build=False,
             f"cd {_pkg_dir}",
             f"{param.python_cmd} -m pip install --editable {src}",
             f"cd {os.getcwd()}"]
-    # Follow up if on Unix as R installation may require sudo
-    if param.install_opts['r'] and _is_unix:
-        # TODO: Fix location of R executable
-        R_cmd = f"{param.python_cmd} -m yggdrasil install r"
-        if param.method_base == 'conda':
-            R_exe = locate_conda_exe(param.conda_env, 'R',
-                                     use_mamba=param.use_mamba,
-                                     allow_missing=True)
-            R_cmd += f" --r-interpreter={R_exe}"
-        elif _on_gha and not param.install_opts['no_sudo']:
-            R_cmd += ' --sudoR'
-        cmds.append(R_cmd)
-    call_kws = {}
-    if param.method == 'conda':
-        env = copy.copy(os.environ)
-        if ((_on_gha and param.install_opts['r']
-             and not (param.install_opts['no_sudo']
-                      or param.method_base == 'conda'))):
-            env['YGG_USE_SUDO_FOR_R'] = '1'
-        src_dir = os.path.join(os.getcwd(),
-                               os.path.dirname(os.path.dirname(__file__)))
-        cmds += [
-            f"cd {src_dir}",
-            f"{param.python_cmd} create_coveragerc.py",
-            f"cd {os.getcwd()}"]
-        call_kws['env'] = env
+    cmds += config_pkg(param=param, return_commands=True,
+                       allow_missing=False)
     if return_commands:
         return cmds
-    call_script(cmds, verbose=param.verbose, dry_run=param.dry_run,
-                call_kws=call_kws)
+    call_script(cmds, param=param)
 
 
 def verify_pkg(install_opts=None):
